@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
 class Car {
   constructor(x, y, width, height) {
     this.x = x;
