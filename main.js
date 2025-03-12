@@ -27,7 +27,7 @@ function generateCars(n) {
   return cars;
 }
 
-const N = 1;
+const N = 100;
 const cars = generateCars(N);
 
 let bestCar = cars[0];
@@ -75,10 +75,10 @@ function animate(time) {
 
   carCtx.globalAlpha = 0.2;
   for (let i = 0; i < cars.length; i++) {
-    cars[i].draw(carCtx, 'blue');
+    cars[i].draw(carCtx);
   }
   carCtx.globalAlpha = 1;
-  bestCar.draw(carCtx, 'blue', true);
+  bestCar.draw(carCtx, true);
 
   carCtx.restore();
 
