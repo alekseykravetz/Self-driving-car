@@ -1,9 +1,11 @@
 class Car {
-  constructor(x, y, width, height, controlType, maxSpeed = 3) {
+  constructor(x, y, width, height, controlType, maxSpeed = 3, color = 'blue') {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+
+    this.color = color;
 
     this.speed = 0;
     this.acceleration = 0.2;
@@ -123,11 +125,11 @@ class Car {
     this.y -= this.speed;
   }
 
-  draw(ctx, color, drawSensor = false) {
+  draw(ctx, drawSensor = false) {
     if (this.damaged) {
       ctx.fillStyle = 'gray';
     } else {
-      ctx.fillStyle = color;
+      ctx.fillStyle = this.color;
     }
 
     ctx.beginPath();
