@@ -1,5 +1,5 @@
 class Road {
-  constructor(x, width, laneCount = 3) {
+  constructor(x, width, laneCount = constants.roadLaneCount) {
     this.x = x;
     this.width = width;
     this.laneCount = laneCount;
@@ -30,7 +30,7 @@ class Road {
 
   draw(ctx) {
     ctx.lineWidth = 5;
-    ctx.strokeStyle = '#FFFFFF';
+    ctx.strokeStyle = 'white';
 
     for (let i = 1; i <= this.laneCount - 1; i++) {
       const x = lerp(this.left, this.right, i / this.laneCount);
