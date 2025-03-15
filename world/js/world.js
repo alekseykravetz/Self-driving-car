@@ -64,7 +64,7 @@ class World {
       // Check if tree too close to other trees
       if (keep) {
         for (const tree of trees) {
-          if (distance(tree, point) < this.treeSize) {
+          if (distance(tree.center, point) < this.treeSize) {
             keep = false;
             break;
           }
@@ -84,7 +84,7 @@ class World {
       }
 
       if (keep) {
-        trees.push(point);
+        trees.push(new Tree(point, this.treeSize));
         tryCount = 0;
       }
       tryCount++;
@@ -143,7 +143,7 @@ class World {
     return bases;
   }
 
-  draw(ctx) {
+  draw(ctx, viewPoint) {
     for (const envelope of this.envelopes) {
       envelope.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
     }
@@ -155,7 +155,7 @@ class World {
     }
 
     for (const tree of this.trees) {
-      tree.draw(ctx, { size: this.treeSize, color: 'rgba(0,0,0,0.5)' });
+      tree.draw(ctx, viewPoint);
     }
     for (const building of this.buildings) {
       building.draw(ctx);
