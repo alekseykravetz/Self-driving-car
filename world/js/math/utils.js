@@ -2,21 +2,25 @@ function getNearestPoint(location, points, threshold = Number.MAX_SAFE_INTEGER) 
   let minDistance = Number.MAX_SAFE_INTEGER;
   let nearestPoint = null;
   for (const point of points) {
-    const distance = getDistance(location, point);
-    if (distance < minDistance && distance < threshold) {
-      minDistance = distance;
+    const dist = distance(location, point);
+    if (dist < minDistance && dist < threshold) {
+      minDistance = dist;
       nearestPoint = point;
     }
   }
   return nearestPoint;
 }
 
-function getDistance(p1, p2) {
+function distance(p1, p2) {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
 function average(p1, p2) {
   return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+}
+
+function dot(p1, p2) {
+  return p1.x * p2.x + p1.y * p2.y;
 }
 
 function add(p1, p2) {
@@ -29,6 +33,14 @@ function subtract(p1, p2) {
 
 function scale(p, scaler) {
   return new Point(p.x * scaler, p.y * scaler);
+}
+
+function normalize(p) {
+  return scale(p, 1 / magnitude(p));
+}
+
+function magnitude(p) {
+  return Math.hypot(p.x, p.y);
 }
 
 function translate(location, angle, offset) {
@@ -44,7 +56,8 @@ function getIntersection(a, b, c, d) {
   const uTop = (c.y - a.y) * (a.x - b.x) - (c.x - a.x) * (a.y - b.y);
   const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
 
-  if (bottom != 0) {
+  const epsilon = 0.001;
+  if (Math.abs(bottom) > epsilon) {
     const t = tTop / bottom;
     const u = uTop / bottom;
 
