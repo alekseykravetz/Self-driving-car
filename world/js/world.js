@@ -38,14 +38,17 @@ class World {
   #generateTrees() {
     const points = [
       ...this.roadBorders.map((segment) => [segment.p1, segment.p2]).flat(),
-      ...this.buildings.map((building) => building.points).flat(),
+      ...this.buildings.map((building) => building.base.points).flat(),
     ];
     const left = Math.min(...points.map((point) => point.x));
     const right = Math.max(...points.map((point) => point.x));
     const top = Math.min(...points.map((point) => point.y));
     const bottom = Math.max(...points.map((point) => point.y));
 
-    const illegalPolygons = [...this.buildings, ...this.envelopes.map((envelope) => envelope.polygon)];
+    const illegalPolygons = [
+      ...this.buildings.map((building) => building.base),
+      ...this.envelopes.map((envelope) => envelope.polygon),
+    ];
 
     const trees = [];
     let tryCount = 0;
@@ -140,7 +143,7 @@ class World {
         }
       }
     }
-    return bases;
+    return bases.map((b) => new Building(b));
   }
 
   draw(ctx, viewPoint) {
@@ -154,11 +157,8 @@ class World {
       segment.draw(ctx, { color: 'white', width: 4 });
     }
 
-    for (const tree of this.trees) {
-      tree.draw(ctx, viewPoint);
-    }
-    for (const building of this.buildings) {
-      building.draw(ctx);
-    }
+    const items = [...this.buildings, ...this.trees];
+    items.sort((a, b) => b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint));
+    for (const item of items) item.draw(ctx, viewPoint);
   }
 }
