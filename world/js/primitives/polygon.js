@@ -7,6 +7,10 @@ class Polygon {
     }
   }
 
+  static load(info) {
+    return new Polygon(info.points.map((point) => new Point(point.x, point.y)));
+  }
+
   static union(polygons) {
     Polygon.multiBreak(polygons);
     const keptSegments = [];
