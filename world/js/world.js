@@ -204,12 +204,14 @@ class World {
       segment.draw(ctx, { color: 'white', width: 4 });
     }
 
-    gameCtx.globalAlpha = 0.2;
+    ctx.globalAlpha = 0.2;
     for (const car of this.cars) {
-      car.draw(gameCtx);
+      car.draw(ctx);
     }
-    gameCtx.globalAlpha = 1;
-    this.bestCar.draw(gameCtx, true);
+    ctx.globalAlpha = 1;
+    if (this.bestCar) {
+      this.bestCar.draw(ctx, true);
+    }
 
     const items = [...this.buildings, ...this.trees];
     items.sort((a, b) => b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint));
