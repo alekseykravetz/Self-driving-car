@@ -16,7 +16,8 @@ class MarkingEditor {
 
   // to be overwritten
   createMarking(center, directionVector) {
-    return center;
+    return new Marking(center, directionVector, world.roadWidth, world.roadWidth);
+    // return center;
   }
 
   enable() {

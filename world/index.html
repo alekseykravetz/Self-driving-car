@@ -18,17 +18,18 @@
       </label>
       <button onclick="openOsmPanel()">🗺</button>
       &nbsp;
-      <button id="graphBtn" onclick="setMode('graph')">🕸</button>
+      <button id="graphBtn" onclick="setMode('graph')">🌐</button>
+      <button id="markingBtn" onclick="setMode('marking')">🔲</button>
+      <button id="startBtn" onclick="setMode('start')">🚙</button>
+      <button id="targetBtn" onclick="setMode('target')">🎯</button>
       <button id="stopBtn" onclick="setMode('stop')">🛑</button>
       <button id="crossingBtn" onclick="setMode('crossing')">🚶‍➡️</button>
-      <button id="startBtn" onclick="setMode('start')">🚙</button>
       <button id="parkingBtn" onclick="setMode('parking')">🅿️</button>
-      <button id="targetBtn" onclick="setMode('target')">🎯</button>
 
       <div id="osmPanel" style="display: none">
         <textarea id="osmDataContainer" rows="10" cols="50" placeholder="Paste OSM data here"></textarea>
         <div>
-          <button onclick="parseOsmData()">✔️</button>
+          <button onclick="parseOsmData()">✅</button>
           <button onclick="closeOsmPanel()">❌</button>
         </div>
       </div>
@@ -75,6 +76,7 @@
 
       const tools = {
         graph: { button: graphBtn, editor: new GraphEditor(viewport, graph) },
+        marking: { button: markingBtn, editor: new MarkingEditor(viewport, world, graph.segments) },
         stop: { button: stopBtn, editor: new StopEditor(viewport, world) },
         crossing: { button: crossingBtn, editor: new CrossingEditor(viewport, world) },
         start: { button: startBtn, editor: new StartEditor(viewport, world) },

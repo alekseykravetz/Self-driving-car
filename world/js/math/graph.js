@@ -55,7 +55,6 @@ class Graph {
   }
 
   addSegment(segment) {
-    console.log('addSegment', segment);
     this.segments.push(segment);
   }
 
