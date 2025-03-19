@@ -1,0 +1,6628 @@
+{
+    "version": 0.6,
+    "generator": "Overpass API 0.7.62.5 1bd436f1",
+    "osm3s": {
+      "timestamp_osm_base": "2025-03-19T13:41:14Z",
+      "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+    },
+    "elements": [
+  
+  {
+    "type": "way",
+    "id": 36836803,
+    "nodes": [
+      688358129,
+      1395072631,
+      1197699761
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "ניסן",
+      "name:en": "Nisan",
+      "name:he": "ניסן"
+    }
+  },
+  {
+    "type": "way",
+    "id": 36951450,
+    "nodes": [
+      1474466937,
+      8850049259,
+      1474467341,
+      429661629,
+      2132597671,
+      429661628
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "3",
+      "name": "אקסודוס",
+      "name:en": "Exodus",
+      "name:en1": "Ana Frank",
+      "name:en2": "Anne Frank",
+      "name:he": "אקסודוס",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 36951452,
+    "nodes": [
+      9265988070,
+      1474467043,
+      1474467193,
+      1474467229,
+      9265988056
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 46045725,
+    "nodes": [
+      2247744399,
+      1344792948,
+      3485984929,
+      3485984643,
+      1617058815,
+      390440023,
+      2127251969,
+      390440024,
+      390440025,
+      1345736426,
+      3708142667,
+      390440026,
+      390440027,
+      390440028,
+      2127251966,
+      390440029,
+      6025530418,
+      390440030,
+      11613689429
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 54039981,
+    "nodes": [
+      688365054,
+      2145620083,
+      688365055,
+      3924172728,
+      4260308988,
+      4260304678,
+      2145620312,
+      1395072238,
+      691278176,
+      3924172670,
+      1474467186,
+      2145620427,
+      2145620219,
+      11157716200,
+      11157716201,
+      681337570,
+      3920356616
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 54676061,
+    "nodes": [
+      681336055,
+      1469247816,
+      4735972853,
+      1469248093,
+      688356450,
+      1469247784,
+      1469247926,
+      688356453,
+      1469247913,
+      1469247831,
+      1469248079,
+      688356443
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "עשרת השבטים",
+      "name:en": "Aseret HaShvatim",
+      "name:he": "עשרת השבטים"
+    }
+  },
+  {
+    "type": "way",
+    "id": 54676281,
+    "nodes": [
+      9265988060,
+      1395071975,
+      9265988061,
+      1395071981,
+      688358128,
+      4224268825,
+      2145620184,
+      688361404,
+      2145620142,
+      688358129
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "תשרי",
+      "name:ar": "تشري",
+      "name:en": "Tishrei",
+      "name:he": "תשרי",
+      "name:ru": "Тишрей"
+    }
+  },
+  {
+    "type": "way",
+    "id": 54676319,
+    "nodes": [
+      688358313,
+      1474466943,
+      10700164931
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "בוריס פסטרנק",
+      "name:en": "Boris Pasternak",
+      "name:he": "בוריס פסטרנק",
+      "name:ru": "Борис Пастернак",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 54676472,
+    "nodes": [
+      688359214,
+      2145620114,
+      1360453794,
+      2415158814,
+      429661664,
+      1474467206,
+      2145401055
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 54677233,
+    "nodes": [
+      1474467033,
+      8830062865,
+      691278179,
+      688365060,
+      1388960878,
+      1388960830,
+      2145620006,
+      6216681342
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 55262445,
+    "nodes": [
+      694373394,
+      5196596492,
+      8830062897,
+      8830062898,
+      6216681337
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "משה קול",
+      "name:en": "Moshe Kol",
+      "name:he": "משה קול",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 61717823,
+    "nodes": [
+      769063755,
+      769063756,
+      1474466967
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "יהדות אמריקה הלטינית",
+      "name:en": "Yediiya HaPnini",
+      "name:en1": "Yedi'iya Ha'Pnini",
+      "name:he": "יהדות אמריקה הלטינית",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 61717830,
+    "nodes": [
+      769063781,
+      5400733344,
+      769063782,
+      695142344
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הרב שלום שבזי",
+      "name:en": "HaRav Shalom Shabazi",
+      "name:en1": "Ha'Rav Shalom Shabazi",
+      "name:he": "הרב שלום שבזי",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 61717832,
+    "nodes": [
+      769063787,
+      1072335294,
+      769063782
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "התלמוד",
+      "name:en": "HaTalmid",
+      "name:he": "התלמוד",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 61717833,
+    "nodes": [
+      769063789,
+      1470979472,
+      769063790
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "ש.ב. ישעיהו",
+      "name:en": "Sh.B. YeshaAyahu",
+      "name:en1": "Sh.B. Yesha'Ayahu",
+      "name:he": "ש.ב. ישעיהו",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 61717834,
+    "nodes": [
+      769063791,
+      769063793,
+      769063794
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "חננאל",
+      "name:en": "Hananel",
+      "name:he": "חננאל",
+      "note": "fixme"
+    }
+  },
+  {
+    "type": "way",
+    "id": 61717837,
+    "nodes": [
+      769063790,
+      1470967047,
+      769063824,
+      691278156
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "בן דוד",
+      "name:en": "Ben David",
+      "name:he": "בן דוד",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 61717839,
+    "nodes": [
+      769063829,
+      1427342272,
+      1427342129,
+      769063830,
+      4438023712,
+      1427342271,
+      1427342282,
+      1427342238
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הכרם",
+      "name:en": "HaKerem",
+      "name:he": "הכרם"
+    }
+  },
+  {
+    "type": "way",
+    "id": 125639225,
+    "nodes": [
+      1395072192,
+      1395072633,
+      1395072332,
+      1395072038,
+      1395072660,
+      1395072062,
+      3465061650,
+      1395072477,
+      3465061652,
+      1395072645,
+      1395072652,
+      1395072611,
+      1395072055,
+      1395072207,
+      1395072553,
+      1395071928,
+      1395072309,
+      1395072120,
+      1395072059,
+      1395072220
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "אב",
+      "name:en": "Av",
+      "name:he": "אב"
+    }
+  },
+  {
+    "type": "way",
+    "id": 125639236,
+    "nodes": [
+      1395072419,
+      11235802646,
+      11235802647,
+      2145620064,
+      2145620415,
+      1395072238,
+      2145620057
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 133491858,
+    "nodes": [
+      1469247889,
+      1469248093
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "גרופית",
+      "name:en": "Grofit",
+      "name:he": "גרופית"
+    }
+  },
+  {
+    "type": "way",
+    "id": 133491870,
+    "nodes": [
+      1469247955,
+      1469248062,
+      1469248067,
+      8850049288
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 133491887,
+    "nodes": [
+      1469247765,
+      1469248012,
+      1469248062,
+      1469248079,
+      1469247866,
+      1469248111
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "ניצנה",
+      "name:en": "Nitsana",
+      "name:en1": "Nizzana",
+      "name:he": "ניצנה"
+    }
+  },
+  {
+    "type": "way",
+    "id": 133638031,
+    "nodes": [
+      1470906180,
+      1470906129,
+      1470906099,
+      1470906156
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 133645629,
+    "nodes": [
+      1470966983,
+      1470967108,
+      1470967070,
+      1470966886
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "בר יוחאי",
+      "name:ar": "بار يوهاي",
+      "name:en": "Bar Yohai",
+      "name:he": "בר יוחאי",
+      "name:ru": "бар Йохай",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 133646973,
+    "nodes": [
+      1470979472,
+      5434373766,
+      5434373767,
+      1470967130,
+      688365054
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הריף",
+      "name:en": "HaRif",
+      "name:en1": "Ha'Rif",
+      "name:he": "הריף",
+      "name:he1": "הרי\"ף",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046883,
+    "nodes": [
+      1474467191,
+      1474467000
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "פולינה גלמן",
+      "name:en": "Polina Gelman",
+      "name:he": "פולינה גלמן",
+      "name:ru": "Полина Гельман"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046890,
+    "nodes": [
+      688358313,
+      5400733337,
+      5400733338,
+      688361403,
+      3465061648,
+      691278181,
+      691278182,
+      5400733336,
+      694373400,
+      769063756,
+      5400733335,
+      694373403,
+      2145620197,
+      1072335761,
+      695142341,
+      1072335586,
+      695142342,
+      769063777
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "רמב\"ם",
+      "name:ar": "رمبام",
+      "name:en": "Rambam",
+      "name:he": "רמב\"ם",
+      "name:ru": "Рамбам",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046899,
+    "nodes": [
+      1474467401,
+      1474467294,
+      1474467191,
+      1474467045,
+      1474467411,
+      1474466943,
+      1474466939,
+      3465061645,
+      1474467054
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "רבי עקיבא",
+      "name:en": "Rabbi Akiva",
+      "name:en1": "Rabi Akiva",
+      "name:he": "רבי עקיבא",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046906,
+    "nodes": [
+      2145391585,
+      2145391597,
+      2145391563,
+      2145391606,
+      1388961537,
+      688359211,
+      1427342251,
+      4438023760,
+      4438023746,
+      769063827,
+      769063829,
+      1427342146,
+      691278189,
+      2415158799,
+      1427342163,
+      2145620165,
+      688359214,
+      1474467087,
+      1474467138,
+      2145620170,
+      2145620360
+    ],
+    "tags": {
+      "highway": "residential",
+      "lane_markings": "no",
+      "maxspeed": "50",
+      "name": "הרצל",
+      "name:ar": "هرتسل",
+      "name:en": "Herzl",
+      "name:en1": "Hertsel",
+      "name:en2": "Hertzel",
+      "name:en3": "Herzel",
+      "name:he": "הרצל",
+      "name:ru": "Герцель",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046911,
+    "nodes": [
+      1474466937,
+      1345736428,
+      1469248111,
+      1345736437
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "name": "אקסודוס",
+      "name:en": "Exodus",
+      "name:he": "אקסודוס",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046915,
+    "nodes": [
+      3574149198,
+      1474467271,
+      1474467079,
+      1474467188,
+      1474467439,
+      3920356623
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "רבי מאיר",
+      "name:en": "Rabbi Meir",
+      "name:en1": "Rabi Meir",
+      "name:he": "רבי מאיר",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046916,
+    "nodes": [
+      1474467360,
+      1474467398,
+      1474467435,
+      1474466997,
+      1474467115,
+      1474467353,
+      1474467068,
+      1474467012,
+      1474467375,
+      1474467276,
+      1474467338
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "רבי מאיר",
+      "name:en": "Rabbi Meir",
+      "name:en1": "Rabi Meir",
+      "name:he": "רבי מאיר"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046924,
+    "nodes": [
+      2145401059,
+      1474467056,
+      1474466918,
+      1474466940,
+      2145620237,
+      2145620252,
+      1474467000,
+      2145620017,
+      1474467097,
+      10700164922,
+      10700164917,
+      10700164910
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אנה פרנק",
+      "name:ar": "آنا فرانْك",
+      "name:en": "Anne Frank",
+      "name:en1": "Anna Frank",
+      "name:he": "אנה פרנק",
+      "name:ru": "Анна Франк",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046928,
+    "nodes": [
+      1474467164,
+      1474467162,
+      1474467291
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הסופרים היהודים",
+      "name:en": "HaSofrim HaYehudiyim",
+      "name:he": "הסופרים היהודים",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046932,
+    "nodes": [
+      695142344,
+      694373390,
+      5400733341,
+      1474467099,
+      5400733340,
+      694373394,
+      694373396,
+      5400733339,
+      1474467078,
+      691278180,
+      688361402,
+      688358313
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "רמב\"ם",
+      "name:ar": "رمبام",
+      "name:en": "Rambam",
+      "name:he": "רמב\"ם",
+      "name:ru": "Рамбам",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046937,
+    "nodes": [
+      1474467378,
+      1474466948
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "name": "אקסודוס",
+      "name:en": "Exodus",
+      "name:he": "אקסודוס",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046942,
+    "nodes": [
+      1474467069,
+      1474467358,
+      769063755,
+      1474466990,
+      1474467168
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "לב לנדאו",
+      "name:en": "Lev Landau",
+      "name:he": "לב לנדאו",
+      "name:ru": "Лев Ландау",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046945,
+    "nodes": [
+      1474467139,
+      2470055558
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046948,
+    "nodes": [
+      1474466967,
+      1474467183,
+      1474467403,
+      1474467080,
+      1474466965,
+      1474467272,
+      769063752,
+      688361405,
+      769063753,
+      1474467275,
+      1474467376,
+      1474466962
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הרב הרצוג",
+      "name:ar": "الحاخام هيرتسوغ",
+      "name:en": "HaRav Herzog",
+      "name:en1": "Harav Hertsog",
+      "name:en2": "HaRav Hertzog",
+      "name:en3": "Ha'Rav Hertzog",
+      "name:he": "הרב הרצוג",
+      "name:ru": "рабби Херцог"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046953,
+    "nodes": [
+      1474467385,
+      1474467085,
+      1474467383,
+      694373396
+    ],
+    "tags": {
+      "highway": "residential",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046959,
+    "nodes": [
+      1474467099,
+      1474467028,
+      1474466991,
+      769063784,
+      1474467002,
+      1474467071,
+      1072335643,
+      5400733343,
+      769063781
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הרב חיים כהנא",
+      "name:en": "HaRav Haim Kahana",
+      "name:en1": "HaRav Chaim Kahana",
+      "name:he": "הרב חיים כהנא",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 134046964,
+    "nodes": [
+      1474467129,
+      1474467122,
+      1474467413,
+      1474467061,
+      1474467052,
+      2145620205
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 203267661,
+    "nodes": [
+      2132597675,
+      2132597679,
+      2132597667,
+      2132597659
+    ],
+    "tags": {
+      "highway": "secondary_link",
+      "lane_markings": "no",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 203267662,
+    "nodes": [
+      2132597657,
+      2271424730,
+      2132597663,
+      2132597652
+    ],
+    "tags": {
+      "highway": "secondary_link",
+      "lane_markings": "no",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 203267663,
+    "nodes": [
+      2132597665,
+      2132597661,
+      2127251948
+    ],
+    "tags": {
+      "highway": "secondary_link",
+      "lane_markings": "no",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 203268475,
+    "nodes": [
+      1470979472,
+      5434373765,
+      5434373764,
+      1470967195,
+      4260304682,
+      11157716038,
+      688365059,
+      5434373762,
+      688365058,
+      5434373763,
+      1470979442,
+      769063794,
+      691866223,
+      1470966997,
+      1470967042,
+      8830062891
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "דוד רזיאל",
+      "name:ar": "رَزيئيل, داڨيد",
+      "name:en": "David Raziel",
+      "name:he": "דוד רזיאל",
+      "name:ru": "Давид Разиэль",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 204541657,
+    "nodes": [
+      9265988070,
+      2145401082,
+      2145401069,
+      2145401074
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 204563884,
+    "nodes": [
+      1474467273,
+      11492029859,
+      769063777,
+      1474467157,
+      1474467068,
+      1474467041,
+      2145620219
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הסופרים היהודים",
+      "name:en": "HaSofrim HaYehudiyim",
+      "name:he": "הסופרים היהודים",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 204563889,
+    "nodes": [
+      2145620107,
+      11235802654,
+      1395072419
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 204563892,
+    "nodes": [
+      2145620205,
+      2145620303,
+      2145620438,
+      2145620454,
+      2145620125,
+      2145620264,
+      2145620376,
+      2145620329
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "source:width": "ARCore",
+      "surface": "asphalt",
+      "width": "5.1"
+    }
+  },
+  {
+    "type": "way",
+    "id": 204563893,
+    "nodes": [
+      8830062857,
+      691278148,
+      1470966971,
+      1388961734,
+      691278156,
+      1388961082,
+      691278158
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 217840846,
+    "nodes": [
+      10700164921,
+      10700164920,
+      10700164924,
+      429661624,
+      10700164930,
+      1474467048,
+      2145620014,
+      1474467003,
+      429661662,
+      1474467263,
+      2145401065
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אנה פרנק",
+      "name:ar": "آنا فرانْك",
+      "name:en": "Anne Frank",
+      "name:en1": "Anna Frank",
+      "name:he": "אנה פרנק",
+      "name:ru": "Анна Франк",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 227976722,
+    "nodes": [
+      2366049005,
+      2366049003,
+      2366048996,
+      2366049000,
+      5196595558,
+      5196595536,
+      5196602355,
+      5196602343,
+      3376827706,
+      2366049011,
+      9265988088,
+      2145620360,
+      1474467016,
+      6216681336
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 239193275,
+    "nodes": [
+      2470055554,
+      11235995700,
+      2470055550,
+      2470055551,
+      11613689430,
+      10982132298,
+      11235995698,
+      11235995699,
+      2470055556
+    ],
+    "tags": {
+      "highway": "secondary_link",
+      "lane_markings": "no",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 239193276,
+    "nodes": [
+      2470055555,
+      2470055557,
+      11613689432,
+      2470055553,
+      11613689431,
+      2470055558
+    ],
+    "tags": {
+      "highway": "secondary_link",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 330690859,
+    "nodes": [
+      1360453794,
+      3376827709,
+      3376827707,
+      3376827708,
+      3376827706
+    ],
+    "tags": {
+      "highway": "residential",
+      "oneway": "yes"
+    }
+  },
+  {
+    "type": "way",
+    "id": 354070273,
+    "nodes": [
+      3598478663,
+      1427342122,
+      4438023713,
+      1360453749,
+      1470906180,
+      1474467062,
+      2145401076
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "דוד רמז",
+      "name:ar": "ديفيد ريمز",
+      "name:en": "David Remez",
+      "name:he": "דוד רמז",
+      "name:ru": "Давид Ремез",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 354070276,
+    "nodes": [
+      3598478663,
+      8544864645,
+      3598478662,
+      8544864636,
+      8544864639,
+      8544864640,
+      3598478661,
+      8544864634,
+      3598478659,
+      8544864635,
+      8544864633,
+      3598478632,
+      3598478651
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "name": "דוד רמז",
+      "name:ar": "ديفيد ريمز",
+      "name:en": "David Remez",
+      "name:he": "דוד רמז",
+      "name:ru": "Давид Ремез",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 388849684,
+    "nodes": [
+      3920356614,
+      3920356628
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 388849685,
+    "nodes": [
+      3920356630,
+      8851313315,
+      8851313316,
+      1474467117,
+      1474467041,
+      1474467026,
+      1474467154,
+      2145620057,
+      1474466923,
+      4260308919,
+      1474466956,
+      1474467046
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 388849686,
+    "nodes": [
+      3920356635,
+      3920356613,
+      3920356625,
+      3920356621,
+      3920356623,
+      3920356629,
+      3920356611,
+      3920356622,
+      3920356630
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 388849687,
+    "nodes": [
+      3920356610,
+      2127251967,
+      2470055554
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "3",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 446556510,
+    "nodes": [
+      3598478655,
+      4438023721,
+      4438023722,
+      4438023711,
+      4438023712
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 446556516,
+    "nodes": [
+      4438023711,
+      2415158801
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 664185370,
+    "nodes": [
+      6216681342,
+      6216681329,
+      6216681339,
+      6216681324,
+      6216681325,
+      6216681337,
+      6216681341,
+      6216681323,
+      6216681328,
+      6216681345,
+      6216681338,
+      6216681335
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 664185371,
+    "nodes": [
+      6216681340,
+      1474467120,
+      2145620152,
+      1474467015,
+      1474467123,
+      1474467436,
+      1474467082
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 664185372,
+    "nodes": [
+      6216681335,
+      5196596359,
+      9265988087,
+      9265988086,
+      2366049002,
+      5196595978,
+      5196595720,
+      5196595661,
+      5196595601,
+      5196595715,
+      5196597206,
+      2366048989,
+      2366048998,
+      2366049010,
+      2366049008
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 952126362,
+    "nodes": [
+      3598478635,
+      3598478637,
+      3598478655,
+      8544864637,
+      3598478657,
+      8544864638,
+      3598478658,
+      3598478650,
+      3598478663
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "name": "דוד רמז",
+      "name:ar": "ديفيد ريمز",
+      "name:en": "David Remez",
+      "name:he": "דוד רמז",
+      "name:ru": "Давид Ремез",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 953328989,
+    "nodes": [
+      2145401076,
+      2145401088,
+      2145401072,
+      2145401061,
+      12638936085,
+      2145401055,
+      2366049005
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 953329051,
+    "nodes": [
+      6736358539,
+      6637071136,
+      390445266,
+      3465061651,
+      5399845131,
+      2127251964,
+      3465061649,
+      390445268,
+      390445269,
+      2132597665
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 953329054,
+    "nodes": [
+      2145401059,
+      2145401080,
+      2145401086,
+      2145401067,
+      2145401065
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036286,
+    "nodes": [
+      1474467088,
+      11252910204,
+      1474467314,
+      2145620048,
+      1474467334,
+      1474467141
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036287,
+    "nodes": [
+      691278175,
+      1474467207,
+      1474467073,
+      1474467125,
+      1474467141
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036288,
+    "nodes": [
+      1474467141,
+      1474466925,
+      1474467310,
+      691278178
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036289,
+    "nodes": [
+      691278178,
+      1474466970,
+      1474466986,
+      1388961145,
+      1072335648,
+      1474467033
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "source:width": "ARCore",
+      "surface": "asphalt",
+      "width": "6.1"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036291,
+    "nodes": [
+      8830062860,
+      8830062867,
+      8830062866,
+      8830062861,
+      8830062862,
+      8830062863,
+      8830062864,
+      8830062865
+    ],
+    "tags": {
+      "highway": "tertiary_link",
+      "lanes": "1",
+      "maxspeed": "50",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036299,
+    "nodes": [
+      1474467082,
+      1474467033
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הרב שלום שבזי",
+      "name:en": "HaRav Shalom Shabazi",
+      "name:en1": "Ha'Rav Shalom Shabazi",
+      "name:he": "הרב שלום שבזי",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036300,
+    "nodes": [
+      769063777,
+      1072335591,
+      695142343,
+      1072335616,
+      1072335297,
+      695142344
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "רמב\"ם",
+      "name:ar": "رمبام",
+      "name:en": "Rambam",
+      "name:he": "רמב\"ם",
+      "name:ru": "Рамбам",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036301,
+    "nodes": [
+      688361405,
+      688358313
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "בוריס פסטרנק",
+      "name:en": "Boris Pasternak",
+      "name:he": "בוריס פסטרנק",
+      "name:ru": "Борис Пастернак",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036302,
+    "nodes": [
+      390445271,
+      2127251948
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אנה פרנק",
+      "name:ar": "آنا فرانْك",
+      "name:en": "Anne Frank",
+      "name:en1": "Anna Frank",
+      "name:he": "אנה פרנק",
+      "name:ru": "Анна Франк",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036303,
+    "nodes": [
+      10700164927,
+      10700164932,
+      10700164926,
+      1474467132,
+      1474467241,
+      3465061646,
+      2127251949,
+      2127251972,
+      2132597675
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אנה פרנק",
+      "name:ar": "آنا فرانْك",
+      "name:en": "Anne Frank",
+      "name:en1": "Anna Frank",
+      "name:he": "אנה פרנק",
+      "name:ru": "Анна Франк",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036305,
+    "nodes": [
+      1474467082,
+      1474467059,
+      1474467086,
+      1474467089,
+      1474467265,
+      1474467129
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "source:width": "ARCore",
+      "surface": "asphalt",
+      "width": "6.3"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036306,
+    "nodes": [
+      691278175,
+      1388960879,
+      1470966886,
+      688365054
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036307,
+    "nodes": [
+      688365054,
+      1474467088
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הריף",
+      "name:en": "HaRif",
+      "name:en1": "Ha'Rif",
+      "name:he": "הריף",
+      "name:he1": "הרי\"ף",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036312,
+    "nodes": [
+      691278158,
+      1474467190,
+      1474466929,
+      1474467362,
+      1474466926,
+      1474467182,
+      691278175
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036313,
+    "nodes": [
+      1474467033,
+      1474467075,
+      8830062858,
+      8830062860,
+      8830062859,
+      1474467127,
+      1474467295,
+      5400733342,
+      769063781
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הרב שלום שבזי",
+      "name:en": "HaRav Shalom Shabazi",
+      "name:en1": "Ha'Rav Shalom Shabazi",
+      "name:he": "הרב שלום שבזי",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036314,
+    "nodes": [
+      769063781,
+      1474467177,
+      1474467178,
+      1474467287,
+      1474467046
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הרב חיים כהנא",
+      "name:en": "HaRav Haim Kahana",
+      "name:en1": "HaRav Chaim Kahana",
+      "name:he": "הרב חיים כהנא",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036315,
+    "nodes": [
+      1474467046,
+      1474467088
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036316,
+    "nodes": [
+      6216681336,
+      6216681333,
+      6216681331,
+      6216681327,
+      6216681330,
+      6216681340
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954036317,
+    "nodes": [
+      2366049008,
+      2145401059
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954432209,
+    "nodes": [
+      2145401074,
+      2145401071,
+      2145401053,
+      2145401076
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 954432210,
+    "nodes": [
+      2145401065,
+      2145401078,
+      2145401084,
+      9265988070
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254498,
+    "nodes": [
+      390445271,
+      1474467378
+    ],
+    "tags": {
+      "highway": "secondary",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254499,
+    "nodes": [
+      2127251948,
+      429661627,
+      2127251965,
+      2127251973,
+      688358131
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אנה פרנק",
+      "name:ar": "آنا فرانْك",
+      "name:en": "Anne Frank",
+      "name:en1": "Anna Frank",
+      "name:he": "אנה פרנק",
+      "name:ru": "Анна Франк",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254500,
+    "nodes": [
+      429661628,
+      390445271
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אקסודוס",
+      "name:en": "Exodus",
+      "name:en1": "Ana Frank",
+      "name:en2": "Anne Frank",
+      "name:he": "אקסודוס",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254501,
+    "nodes": [
+      429661628,
+      2132597669,
+      390440036,
+      390440037,
+      2127251961,
+      390440038,
+      390440039,
+      6637071138,
+      6736358538
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254502,
+    "nodes": [
+      2132597652,
+      1474467355,
+      2127251960,
+      1474466937
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אקסודוס",
+      "name:en": "Exodus",
+      "name:he": "אקסודוס",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254503,
+    "nodes": [
+      1474466948,
+      429661628
+    ],
+    "tags": {
+      "highway": "secondary",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254516,
+    "nodes": [
+      688358131,
+      429661626,
+      10700164929,
+      10700164918,
+      10700164906
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "1",
+      "name": "אנה פרנק",
+      "name:ar": "آنا فرانْك",
+      "name:en": "Anne Frank",
+      "name:en1": "Anna Frank",
+      "name:he": "אנה פרנק",
+      "name:ru": "Анна Франк",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956254517,
+    "nodes": [
+      688358129,
+      688358130,
+      1395072192,
+      1395072439,
+      688358131
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "תשרי",
+      "name:ar": "تشري",
+      "name:en": "Tishrei",
+      "name:he": "תשרי",
+      "name:ru": "Тишрей"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956353233,
+    "nodes": [
+      2132597657,
+      1474466948
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "4",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956353234,
+    "nodes": [
+      1474466948,
+      2132597652
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אקסודוס",
+      "name:en": "Exodus",
+      "name:he": "אקסודוס",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956362133,
+    "nodes": [
+      2132597675,
+      1474467057,
+      1474467378
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אנה פרנק",
+      "name:ar": "آنا فرانْك",
+      "name:en": "Anne Frank",
+      "name:en1": "Anna Frank",
+      "name:he": "אנה פרנק",
+      "name:ru": "Анна Франк",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956362134,
+    "nodes": [
+      1474467378,
+      2132597659
+    ],
+    "tags": {
+      "highway": "secondary",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956403971,
+    "nodes": [
+      3920356616,
+      3920356626,
+      3920356615,
+      3920356628,
+      3920356627,
+      3920356633,
+      3920356619,
+      3920356610
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956403972,
+    "nodes": [
+      3920356610,
+      3920356634,
+      3920356631,
+      3920356635
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956403973,
+    "nodes": [
+      2470055554,
+      390445276
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956403974,
+    "nodes": [
+      2132597659,
+      390445272,
+      2127251968,
+      390445273,
+      390445274,
+      2127251962,
+      2127251952,
+      390445275,
+      2470055555
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956403978,
+    "nodes": [
+      11613689429,
+      1474467318,
+      390440031,
+      390440032,
+      2127251974,
+      390440033,
+      390440034,
+      2127251954,
+      390440035,
+      2132597657
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 956403979,
+    "nodes": [
+      3920356630,
+      3920356636,
+      3920356612,
+      3920356617,
+      3920356616
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1004256405,
+    "nodes": [
+      9265988065,
+      9265988066,
+      443456536,
+      1474466959,
+      2145401074
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אלי כהן",
+      "name:ar": "إيِلي كوهن",
+      "name:en": "Eli Cohen",
+      "name:en1": "Eli Kohen",
+      "name:he": "אלי כהן",
+      "name:ru": "Эли Коэна",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1116339285,
+    "nodes": [
+      1474467291,
+      1474467273
+    ],
+    "tags": {
+      "highway": "residential",
+      "name": "הסופרים היהודים",
+      "name:en": "HaSofrim HaYehudiyim",
+      "name:he": "הסופרים היהודים",
+      "surface": "paving_stones"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1120571858,
+    "nodes": [
+      2470055556,
+      2127251951,
+      390445277,
+      390445278,
+      11157715997,
+      11157715991,
+      390445279,
+      3924172716,
+      1345736434,
+      390445280,
+      390445281,
+      1474515623,
+      10160134464,
+      390445392
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1150236691,
+    "nodes": [
+      10700164931,
+      10700164928,
+      10700150204,
+      10700164911,
+      10700164927
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1209189274,
+    "nodes": [
+      10700164906,
+      10700164907,
+      10700164916,
+      10700164913,
+      10700164912,
+      11203476667,
+      10700164921
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1209189275,
+    "nodes": [
+      10700164921,
+      10700164908,
+      10700164923,
+      10700164925,
+      10700164910
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1209189276,
+    "nodes": [
+      10700164927,
+      10700164914,
+      10700164905,
+      10700164906
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1209189277,
+    "nodes": [
+      10700164910,
+      10700164919,
+      10700164909,
+      10700164915,
+      10700164931
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1212748060,
+    "nodes": [
+      11235802655,
+      11235802663
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1212748068,
+    "nodes": [
+      11235802663,
+      11235802648,
+      11235802649,
+      11235802650,
+      11235802651,
+      11235802652,
+      11235775825,
+      11235802656,
+      2145620107
+    ],
+    "tags": {
+      "highway": "residential",
+      "oneway": "yes"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1212748069,
+    "nodes": [
+      11235802644,
+      11235802655,
+      11157715939,
+      2145620219
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1237308530,
+    "nodes": [
+      11492029859,
+      11492029860,
+      11492029861,
+      11492029862,
+      11492029863,
+      11613055667,
+      11613055664
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1249447720,
+    "nodes": [
+      695142344,
+      11613055664,
+      11613055665,
+      11613055666
+    ],
+    "tags": {
+      "highway": "residential"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1249530331,
+    "nodes": [
+      11613689429,
+      1474467139
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1249530333,
+    "nodes": [
+      1474467139,
+      390445276
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1249530334,
+    "nodes": [
+      390445276,
+      11613689429
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lanes": "2",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1249530335,
+    "nodes": [
+      390445276,
+      2470055556
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1249530336,
+    "nodes": [
+      2470055555,
+      1474467139
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1249530337,
+    "nodes": [
+      2470055558,
+      2127251950,
+      3920356635
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "lane_markings": "no",
+      "name": "אבן עזרא",
+      "name:en": "Ibn Ezra",
+      "name:en1": "Eben Ezra",
+      "name:he": "אבן עזרא",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1364802877,
+    "nodes": [
+      2366049005,
+      2145401057,
+      2145401047,
+      2366049008
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1364802878,
+    "nodes": [
+      6216681335,
+      6216681326,
+      6216681344,
+      6216681336
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1364802879,
+    "nodes": [
+      6216681340,
+      6216681343,
+      6216681332,
+      6216681334,
+      6216681342
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1364802880,
+    "nodes": [
+      691278178,
+      1474467322,
+      1474467129
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1364802881,
+    "nodes": [
+      2145620205,
+      1474467316,
+      691278158
+    ],
+    "tags": {
+      "highway": "tertiary",
+      "junction": "roundabout",
+      "lane_markings": "no",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "way",
+    "id": 1368455427,
+    "nodes": [
+      2132597665,
+      390445271
+    ],
+    "tags": {
+      "highway": "secondary",
+      "lanes": "3",
+      "name": "מנחם בגין",
+      "name:ar": "مناحيم بيغن",
+      "name:en": "Menachem Begin",
+      "name:he": "מנחם בגין",
+      "name:ru": "Менахем Бегин",
+      "oneway": "yes",
+      "surface": "asphalt"
+    }
+  },
+  {
+    "type": "node",
+    "id": 390440023,
+    "lat": 31.6785857,
+    "lon": 34.5952352
+  },
+  {
+    "type": "node",
+    "id": 390440024,
+    "lat": 31.6781778,
+    "lon": 34.5944836
+  },
+  {
+    "type": "node",
+    "id": 390440025,
+    "lat": 31.6777995,
+    "lon": 34.5939127
+  },
+  {
+    "type": "node",
+    "id": 390440026,
+    "lat": 31.6757627,
+    "lon": 34.5913109
+  },
+  {
+    "type": "node",
+    "id": 390440027,
+    "lat": 31.6754107,
+    "lon": 34.5908013
+  },
+  {
+    "type": "node",
+    "id": 390440028,
+    "lat": 31.6749773,
+    "lon": 34.5901369
+  },
+  {
+    "type": "node",
+    "id": 390440029,
+    "lat": 31.6747270,
+    "lon": 34.5896710
+  },
+  {
+    "type": "node",
+    "id": 390440030,
+    "lat": 31.6745434,
+    "lon": 34.5892307
+  },
+  {
+    "type": "node",
+    "id": 390440031,
+    "lat": 31.6742808,
+    "lon": 34.5885479
+  },
+  {
+    "type": "node",
+    "id": 390440032,
+    "lat": 31.6740928,
+    "lon": 34.5879732
+  },
+  {
+    "type": "node",
+    "id": 390440033,
+    "lat": 31.6739102,
+    "lon": 34.5872029
+  },
+  {
+    "type": "node",
+    "id": 390440034,
+    "lat": 31.6737813,
+    "lon": 34.5864101
+  },
+  {
+    "type": "node",
+    "id": 390440035,
+    "lat": 31.6736535,
+    "lon": 34.5856063
+  },
+  {
+    "type": "node",
+    "id": 390440036,
+    "lat": 31.6736045,
+    "lon": 34.5843435
+  },
+  {
+    "type": "node",
+    "id": 390440037,
+    "lat": 31.6736150,
+    "lon": 34.5837472
+  },
+  {
+    "type": "node",
+    "id": 390440038,
+    "lat": 31.6736915,
+    "lon": 34.5829368
+  },
+  {
+    "type": "node",
+    "id": 390440039,
+    "lat": 31.6737622,
+    "lon": 34.5823840
+  },
+  {
+    "type": "node",
+    "id": 390445266,
+    "lat": 31.6736525,
+    "lon": 34.5823126
+  },
+  {
+    "type": "node",
+    "id": 390445268,
+    "lat": 31.6734973,
+    "lon": 34.5837289
+  },
+  {
+    "type": "node",
+    "id": 390445269,
+    "lat": 31.6734877,
+    "lon": 34.5844378
+  },
+  {
+    "type": "node",
+    "id": 390445271,
+    "lat": 31.6734822,
+    "lon": 34.5848519
+  },
+  {
+    "type": "node",
+    "id": 390445272,
+    "lat": 31.6735386,
+    "lon": 34.5854777
+  },
+  {
+    "type": "node",
+    "id": 390445273,
+    "lat": 31.6737223,
+    "lon": 34.5866885
+  },
+  {
+    "type": "node",
+    "id": 390445274,
+    "lat": 31.6737980,
+    "lon": 34.5872008
+  },
+  {
+    "type": "node",
+    "id": 390445275,
+    "lat": 31.6741085,
+    "lon": 34.5884042
+  },
+  {
+    "type": "node",
+    "id": 390445276,
+    "lat": 31.6744327,
+    "lon": 34.5892908
+  },
+  {
+    "type": "node",
+    "id": 390445277,
+    "lat": 31.6747697,
+    "lon": 34.5900522
+  },
+  {
+    "type": "node",
+    "id": 390445278,
+    "lat": 31.6752982,
+    "lon": 34.5909226
+  },
+  {
+    "type": "node",
+    "id": 390445279,
+    "lat": 31.6768079,
+    "lon": 34.5928943
+  },
+  {
+    "type": "node",
+    "id": 390445280,
+    "lat": 31.6779820,
+    "lon": 34.5944447
+  },
+  {
+    "type": "node",
+    "id": 390445281,
+    "lat": 31.6783261,
+    "lon": 34.5950717
+  },
+  {
+    "type": "node",
+    "id": 390445392,
+    "lat": 31.6786843,
+    "lon": 34.5958785
+  },
+  {
+    "type": "node",
+    "id": 429661624,
+    "lat": 31.6709858,
+    "lon": 34.5851080
+  },
+  {
+    "type": "node",
+    "id": 429661626,
+    "lat": 31.6719217,
+    "lon": 34.5851150
+  },
+  {
+    "type": "node",
+    "id": 429661627,
+    "lat": 31.6732074,
+    "lon": 34.5848437
+  },
+  {
+    "type": "node",
+    "id": 429661628,
+    "lat": 31.6735968,
+    "lon": 34.5848928
+  },
+  {
+    "type": "node",
+    "id": 429661629,
+    "lat": 31.6738866,
+    "lon": 34.5850498
+  },
+  {
+    "type": "node",
+    "id": 429661662,
+    "lat": 31.6697609,
+    "lon": 34.5845163
+  },
+  {
+    "type": "node",
+    "id": 429661664,
+    "lat": 31.6693485,
+    "lon": 34.5848949
+  },
+  {
+    "type": "node",
+    "id": 443456536,
+    "lat": 31.6693154,
+    "lon": 34.5839294
+  },
+  {
+    "type": "node",
+    "id": 681336055,
+    "lat": 31.6749548,
+    "lon": 34.5824432
+  },
+  {
+    "type": "node",
+    "id": 681337570,
+    "lat": 31.6733110,
+    "lon": 34.5898484
+  },
+  {
+    "type": "node",
+    "id": 688356443,
+    "lat": 31.6755439,
+    "lon": 34.5851942
+  },
+  {
+    "type": "node",
+    "id": 688356450,
+    "lat": 31.6744656,
+    "lon": 34.5838838
+  },
+  {
+    "type": "node",
+    "id": 688356453,
+    "lat": 31.6745288,
+    "lon": 34.5845251
+  },
+  {
+    "type": "node",
+    "id": 688358128,
+    "lat": 31.6702713,
+    "lon": 34.5825999
+  },
+  {
+    "type": "node",
+    "id": 688358129,
+    "lat": 31.6715502,
+    "lon": 34.5834382
+  },
+  {
+    "type": "node",
+    "id": 688358130,
+    "lat": 31.6718295,
+    "lon": 34.5838087
+  },
+  {
+    "type": "node",
+    "id": 688358131,
+    "lat": 31.6722809,
+    "lon": 34.5850189
+  },
+  {
+    "type": "node",
+    "id": 688358313,
+    "lat": 31.6716114,
+    "lon": 34.5861885
+  },
+  {
+    "type": "node",
+    "id": 688359211,
+    "lat": 31.6667117,
+    "lon": 34.5867514
+  },
+  {
+    "type": "node",
+    "id": 688359214,
+    "lat": 31.6692870,
+    "lon": 34.5865110
+  },
+  {
+    "type": "node",
+    "id": 688361402,
+    "lat": 31.6713477,
+    "lon": 34.5862252
+  },
+  {
+    "type": "node",
+    "id": 688361403,
+    "lat": 31.6721558,
+    "lon": 34.5862083
+  },
+  {
+    "type": "node",
+    "id": 688361404,
+    "lat": 31.6709718,
+    "lon": 34.5829402
+  },
+  {
+    "type": "node",
+    "id": 688361405,
+    "lat": 31.6716539,
+    "lon": 34.5865948
+  },
+  {
+    "type": "node",
+    "id": 688365054,
+    "lat": 31.6697612,
+    "lon": 34.5904362
+  },
+  {
+    "type": "node",
+    "id": 688365055,
+    "lat": 31.6704783,
+    "lon": 34.5906129
+  },
+  {
+    "type": "node",
+    "id": 688365058,
+    "lat": 31.6687861,
+    "lon": 34.5938887
+  },
+  {
+    "type": "node",
+    "id": 688365059,
+    "lat": 31.6689087,
+    "lon": 34.5937057
+  },
+  {
+    "type": "node",
+    "id": 688365060,
+    "lat": 31.6695660,
+    "lon": 34.5881039
+  },
+  {
+    "type": "node",
+    "id": 691278148,
+    "lat": 31.6668176,
+    "lon": 34.5898969
+  },
+  {
+    "type": "node",
+    "id": 691278156,
+    "lat": 31.6680080,
+    "lon": 34.5900861
+  },
+  {
+    "type": "node",
+    "id": 691278158,
+    "lat": 31.6683926,
+    "lon": 34.5900587
+  },
+  {
+    "type": "node",
+    "id": 691278175,
+    "lat": 31.6685443,
+    "lon": 34.5901114
+  },
+  {
+    "type": "node",
+    "id": 691278176,
+    "lat": 31.6715880,
+    "lon": 34.5905972
+  },
+  {
+    "type": "node",
+    "id": 691278178,
+    "lat": 31.6685618,
+    "lon": 34.5899110
+  },
+  {
+    "type": "node",
+    "id": 691278179,
+    "lat": 31.6693771,
+    "lon": 34.5884123
+  },
+  {
+    "type": "node",
+    "id": 691278180,
+    "lat": 31.6711379,
+    "lon": 34.5862906
+  },
+  {
+    "type": "node",
+    "id": 691278181,
+    "lat": 31.6725377,
+    "lon": 34.5863845
+  },
+  {
+    "type": "node",
+    "id": 691278182,
+    "lat": 31.6726749,
+    "lon": 34.5865856
+  },
+  {
+    "type": "node",
+    "id": 691278189,
+    "lat": 31.6683673,
+    "lon": 34.5864755
+  },
+  {
+    "type": "node",
+    "id": 691866223,
+    "lat": 31.6672660,
+    "lon": 34.5936682
+  },
+  {
+    "type": "node",
+    "id": 694373390,
+    "lat": 31.6706399,
+    "lon": 34.5880540
+  },
+  {
+    "type": "node",
+    "id": 694373394,
+    "lat": 31.6706796,
+    "lon": 34.5872570
+  },
+  {
+    "type": "node",
+    "id": 694373396,
+    "lat": 31.6708251,
+    "lon": 34.5867278
+  },
+  {
+    "type": "node",
+    "id": 694373400,
+    "lat": 31.6727822,
+    "lon": 34.5869504
+  },
+  {
+    "type": "node",
+    "id": 694373403,
+    "lat": 31.6729672,
+    "lon": 34.5879967
+  },
+  {
+    "type": "node",
+    "id": 695142341,
+    "lat": 31.6727993,
+    "lon": 34.5886914
+  },
+  {
+    "type": "node",
+    "id": 695142342,
+    "lat": 31.6724086,
+    "lon": 34.5890281
+  },
+  {
+    "type": "node",
+    "id": 695142343,
+    "lat": 31.6715507,
+    "lon": 34.5892045
+  },
+  {
+    "type": "node",
+    "id": 695142344,
+    "lat": 31.6706958,
+    "lon": 34.5883069
+  },
+  {
+    "type": "node",
+    "id": 769063752,
+    "lat": 31.6719054,
+    "lon": 34.5865708
+  },
+  {
+    "type": "node",
+    "id": 769063753,
+    "lat": 31.6714278,
+    "lon": 34.5866545
+  },
+  {
+    "type": "node",
+    "id": 769063755,
+    "lat": 31.6732674,
+    "lon": 34.5870937
+  },
+  {
+    "type": "node",
+    "id": 769063756,
+    "lat": 31.6728371,
+    "lon": 34.5872286
+  },
+  {
+    "type": "node",
+    "id": 769063777,
+    "lat": 31.6722186,
+    "lon": 34.5891104
+  },
+  {
+    "type": "node",
+    "id": 769063781,
+    "lat": 31.6699847,
+    "lon": 34.5888449
+  },
+  {
+    "type": "node",
+    "id": 769063782,
+    "lat": 31.6704018,
+    "lon": 34.5886156
+  },
+  {
+    "type": "node",
+    "id": 769063784,
+    "lat": 31.6701307,
+    "lon": 34.5877806
+  },
+  {
+    "type": "node",
+    "id": 769063787,
+    "lat": 31.6706101,
+    "lon": 34.5899950
+  },
+  {
+    "type": "node",
+    "id": 769063789,
+    "lat": 31.6702280,
+    "lon": 34.5917837
+  },
+  {
+    "type": "node",
+    "id": 769063790,
+    "lat": 31.6678641,
+    "lon": 34.5911810
+  },
+  {
+    "type": "node",
+    "id": 769063791,
+    "lat": 31.6683309,
+    "lon": 34.5924689
+  },
+  {
+    "type": "node",
+    "id": 769063793,
+    "lat": 31.6684405,
+    "lon": 34.5925762
+  },
+  {
+    "type": "node",
+    "id": 769063794,
+    "lat": 31.6682472,
+    "lon": 34.5938842
+  },
+  {
+    "type": "node",
+    "id": 769063824,
+    "lat": 31.6679735,
+    "lon": 34.5903485
+  },
+  {
+    "type": "node",
+    "id": 769063827,
+    "lat": 31.6675951,
+    "lon": 34.5866596
+  },
+  {
+    "type": "node",
+    "id": 769063829,
+    "lat": 31.6679785,
+    "lon": 34.5865302
+  },
+  {
+    "type": "node",
+    "id": 769063830,
+    "lat": 31.6677684,
+    "lon": 34.5853518
+  },
+  {
+    "type": "node",
+    "id": 1072335294,
+    "lat": 31.6704704,
+    "lon": 34.5888982
+  },
+  {
+    "type": "node",
+    "id": 1072335297,
+    "lat": 31.6709961,
+    "lon": 34.5887851
+  },
+  {
+    "type": "node",
+    "id": 1072335586,
+    "lat": 31.6726272,
+    "lon": 34.5888902
+  },
+  {
+    "type": "node",
+    "id": 1072335591,
+    "lat": 31.6718268,
+    "lon": 34.5892191
+  },
+  {
+    "type": "node",
+    "id": 1072335616,
+    "lat": 31.6712783,
+    "lon": 34.5891000
+  },
+  {
+    "type": "node",
+    "id": 1072335643,
+    "lat": 31.6699461,
+    "lon": 34.5885877
+  },
+  {
+    "type": "node",
+    "id": 1072335648,
+    "lat": 31.6690170,
+    "lon": 34.5889097
+  },
+  {
+    "type": "node",
+    "id": 1072335761,
+    "lat": 31.6729171,
+    "lon": 34.5884812
+  },
+  {
+    "type": "node",
+    "id": 1197699761,
+    "lat": 31.6724339,
+    "lon": 34.5812657
+  },
+  {
+    "type": "node",
+    "id": 1344792948,
+    "lat": 31.6789207,
+    "lon": 34.5961042
+  },
+  {
+    "type": "node",
+    "id": 1345736426,
+    "lat": 31.6768627,
+    "lon": 34.5927170
+  },
+  {
+    "type": "node",
+    "id": 1345736428,
+    "lat": 31.6747356,
+    "lon": 34.5856818
+  },
+  {
+    "type": "node",
+    "id": 1345736434,
+    "lat": 31.6774641,
+    "lon": 34.5937378
+  },
+  {
+    "type": "node",
+    "id": 1345736437,
+    "lat": 31.6753790,
+    "lon": 34.5861304
+  },
+  {
+    "type": "node",
+    "id": 1360453749,
+    "lat": 31.6686641,
+    "lon": 34.5844060
+  },
+  {
+    "type": "node",
+    "id": 1360453794,
+    "lat": 31.6693343,
+    "lon": 34.5858614
+  },
+  {
+    "type": "node",
+    "id": 1388960830,
+    "lat": 31.6697522,
+    "lon": 34.5876177
+  },
+  {
+    "type": "node",
+    "id": 1388960878,
+    "lat": 31.6696906,
+    "lon": 34.5878286
+  },
+  {
+    "type": "node",
+    "id": 1388960879,
+    "lat": 31.6687368,
+    "lon": 34.5901839
+  },
+  {
+    "type": "node",
+    "id": 1388961082,
+    "lat": 31.6681496,
+    "lon": 34.5900731
+  },
+  {
+    "type": "node",
+    "id": 1388961145,
+    "lat": 31.6688599,
+    "lon": 34.5891706
+  },
+  {
+    "type": "node",
+    "id": 1388961537,
+    "lat": 31.6658780,
+    "lon": 34.5868320
+  },
+  {
+    "type": "node",
+    "id": 1388961734,
+    "lat": 31.6675350,
+    "lon": 34.5900605
+  },
+  {
+    "type": "node",
+    "id": 1395071928,
+    "lat": 31.6724353,
+    "lon": 34.5822393
+  },
+  {
+    "type": "node",
+    "id": 1395071975,
+    "lat": 31.6695423,
+    "lon": 34.5825185
+  },
+  {
+    "type": "node",
+    "id": 1395071981,
+    "lat": 31.6699528,
+    "lon": 34.5825577
+  },
+  {
+    "type": "node",
+    "id": 1395072038,
+    "lat": 31.6728785,
+    "lon": 34.5837707
+  },
+  {
+    "type": "node",
+    "id": 1395072055,
+    "lat": 31.6727440,
+    "lon": 34.5817058
+  },
+  {
+    "type": "node",
+    "id": 1395072059,
+    "lat": 31.6722413,
+    "lon": 34.5829563
+  },
+  {
+    "type": "node",
+    "id": 1395072062,
+    "lat": 31.6730040,
+    "lon": 34.5836854
+  },
+  {
+    "type": "node",
+    "id": 1395072120,
+    "lat": 31.6722047,
+    "lon": 34.5829129
+  },
+  {
+    "type": "node",
+    "id": 1395072192,
+    "lat": 31.6720073,
+    "lon": 34.5841332
+  },
+  {
+    "type": "node",
+    "id": 1395072207,
+    "lat": 31.6726804,
+    "lon": 34.5816966
+  },
+  {
+    "type": "node",
+    "id": 1395072220,
+    "lat": 31.6725678,
+    "lon": 34.5831278
+  },
+  {
+    "type": "node",
+    "id": 1395072238,
+    "lat": 31.6712178,
+    "lon": 34.5906648
+  },
+  {
+    "type": "node",
+    "id": 1395072309,
+    "lat": 31.6722068,
+    "lon": 34.5828297
+  },
+  {
+    "type": "node",
+    "id": 1395072332,
+    "lat": 31.6724970,
+    "lon": 34.5838630
+  },
+  {
+    "type": "node",
+    "id": 1395072419,
+    "lat": 31.6710273,
+    "lon": 34.5922417
+  },
+  {
+    "type": "node",
+    "id": 1395072439,
+    "lat": 31.6721251,
+    "lon": 34.5844613
+  },
+  {
+    "type": "node",
+    "id": 1395072477,
+    "lat": 31.6730957,
+    "lon": 34.5826422
+  },
+  {
+    "type": "node",
+    "id": 1395072553,
+    "lat": 31.6726328,
+    "lon": 34.5817261
+  },
+  {
+    "type": "node",
+    "id": 1395072611,
+    "lat": 31.6731314,
+    "lon": 34.5819376
+  },
+  {
+    "type": "node",
+    "id": 1395072631,
+    "lat": 31.6720978,
+    "lon": 34.5820723
+  },
+  {
+    "type": "node",
+    "id": 1395072633,
+    "lat": 31.6723993,
+    "lon": 34.5839028
+  },
+  {
+    "type": "node",
+    "id": 1395072645,
+    "lat": 31.6731749,
+    "lon": 34.5820758
+  },
+  {
+    "type": "node",
+    "id": 1395072652,
+    "lat": 31.6731655,
+    "lon": 34.5819941
+  },
+  {
+    "type": "node",
+    "id": 1395072660,
+    "lat": 31.6729560,
+    "lon": 34.5837417
+  },
+  {
+    "type": "node",
+    "id": 1427342122,
+    "lat": 31.6683707,
+    "lon": 34.5843672
+  },
+  {
+    "type": "node",
+    "id": 1427342129,
+    "lat": 31.6679495,
+    "lon": 34.5861728
+  },
+  {
+    "type": "node",
+    "id": 1427342146,
+    "lat": 31.6680500,
+    "lon": 34.5865223
+  },
+  {
+    "type": "node",
+    "id": 1427342163,
+    "lat": 31.6690629,
+    "lon": 34.5865496
+  },
+  {
+    "type": "node",
+    "id": 1427342238,
+    "lat": 31.6675426,
+    "lon": 34.5847027
+  },
+  {
+    "type": "node",
+    "id": 1427342251,
+    "lat": 31.6670587,
+    "lon": 34.5867473
+  },
+  {
+    "type": "node",
+    "id": 1427342271,
+    "lat": 31.6676666,
+    "lon": 34.5851037
+  },
+  {
+    "type": "node",
+    "id": 1427342272,
+    "lat": 31.6679787,
+    "lon": 34.5863211
+  },
+  {
+    "type": "node",
+    "id": 1427342282,
+    "lat": 31.6676228,
+    "lon": 34.5849452
+  },
+  {
+    "type": "node",
+    "id": 1469247765,
+    "lat": 31.6755135,
+    "lon": 34.5829725
+  },
+  {
+    "type": "node",
+    "id": 1469247784,
+    "lat": 31.6744446,
+    "lon": 34.5840214
+  },
+  {
+    "type": "node",
+    "id": 1469247816,
+    "lat": 31.6747834,
+    "lon": 34.5828156
+  },
+  {
+    "type": "node",
+    "id": 1469247831,
+    "lat": 31.6748821,
+    "lon": 34.5849037
+  },
+  {
+    "type": "node",
+    "id": 1469247866,
+    "lat": 31.6750466,
+    "lon": 34.5852732
+  },
+  {
+    "type": "node",
+    "id": 1469247889,
+    "lat": 31.6749596,
+    "lon": 34.5835023
+  },
+  {
+    "type": "node",
+    "id": 1469247913,
+    "lat": 31.6746327,
+    "lon": 34.5846900
+  },
+  {
+    "type": "node",
+    "id": 1469247926,
+    "lat": 31.6744458,
+    "lon": 34.5842122
+  },
+  {
+    "type": "node",
+    "id": 1469247955,
+    "lat": 31.6750137,
+    "lon": 34.5838072
+  },
+  {
+    "type": "node",
+    "id": 1469248012,
+    "lat": 31.6753629,
+    "lon": 34.5836092
+  },
+  {
+    "type": "node",
+    "id": 1469248062,
+    "lat": 31.6753192,
+    "lon": 34.5838683
+  },
+  {
+    "type": "node",
+    "id": 1469248067,
+    "lat": 31.6754515,
+    "lon": 34.5839139
+  },
+  {
+    "type": "node",
+    "id": 1469248079,
+    "lat": 31.6750955,
+    "lon": 34.5850078
+  },
+  {
+    "type": "node",
+    "id": 1469248093,
+    "lat": 31.6745910,
+    "lon": 34.5834047
+  },
+  {
+    "type": "node",
+    "id": 1469248111,
+    "lat": 31.6749270,
+    "lon": 34.5858134
+  },
+  {
+    "type": "node",
+    "id": 1470906099,
+    "lat": 31.6688215,
+    "lon": 34.5833907
+  },
+  {
+    "type": "node",
+    "id": 1470906129,
+    "lat": 31.6688273,
+    "lon": 34.5840010
+  },
+  {
+    "type": "node",
+    "id": 1470906156,
+    "lat": 31.6688153,
+    "lon": 34.5827457
+  },
+  {
+    "type": "node",
+    "id": 1470906180,
+    "lat": 31.6688172,
+    "lon": 34.5844165
+  },
+  {
+    "type": "node",
+    "id": 1470966886,
+    "lat": 31.6692787,
+    "lon": 34.5903301
+  },
+  {
+    "type": "node",
+    "id": 1470966971,
+    "lat": 31.6670622,
+    "lon": 34.5899569
+  },
+  {
+    "type": "node",
+    "id": 1470966983,
+    "lat": 31.6691244,
+    "lon": 34.5911343
+  },
+  {
+    "type": "node",
+    "id": 1470966997,
+    "lat": 31.6668051,
+    "lon": 34.5935668
+  },
+  {
+    "type": "node",
+    "id": 1470967042,
+    "lat": 31.6663589,
+    "lon": 34.5934686
+  },
+  {
+    "type": "node",
+    "id": 1470967047,
+    "lat": 31.6679301,
+    "lon": 34.5906790
+  },
+  {
+    "type": "node",
+    "id": 1470967070,
+    "lat": 31.6692248,
+    "lon": 34.5906237
+  },
+  {
+    "type": "node",
+    "id": 1470967108,
+    "lat": 31.6691605,
+    "lon": 34.5909452
+  },
+  {
+    "type": "node",
+    "id": 1470967130,
+    "lat": 31.6696270,
+    "lon": 34.5910393
+  },
+  {
+    "type": "node",
+    "id": 1470967195,
+    "lat": 31.6693260,
+    "lon": 34.5920955
+  },
+  {
+    "type": "node",
+    "id": 1470979442,
+    "lat": 31.6686077,
+    "lon": 34.5939635
+  },
+  {
+    "type": "node",
+    "id": 1470979472,
+    "lat": 31.6694833,
+    "lon": 34.5915553
+  },
+  {
+    "type": "node",
+    "id": 1474466918,
+    "lat": 31.6697317,
+    "lon": 34.5846333
+  },
+  {
+    "type": "node",
+    "id": 1474466923,
+    "lat": 31.6708774,
+    "lon": 34.5905567
+  },
+  {
+    "type": "node",
+    "id": 1474466925,
+    "lat": 31.6685823,
+    "lon": 34.5899415
+  },
+  {
+    "type": "node",
+    "id": 1474466926,
+    "lat": 31.6684878,
+    "lon": 34.5901295
+  },
+  {
+    "type": "node",
+    "id": 1474466929,
+    "lat": 31.6684316,
+    "lon": 34.5901100
+  },
+  {
+    "type": "node",
+    "id": 1474466937,
+    "lat": 31.6742933,
+    "lon": 34.5853586
+  },
+  {
+    "type": "node",
+    "id": 1474466939,
+    "lat": 31.6718967,
+    "lon": 34.5856783
+  },
+  {
+    "type": "node",
+    "id": 1474466940,
+    "lat": 31.6699573,
+    "lon": 34.5847190
+  },
+  {
+    "type": "node",
+    "id": 1474466943,
+    "lat": 31.6715677,
+    "lon": 34.5857380
+  },
+  {
+    "type": "node",
+    "id": 1474466948,
+    "lat": 31.6735951,
+    "lon": 34.5849914
+  },
+  {
+    "type": "node",
+    "id": 1474466956,
+    "lat": 31.6704990,
+    "lon": 34.5904925
+  },
+  {
+    "type": "node",
+    "id": 1474466959,
+    "lat": 31.6693242,
+    "lon": 34.5841293
+  },
+  {
+    "type": "node",
+    "id": 1474466962,
+    "lat": 31.6712050,
+    "lon": 34.5868868
+  },
+  {
+    "type": "node",
+    "id": 1474466965,
+    "lat": 31.6722672,
+    "lon": 34.5866831
+  },
+  {
+    "type": "node",
+    "id": 1474466967,
+    "lat": 31.6724925,
+    "lon": 34.5873682
+  },
+  {
+    "type": "node",
+    "id": 1474466970,
+    "lat": 31.6686457,
+    "lon": 34.5896296
+  },
+  {
+    "type": "node",
+    "id": 1474466986,
+    "lat": 31.6687434,
+    "lon": 34.5894004
+  },
+  {
+    "type": "node",
+    "id": 1474466990,
+    "lat": 31.6733644,
+    "lon": 34.5875424
+  },
+  {
+    "type": "node",
+    "id": 1474466991,
+    "lat": 31.6701526,
+    "lon": 34.5877033
+  },
+  {
+    "type": "node",
+    "id": 1474466997,
+    "lat": 31.6717848,
+    "lon": 34.5898867
+  },
+  {
+    "type": "node",
+    "id": 1474467000,
+    "lat": 31.6706357,
+    "lon": 34.5850975
+  },
+  {
+    "type": "node",
+    "id": 1474467002,
+    "lat": 31.6700362,
+    "lon": 34.5881905
+  },
+  {
+    "type": "node",
+    "id": 1474467003,
+    "lat": 31.6699673,
+    "lon": 34.5845939
+  },
+  {
+    "type": "node",
+    "id": 1474467012,
+    "lat": 31.6725614,
+    "lon": 34.5894943
+  },
+  {
+    "type": "node",
+    "id": 1474467015,
+    "lat": 31.6696257,
+    "lon": 34.5878157
+  },
+  {
+    "type": "node",
+    "id": 1474467016,
+    "lat": 31.6697539,
+    "lon": 34.5868585
+  },
+  {
+    "type": "node",
+    "id": 1474467026,
+    "lat": 31.6719292,
+    "lon": 34.5903683
+  },
+  {
+    "type": "node",
+    "id": 1474467028,
+    "lat": 31.6701915,
+    "lon": 34.5876497
+  },
+  {
+    "type": "node",
+    "id": 1474467033,
+    "lat": 31.6691977,
+    "lon": 34.5886580
+  },
+  {
+    "type": "node",
+    "id": 1474467041,
+    "lat": 31.6725003,
+    "lon": 34.5901004
+  },
+  {
+    "type": "node",
+    "id": 1474467043,
+    "lat": 31.6694021,
+    "lon": 34.5841008
+  },
+  {
+    "type": "node",
+    "id": 1474467045,
+    "lat": 31.6708098,
+    "lon": 34.5856917
+  },
+  {
+    "type": "node",
+    "id": 1474467046,
+    "lat": 31.6701541,
+    "lon": 34.5904028
+  },
+  {
+    "type": "node",
+    "id": 1474467048,
+    "lat": 31.6706682,
+    "lon": 34.5849822
+  },
+  {
+    "type": "node",
+    "id": 1474467052,
+    "lat": 31.6683946,
+    "lon": 34.5899437
+  },
+  {
+    "type": "node",
+    "id": 1474467054,
+    "lat": 31.6727458,
+    "lon": 34.5854771
+  },
+  {
+    "type": "node",
+    "id": 1474467056,
+    "lat": 31.6696034,
+    "lon": 34.5845975
+  },
+  {
+    "type": "node",
+    "id": 1474467057,
+    "lat": 31.6733821,
+    "lon": 34.5849340
+  },
+  {
+    "type": "node",
+    "id": 1474467059,
+    "lat": 31.6689600,
+    "lon": 34.5888804
+  },
+  {
+    "type": "node",
+    "id": 1474467061,
+    "lat": 31.6684124,
+    "lon": 34.5899152
+  },
+  {
+    "type": "node",
+    "id": 1474467062,
+    "lat": 31.6691114,
+    "lon": 34.5844206
+  },
+  {
+    "type": "node",
+    "id": 1474467068,
+    "lat": 31.6723466,
+    "lon": 34.5895952
+  },
+  {
+    "type": "node",
+    "id": 1474467069,
+    "lat": 31.6731681,
+    "lon": 34.5863462
+  },
+  {
+    "type": "node",
+    "id": 1474467071,
+    "lat": 31.6699638,
+    "lon": 34.5884694
+  },
+  {
+    "type": "node",
+    "id": 1474467073,
+    "lat": 31.6685902,
+    "lon": 34.5900449
+  },
+  {
+    "type": "node",
+    "id": 1474467075,
+    "lat": 31.6692452,
+    "lon": 34.5886984
+  },
+  {
+    "type": "node",
+    "id": 1474467078,
+    "lat": 31.6710007,
+    "lon": 34.5864159
+  },
+  {
+    "type": "node",
+    "id": 1474467079,
+    "lat": 31.6738853,
+    "lon": 34.5890952
+  },
+  {
+    "type": "node",
+    "id": 1474467080,
+    "lat": 31.6723472,
+    "lon": 34.5867940
+  },
+  {
+    "type": "node",
+    "id": 1474467082,
+    "lat": 31.6691476,
+    "lon": 34.5886093
+  },
+  {
+    "type": "node",
+    "id": 1474467085,
+    "lat": 31.6702871,
+    "lon": 34.5864750
+  },
+  {
+    "type": "node",
+    "id": 1474467086,
+    "lat": 31.6687733,
+    "lon": 34.5891919
+  },
+  {
+    "type": "node",
+    "id": 1474467087,
+    "lat": 31.6694519,
+    "lon": 34.5865599
+  },
+  {
+    "type": "node",
+    "id": 1474467088,
+    "lat": 31.6697790,
+    "lon": 34.5903163
+  },
+  {
+    "type": "node",
+    "id": 1474467089,
+    "lat": 31.6686606,
+    "lon": 34.5894082
+  },
+  {
+    "type": "node",
+    "id": 1474467097,
+    "lat": 31.6711997,
+    "lon": 34.5852528
+  },
+  {
+    "type": "node",
+    "id": 1474467099,
+    "lat": 31.6706036,
+    "lon": 34.5876808
+  },
+  {
+    "type": "node",
+    "id": 1474467115,
+    "lat": 31.6718670,
+    "lon": 34.5897902
+  },
+  {
+    "type": "node",
+    "id": 1474467117,
+    "lat": 31.6730257,
+    "lon": 34.5898757
+  },
+  {
+    "type": "node",
+    "id": 1474467120,
+    "lat": 31.6697530,
+    "lon": 34.5873753
+  },
+  {
+    "type": "node",
+    "id": 1474467122,
+    "lat": 31.6684643,
+    "lon": 34.5898809
+  },
+  {
+    "type": "node",
+    "id": 1474467123,
+    "lat": 31.6695143,
+    "lon": 34.5880592
+  },
+  {
+    "type": "node",
+    "id": 1474467125,
+    "lat": 31.6685962,
+    "lon": 34.5900020
+  },
+  {
+    "type": "node",
+    "id": 1474467127,
+    "lat": 31.6695968,
+    "lon": 34.5888258
+  },
+  {
+    "type": "node",
+    "id": 1474467129,
+    "lat": 31.6684942,
+    "lon": 34.5898777
+  },
+  {
+    "type": "node",
+    "id": 1474467132,
+    "lat": 31.6719067,
+    "lon": 34.5852207
+  },
+  {
+    "type": "node",
+    "id": 1474467138,
+    "lat": 31.6695740,
+    "lon": 34.5866153
+  },
+  {
+    "type": "node",
+    "id": 1474467139,
+    "lat": 31.6744016,
+    "lon": 34.5892049
+  },
+  {
+    "type": "node",
+    "id": 1474467141,
+    "lat": 31.6685894,
+    "lon": 34.5899592
+  },
+  {
+    "type": "node",
+    "id": 1474467154,
+    "lat": 31.6715644,
+    "lon": 34.5905042
+  },
+  {
+    "type": "node",
+    "id": 1474467157,
+    "lat": 31.6723099,
+    "lon": 34.5894092
+  },
+  {
+    "type": "node",
+    "id": 1474467162,
+    "lat": 31.6721447,
+    "lon": 34.5882341
+  },
+  {
+    "type": "node",
+    "id": 1474467164,
+    "lat": 31.6721546,
+    "lon": 34.5881647
+  },
+  {
+    "type": "node",
+    "id": 1474467168,
+    "lat": 31.6734507,
+    "lon": 34.5878909
+  },
+  {
+    "type": "node",
+    "id": 1474467177,
+    "lat": 31.6701271,
+    "lon": 34.5899004
+  },
+  {
+    "type": "node",
+    "id": 1474467178,
+    "lat": 31.6701505,
+    "lon": 34.5900577
+  },
+  {
+    "type": "node",
+    "id": 1474467182,
+    "lat": 31.6685171,
+    "lon": 34.5901251
+  },
+  {
+    "type": "node",
+    "id": 1474467183,
+    "lat": 31.6724377,
+    "lon": 34.5871466
+  },
+  {
+    "type": "node",
+    "id": 1474467186,
+    "lat": 31.6719527,
+    "lon": 34.5904710
+  },
+  {
+    "type": "node",
+    "id": 1474467188,
+    "lat": 31.6736713,
+    "lon": 34.5891942
+  },
+  {
+    "type": "node",
+    "id": 1474467190,
+    "lat": 31.6684090,
+    "lon": 34.5900875
+  },
+  {
+    "type": "node",
+    "id": 1474467191,
+    "lat": 31.6705186,
+    "lon": 34.5855747
+  },
+  {
+    "type": "node",
+    "id": 1474467193,
+    "lat": 31.6693766,
+    "lon": 34.5837128
+  },
+  {
+    "type": "node",
+    "id": 1474467206,
+    "lat": 31.6693708,
+    "lon": 34.5847386
+  },
+  {
+    "type": "node",
+    "id": 1474467207,
+    "lat": 31.6685722,
+    "lon": 34.5900829
+  },
+  {
+    "type": "node",
+    "id": 1474467229,
+    "lat": 31.6693520,
+    "lon": 34.5833434
+  },
+  {
+    "type": "node",
+    "id": 1474467241,
+    "lat": 31.6722751,
+    "lon": 34.5851396
+  },
+  {
+    "type": "node",
+    "id": 1474467263,
+    "lat": 31.6696133,
+    "lon": 34.5844616
+  },
+  {
+    "type": "node",
+    "id": 1474467265,
+    "lat": 31.6685807,
+    "lon": 34.5896094
+  },
+  {
+    "type": "node",
+    "id": 1474467271,
+    "lat": 31.6737491,
+    "lon": 34.5886226
+  },
+  {
+    "type": "node",
+    "id": 1474467272,
+    "lat": 31.6721404,
+    "lon": 34.5866180
+  },
+  {
+    "type": "node",
+    "id": 1474467273,
+    "lat": 31.6720131,
+    "lon": 34.5883739
+  },
+  {
+    "type": "node",
+    "id": 1474467275,
+    "lat": 31.6713296,
+    "lon": 34.5867005
+  },
+  {
+    "type": "node",
+    "id": 1474467276,
+    "lat": 31.6728577,
+    "lon": 34.5893181
+  },
+  {
+    "type": "node",
+    "id": 1474467287,
+    "lat": 31.6701570,
+    "lon": 34.5902035
+  },
+  {
+    "type": "node",
+    "id": 1474467291,
+    "lat": 31.6720999,
+    "lon": 34.5882934
+  },
+  {
+    "type": "node",
+    "id": 1474467294,
+    "lat": 31.6702805,
+    "lon": 34.5854342
+  },
+  {
+    "type": "node",
+    "id": 1474467295,
+    "lat": 31.6696961,
+    "lon": 34.5888432
+  },
+  {
+    "type": "node",
+    "id": 1474467310,
+    "lat": 31.6685731,
+    "lon": 34.5899253
+  },
+  {
+    "type": "node",
+    "id": 1474467314,
+    "lat": 31.6692116,
+    "lon": 34.5902139
+  },
+  {
+    "type": "node",
+    "id": 1474467316,
+    "lat": 31.6683825,
+    "lon": 34.5900185
+  },
+  {
+    "type": "node",
+    "id": 1474467318,
+    "lat": 31.6745114,
+    "lon": 34.5891487
+  },
+  {
+    "type": "node",
+    "id": 1474467322,
+    "lat": 31.6685305,
+    "lon": 34.5898873
+  },
+  {
+    "type": "node",
+    "id": 1474467334,
+    "lat": 31.6687115,
+    "lon": 34.5900468
+  },
+  {
+    "type": "node",
+    "id": 1474467338,
+    "lat": 31.6729627,
+    "lon": 34.5892591
+  },
+  {
+    "type": "node",
+    "id": 1474467341,
+    "lat": 31.6740301,
+    "lon": 34.5851518
+  },
+  {
+    "type": "node",
+    "id": 1474467353,
+    "lat": 31.6720679,
+    "lon": 34.5897151
+  },
+  {
+    "type": "node",
+    "id": 1474467355,
+    "lat": 31.6738689,
+    "lon": 34.5851424
+  },
+  {
+    "type": "node",
+    "id": 1474467358,
+    "lat": 31.6731910,
+    "lon": 34.5865929
+  },
+  {
+    "type": "node",
+    "id": 1474467360,
+    "lat": 31.6712141,
+    "lon": 34.5901442
+  },
+  {
+    "type": "node",
+    "id": 1474467362,
+    "lat": 31.6684585,
+    "lon": 34.5901243
+  },
+  {
+    "type": "node",
+    "id": 1474467375,
+    "lat": 31.6727938,
+    "lon": 34.5894093
+  },
+  {
+    "type": "node",
+    "id": 1474467376,
+    "lat": 31.6712568,
+    "lon": 34.5867881
+  },
+  {
+    "type": "node",
+    "id": 1474467378,
+    "lat": 31.6734861,
+    "lon": 34.5849511
+  },
+  {
+    "type": "node",
+    "id": 1474467383,
+    "lat": 31.6704717,
+    "lon": 34.5865444
+  },
+  {
+    "type": "node",
+    "id": 1474467385,
+    "lat": 31.6701595,
+    "lon": 34.5865125
+  },
+  {
+    "type": "node",
+    "id": 1474467398,
+    "lat": 31.6716205,
+    "lon": 34.5900745
+  },
+  {
+    "type": "node",
+    "id": 1474467401,
+    "lat": 31.6699517,
+    "lon": 34.5851660
+  },
+  {
+    "type": "node",
+    "id": 1474467403,
+    "lat": 31.6723875,
+    "lon": 34.5869362
+  },
+  {
+    "type": "node",
+    "id": 1474467411,
+    "lat": 31.6710630,
+    "lon": 34.5857617
+  },
+  {
+    "type": "node",
+    "id": 1474467413,
+    "lat": 31.6684363,
+    "lon": 34.5898938
+  },
+  {
+    "type": "node",
+    "id": 1474467435,
+    "lat": 31.6716981,
+    "lon": 34.5900369
+  },
+  {
+    "type": "node",
+    "id": 1474467436,
+    "lat": 31.6693465,
+    "lon": 34.5883394
+  },
+  {
+    "type": "node",
+    "id": 1474467439,
+    "lat": 31.6733280,
+    "lon": 34.5893878
+  },
+  {
+    "type": "node",
+    "id": 1474515623,
+    "lat": 31.6784495,
+    "lon": 34.5953294
+  },
+  {
+    "type": "node",
+    "id": 1617058815,
+    "lat": 31.6787271,
+    "lon": 34.5955911
+  },
+  {
+    "type": "node",
+    "id": 2127251948,
+    "lat": 31.6733437,
+    "lon": 34.5848372
+  },
+  {
+    "type": "node",
+    "id": 2127251949,
+    "lat": 31.6727033,
+    "lon": 34.5850476
+  },
+  {
+    "type": "node",
+    "id": 2127251950,
+    "lat": 31.6740630,
+    "lon": 34.5893752
+  },
+  {
+    "type": "node",
+    "id": 2127251951,
+    "lat": 31.6746198,
+    "lon": 34.5897350
+  },
+  {
+    "type": "node",
+    "id": 2127251952,
+    "lat": 31.6739597,
+    "lon": 34.5879170
+  },
+  {
+    "type": "node",
+    "id": 2127251954,
+    "lat": 31.6736910,
+    "lon": 34.5858552
+  },
+  {
+    "type": "node",
+    "id": 2127251960,
+    "lat": 31.6740865,
+    "lon": 34.5852596
+  },
+  {
+    "type": "node",
+    "id": 2127251961,
+    "lat": 31.6736472,
+    "lon": 34.5832927
+  },
+  {
+    "type": "node",
+    "id": 2127251962,
+    "lat": 31.6738506,
+    "lon": 34.5874872
+  },
+  {
+    "type": "node",
+    "id": 2127251964,
+    "lat": 31.6735375,
+    "lon": 34.5832066
+  },
+  {
+    "type": "node",
+    "id": 2127251965,
+    "lat": 31.6730651,
+    "lon": 34.5848598
+  },
+  {
+    "type": "node",
+    "id": 2127251966,
+    "lat": 31.6748119,
+    "lon": 34.5898476
+  },
+  {
+    "type": "node",
+    "id": 2127251967,
+    "lat": 31.6740791,
+    "lon": 34.5894662
+  },
+  {
+    "type": "node",
+    "id": 2127251968,
+    "lat": 31.6735889,
+    "lon": 34.5858312
+  },
+  {
+    "type": "node",
+    "id": 2127251969,
+    "lat": 31.6783841,
+    "lon": 34.5948214
+  },
+  {
+    "type": "node",
+    "id": 2127251972,
+    "lat": 31.6730221,
+    "lon": 34.5849678
+  },
+  {
+    "type": "node",
+    "id": 2127251973,
+    "lat": 31.6728648,
+    "lon": 34.5848939
+  },
+  {
+    "type": "node",
+    "id": 2127251974,
+    "lat": 31.6739670,
+    "lon": 34.5875092
+  },
+  {
+    "type": "node",
+    "id": 2132597652,
+    "lat": 31.6737937,
+    "lon": 34.5850979
+  },
+  {
+    "type": "node",
+    "id": 2132597657,
+    "lat": 31.6736251,
+    "lon": 34.5853365
+  },
+  {
+    "type": "node",
+    "id": 2132597659,
+    "lat": 31.6735079,
+    "lon": 34.5852094
+  },
+  {
+    "type": "node",
+    "id": 2132597661,
+    "lat": 31.6734203,
+    "lon": 34.5847525
+  },
+  {
+    "type": "node",
+    "id": 2132597663,
+    "lat": 31.6737258,
+    "lon": 34.5851436
+  },
+  {
+    "type": "node",
+    "id": 2132597665,
+    "lat": 31.6734823,
+    "lon": 34.5845467
+  },
+  {
+    "type": "node",
+    "id": 2132597667,
+    "lat": 31.6734297,
+    "lon": 34.5850645
+  },
+  {
+    "type": "node",
+    "id": 2132597669,
+    "lat": 31.6735992,
+    "lon": 34.5846599
+  },
+  {
+    "type": "node",
+    "id": 2132597671,
+    "lat": 31.6737452,
+    "lon": 34.5849634
+  },
+  {
+    "type": "node",
+    "id": 2132597675,
+    "lat": 31.6732719,
+    "lon": 34.5849324
+  },
+  {
+    "type": "node",
+    "id": 2132597679,
+    "lat": 31.6733615,
+    "lon": 34.5849871
+  },
+  {
+    "type": "node",
+    "id": 2145391563,
+    "lat": 31.6655291,
+    "lon": 34.5868304
+  },
+  {
+    "type": "node",
+    "id": 2145391585,
+    "lat": 31.6654791,
+    "lon": 34.5868684
+  },
+  {
+    "type": "node",
+    "id": 2145391597,
+    "lat": 31.6654973,
+    "lon": 34.5868496
+  },
+  {
+    "type": "node",
+    "id": 2145391606,
+    "lat": 31.6656388,
+    "lon": 34.5868221
+  },
+  {
+    "type": "node",
+    "id": 2145401047,
+    "lat": 31.6694855,
+    "lon": 34.5845938
+  },
+  {
+    "type": "node",
+    "id": 2145401053,
+    "lat": 31.6692937,
+    "lon": 34.5843954
+  },
+  {
+    "type": "node",
+    "id": 2145401055,
+    "lat": 31.6694101,
+    "lon": 34.5845804
+  },
+  {
+    "type": "node",
+    "id": 2145401057,
+    "lat": 31.6694490,
+    "lon": 34.5845938
+  },
+  {
+    "type": "node",
+    "id": 2145401059,
+    "lat": 31.6695152,
+    "lon": 34.5845724
+  },
+  {
+    "type": "node",
+    "id": 2145401061,
+    "lat": 31.6693759,
+    "lon": 34.5845536
+  },
+  {
+    "type": "node",
+    "id": 2145401065,
+    "lat": 31.6695152,
+    "lon": 34.5844168
+  },
+  {
+    "type": "node",
+    "id": 2145401067,
+    "lat": 31.6695307,
+    "lon": 34.5844620
+  },
+  {
+    "type": "node",
+    "id": 2145401069,
+    "lat": 31.6693554,
+    "lon": 34.5843095
+  },
+  {
+    "type": "node",
+    "id": 2145401071,
+    "lat": 31.6693006,
+    "lon": 34.5843471
+  },
+  {
+    "type": "node",
+    "id": 2145401072,
+    "lat": 31.6693439,
+    "lon": 34.5845187
+  },
+  {
+    "type": "node",
+    "id": 2145401074,
+    "lat": 31.6693234,
+    "lon": 34.5843229
+  },
+  {
+    "type": "node",
+    "id": 2145401076,
+    "lat": 31.6693006,
+    "lon": 34.5844383
+  },
+  {
+    "type": "node",
+    "id": 2145401078,
+    "lat": 31.6694809,
+    "lon": 34.5843578
+  },
+  {
+    "type": "node",
+    "id": 2145401080,
+    "lat": 31.6695289,
+    "lon": 34.5845429
+  },
+  {
+    "type": "node",
+    "id": 2145401082,
+    "lat": 31.6693965,
+    "lon": 34.5843095
+  },
+  {
+    "type": "node",
+    "id": 2145401084,
+    "lat": 31.6694375,
+    "lon": 34.5843203
+  },
+  {
+    "type": "node",
+    "id": 2145401086,
+    "lat": 31.6695357,
+    "lon": 34.5845053
+  },
+  {
+    "type": "node",
+    "id": 2145401088,
+    "lat": 31.6693197,
+    "lon": 34.5844834
+  },
+  {
+    "type": "node",
+    "id": 2145620006,
+    "lat": 31.6698249,
+    "lon": 34.5873325
+  },
+  {
+    "type": "node",
+    "id": 2145620014,
+    "lat": 31.6703055,
+    "lon": 34.5847858
+  },
+  {
+    "type": "node",
+    "id": 2145620017,
+    "lat": 31.6708848,
+    "lon": 34.5851841
+  },
+  {
+    "type": "node",
+    "id": 2145620048,
+    "lat": 31.6688946,
+    "lon": 34.5901260
+  },
+  {
+    "type": "node",
+    "id": 2145620057,
+    "lat": 31.6712180,
+    "lon": 34.5905618
+  },
+  {
+    "type": "node",
+    "id": 2145620064,
+    "lat": 31.6711384,
+    "lon": 34.5914624
+  },
+  {
+    "type": "node",
+    "id": 2145620083,
+    "lat": 31.6701386,
+    "lon": 34.5905231
+  },
+  {
+    "type": "node",
+    "id": 2145620107,
+    "lat": 31.6713419,
+    "lon": 34.5925208
+  },
+  {
+    "type": "node",
+    "id": 2145620114,
+    "lat": 31.6693177,
+    "lon": 34.5862578
+  },
+  {
+    "type": "node",
+    "id": 2145620125,
+    "lat": 31.6670754,
+    "lon": 34.5898780
+  },
+  {
+    "type": "node",
+    "id": 2145620142,
+    "lat": 31.6712636,
+    "lon": 34.5831711
+  },
+  {
+    "type": "node",
+    "id": 2145620152,
+    "lat": 31.6696842,
+    "lon": 34.5876334
+  },
+  {
+    "type": "node",
+    "id": 2145620165,
+    "lat": 31.6691704,
+    "lon": 34.5865609
+  },
+  {
+    "type": "node",
+    "id": 2145620170,
+    "lat": 31.6696520,
+    "lon": 34.5866503
+  },
+  {
+    "type": "node",
+    "id": 2145620184,
+    "lat": 31.6706568,
+    "lon": 34.5827532
+  },
+  {
+    "type": "node",
+    "id": 2145620197,
+    "lat": 31.6729612,
+    "lon": 34.5882290
+  },
+  {
+    "type": "node",
+    "id": 2145620205,
+    "lat": 31.6683842,
+    "lon": 34.5899768
+  },
+  {
+    "type": "node",
+    "id": 2145620219,
+    "lat": 31.6725336,
+    "lon": 34.5902100
+  },
+  {
+    "type": "node",
+    "id": 2145620237,
+    "lat": 31.6701910,
+    "lon": 34.5848448
+  },
+  {
+    "type": "node",
+    "id": 2145620252,
+    "lat": 31.6704374,
+    "lon": 34.5849810
+  },
+  {
+    "type": "node",
+    "id": 2145620264,
+    "lat": 31.6668332,
+    "lon": 34.5898186
+  },
+  {
+    "type": "node",
+    "id": 2145620303,
+    "lat": 31.6681459,
+    "lon": 34.5899929
+  },
+  {
+    "type": "node",
+    "id": 2145620312,
+    "lat": 31.6708707,
+    "lon": 34.5906722
+  },
+  {
+    "type": "node",
+    "id": 2145620329,
+    "lat": 31.6665155,
+    "lon": 34.5896921
+  },
+  {
+    "type": "node",
+    "id": 2145620360,
+    "lat": 31.6697233,
+    "lon": 34.5866894
+  },
+  {
+    "type": "node",
+    "id": 2145620376,
+    "lat": 31.6666601,
+    "lon": 34.5897652
+  },
+  {
+    "type": "node",
+    "id": 2145620415,
+    "lat": 31.6711881,
+    "lon": 34.5910995
+  },
+  {
+    "type": "node",
+    "id": 2145620427,
+    "lat": 31.6722471,
+    "lon": 34.5903446
+  },
+  {
+    "type": "node",
+    "id": 2145620438,
+    "lat": 31.6679832,
+    "lon": 34.5900044
+  },
+  {
+    "type": "node",
+    "id": 2145620454,
+    "lat": 31.6675428,
+    "lon": 34.5899805
+  },
+  {
+    "type": "node",
+    "id": 2247744399,
+    "lat": 31.6790026,
+    "lon": 34.5963627
+  },
+  {
+    "type": "node",
+    "id": 2271424730,
+    "lat": 31.6736756,
+    "lon": 34.5851956
+  },
+  {
+    "type": "node",
+    "id": 2366048989,
+    "lat": 31.6697658,
+    "lon": 34.5853113
+  },
+  {
+    "type": "node",
+    "id": 2366048996,
+    "lat": 31.6696911,
+    "lon": 34.5852163
+  },
+  {
+    "type": "node",
+    "id": 2366048998,
+    "lat": 31.6697345,
+    "lon": 34.5851825
+  },
+  {
+    "type": "node",
+    "id": 2366049000,
+    "lat": 31.6697135,
+    "lon": 34.5853410
+  },
+  {
+    "type": "node",
+    "id": 2366049002,
+    "lat": 31.6697113,
+    "lon": 34.5861545
+  },
+  {
+    "type": "node",
+    "id": 2366049003,
+    "lat": 31.6696417,
+    "lon": 34.5850850
+  },
+  {
+    "type": "node",
+    "id": 2366049005,
+    "lat": 31.6694328,
+    "lon": 34.5845895
+  },
+  {
+    "type": "node",
+    "id": 2366049008,
+    "lat": 31.6695030,
+    "lon": 34.5845812
+  },
+  {
+    "type": "node",
+    "id": 2366049010,
+    "lat": 31.6696961,
+    "lon": 34.5850601
+  },
+  {
+    "type": "node",
+    "id": 2366049011,
+    "lat": 31.6696467,
+    "lon": 34.5860703
+  },
+  {
+    "type": "node",
+    "id": 2415158799,
+    "lat": 31.6689230,
+    "lon": 34.5865347
+  },
+  {
+    "type": "node",
+    "id": 2415158801,
+    "lat": 31.6682211,
+    "lon": 34.5851914
+  },
+  {
+    "type": "node",
+    "id": 2415158814,
+    "lat": 31.6693306,
+    "lon": 34.5853645
+  },
+  {
+    "type": "node",
+    "id": 2470055550,
+    "lat": 31.6742758,
+    "lon": 34.5894144
+  },
+  {
+    "type": "node",
+    "id": 2470055551,
+    "lat": 31.6743262,
+    "lon": 34.5894163
+  },
+  {
+    "type": "node",
+    "id": 2470055553,
+    "lat": 31.6742781,
+    "lon": 34.5891707
+  },
+  {
+    "type": "node",
+    "id": 2470055554,
+    "lat": 31.6741599,
+    "lon": 34.5894263
+  },
+  {
+    "type": "node",
+    "id": 2470055555,
+    "lat": 31.6743111,
+    "lon": 34.5889578
+  },
+  {
+    "type": "node",
+    "id": 2470055556,
+    "lat": 31.6745635,
+    "lon": 34.5896016
+  },
+  {
+    "type": "node",
+    "id": 2470055557,
+    "lat": 31.6743052,
+    "lon": 34.5890463
+  },
+  {
+    "type": "node",
+    "id": 2470055558,
+    "lat": 31.6742068,
+    "lon": 34.5893029
+  },
+  {
+    "type": "node",
+    "id": 3376827706,
+    "lat": 31.6696478,
+    "lon": 34.5859553
+  },
+  {
+    "type": "node",
+    "id": 3376827707,
+    "lat": 31.6695706,
+    "lon": 34.5859124
+  },
+  {
+    "type": "node",
+    "id": 3376827708,
+    "lat": 31.6696103,
+    "lon": 34.5859287
+  },
+  {
+    "type": "node",
+    "id": 3376827709,
+    "lat": 31.6695051,
+    "lon": 34.5858896
+  },
+  {
+    "type": "node",
+    "id": 3465061645,
+    "lat": 31.6724588,
+    "lon": 34.5855368
+  },
+  {
+    "type": "node",
+    "id": 3465061646,
+    "lat": 31.6723831,
+    "lon": 34.5851184
+  },
+  {
+    "type": "node",
+    "id": 3465061648,
+    "lat": 31.6723610,
+    "lon": 34.5862572
+  },
+  {
+    "type": "node",
+    "id": 3465061649,
+    "lat": 31.6735180,
+    "lon": 34.5834603
+  },
+  {
+    "type": "node",
+    "id": 3465061650,
+    "lat": 31.6730312,
+    "lon": 34.5833850
+  },
+  {
+    "type": "node",
+    "id": 3465061651,
+    "lat": 31.6736213,
+    "lon": 34.5825167
+  },
+  {
+    "type": "node",
+    "id": 3465061652,
+    "lat": 31.6731499,
+    "lon": 34.5822558
+  },
+  {
+    "type": "node",
+    "id": 3485984643,
+    "lat": 31.6788077,
+    "lon": 34.5957900
+  },
+  {
+    "type": "node",
+    "id": 3485984929,
+    "lat": 31.6788615,
+    "lon": 34.5959331
+  },
+  {
+    "type": "node",
+    "id": 3574149198,
+    "lat": 31.6734118,
+    "lon": 34.5887522
+  },
+  {
+    "type": "node",
+    "id": 3598478632,
+    "lat": 31.6678065,
+    "lon": 34.5843534
+  },
+  {
+    "type": "node",
+    "id": 3598478635,
+    "lat": 31.6675240,
+    "lon": 34.5844302
+  },
+  {
+    "type": "node",
+    "id": 3598478637,
+    "lat": 31.6678052,
+    "lon": 34.5844399
+  },
+  {
+    "type": "node",
+    "id": 3598478650,
+    "lat": 31.6681596,
+    "lon": 34.5843543
+  },
+  {
+    "type": "node",
+    "id": 3598478651,
+    "lat": 31.6675247,
+    "lon": 34.5843479
+  },
+  {
+    "type": "node",
+    "id": 3598478655,
+    "lat": 31.6679041,
+    "lon": 34.5844401
+  },
+  {
+    "type": "node",
+    "id": 3598478657,
+    "lat": 31.6680034,
+    "lon": 34.5843943
+  },
+  {
+    "type": "node",
+    "id": 3598478658,
+    "lat": 31.6681080,
+    "lon": 34.5843628
+  },
+  {
+    "type": "node",
+    "id": 3598478659,
+    "lat": 31.6678968,
+    "lon": 34.5843432
+  },
+  {
+    "type": "node",
+    "id": 3598478661,
+    "lat": 31.6679515,
+    "lon": 34.5843171
+  },
+  {
+    "type": "node",
+    "id": 3598478662,
+    "lat": 31.6681420,
+    "lon": 34.5843018
+  },
+  {
+    "type": "node",
+    "id": 3598478663,
+    "lat": 31.6682745,
+    "lon": 34.5843432
+  },
+  {
+    "type": "node",
+    "id": 3708142667,
+    "lat": 31.6765775,
+    "lon": 34.5923524
+  },
+  {
+    "type": "node",
+    "id": 3920356610,
+    "lat": 31.6735439,
+    "lon": 34.5897131
+  },
+  {
+    "type": "node",
+    "id": 3920356611,
+    "lat": 31.6733473,
+    "lon": 34.5896460
+  },
+  {
+    "type": "node",
+    "id": 3920356612,
+    "lat": 31.6733317,
+    "lon": 34.5897778
+  },
+  {
+    "type": "node",
+    "id": 3920356613,
+    "lat": 31.6734807,
+    "lon": 34.5896094
+  },
+  {
+    "type": "node",
+    "id": 3920356614,
+    "lat": 31.6736240,
+    "lon": 34.5903126
+  },
+  {
+    "type": "node",
+    "id": 3920356615,
+    "lat": 31.6734318,
+    "lon": 34.5898575
+  },
+  {
+    "type": "node",
+    "id": 3920356616,
+    "lat": 31.6733692,
+    "lon": 34.5898331
+  },
+  {
+    "type": "node",
+    "id": 3920356617,
+    "lat": 31.6733472,
+    "lon": 34.5898085
+  },
+  {
+    "type": "node",
+    "id": 3920356619,
+    "lat": 31.6735414,
+    "lon": 34.5897581
+  },
+  {
+    "type": "node",
+    "id": 3920356621,
+    "lat": 31.6734223,
+    "lon": 34.5895979
+  },
+  {
+    "type": "node",
+    "id": 3920356622,
+    "lat": 31.6733324,
+    "lon": 34.5896750
+  },
+  {
+    "type": "node",
+    "id": 3920356623,
+    "lat": 31.6733934,
+    "lon": 34.5896062
+  },
+  {
+    "type": "node",
+    "id": 3920356625,
+    "lat": 31.6734522,
+    "lon": 34.5895990
+  },
+  {
+    "type": "node",
+    "id": 3920356626,
+    "lat": 31.6733989,
+    "lon": 34.5898509
+  },
+  {
+    "type": "node",
+    "id": 3920356627,
+    "lat": 31.6734994,
+    "lon": 34.5898322
+  },
+  {
+    "type": "node",
+    "id": 3920356628,
+    "lat": 31.6734649,
+    "lon": 34.5898522
+  },
+  {
+    "type": "node",
+    "id": 3920356629,
+    "lat": 31.6733681,
+    "lon": 34.5896225
+  },
+  {
+    "type": "node",
+    "id": 3920356630,
+    "lat": 31.6733243,
+    "lon": 34.5897076
+  },
+  {
+    "type": "node",
+    "id": 3920356631,
+    "lat": 31.6735244,
+    "lon": 34.5896525
+  },
+  {
+    "type": "node",
+    "id": 3920356633,
+    "lat": 31.6735259,
+    "lon": 34.5897995
+  },
+  {
+    "type": "node",
+    "id": 3920356634,
+    "lat": 31.6735374,
+    "lon": 34.5896813
+  },
+  {
+    "type": "node",
+    "id": 3920356635,
+    "lat": 31.6735057,
+    "lon": 34.5896284
+  },
+  {
+    "type": "node",
+    "id": 3920356636,
+    "lat": 31.6733238,
+    "lon": 34.5897433
+  },
+  {
+    "type": "node",
+    "id": 3924172670,
+    "lat": 31.6716728,
+    "lon": 34.5905679
+  },
+  {
+    "type": "node",
+    "id": 3924172716,
+    "lat": 31.6773886,
+    "lon": 34.5936407
+  },
+  {
+    "type": "node",
+    "id": 3924172728,
+    "lat": 31.6704881,
+    "lon": 34.5906144
+  },
+  {
+    "type": "node",
+    "id": 4224268825,
+    "lat": 31.6705704,
+    "lon": 34.5827189
+  },
+  {
+    "type": "node",
+    "id": 4260304678,
+    "lat": 31.6706148,
+    "lon": 34.5906335
+  },
+  {
+    "type": "node",
+    "id": 4260304682,
+    "lat": 31.6691812,
+    "lon": 34.5927544
+  },
+  {
+    "type": "node",
+    "id": 4260308919,
+    "lat": 31.6706050,
+    "lon": 34.5905105
+  },
+  {
+    "type": "node",
+    "id": 4260308988,
+    "lat": 31.6705092,
+    "lon": 34.5906176
+  },
+  {
+    "type": "node",
+    "id": 4438023711,
+    "lat": 31.6679391,
+    "lon": 34.5852187
+  },
+  {
+    "type": "node",
+    "id": 4438023712,
+    "lat": 31.6677174,
+    "lon": 34.5852213
+  },
+  {
+    "type": "node",
+    "id": 4438023713,
+    "lat": 31.6685353,
+    "lon": 34.5843916
+  },
+  {
+    "type": "node",
+    "id": 4438023721,
+    "lat": 31.6678971,
+    "lon": 34.5846190
+  },
+  {
+    "type": "node",
+    "id": 4438023722,
+    "lat": 31.6679258,
+    "lon": 34.5849720
+  },
+  {
+    "type": "node",
+    "id": 4438023746,
+    "lat": 31.6674190,
+    "lon": 34.5866884
+  },
+  {
+    "type": "node",
+    "id": 4438023760,
+    "lat": 31.6671747,
+    "lon": 34.5867283
+  },
+  {
+    "type": "node",
+    "id": 4735972853,
+    "lat": 31.6746663,
+    "lon": 34.5831411
+  },
+  {
+    "type": "node",
+    "id": 5196595536,
+    "lat": 31.6697158,
+    "lon": 34.5855637
+  },
+  {
+    "type": "node",
+    "id": 5196595558,
+    "lat": 31.6697194,
+    "lon": 34.5854465
+  },
+  {
+    "type": "node",
+    "id": 5196595601,
+    "lat": 31.6697553,
+    "lon": 34.5856820
+  },
+  {
+    "type": "node",
+    "id": 5196595661,
+    "lat": 31.6697345,
+    "lon": 34.5857886
+  },
+  {
+    "type": "node",
+    "id": 5196595715,
+    "lat": 31.6697748,
+    "lon": 34.5855481
+  },
+  {
+    "type": "node",
+    "id": 5196595720,
+    "lat": 31.6697135,
+    "lon": 34.5858918
+  },
+  {
+    "type": "node",
+    "id": 5196595978,
+    "lat": 31.6697047,
+    "lon": 34.5860229
+  },
+  {
+    "type": "node",
+    "id": 5196596359,
+    "lat": 31.6698185,
+    "lon": 34.5868451
+  },
+  {
+    "type": "node",
+    "id": 5196596492,
+    "lat": 31.6703360,
+    "lon": 34.5871598
+  },
+  {
+    "type": "node",
+    "id": 5196597206,
+    "lat": 31.6697779,
+    "lon": 34.5854312
+  },
+  {
+    "type": "node",
+    "id": 5196602343,
+    "lat": 31.6696670,
+    "lon": 34.5858268
+  },
+  {
+    "type": "node",
+    "id": 5196602355,
+    "lat": 31.6696999,
+    "lon": 34.5857001
+  },
+  {
+    "type": "node",
+    "id": 5399845131,
+    "lat": 31.6735815,
+    "lon": 34.5828191
+  },
+  {
+    "type": "node",
+    "id": 5400733335,
+    "lat": 31.6729247,
+    "lon": 34.5876783
+  },
+  {
+    "type": "node",
+    "id": 5400733336,
+    "lat": 31.6727466,
+    "lon": 34.5867771
+  },
+  {
+    "type": "node",
+    "id": 5400733337,
+    "lat": 31.6718335,
+    "lon": 34.5861723
+  },
+  {
+    "type": "node",
+    "id": 5400733338,
+    "lat": 31.6719819,
+    "lon": 34.5861750
+  },
+  {
+    "type": "node",
+    "id": 5400733339,
+    "lat": 31.6708930,
+    "lon": 34.5865706
+  },
+  {
+    "type": "node",
+    "id": 5400733340,
+    "lat": 31.6706396,
+    "lon": 34.5874383
+  },
+  {
+    "type": "node",
+    "id": 5400733341,
+    "lat": 31.6706145,
+    "lon": 34.5878715
+  },
+  {
+    "type": "node",
+    "id": 5400733342,
+    "lat": 31.6698703,
+    "lon": 34.5888565
+  },
+  {
+    "type": "node",
+    "id": 5400733343,
+    "lat": 31.6699571,
+    "lon": 34.5886956
+  },
+  {
+    "type": "node",
+    "id": 5400733344,
+    "lat": 31.6701922,
+    "lon": 34.5887599
+  },
+  {
+    "type": "node",
+    "id": 5434373762,
+    "lat": 31.6688579,
+    "lon": 34.5938035
+  },
+  {
+    "type": "node",
+    "id": 5434373763,
+    "lat": 31.6687027,
+    "lon": 34.5939510
+  },
+  {
+    "type": "node",
+    "id": 5434373764,
+    "lat": 31.6693864,
+    "lon": 34.5917556
+  },
+  {
+    "type": "node",
+    "id": 5434373765,
+    "lat": 31.6694297,
+    "lon": 34.5916403
+  },
+  {
+    "type": "node",
+    "id": 5434373766,
+    "lat": 31.6695382,
+    "lon": 34.5914941
+  },
+  {
+    "type": "node",
+    "id": 5434373767,
+    "lat": 31.6695701,
+    "lon": 34.5914183
+  },
+  {
+    "type": "node",
+    "id": 6025530418,
+    "lat": 31.6746901,
+    "lon": 34.5895825
+  },
+  {
+    "type": "node",
+    "id": 6216681323,
+    "lat": 31.6699270,
+    "lon": 34.5870590
+  },
+  {
+    "type": "node",
+    "id": 6216681324,
+    "lat": 31.6699194,
+    "lon": 34.5871612
+  },
+  {
+    "type": "node",
+    "id": 6216681325,
+    "lat": 31.6699304,
+    "lon": 34.5871372
+  },
+  {
+    "type": "node",
+    "id": 6216681326,
+    "lat": 31.6698331,
+    "lon": 34.5870062
+  },
+  {
+    "type": "node",
+    "id": 6216681327,
+    "lat": 31.6697684,
+    "lon": 34.5871191
+  },
+  {
+    "type": "node",
+    "id": 6216681328,
+    "lat": 31.6699148,
+    "lon": 34.5870376
+  },
+  {
+    "type": "node",
+    "id": 6216681329,
+    "lat": 31.6698831,
+    "lon": 34.5871945
+  },
+  {
+    "type": "node",
+    "id": 6216681330,
+    "lat": 31.6697767,
+    "lon": 34.5871483
+  },
+  {
+    "type": "node",
+    "id": 6216681331,
+    "lat": 31.6697682,
+    "lon": 34.5870882
+  },
+  {
+    "type": "node",
+    "id": 6216681332,
+    "lat": 31.6698238,
+    "lon": 34.5871962
+  },
+  {
+    "type": "node",
+    "id": 6216681333,
+    "lat": 31.6697761,
+    "lon": 34.5870588
+  },
+  {
+    "type": "node",
+    "id": 6216681334,
+    "lat": 31.6698419,
+    "lon": 34.5872011
+  },
+  {
+    "type": "node",
+    "id": 6216681335,
+    "lat": 31.6698572,
+    "lon": 34.5870041
+  },
+  {
+    "type": "node",
+    "id": 6216681336,
+    "lat": 31.6697913,
+    "lon": 34.5870336
+  },
+  {
+    "type": "node",
+    "id": 6216681337,
+    "lat": 31.6699354,
+    "lon": 34.5871106
+  },
+  {
+    "type": "node",
+    "id": 6216681338,
+    "lat": 31.6698787,
+    "lon": 34.5870092
+  },
+  {
+    "type": "node",
+    "id": 6216681339,
+    "lat": 31.6699032,
+    "lon": 34.5871808
+  },
+  {
+    "type": "node",
+    "id": 6216681340,
+    "lat": 31.6697923,
+    "lon": 34.5871732
+  },
+  {
+    "type": "node",
+    "id": 6216681341,
+    "lat": 31.6699340,
+    "lon": 34.5870833
+  },
+  {
+    "type": "node",
+    "id": 6216681342,
+    "lat": 31.6698605,
+    "lon": 34.5872011
+  },
+  {
+    "type": "node",
+    "id": 6216681343,
+    "lat": 31.6698070,
+    "lon": 34.5871867
+  },
+  {
+    "type": "node",
+    "id": 6216681344,
+    "lat": 31.6698105,
+    "lon": 34.5870163
+  },
+  {
+    "type": "node",
+    "id": 6216681345,
+    "lat": 31.6698983,
+    "lon": 34.5870206
+  },
+  {
+    "type": "node",
+    "id": 6637071136,
+    "lat": 31.6736994,
+    "lon": 34.5820873
+  },
+  {
+    "type": "node",
+    "id": 6637071138,
+    "lat": 31.6737904,
+    "lon": 34.5822251
+  },
+  {
+    "type": "node",
+    "id": 6736358538,
+    "lat": 31.6738549,
+    "lon": 34.5818753
+  },
+  {
+    "type": "node",
+    "id": 6736358539,
+    "lat": 31.6737539,
+    "lon": 34.5818248
+  },
+  {
+    "type": "node",
+    "id": 8544864633,
+    "lat": 31.6678494,
+    "lon": 34.5843512
+  },
+  {
+    "type": "node",
+    "id": 8544864634,
+    "lat": 31.6679209,
+    "lon": 34.5843336
+  },
+  {
+    "type": "node",
+    "id": 8544864635,
+    "lat": 31.6678746,
+    "lon": 34.5843472
+  },
+  {
+    "type": "node",
+    "id": 8544864636,
+    "lat": 31.6680819,
+    "lon": 34.5842978
+  },
+  {
+    "type": "node",
+    "id": 8544864637,
+    "lat": 31.6679472,
+    "lon": 34.5844245
+  },
+  {
+    "type": "node",
+    "id": 8544864638,
+    "lat": 31.6680462,
+    "lon": 34.5843743
+  },
+  {
+    "type": "node",
+    "id": 8544864639,
+    "lat": 31.6680265,
+    "lon": 34.5842966
+  },
+  {
+    "type": "node",
+    "id": 8544864640,
+    "lat": 31.6679883,
+    "lon": 34.5843022
+  },
+  {
+    "type": "node",
+    "id": 8544864645,
+    "lat": 31.6682082,
+    "lon": 34.5843156
+  },
+  {
+    "type": "node",
+    "id": 8830062857,
+    "lat": 31.6666823,
+    "lon": 34.5898552
+  },
+  {
+    "type": "node",
+    "id": 8830062858,
+    "lat": 31.6693085,
+    "lon": 34.5887356
+  },
+  {
+    "type": "node",
+    "id": 8830062859,
+    "lat": 31.6694115,
+    "lon": 34.5887729
+  },
+  {
+    "type": "node",
+    "id": 8830062860,
+    "lat": 31.6693528,
+    "lon": 34.5887539
+  },
+  {
+    "type": "node",
+    "id": 8830062861,
+    "lat": 31.6692982,
+    "lon": 34.5886833
+  },
+  {
+    "type": "node",
+    "id": 8830062862,
+    "lat": 31.6692866,
+    "lon": 34.5886472
+  },
+  {
+    "type": "node",
+    "id": 8830062863,
+    "lat": 31.6692843,
+    "lon": 34.5886011
+  },
+  {
+    "type": "node",
+    "id": 8830062864,
+    "lat": 31.6692889,
+    "lon": 34.5885632
+  },
+  {
+    "type": "node",
+    "id": 8830062865,
+    "lat": 31.6693025,
+    "lon": 34.5885145
+  },
+  {
+    "type": "node",
+    "id": 8830062866,
+    "lat": 31.6693129,
+    "lon": 34.5887079
+  },
+  {
+    "type": "node",
+    "id": 8830062867,
+    "lat": 31.6693324,
+    "lon": 34.5887294
+  },
+  {
+    "type": "node",
+    "id": 8830062891,
+    "lat": 31.6662272,
+    "lon": 34.5934396
+  },
+  {
+    "type": "node",
+    "id": 8830062897,
+    "lat": 31.6701903,
+    "lon": 34.5871131
+  },
+  {
+    "type": "node",
+    "id": 8830062898,
+    "lat": 31.6700631,
+    "lon": 34.5870913
+  },
+  {
+    "type": "node",
+    "id": 8850049259,
+    "lat": 31.6741431,
+    "lon": 34.5852355
+  },
+  {
+    "type": "node",
+    "id": 8850049288,
+    "lat": 31.6756751,
+    "lon": 34.5839904
+  },
+  {
+    "type": "node",
+    "id": 8851313315,
+    "lat": 31.6732711,
+    "lon": 34.5897491
+  },
+  {
+    "type": "node",
+    "id": 8851313316,
+    "lat": 31.6731725,
+    "lon": 34.5898071
+  },
+  {
+    "type": "node",
+    "id": 9265988056,
+    "lat": 31.6693179,
+    "lon": 34.5828534
+  },
+  {
+    "type": "node",
+    "id": 9265988060,
+    "lat": 31.6694362,
+    "lon": 34.5825342
+  },
+  {
+    "type": "node",
+    "id": 9265988061,
+    "lat": 31.6696285,
+    "lon": 34.5825239
+  },
+  {
+    "type": "node",
+    "id": 9265988065,
+    "lat": 31.6692509,
+    "lon": 34.5828630
+  },
+  {
+    "type": "node",
+    "id": 9265988066,
+    "lat": 31.6692804,
+    "lon": 34.5832140
+  },
+  {
+    "type": "node",
+    "id": 9265988070,
+    "lat": 31.6694175,
+    "lon": 34.5843150
+  },
+  {
+    "type": "node",
+    "id": 9265988086,
+    "lat": 31.6697222,
+    "lon": 34.5862709
+  },
+  {
+    "type": "node",
+    "id": 9265988087,
+    "lat": 31.6697697,
+    "lon": 34.5866132
+  },
+  {
+    "type": "node",
+    "id": 9265988088,
+    "lat": 31.6696564,
+    "lon": 34.5862239
+  },
+  {
+    "type": "node",
+    "id": 10160134464,
+    "lat": 31.6785595,
+    "lon": 34.5955751
+  },
+  {
+    "type": "node",
+    "id": 10700150204,
+    "lat": 31.6715655,
+    "lon": 34.5853317
+  },
+  {
+    "type": "node",
+    "id": 10700164905,
+    "lat": 31.6715936,
+    "lon": 34.5852146
+  },
+  {
+    "type": "node",
+    "id": 10700164906,
+    "lat": 31.6715797,
+    "lon": 34.5851858
+  },
+  {
+    "type": "node",
+    "id": 10700164907,
+    "lat": 31.6715605,
+    "lon": 34.5851650
+  },
+  {
+    "type": "node",
+    "id": 10700164908,
+    "lat": 31.6714291,
+    "lon": 34.5852141
+  },
+  {
+    "type": "node",
+    "id": 10700164909,
+    "lat": 31.6714712,
+    "lon": 34.5853423
+  },
+  {
+    "type": "node",
+    "id": 10700164910,
+    "lat": 31.6714376,
+    "lon": 34.5853066
+  },
+  {
+    "type": "node",
+    "id": 10700164911,
+    "lat": 31.6715839,
+    "lon": 34.5853086
+  },
+  {
+    "type": "node",
+    "id": 10700164912,
+    "lat": 31.6714852,
+    "lon": 34.5851519
+  },
+  {
+    "type": "node",
+    "id": 10700164913,
+    "lat": 31.6715110,
+    "lon": 34.5851473
+  },
+  {
+    "type": "node",
+    "id": 10700164914,
+    "lat": 31.6715991,
+    "lon": 34.5852471
+  },
+  {
+    "type": "node",
+    "id": 10700164915,
+    "lat": 31.6714927,
+    "lon": 34.5853513
+  },
+  {
+    "type": "node",
+    "id": 10700164916,
+    "lat": 31.6715369,
+    "lon": 34.5851517
+  },
+  {
+    "type": "node",
+    "id": 10700164917,
+    "lat": 31.6713972,
+    "lon": 34.5852922
+  },
+  {
+    "type": "node",
+    "id": 10700164918,
+    "lat": 31.6716518,
+    "lon": 34.5851829
+  },
+  {
+    "type": "node",
+    "id": 10700164919,
+    "lat": 31.6714524,
+    "lon": 34.5853271
+  },
+  {
+    "type": "node",
+    "id": 10700164920,
+    "lat": 31.6713725,
+    "lon": 34.5851900
+  },
+  {
+    "type": "node",
+    "id": 10700164921,
+    "lat": 31.6714425,
+    "lon": 34.5851862
+  },
+  {
+    "type": "node",
+    "id": 10700164922,
+    "lat": 31.6713447,
+    "lon": 34.5852761
+  },
+  {
+    "type": "node",
+    "id": 10700164923,
+    "lat": 31.6714236,
+    "lon": 34.5852455
+  },
+  {
+    "type": "node",
+    "id": 10700164924,
+    "lat": 31.6712282,
+    "lon": 34.5851594
+  },
+  {
+    "type": "node",
+    "id": 10700164925,
+    "lat": 31.6714265,
+    "lon": 34.5852774
+  },
+  {
+    "type": "node",
+    "id": 10700164926,
+    "lat": 31.6717396,
+    "lon": 34.5852573
+  },
+  {
+    "type": "node",
+    "id": 10700164927,
+    "lat": 31.6715955,
+    "lon": 34.5852800
+  },
+  {
+    "type": "node",
+    "id": 10700164928,
+    "lat": 31.6715419,
+    "lon": 34.5853472
+  },
+  {
+    "type": "node",
+    "id": 10700164929,
+    "lat": 31.6717217,
+    "lon": 34.5851663
+  },
+  {
+    "type": "node",
+    "id": 10700164930,
+    "lat": 31.6708253,
+    "lon": 34.5850591
+  },
+  {
+    "type": "node",
+    "id": 10700164931,
+    "lat": 31.6715155,
+    "lon": 34.5853536
+  },
+  {
+    "type": "node",
+    "id": 10700164932,
+    "lat": 31.6716666,
+    "lon": 34.5852636
+  },
+  {
+    "type": "node",
+    "id": 10982132298,
+    "lat": 31.6743881,
+    "lon": 34.5894263
+  },
+  {
+    "type": "node",
+    "id": 11157715939,
+    "lat": 31.6729218,
+    "lon": 34.5915312
+  },
+  {
+    "type": "node",
+    "id": 11157715991,
+    "lat": 31.6766267,
+    "lon": 34.5926577
+  },
+  {
+    "type": "node",
+    "id": 11157715997,
+    "lat": 31.6763439,
+    "lon": 34.5922943
+  },
+  {
+    "type": "node",
+    "id": 11157716038,
+    "lat": 31.6690207,
+    "lon": 34.5933146
+  },
+  {
+    "type": "node",
+    "id": 11157716200,
+    "lat": 31.6731555,
+    "lon": 34.5899207
+  },
+  {
+    "type": "node",
+    "id": 11157716201,
+    "lat": 31.6731963,
+    "lon": 34.5899017
+  },
+  {
+    "type": "node",
+    "id": 11203476667,
+    "lat": 31.6714617,
+    "lon": 34.5851653
+  },
+  {
+    "type": "node",
+    "id": 11235775825,
+    "lat": 31.6716493,
+    "lon": 34.5926481
+  },
+  {
+    "type": "node",
+    "id": 11235802644,
+    "lat": 31.6732385,
+    "lon": 34.5925942
+  },
+  {
+    "type": "node",
+    "id": 11235802646,
+    "lat": 31.6710233,
+    "lon": 34.5921571
+  },
+  {
+    "type": "node",
+    "id": 11235802647,
+    "lat": 31.6710434,
+    "lon": 34.5920013
+  },
+  {
+    "type": "node",
+    "id": 11235802648,
+    "lat": 31.6727916,
+    "lon": 34.5924958
+  },
+  {
+    "type": "node",
+    "id": 11235802649,
+    "lat": 31.6726163,
+    "lon": 34.5925516
+  },
+  {
+    "type": "node",
+    "id": 11235802650,
+    "lat": 31.6724291,
+    "lon": 34.5925881
+  },
+  {
+    "type": "node",
+    "id": 11235802651,
+    "lat": 31.6721469,
+    "lon": 34.5926235
+  },
+  {
+    "type": "node",
+    "id": 11235802652,
+    "lat": 31.6717698,
+    "lon": 34.5926492
+  },
+  {
+    "type": "node",
+    "id": 11235802654,
+    "lat": 31.6710711,
+    "lon": 34.5923097
+  },
+  {
+    "type": "node",
+    "id": 11235802655,
+    "lat": 31.6731622,
+    "lon": 34.5923382
+  },
+  {
+    "type": "node",
+    "id": 11235802656,
+    "lat": 31.6714749,
+    "lon": 34.5926009
+  },
+  {
+    "type": "node",
+    "id": 11235802663,
+    "lat": 31.6729698,
+    "lon": 34.5924200
+  },
+  {
+    "type": "node",
+    "id": 11235995698,
+    "lat": 31.6744505,
+    "lon": 34.5894636
+  },
+  {
+    "type": "node",
+    "id": 11235995699,
+    "lat": 31.6745081,
+    "lon": 34.5895200
+  },
+  {
+    "type": "node",
+    "id": 11235995700,
+    "lat": 31.6742273,
+    "lon": 34.5894174
+  },
+  {
+    "type": "node",
+    "id": 11252910204,
+    "lat": 31.6696552,
+    "lon": 34.5902940
+  },
+  {
+    "type": "node",
+    "id": 11492029859,
+    "lat": 31.6721120,
+    "lon": 34.5887282
+  },
+  {
+    "type": "node",
+    "id": 11492029860,
+    "lat": 31.6720074,
+    "lon": 34.5887581
+  },
+  {
+    "type": "node",
+    "id": 11492029861,
+    "lat": 31.6717026,
+    "lon": 34.5888607
+  },
+  {
+    "type": "node",
+    "id": 11492029862,
+    "lat": 31.6715364,
+    "lon": 34.5888372
+  },
+  {
+    "type": "node",
+    "id": 11492029863,
+    "lat": 31.6713888,
+    "lon": 34.5887001
+  },
+  {
+    "type": "node",
+    "id": 11613055664,
+    "lat": 31.6710263,
+    "lon": 34.5881326
+  },
+  {
+    "type": "node",
+    "id": 11613055665,
+    "lat": 31.6711827,
+    "lon": 34.5880555
+  },
+  {
+    "type": "node",
+    "id": 11613055666,
+    "lat": 31.6713927,
+    "lon": 34.5879796
+  },
+  {
+    "type": "node",
+    "id": 11613055667,
+    "lat": 31.6712354,
+    "lon": 34.5884801
+  },
+  {
+    "type": "node",
+    "id": 11613689429,
+    "lat": 31.6745274,
+    "lon": 34.5891897
+  },
+  {
+    "type": "node",
+    "id": 11613689430,
+    "lat": 31.6743656,
+    "lon": 34.5894201
+  },
+  {
+    "type": "node",
+    "id": 11613689431,
+    "lat": 31.6742502,
+    "lon": 34.5892328
+  },
+  {
+    "type": "node",
+    "id": 11613689432,
+    "lat": 31.6742949,
+    "lon": 34.5891196
+  },
+  {
+    "type": "node",
+    "id": 12638936085,
+    "lat": 31.6693876,
+    "lon": 34.5845628
+  }
+  
+    ]
+  }
+  

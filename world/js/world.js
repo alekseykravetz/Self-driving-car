@@ -189,7 +189,7 @@ class World {
     return bases.map((b) => new Building(b));
   }
 
-  draw(ctx, viewPoint, showStartMarkings = true) {
+  draw(ctx, viewPoint, showStartMarkings = true, renderRadius = 1000) {
     for (const envelope of this.envelopes) {
       envelope.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
     }
@@ -213,7 +213,9 @@ class World {
       this.bestCar.draw(ctx, true);
     }
 
-    const items = [...this.buildings, ...this.trees];
+    const items = [...this.buildings, ...this.trees].filter(
+      (item) => item.base.distanceToPoint(viewPoint) < renderRadius
+    );
     items.sort((a, b) => b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint));
     for (const item of items) item.draw(ctx, viewPoint);
   }
