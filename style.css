@@ -24,7 +24,8 @@ button:hover {
 }
 
 #gameCanvas {
-  background: lightgray;
+  /* background: lightgray; */
+  background: #2a5;
 }
 
 #networkCanvas {

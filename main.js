@@ -6,22 +6,45 @@ const networkCanvas = document.getElementById('networkCanvas');
 networkCanvas.width = constants.networkCanvasWidth;
 const networkCtx = networkCanvas.getContext('2d');
 
-const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
+gameCanvas.height = window.innerHeight;
+networkCanvas.height = window.innerHeight;
+
+const worldString = localStorage.getItem('world');
+const worldInfo = worldString ? JSON.parse(worldString) : null;
+const world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+
+const viewport = new Viewport(gameCanvas, world.zoom, world.offset);
+
+// const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 
 const traffic = [
-  new Car(road.getLaneCenter(1), -100, 30, 50, 'DUMMY', 2, getRandomColor()),
-  new Car(road.getLaneCenter(0), -300, 30, 50, 'DUMMY', 2, getRandomColor()),
-  new Car(road.getLaneCenter(2), -300, 30, 50, 'DUMMY', 2, getRandomColor()),
-  new Car(road.getLaneCenter(0), -500, 30, 50, 'DUMMY', 2, getRandomColor()),
-  new Car(road.getLaneCenter(1), -500, 30, 50, 'DUMMY', 2, getRandomColor()),
-  new Car(road.getLaneCenter(1), -700, 30, 50, 'DUMMY', 2, getRandomColor()),
-  new Car(road.getLaneCenter(2), -700, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(1), -100, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(0), -300, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(2), -300, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(0), -500, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(1), -500, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(1), -700, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(2), -700, 30, 50, 'DUMMY', 2, getRandomColor()),
+];
+
+const roadBorders = [
+  ...world.buildings
+    .map((b) => b.base.segments)
+    .flat()
+    .map((s) => [s.p1, s.p2]),
+  ...world.roadBorders.map((s) => [s.p1, s.p2]),
 ];
 
 function generateCars(n) {
+  const startMarkings = world.markings.filter((m) => m instanceof Start);
+  const startPoint = startMarkings.length ? startMarkings[0].center : new Point(100, 100);
+  const direction = startMarkings.length ? startMarkings[0].directionVector : new Point(0, -1);
+  const startAngle = -angle(direction) + Math.PI / 2;
+
   const cars = [];
   for (let i = 1; i <= n; i++) {
-    cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, 'AI', 3, 'blue'));
+    // cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', 3, 'blue'));
+    cars.push(new Car(startPoint.x, startPoint.y, 30, 50, 'AI', startAngle, 3, 'blue'));
   }
   return cars;
 }
@@ -52,38 +75,49 @@ animate();
 function animate(time) {
   // update traffic cars and play cars data
   for (let i = 0; i < traffic.length; i++) {
-    traffic[i].update(road.borders, []);
+    // traffic[i].update(road.borders, []);
+    traffic[i].update(roadBorders, []);
   }
   for (let i = 0; i < cars.length; i++) {
-    cars[i].update(road.borders, traffic);
+    // cars[i].update(road.borders, traffic);
+    cars[i].update(roadBorders, traffic);
   }
 
   // Fitness function
-  bestCar = cars.find((c) => c.y === Math.min(...cars.map((c) => c.y))); // the hightest car on game canvas
+  // bestCar = cars.find((c) => c.y === Math.min(...cars.map((c) => c.y))); // the hightest car on game canvas
+  bestCar = cars.find((c) => c.fitness === Math.max(...cars.map((c) => c.fitness))); // the hightest car on game canvas
+
+  world.cars = cars;
+  world.bestCar = bestCar;
+
+  viewport.offset.x = -bestCar.x;
+  viewport.offset.y = -bestCar.y;
 
   // draw Game canvas
-  gameCanvas.height = window.innerHeight;
-  networkCanvas.height = window.innerHeight;
+  viewport.reset();
+  const viewPoint = scale(viewport.getOffset(), -1);
+  world.draw(gameCtx, viewPoint, false);
 
-  gameCtx.save();
-  gameCtx.translate(0, -bestCar.y + gameCanvas.height * 0.7);
+  // gameCtx.save();
+  // gameCtx.translate(0, -bestCar.y + gameCanvas.height * 0.7);
 
-  road.draw(gameCtx);
+  // road.draw(gameCtx);
   for (let i = 0; i < traffic.length; i++) {
     traffic[i].draw(gameCtx);
   }
 
-  gameCtx.globalAlpha = 0.2;
-  for (let i = 0; i < cars.length; i++) {
-    cars[i].draw(gameCtx);
-  }
-  gameCtx.globalAlpha = 1;
-  bestCar.draw(gameCtx, true);
+  // gameCtx.globalAlpha = 0.2;
+  // for (let i = 0; i < cars.length; i++) {
+  //   cars[i].draw(gameCtx);
+  // }
+  // gameCtx.globalAlpha = 1;
+  // bestCar.draw(gameCtx, true);
 
-  gameCtx.restore();
+  // gameCtx.restore();
 
   // draw Network canvas
   networkCtx.lineDashOffset = -time / 50;
+  networkCtx.clearRect(0, 0, networkCanvas.width, networkCanvas.height);
   Visualizer.drawNetwork(networkCtx, bestCar.brain);
 
   requestAnimationFrame(animate);

@@ -24,6 +24,9 @@ class World {
 
     this.markings = [];
 
+    this.cars = [];
+    this.bestCar = null;
+
     this.generate();
   }
 
@@ -186,11 +189,12 @@ class World {
     return bases.map((b) => new Building(b));
   }
 
-  draw(ctx, viewPoint) {
+  draw(ctx, viewPoint, showStartMarkings = true) {
     for (const envelope of this.envelopes) {
       envelope.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
     }
     for (const marking of this.markings) {
+      if (marking instanceof Start && !showStartMarkings) continue;
       marking.draw(ctx);
     }
     for (const segment of this.graph.segments) {
@@ -199,6 +203,13 @@ class World {
     for (const segment of this.roadBorders) {
       segment.draw(ctx, { color: 'white', width: 4 });
     }
+
+    gameCtx.globalAlpha = 0.2;
+    for (const car of this.cars) {
+      car.draw(gameCtx);
+    }
+    gameCtx.globalAlpha = 1;
+    this.bestCar.draw(gameCtx, true);
 
     const items = [...this.buildings, ...this.trees];
     items.sort((a, b) => b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint));
