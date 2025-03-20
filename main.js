@@ -9,22 +9,25 @@ const networkCtx = networkCanvas.getContext('2d');
 gameCanvas.height = window.innerHeight;
 networkCanvas.height = window.innerHeight;
 
-const worldString = localStorage.getItem('world');
-const worldInfo = worldString ? JSON.parse(worldString) : null;
-const world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+//World loaded as regular js file attached to index.html
+// const worldString = localStorage.getItem('world');
+// const worldInfo = worldString ? JSON.parse(worldString) : null;
+// const world = worldInfo ? World.load(worldInfo) : new World(new Graph());
 
 const viewport = new Viewport(gameCanvas, world.zoom, world.offset);
 
 // const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 
+// const trafficDirections = new Point(0, -1);
+// const trafficStartAngle = -angle(trafficDirections) + Math.PI / 2;
 const traffic = [
-  // new Car(road.getLaneCenter(1), -100, 30, 50, 'DUMMY', 2, getRandomColor()),
-  // new Car(road.getLaneCenter(0), -300, 30, 50, 'DUMMY', 2, getRandomColor()),
-  // new Car(road.getLaneCenter(2), -300, 30, 50, 'DUMMY', 2, getRandomColor()),
-  // new Car(road.getLaneCenter(0), -500, 30, 50, 'DUMMY', 2, getRandomColor()),
-  // new Car(road.getLaneCenter(1), -500, 30, 50, 'DUMMY', 2, getRandomColor()),
-  // new Car(road.getLaneCenter(1), -700, 30, 50, 'DUMMY', 2, getRandomColor()),
-  // new Car(road.getLaneCenter(2), -700, 30, 50, 'DUMMY', 2, getRandomColor()),
+  // new Car(road.getLaneCenter(1), -100, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
+  // new Car(road.getLaneCenter(0), -300, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
+  // new Car(road.getLaneCenter(2), -300, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
+  // new Car(road.getLaneCenter(0), -500, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
+  // new Car(road.getLaneCenter(1), -500, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
+  // new Car(road.getLaneCenter(1), -700, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
+  // new Car(road.getLaneCenter(2), -700, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
 ];
 
 const roadBorders = [
