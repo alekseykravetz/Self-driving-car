@@ -1,13 +1,16 @@
 const gameCanvas = document.getElementById('gameCanvas');
 gameCanvas.width = constants.gameCanvasWidth;
+gameCanvas.height = window.innerHeight;
 const gameCtx = gameCanvas.getContext('2d');
 
 const networkCanvas = document.getElementById('networkCanvas');
 networkCanvas.width = constants.networkCanvasWidth;
+networkCanvas.height = window.innerHeight - 300;
 const networkCtx = networkCanvas.getContext('2d');
 
-gameCanvas.height = window.innerHeight;
-networkCanvas.height = window.innerHeight;
+const miniMapCanvas = document.getElementById('miniMapCanvas');
+miniMapCanvas.width = constants.miniMapCanvasWidth;
+miniMapCanvas.height = window.innerHeight - 300;
 
 //World loaded as regular js file attached to index.html
 // const worldString = localStorage.getItem('world');
@@ -15,6 +18,7 @@ networkCanvas.height = window.innerHeight;
 // const world = worldInfo ? World.load(worldInfo) : new World(new Graph());
 
 const viewport = new Viewport(gameCanvas, world.zoom, world.offset);
+const miniMap = new MiniMap(miniMapCanvas, world.graph, constants.miniMapCanvasWidth);
 
 // const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 
@@ -100,6 +104,7 @@ function animate(time) {
   viewport.reset();
   const viewPoint = scale(viewport.getOffset(), -1);
   world.draw(gameCtx, viewPoint, false);
+  miniMap.update(viewPoint);
 
   // gameCtx.save();
   // gameCtx.translate(0, -bestCar.y + gameCanvas.height * 0.7);

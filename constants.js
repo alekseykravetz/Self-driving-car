@@ -6,6 +6,7 @@ const constants = {
   sensorRayLength: 150,
   sensorRaySpread: Math.PI / 2,
   networkCanvasWidth: 300,
+  miniMapCanvasWidth: 300,
   networkMutateAmount: 0.1,
   networkHiddenLayers: [6],
 };
