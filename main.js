@@ -97,6 +97,8 @@ function animate(time) {
   world.cars = cars;
   world.bestCar = bestCar;
 
+  miniMap.cars = cars;
+
   viewport.offset.x = -bestCar.x;
   viewport.offset.y = -bestCar.y;
 

@@ -15,13 +15,23 @@ class MiniMap {
 
     const scaler = 0.05;
     const scaledViewPoint = scale(viewPoint, -scaler);
+
     this.ctx.save();
     this.ctx.translate(scaledViewPoint.x + this.size / 2, scaledViewPoint.y + this.size / 2);
     this.ctx.scale(scaler, scaler);
+
     for (const segment of this.graph.segments) {
       segment.draw(this.ctx, { width: 3 / scaler, color: 'white' });
     }
+    for (const car of this.cars) {
+      new Point(car.x, car.y).draw(this.ctx, {
+        color: car.damaged ? 'gray' : 'red',
+        size: 5 / scaler,
+      });
+    }
+
     this.ctx.restore();
-    new Point(this.size / 2, this.size / 2).draw(this.ctx, { color: 'blue', outline: true });
+
+    new Point(this.size / 2, this.size / 2).draw(this.ctx, { size: 12, color: 'blue', outline: true });
   }
 }
