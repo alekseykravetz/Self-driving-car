@@ -42,6 +42,18 @@ const roadBorders = [
   ...world.roadBorders.map((s) => [s.p1, s.p2]),
 ];
 
+const N = 1;
+const cars = generateCars(N);
+let bestCar = cars[0];
+if (localStorage.getItem('bestBrain')) {
+  for (let i = 0; i < cars.length; i++) {
+    cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
+    if (i !== 0) {
+      NeuralNetwork.mutate(cars[i].brain, constants.networkMutateAmount);
+    }
+  }
+}
+
 function generateCars(n) {
   const startMarkings = world.markings.filter((m) => m instanceof Start);
   const startPoint = startMarkings.length ? startMarkings[0].center : new Point(100, 100);
@@ -51,23 +63,11 @@ function generateCars(n) {
   const cars = [];
   for (let i = 1; i <= n; i++) {
     // cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', 3, 'blue'));
-    cars.push(new Car(startPoint.x, startPoint.y, 30, 50, 'AI', startAngle, 3, 'blue'));
+    const car = new Car(startPoint.x, startPoint.y, 30, 50, 'AI', startAngle, 3, 'blue');
+    car.load(carInfo);
+    cars.push(car);
   }
   return cars;
-}
-
-const N = constants.generateCarsNumber;
-const cars = generateCars(N);
-
-let bestCar = cars[0];
-
-if (localStorage.getItem('bestBrain')) {
-  for (let i = 0; i < cars.length; i++) {
-    cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
-    if (i !== 0) {
-      NeuralNetwork.mutate(cars[i].brain, constants.networkMutateAmount);
-    }
-  }
 }
 
 function save() {

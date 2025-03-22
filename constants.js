@@ -1,6 +1,6 @@
 const constants = {
   gameCanvasWidth: window.innerWidth - 330,
-  generateCarsNumber: 100,
+  generateCarsNumber: 1,
   roadLaneCount: 3,
   sensorRayCount: 5,
   sensorRayLength: 150,

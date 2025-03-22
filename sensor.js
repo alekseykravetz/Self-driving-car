@@ -4,6 +4,7 @@ class Sensor {
     this.rayCount = constants.sensorRayCount;
     this.rayLength = constants.sensorRayLength;
     this.raySpread = constants.sensorRaySpread; // Math.PI / 2,
+    this.rayOffset = 0;
 
     this.rays = [];
     this.readings = [];
@@ -21,12 +22,7 @@ class Sensor {
     let touches = [];
 
     for (let i = 0; i < roadBorders.length; i++) {
-      const touch = getIntersection(
-        ray[0],
-        ray[1],
-        roadBorders[i][0],
-        roadBorders[i][1]
-      );
+      const touch = getIntersection(ray[0], ray[1], roadBorders[i][0], roadBorders[i][1]);
       if (touch) {
         touches.push(touch);
       }
@@ -35,12 +31,7 @@ class Sensor {
     for (let i = 0; i < traffic.length; i++) {
       const poly = traffic[i].polygon;
       for (let j = 0; j < poly.length; j++) {
-        const value = getIntersection(
-          ray[0],
-          ray[1],
-          poly[j],
-          poly[(j + 1) % poly.length]
-        );
+        const value = getIntersection(ray[0], ray[1], poly[j], poly[(j + 1) % poly.length]);
         if (value) {
           touches.push(value);
         }
@@ -60,11 +51,9 @@ class Sensor {
     this.rays = [];
     for (let i = 0; i < this.rayCount; i++) {
       const rayAngle =
-        lerp(
-          this.raySpread / 2,
-          -this.raySpread / 2,
-          this.rayCount === 1 ? 0.5 : i / (this.rayCount - 1)
-        ) + this.car.angle;
+        lerp(this.raySpread / 2, -this.raySpread / 2, this.rayCount === 1 ? 0.5 : i / (this.rayCount - 1)) +
+        this.car.angle +
+        this.rayOffset;
 
       const start = { x: this.car.x, y: this.car.y };
       const end = {
