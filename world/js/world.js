@@ -262,8 +262,7 @@ class World {
     }
     ctx.globalAlpha = 1;
     if (this.bestCar) {
-      // this.bestCar.draw(ctx, true);
-      this.bestCar.draw(ctx, false);
+      this.bestCar.draw(ctx, true);
     }
 
     const items = [...this.buildings, ...this.trees].filter(

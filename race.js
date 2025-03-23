@@ -22,7 +22,7 @@ if (localStorage.getItem('bestBrain')) {
   for (let i = 0; i < cars.length; i++) {
     cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
     if (i > 1) {
-      NeuralNetwork.mutate(cars[i].brain, constants.networkMutateAmount);
+      NeuralNetwork.mutate(cars[i].brain, 0.1);
     }
   }
 }

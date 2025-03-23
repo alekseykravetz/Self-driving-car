@@ -1,16 +1,19 @@
+const rightPanelWidth = 300;
+const buttonsPanelWidth = 30;
+
 const gameCanvas = document.getElementById('gameCanvas');
-gameCanvas.width = constants.gameCanvasWidth;
+gameCanvas.width = window.innerWidth - rightPanelWidth - buttonsPanelWidth;
 gameCanvas.height = window.innerHeight;
 const gameCtx = gameCanvas.getContext('2d');
 
 const networkCanvas = document.getElementById('networkCanvas');
-networkCanvas.width = constants.networkCanvasWidth;
-networkCanvas.height = window.innerHeight - 300;
+networkCanvas.width = rightPanelWidth;
+networkCanvas.height = window.innerHeight - rightPanelWidth;
 const networkCtx = networkCanvas.getContext('2d');
 
 const miniMapCanvas = document.getElementById('miniMapCanvas');
-miniMapCanvas.width = constants.miniMapCanvasWidth;
-miniMapCanvas.height = window.innerHeight - 300;
+miniMapCanvas.width = rightPanelWidth;
+miniMapCanvas.height = window.innerHeight - rightPanelWidth;
 
 //World loaded as regular js file attached to index.html
 // const worldString = localStorage.getItem('world');
@@ -18,7 +21,7 @@ miniMapCanvas.height = window.innerHeight - 300;
 // const world = worldInfo ? World.load(worldInfo) : new World(new Graph());
 
 const viewport = new Viewport(gameCanvas, world.zoom, world.offset);
-const miniMap = new MiniMap(miniMapCanvas, world.graph, constants.miniMapCanvasWidth);
+const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth);
 
 // const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 
@@ -41,7 +44,7 @@ if (localStorage.getItem('bestBrain')) {
   for (let i = 0; i < cars.length; i++) {
     cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
     if (i !== 0) {
-      NeuralNetwork.mutate(cars[i].brain, constants.networkMutateAmount);
+      NeuralNetwork.mutate(cars[i].brain, 0.1);
     }
   }
 }
