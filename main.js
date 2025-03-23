@@ -34,15 +34,7 @@ const traffic = [
   // new Car(road.getLaneCenter(2), -700, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
 ];
 
-const roadBorders = [
-  ...world.buildings
-    .map((b) => b.base.segments)
-    .flat()
-    .map((s) => [s.p1, s.p2]),
-  ...world.roadBorders.map((s) => [s.p1, s.p2]),
-];
-
-const N = 1;
+const N = 100;
 const cars = generateCars(N);
 let bestCar = cars[0];
 if (localStorage.getItem('bestBrain')) {
@@ -52,6 +44,21 @@ if (localStorage.getItem('bestBrain')) {
       NeuralNetwork.mutate(cars[i].brain, constants.networkMutateAmount);
     }
   }
+}
+
+let roadBorders = [];
+const target = world.markings.find((m) => m instanceof Target);
+if (target) {
+  world.generateCorridor(bestCar, target.center);
+  roadBorders = world.corridor.map((s) => [s.p1, s.p2]);
+} else {
+  roadBorders = [
+    // ...world.buildings
+    //   .map((b) => b.base.segments)
+    //   .flat()
+    //   .map((s) => [s.p1, s.p2]),
+    ...world.roadBorders.map((s) => [s.p1, s.p2]),
+  ];
 }
 
 function generateCars(n) {
