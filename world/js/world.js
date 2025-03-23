@@ -68,7 +68,7 @@ class World {
     this.laneGuides.push(...this.#generateLaneGuides());
   }
 
-  generateCorridor(start, end) {
+  generateCorridor(start, end, extendEnd = false) {
     const startSegment = getNearestSegment(start, this.graph.segments);
     const endSegment = getNearestSegment(end, this.graph.segments);
 
@@ -100,12 +100,18 @@ class World {
     for (let i = 1; i < path.length; i++) {
       segments.push(new Segment(path[i - 1], path[i]));
     }
-
+    if (extendEnd) {
+      const lastSegment = segments[segments.length - 1];
+      const lastSegmentDirection = lastSegment.directionVector();
+      segments.push(new Segment(lastSegment.p2, add(lastSegment.p2, scale(lastSegmentDirection, this.roadWidth))));
+    }
     const tempEnvelopes = segments.map((s) => new Envelope(s, this.roadWidth, this.roadRoundness));
+    if (extendEnd) {
+      segments.pop();
+    }
+    const unionSegments = Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
 
-    const polygons = Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
-
-    this.corridor = polygons;
+    this.corridor = { borders: unionSegments, skeleton: segments };
   }
 
   #generateLaneGuides() {
@@ -245,8 +251,8 @@ class World {
     }
 
     if (this.corridor) {
-      for (const polygon of this.corridor) {
-        polygon.draw(ctx, { color: 'red', width: 4 });
+      for (const segment of this.corridor.borders) {
+        segment.draw(ctx, { color: 'red', width: 4 });
       }
     }
 
@@ -256,7 +262,8 @@ class World {
     }
     ctx.globalAlpha = 1;
     if (this.bestCar) {
-      this.bestCar.draw(ctx, true);
+      // this.bestCar.draw(ctx, true);
+      this.bestCar.draw(ctx, false);
     }
 
     const items = [...this.buildings, ...this.trees].filter(
