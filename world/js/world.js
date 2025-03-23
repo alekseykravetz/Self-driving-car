@@ -68,6 +68,46 @@ class World {
     this.laneGuides.push(...this.#generateLaneGuides());
   }
 
+  generateCorridor(start, end) {
+    const startSegment = getNearestSegment(start, this.graph.segments);
+    const endSegment = getNearestSegment(end, this.graph.segments);
+
+    const { point: projectionStart } = startSegment.projectPoint(start);
+    const { point: projectionEnd } = endSegment.projectPoint(end);
+
+    this.graph.points.push(projectionStart);
+    this.graph.points.push(projectionEnd);
+
+    const tempSegments = [
+      new Segment(startSegment.p1, projectionStart),
+      new Segment(projectionStart, startSegment.p2),
+      new Segment(endSegment.p1, projectionEnd),
+      new Segment(projectionEnd, endSegment.p2),
+    ];
+
+    if (startSegment.equals(endSegment)) {
+      tempSegments.push(new Segment(projectionStart, projectionEnd));
+    }
+
+    this.graph.segments = this.graph.segments.concat(tempSegments);
+
+    const path = this.graph.getShortestPath(projectionStart, projectionEnd);
+
+    this.graph.removePoint(projectionStart);
+    this.graph.removePoint(projectionEnd);
+
+    const segments = [];
+    for (let i = 1; i < path.length; i++) {
+      segments.push(new Segment(path[i - 1], path[i]));
+    }
+
+    const tempEnvelopes = segments.map((s) => new Envelope(s, this.roadWidth, this.roadRoundness));
+
+    const polygons = Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
+
+    this.corridor = polygons;
+  }
+
   #generateLaneGuides() {
     const tempEnvelopes = [];
     for (const segment of this.graph.segments) {
@@ -202,6 +242,12 @@ class World {
     }
     for (const segment of this.roadBorders) {
       segment.draw(ctx, { color: 'white', width: 4 });
+    }
+
+    if (this.corridor) {
+      for (const polygon of this.corridor) {
+        polygon.draw(ctx, { color: 'red', width: 4 });
+      }
     }
 
     ctx.globalAlpha = 0.2;
