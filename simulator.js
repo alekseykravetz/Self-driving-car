@@ -23,19 +23,7 @@ miniMapCanvas.height = window.innerHeight - rightPanelWidth;
 const viewport = new Viewport(gameCanvas, world.zoom, world.offset);
 const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth);
 
-// const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
-
-// const trafficDirections = new Point(0, -1);
-// const trafficStartAngle = -angle(trafficDirections) + Math.PI / 2;
-const traffic = [
-  // new Car(road.getLaneCenter(1), -100, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
-  // new Car(road.getLaneCenter(0), -300, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
-  // new Car(road.getLaneCenter(2), -300, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
-  // new Car(road.getLaneCenter(0), -500, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
-  // new Car(road.getLaneCenter(1), -500, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
-  // new Car(road.getLaneCenter(1), -700, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
-  // new Car(road.getLaneCenter(2), -700, 30, 50, 'DUMMY', trafficStartAngle, 2, getRandomColor()),
-];
+const traffic = [];
 
 const N = 100;
 const cars = generateCars(N);
@@ -101,7 +89,6 @@ function animate(time) {
   }
 
   // Fitness function
-  // bestCar = cars.find((c) => c.y === Math.min(...cars.map((c) => c.y))); // the hightest car on game canvas
   bestCar = cars.find((c) => c.fitness === Math.max(...cars.map((c) => c.fitness))); // the hightest car on game canvas
 
   world.cars = cars;
