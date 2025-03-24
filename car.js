@@ -40,6 +40,8 @@ class Car {
       maskCtx.globalCompositeOperation = 'destination-atop';
       maskCtx.drawImage(this.image, 0, 0, this.width, this.height);
     };
+
+    this.update([], []);
   }
 
   load(info) {

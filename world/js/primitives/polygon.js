@@ -41,7 +41,7 @@ class Polygon {
     }
   }
 
-  static break(polygon1, polygon2) {
+  static break(polygon1, polygon2, markIntersections = false) {
     const segments1 = polygon1.segments;
     const segments2 = polygon2.segments;
     for (let i = 0; i < segments1.length; i++) {
@@ -49,6 +49,9 @@ class Polygon {
         const intersection = getIntersection(segments1[i].p1, segments1[i].p2, segments2[j].p1, segments2[j].p2);
         if (intersection && intersection.offset !== 1 && intersection.offset !== 0) {
           const point = new Point(intersection.x, intersection.y);
+          if (markIntersections) {
+            point.intersection = true;
+          }
           let aux = segments1[i].p2;
           segments1[i].p2 = point;
           segments1.splice(i + 1, 0, new Segment(point, aux));
@@ -79,13 +82,17 @@ class Polygon {
     return false;
   }
 
+  containsPolygon(polygon) {
+    return polygon.points.filter((p) => this.containsPoint(p)).length > 0;
+  }
+
   containsSegment(segment) {
     const midpoint = average(segment.p1, segment.p2);
     return this.containsPoint(midpoint);
   }
 
   containsPoint(point) {
-    const outerPoint = new Point(-1000, -1000);
+    const outerPoint = new Point(-100000, -100000);
     let intersectionCount = 0;
     for (const segment of this.segments) {
       const intersection = getIntersection(outerPoint, point, segment.p1, segment.p2);

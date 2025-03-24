@@ -1,9 +1,16 @@
 const rightPanelWidth = 300;
 
+document.body.style.flexDirection = 'column';
+
 const gameCanvas = document.getElementById('gameCanvas');
 gameCanvas.width = window.innerWidth;
-gameCanvas.height = window.innerHeight;
+gameCanvas.height = window.innerHeight / 2;
 const gameCtx = gameCanvas.getContext('2d');
+
+const cameraCanvas = document.getElementById('cameraCanvas');
+cameraCanvas.width = window.innerWidth;
+cameraCanvas.height = window.innerHeight / 2;
+const cameraCtx = cameraCanvas.getContext('2d');
 
 const miniMapCanvas = document.getElementById('miniMapCanvas');
 miniMapCanvas.width = rightPanelWidth;
@@ -18,6 +25,8 @@ const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth);
 const N = 100;
 const cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI'));
 const myCar = cars[0];
+const camera = new Camera(myCar);
+
 if (localStorage.getItem('bestBrain')) {
   for (let i = 0; i < cars.length; i++) {
     cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
@@ -151,6 +160,10 @@ function animate() {
       stat.innerHTML += '<span style="float: right;">' + (cars[i].finishTime / 60).toFixed(1) + 's </span>';
     }
   }
+
+  camera.move(myCar);
+  camera.draw(gameCtx);
+  camera.render(cameraCtx, world);
 
   frameCount++;
   requestAnimationFrame(animate);
