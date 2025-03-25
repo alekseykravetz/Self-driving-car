@@ -95,6 +95,9 @@ function updateCarProgress(car) {
     if (car.progress >= 1) {
       car.progress = 1;
       car.finishTime = frameCount;
+      if (car == myCar) {
+        taDaa();
+      }
     }
   }
 }

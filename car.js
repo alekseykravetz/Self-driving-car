@@ -63,6 +63,9 @@ class Car {
       this.damaged = this.#assessDamage(roadBorders, traffic);
       if (this.damaged) {
         this.speed = 0;
+        if (this.type == 'KEYS') {
+          explode();
+        }
       }
     }
     if (this.sensor) {
@@ -164,10 +167,6 @@ class Car {
 
     this.x -= Math.sin(this.angle) * this.speed;
     this.y -= Math.cos(this.angle) * this.speed;
-  }
-
-  reverse() {
-    this.y -= this.speed;
   }
 
   draw(ctx, drawSensor = false) {
