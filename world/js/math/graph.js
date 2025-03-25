@@ -133,8 +133,9 @@ class Graph {
   }
 
   dispose() {
-    this.points = [];
-    this.segments = [];
+    // re instantiated the same reference
+    this.points.length = 0;
+    this.segments.length = 0;
   }
 
   draw(ctx) {

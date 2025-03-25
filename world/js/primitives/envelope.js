@@ -7,10 +7,10 @@ class Envelope {
   }
 
   static load(info) {
-    const envelope = new Envelope();
-    envelope.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
-    envelope.polygon = Polygon.load(info.polygon);
-    return envelope;
+    const env = new Envelope();
+    env.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
+    env.polygon = Polygon.load(info.polygon);
+    return env;
   }
 
   #generatePolygon(width, roundness) {
@@ -20,6 +20,7 @@ class Envelope {
     const alpha = angle(subtract(p1, p2));
     const alpha_cw = alpha + Math.PI / 2;
     const alpha_ccw = alpha - Math.PI / 2;
+
     const points = [];
     const step = Math.PI / Math.max(1, roundness);
     const epsilon = step / 2;

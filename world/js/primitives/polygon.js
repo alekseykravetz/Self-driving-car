@@ -8,7 +8,7 @@ class Polygon {
   }
 
   static load(info) {
-    return new Polygon(info.points.map((point) => new Point(point.x, point.y)));
+    return new Polygon(info.points.map((p) => new Point(p.x, p.y)));
   }
 
   static union(polygons) {
@@ -34,7 +34,7 @@ class Polygon {
   }
 
   static multiBreak(polygons) {
-    for (let i = 0; i < polygons.length; i++) {
+    for (let i = 0; i < polygons.length - 1; i++) {
       for (let j = i + 1; j < polygons.length; j++) {
         Polygon.break(polygons[i], polygons[j]);
       }
@@ -47,6 +47,7 @@ class Polygon {
     for (let i = 0; i < segments1.length; i++) {
       for (let j = 0; j < segments2.length; j++) {
         const intersection = getIntersection(segments1[i].p1, segments1[i].p2, segments2[j].p1, segments2[j].p2);
+
         if (intersection && intersection.offset !== 1 && intersection.offset !== 0) {
           const point = new Point(intersection.x, intersection.y);
           if (markIntersections) {
@@ -64,11 +65,11 @@ class Polygon {
   }
 
   distanceToPoint(point) {
-    return Math.min(...this.segments.map((segment) => segment.distanceToPoint(point)));
+    return Math.min(...this.segments.map((s) => s.distanceToPoint(point)));
   }
 
   distanceToPolygon(polygon) {
-    return Math.min(...this.points.map((point) => polygon.distanceToPoint(point)));
+    return Math.min(...this.points.map((p) => polygon.distanceToPoint(p)));
   }
 
   intersectsPolygon(polygon) {
@@ -94,8 +95,8 @@ class Polygon {
   containsPoint(point) {
     const outerPoint = new Point(-100000, -100000);
     let intersectionCount = 0;
-    for (const segment of this.segments) {
-      const intersection = getIntersection(outerPoint, point, segment.p1, segment.p2);
+    for (const seg of this.segments) {
+      const intersection = getIntersection(outerPoint, point, seg.p1, seg.p2);
       if (intersection) {
         intersectionCount++;
       }
@@ -104,16 +105,17 @@ class Polygon {
   }
 
   drawSegments(ctx) {
-    for (const segment of this.segments) {
-      segment.draw(ctx, { color: getRandomColor(), width: 5 });
+    for (const seg of this.segments) {
+      seg.draw(ctx, { color: getRandomColor(), width: 5 });
     }
   }
 
-  draw(ctx, { stroke = 'blue', lineWidth = 2, fill = 'rgba(0,0,255,0.3)' } = {}) {
+  draw(ctx, { stroke = 'blue', lineWidth = 2, fill = 'rgba(0,0,255,0.3)', join = 'miter' } = {}) {
     ctx.beginPath();
     ctx.fillStyle = fill;
     ctx.strokeStyle = stroke;
     ctx.lineWidth = lineWidth;
+    ctx.lineJoin = join;
     ctx.moveTo(this.points[0].x, this.points[0].y);
     for (let i = 1; i < this.points.length; i++) {
       ctx.lineTo(this.points[i].x, this.points[i].y);

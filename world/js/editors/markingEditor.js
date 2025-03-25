@@ -41,16 +41,16 @@ class MarkingEditor {
   #removeEventListeners() {
     this.canvas.removeEventListener('mousedown', this.boundMouseDown);
     this.canvas.removeEventListener('mousemove', this.boundMouseMove);
-    this.canvas.removeEventListener('contextmenu', (e) => e.preventDefault());
+    this.canvas.removeEventListener('contextmenu', this.boundContextMenu);
   }
 
   #handleMouseMove(e) {
     this.mouse = this.viewport.getMouse(e, true);
     const segment = getNearestSegment(this.mouse, this.targetSegments, 10 * this.viewport.zoom);
     if (segment) {
-      const project = segment.projectPoint(this.mouse);
-      if (project.offset >= 0 && project.offset <= 1) {
-        this.intent = this.createMarking(project.point, segment.directionVector());
+      const proj = segment.projectPoint(this.mouse);
+      if (proj.offset >= 0 && proj.offset <= 1) {
+        this.intent = this.createMarking(proj.point, segment.directionVector());
       } else {
         this.intent = null;
       }
@@ -70,8 +70,8 @@ class MarkingEditor {
     // right click
     if (e.button === 2) {
       for (let i = 0; i < this.markings.length; i++) {
-        const polygon = this.markings[i].polygon;
-        if (polygon.containsPoint(this.mouse)) {
+        const poly = this.markings[i].polygon;
+        if (poly.containsPoint(this.mouse)) {
           this.markings.splice(i, 1);
           return;
         }
