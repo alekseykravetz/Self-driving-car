@@ -59,6 +59,9 @@
     <script>
       myCar.controls = new PhoneControls(cameraCanvas);
 
+      gameCanvas.height = 0;
+      cameraCanvas.height = window.innerHeight;
+
       document.addEventListener("click", (e) => {
         if(document.body.requestFullscreen) {
           document.body.requestFullscreen();

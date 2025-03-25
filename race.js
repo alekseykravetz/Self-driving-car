@@ -4,12 +4,12 @@ document.body.style.flexDirection = 'column';
 
 const gameCanvas = document.getElementById('gameCanvas');
 gameCanvas.width = window.innerWidth;
-gameCanvas.height = 0; // window.innerHeight / 2;
+gameCanvas.height = window.innerHeight / 2; // 0;
 const gameCtx = gameCanvas.getContext('2d');
 
 const cameraCanvas = document.getElementById('cameraCanvas');
 cameraCanvas.width = window.innerWidth;
-cameraCanvas.height = window.innerHeight; // window.innerHeight / 2;
+cameraCanvas.height = window.innerHeight / 2; // window.innerHeight;
 const cameraCtx = cameraCanvas.getContext('2d');
 
 const miniMapCanvas = document.getElementById('miniMapCanvas');
