@@ -3,6 +3,11 @@ class CameraControls {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
 
+    this.tempCanvas = document.createElement('canvas');
+    this.tempCanvas.width = this.canvas.width;
+    this.tempCanvas.height = this.canvas.height;
+    this.tempCtx = this.tempCanvas.getContext('2d');
+
     this.tilt = 0;
     this.forward = true;
     this.reverse = false;
@@ -18,12 +23,18 @@ class CameraControls {
         this.video.onloadeddata = () => {
           this.canvas.width = this.video.videoWidth / 4; // to increase performance
           this.canvas.height = this.video.videoHeight / 4; // to increase performance
+          this.tempCanvas.width = this.canvas.width;
+          this.tempCanvas.height = this.canvas.height;
           this.#loop();
         };
       })
       .catch((err) => {
         alert(err);
       });
+
+    this.canvas.addEventListener('wheel', (e) => {
+      this.markerDetector.updateThreshold(-Math.sign(e.deltaY));
+    });
   }
 
   #processMarkers({ leftMarker, rightMarker }) {
@@ -54,6 +65,18 @@ class CameraControls {
 
     if (result) {
       this.#processMarkers(result);
+
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        imageData.data[i + 3] = 0; // transparent, disable alpha bit
+      }
+
+      for (const point of [...result.leftMarker.points, ...result.rightMarker.points]) {
+        const index = (point.y * imageData.width + point.x) * 4;
+        imageData.data[index + 3] = 255; // alpha
+      }
+
+      this.tempCtx.putImageData(imageData, 0, 0);
+      this.ctx.drawImage(this.tempCanvas, 0, 0);
     }
 
     requestAnimationFrame(() => this.#loop());
