@@ -20,7 +20,6 @@ statistics.style.width = `${rightPanelWidth}px`;
 statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
 
 const viewport = new Viewport(gameCanvas, world.zoom, world.offset);
-const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth);
 
 const N = 100;
 const cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI'));
@@ -53,6 +52,10 @@ if (target) {
 } else {
   roadBorders = [...world.roadBorders.map((s) => [s.p1, s.p2])];
 }
+
+const miniMapGraph = new Graph([], world.corridor.skeleton);
+const miniMap = new MiniMap(miniMapCanvas, miniMapGraph, rightPanelWidth, cars, 0.1);
+// const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth, cars);
 
 function generateCars(n, type) {
   const startMarkings = world.markings.filter((m) => m instanceof Start);
@@ -129,16 +132,44 @@ startCounter();
 
 animate();
 
+function handleCollisionWithRoadBorders(car) {
+  const segment = getNearestSegment(car, world.corridor.skeleton);
+  const correctors = car.polygon.map((p) => {
+    const proj = segment.projectPoint(p);
+    const projPoint = proj.offset > 1 ? segment.p2 : proj.point;
+    return subtract(projPoint, p);
+  });
+
+  const maxMagnitude = Math.max(...correctors.map((p) => magnitude(p)));
+  const corrector = correctors.find((p) => magnitude(p) === maxMagnitude);
+  const normalizedCorrector = normalize(corrector);
+
+  if (corrector === correctors[0] || corrector === correctors[2]) {
+    car.angle += 0.1;
+  } else {
+    car.angle -= 0.1;
+  }
+
+  car.x += normalizedCorrector.x;
+  car.y += normalizedCorrector.y;
+  car.damaged = false;
+}
+
 function animate() {
   if (started) {
     for (let i = 0; i < cars.length; i++) {
       cars[i].update(roadBorders, []);
     }
   }
+
+  for (const car of cars) {
+    if (car.damaged) {
+      handleCollisionWithRoadBorders(car);
+    }
+  }
+
   world.cars = cars;
   world.bestCar = myCar;
-
-  miniMap.cars = cars;
 
   viewport.offset.x = -myCar.x;
   viewport.offset.y = -myCar.y;
@@ -147,6 +178,7 @@ function animate() {
   const viewPoint = scale(viewport.getOffset(), -1);
   world.draw(gameCtx, viewPoint, false);
   miniMap.update(viewPoint);
+  miniMapCanvas.style.transform = `rotate(${myCar.angle}rad)`;
 
   for (let i = 0; i < cars.length; i++) {
     updateCarProgress(cars[i]);
@@ -155,7 +187,7 @@ function animate() {
 
   for (let i = 0; i < cars.length; i++) {
     const stat = document.getElementById('stat_' + i);
-    stat.style.color = cars[i].color;
+    stat.style.color = cars[i].type === 'AI' ? 'white' : cars[i].color;
     // stat.innerText = `${i + 1}: ${(cars[i].progress * 100).toFixed(1)}%`;
     stat.innerText = `${i + 1}: ${cars[i].name} ${cars[i].damaged ? '💀' : ''}`;
     stat.style.backgroundColor = cars[i].type === 'AI' ? 'black' : 'white';

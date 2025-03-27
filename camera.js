@@ -1,12 +1,12 @@
 class Camera {
-  constructor({ x, y, angle }, range = 1000, distanceBehind = 150) {
+  constructor({ x, y, angle }, range = 1000, distanceBehind = 100) {
     this.range = range;
     this.distanceBehind = distanceBehind;
     this.simpleMove({ x, y, angle });
   }
 
   move({ x, y, angle }) {
-    const t = 0.1;
+    const t = 0.15;
     this.x = lerp(this.x, x + this.distanceBehind * Math.sin(angle), t);
     this.y = lerp(this.y, y + this.distanceBehind * Math.cos(angle), t);
     this.z = -40;
@@ -93,6 +93,108 @@ class Camera {
     return extrudedPolygons;
   }
 
+  #extrudeCar(polygon, height = 15, wheelRadius = 5) {
+    const frontRight = new Point(polygon.points[0].x, polygon.points[0].y);
+    const frontLeft = new Point(polygon.points[1].x, polygon.points[1].y);
+    const backLeft = new Point(polygon.points[2].x, polygon.points[2].y);
+    const backRight = new Point(polygon.points[3].x, polygon.points[3].y);
+    const middleLeft = average(frontLeft, backLeft);
+    const middleRight = average(frontRight, backRight);
+    const quarterFrontLeft = average(frontLeft, middleLeft);
+    const quarterBackLeft = average(backLeft, middleLeft);
+    const quarterFrontRight = average(frontRight, middleRight);
+    const quarterBackRight = average(backRight, middleRight);
+
+    this.#moveInward(frontLeft, frontRight, 0.2);
+    this.#moveInward(backLeft, backRight, 0.1);
+
+    const base = new Polygon([
+      frontLeft,
+      quarterFrontLeft,
+      middleLeft,
+      quarterBackLeft,
+      backLeft,
+      backRight,
+      quarterBackRight,
+      middleRight,
+      quarterFrontRight,
+      frontRight,
+    ]);
+
+    for (const point of base.points) {
+      point.z -= wheelRadius;
+    }
+
+    const ceiling = new Polygon(base.points.map((p) => new Point(p.x, p.y, -height)));
+    const midLine = new Polygon(base.points.map((p) => new Point(p.x, p.y, -height / 2)));
+
+    const c_frontLeft = ceiling.points[0];
+    const c_quarterFrontLeft = ceiling.points[1];
+    const c_middleLeft = ceiling.points[2];
+    const c_quarterBackLeft = ceiling.points[3];
+    const c_backLeft = ceiling.points[4];
+    const c_backRight = ceiling.points[5];
+    const c_quarterBackRight = ceiling.points[6];
+    const c_middleRight = ceiling.points[7];
+    const c_quarterFrontRight = ceiling.points[8];
+    const c_frontRight = ceiling.points[9];
+
+    c_frontLeft.z += 7;
+    c_frontRight.z += 7;
+    c_quarterFrontLeft.z += 6;
+    c_quarterFrontRight.z += 6;
+    c_backLeft.z += 4;
+    c_backRight.z += 4;
+
+    this.#moveInward(c_frontLeft, c_frontRight);
+    this.#moveInward(c_quarterFrontLeft, c_quarterFrontRight);
+    this.#moveInward(c_middleLeft, c_middleRight);
+    this.#moveInward(c_quarterBackLeft, c_quarterBackRight);
+    this.#moveInward(c_backLeft, c_backRight);
+    this.#moveInward(c_frontLeft, c_backLeft, 0.1);
+    this.#moveInward(c_frontRight, c_backRight, 0.1);
+
+    const sides = [];
+    for (let i = 0; i < base.points.length; i++) {
+      sides.push(
+        new Polygon([
+          base.points[i],
+          base.points[(i + 1) % base.points.length],
+          midLine.points[(i + 1) % midLine.points.length],
+          midLine.points[i],
+        ])
+      );
+    }
+    for (let i = 0; i < base.points.length; i++) {
+      sides.push(
+        new Polygon([
+          midLine.points[i],
+          midLine.points[(i + 1) % midLine.points.length],
+          ceiling.points[(i + 1) % ceiling.points.length],
+          ceiling.points[i],
+        ])
+      );
+    }
+
+    const ceilingParts = [];
+
+    ceilingParts.push(new Polygon([c_frontLeft, c_quarterFrontLeft, c_quarterFrontRight, c_frontRight]));
+    ceilingParts.push(new Polygon([c_quarterFrontLeft, c_middleLeft, c_middleRight, c_quarterFrontRight]));
+    ceilingParts.push(new Polygon([c_middleLeft, c_quarterBackLeft, c_quarterBackRight, c_middleRight]));
+    ceilingParts.push(new Polygon([c_quarterBackLeft, c_backLeft, c_backRight, c_quarterBackRight]));
+
+    return [...sides, ...ceilingParts];
+  }
+
+  #moveInward(p1, p2, percent = 0.3) {
+    const new_p1 = lerp2D(p1, p2, percent);
+    const new_p2 = lerp2D(p2, p1, percent);
+    p1.x = new_p1.x;
+    p1.y = new_p1.y;
+    p2.x = new_p2.x;
+    p2.y = new_p2.y;
+  }
+
   #getPolygons(world) {
     const buildingPolygons = this.#extrude(this.#filter(world.buildings.map((b) => b.base)), 200);
     // const treePolygons = this.#extrude(this.#filter(world.trees.map((b) => b.base)), 200);
@@ -103,12 +205,25 @@ class Camera {
     //   ),
     //   10
     // );
-    const carPolygons = this.#extrude(
-      this.#filter([new Polygon(world.bestCar.polygon.map((point) => new Point(point.x, point.y)))]),
-      10
+    const carPolygons = this.#extrudeCar(
+      this.#filter([new Polygon(world.bestCar.polygon.map((point) => new Point(point.x, point.y)))])[0]
     );
 
-    const polygons = [...buildingPolygons, ...carPolygons, ...roadPolygons];
+    const carShadows = this.#filter(
+      world.cars.map((c) => new Polygon(c.polygon.map((point) => new Point(point.x, point.y))))
+    );
+
+    for (const poly of carShadows) {
+      poly.fill = 'rgba(220, 220, 220, 1)';
+      poly.stroke = 'rgba(0, 0, 0, 0)';
+    }
+
+    for (const poly of buildingPolygons) {
+      poly.fill = 'rgba(150, 150, 150, 0.2)';
+      poly.stroke = 'rgba(150, 150, 150, 0.2)';
+    }
+
+    const polygons = [...carShadows, ...buildingPolygons, ...carPolygons, ...roadPolygons];
     return polygons;
   }
 
@@ -121,8 +236,17 @@ class Camera {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    for (const polygon of projectedPolygons) {
-      polygon.draw(ctx);
+    // for (const polygon of projectedPolygons) {
+    //   polygon.draw(ctx);
+    // }
+
+    for (let i = 0; i < projectedPolygons.length; i++) {
+      // Fog effect
+      const distance = polygons[i].distanceToPoint(this); // this is camera
+      ctx.globalAlpha = (1 - distance / this.range) ** 2;
+
+      const { fill, stroke } = polygons[i];
+      projectedPolygons[i].draw(ctx, { fill, stroke, join: 'round' });
     }
 
     //to show the camera visible polygons on main ctx
