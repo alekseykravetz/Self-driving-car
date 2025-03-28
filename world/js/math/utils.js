@@ -1,4 +1,8 @@
-function getNearestPoint(location, points, threshold = Number.MAX_SAFE_INTEGER) {
+function getNearestPoint(
+  location,
+  points,
+  threshold = Number.MAX_SAFE_INTEGER,
+) {
   let minDistance = Number.MAX_SAFE_INTEGER;
   let nearestPoint = null;
   for (const point of points) {
@@ -11,7 +15,11 @@ function getNearestPoint(location, points, threshold = Number.MAX_SAFE_INTEGER) 
   return nearestPoint;
 }
 
-function getNearestSegment(location, segments, threshold = Number.MAX_SAFE_INTEGER) {
+function getNearestSegment(
+  location,
+  segments,
+  threshold = Number.MAX_SAFE_INTEGER,
+) {
   let minDistance = Number.MAX_SAFE_INTEGER;
   let nearestSegment = null;
   for (const segment of segments) {
@@ -65,7 +73,10 @@ function perpendicular(p) {
 }
 
 function translate(location, angle, offset) {
-  return new Point(location.x + Math.cos(angle) * offset, location.y + Math.sin(angle) * offset);
+  return new Point(
+    location.x + Math.cos(angle) * offset,
+    location.y + Math.sin(angle) * offset,
+  );
 }
 
 function angle(p) {

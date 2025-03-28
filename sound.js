@@ -44,7 +44,8 @@ function beep(frequency, waveType = 'sine') {
 
 class Engine {
   constructor() {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
 
     const osc = audioContext.createOscillator();
     const masterGain = audioContext.createGain();

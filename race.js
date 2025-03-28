@@ -54,19 +54,38 @@ if (target) {
 }
 
 const miniMapGraph = new Graph([], world.corridor.skeleton);
-const miniMap = new MiniMap(miniMapCanvas, miniMapGraph, rightPanelWidth, cars, 0.1);
+const miniMap = new MiniMap(
+  miniMapCanvas,
+  miniMapGraph,
+  rightPanelWidth,
+  cars,
+  0.1,
+);
 // const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth, cars);
 
 function generateCars(n, type) {
   const startMarkings = world.markings.filter((m) => m instanceof Start);
-  const startPoint = startMarkings.length ? startMarkings[0].center : new Point(100, 100);
-  const direction = startMarkings.length ? startMarkings[0].directionVector : new Point(0, -1);
+  const startPoint = startMarkings.length
+    ? startMarkings[0].center
+    : new Point(100, 100);
+  const direction = startMarkings.length
+    ? startMarkings[0].directionVector
+    : new Point(0, -1);
   const startAngle = -angle(direction) + Math.PI / 2;
 
   const cars = [];
   for (let i = 1; i <= n; i++) {
     const color = type === 'AI' ? getRandomColor() : 'blue';
-    const car = new Car(startPoint.x, startPoint.y, 30, 50, type, startAngle, 3, color);
+    const car = new Car(
+      startPoint.x,
+      startPoint.y,
+      30,
+      50,
+      type,
+      startAngle,
+      3,
+      color,
+    );
     car.name = type === 'AI' ? 'AI ' + i : 'Player ' + i;
 
     car.load(carInfo);
@@ -93,7 +112,10 @@ function updateCarProgress(car) {
         car.progress += segment.length();
       }
     }
-    const totalDistance = world.corridor.skeleton.reduce((acc, segment) => acc + segment.length(), 0);
+    const totalDistance = world.corridor.skeleton.reduce(
+      (acc, segment) => acc + segment.length(),
+      0,
+    );
     car.progress /= totalDistance;
     if (car.progress >= 1) {
       car.progress = 1;
@@ -192,7 +214,10 @@ function animate() {
     stat.innerText = `${i + 1}: ${cars[i].name} ${cars[i].damaged ? '💀' : ''}`;
     stat.style.backgroundColor = cars[i].type === 'AI' ? 'black' : 'white';
     if (cars[i].finishTime) {
-      stat.innerHTML += '<span style="float: right;">' + (cars[i].finishTime / 60).toFixed(1) + 's </span>';
+      stat.innerHTML +=
+        '<span style="float: right;">' +
+        (cars[i].finishTime / 60).toFixed(1) +
+        's </span>';
     }
   }
 

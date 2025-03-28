@@ -11,7 +11,7 @@ class Light extends Marking {
     const perp = perpendicular(this.directionVector);
     const line = new Segment(
       add(this.center, scale(perp, this.width / 2)),
-      add(this.center, scale(perp, -this.width / 2))
+      add(this.center, scale(perp, -this.width / 2)),
     );
 
     const green = lerp2D(line.p1, line.p2, 0.2);

@@ -45,8 +45,12 @@ class MarkerDetector {
     let group2 = [];
 
     for (let i = 1; i <= 10; i++) {
-      group1 = points.filter((p) => distance(p, centroid1) < distance(p, centroid2));
-      group2 = points.filter((p) => distance(p, centroid1) >= distance(p, centroid2));
+      group1 = points.filter(
+        (p) => distance(p, centroid1) < distance(p, centroid2),
+      );
+      group2 = points.filter(
+        (p) => distance(p, centroid1) >= distance(p, centroid2),
+      );
 
       centroid1 = this.#averagePoints(group1);
       centroid2 = this.#averagePoints(group2);

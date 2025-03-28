@@ -6,7 +6,7 @@ class World {
     buildingWidth = 150,
     buildingMinLength = 150,
     spacing = 50,
-    treeSize = 160
+    treeSize = 160,
   ) {
     this.graph = graph;
     this.roadWidth = roadWidth;
@@ -44,7 +44,9 @@ class World {
     world.treeSize = info.treeSize;
 
     world.envelopes = info.envelopes.map((envelope) => Envelope.load(envelope));
-    world.roadBorders = info.roadBorders.map((segment) => new Segment(segment.p1, segment.p2));
+    world.roadBorders = info.roadBorders.map(
+      (segment) => new Segment(segment.p1, segment.p2),
+    );
     world.buildings = info.buildings.map((building) => Building.load(building));
     world.trees = info.trees.map((t) => new Tree(t.center, info.treeSize));
     world.laneGuides = info.laneGuides.map((g) => new Segment(g.p1, g.p2));
@@ -59,10 +61,14 @@ class World {
   generate() {
     this.envelopes.length = 0; // re instantiated the same reference
     for (const segment of this.graph.segments) {
-      this.envelopes.push(new Envelope(segment, this.roadWidth, this.roadRoundness));
+      this.envelopes.push(
+        new Envelope(segment, this.roadWidth, this.roadRoundness),
+      );
     }
 
-    this.roadBorders = Polygon.union(this.envelopes.map((envelope) => envelope.polygon));
+    this.roadBorders = Polygon.union(
+      this.envelopes.map((envelope) => envelope.polygon),
+    );
     this.buildings = this.#generateBuildings();
     this.trees = this.#generateTrees();
 
@@ -106,13 +112,22 @@ class World {
     if (extendEnd) {
       const lastSeg = segments[segments.length - 1];
       const lastSegDir = lastSeg.directionVector();
-      segments.push(new Segment(lastSeg.p2, add(lastSeg.p2, scale(lastSegDir, this.roadWidth * 2))));
+      segments.push(
+        new Segment(
+          lastSeg.p2,
+          add(lastSeg.p2, scale(lastSegDir, this.roadWidth * 2)),
+        ),
+      );
     }
-    const tempEnvelopes = segments.map((s) => new Envelope(s, this.roadWidth, this.roadRoundness));
+    const tempEnvelopes = segments.map(
+      (s) => new Envelope(s, this.roadWidth, this.roadRoundness),
+    );
     if (extendEnd) {
       segments.pop();
     }
-    const unionSegments = Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
+    const unionSegments = Polygon.union(
+      tempEnvelopes.map((envelope) => envelope.polygon),
+    );
 
     this.corridor = { borders: unionSegments, skeleton: segments };
   }
@@ -120,10 +135,14 @@ class World {
   #generateLaneGuides() {
     const tempEnvelopes = [];
     for (const segment of this.graph.segments) {
-      tempEnvelopes.push(new Envelope(segment, this.roadWidth / 2, this.roadRoundness));
+      tempEnvelopes.push(
+        new Envelope(segment, this.roadWidth / 2, this.roadRoundness),
+      );
     }
 
-    const segments = Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
+    const segments = Polygon.union(
+      tempEnvelopes.map((envelope) => envelope.polygon),
+    );
     return segments;
   }
 
@@ -137,17 +156,26 @@ class World {
     const top = Math.min(...points.map((p) => p.y));
     const bottom = Math.max(...points.map((p) => p.y));
 
-    const illegalPolygons = [...this.buildings.map((b) => b.base), ...this.envelopes.map((e) => e.polygon)];
+    const illegalPolygons = [
+      ...this.buildings.map((b) => b.base),
+      ...this.envelopes.map((e) => e.polygon),
+    ];
 
     const trees = [];
     let tryCount = 0;
     while (tryCount < 100) {
-      const p = new Point(lerp(left, right, Math.random()), lerp(bottom, top, Math.random()));
+      const p = new Point(
+        lerp(left, right, Math.random()),
+        lerp(bottom, top, Math.random()),
+      );
 
       // check if tree inside or nearby building / road
       let keep = true;
       for (const poly of illegalPolygons) {
-        if (poly.containsPoint(p) || poly.distanceToPoint(p) < this.treeSize / 2) {
+        if (
+          poly.containsPoint(p) ||
+          poly.distanceToPoint(p) < this.treeSize / 2
+        ) {
           keep = false;
           break;
         }
@@ -187,7 +215,13 @@ class World {
   #generateBuildings() {
     const tempEnvelopes = [];
     for (const seg of this.graph.segments) {
-      tempEnvelopes.push(new Envelope(seg, this.roadWidth + this.buildingWidth + this.spacing * 2, this.roadRoundness));
+      tempEnvelopes.push(
+        new Envelope(
+          seg,
+          this.roadWidth + this.buildingWidth + this.spacing * 2,
+          this.roadRoundness,
+        ),
+      );
     }
 
     const guides = Polygon.union(tempEnvelopes.map((e) => e.polygon));
@@ -203,7 +237,9 @@ class World {
     const supports = [];
     for (let seg of guides) {
       const length = seg.length() + this.spacing;
-      const buildingCount = Math.floor(length / (this.buildingMinLength + this.spacing));
+      const buildingCount = Math.floor(
+        length / (this.buildingMinLength + this.spacing),
+      );
       const buildingLength = length / buildingCount - this.spacing;
 
       const direction = seg.directionVector();
@@ -227,7 +263,10 @@ class World {
     const epsilon = 0.001;
     for (let i = 0; i < bases.length - 1; i++) {
       for (let j = i + 1; j < bases.length; j++) {
-        if (bases[i].intersectsPolygon(bases[j]) || bases[i].distanceToPolygon(bases[j]) < this.spacing - epsilon) {
+        if (
+          bases[i].intersectsPolygon(bases[j]) ||
+          bases[i].distanceToPolygon(bases[j]) < this.spacing - epsilon
+        ) {
           bases.splice(j, 1);
           j--;
         }
@@ -275,8 +314,13 @@ class World {
     const tick = Math.floor(this.frameCount / 60);
     for (const center of controlCenters) {
       const cTick = tick % center.ticks;
-      const greenYellowIndex = Math.floor(cTick / (greenDuration + yellowDuration));
-      const greenYellowState = cTick % (greenDuration + yellowDuration) < greenDuration ? 'green' : 'yellow';
+      const greenYellowIndex = Math.floor(
+        cTick / (greenDuration + yellowDuration),
+      );
+      const greenYellowState =
+        cTick % (greenDuration + yellowDuration) < greenDuration
+          ? 'green'
+          : 'yellow';
       for (let i = 0; i < center.lights.length; i++) {
         if (i == greenYellowIndex) {
           center.lights[i].state = greenYellowState;
@@ -321,8 +365,13 @@ class World {
       this.bestCar.draw(ctx, true);
     }
 
-    const items = [...this.buildings, ...this.trees].filter((i) => i.base.distanceToPoint(viewPoint) < renderRadius);
-    items.sort((a, b) => b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint));
+    const items = [...this.buildings, ...this.trees].filter(
+      (i) => i.base.distanceToPoint(viewPoint) < renderRadius,
+    );
+    items.sort(
+      (a, b) =>
+        b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint),
+    );
     for (const item of items) {
       item.draw(ctx, viewPoint);
     }

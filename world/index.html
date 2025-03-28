@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>World Editor</title>
@@ -22,8 +22,13 @@
       <button id="parkingBtn" onclick="setMode('parking')">🅿️</button>
       <button id="lightBtn" onclick="setMode('light')">🚦</button>
 
-      <div id="osmPanel" style="display:none;">
-        <textarea id="osmDataContainer" rows="10" cols="50" placeholder="Paste OSM data here"></textarea>
+      <div id="osmPanel" style="display: none">
+        <textarea
+          id="osmDataContainer"
+          rows="10"
+          cols="50"
+          placeholder="Paste OSM data here"
+        ></textarea>
         <div>
           <button onclick="parseOsmData()">✔️</button>
           <button onclick="closeOsmPanel()">❌</button>
@@ -65,32 +70,43 @@
     <!-- <script src="saves/ashkelon.world"></script> -->
     <!-- <script src="saves/path_finding.world"></script> -->
 
-
     <script>
       myCanvas.width = 800;
       myCanvas.height = 490;
 
-      const ctx = myCanvas.getContext("2d");
+      const ctx = myCanvas.getContext('2d');
 
-      const graph = world.graph; 
+      const graph = world.graph;
 
       const viewport = new Viewport(myCanvas, world.zoom, world.offset);
 
       const tools = {
         graph: { button: graphBtn, editor: new GraphEditor(viewport, graph) },
-        marking: { button: markingBtn, editor: new MarkingEditor(viewport, world, graph.segments) },
+        marking: {
+          button: markingBtn,
+          editor: new MarkingEditor(viewport, world, graph.segments),
+        },
         stop: { button: stopBtn, editor: new StopEditor(viewport, world) },
-        crossing: { button: crossingBtn, editor: new CrossingEditor(viewport, world) },
+        crossing: {
+          button: crossingBtn,
+          editor: new CrossingEditor(viewport, world),
+        },
         start: { button: startBtn, editor: new StartEditor(viewport, world) },
-        parking: { button: parkingBtn, editor: new ParkingEditor(viewport, world) },
+        parking: {
+          button: parkingBtn,
+          editor: new ParkingEditor(viewport, world),
+        },
         light: { button: lightBtn, editor: new LightEditor(viewport, world) },
-        target: { button: targetBtn, editor: new TargetEditor(viewport, world) },
+        target: {
+          button: targetBtn,
+          editor: new TargetEditor(viewport, world),
+        },
         yield: { button: yieldBtn, editor: new YieldEditor(viewport, world) },
       };
 
       let oldGraphHash = graph.hash();
 
-      setMode("graph");
+      setMode('graph');
 
       animate();
 
@@ -120,7 +136,13 @@
         world.offset = viewport.offset;
 
         const element = document.createElement('a');
-        element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(`const world = World.load(${JSON.stringify(world)});`));
+        element.setAttribute(
+          'href',
+          'data:application/json;charset=utf-8,' +
+            encodeURIComponent(
+              `const world = World.load(${JSON.stringify(world)});`,
+            ),
+        );
 
         const fileName = 'name.world';
         element.setAttribute('download', fileName);
@@ -155,7 +177,7 @@
 
       function parseOsmData() {
         const osmData = osmDataContainer.value;
-        if(!osmData) {
+        if (!osmData) {
           alert('No OSM data provided');
           return;
         }

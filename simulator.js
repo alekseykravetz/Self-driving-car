@@ -54,14 +54,27 @@ if (target) {
 
 function generateCars(n) {
   const startMarkings = world.markings.filter((m) => m instanceof Start);
-  const startPoint = startMarkings.length ? startMarkings[0].center : new Point(100, 100);
-  const direction = startMarkings.length ? startMarkings[0].directionVector : new Point(0, -1);
+  const startPoint = startMarkings.length
+    ? startMarkings[0].center
+    : new Point(100, 100);
+  const direction = startMarkings.length
+    ? startMarkings[0].directionVector
+    : new Point(0, -1);
   const startAngle = -angle(direction) + Math.PI / 2;
 
   const cars = [];
   for (let i = 1; i <= n; i++) {
     // cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', 3, 'blue'));
-    const car = new Car(startPoint.x, startPoint.y, 30, 50, 'AI', startAngle, 3, 'blue');
+    const car = new Car(
+      startPoint.x,
+      startPoint.y,
+      30,
+      50,
+      'AI',
+      startAngle,
+      3,
+      'blue',
+    );
     car.load(carInfo);
     cars.push(car);
   }
@@ -89,7 +102,9 @@ function animate(time) {
   }
 
   // Fitness function
-  bestCar = cars.find((c) => c.fitness === Math.max(...cars.map((c) => c.fitness))); // the hightest car on game canvas
+  bestCar = cars.find(
+    (c) => c.fitness === Math.max(...cars.map((c) => c.fitness)),
+  );
 
   world.cars = cars;
   world.bestCar = bestCar;

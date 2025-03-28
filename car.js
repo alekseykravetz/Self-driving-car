@@ -1,5 +1,14 @@
 class Car {
-  constructor(x, y, width, height, controlType, angle = 0, maxSpeed = 3, color = 'blue') {
+  constructor(
+    x,
+    y,
+    width,
+    height,
+    controlType,
+    angle = 0,
+    maxSpeed = 3,
+    color = 'blue',
+  ) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -192,10 +201,22 @@ class Car {
     ctx.rotate(-this.angle);
 
     if (!this.damaged) {
-      ctx.drawImage(this.mask, -this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.drawImage(
+        this.mask,
+        -this.width / 2,
+        -this.height / 2,
+        this.width,
+        this.height,
+      );
       ctx.globalCompositeOperation = 'multiply';
     }
-    ctx.drawImage(this.image, -this.width / 2, -this.height / 2, this.width, this.height);
+    ctx.drawImage(
+      this.image,
+      -this.width / 2,
+      -this.height / 2,
+      this.width,
+      this.height,
+    );
     ctx.restore();
   }
 }

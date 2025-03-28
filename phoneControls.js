@@ -15,17 +15,20 @@ class PhoneControls {
     // });
 
     window.addEventListener('devicemotion', (e) => {
-      this.tilt = Math.atan2(e.accelerationIncludingGravity.y, e.accelerationIncludingGravity.x);
+      this.tilt = Math.atan2(
+        e.accelerationIncludingGravity.y,
+        e.accelerationIncludingGravity.x,
+      );
       const newCanvasAngle = -this.tilt;
       this.canvasAngle = this.canvasAngle * 0.6 + newCanvasAngle * 0.4;
       this.canvas.style.transform = `translate(-50%,-50%) rotate(${this.canvasAngle}rad)`;
     });
 
-    window.addEventListener('touchstart', (e) => {
+    window.addEventListener('touchstart', () => {
       this.reverse = true;
       this.forward = false;
     });
-    window.addEventListener('touchend', (e) => {
+    window.addEventListener('touchend', () => {
       this.reverse = false;
       this.forward = true;
     });

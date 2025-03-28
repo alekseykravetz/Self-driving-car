@@ -14,7 +14,7 @@ class Visualizer {
         lerp(
           height - levelHeight,
           0,
-          network.levels.length === 1 ? 0.5 : i / (network.levels.length - 1)
+          network.levels.length === 1 ? 0.5 : i / (network.levels.length - 1),
         );
 
       ctx.setLineDash([7, 3]);
@@ -25,7 +25,7 @@ class Visualizer {
         levelTop,
         width,
         levelHeight,
-        i === network.levels.length - 1 ? ['↥', '↤', '↦', '↧'] : []
+        i === network.levels.length - 1 ? ['↥', '↤', '↦', '↧'] : [],
       );
     }
   }
@@ -99,7 +99,7 @@ class Visualizer {
     return lerp(
       left,
       right,
-      nodes.length === 1 ? 0.5 : index / (nodes.length - 1)
+      nodes.length === 1 ? 0.5 : index / (nodes.length - 1),
     );
   }
 }

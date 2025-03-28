@@ -13,7 +13,8 @@ h1 {
   background-color: #2a5;
 }
 
-button, .file-input-label {
+button,
+.file-input-label {
   display: inline-block;
   background-color: white;
   font-size: 20px;
@@ -24,7 +25,7 @@ button, .file-input-label {
   cursor: pointer;
 }
 
-input[type="file"] {
+input[type='file'] {
   display: none;
 }
 
@@ -33,6 +34,6 @@ input[type="file"] {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0, 0, 0, 0.7);
   padding: 5000px;
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>Self-driving car - Race</title>
@@ -6,9 +6,17 @@
   </head>
   <body>
     <canvas id="gameCanvas"></canvas>
-    <canvas id="cameraCanvas" style="top:50%; left:50%; position:absolute; transform:translate(-50%, -50%);"></canvas>
-    <canvas id="miniMapCanvas" class="miniMap" style="display: none;"></canvas>
-    <div id="statistics" style="display: none;"></div>
+    <canvas
+      id="cameraCanvas"
+      style="
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+      "
+    ></canvas>
+    <canvas id="miniMapCanvas" class="miniMap" style="display: none"></canvas>
+    <div id="statistics" style="display: none"></div>
     <div id="counter"></div>
 
     <script src="world/js/world.js"></script>
@@ -63,14 +71,14 @@
       gameCanvas.height = 0;
       cameraCanvas.height = window.innerHeight;
 
-      document.addEventListener("click", (e) => {
-        if(document.body.requestFullscreen) {
+      document.addEventListener('click', (e) => {
+        if (document.body.requestFullscreen) {
           document.body.requestFullscreen();
-        } else if(document.body.webkitRequestFullscreen) {
+        } else if (document.body.webkitRequestFullscreen) {
           document.body.webkitRequestFullscreen();
-        } else if(document.body.mozRequestFullScreen) {
+        } else if (document.body.mozRequestFullScreen) {
           document.body.mozRequestFullScreen();
-        } else if(document.body.msRequestFullscreen) {
+        } else if (document.body.msRequestFullscreen) {
           document.body.msRequestFullscreen();
         }
       });

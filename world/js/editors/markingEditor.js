@@ -16,7 +16,12 @@ class MarkingEditor {
 
   // to be overwritten
   createMarking(center, directionVector) {
-    return new Marking(center, directionVector, world.roadWidth, world.roadWidth);
+    return new Marking(
+      center,
+      directionVector,
+      world.roadWidth,
+      world.roadWidth,
+    );
     // return center;
   }
 
@@ -46,7 +51,11 @@ class MarkingEditor {
 
   #handleMouseMove(e) {
     this.mouse = this.viewport.getMouse(e, true);
-    const segment = getNearestSegment(this.mouse, this.targetSegments, 10 * this.viewport.zoom);
+    const segment = getNearestSegment(
+      this.mouse,
+      this.targetSegments,
+      10 * this.viewport.zoom,
+    );
     if (segment) {
       const proj = segment.projectPoint(this.mouse);
       if (proj.offset >= 0 && proj.offset <= 1) {

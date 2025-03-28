@@ -26,19 +26,84 @@ if (localStorage.getItem('bestBrain')) {
 }
 
 const traffic = [
-  new Car(road.getLaneCenter(1), -100, 30, 50, 'DUMMY', startAngle, 2, getRandomColor()),
-  new Car(road.getLaneCenter(0), -300, 30, 50, 'DUMMY', startAngle, 2, getRandomColor()),
-  new Car(road.getLaneCenter(2), -300, 30, 50, 'DUMMY', startAngle, 2, getRandomColor()),
-  new Car(road.getLaneCenter(0), -500, 30, 50, 'DUMMY', startAngle, 2, getRandomColor()),
-  new Car(road.getLaneCenter(1), -500, 30, 50, 'DUMMY', startAngle, 2, getRandomColor()),
-  new Car(road.getLaneCenter(1), -700, 30, 50, 'DUMMY', startAngle, 2, getRandomColor()),
-  new Car(road.getLaneCenter(2), -700, 30, 50, 'DUMMY', startAngle, 2, getRandomColor()),
+  new Car(
+    road.getLaneCenter(1),
+    -100,
+    30,
+    50,
+    'DUMMY',
+    startAngle,
+    2,
+    getRandomColor(),
+  ),
+  new Car(
+    road.getLaneCenter(0),
+    -300,
+    30,
+    50,
+    'DUMMY',
+    startAngle,
+    2,
+    getRandomColor(),
+  ),
+  new Car(
+    road.getLaneCenter(2),
+    -300,
+    30,
+    50,
+    'DUMMY',
+    startAngle,
+    2,
+    getRandomColor(),
+  ),
+  new Car(
+    road.getLaneCenter(0),
+    -500,
+    30,
+    50,
+    'DUMMY',
+    startAngle,
+    2,
+    getRandomColor(),
+  ),
+  new Car(
+    road.getLaneCenter(1),
+    -500,
+    30,
+    50,
+    'DUMMY',
+    startAngle,
+    2,
+    getRandomColor(),
+  ),
+  new Car(
+    road.getLaneCenter(1),
+    -700,
+    30,
+    50,
+    'DUMMY',
+    startAngle,
+    2,
+    getRandomColor(),
+  ),
+  new Car(
+    road.getLaneCenter(2),
+    -700,
+    30,
+    50,
+    'DUMMY',
+    startAngle,
+    2,
+    getRandomColor(),
+  ),
 ];
 
 function generateCars(n) {
   const cars = [];
   for (let i = 1; i <= n; i++) {
-    cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, 'AI', startAngle, 3, 'blue'));
+    cars.push(
+      new Car(road.getLaneCenter(1), 100, 30, 50, 'AI', startAngle, 3, 'blue'),
+    );
   }
   return cars;
 }

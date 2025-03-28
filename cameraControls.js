@@ -43,7 +43,7 @@ class CameraControls {
   #processMarkers({ leftMarker, rightMarker }) {
     this.tilt = Math.atan2(
       rightMarker.centroid.y - leftMarker.centroid.y,
-      rightMarker.centroid.x - leftMarker.centroid.x
+      rightMarker.centroid.x - leftMarker.centroid.x,
     );
 
     if (this.initializing) {
@@ -76,7 +76,12 @@ class CameraControls {
     this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
     this.ctx.restore();
 
-    const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    const imageData = this.ctx.getImageData(
+      0,
+      0,
+      this.canvas.width,
+      this.canvas.height,
+    );
 
     const result = this.markerDetector.detect(imageData);
 
@@ -87,7 +92,10 @@ class CameraControls {
         imageData.data[i + 3] = 0; // transparent, disable alpha bit
       }
 
-      for (const point of [...result.leftMarker.points, ...result.rightMarker.points]) {
+      for (const point of [
+        ...result.leftMarker.points,
+        ...result.rightMarker.points,
+      ]) {
         const index = (point.y * imageData.width + point.x) * 4;
         imageData.data[index + 3] = 255; // alpha
       }

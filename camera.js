@@ -12,14 +12,17 @@ class Camera {
     this.z = -40;
     this.angle = lerp(this.angle, angle, t);
     this.center = new Point(this.x, this.y);
-    this.tip = new Point(this.x - this.range * Math.sin(this.angle), this.y - this.range * Math.cos(this.angle));
+    this.tip = new Point(
+      this.x - this.range * Math.sin(this.angle),
+      this.y - this.range * Math.cos(this.angle),
+    );
     this.left = new Point(
       this.x - this.range * Math.sin(this.angle - Math.PI / 4),
-      this.y - this.range * Math.cos(this.angle - Math.PI / 4)
+      this.y - this.range * Math.cos(this.angle - Math.PI / 4),
     );
     this.right = new Point(
       this.x - this.range * Math.sin(this.angle + Math.PI / 4),
-      this.y - this.range * Math.cos(this.angle + Math.PI / 4)
+      this.y - this.range * Math.cos(this.angle + Math.PI / 4),
     );
     this.polygon = new Polygon([this.center, this.left, this.right]);
   }
@@ -30,14 +33,17 @@ class Camera {
     this.z = -40;
     this.angle = angle;
     this.center = new Point(this.x, this.y);
-    this.tip = new Point(this.x - this.range * Math.sin(this.angle), this.y - this.range * Math.cos(this.angle));
+    this.tip = new Point(
+      this.x - this.range * Math.sin(this.angle),
+      this.y - this.range * Math.cos(this.angle),
+    );
     this.left = new Point(
       this.x - this.range * Math.sin(this.angle - Math.PI / 4),
-      this.y - this.range * Math.cos(this.angle - Math.PI / 4)
+      this.y - this.range * Math.cos(this.angle - Math.PI / 4),
     );
     this.right = new Point(
       this.x - this.range * Math.sin(this.angle + Math.PI / 4),
-      this.y - this.range * Math.cos(this.angle + Math.PI / 4)
+      this.y - this.range * Math.cos(this.angle + Math.PI / 4),
     );
     this.polygon = new Polygon([this.center, this.left, this.right]);
   }
@@ -63,7 +69,9 @@ class Camera {
         const copy2 = new Polygon(this.polygon.points);
         Polygon.break(copy1, copy2, true);
         const points = copy1.segments.map((segment) => segment.p1);
-        const filteredPoints = points.filter((point) => point.intersection || this.polygon.containsPoint(point));
+        const filteredPoints = points.filter(
+          (point) => point.intersection || this.polygon.containsPoint(point),
+        );
         filteredPolygons.push(new Polygon(filteredPoints));
       } else if (this.polygon.containsPolygon(polygon)) {
         filteredPolygons.push(polygon);
@@ -75,7 +83,9 @@ class Camera {
   #extrude(polygons, height = 10) {
     const extrudedPolygons = [];
     for (const polygon of polygons) {
-      const ceiling = new Polygon(polygon.points.map((point) => new Point(point.x, point.y, -height)));
+      const ceiling = new Polygon(
+        polygon.points.map((point) => new Point(point.x, point.y, -height)),
+      );
       const sides = [];
       for (let i = 0; i < polygon.points.length; i++) {
         sides.push(
@@ -84,7 +94,7 @@ class Camera {
             polygon.points[(i + 1) % polygon.points.length],
             ceiling.points[(i + 1) % ceiling.points.length],
             ceiling.points[i],
-          ])
+          ]),
         );
       }
 
@@ -125,8 +135,12 @@ class Camera {
       point.z -= wheelRadius;
     }
 
-    const ceiling = new Polygon(base.points.map((p) => new Point(p.x, p.y, -height)));
-    const midLine = new Polygon(base.points.map((p) => new Point(p.x, p.y, -height / 2)));
+    const ceiling = new Polygon(
+      base.points.map((p) => new Point(p.x, p.y, -height)),
+    );
+    const midLine = new Polygon(
+      base.points.map((p) => new Point(p.x, p.y, -height / 2)),
+    );
 
     const c_frontLeft = ceiling.points[0];
     const c_quarterFrontLeft = ceiling.points[1];
@@ -162,7 +176,7 @@ class Camera {
           base.points[(i + 1) % base.points.length],
           midLine.points[(i + 1) % midLine.points.length],
           midLine.points[i],
-        ])
+        ]),
       );
     }
     for (let i = 0; i < base.points.length; i++) {
@@ -172,16 +186,48 @@ class Camera {
           midLine.points[(i + 1) % midLine.points.length],
           ceiling.points[(i + 1) % ceiling.points.length],
           ceiling.points[i],
-        ])
+        ]),
       );
     }
 
     const ceilingParts = [];
 
-    ceilingParts.push(new Polygon([c_frontLeft, c_quarterFrontLeft, c_quarterFrontRight, c_frontRight]));
-    ceilingParts.push(new Polygon([c_quarterFrontLeft, c_middleLeft, c_middleRight, c_quarterFrontRight]));
-    ceilingParts.push(new Polygon([c_middleLeft, c_quarterBackLeft, c_quarterBackRight, c_middleRight]));
-    ceilingParts.push(new Polygon([c_quarterBackLeft, c_backLeft, c_backRight, c_quarterBackRight]));
+    const alex = 'test';
+    const tt = (t) => console.log(t);
+    tt(alex);
+
+    ceilingParts.push(
+      new Polygon([
+        c_frontLeft,
+        c_quarterFrontLeft,
+        c_quarterFrontRight,
+        c_frontRight,
+      ]),
+    );
+    ceilingParts.push(
+      new Polygon([
+        c_quarterFrontLeft,
+        c_middleLeft,
+        c_middleRight,
+        c_quarterFrontRight,
+      ]),
+    );
+    ceilingParts.push(
+      new Polygon([
+        c_middleLeft,
+        c_quarterBackLeft,
+        c_quarterBackRight,
+        c_middleRight,
+      ]),
+    );
+    ceilingParts.push(
+      new Polygon([
+        c_quarterBackLeft,
+        c_backLeft,
+        c_backRight,
+        c_quarterBackRight,
+      ]),
+    );
 
     return [...sides, ...ceilingParts];
   }
@@ -196,9 +242,17 @@ class Camera {
   }
 
   #getPolygons(world) {
-    const buildingPolygons = this.#extrude(this.#filter(world.buildings.map((b) => b.base)), 200);
+    const buildingPolygons = this.#extrude(
+      this.#filter(world.buildings.map((b) => b.base)),
+      200,
+    );
     // const treePolygons = this.#extrude(this.#filter(world.trees.map((b) => b.base)), 200);
-    const roadPolygons = this.#extrude(this.#filter(world.corridor.borders.map((s) => new Polygon([s.p1, s.p2]))), 10);
+    const roadPolygons = this.#extrude(
+      this.#filter(
+        world.corridor.borders.map((s) => new Polygon([s.p1, s.p2])),
+      ),
+      10,
+    );
     // const carPolygons = this.#extrude(
     //   this.#filter(
     //     world.cars.map((c) => new Polygon(c.polygon.map((point) => new Point(point.x, point.y))))
@@ -206,11 +260,18 @@ class Camera {
     //   10
     // );
     const carPolygons = this.#extrudeCar(
-      this.#filter([new Polygon(world.bestCar.polygon.map((point) => new Point(point.x, point.y)))])[0]
+      this.#filter([
+        new Polygon(
+          world.bestCar.polygon.map((point) => new Point(point.x, point.y)),
+        ),
+      ])[0],
     );
 
     const carShadows = this.#filter(
-      world.cars.map((c) => new Polygon(c.polygon.map((point) => new Point(point.x, point.y))))
+      world.cars.map(
+        (c) =>
+          new Polygon(c.polygon.map((point) => new Point(point.x, point.y))),
+      ),
     );
 
     for (const poly of carShadows) {
@@ -223,7 +284,12 @@ class Camera {
       poly.stroke = 'rgba(150, 150, 150, 0.2)';
     }
 
-    const polygons = [...carShadows, ...buildingPolygons, ...carPolygons, ...roadPolygons];
+    const polygons = [
+      ...carShadows,
+      ...buildingPolygons,
+      ...carPolygons,
+      ...roadPolygons,
+    ];
     return polygons;
   }
 
@@ -231,7 +297,10 @@ class Camera {
     const polygons = this.#getPolygons(world);
 
     const projectedPolygons = polygons.map(
-      (polygon) => new Polygon(polygon.points.map((point) => this.#projectPoint(ctx, point)))
+      (polygon) =>
+        new Polygon(
+          polygon.points.map((point) => this.#projectPoint(ctx, point)),
+        ),
     );
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);

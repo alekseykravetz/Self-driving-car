@@ -46,9 +46,18 @@ class Polygon {
     const segments2 = polygon2.segments;
     for (let i = 0; i < segments1.length; i++) {
       for (let j = 0; j < segments2.length; j++) {
-        const intersection = getIntersection(segments1[i].p1, segments1[i].p2, segments2[j].p1, segments2[j].p2);
+        const intersection = getIntersection(
+          segments1[i].p1,
+          segments1[i].p2,
+          segments2[j].p1,
+          segments2[j].p2,
+        );
 
-        if (intersection && intersection.offset !== 1 && intersection.offset !== 0) {
+        if (
+          intersection &&
+          intersection.offset !== 1 &&
+          intersection.offset !== 0
+        ) {
           const point = new Point(intersection.x, intersection.y);
           if (markIntersections) {
             point.intersection = true;
@@ -110,7 +119,15 @@ class Polygon {
     }
   }
 
-  draw(ctx, { stroke = 'blue', lineWidth = 2, fill = 'rgba(0,0,255,0.3)', join = 'miter' } = {}) {
+  draw(
+    ctx,
+    {
+      stroke = 'blue',
+      lineWidth = 2,
+      fill = 'rgba(0,0,255,0.3)',
+      join = 'miter',
+    } = {},
+  ) {
     ctx.beginPath();
     ctx.fillStyle = fill;
     ctx.strokeStyle = stroke;

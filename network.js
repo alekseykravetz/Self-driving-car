@@ -24,7 +24,7 @@ class NeuralNetwork {
           level.weights[i][j] = lerp(
             level.weights[i][j],
             Math.random() * 2 - 1,
-            amount
+            amount,
           );
         }
       }

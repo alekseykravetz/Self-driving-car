@@ -11,8 +11,8 @@ class Graph {
         new Segment(
           points.find((p) => p.equals(i.p1)),
           points.find((p) => p.equals(i.p2)),
-          i.oneWay
-        )
+          i.oneWay,
+        ),
     );
     return new Graph(points, segments);
   }
@@ -103,7 +103,9 @@ class Graph {
     while (!end.visited) {
       const segments = this.getSegmentsLeavingFromPoint(currentPoint);
       for (let segment of segments) {
-        const otherPoint = segment.p1.equals(currentPoint) ? segment.p2 : segment.p1;
+        const otherPoint = segment.p1.equals(currentPoint)
+          ? segment.p2
+          : segment.p1;
         if (currentPoint.distance + segment.length() < otherPoint.distance) {
           otherPoint.distance = currentPoint.distance + segment.length();
           otherPoint.previous = currentPoint;
@@ -113,7 +115,9 @@ class Graph {
 
       const unvisited = this.points.filter((p) => !p.visited);
       const distances = unvisited.map((p) => p.distance);
-      currentPoint = unvisited.find((p) => p.distance === Math.min(...distances));
+      currentPoint = unvisited.find(
+        (p) => p.distance === Math.min(...distances),
+      );
     }
 
     const path = [];
