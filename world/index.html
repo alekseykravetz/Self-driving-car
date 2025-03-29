@@ -77,7 +77,7 @@
     <!-- <script src="saves/kohav-hazafon.world"></script> -->
     <!-- <script src="saves/kohav-hazafon-with-target.world"></script> -->
     <!-- <script src="saves/ashkelon.world"></script> -->
-    <script src="saves/path_finding.world"></script>
+    <!-- <script src="saves/path_finding.world"></script> -->
 
     <script>
       myCanvas.width = 800;
@@ -85,25 +85,30 @@
 
       const ctx = myCanvas.getContext('2d');
 
-      const worldString = localStorage.getItem('world');
-      const worldInfo = worldString ? JSON.parse(worldString) : null;
-
-      // let world;
+      let localWorld;
       let viewport;
       let tools;
       let oldGraphHash;
-      initializeWorldEditor(myCanvas, worldInfo);
+
+      if (typeof world === 'undefined') {
+        const worldString = localStorage.getItem('world');
+        const worldInfo = worldString ? JSON.parse(worldString) : null;
+
+        initializeWorldEditor(myCanvas, worldInfo);
+      } else {
+        initializeWorldEditor(myCanvas, world); // global world info
+      }
 
       animate();
 
       function animate() {
         viewport.reset();
-        if (world.graph.hash() !== oldGraphHash) {
-          world.generate();
-          oldGraphHash = world.graph.hash();
+        if (localWorld.graph.hash() !== oldGraphHash) {
+          localWorld.generate();
+          oldGraphHash = localWorld.graph.hash();
         }
         const viewPoint = scale(viewport.getOffset(), -1);
-        world.draw(ctx, viewPoint);
+        localWorld.draw(ctx, viewPoint);
         ctx.globalAlpha = 0.3;
         for (const tool of Object.values(tools)) {
           tool.editor.display();
@@ -113,12 +118,14 @@
       }
 
       function initializeWorldEditor(canvas, worldInfo) {
-        if (typeof world === 'undefined') {
-          world = worldInfo ? World.load(worldInfo) : new World(new Graph());
-        }
-        viewport = initializeViewport(canvas, world.zoom, world.offset);
-        tools = initializeEditors(viewport, world);
-        oldGraphHash = world.graph.hash();
+        localWorld = worldInfo ? World.load(worldInfo) : new World(new Graph());
+        viewport = initializeViewport(
+          canvas,
+          localWorld.zoom,
+          localWorld.offset,
+        );
+        tools = initializeEditors(viewport, localWorld);
+        oldGraphHash = localWorld.graph.hash();
         setMode('graph');
       }
 
@@ -157,7 +164,7 @@
 
       function dispose() {
         tools['graph'].editor.dispose();
-        world.markings.length = 0; // world.markings = []; // don't work!
+        localWorld.markings.length = 0; // world.markings = []; // don't work!
       }
 
       function loadWorldFromFile(e) {
@@ -173,6 +180,7 @@
 
         reader.onload = function (e) {
           const worldFileContent = e.target.result;
+
           const removeWorldVariableDeclaration = worldFileContent
             ? worldFileContent.substring(
                 worldFileContent.indexOf('(') + 1,
@@ -192,10 +200,10 @@
       }
 
       function save() {
-        world.zoom = viewport.zoom;
-        world.offset = viewport.offset;
+        localWorld.zoom = viewport.zoom;
+        localWorld.offset = viewport.offset;
 
-        const worldString = JSON.stringify(world);
+        const worldString = JSON.stringify(localWorld);
 
         try {
           localStorage.setItem('world', worldString);
@@ -243,8 +251,8 @@
           return;
         }
         const result = Osm.parseRoads(JSON.parse(osmData));
-        world.graph.points = result.points;
-        world.graph.segments = result.segments;
+        localWorld.graph.points = result.points;
+        localWorld.graph.segments = result.segments;
         closeOsmPanel();
       }
     </script>
