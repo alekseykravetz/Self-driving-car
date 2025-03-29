@@ -35,6 +35,9 @@ class World {
   static load(info) {
     const world = new World(new Graph());
     world.graph = Graph.load(info.graph);
+    //this version trigger world generation and it is slower
+    // const graph = Graph.load(info.graph);
+    // const world = new World(graph);
 
     world.roadWidth = info.roadWidth;
     world.roadRoundness = info.roadRoundness;
@@ -375,5 +378,9 @@ class World {
     for (const item of items) {
       item.draw(ctx, viewPoint);
     }
+
+    // for (const seg of this.laneGuides) {
+    //   seg.draw(ctx);
+    // }
   }
 }

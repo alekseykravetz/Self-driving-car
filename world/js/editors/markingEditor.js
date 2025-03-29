@@ -1,5 +1,5 @@
 class MarkingEditor {
-  constructor(viewport, world, targetSegments) {
+  constructor(viewport, world, targetSegments = world.graph.segments) {
     this.viewport = viewport;
     this.world = world;
 

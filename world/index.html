@@ -10,6 +10,15 @@
     <div id="controls">
       <button onclick="dispose()">🗑️</button>
       <button onclick="save()">💾</button>
+      <label for="fileInput" class="file-input-label">
+        📁
+        <input
+          type="file"
+          id="fileInput"
+          accept=".world"
+          onchange="loadWorldFromFile(event)"
+        />
+      </label>
       <button onclick="openOsmPanel()">🗺️</button>
       &nbsp;
       <button id="graphBtn" onclick="setMode('graph')">🌐</button>
@@ -66,9 +75,9 @@
     <script src="js/primitives/envelope.js"></script>
 
     <!-- <script src="saves/kohav-hazafon.world"></script> -->
-    <script src="saves/kohav-hazafon-with-target.world"></script>
+    <!-- <script src="saves/kohav-hazafon-with-target.world"></script> -->
     <!-- <script src="saves/ashkelon.world"></script> -->
-    <!-- <script src="saves/path_finding.world"></script> -->
+    <script src="saves/path_finding.world"></script>
 
     <script>
       myCanvas.width = 800;
@@ -76,45 +85,22 @@
 
       const ctx = myCanvas.getContext('2d');
 
-      const graph = world.graph;
+      const worldString = localStorage.getItem('world');
+      const worldInfo = worldString ? JSON.parse(worldString) : null;
 
-      const viewport = new Viewport(myCanvas, world.zoom, world.offset);
-
-      const tools = {
-        graph: { button: graphBtn, editor: new GraphEditor(viewport, graph) },
-        marking: {
-          button: markingBtn,
-          editor: new MarkingEditor(viewport, world, graph.segments),
-        },
-        stop: { button: stopBtn, editor: new StopEditor(viewport, world) },
-        crossing: {
-          button: crossingBtn,
-          editor: new CrossingEditor(viewport, world),
-        },
-        start: { button: startBtn, editor: new StartEditor(viewport, world) },
-        parking: {
-          button: parkingBtn,
-          editor: new ParkingEditor(viewport, world),
-        },
-        light: { button: lightBtn, editor: new LightEditor(viewport, world) },
-        target: {
-          button: targetBtn,
-          editor: new TargetEditor(viewport, world),
-        },
-        yield: { button: yieldBtn, editor: new YieldEditor(viewport, world) },
-      };
-
-      let oldGraphHash = graph.hash();
-
-      setMode('graph');
+      // let world;
+      let viewport;
+      let tools;
+      let oldGraphHash;
+      initializeWorldEditor(myCanvas, worldInfo);
 
       animate();
 
       function animate() {
         viewport.reset();
-        if (graph.hash() !== oldGraphHash) {
+        if (world.graph.hash() !== oldGraphHash) {
           world.generate();
-          oldGraphHash = graph.hash();
+          oldGraphHash = world.graph.hash();
         }
         const viewPoint = scale(viewport.getOffset(), -1);
         world.draw(ctx, viewPoint);
@@ -126,30 +112,105 @@
         requestAnimationFrame(animate);
       }
 
+      function initializeWorldEditor(canvas, worldInfo) {
+        if (typeof world === 'undefined') {
+          world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+        }
+        viewport = initializeViewport(canvas, world.zoom, world.offset);
+        tools = initializeEditors(viewport, world);
+        oldGraphHash = world.graph.hash();
+        setMode('graph');
+      }
+
+      function initializeViewport(canvas, zoom, offset) {
+        return new Viewport(canvas, zoom, offset);
+      }
+
+      function initializeEditors(viewport, world) {
+        return {
+          graph: {
+            button: graphBtn,
+            editor: new GraphEditor(viewport, world.graph),
+          },
+          marking: {
+            button: markingBtn,
+            editor: new MarkingEditor(viewport, world),
+          },
+          stop: { button: stopBtn, editor: new StopEditor(viewport, world) },
+          crossing: {
+            button: crossingBtn,
+            editor: new CrossingEditor(viewport, world),
+          },
+          start: { button: startBtn, editor: new StartEditor(viewport, world) },
+          parking: {
+            button: parkingBtn,
+            editor: new ParkingEditor(viewport, world),
+          },
+          light: { button: lightBtn, editor: new LightEditor(viewport, world) },
+          target: {
+            button: targetBtn,
+            editor: new TargetEditor(viewport, world),
+          },
+          yield: { button: yieldBtn, editor: new YieldEditor(viewport, world) },
+        };
+      }
+
       function dispose() {
         tools['graph'].editor.dispose();
         world.markings.length = 0; // world.markings = []; // don't work!
+      }
+
+      function loadWorldFromFile(e) {
+        const worldFile = e.target.files[0];
+
+        if (!worldFile) {
+          alert('No file selected');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsText(worldFile);
+
+        reader.onload = function (e) {
+          const worldFileContent = e.target.result;
+          const removeWorldVariableDeclaration = worldFileContent
+            ? worldFileContent.substring(
+                worldFileContent.indexOf('(') + 1,
+                worldFileContent.lastIndexOf(')'),
+              )
+            : null;
+
+          if (!removeWorldVariableDeclaration) {
+            alert('Wrong file content. use .world extension');
+            return;
+          }
+
+          const worldInfo = JSON.parse(removeWorldVariableDeclaration);
+
+          initializeWorldEditor(myCanvas, worldInfo);
+        };
       }
 
       function save() {
         world.zoom = viewport.zoom;
         world.offset = viewport.offset;
 
+        const worldString = JSON.stringify(world);
+
+        try {
+          localStorage.setItem('world', worldString);
+        } catch (error) {
+          console.error('World is to big to save in local storage', error);
+        }
+
         const element = document.createElement('a');
         element.setAttribute(
           'href',
           'data:application/json;charset=utf-8,' +
-            encodeURIComponent(
-              `const world = World.load(${JSON.stringify(world)});`,
-            ),
+            encodeURIComponent(`const world = World.load(${worldString});`),
         );
-
-        const fileName = 'name.world';
-        element.setAttribute('download', fileName);
-
+        element.setAttribute('download', 'name.world');
         element.click();
-
-        localStorage.setItem('world', JSON.stringify(world));
       }
 
       function setMode(mode) {
@@ -182,8 +243,8 @@
           return;
         }
         const result = Osm.parseRoads(JSON.parse(osmData));
-        graph.points = result.points;
-        graph.segments = result.segments;
+        world.graph.points = result.points;
+        world.graph.segments = result.segments;
         closeOsmPanel();
       }
     </script>

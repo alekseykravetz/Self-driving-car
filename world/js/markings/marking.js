@@ -23,10 +23,14 @@ class Marking {
         return new Crossing(point, direction, info.width, info.height);
       case 'parking':
         return new Parking(point, direction, info.width, info.height);
+      case 'light':
+        return new Light(point, direction, info.width, info.height);
       case 'start':
         return new Start(point, direction, info.width, info.height);
       case 'stop':
         return new Stop(point, direction, info.width, info.height);
+      case 'yield':
+        return new Yield(point, direction, info.width, info.height);
       case 'target':
         return new Target(point, direction, info.width, info.height);
     }
