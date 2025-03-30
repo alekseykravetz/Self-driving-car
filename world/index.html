@@ -8,28 +8,23 @@
     <h1>World Editor</h1>
     <canvas id="myCanvas"></canvas>
     <div id="controls">
-      <button onclick="dispose()">🗑️</button>
-      <button onclick="save()">💾</button>
-      <label for="fileInput" class="file-input-label">
+      <button id="disposeBtn">🗑️</button>
+      <button id="saveBtn">💾</button>
+      <label for="loadWorldInput" class="file-input-label">
         📁
-        <input
-          type="file"
-          id="fileInput"
-          accept=".world"
-          onchange="loadWorldFromFile(event)"
-        />
+        <input type="file" id="loadWorldInput" accept=".world" />
       </label>
-      <button onclick="openOsmPanel()">🗺️</button>
+      <button id="openOsmPanelBtn">🗺️</button>
       &nbsp;
-      <button id="graphBtn" onclick="setMode('graph')">🌐</button>
-      <button id="markingBtn" onclick="setMode('marking')">🔲</button>
-      <button id="startBtn" onclick="setMode('start')">🚙</button>
-      <button id="targetBtn" onclick="setMode('target')">🎯</button>
-      <button id="stopBtn" onclick="setMode('stop')">🛑</button>
-      <button id="crossingBtn" onclick="setMode('crossing')">🚶</button>
-      <button id="yieldBtn" onclick="setMode('yield')">⚠️</button>
-      <button id="parkingBtn" onclick="setMode('parking')">🅿️</button>
-      <button id="lightBtn" onclick="setMode('light')">🚦</button>
+      <button id="graphBtn">🌐</button>
+      <button id="markingBtn">🔲</button>
+      <button id="startBtn">🚙</button>
+      <button id="targetBtn">🎯</button>
+      <button id="stopBtn">🛑</button>
+      <button id="crossingBtn">🚶</button>
+      <button id="yieldBtn">⚠️</button>
+      <button id="parkingBtn">🅿️</button>
+      <button id="lightBtn">🚦</button>
 
       <div id="osmPanel" style="display: none">
         <textarea
@@ -39,8 +34,8 @@
           placeholder="Paste OSM data here"
         ></textarea>
         <div>
-          <button onclick="parseOsmData()">✔️</button>
-          <button onclick="closeOsmPanel()">❌</button>
+          <button id="parseOsmDataBtn">✔️</button>
+          <button id="closeOsmPanelBtn">❌</button>
         </div>
       </div>
     </div>
@@ -56,6 +51,7 @@
     <script src="js/markings/target.js"></script>
     <script src="js/markings/yield.js"></script>
     <script src="js/editors/markingEditor.js"></script>
+    <script src="js/editors/worldEditor.js"></script>
     <script src="js/editors/graphEditor.js"></script>
     <script src="js/editors/stopEditor.js"></script>
     <script src="js/editors/startEditor.js"></script>
@@ -83,178 +79,8 @@
       myCanvas.width = 800;
       myCanvas.height = 490;
 
-      const ctx = myCanvas.getContext('2d');
-
-      let localWorld;
-      let viewport;
-      let tools;
-      let oldGraphHash;
-
-      if (typeof world === 'undefined') {
-        const worldString = localStorage.getItem('world');
-        const worldInfo = worldString ? JSON.parse(worldString) : null;
-
-        initializeWorldEditor(myCanvas, worldInfo);
-      } else {
-        initializeWorldEditor(myCanvas, world); // global world info
-      }
-
-      animate();
-
-      function animate() {
-        viewport.reset();
-        if (localWorld.graph.hash() !== oldGraphHash) {
-          localWorld.generate();
-          oldGraphHash = localWorld.graph.hash();
-        }
-        const viewPoint = scale(viewport.getOffset(), -1);
-        localWorld.draw(ctx, viewPoint);
-        ctx.globalAlpha = 0.3;
-        for (const tool of Object.values(tools)) {
-          tool.editor.display();
-        }
-
-        requestAnimationFrame(animate);
-      }
-
-      function initializeWorldEditor(canvas, worldInfo) {
-        localWorld = worldInfo ? World.load(worldInfo) : new World(new Graph());
-        viewport = initializeViewport(
-          canvas,
-          localWorld.zoom,
-          localWorld.offset,
-        );
-        tools = initializeEditors(viewport, localWorld);
-        oldGraphHash = localWorld.graph.hash();
-        setMode('graph');
-      }
-
-      function initializeViewport(canvas, zoom, offset) {
-        return new Viewport(canvas, zoom, offset);
-      }
-
-      function initializeEditors(viewport, world) {
-        return {
-          graph: {
-            button: graphBtn,
-            editor: new GraphEditor(viewport, world.graph),
-          },
-          marking: {
-            button: markingBtn,
-            editor: new MarkingEditor(viewport, world),
-          },
-          stop: { button: stopBtn, editor: new StopEditor(viewport, world) },
-          crossing: {
-            button: crossingBtn,
-            editor: new CrossingEditor(viewport, world),
-          },
-          start: { button: startBtn, editor: new StartEditor(viewport, world) },
-          parking: {
-            button: parkingBtn,
-            editor: new ParkingEditor(viewport, world),
-          },
-          light: { button: lightBtn, editor: new LightEditor(viewport, world) },
-          target: {
-            button: targetBtn,
-            editor: new TargetEditor(viewport, world),
-          },
-          yield: { button: yieldBtn, editor: new YieldEditor(viewport, world) },
-        };
-      }
-
-      function dispose() {
-        tools['graph'].editor.dispose();
-        localWorld.markings.length = 0; // world.markings = []; // don't work!
-      }
-
-      function loadWorldFromFile(e) {
-        const worldFile = e.target.files[0];
-
-        if (!worldFile) {
-          alert('No file selected');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.readAsText(worldFile);
-
-        reader.onload = function (e) {
-          const worldFileContent = e.target.result;
-
-          const removeWorldVariableDeclaration = worldFileContent
-            ? worldFileContent.substring(
-                worldFileContent.indexOf('(') + 1,
-                worldFileContent.lastIndexOf(')'),
-              )
-            : null;
-
-          if (!removeWorldVariableDeclaration) {
-            alert('Wrong file content. use .world extension');
-            return;
-          }
-
-          const worldInfo = JSON.parse(removeWorldVariableDeclaration);
-
-          initializeWorldEditor(myCanvas, worldInfo);
-        };
-      }
-
-      function save() {
-        localWorld.zoom = viewport.zoom;
-        localWorld.offset = viewport.offset;
-
-        const worldString = JSON.stringify(localWorld);
-
-        try {
-          localStorage.setItem('world', worldString);
-        } catch (error) {
-          console.error('World is to big to save in local storage', error);
-        }
-
-        const element = document.createElement('a');
-        element.setAttribute(
-          'href',
-          'data:application/json;charset=utf-8,' +
-            encodeURIComponent(`const world = World.load(${worldString});`),
-        );
-        element.setAttribute('download', 'name.world');
-        element.click();
-      }
-
-      function setMode(mode) {
-        disableEditors();
-        tools[mode].button.style.backgroundColor = 'white';
-        tools[mode].button.style.filter = '';
-        tools[mode].editor.enable();
-      }
-
-      function disableEditors() {
-        for (const tool of Object.values(tools)) {
-          tool.button.style.backgroundColor = 'gray';
-          tool.button.style.filter = 'grayscale(100%)';
-          tool.editor.disable();
-        }
-      }
-
-      function openOsmPanel() {
-        osmPanel.style.display = 'block';
-      }
-
-      function closeOsmPanel() {
-        osmPanel.style.display = 'none';
-      }
-
-      function parseOsmData() {
-        const osmData = osmDataContainer.value;
-        if (!osmData) {
-          alert('No OSM data provided');
-          return;
-        }
-        const result = Osm.parseRoads(JSON.parse(osmData));
-        localWorld.graph.points = result.points;
-        localWorld.graph.segments = result.segments;
-        closeOsmPanel();
-      }
+      const worldEditor = new WorldEditor(myCanvas);
+      worldEditor.animate();
     </script>
   </body>
 </html>
