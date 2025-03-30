@@ -14,9 +14,9 @@ class WorldEditor {
       const worldString = localStorage.getItem('world');
       const worldInfo = worldString ? JSON.parse(worldString) : null;
 
-      this.initializeWorldEditor(worldInfo);
+      this.#initializeWorldEditor(worldInfo);
     } else {
-      this.initializeWorldEditor(world); // global world info
+      this.#initializeWorldEditor(world); // global world info
     }
   }
 
@@ -81,7 +81,7 @@ class WorldEditor {
     this.lightBtn.addEventListener('click', this.setMode.bind(this, 'light'));
   }
 
-  initializeWorldEditor(worldInfo) {
+  #initializeWorldEditor(worldInfo) {
     this.localWorld = worldInfo
       ? World.load(worldInfo)
       : new World(new Graph());
@@ -151,44 +151,6 @@ class WorldEditor {
     }
   }
 
-  dispose() {
-    this.tools['graph'].editor.dispose();
-    this.localWorld.markings.length = 0; // world.markings = []; // don't work!
-  }
-
-  loadWorldFromFile(e) {
-    const worldFile = e.target.files[0];
-
-    if (!worldFile) {
-      alert('No file selected');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.readAsText(worldFile);
-
-    const that = this;
-    reader.onload = function (e) {
-      const worldFileContent = e.target.result;
-
-      const removeWorldVariableDeclaration = worldFileContent
-        ? worldFileContent.substring(
-            worldFileContent.indexOf('(') + 1,
-            worldFileContent.lastIndexOf(')'),
-          )
-        : null;
-
-      if (!removeWorldVariableDeclaration) {
-        alert('Wrong file content. use .world extension');
-        return;
-      }
-
-      const worldInfo = JSON.parse(removeWorldVariableDeclaration);
-
-      that.initializeWorldEditor(worldInfo);
-    };
-  }
-
   save() {
     this.localWorld.zoom = this.viewport.zoom;
     this.localWorld.offset = this.viewport.offset;
@@ -209,6 +171,44 @@ class WorldEditor {
     );
     element.setAttribute('download', 'name.world');
     element.click();
+  }
+
+  dispose() {
+    this.tools['graph'].editor.dispose();
+    this.localWorld.markings.length = 0; // world.markings = []; // don't work!
+  }
+
+  loadWorldFromFile(e) {
+    const worldFile = e.target.files[0];
+
+    if (!worldFile) {
+      alert('No file selected');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsText(worldFile);
+    reader.onload = this.#onLoadWorldFromFileRead.bind(this);
+  }
+
+  #onLoadWorldFromFileRead(e) {
+    const worldFileContent = e.target.result;
+
+    const removeWorldVariableDeclaration = worldFileContent
+      ? worldFileContent.substring(
+          worldFileContent.indexOf('(') + 1,
+          worldFileContent.lastIndexOf(')'),
+        )
+      : null;
+
+    if (!removeWorldVariableDeclaration) {
+      alert('Wrong file content. use .world extension');
+      return;
+    }
+
+    const worldInfo = JSON.parse(removeWorldVariableDeclaration);
+
+    this.#initializeWorldEditor(worldInfo);
   }
 
   openOsmPanel() {
