@@ -41,6 +41,7 @@ class GraphEditor {
         this.end = this.mouse;
       }
       if (this.start && this.end) {
+        //todo: global world
         world.generateCorridor(this.start, this.end);
       }
     });

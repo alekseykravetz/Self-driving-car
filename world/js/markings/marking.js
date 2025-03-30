@@ -1,6 +1,6 @@
 class Marking {
   constructor(center, directionVector, width, height) {
-    this.type = 'Marking';
+    this.type = 'marking';
     this.center = center;
     this.directionVector = directionVector;
     this.width = width;

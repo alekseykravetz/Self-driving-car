@@ -7,8 +7,8 @@ class ParkingEditor extends MarkingEditor {
     return new Parking(
       center,
       directionVector,
-      world.roadWidth / 2,
-      world.roadWidth / 2,
+      this.world.roadWidth / 2,
+      this.world.roadWidth / 2,
     );
   }
 }

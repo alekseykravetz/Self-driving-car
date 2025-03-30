@@ -19,8 +19,8 @@ class MarkingEditor {
     return new Marking(
       center,
       directionVector,
-      world.roadWidth,
-      world.roadWidth,
+      this.world.roadWidth,
+      this.world.roadWidth,
     );
     // return center;
   }
