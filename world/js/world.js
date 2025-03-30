@@ -65,11 +65,18 @@ class World {
     this.envelopes.length = 0; // re instantiated the same reference
     for (const segment of this.graph.segments) {
       this.envelopes.push(
-        new Envelope(segment, this.roadWidth, this.roadRoundness),
+        new Envelope(
+          segment,
+          segment.oneWay ? this.roadWidth / 2 : this.roadWidth,
+          this.roadRoundness,
+        ),
       );
     }
 
     if (generateWorld) {
+      this.laneGuides.length = 0;
+      this.laneGuides.push(...this.#generateLaneGuides());
+
       this.roadBorders.length = 0;
       this.roadBorders.push(
         ...Polygon.union(this.envelopes.map((envelope) => envelope.polygon)),
@@ -77,15 +84,11 @@ class World {
 
       this.buildings = this.#generateBuildings();
       this.trees = this.#generateTrees();
-
-      // re instantiated the same reference
-      this.laneGuides.length = 0;
-      this.laneGuides.push(...this.#generateLaneGuides());
     } else {
+      this.laneGuides.length = 0;
       this.buildings = [];
       this.trees = [];
       this.roadBorders.length = 0;
-      this.laneGuides.length = 0;
     }
   }
 
@@ -148,7 +151,11 @@ class World {
     const tempEnvelopes = [];
     for (const segment of this.graph.segments) {
       tempEnvelopes.push(
-        new Envelope(segment, this.roadWidth / 2, this.roadRoundness),
+        new Envelope(
+          segment,
+          segment.oneWay ? 2 : this.roadWidth / 2,
+          this.roadRoundness,
+        ),
       );
     }
 
@@ -356,7 +363,9 @@ class World {
       }
     }
     for (const seg of this.graph.segments) {
-      seg.draw(ctx, { color: 'white', width: 4, dash: [10, 10] });
+      if (!seg.oneWay) {
+        seg.draw(ctx, { color: 'white', width: 4, dash: [10, 20] });
+      }
     }
     for (const seg of this.roadBorders) {
       seg.draw(ctx, { color: 'white', width: 4 });
