@@ -12,15 +12,27 @@ body:not(.main-page) {
   flex-direction: column;
 }
 
-button {
+label {
+  display: flex;
+  justify-content: center;
+}
+
+button,
+.file-input-label {
   border: none;
   border-radius: 5px;
   padding: 5px;
   margin: 2px;
   cursor: pointer;
+  background-color: lightgray;
 }
-button:hover {
-  background: blue;
+button:hover,
+.file-input-label:hover {
+  background: white;
+}
+
+input[type='file'] {
+  display: none;
 }
 
 #gameCanvas {
