@@ -61,7 +61,7 @@ class World {
     return world;
   }
 
-  generate() {
+  generate(generateWorld = true) {
     this.envelopes.length = 0; // re instantiated the same reference
     for (const segment of this.graph.segments) {
       this.envelopes.push(
@@ -69,15 +69,24 @@ class World {
       );
     }
 
-    this.roadBorders = Polygon.union(
-      this.envelopes.map((envelope) => envelope.polygon),
-    );
-    this.buildings = this.#generateBuildings();
-    this.trees = this.#generateTrees();
+    if (generateWorld) {
+      this.roadBorders.length = 0;
+      this.roadBorders.push(
+        ...Polygon.union(this.envelopes.map((envelope) => envelope.polygon)),
+      );
 
-    // re instantiated the same reference
-    this.laneGuides.length = 0;
-    this.laneGuides.push(...this.#generateLaneGuides());
+      this.buildings = this.#generateBuildings();
+      this.trees = this.#generateTrees();
+
+      // re instantiated the same reference
+      this.laneGuides.length = 0;
+      this.laneGuides.push(...this.#generateLaneGuides());
+    } else {
+      this.buildings = [];
+      this.trees = [];
+      this.roadBorders.length = 0;
+      this.laneGuides.length = 0;
+    }
   }
 
   generateCorridor(start, end, extendEnd = false) {

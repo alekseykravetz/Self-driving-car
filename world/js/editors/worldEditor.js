@@ -3,10 +3,12 @@ class WorldEditor {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
 
-    this.localWorld = null;
+    this.world = null;
     this.viewport = null;
     this.tools = null;
     this.oldGraphHash = null;
+
+    this.generateWorld = true;
 
     this.#addEventListeners();
 
@@ -21,6 +23,13 @@ class WorldEditor {
   }
 
   #addEventListeners() {
+    this.worldGenerationInput = document.getElementById('worldGenerationInput');
+    this.worldGenerationInput.checked = this.generateWorld;
+    this.worldGenerationInput.addEventListener(
+      'change',
+      this.toggleWorldGeneration.bind(this),
+    );
+
     this.saveBtn = document.getElementById('saveBtn');
     this.disposeBtn = document.getElementById('disposeBtn');
     this.loadWorldInput = document.getElementById('loadWorldInput');
@@ -82,16 +91,14 @@ class WorldEditor {
   }
 
   #initializeWorldEditor(worldInfo) {
-    this.localWorld = worldInfo
-      ? World.load(worldInfo)
-      : new World(new Graph());
+    this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
     this.viewport = new Viewport(
       this.canvas,
-      this.localWorld.zoom,
-      this.localWorld.offset,
+      this.world.zoom,
+      this.world.offset,
     );
-    this.tools = this.initializeEditors(this.viewport, this.localWorld);
-    this.oldGraphHash = this.localWorld.graph.hash();
+    this.tools = this.initializeEditors(this.viewport, this.world);
+    this.oldGraphHash = this.world.graph.hash();
     this.setMode('graph');
   }
 
@@ -152,10 +159,10 @@ class WorldEditor {
   }
 
   save() {
-    this.localWorld.zoom = this.viewport.zoom;
-    this.localWorld.offset = this.viewport.offset;
+    this.world.zoom = this.viewport.zoom;
+    this.world.offset = this.viewport.offset;
 
-    const worldString = JSON.stringify(this.localWorld);
+    const worldString = JSON.stringify(this.world);
 
     try {
       localStorage.setItem('world', worldString);
@@ -175,7 +182,7 @@ class WorldEditor {
 
   dispose() {
     this.tools['graph'].editor.dispose();
-    this.localWorld.markings.length = 0; // world.markings = []; // don't work!
+    this.world.markings.length = 0;
   }
 
   loadWorldFromFile(e) {
@@ -236,19 +243,24 @@ class WorldEditor {
     }
 
     const result = Osm.parseRoads(osmDataJson);
-    this.localWorld.graph.points = result.points;
-    this.localWorld.graph.segments = result.segments;
+    this.world.graph.points = result.points;
+    this.world.graph.segments = result.segments;
     this.closeOsmPanel();
+  }
+
+  toggleWorldGeneration() {
+    this.generateWorld = !this.generateWorld;
+    this.worldGenerationInput.checked = this.generateWorld;
   }
 
   draw(ctx) {
     this.viewport.reset();
-    if (this.localWorld.graph.hash() !== this.oldGraphHash) {
-      this.localWorld.generate();
-      this.oldGraphHash = this.localWorld.graph.hash();
+    if (this.world.graph.hash() !== this.oldGraphHash) {
+      this.world.generate(this.generateWorld);
+      this.oldGraphHash = this.world.graph.hash();
     }
     const viewPoint = scale(this.viewport.getOffset(), -1);
-    this.localWorld.draw(ctx, viewPoint);
+    this.world.draw(ctx, viewPoint);
     ctx.globalAlpha = 0.3;
     for (const tool of Object.values(this.tools)) {
       tool.editor.display();
