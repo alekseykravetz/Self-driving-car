@@ -1,4 +1,4 @@
-body {
+body:not(.main-page) {
   margin: 0;
   background: darkgray;
   overflow: hidden;

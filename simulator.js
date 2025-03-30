@@ -26,7 +26,7 @@ const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth);
 const traffic = [];
 
 const N = 100;
-const cars = generateCars(N);
+const cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI'));
 let bestCar = cars[0];
 if (localStorage.getItem('bestBrain')) {
   for (let i = 0; i < cars.length; i++) {
@@ -52,7 +52,7 @@ if (target) {
   ];
 }
 
-function generateCars(n) {
+function generateCars(n, type) {
   const startMarkings = world.markings.filter((m) => m instanceof Start);
   const startPoint = startMarkings.length
     ? startMarkings[0].center
@@ -64,17 +64,19 @@ function generateCars(n) {
 
   const cars = [];
   for (let i = 1; i <= n; i++) {
-    // cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', 3, 'blue'));
+    const color = type === 'AI' ? getRandomColor() : 'blue';
     const car = new Car(
       startPoint.x,
       startPoint.y,
       30,
       50,
-      'AI',
+      type,
       startAngle,
       3,
-      'blue',
+      color,
     );
+    car.name = type === 'AI' ? 'AI ' + i : 'Player ' + i;
+
     car.load(carInfo);
     cars.push(car);
   }
@@ -107,7 +109,7 @@ function animate(time) {
   );
 
   world.cars = cars;
-  world.bestCar = bestCar;
+  world.bestCar = bestCar; // cars[0];
 
   miniMap.cars = cars;
 
