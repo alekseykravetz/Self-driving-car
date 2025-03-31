@@ -192,10 +192,6 @@ class Camera {
 
     const ceilingParts = [];
 
-    const alex = 'test';
-    const tt = (t) => console.log(t);
-    tt(alex);
-
     ceilingParts.push(
       new Polygon([
         c_frontLeft,
@@ -249,7 +245,9 @@ class Camera {
     // const treePolygons = this.#extrude(this.#filter(world.trees.map((b) => b.base)), 200);
     const roadPolygons = this.#extrude(
       this.#filter(
-        world.corridor.borders.map((s) => new Polygon([s.p1, s.p2])),
+        world.corridor
+          ? world.corridor.borders.map((s) => new Polygon([s.p1, s.p2]))
+          : world.roadBorders.map((s) => new Polygon([s.p1, s.p2])),
       ),
       10,
     );

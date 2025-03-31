@@ -1,70 +1,94 @@
 const rightPanelWidth = 300;
 
-document.body.style.flexDirection = 'column';
-
 const gameCanvas = document.getElementById('gameCanvas');
-gameCanvas.width = window.innerWidth;
-gameCanvas.height = window.innerHeight / 2; // 0;
 const gameCtx = gameCanvas.getContext('2d');
 
 const cameraCanvas = document.getElementById('cameraCanvas');
-cameraCanvas.width = window.innerWidth;
-cameraCanvas.height = window.innerHeight / 2; // window.innerHeight;
 const cameraCtx = cameraCanvas.getContext('2d');
 
 const miniMapCanvas = document.getElementById('miniMapCanvas');
-miniMapCanvas.width = rightPanelWidth;
-miniMapCanvas.height = rightPanelWidth;
 
-statistics.style.width = `${rightPanelWidth}px`;
-statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
+const N = 1;
+let cars;
+let myCar;
+let roadBorders = [];
 
-const viewport = new Viewport(gameCanvas, world.zoom, world.offset);
+let localWorld;
+let viewport;
+let camera;
+let miniMap;
 
-const N = 100;
-const cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI'));
-const myCar = cars[0];
-const camera = new Camera(myCar);
+const loadWorldInput = document.getElementById('loadWorldInput');
+if (loadWorldInput) {
+  loadWorldInput.addEventListener('change', loadWorldFromFile);
+}
 
-if (localStorage.getItem('bestBrain')) {
-  for (let i = 0; i < cars.length; i++) {
-    cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
-    if (i > 1) {
-      NeuralNetwork.mutate(cars[i].brain, 0.1);
+if (typeof world === 'undefined') {
+  const worldString = localStorage.getItem('world');
+  const worldInfo = worldString ? JSON.parse(worldString) : null;
+  initWorld(worldInfo);
+} else {
+  initWorld(world); // global world info
+}
+
+function initWorld(worldInfo) {
+  localWorld = worldInfo ? World.load(worldInfo) : new World(new Graph());
+
+  viewport = new Viewport(gameCanvas, localWorld.zoom, localWorld.offset);
+
+  cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI'));
+  myCar = cars[0];
+  if (localStorage.getItem('bestBrain')) {
+    for (let i = 0; i < cars.length; i++) {
+      cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
+      if (i > 1) {
+        NeuralNetwork.mutate(cars[i].brain, 0.1);
+      }
     }
+  }
+
+  camera = new Camera(myCar);
+
+  const target = localWorld.markings.find((m) => m instanceof Target);
+  if (target) {
+    localWorld.generateCorridor(myCar, target.center, true);
+    roadBorders = localWorld.corridor.borders.map((s) => [s.p1, s.p2]);
+  } else {
+    roadBorders = [...localWorld.roadBorders.map((s) => [s.p1, s.p2])];
+  }
+
+  if (localWorld.corridor) {
+    // mini map without details, only
+    const miniMapGraph = new Graph([], localWorld.corridor.skeleton);
+
+    miniMap = new MiniMap(
+      miniMapCanvas,
+      miniMapGraph,
+      rightPanelWidth,
+      cars,
+      0.1,
+    );
+  } else {
+    miniMap = new MiniMap(
+      miniMapCanvas,
+      localWorld.graph,
+      rightPanelWidth,
+      cars,
+    );
+  }
+
+  for (let i = 0; i < cars.length; i++) {
+    const div = document.createElement('div');
+    div.id = 'stat_' + i;
+    div.innerText = i;
+    div.style.color = cars[i].color;
+    div.classList.add('stat');
+    statistics.appendChild(div);
   }
 }
 
-for (let i = 0; i < cars.length; i++) {
-  const div = document.createElement('div');
-  div.id = 'stat_' + i;
-  div.innerText = i;
-  div.style.color = cars[i].color;
-  div.classList.add('stat');
-  statistics.appendChild(div);
-}
-
-let roadBorders = [];
-const target = world.markings.find((m) => m instanceof Target);
-if (target) {
-  world.generateCorridor(myCar, target.center, true);
-  roadBorders = world.corridor.borders.map((s) => [s.p1, s.p2]);
-} else {
-  roadBorders = [...world.roadBorders.map((s) => [s.p1, s.p2])];
-}
-
-const miniMapGraph = new Graph([], world.corridor.skeleton);
-const miniMap = new MiniMap(
-  miniMapCanvas,
-  miniMapGraph,
-  rightPanelWidth,
-  cars,
-  0.1,
-);
-// const miniMap = new MiniMap(miniMapCanvas, world.graph, rightPanelWidth, cars);
-
 function generateCars(n, type) {
-  const startMarkings = world.markings.filter((m) => m instanceof Start);
+  const startMarkings = localWorld.markings.filter((m) => m instanceof Start);
   const startPoint = startMarkings.length
     ? startMarkings[0].center
     : new Point(100, 100);
@@ -94,15 +118,49 @@ function generateCars(n, type) {
   return cars;
 }
 
+function loadWorldFromFile(e) {
+  const worldFile = e.target.files[0];
+
+  if (!worldFile) {
+    alert('No file selected');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.readAsText(worldFile);
+  reader.onload = onLoadWorldFromFileRead;
+}
+function onLoadWorldFromFileRead(e) {
+  const worldFileContent = e.target.result;
+
+  const removeWorldVariableDeclaration = worldFileContent
+    ? worldFileContent.substring(
+        worldFileContent.indexOf('(') + 1,
+        worldFileContent.lastIndexOf(')'),
+      )
+    : null;
+
+  if (!removeWorldVariableDeclaration) {
+    alert('Wrong file content. use .world extension');
+    return;
+  }
+
+  const worldInfo = JSON.parse(removeWorldVariableDeclaration);
+
+  initWorld(worldInfo);
+}
+
 let frameCount = 0;
 let started = false;
 
 function updateCarProgress(car) {
+  if (!localWorld.corridor) return;
+
   if (!car.finishTime) {
     car.progress = 0;
-    const carSegment = getNearestSegment(car, world.corridor.skeleton);
-    for (let i = 0; i < world.corridor.skeleton.length; i++) {
-      const segment = world.corridor.skeleton[i];
+    const carSegment = getNearestSegment(car, localWorld.corridor.skeleton);
+    for (let i = 0; i < localWorld.corridor.skeleton.length; i++) {
+      const segment = localWorld.corridor.skeleton[i];
       if (segment.equals(carSegment)) {
         const projection = segment.projectPoint(car);
         const firstPartOfSegment = new Segment(segment.p1, projection.point);
@@ -112,7 +170,7 @@ function updateCarProgress(car) {
         car.progress += segment.length();
       }
     }
-    const totalDistance = world.corridor.skeleton.reduce(
+    const totalDistance = localWorld.corridor.skeleton.reduce(
       (acc, segment) => acc + segment.length(),
       0,
     );
@@ -155,7 +213,10 @@ startCounter();
 animate();
 
 function handleCollisionWithRoadBorders(car) {
-  const segment = getNearestSegment(car, world.corridor.skeleton);
+  const segment = getNearestSegment(
+    car,
+    localWorld.corridor ? localWorld.corridor.skeleton : localWorld.roadBorders,
+  );
   const correctors = car.polygon.map((p) => {
     const proj = segment.projectPoint(p);
     const projPoint = proj.offset > 1 ? segment.p2 : proj.point;
@@ -190,15 +251,15 @@ function animate() {
     }
   }
 
-  world.cars = cars;
-  world.bestCar = myCar;
+  localWorld.cars = cars;
+  localWorld.bestCar = myCar;
 
   viewport.offset.x = -myCar.x;
   viewport.offset.y = -myCar.y;
 
   viewport.reset();
   const viewPoint = scale(viewport.getOffset(), -1);
-  world.draw(gameCtx, viewPoint, false);
+  localWorld.draw(gameCtx, viewPoint, false);
   miniMap.update(viewPoint);
   miniMapCanvas.style.transform = `rotate(${myCar.angle}rad)`;
 
@@ -223,7 +284,7 @@ function animate() {
 
   camera.move(myCar);
   camera.draw(gameCtx);
-  camera.render(cameraCtx, world);
+  camera.render(cameraCtx, localWorld);
 
   frameCount++;
   requestAnimationFrame(animate);

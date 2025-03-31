@@ -11,6 +11,15 @@
     <div id="statistics"></div>
     <div id="counter"></div>
 
+    <label
+      for="loadWorldInput"
+      class="file-input-label"
+      style="position: absolute; left: 0; top: 0"
+    >
+      📁
+      <input type="file" id="loadWorldInput" accept=".world" />
+    </label>
+
     <script src="world/js/world.js"></script>
     <script src="world/js/viewport.js"></script>
     <script src="world/js/markings/marking.js"></script>
@@ -61,11 +70,26 @@
     <script src="race.js"></script>
 
     <script>
+      gameCanvas.height = window.innerHeight / 2;
+      cameraCanvas.height = window.innerHeight / 2;
+
       // gameCanvas.height = 0;
       // cameraCanvas.height = window.innerHeight;
 
       // gameCanvas.height = window.innerHeight;
       // cameraCanvas.height = 0;
+
+      gameCanvas.width = window.innerWidth;
+      cameraCanvas.width = window.innerWidth;
+
+      document.body.style.flexDirection = 'column';
+
+      // const rightPanelWidth = 300;
+      miniMapCanvas.width = rightPanelWidth;
+      miniMapCanvas.height = rightPanelWidth;
+
+      statistics.style.width = `${rightPanelWidth}px`;
+      statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
     </script>
   </body>
 </html>

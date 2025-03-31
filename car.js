@@ -64,6 +64,7 @@ class Car {
     this.sensor.rayOffset = info.sensor.rayOffset;
   }
 
+  // todo: remove traffic, merge with road borders (polygons intersection check)
   update(roadBorders, traffic) {
     if (!this.damaged) {
       this.#move();

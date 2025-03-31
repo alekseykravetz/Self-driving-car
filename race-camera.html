@@ -65,8 +65,28 @@
     <script src="cameraControls.js"></script>
 
     <script>
+      // gameCanvas.height = window.innerHeight / 2;
+      // cameraCanvas.height = window.innerHeight / 2;
+
       gameCanvas.height = 0;
       cameraCanvas.height = window.innerHeight;
+
+      // gameCanvas.height = window.innerHeight;
+      // cameraCanvas.height = 0;
+
+      gameCanvas.width = window.innerWidth;
+      cameraCanvas.width = window.innerWidth;
+
+      document.body.style.flexDirection = 'column';
+
+      // const rightPanelWidth = 300;
+      miniMapCanvas.width = rightPanelWidth;
+      miniMapCanvas.height = rightPanelWidth;
+
+      statistics.style.width = `${rightPanelWidth}px`;
+      statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
+
+      // Special code part for video camera controls
 
       const controls = new CameraControls(ironManCanvas);
       myCar.controls = controls;
