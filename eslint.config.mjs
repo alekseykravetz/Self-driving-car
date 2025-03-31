@@ -96,6 +96,8 @@ export default defineConfig([
         beep: 'readonly',
         Visualizer: 'readonly',
 
+        Simulator: 'readonly',
+
         // main utils
         // lerp: 'readonly',
         // getIntersection: 'readonly',
@@ -128,7 +130,7 @@ export default defineConfig([
         'warn',
         {
           varsIgnorePattern:
-            '^(Point|Segment|Envelope|Polygon|Graph|Osm|getNearestPoint|getNearestSegment|distance|average|dot|cross|add|subtract|scale|normalize|magnitude|perpendicular|translate|angle|getIntersection|lerp|lerp2D|invLerp|degToRad|getRandomColor|getFake3dPoint|Building|Tree|WorldEditor|GraphEditor|MarkingEditor|StartEditor|TargetEditor|CrossingEditor|ParkingEditor|LightEditor|StopEditor|YieldEditor|Marking|Start|Target|Crossing|Parking|Light|Stop|Yield|World|Viewport|Camera|CameraControls|Car|constants|Controls|MarkerDetector|MiniMap|NeuralNetwork|PhoneControls|Race|Road|Sensor|Engine|taDaa|explode|beep|Visualizer|polysIntersect|getRGBA|save|discard)$',
+            '^(Point|Segment|Envelope|Polygon|Graph|Osm|getNearestPoint|getNearestSegment|distance|average|dot|cross|add|subtract|scale|normalize|magnitude|perpendicular|translate|angle|getIntersection|lerp|lerp2D|invLerp|degToRad|getRandomColor|getFake3dPoint|Building|Tree|WorldEditor|GraphEditor|MarkingEditor|StartEditor|TargetEditor|CrossingEditor|ParkingEditor|LightEditor|StopEditor|YieldEditor|Marking|Start|Target|Crossing|Parking|Light|Stop|Yield|World|Viewport|Simulator|Camera|CameraControls|Car|constants|Controls|MarkerDetector|MiniMap|NeuralNetwork|PhoneControls|Race|Road|Sensor|Engine|taDaa|explode|beep|Visualizer|polysIntersect|getRGBA|save|discard)$',
         },
       ],
     },

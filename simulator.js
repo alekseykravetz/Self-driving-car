@@ -1,180 +1,192 @@
-const rightPanelWidth = 300;
-const buttonsPanelWidth = 30;
+class Simulator {
+  constructor(gameCanvas, networkCanvas, miniMapCanvas) {
+    this.gameCanvas = gameCanvas;
+    this.gameCtx = gameCanvas.getContext('2d');
+    this.networkCanvas = networkCanvas;
+    this.networkCtx = networkCanvas.getContext('2d');
+    this.miniMapCanvas = miniMapCanvas;
 
-const gameCanvas = document.getElementById('gameCanvas');
-gameCanvas.width = window.innerWidth - rightPanelWidth - buttonsPanelWidth;
-gameCanvas.height = window.innerHeight;
-const gameCtx = gameCanvas.getContext('2d');
+    this.world = null;
+    this.viewport = null;
+    this.miniMap = null;
 
-const networkCanvas = document.getElementById('networkCanvas');
-networkCanvas.width = rightPanelWidth;
-networkCanvas.height = window.innerHeight - rightPanelWidth;
-const networkCtx = networkCanvas.getContext('2d');
+    this.N = 10;
+    this.cars = null;
+    this.bestCar = null;
+    this.roadBorders = null;
 
-const miniMapCanvas = document.getElementById('miniMapCanvas');
-miniMapCanvas.width = rightPanelWidth;
-miniMapCanvas.height = window.innerHeight - rightPanelWidth;
+    this.#addEventListeners();
 
-const loadWorldInput = document.getElementById('loadWorldInput');
-loadWorldInput.addEventListener('change', loadWorldFromFile);
+    if (typeof world === 'undefined') {
+      const worldString = localStorage.getItem('world');
+      const worldInfo = worldString ? JSON.parse(worldString) : null;
 
-let localWorld;
-let viewport;
-let miniMap;
-
-const traffic = [];
-const N = 1;
-let cars;
-let bestCar;
-let roadBorders = [];
-
-if (typeof world === 'undefined') {
-  const worldString = localStorage.getItem('world');
-  const worldInfo = worldString ? JSON.parse(worldString) : null;
-  initWorld(worldInfo);
-} else {
-  initWorld(world); // global world info
-}
-
-function initWorld(worldInfo) {
-  localWorld = worldInfo ? World.load(worldInfo) : new World(new Graph());
-  viewport = new Viewport(gameCanvas, localWorld.zoom, localWorld.offset);
-  miniMap = new MiniMap(miniMapCanvas, localWorld.graph, rightPanelWidth);
-
-  cars = generateCars(1, 'KEYS').concat(generateCars(N, 'AI'));
-  bestCar = cars[0];
-  if (localStorage.getItem('bestBrain')) {
-    for (let i = 0; i < cars.length; i++) {
-      cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
-      if (i !== 0) {
-        NeuralNetwork.mutate(cars[i].brain, 0.1);
-      }
+      this.#initializeSimulator(worldInfo);
+    } else {
+      this.#initializeSimulator(world); // global world info
     }
   }
 
-  const target = localWorld.markings.find((m) => m instanceof Target);
-  if (target) {
-    localWorld.generateCorridor(bestCar, target.center);
-    roadBorders = localWorld.corridor.borders.map((s) => [s.p1, s.p2]);
-  } else {
-    roadBorders = [
-      // ...localWorld.buildings
-      //   .map((b) => b.base.segments)
-      //   .flat()
-      //   .map((s) => [s.p1, s.p2]),
-      ...localWorld.roadBorders.map((s) => [s.p1, s.p2]),
-    ];
+  generateCars(n, type) {
+    const startMarkings = this.world.markings.filter((m) => m instanceof Start);
+    const startPoint = startMarkings.length
+      ? startMarkings[0].center
+      : new Point(100, 100);
+    const direction = startMarkings.length
+      ? startMarkings[0].directionVector
+      : new Point(0, -1);
+    const startAngle = -angle(direction) + Math.PI / 2;
+
+    const cars = [];
+    for (let i = 1; i <= n; i++) {
+      const color = type === 'AI' ? getRandomColor() : 'blue';
+      const car = new Car(
+        startPoint.x,
+        startPoint.y,
+        30,
+        50,
+        type,
+        startAngle,
+        3,
+        color,
+      );
+      car.name = type === 'AI' ? 'AI ' + i : 'Player ' + i;
+
+      car.load(carInfo);
+      cars.push(car);
+    }
+    return cars;
   }
-}
 
-function generateCars(n, type) {
-  const startMarkings = localWorld.markings.filter((m) => m instanceof Start);
-  const startPoint = startMarkings.length
-    ? startMarkings[0].center
-    : new Point(100, 100);
-  const direction = startMarkings.length
-    ? startMarkings[0].directionVector
-    : new Point(0, -1);
-  const startAngle = -angle(direction) + Math.PI / 2;
-
-  const cars = [];
-  for (let i = 1; i <= n; i++) {
-    const color = type === 'AI' ? getRandomColor() : 'blue';
-    const car = new Car(
-      startPoint.x,
-      startPoint.y,
-      30,
-      50,
-      type,
-      startAngle,
-      3,
-      color,
+  #addEventListeners() {
+    this.saveBtn = document.getElementById('saveBtn');
+    this.saveBtn.addEventListener('click', this.save.bind(this));
+    this.discardBtn = document.getElementById('discardBtn');
+    this.discardBtn.addEventListener('click', this.discard.bind(this));
+    this.loadWorldInput = document.getElementById('loadWorldInput');
+    this.loadWorldInput.addEventListener(
+      'change',
+      this.loadWorldFromFile.bind(this),
     );
-    car.name = type === 'AI' ? 'AI ' + i : 'Player ' + i;
-
-    car.load(carInfo);
-    cars.push(car);
-  }
-  return cars;
-}
-
-function save() {
-  localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain));
-}
-function discard() {
-  localStorage.removeItem('bestBrain');
-}
-
-function loadWorldFromFile(e) {
-  const worldFile = e.target.files[0];
-
-  if (!worldFile) {
-    alert('No file selected');
-    return;
   }
 
-  const reader = new FileReader();
-  reader.readAsText(worldFile);
-  reader.onload = onLoadWorldFromFileRead;
-}
-function onLoadWorldFromFileRead(e) {
-  const worldFileContent = e.target.result;
+  #initializeSimulator(worldInfo) {
+    this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+    this.viewport = new Viewport(
+      this.gameCanvas,
+      this.world.zoom,
+      this.world.offset,
+    );
+    this.miniMap = new MiniMap(
+      this.miniMapCanvas,
+      this.world.graph,
+      this.miniMapCanvas.width,
+    );
 
-  const removeWorldVariableDeclaration = worldFileContent
-    ? worldFileContent.substring(
-        worldFileContent.indexOf('(') + 1,
-        worldFileContent.lastIndexOf(')'),
-      )
-    : null;
+    this.cars = this.generateCars(1, 'KEYS').concat(
+      this.generateCars(this.N, 'AI'),
+    );
+    this.bestCar = this.cars[0];
+    if (localStorage.getItem('bestBrain')) {
+      for (let i = 0; i < this.cars.length; i++) {
+        this.cars[i].brain = JSON.parse(localStorage.getItem('bestBrain'));
+        if (i > 1) {
+          NeuralNetwork.mutate(this.cars[i].brain, 0.1);
+        }
+      }
+    }
 
-  if (!removeWorldVariableDeclaration) {
-    alert('Wrong file content. use .world extension');
-    return;
+    const target = this.world.markings.find((m) => m instanceof Target);
+    if (target) {
+      this.world.generateCorridor(this.bestCar, target.center);
+      this.roadBorders = this.world.corridor.borders.map((s) => [s.p1, s.p2]);
+    } else {
+      this.roadBorders = [
+        // ...this.localWorld.buildings
+        //   .map((b) => b.base.segments)
+        //   .flat()
+        //   .map((s) => [s.p1, s.p2]),
+        ...this.world.roadBorders.map((s) => [s.p1, s.p2]),
+      ];
+    }
   }
 
-  const worldInfo = JSON.parse(removeWorldVariableDeclaration);
-
-  initWorld(worldInfo);
-}
-
-animate();
-
-function animate(time) {
-  // update traffic cars and play cars data
-  for (let i = 0; i < traffic.length; i++) {
-    // traffic[i].update(road.borders, []);
-    traffic[i].update(roadBorders, []);
+  save() {
+    localStorage.setItem('bestBrain', JSON.stringify(this.bestCar.brain));
   }
-  for (let i = 0; i < cars.length; i++) {
-    // cars[i].update(road.borders, traffic);
-    cars[i].update(roadBorders, traffic);
+  discard() {
+    localStorage.removeItem('bestBrain');
   }
 
-  // Fitness function
-  bestCar = cars.find(
-    (c) => c.fitness === Math.max(...cars.map((c) => c.fitness)),
-  );
+  loadWorldFromFile(e) {
+    const worldFile = e.target.files[0];
 
-  localWorld.cars = cars;
-  localWorld.bestCar = bestCar; // cars[0];
+    if (!worldFile) {
+      alert('No file selected');
+      return;
+    }
 
-  miniMap.cars = cars;
-
-  viewport.offset.x = -bestCar.x;
-  viewport.offset.y = -bestCar.y;
-
-  viewport.reset();
-  const viewPoint = scale(viewport.getOffset(), -1);
-  localWorld.draw(gameCtx, viewPoint, false);
-  miniMap.update(viewPoint);
-
-  for (let i = 0; i < traffic.length; i++) {
-    traffic[i].draw(gameCtx);
+    const reader = new FileReader();
+    reader.readAsText(worldFile);
+    reader.onload = this.#onLoadWorldFromFileRead.bind(this);
   }
 
-  networkCtx.lineDashOffset = -time / 50;
-  networkCtx.clearRect(0, 0, networkCanvas.width, networkCanvas.height);
-  Visualizer.drawNetwork(networkCtx, bestCar.brain);
+  #onLoadWorldFromFileRead(e) {
+    const worldFileContent = e.target.result;
 
-  requestAnimationFrame(animate);
+    const removeWorldVariableDeclaration = worldFileContent
+      ? worldFileContent.substring(
+          worldFileContent.indexOf('(') + 1,
+          worldFileContent.lastIndexOf(')'),
+        )
+      : null;
+
+    if (!removeWorldVariableDeclaration) {
+      alert('Wrong file content. use .world extension');
+      return;
+    }
+
+    const worldInfo = JSON.parse(removeWorldVariableDeclaration);
+
+    this.#initializeSimulator(worldInfo);
+  }
+
+  draw(time) {
+    for (let i = 0; i < this.cars.length; i++) {
+      // this.cars[i].update(road.borders, traffic);
+      this.cars[i].update(this.roadBorders, []);
+    }
+
+    // Fitness function
+    this.bestCar = this.cars.find(
+      (c) => c.fitness === Math.max(...this.cars.map((c) => c.fitness)),
+    );
+
+    this.world.cars = this.cars;
+    this.world.bestCar = this.bestCar; // cars[0];
+
+    this.miniMap.cars = this.cars;
+
+    this.viewport.offset.x = -this.bestCar.x;
+    this.viewport.offset.y = -this.bestCar.y;
+
+    this.viewport.reset();
+    const viewPoint = scale(this.viewport.getOffset(), -1);
+    this.world.draw(this.gameCtx, viewPoint, false);
+    this.miniMap.update(viewPoint);
+
+    this.networkCtx.lineDashOffset = -time / 50;
+    this.networkCtx.clearRect(
+      0,
+      0,
+      this.networkCanvas.width,
+      this.networkCanvas.height,
+    );
+    Visualizer.drawNetwork(this.networkCtx, this.bestCar.brain);
+  }
+
+  animate(time) {
+    this.draw(time);
+    requestAnimationFrame(this.animate.bind(this));
+  }
 }

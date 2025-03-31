@@ -13,8 +13,8 @@
         <input type="file" id="loadWorldInput" accept=".world" />
       </label>
       &nbsp;
-      <button onclick="save()">💾</button>
-      <button onclick="discard()">🗑️</button>
+      <button id="saveBtn">💾</button>
+      <button id="discardBtn">🗑️</button>
     </div>
 
     <div>
@@ -68,5 +68,23 @@
     <script src="controls.js"></script>
     <script src="car.js"></script>
     <script src="simulator.js"></script>
+
+    <script>
+      const rightPanelWidth = 300;
+      const buttonsPanelWidth = 30;
+
+      gameCanvas.width =
+        window.innerWidth - rightPanelWidth - buttonsPanelWidth;
+      gameCanvas.height = window.innerHeight;
+
+      networkCanvas.width = rightPanelWidth;
+      networkCanvas.height = window.innerHeight - rightPanelWidth;
+
+      miniMapCanvas.width = rightPanelWidth;
+      miniMapCanvas.height = window.innerHeight - rightPanelWidth;
+
+      const simulator = new Simulator(gameCanvas, networkCanvas, miniMapCanvas);
+      simulator.animate();
+    </script>
   </body>
 </html>
