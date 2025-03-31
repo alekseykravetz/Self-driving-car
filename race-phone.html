@@ -68,10 +68,8 @@
     <script>
       // gameCanvas.height = window.innerHeight / 2;
       // cameraCanvas.height = window.innerHeight / 2;
-
       gameCanvas.height = 0;
       cameraCanvas.height = window.innerHeight;
-
       // gameCanvas.height = window.innerHeight;
       // cameraCanvas.height = 0;
 
@@ -80,7 +78,7 @@
 
       document.body.style.flexDirection = 'column';
 
-      // const rightPanelWidth = 300;
+      const rightPanelWidth = 250;
       miniMapCanvas.width = rightPanelWidth;
       miniMapCanvas.height = rightPanelWidth;
 
@@ -89,7 +87,7 @@
 
       // Special code part for phone devices
 
-      myCar.controls = new PhoneControls(cameraCanvas);
+      const controls = new PhoneControls(cameraCanvas);
 
       document.addEventListener('click', (e) => {
         if (document.body.requestFullscreen) {
@@ -102,6 +100,10 @@
           document.body.msRequestFullscreen();
         }
       });
+
+      const race = new Race(gameCanvas, cameraCanvas, miniMapCanvas, controls);
+      race.animate();
+      race.startCounter();
     </script>
   </body>
 </html>

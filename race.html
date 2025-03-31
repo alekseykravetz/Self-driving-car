@@ -72,10 +72,8 @@
     <script>
       gameCanvas.height = window.innerHeight / 2;
       cameraCanvas.height = window.innerHeight / 2;
-
       // gameCanvas.height = 0;
       // cameraCanvas.height = window.innerHeight;
-
       // gameCanvas.height = window.innerHeight;
       // cameraCanvas.height = 0;
 
@@ -84,12 +82,16 @@
 
       document.body.style.flexDirection = 'column';
 
-      // const rightPanelWidth = 300;
+      const rightPanelWidth = 250;
       miniMapCanvas.width = rightPanelWidth;
       miniMapCanvas.height = rightPanelWidth;
 
       statistics.style.width = `${rightPanelWidth}px`;
       statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
+
+      const race = new Race(gameCanvas, cameraCanvas, miniMapCanvas);
+      race.animate();
+      race.startCounter();
     </script>
   </body>
 </html>

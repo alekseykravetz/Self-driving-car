@@ -40,6 +40,10 @@ class CameraControls {
     });
   }
 
+  saveExpectedSize() {
+    this.initializing = false;
+  }
+
   #processMarkers({ leftMarker, rightMarker }) {
     this.tilt = Math.atan2(
       rightMarker.centroid.y - leftMarker.centroid.y,
@@ -68,8 +72,6 @@ class CameraControls {
   }
 
   #loop() {
-    this.initializing = !started; // global variable in Race game
-
     this.ctx.save();
     this.ctx.translate(this.canvas.width, 0);
     this.ctx.scale(-1, 1);
