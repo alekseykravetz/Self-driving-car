@@ -7,7 +7,7 @@ class Race {
     this.miniMapCanvas = miniMapCanvas;
     this.controls = controls;
 
-    this.localWorld = null;
+    this.world = null;
     this.camera = null;
     this.viewport = null;
     this.miniMap = null;
@@ -37,9 +37,7 @@ class Race {
   }
 
   generateCars(n, type) {
-    const startMarkings = this.localWorld.markings.filter(
-      (m) => m instanceof Start,
-    );
+    const startMarkings = this.world.markings.filter((m) => m instanceof Start);
     const startPoint = startMarkings.length
       ? startMarkings[0].center
       : new Point(100, 100);
@@ -82,14 +80,12 @@ class Race {
   }
 
   #initializeRace(worldInfo) {
-    this.localWorld = worldInfo
-      ? World.load(worldInfo)
-      : new World(new Graph());
+    this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
 
     this.viewport = new Viewport(
       this.gameCanvas,
-      this.localWorld.zoom,
-      this.localWorld.offset,
+      this.world.zoom,
+      this.world.offset,
     );
 
     this.cars = this.generateCars(1, 'KEYS').concat(
@@ -107,22 +103,17 @@ class Race {
 
     this.camera = new Camera(this.myCar);
 
-    const target = this.localWorld.markings.find((m) => m instanceof Target);
+    const target = this.world.markings.find((m) => m instanceof Target);
     if (target) {
-      this.localWorld.generateCorridor(this.myCar, target.center, true);
-      this.roadBorders = this.localWorld.corridor.borders.map((s) => [
-        s.p1,
-        s.p2,
-      ]);
+      this.world.generateCorridor(this.myCar, target.center, true);
+      this.roadBorders = this.world.corridor.borders.map((s) => [s.p1, s.p2]);
     } else {
-      this.roadBorders = [
-        ...this.localWorld.roadBorders.map((s) => [s.p1, s.p2]),
-      ];
+      this.roadBorders = [...this.world.roadBorders.map((s) => [s.p1, s.p2])];
     }
 
-    if (this.localWorld.corridor) {
+    if (this.world.corridor) {
       // mini map without details, only
-      const miniMapGraph = new Graph([], this.localWorld.corridor.skeleton);
+      const miniMapGraph = new Graph([], this.world.corridor.skeleton);
 
       this.miniMap = new MiniMap(
         this.miniMapCanvas,
@@ -134,7 +125,7 @@ class Race {
     } else {
       this.miniMap = new MiniMap(
         this.miniMapCanvas,
-        this.localWorld.graph,
+        this.world.graph,
         this.miniMapCanvas.width,
         this.cars,
       );
@@ -184,16 +175,13 @@ class Race {
   }
 
   updateCarProgress(car) {
-    if (!this.localWorld.corridor) return;
+    if (!this.world.corridor) return;
 
     if (!car.finishTime) {
       car.progress = 0;
-      const carSegment = getNearestSegment(
-        car,
-        this.localWorld.corridor.skeleton,
-      );
-      for (let i = 0; i < this.localWorld.corridor.skeleton.length; i++) {
-        const segment = this.localWorld.corridor.skeleton[i];
+      const carSegment = getNearestSegment(car, this.world.corridor.skeleton);
+      for (let i = 0; i < this.world.corridor.skeleton.length; i++) {
+        const segment = this.world.corridor.skeleton[i];
         if (segment.equals(carSegment)) {
           const projection = segment.projectPoint(car);
           const firstPartOfSegment = new Segment(segment.p1, projection.point);
@@ -203,7 +191,7 @@ class Race {
           car.progress += segment.length();
         }
       }
-      const totalDistance = this.localWorld.corridor.skeleton.reduce(
+      const totalDistance = this.world.corridor.skeleton.reduce(
         (acc, segment) => acc + segment.length(),
         0,
       );
@@ -252,9 +240,9 @@ class Race {
   handleCollisionWithRoadBorders(car) {
     const segment = getNearestSegment(
       car,
-      this.localWorld.corridor
-        ? this.localWorld.corridor.skeleton
-        : this.localWorld.roadBorders,
+      this.world.corridor
+        ? this.world.corridor.skeleton
+        : this.world.roadBorders,
     );
     const correctors = car.polygon.map((p) => {
       const proj = segment.projectPoint(p);
@@ -290,15 +278,15 @@ class Race {
       }
     }
 
-    this.localWorld.cars = this.cars;
-    this.localWorld.bestCar = this.myCar;
+    this.world.cars = this.cars;
+    this.world.bestCar = this.myCar;
 
     this.viewport.offset.x = -this.myCar.x;
     this.viewport.offset.y = -this.myCar.y;
 
     this.viewport.reset();
     const viewPoint = scale(this.viewport.getOffset(), -1);
-    this.localWorld.draw(this.gameCtx, viewPoint, false);
+    this.world.draw(this.gameCtx, viewPoint, false);
     this.miniMap.update(viewPoint);
     this.miniMapCanvas.style.transform = `rotate(${this.myCar.angle}rad)`;
 
@@ -325,7 +313,7 @@ class Race {
 
     this.camera.move(this.myCar);
     this.camera.draw(this.gameCtx);
-    this.camera.render(this.cameraCtx, this.localWorld);
+    this.camera.render(this.cameraCtx, this.world);
 
     this.frameCount++;
   }
