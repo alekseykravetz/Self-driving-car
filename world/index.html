@@ -7,6 +7,17 @@
   <body>
     <h1>World Editor</h1>
     <canvas id="myCanvas"></canvas>
+    <canvas
+      id="miniMapCanvas"
+      style="
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        background-color: #2a5;
+        outline: 2px solid black;
+      "
+    ></canvas>
+
     <div id="controls">
       <input id="worldGenerationInput" type="checkbox" />
       <button id="disposeBtn">🗑️</button>
@@ -45,6 +56,7 @@
 
     <script src="js/world.js"></script>
     <script src="js/viewport.js"></script>
+    <script src="js/miniMap.js"></script>
     <script src="js/markings/marking.js"></script>
     <script src="js/markings/stop.js"></script>
     <script src="js/markings/start.js"></script>
@@ -83,7 +95,10 @@
       myCanvas.width = 800;
       myCanvas.height = 490;
 
-      const worldEditor = new WorldEditor(myCanvas);
+      miniMapCanvas.width = 150;
+      miniMapCanvas.height = 150;
+
+      const worldEditor = new WorldEditor(myCanvas, miniMapCanvas);
       worldEditor.animate();
     </script>
   </body>

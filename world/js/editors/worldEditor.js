@@ -1,10 +1,13 @@
 class WorldEditor {
-  constructor(canvas) {
+  constructor(canvas, miniMapCanvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.miniMapCanvas = miniMapCanvas;
 
     this.world = null;
     this.viewport = null;
+    this.miniMap = null;
+    this.miniMapViewport = null;
     this.tools = null;
     this.oldGraphHash = null;
 
@@ -100,6 +103,15 @@ class WorldEditor {
     this.tools = this.initializeEditors(this.viewport, this.world);
     this.oldGraphHash = this.world.graph.hash();
     this.setMode('graph');
+
+    this.miniMap = new MiniMap(
+      this.miniMapCanvas,
+      this.world.graph,
+      this.miniMapCanvas.width,
+      0.03,
+    );
+
+    this.miniMapViewport = new Viewport(this.miniMapCanvas);
   }
 
   initializeEditors(viewport, world) {
@@ -265,6 +277,9 @@ class WorldEditor {
     for (const tool of Object.values(this.tools)) {
       tool.editor.display();
     }
+
+    this.miniMapViewport.reset();
+    this.miniMap.update(viewPoint);
   }
 
   animate() {

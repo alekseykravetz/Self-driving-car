@@ -10,7 +10,7 @@ class Simulator {
     this.viewport = null;
     this.miniMap = null;
 
-    this.N = 10;
+    this.N = 100;
     this.cars = null;
     this.bestCar = null;
     this.roadBorders = null;
