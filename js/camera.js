@@ -237,6 +237,19 @@ class Camera {
     p2.y = new_p2.y;
   }
 
+  #getCentroid(points) {
+    let xSum = 0,
+      ySum = 0,
+      n = points.length;
+    points.forEach((p) => {
+      xSum += p.x;
+      ySum += p.y;
+    });
+    const x = xSum / n;
+    const y = ySum / n;
+    return new Point(x, y);
+  }
+
   #extrudeTrees(polygons, height = 10) {
     const extrudedPolygons = [];
 
@@ -249,7 +262,7 @@ class Camera {
         this.#moveInward(sPolygon.points[i], sPolygon.points[half + i], 0.4);
       }
       const sLegCeiling = new Polygon(
-        sPolygon.points.map((point) => new Point(point.x, point.y, -70)),
+        sPolygon.points.map((point) => new Point(point.x, point.y, -40)),
       );
       const sLegSides = [];
       for (let i = 0; i < sPolygon.points.length; i++) {
@@ -264,13 +277,15 @@ class Camera {
       }
 
       const hBase = new Polygon(
-        polygon.points.map((point) => new Point(point.x, point.y, -70)),
+        polygon.points.map((point) => new Point(point.x, point.y, -40)),
       );
-      const sCeiling = new Polygon(
-        sPolygon.points.map(
-          (point) => new Point(point.x, point.y, -height - 200),
-        ),
-      );
+      // const sCeiling = new Polygon(
+      //   sPolygon.points.map(
+      //     (point) => new Point(point.x, point.y, -height - 200),
+      //   ),
+      // );
+      this.centroid = this.#getCentroid(polygon.points);
+      this.centroid.z = -height;
 
       const sSides = [];
       for (let i = 0; i < hBase.points.length; i++) {
@@ -278,13 +293,12 @@ class Camera {
           new Polygon([
             hBase.points[i],
             hBase.points[(i + 1) % hBase.points.length],
-            sCeiling.points[(i + 1) % sCeiling.points.length],
-            sCeiling.points[i],
+            this.centroid,
           ]),
         );
       }
 
-      extrudedPolygons.push(...sSides, sCeiling, ...sLegSides, hBase);
+      extrudedPolygons.push(...sSides, ...sLegSides, hBase);
     }
     return extrudedPolygons;
   }
@@ -296,7 +310,7 @@ class Camera {
     );
     const treePolygons = this.#extrudeTrees(
       this.#filter(world.trees.map((b) => b.base)),
-      10,
+      200,
     );
     const roadPolygons = this.#extrude(
       this.#filter(
@@ -387,5 +401,6 @@ class Camera {
 
   draw(ctx) {
     this.polygon.draw(ctx);
+    this.centroid?.draw(ctx);
   }
 }
