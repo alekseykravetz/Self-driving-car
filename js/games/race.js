@@ -312,7 +312,7 @@ class Race {
     }
 
     this.camera.move(this.myCar);
-    this.camera.draw(this.gameCtx);
+    // this.camera.draw(this.gameCtx);
     this.camera.render(this.cameraCtx, this.world);
 
     this.frameCount++;

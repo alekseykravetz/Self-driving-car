@@ -237,12 +237,67 @@ class Camera {
     p2.y = new_p2.y;
   }
 
+  #extrudeTrees(polygons, height = 10) {
+    const extrudedPolygons = [];
+
+    for (const polygon of polygons) {
+      const sPolygon = new Polygon(
+        polygon.points.map((point) => new Point(point.x, point.y)),
+      );
+      const half = Math.floor(sPolygon.points.length / 2);
+      for (let i = 0; i < half; i++) {
+        this.#moveInward(sPolygon.points[i], sPolygon.points[half + i], 0.4);
+      }
+      const sLegCeiling = new Polygon(
+        sPolygon.points.map((point) => new Point(point.x, point.y, -70)),
+      );
+      const sLegSides = [];
+      for (let i = 0; i < sPolygon.points.length; i++) {
+        sLegSides.push(
+          new Polygon([
+            sPolygon.points[i],
+            sPolygon.points[(i + 1) % sPolygon.points.length],
+            sLegCeiling.points[(i + 1) % sLegCeiling.points.length],
+            sLegCeiling.points[i],
+          ]),
+        );
+      }
+
+      const hBase = new Polygon(
+        polygon.points.map((point) => new Point(point.x, point.y, -70)),
+      );
+      const sCeiling = new Polygon(
+        sPolygon.points.map(
+          (point) => new Point(point.x, point.y, -height - 200),
+        ),
+      );
+
+      const sSides = [];
+      for (let i = 0; i < hBase.points.length; i++) {
+        sSides.push(
+          new Polygon([
+            hBase.points[i],
+            hBase.points[(i + 1) % hBase.points.length],
+            sCeiling.points[(i + 1) % sCeiling.points.length],
+            sCeiling.points[i],
+          ]),
+        );
+      }
+
+      extrudedPolygons.push(...sSides, sCeiling, ...sLegSides, hBase);
+    }
+    return extrudedPolygons;
+  }
+
   #getPolygons(world) {
     const buildingPolygons = this.#extrude(
       this.#filter(world.buildings.map((b) => b.base)),
       200,
     );
-    // const treePolygons = this.#extrude(this.#filter(world.trees.map((b) => b.base)), 200);
+    const treePolygons = this.#extrudeTrees(
+      this.#filter(world.trees.map((b) => b.base)),
+      10,
+    );
     const roadPolygons = this.#extrude(
       this.#filter(
         world.corridor
@@ -282,16 +337,22 @@ class Camera {
       poly.stroke = 'rgba(150, 150, 150, 0.2)';
     }
 
+    for (const poly of treePolygons) {
+      poly.fill = 'rgba(34, 196, 74, 0.2)';
+      poly.stroke = 'rgba(34, 196, 74, 0.2)';
+    }
+
     const polygons = [
       ...carShadows,
       ...buildingPolygons,
       ...carPolygons,
       ...roadPolygons,
+      ...treePolygons,
     ];
     return polygons;
   }
 
-  render(ctx, world) {
+  render(ctx, world, gameCtx) {
     const polygons = this.#getPolygons(world);
 
     const projectedPolygons = polygons.map(
@@ -309,7 +370,7 @@ class Camera {
 
     for (let i = 0; i < projectedPolygons.length; i++) {
       // Fog effect
-      const distance = polygons[i].distanceToPoint(this); // this is camera
+      const distance = polygons[i].distanceToPoint(this); // this is camera x, y
       ctx.globalAlpha = (1 - distance / this.range) ** 2;
 
       const { fill, stroke } = polygons[i];
@@ -317,9 +378,11 @@ class Camera {
     }
 
     //to show the camera visible polygons on main ctx
-    // for (const polygon of polygons) {
-    //   polygon.draw(gameCtx);
-    // }
+    if (gameCtx) {
+      for (const polygon of polygons) {
+        polygon.draw(gameCtx);
+      }
+    }
   }
 
   draw(ctx) {
