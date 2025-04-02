@@ -1,5 +1,9 @@
 'use strict';
 class Point {
+  x;
+  y;
+  z;
+  intersection;
   constructor(x, y, z = 0) {
     this.x = x;
     this.y = y;

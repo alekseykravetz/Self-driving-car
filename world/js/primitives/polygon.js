@@ -1,5 +1,7 @@
 'use strict';
 class Polygon {
+  points;
+  segments;
   constructor(points) {
     this.points = points;
     this.segments = [];

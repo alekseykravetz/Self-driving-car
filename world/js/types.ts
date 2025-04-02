@@ -18,3 +18,10 @@ interface SegmentDrawOptions {
   dash?: number[];
   cap?: CanvasLineCap;
 }
+
+interface PolygonDrawOptions {
+  stroke?: string;
+  lineWidth?: number;
+  fill?: string;
+  join?: CanvasLineJoin;
+}
