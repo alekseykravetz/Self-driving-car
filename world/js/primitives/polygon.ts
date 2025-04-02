@@ -1,6 +1,8 @@
-'use strict';
 class Polygon {
-  constructor(points) {
+  points: Point[];
+  segments: Segment[];
+
+  constructor(points: Point[]) {
     this.points = points;
     this.segments = [];
     for (let i = 1; i <= points.length; i++) {
@@ -8,13 +10,13 @@ class Polygon {
     }
   }
 
-  static load(info) {
+  static load(info: { points: { x: number; y: number }[] }): Polygon {
     return new Polygon(info.points.map((p) => new Point(p.x, p.y)));
   }
 
-  static union(polygons) {
+  static union(polygons: Polygon[]): Segment[] {
     Polygon.multiBreak(polygons);
-    const keptSegments = [];
+    const keptSegments: Segment[] = [];
     for (let i = 0; i < polygons.length; i++) {
       for (const segment of polygons[i].segments) {
         let keep = true;
@@ -32,7 +34,7 @@ class Polygon {
     return keptSegments;
   }
 
-  static multiBreak(polygons) {
+  static multiBreak(polygons: Polygon[]): void {
     for (let i = 0; i < polygons.length - 1; i++) {
       for (let j = i + 1; j < polygons.length; j++) {
         Polygon.break(polygons[i], polygons[j]);
@@ -40,7 +42,11 @@ class Polygon {
     }
   }
 
-  static break(polygon1, polygon2, markIntersections = false) {
+  static break(
+    polygon1: Polygon,
+    polygon2: Polygon,
+    markIntersections = false,
+  ): void {
     const segments1 = polygon1.segments;
     const segments2 = polygon2.segments;
     for (let i = 0; i < segments1.length; i++) {
@@ -51,6 +57,7 @@ class Polygon {
           segments2[j].p1,
           segments2[j].p2,
         );
+
         if (
           intersection &&
           intersection.offset !== 1 &&
@@ -71,15 +78,15 @@ class Polygon {
     }
   }
 
-  distanceToPoint(point) {
+  distanceToPoint(point: Point): number {
     return Math.min(...this.segments.map((s) => s.distanceToPoint(point)));
   }
 
-  distanceToPolygon(polygon) {
+  distanceToPolygon(polygon: Polygon): number {
     return Math.min(...this.points.map((p) => polygon.distanceToPoint(p)));
   }
 
-  intersectsPolygon(polygon) {
+  intersectsPolygon(polygon: Polygon): boolean {
     for (const s1 of this.segments) {
       for (const s2 of polygon.segments) {
         if (getIntersection(s1.p1, s1.p2, s2.p1, s2.p2)) {
@@ -90,16 +97,16 @@ class Polygon {
     return false;
   }
 
-  containsPolygon(polygon) {
+  containsPolygon(polygon: Polygon): boolean {
     return polygon.points.some((p) => this.containsPoint(p));
   }
 
-  containsSegment(segment) {
+  containsSegment(segment: Segment): boolean {
     const midpoint = average(segment.p1, segment.p2);
     return this.containsPoint(midpoint);
   }
 
-  containsPoint(point) {
+  containsPoint(point: Point): boolean {
     const outerPoint = new Point(-100000, -100000);
     let intersectionCount = 0;
     for (const seg of this.segments) {
@@ -110,21 +117,26 @@ class Polygon {
     return intersectionCount % 2 === 1;
   }
 
-  drawSegments(ctx) {
+  drawSegments(ctx: CanvasRenderingContext2D): void {
     for (const seg of this.segments) {
       seg.draw(ctx, { color: getRandomColor(), width: 5 });
     }
   }
 
   draw(
-    ctx,
+    ctx: CanvasRenderingContext2D,
     {
       stroke = 'blue',
       lineWidth = 2,
       fill = 'rgba(0,0,255,0.3)',
       join = 'miter',
+    }: {
+      stroke?: string;
+      lineWidth?: number;
+      fill?: string;
+      join?: CanvasLineJoin;
     } = {},
-  ) {
+  ): void {
     ctx.beginPath();
     ctx.fillStyle = fill;
     ctx.strokeStyle = stroke;

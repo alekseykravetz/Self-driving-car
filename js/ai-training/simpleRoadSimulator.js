@@ -111,6 +111,7 @@ function generateCars(n) {
 function save() {
   localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain));
 }
+
 function discard() {
   localStorage.removeItem('bestBrain');
 }

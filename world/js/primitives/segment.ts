@@ -1,28 +1,31 @@
-'use strict';
 class Segment {
-  constructor(p1, p2, oneWay = false) {
+  p1: Point;
+  p2: Point;
+  oneWay: boolean;
+
+  constructor(p1: Point, p2: Point, oneWay = false) {
     this.p1 = p1;
     this.p2 = p2;
     this.oneWay = oneWay;
   }
 
-  length() {
+  length(): number {
     return distance(this.p1, this.p2);
   }
 
-  directionVector() {
+  directionVector(): Point {
     return normalize(subtract(this.p2, this.p1));
   }
 
-  equals(segment) {
+  equals(segment: Segment): boolean {
     return this.includes(segment.p1) && this.includes(segment.p2);
   }
 
-  includes(point) {
+  includes(point: Point): boolean {
     return this.p1.equals(point) || this.p2.equals(point);
   }
 
-  distanceToPoint(point) {
+  distanceToPoint(point: Point): number {
     const proj = this.projectPoint(point);
     if (proj.offset > 0 && proj.offset < 1) {
       return distance(point, proj.point);
@@ -32,7 +35,7 @@ class Segment {
     return Math.min(distToP1, distToP2);
   }
 
-  projectPoint(point) {
+  projectPoint(point: Point): { point: Point; offset: number } {
     const a = subtract(point, this.p1);
     const b = subtract(this.p2, this.p1);
     const normB = normalize(b);
@@ -43,7 +46,15 @@ class Segment {
     };
   }
 
-  draw(ctx, { width = 2, color = 'black', dash = [], cap = 'butt' } = {}) {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    {
+      width = 2,
+      color = 'black',
+      dash = [],
+      cap = 'butt',
+    }: SegmentDrawOptions = {},
+  ): void {
     ctx.beginPath();
     ctx.lineWidth = width;
     ctx.strokeStyle = color;

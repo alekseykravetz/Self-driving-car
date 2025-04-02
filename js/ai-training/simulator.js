@@ -114,6 +114,7 @@ class Simulator {
   save() {
     localStorage.setItem('bestBrain', JSON.stringify(this.bestCar.brain));
   }
+
   discard() {
     localStorage.removeItem('bestBrain');
   }
