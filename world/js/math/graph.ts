@@ -1,38 +1,53 @@
-'use strict';
+type GraphInfo = {
+  points: { x: number; y: number }[];
+  segments: {
+    p1: { x: number; y: number };
+    p2: { x: number; y: number };
+    oneWay: boolean;
+  }[];
+};
+
+type ShortestPathPoint = Point & {
+  distance: number;
+  visited: boolean;
+  previous: ShortestPathPoint;
+};
+
 class Graph {
-  points;
-  segments;
-  constructor(points = [], segments = []) {
+  points: Point[];
+  segments: Segment[];
+
+  constructor(points: Point[] = [], segments: Segment[] = []) {
     this.points = points;
     this.segments = segments;
   }
 
-  static load(info) {
+  static load(info: GraphInfo): Graph {
     const points = info.points.map((i) => new Point(i.x, i.y));
     const segments = info.segments.map(
       (i) =>
         new Segment(
-          points.find((p) => p.equals(i.p1)),
-          points.find((p) => p.equals(i.p2)),
+          points.find((p) => p.equals(i.p1 as Point))!,
+          points.find((p) => p.equals(i.p2 as Point))!,
           i.oneWay,
         ),
     );
     return new Graph(points, segments);
   }
 
-  hash() {
+  hash(): string {
     return JSON.stringify(this);
   }
 
-  addPoint(point) {
+  addPoint(point: Point): void {
     this.points.push(point);
   }
 
-  containsPoint(point) {
+  containsPoint(point: Point): Point | undefined {
     return this.points.find((p) => p.equals(point));
   }
 
-  tryAddPoint(point) {
+  tryAddPoint(point: Point): boolean {
     if (!this.containsPoint(point)) {
       this.addPoint(point);
       return true;
@@ -40,7 +55,7 @@ class Graph {
     return false;
   }
 
-  removePoint(point) {
+  removePoint(point: Point): void {
     const segments = this.getSegmentsWithPoint(point);
     for (let segment of segments) {
       this.removeSegment(segment);
@@ -48,25 +63,25 @@ class Graph {
     this.points.splice(this.points.indexOf(point), 1);
   }
 
-  getSegmentsWithPoint(point) {
+  getSegmentsWithPoint(point: Point): Segment[] {
     return this.segments.filter((segment) => segment.includes(point));
   }
 
-  getSegmentsLeavingFromPoint(point) {
+  getSegmentsLeavingFromPoint(point: Point): Segment[] {
     return this.segments.filter((segment) =>
       segment.oneWay ? segment.p1.equals(point) : segment.includes(point),
     );
   }
 
-  addSegment(segment) {
+  addSegment(segment: Segment): void {
     this.segments.push(segment);
   }
 
-  containsSegment(segment) {
+  containsSegment(segment: Segment): Segment | undefined {
     return this.segments.find((s) => s.equals(segment));
   }
 
-  tryAddSegment(segment) {
+  tryAddSegment(segment: Segment): boolean {
     if (!this.containsSegment(segment) && !segment.p1.equals(segment.p2)) {
       this.addSegment(segment);
       return true;
@@ -74,59 +89,67 @@ class Graph {
     return false;
   }
 
-  removeSegment(segment) {
+  removeSegment(segment: Segment): void {
     this.segments.splice(this.segments.indexOf(segment), 1);
   }
 
-  getShortestPath(start, end) {
-    for (const point of this.points) {
+  getShortestPath(start: Point, end: Point): Point[] {
+    for (const point of this.points as ShortestPathPoint[]) {
       point.distance = Number.MAX_SAFE_INTEGER;
       point.visited = false;
     }
-    let currentPoint = start;
+
+    let currentPoint: ShortestPathPoint = start as ShortestPathPoint;
     currentPoint.distance = 0;
-    while (!end.visited) {
+
+    while (!(end as ShortestPathPoint).visited) {
       const segments = this.getSegmentsLeavingFromPoint(currentPoint);
       for (let segment of segments) {
         const otherPoint = segment.p1.equals(currentPoint)
-          ? segment.p2
-          : segment.p1;
+          ? (segment.p2 as ShortestPathPoint)
+          : (segment.p1 as ShortestPathPoint);
         if (currentPoint.distance + segment.length() < otherPoint.distance) {
           otherPoint.distance = currentPoint.distance + segment.length();
           otherPoint.previous = currentPoint;
         }
       }
       currentPoint.visited = true;
-      const unvisited = this.points.filter((p) => !p.visited);
+
+      const unvisited = (this.points as ShortestPathPoint[]).filter(
+        (p) => !p.visited,
+      );
       const distances = unvisited.map((p) => p.distance);
       currentPoint = unvisited.find(
         (p) => p.distance === Math.min(...distances),
-      );
+      )!;
       // currentPoint = unvisited.sort((a, b) =>
       //   a.distance && b.distance ? a.distance - b.distance : 0,
       // )[0];
     }
-    const path = [];
-    currentPoint = end;
+
+    const path: ShortestPathPoint[] = [];
+    currentPoint = end as ShortestPathPoint;
     while (currentPoint) {
       path.unshift(currentPoint);
       currentPoint = currentPoint.previous;
     }
-    for (const point of this.points) {
-      delete point.distance;
-      delete point.visited;
-      delete point.previous;
+
+    for (const point of this.points as ShortestPathPoint[]) {
+      delete (point as Partial<ShortestPathPoint>).distance;
+      delete (point as Partial<ShortestPathPoint>).visited;
+      delete (point as Partial<ShortestPathPoint>).previous;
     }
+
     return path;
   }
 
-  dispose() {
+  dispose(): void {
     // re instantiated the same reference
     this.points.length = 0;
     this.segments.length = 0;
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D): void {
     // for (let segment of this.segments) {
     //   segment.draw(ctx);
     // }

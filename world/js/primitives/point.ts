@@ -2,6 +2,7 @@ class Point {
   x: number;
   y: number;
   z: number;
+
   intersection?: boolean;
 
   constructor(x: number, y: number, z: number = 0) {
