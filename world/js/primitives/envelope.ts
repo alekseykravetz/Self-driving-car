@@ -11,32 +11,29 @@ interface EnvelopeInfo {
 }
 
 class Envelope {
-  private skeleton: Segment;
-  private polygon: Polygon;
+  private skeleton?: Segment;
+  private polygon?: Polygon;
 
   constructor(
-    skeleton: Segment,
-    width: number = 100,
-    roundness: number = 10,
-    generatedPolygon: Polygon | undefined = undefined,
+    skeleton: Segment | undefined,
+    width: number | undefined = 10,
+    roundness: number = 1,
   ) {
-    this.skeleton = skeleton;
-
-    if (!generatedPolygon) {
+    if (skeleton) {
+      this.skeleton = skeleton;
       this.polygon = this.#generatePolygon(width, roundness);
-    } else {
-      this.polygon = generatedPolygon;
     }
   }
 
-  static load(info: EnvelopeInfo): Envelope {
-    const skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
-    const polygon = Polygon.load(info.polygon);
-    return new Envelope(skeleton, undefined, undefined, polygon);
+  static load(info: EnvelopeInfo) {
+    const env = new Envelope(undefined, undefined);
+    env.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
+    env.polygon = Polygon.load(info.polygon);
+    return env;
   }
 
   #generatePolygon(width: number, roundness: number): Polygon {
-    const { p1, p2 } = this.skeleton;
+    const { p1, p2 } = this.skeleton!;
     const radius = width / 2;
     const alpha = angle(subtract(p1, p2));
     const alpha_cw = alpha + Math.PI / 2;
@@ -56,6 +53,6 @@ class Envelope {
   }
 
   draw(ctx: CanvasRenderingContext2D, options?: PolygonDrawOptions): void {
-    this.polygon.draw(ctx, options);
+    this.polygon?.draw(ctx, options);
   }
 }

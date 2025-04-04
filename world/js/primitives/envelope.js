@@ -2,24 +2,18 @@
 class Envelope {
   skeleton;
   polygon;
-  constructor(
-    skeleton,
-    width = 100,
-    roundness = 10,
-    generatedPolygon = undefined,
-  ) {
-    this.skeleton = skeleton;
-    if (!generatedPolygon) {
+  constructor(skeleton, width = 10, roundness = 1) {
+    if (skeleton) {
+      this.skeleton = skeleton;
       this.polygon = this.#generatePolygon(width, roundness);
-    } else {
-      this.polygon = generatedPolygon;
     }
   }
 
   static load(info) {
-    const skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
-    const polygon = Polygon.load(info.polygon);
-    return new Envelope(skeleton, undefined, undefined, polygon);
+    const env = new Envelope(undefined, undefined);
+    env.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
+    env.polygon = Polygon.load(info.polygon);
+    return env;
   }
 
   #generatePolygon(width, roundness) {
@@ -41,6 +35,6 @@ class Envelope {
   }
 
   draw(ctx, options) {
-    this.polygon.draw(ctx, options);
+    this.polygon?.draw(ctx, options);
   }
 }
