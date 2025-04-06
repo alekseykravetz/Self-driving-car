@@ -83,15 +83,15 @@ class Building {
     });
     // Draw sorted sides
     for (const side of sides) {
-      side.draw(ctx, { fill: 'white', stroke: '#AAA' }); // White sides with gray outlines
+      side.draw(ctx, { fill: 'white', stroke: '#AAA' });
     }
     // Draw ceiling polygon
-    ceiling.draw(ctx, { fill: 'white', stroke: 'white', lineWidth: 6 }); // White ceiling
+    ceiling.draw(ctx, { fill: 'white', stroke: 'white', lineWidth: 6 });
     // Draw sorted roof polygons (if generated)
     for (const poly of roofPolys) {
       poly.draw(ctx, {
-        fill: '#D44', // Reddish roof fill
-        stroke: '#C44', // Darker red roof stroke
+        fill: '#D44',
+        stroke: '#C44',
         lineWidth: 8,
         join: 'round', // Use round line joins for roof edges
       });

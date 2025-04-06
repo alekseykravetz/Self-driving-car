@@ -1,10 +1,3 @@
-declare class Tree {
-  center: Point;
-  size: number;
-  base: Polygon;
-  constructor(center: Point, size: number);
-  draw(ctx: CanvasRenderingContext2D, viewPoint: Point): void;
-}
 interface Car {
   draw(ctx: CanvasRenderingContext2D, drawSensors?: boolean): void;
 }

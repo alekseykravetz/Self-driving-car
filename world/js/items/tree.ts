@@ -1,20 +1,21 @@
-'use strict';
 class Tree {
   // Mark properties as readonly if they shouldn't change after construction
-  center;
-  size; // Diameter of the base level
-  height;
-  base; // The ground-level polygon shape
+  readonly center: Point;
+  readonly size: number; // Diameter of the base level
+  readonly height: number;
+  readonly base: Polygon; // The ground-level polygon shape
+
   /**
    * Creates a Tree object.
    * @param center The center point of the tree base on the ground.
    * @param size The diameter of the widest part of the tree (the base).
    * @param height The approximate height of the tree. Defaults to 200.
    */
-  constructor(center, size, height = 200) {
+  constructor(center: Point, size: number, height: number = 200) {
     this.center = center;
     this.size = size;
     this.height = height;
+
     // Generate the base polygon shape upon construction
     this.base = this.#generateLevel(this.center, this.size);
   }
@@ -26,19 +27,23 @@ class Tree {
    * @param size The diameter for this canopy level.
    * @returns A Polygon object representing the shape of this level.
    */
-  #generateLevel(point, size) {
-    const points = [];
-    const radius = size / 2;
+  #generateLevel(point: Point, size: number): Polygon {
+    const points: Point[] = [];
+    const radius: number = size / 2;
+
     // Define the number of points/segments for the polygon level
     const angleStep = Math.PI / 16; // Creates a 32-sided polygon
+
     // Generate points around the center
     for (let angle = 0; angle < Math.PI * 2; angle += angleStep) {
       // Generate pseudo-randomness based on angle and tree properties
       // This ensures the tree shape is consistent every time it's drawn
       const kindOfRandom = Math.cos(((angle + this.center.x) * size) % 17) ** 2;
+
       // Create a noisy radius using interpolation, making the shape irregular
       // The radius varies between 50% and 100% of the calculated radius
       const noisyRadius = radius * lerp(0.5, 1, kindOfRandom);
+
       // Calculate the position of the point using translate function
       points.push(translate(point, angle, noisyRadius));
     }
@@ -52,27 +57,34 @@ class Tree {
    * @param ctx The canvas rendering context.
    * @param viewPoint The point from which the scene is being viewed (for perspective).
    */
-  draw(ctx, viewPoint) {
+  draw(ctx: CanvasRenderingContext2D, viewPoint: Point): void {
     // Calculate the apparent top point of the tree based on perspective
-    const top = getFake3dPoint(this.center, viewPoint, this.height);
-    const levelCount = 7; // Number of canopy levels to draw
+    const top: Point = getFake3dPoint(this.center, viewPoint, this.height);
+
+    const levelCount: number = 7; // Number of canopy levels to draw
+
     // Draw each level from bottom to top (or top to bottom, order matters for overlap)
     // Drawing from bottom (level=0) to top ensures higher levels overlap lower ones.
     for (let level = 0; level < levelCount; level++) {
       // Calculate the interpolation factor (0 = base, 1 = top)
       // Avoid division by zero if levelCount is 1
       const t = levelCount === 1 ? 1 : level / (levelCount - 1);
+
       // Interpolate the center point for the current level
-      const currentLevelCenter = lerp2D(this.center, top, t);
+      const currentLevelCenter: Point = lerp2D(this.center, top, t);
+
       // Interpolate the color - gets greener towards the top
       // Ensure RGB components are integers
       const greenComponent = Math.round(lerp(50, 200, t));
       const color = `rgb(30, ${greenComponent}, 70)`;
+
       // Interpolate the size - gets smaller towards the top
       // Define a minimum size for the top level (e.g., 40)
       const currentLevelSize = lerp(this.size, 40, t);
+
       // Generate the polygon shape for the current level
       const polygon = this.#generateLevel(currentLevelCenter, currentLevelSize);
+
       // Draw the polygon level with the calculated color and no visible stroke
       polygon.draw(ctx, { fill: color, stroke: 'rgba(0,0,0,0)' });
     }
