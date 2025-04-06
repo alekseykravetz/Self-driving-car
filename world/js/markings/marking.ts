@@ -1,7 +1,5 @@
 declare class Crossing extends Marking {}
 declare class Parking extends Marking {}
-declare class Start extends Marking {}
-declare class Stop extends Marking {}
 declare class Yield extends Marking {}
 declare class Target extends Marking {}
 
