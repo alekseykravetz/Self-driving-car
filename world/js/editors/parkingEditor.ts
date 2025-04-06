@@ -1,10 +1,9 @@
-'use strict';
 class ParkingEditor extends MarkingEditor {
   /**
    * Editor for creating Parking markings.
    * Targets lane guide segments.
    */
-  constructor(viewport, world) {
+  constructor(viewport: Viewport, world: World) {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
@@ -15,12 +14,12 @@ class ParkingEditor extends MarkingEditor {
    * @param directionVector The orientation vector (usually perpendicular to road direction).
    * @returns A new Parking instance.
    */
-  createMarking(center, directionVector) {
+  createMarking(center: Point, directionVector: Point): Parking {
     return new Parking(
       center,
       directionVector,
       this.world.roadWidth / 2, // Width of the parking spot
-      this.world.roadWidth / 2,
+      this.world.roadWidth / 2, // Length of the parking spot
     );
   }
 }

@@ -1,10 +1,9 @@
-'use strict';
 class LightEditor extends MarkingEditor {
   /**
    * Editor for creating Light markings.
    * Targets lane guide segments.
    */
-  constructor(viewport, world) {
+  constructor(viewport: Viewport, world: World) {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
@@ -15,8 +14,13 @@ class LightEditor extends MarkingEditor {
    * @param directionVector The orientation vector (along the road).
    * @returns A new Light instance.
    */
-  createMarking(center, directionVector) {
+  createMarking(center: Point, directionVector: Point): Light {
     // Use the Light constructor (no height parameter)
-    return new Light(center, directionVector, this.world.roadWidth / 2);
+    return new Light(
+      center,
+      directionVector,
+      this.world.roadWidth / 2, // Width for the light placement
+      // Height is fixed internally by Light constructor/super call (e.g., 18)
+    );
   }
 }

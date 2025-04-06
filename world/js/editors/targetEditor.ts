@@ -1,10 +1,9 @@
-'use strict';
 class TargetEditor extends MarkingEditor {
   /**
    * Editor for creating Target markings.
    * Targets lane guide segments.
    */
-  constructor(viewport, world) {
+  constructor(viewport: Viewport, world: World) {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
@@ -15,12 +14,12 @@ class TargetEditor extends MarkingEditor {
    * @param directionVector The orientation vector (along the road).
    * @returns A new Target instance.
    */
-  createMarking(center, directionVector) {
+  createMarking(center: Point, directionVector: Point): Target {
     return new Target(
       center,
       directionVector,
       this.world.roadWidth / 2, // Width of the target marking
-      this.world.roadWidth / 2,
+      this.world.roadWidth / 2, // Height/length of the target marking
     );
   }
 }

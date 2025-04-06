@@ -1,10 +1,9 @@
-'use strict';
 class StartEditor extends MarkingEditor {
   /**
    * Editor for creating Start markings.
    * Targets lane guide segments.
    */
-  constructor(viewport, world) {
+  constructor(viewport: Viewport, world: World) {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
@@ -15,12 +14,12 @@ class StartEditor extends MarkingEditor {
    * @param directionVector The orientation vector (along the road).
    * @returns A new Start instance.
    */
-  createMarking(center, directionVector) {
+  createMarking(center: Point, directionVector: Point): Start {
     return new Start(
       center,
       directionVector,
       this.world.roadWidth / 2, // Width of the start marking
-      this.world.roadWidth / 2,
+      this.world.roadWidth / 2, // Height/length of the start marking
     );
   }
 }

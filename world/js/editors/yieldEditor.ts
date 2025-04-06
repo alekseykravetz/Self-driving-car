@@ -1,10 +1,9 @@
-'use strict';
 class YieldEditor extends MarkingEditor {
   /**
    * Editor for creating Yield markings.
    * Targets lane guide segments.
    */
-  constructor(viewport, world) {
+  constructor(viewport: Viewport, world: World) {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
@@ -15,12 +14,12 @@ class YieldEditor extends MarkingEditor {
    * @param directionVector The orientation vector (along the road).
    * @returns A new Yield instance.
    */
-  createMarking(center, directionVector) {
+  createMarking(center: Point, directionVector: Point): Yield {
     return new Yield(
       center,
       directionVector,
       this.world.roadWidth / 2, // Width of the yield marking
-      this.world.roadWidth / 2,
+      this.world.roadWidth / 2, // Height/length of the yield marking
     );
   }
 }

@@ -1,4 +1,45 @@
-'use strict';
+// --- Interfaces for OSM Data Structure ---
+interface OsmNodeElement {
+  type: 'node';
+  id: number;
+  lat: number;
+  lon: number;
+}
+
+interface OsmWayTags {
+  oneway: string; // e.g., "yes", "no", "-1"
+  lanes: string;
+  // Include other tags you might need, e.g., 'highway', 'name'
+  [key: string]: string; // Allow for other unspecified tags
+}
+
+interface OsmWayElement {
+  type: 'way';
+  id: number;
+  nodes: number[]; // Array of node IDs forming the way
+  tags: OsmWayTags;
+}
+
+// Union type for elements in the OSM data
+type OsmElement = OsmNodeElement | OsmWayElement;
+
+// Main interface for the input data to parseRoads
+interface OsmData {
+  elements: OsmElement[];
+}
+
+// Interface for the return type of parseRoads
+interface ParsedRoads {
+  points: Point[]; // Array of created Point instances
+  segments: Segment[]; // Array of created Segment instances
+}
+
+// --- Converted Osm Object ---
+
+type OsmPoint = Point & {
+  id: number;
+};
+
 class Osm {
   /**
    * Parses raw OSM data (typically from Overpass API JSON) to extract nodes and ways,
@@ -6,27 +47,35 @@ class Osm {
    * @param data - The parsed JSON data from an OSM source.
    * @returns An object containing arrays of Point and Segment instances.
    */
-  static parseRoads(data) {
+  static parseRoads(data: OsmData): ParsedRoads {
     // Filter out only node elements using a type guard
-    const nodes = data.elements.filter((element) => element.type === 'node');
+    const nodes = data.elements.filter(
+      (element): element is OsmNodeElement => element.type === 'node',
+    );
+
     // Early exit if no nodes are found
     if (nodes.length === 0) {
       console.warn('No nodes found in OSM data.');
       return { points: [], segments: [] };
     }
+
     // Extract latitudes and longitudes for bounding box calculation
     const latitudes = nodes.map((node) => node.lat);
     const longitudes = nodes.map((node) => node.lon);
+
     // Calculate geographic bounds
     const minLat = Math.min(...latitudes);
     const maxLat = Math.max(...latitudes);
     const minLon = Math.min(...longitudes);
     const maxLon = Math.max(...longitudes);
+
     // Calculate scaling factors for coordinate conversion
     const deltaLat = maxLat - minLat;
     const deltaLon = maxLon - minLon;
+
     // Calculate aspect ratio, handle deltaLat being zero
     const ar = deltaLat === 0 ? 1 : deltaLon / deltaLat;
+
     // Calculate target canvas dimensions based on geographic range
     // 1 degree latitude ~= 111 km. Scale factor 10 might relate canvas units to meters (e.g., 10 pixels = 1 meter)
     // one degree is 111000 km so it converted to meters. and + 10 is to scale our road width of 100px to 10 meters
@@ -35,9 +84,11 @@ class Osm {
     // Using average latitude might be slightly better than maxLat for large areas
     const avgLat = (minLat + maxLat) / 2;
     const width = height * ar * Math.cos(degToRad(avgLat));
-    const points = []; // To store created Point objects
+
+    const points: Point[] = []; // To store created Point objects
     // Use a Map for efficient lookup of points by their original OSM ID
-    const nodeMap = new Map();
+    const nodeMap = new Map<number | string, Point>();
+
     // Convert nodes to Point objects
     for (const node of nodes) {
       // Calculate canvas coordinates using inverse linear interpolation
@@ -48,14 +99,19 @@ class Osm {
           : invLerp(maxLat, minLat, node.lat) * height;
       const x =
         deltaLon === 0 ? width / 2 : invLerp(minLon, maxLon, node.lon) * width;
-      const point = new Point(x, y);
+
+      const point = new Point(x, y) as OsmPoint;
       point.id = node.id; // Attach OSM ID to the Point object (requires Point class modification)
       points.push(point);
       nodeMap.set(node.id, point); // Store in map for quick lookup
     }
-    const segments = []; // To store created Segment objects
+
+    const segments: Segment[] = []; // To store created Segment objects
     // Filter out only way elements using a type guard
-    const ways = data.elements.filter((element) => element.type === 'way');
+    const ways = data.elements.filter(
+      (element): element is OsmWayElement => element.type === 'way',
+    );
+
     // Convert ways to Segment objects
     for (const way of ways) {
       const nodeIds = way.nodes;
@@ -64,6 +120,7 @@ class Osm {
         // Find the corresponding Point objects using the map
         const prevPoint = nodeMap.get(nodeIds[i - 1]);
         const currentPoint = nodeMap.get(nodeIds[i]);
+
         // Only create a segment if both points were found in the data
         if (prevPoint && currentPoint) {
           // Determine if the way is one-way based on tags
@@ -75,6 +132,7 @@ class Osm {
             oneWayTag === '1' ||
             oneWayTag === '-1' || // Include -1?
             lanesTag === '1';
+
           // Create and add the new Segment
           segments.push(new Segment(prevPoint, currentPoint, isOneWay));
         } else {
@@ -85,6 +143,7 @@ class Osm {
         }
       }
     }
+
     // Return the processed points and segments
     return { points, segments };
   }

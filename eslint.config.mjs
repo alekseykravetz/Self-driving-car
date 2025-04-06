@@ -49,6 +49,8 @@ const myGlobals = {
     PolygonInfo: 'readonly',
     BuildingInfo: 'readonly',
     MarkingInfo: 'readonly',
+    WorldInfo: 'readonly',
+    OsmData: 'readonly',
 
     // world primitives
     Point: 'readonly',

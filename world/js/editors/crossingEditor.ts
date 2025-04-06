@@ -1,10 +1,9 @@
-'use strict';
 class CrossingEditor extends MarkingEditor {
   /**
    * Editor for creating Crossing markings.
    * Targets graph segments by default.
    */
-  constructor(viewport, world) {
+  constructor(viewport: Viewport, world: World) {
     // Call base constructor, passing graph segments as targets
     super(viewport, world, world.graph.segments);
   }
@@ -15,12 +14,12 @@ class CrossingEditor extends MarkingEditor {
    * @param directionVector The orientation vector (along the road).
    * @returns A new Crossing instance.
    */
-  createMarking(center, directionVector) {
+  createMarking(center: Point, directionVector: Point): Crossing {
     return new Crossing(
       center,
       directionVector,
       this.world.roadWidth, // Crossing width typically matches road width
-      this.world.roadWidth / 2,
+      this.world.roadWidth / 2, // Height/length of the crossing marking
     );
   }
 }

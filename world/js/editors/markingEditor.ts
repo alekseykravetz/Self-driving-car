@@ -1,28 +1,36 @@
-'use strict';
 class MarkingEditor {
-  viewport;
-  world;
-  targetSegments; // Segments where markings can be placed
-  canvas;
-  ctx;
-  mouse = null;
-  intent = null; // The marking preview
-  markings; // Reference to world.markings
+  protected viewport: Viewport;
+  protected world: World;
+  protected targetSegments: Segment[]; // Segments where markings can be placed
+  protected canvas: HTMLCanvasElement;
+  protected ctx: CanvasRenderingContext2D;
+  protected mouse: Point | null = null;
+  protected intent: Marking | null = null; // The marking preview
+  protected markings: Marking[]; // Reference to world.markings
+
   // Bound event listeners for correct 'this' context and removal
-  boundMouseDown;
-  boundMouseMove;
-  boundContextMenu;
-  constructor(viewport, world, targetSegments = world.graph.segments) {
+  private boundMouseDown: (event: MouseEvent) => void;
+  private boundMouseMove: (event: MouseEvent) => void;
+  private boundContextMenu: (event: MouseEvent) => void;
+
+  constructor(
+    viewport: Viewport,
+    world: World,
+    targetSegments: Segment[] = world.graph.segments,
+  ) {
     this.viewport = viewport;
     this.world = world;
     this.targetSegments = targetSegments;
+
     this.canvas = viewport.canvas;
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx = this.canvas.getContext('2d')!;
+
     this.markings = world.markings; // Store reference
+
     // Initialize bound functions here to ensure 'this' is correct
     this.boundMouseDown = this.#handleMouseDown.bind(this);
     this.boundMouseMove = this.#handleMouseMove.bind(this);
-    this.boundContextMenu = (e) => e.preventDefault();
+    this.boundContextMenu = (e: MouseEvent) => e.preventDefault();
   }
 
   /**
@@ -32,29 +40,29 @@ class MarkingEditor {
    * @param directionVector The orientation vector of the marking.
    * @returns A new Marking instance.
    */
-  createMarking(center, directionVector) {
+  createMarking(center: Point, directionVector: Point): Marking {
     // Base implementation creates a generic Marking
     return new Marking(
       center,
       directionVector,
       this.world.roadWidth, // Default width
-      this.world.roadWidth,
+      this.world.roadWidth, // Default height
     );
   }
 
   /** Enables the editor by adding event listeners. */
-  enable() {
+  enable(): void {
     this.#addEventListeners();
   }
 
   /** Disables the editor by removing event listeners and clearing intent. */
-  disable() {
+  disable(): void {
     this.#removeEventListeners();
     this.intent = null; // Clear preview when disabled
   }
 
   /** Adds necessary event listeners to the canvas. */
-  #addEventListeners() {
+  #addEventListeners(): void {
     this.canvas.addEventListener('mousedown', this.boundMouseDown);
     this.canvas.addEventListener('mousemove', this.boundMouseMove);
     // Prevent default right-click menu
@@ -62,21 +70,22 @@ class MarkingEditor {
   }
 
   /** Removes event listeners from the canvas. */
-  #removeEventListeners() {
+  #removeEventListeners(): void {
     this.canvas.removeEventListener('mousedown', this.boundMouseDown);
     this.canvas.removeEventListener('mousemove', this.boundMouseMove);
     this.canvas.removeEventListener('contextmenu', this.boundContextMenu);
   }
 
   /** Handles mouse movement to update the marking intent (preview). */
-  #handleMouseMove(e) {
+  #handleMouseMove(e: MouseEvent): void {
     this.mouse = this.viewport.getMouse(e, true);
     // Find the nearest segment within a threshold based on zoom level
     const segment = getNearestSegment(
       this.mouse,
       this.targetSegments,
-      10 * this.viewport.zoom,
+      10 * this.viewport.zoom, // Threshold scales with zoom
     );
+
     if (segment) {
       // Project the mouse point onto the segment
       const proj = segment.projectPoint(this.mouse);
@@ -93,8 +102,9 @@ class MarkingEditor {
   }
 
   /** Handles mouse down events to place or remove markings. */
-  #handleMouseDown(e) {
+  #handleMouseDown(e: MouseEvent): void {
     if (!this.mouse) return; // Make sure mouse position is available
+
     // Left click (Place marking)
     if (e.button === 0) {
       if (this.intent) {
@@ -120,7 +130,7 @@ class MarkingEditor {
   }
 
   /** Displays the current marking intent (preview) on the canvas. */
-  display() {
+  display(): void {
     if (this.intent) {
       this.intent.draw(this.ctx);
     }
