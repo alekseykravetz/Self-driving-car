@@ -1,15 +1,42 @@
-'use strict';
+declare class Crossing extends Marking {}
+declare class Parking extends Marking {}
+declare class Start extends Marking {}
+declare class Stop extends Marking {}
+declare class Yield extends Marking {}
+declare class Target extends Marking {}
+
+type MarkingType =
+  | 'marking'
+  | 'crossing'
+  | 'parking'
+  | 'light'
+  | 'start'
+  | 'stop'
+  | 'yield'
+  | 'target';
+
+interface MarkingInfo {
+  center: Point;
+  directionVector: Point;
+  width: number;
+  height: number;
+  type: MarkingType | string; // Allow known types or other strings
+}
+
 class Marking {
   // Core properties defining the marking
-  center;
-  directionVector;
-  width;
-  height; // Height used for the support segment length
+  readonly center: Point;
+  readonly directionVector: Point;
+  readonly width: number;
+  readonly height: number; // Height used for the support segment length
+
   // Generated geometry
-  support; // The centerline segment
-  polygon; // The bounding polygon
+  readonly support: Segment; // The centerline segment
+  readonly polygon: Polygon; // The bounding polygon
+
   // Type identifier - subclasses should override this
-  type = 'marking';
+  type: string = 'marking';
+
   /**
    * Base class for road markings.
    * @param center The center point of the marking.
@@ -17,16 +44,22 @@ class Marking {
    * @param width The width of the marking (usually related to road width).
    * @param height The length of the marking along the road direction.
    */
-  constructor(center, directionVector, width, height) {
+  constructor(
+    center: Point,
+    directionVector: Point,
+    width: number,
+    height: number,
+  ) {
     this.center = center;
     this.directionVector = directionVector;
     this.width = width;
     this.height = height;
+
     this.support = new Segment(
       translate(this.center, angle(this.directionVector), this.height / 2),
       translate(this.center, angle(this.directionVector), -this.height / 2),
     );
-    this.polygon = new Envelope(this.support, this.width, 0).polygon;
+    this.polygon = new Envelope(this.support, this.width, 0).polygon!;
   }
 
   /**
@@ -34,9 +67,10 @@ class Marking {
    * @param info Object containing the saved state of the marking.
    * @returns An instance of Marking or one of its subclasses, or null if type is unknown.
    */
-  static load(info) {
+  static load(info: MarkingInfo): Marking | null {
     const point = new Point(info.center.x, info.center.y);
     const direction = new Point(info.directionVector.x, info.directionVector.y);
+
     switch (info.type) {
       case 'marking':
         return new Marking(point, direction, info.width, info.height);
@@ -67,7 +101,7 @@ class Marking {
    * Subclasses should override this method to draw their specific visuals.
    * @param ctx The canvas rendering context.
    */
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D): void {
     this.polygon.draw(ctx);
   }
 }

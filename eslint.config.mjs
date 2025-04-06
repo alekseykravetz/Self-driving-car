@@ -31,6 +31,7 @@ const pluginsAndRules = {
       'always',
       { exceptAfterSingleLine: true },
     ],
+    '@typescript-eslint/no-explicit-any': 'warn',
   },
 };
 
@@ -43,6 +44,11 @@ const myGlobals = {
     PointDrawOptions: 'readonly',
     SegmentDrawOptions: 'readonly',
     PolygonDrawOptions: 'readonly',
+    EnvelopeInfo: 'readonly',
+    GraphInfo: 'readonly',
+    PolygonInfo: 'readonly',
+    BuildingInfo: 'readonly',
+    MarkingInfo: 'readonly',
 
     // world primitives
     Point: 'readonly',

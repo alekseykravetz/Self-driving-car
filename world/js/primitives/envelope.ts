@@ -1,10 +1,10 @@
 interface EnvelopeInfo {
   skeleton: { p1: Point; p2: Point };
   polygon: {
-    points: { x: number; y: number }[];
+    points: Point[];
     segments: {
-      p1: { x: number; y: number };
-      p2: { x: number; y: number };
+      p1: Point;
+      p2: Point;
       oneWay: boolean;
     }[];
   };
@@ -12,7 +12,7 @@ interface EnvelopeInfo {
 
 class Envelope {
   private skeleton?: Segment;
-  private polygon?: Polygon;
+  public polygon?: Polygon;
 
   constructor(
     skeleton: Segment | undefined,
