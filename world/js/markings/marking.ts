@@ -1,7 +1,6 @@
 declare class Crossing extends Marking {}
 declare class Parking extends Marking {}
 declare class Yield extends Marking {}
-declare class Target extends Marking {}
 
 type MarkingType =
   | 'marking'
