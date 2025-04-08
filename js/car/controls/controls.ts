@@ -1,22 +1,23 @@
-'use strict';
-var ControlType;
-(function (ControlType) {
-  ControlType['KEYS'] = 'KEYS';
-  ControlType['DUMMY'] = 'DUMMY';
-  ControlType['AI'] = 'AI';
+enum ControlType {
+  KEYS = 'KEYS',
+  DUMMY = 'DUMMY',
+  AI = 'AI', // Added based on car.js usage
   // CAMERA = 'CAMERA', // Assuming possibility
   // PHONE = 'PHONE', // Assuming possibility
-})(ControlType || (ControlType = {}));
+}
+
 class Controls {
-  forward;
-  left;
-  right;
-  reverse;
-  constructor(type) {
+  public forward: boolean;
+  public left: boolean;
+  public right: boolean;
+  public reverse: boolean;
+
+  constructor(type: ControlType | string) {
     this.forward = false;
     this.left = false;
     this.right = false;
     this.reverse = false;
+
     switch (type) {
       case ControlType.KEYS:
       case 'KEYS': // Allow string comparison too
@@ -41,8 +42,8 @@ class Controls {
     }
   }
 
-  #addKeyboardListeners() {
-    document.addEventListener('keydown', (event) => {
+  #addKeyboardListeners(): void {
+    document.addEventListener('keydown', (event: KeyboardEvent): void => {
       switch (event.key) {
         case 'ArrowLeft':
         case 'a':
@@ -62,7 +63,7 @@ class Controls {
           break;
       }
     });
-    document.addEventListener('keyup', (event) => {
+    document.addEventListener('keyup', (event: KeyboardEvent): void => {
       switch (event.key) {
         case 'ArrowLeft':
         case 'a':

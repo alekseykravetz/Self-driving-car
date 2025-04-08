@@ -51,6 +51,8 @@ const myGlobals = {
     MarkingInfo: 'readonly',
     WorldInfo: 'readonly',
     OsmData: 'readonly',
+    //camera controls
+    Marker: 'readonly',
 
     // world primitives
     Point: 'readonly',

@@ -1,61 +1,90 @@
-'use strict';
+declare class NeuralNetwork {
+  constructor(neuronCounts: number[]);
+  static feedForward(givenInputs: number[], network: NeuralNetwork): number[];
+}
+declare function polysIntersect(poly1: Point[], poly2: Point[]): boolean;
+
+type CarControls = Controls | PhoneControls | CameraControls;
+
+interface CarInfo {
+  brain: NeuralNetwork;
+  maxSpeed: number;
+  friction: number;
+  acceleration: number;
+  sensor: {
+    rayCount: number;
+    raySpread: number;
+    rayLength: number;
+    rayOffset: number;
+  };
+}
+
 class Car {
-  x;
-  y;
-  width;
-  height;
-  color;
-  type; // controlType
-  speed;
-  acceleration;
-  maxSpeed;
-  friction;
-  angle;
-  damaged;
-  fitness;
-  useBrain;
-  sensor;
-  brain;
-  controls;
-  image;
-  mask;
-  polygon;
-  engine;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  type: string; // controlType
+  speed: number;
+  acceleration: number;
+  maxSpeed: number;
+  friction: number;
+  angle: number;
+  damaged: boolean;
+  fitness: number;
+  useBrain: boolean;
+  sensor?: Sensor;
+  brain?: NeuralNetwork;
+  controls: CarControls;
+  image: HTMLImageElement;
+  mask: HTMLCanvasElement;
+  polygon: Point[];
+  engine?: Engine;
+
   constructor(
-    x,
-    y,
-    width,
-    height,
-    controlType,
-    angle = 0,
-    maxSpeed = 3,
-    color = 'blue',
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    controlType: string,
+    angle: number = 0,
+    maxSpeed: number = 3,
+    color: string = 'blue',
   ) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+
     this.color = color;
     this.type = controlType;
+
     this.speed = 0;
     this.acceleration = 0.2;
     this.maxSpeed = maxSpeed;
     this.friction = 0.05;
     this.angle = angle;
     this.damaged = false;
+
     this.fitness = 0;
+
     this.useBrain = controlType === 'AI';
+
     if (controlType !== 'DUMMY') {
       this.sensor = new Sensor(this);
       this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
     }
     this.controls = new Controls(controlType);
+
     this.image = new Image();
     this.image.src = 'assets/car.png';
+
     this.mask = document.createElement('canvas');
     this.mask.width = width;
     this.mask.height = height;
-    const maskCtx = this.mask.getContext('2d');
+
+    const maskCtx = this.mask.getContext('2d')!;
     this.image.onload = () => {
       maskCtx.fillStyle = this.color;
       maskCtx.rect(0, 0, this.width, this.height);
@@ -63,11 +92,12 @@ class Car {
       maskCtx.globalCompositeOperation = 'destination-atop';
       maskCtx.drawImage(this.image, 0, 0, this.width, this.height);
     };
+
     this.polygon = this.#createPolygon();
     this.update([], []);
   }
 
-  load(info) {
+  load(info: CarInfo): void {
     this.brain = info.brain;
     this.maxSpeed = info.maxSpeed;
     this.friction = info.friction;
@@ -81,7 +111,7 @@ class Car {
   }
 
   // todo: remove traffic, merge with road borders (polygons intersection check)
-  update(roadBorders, traffic) {
+  update(roadBorders: Point[][], traffic: Car[]): void {
     if (!this.damaged) {
       this.#move();
       this.fitness += this.speed;
@@ -100,6 +130,7 @@ class Car {
         .map((s) => (s === null ? 0 : 1 - s.offset))
         .concat([this.speed / this.maxSpeed]);
       const outputs = NeuralNetwork.feedForward(offsets, this.brain);
+
       if (this.useBrain && this.controls instanceof Controls) {
         this.controls.forward = !!outputs[0];
         this.controls.left = !!outputs[1];
@@ -114,7 +145,7 @@ class Car {
     }
   }
 
-  #assessDamage(roadBorders, traffic) {
+  #assessDamage(roadBorders: Point[][], traffic: Car[]): boolean {
     for (let i = 0; i < roadBorders.length; i++) {
       if (polysIntersect(this.polygon, roadBorders[i])) {
         return true;
@@ -128,36 +159,37 @@ class Car {
     return false;
   }
 
-  #createPolygon() {
-    const points = [];
+  #createPolygon(): Point[] {
+    const points: Point[] = [];
     const rad = Math.hypot(this.width, this.height) / 2;
     const alpha = Math.atan2(this.width, this.height);
     points.push({
       x: this.x - Math.sin(this.angle - alpha) * rad,
       y: this.y - Math.cos(this.angle - alpha) * rad,
-    });
+    } as Point);
     points.push({
       x: this.x - Math.sin(this.angle + alpha) * rad,
       y: this.y - Math.cos(this.angle + alpha) * rad,
-    });
+    } as Point);
     points.push({
       x: this.x - Math.sin(Math.PI + this.angle - alpha) * rad,
       y: this.y - Math.cos(Math.PI + this.angle - alpha) * rad,
-    });
+    } as Point);
     points.push({
       x: this.x - Math.sin(Math.PI + this.angle + alpha) * rad,
       y: this.y - Math.cos(Math.PI + this.angle + alpha) * rad,
-    });
+    } as Point);
     return points;
   }
 
-  #move() {
+  #move(): void {
     if (this.controls.forward) {
       this.speed += this.acceleration;
     }
     if (this.controls.reverse) {
       this.speed -= this.acceleration;
     }
+
     if (this.speed > this.maxSpeed) {
       this.speed = this.maxSpeed;
     }
@@ -165,6 +197,7 @@ class Car {
     if (this.speed < -this.maxSpeed / 2) {
       this.speed = -this.maxSpeed / 2;
     }
+
     if (this.speed > 0) {
       this.speed -= this.friction;
     }
@@ -174,6 +207,7 @@ class Car {
     if (Math.abs(this.speed) < this.friction) {
       this.speed = 0;
     }
+
     if (this.speed !== 0) {
       // Check for tilt control specifically if it exists
       if (
@@ -186,22 +220,24 @@ class Car {
         this.angle -= this.controls.tilt * 0.03;
       } else {
         const flip = this.speed > 0 ? 1 : -1;
-        if (this.controls.left) {
+        if ((this.controls as Controls).left) {
           this.angle += 0.03 * flip;
         }
-        if (this.controls.right) {
+        if ((this.controls as Controls).right) {
           this.angle -= 0.03 * flip;
         }
       }
     }
+
     this.x -= Math.sin(this.angle) * this.speed;
     this.y -= Math.cos(this.angle) * this.speed;
   }
 
-  draw(ctx, drawSensor = false) {
+  draw(ctx: CanvasRenderingContext2D, drawSensor: boolean = false): void {
     if (this.sensor && drawSensor) {
       this.sensor.draw(ctx);
     }
+
     // Original polygon drawing commented out, kept for reference
     // if (this.damaged) {
     //   ctx.fillStyle = 'gray';
@@ -214,9 +250,11 @@ class Car {
     //   ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
     // }
     // ctx.fill();
+
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(-this.angle);
+
     if (!this.damaged) {
       ctx.drawImage(
         this.mask,
