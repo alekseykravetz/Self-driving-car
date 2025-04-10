@@ -12,14 +12,6 @@ type MarkingType =
   | 'yield'
   | 'target';
 
-interface MarkingInfo {
-  center: Point;
-  directionVector: Point;
-  width: number;
-  height: number;
-  type: MarkingType | string; // Allow known types or other strings
-}
-
 class Marking {
   // Core properties defining the marking
   readonly center: Point;
@@ -32,7 +24,7 @@ class Marking {
   readonly polygon: Polygon; // The bounding polygon
 
   // Type identifier - subclasses should override this
-  type: string = 'marking';
+  type: MarkingType | string = 'marking'; // Allow known types or other strings
 
   /**
    * Base class for road markings.
@@ -64,7 +56,7 @@ class Marking {
    * @param info Object containing the saved state of the marking.
    * @returns An instance of Marking or one of its subclasses, or null if type is unknown.
    */
-  static load(info: MarkingInfo): Marking | null {
+  static load(info: Marking): Marking | null {
     const point = new Point(info.center.x, info.center.y);
     const direction = new Point(info.directionVector.x, info.directionVector.y);
 

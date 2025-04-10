@@ -147,12 +147,8 @@ class WorldEditor {
   }
 
   /** Initializes or re-initializes the world, viewport, minimap, and tools. */
-  #initializeWorldEditor(worldInfo: World | WorldInfo | null): void {
-    if (worldInfo instanceof World) {
-      this.world = worldInfo;
-    } else {
-      this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
-    }
+  #initializeWorldEditor(worldInfo: World | null): void {
+    this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
 
     // Initialize Viewport after World is loaded (uses world zoom/offset)
     this.viewport = new Viewport(

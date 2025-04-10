@@ -1,8 +1,3 @@
-interface BuildingInfo {
-  base: PolygonInfo;
-  height: number;
-}
-
 class Building {
   readonly base: Polygon;
   readonly height: number;
@@ -12,7 +7,7 @@ class Building {
     this.height = height;
   }
 
-  static load(info: BuildingInfo): Building {
+  static load(info: Building): Building {
     const basePolygon = Polygon.load(info.base);
     return new Building(basePolygon, info.height);
   }

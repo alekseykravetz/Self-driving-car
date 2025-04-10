@@ -11,24 +11,6 @@ type lightControlCenterPoint = Point & {
   ticks?: number;
 };
 
-interface WorldInfo {
-  graph: GraphInfo;
-  roadWidth: number;
-  roadRoundness: number;
-  buildingWidth: number;
-  buildingMinLength: number;
-  spacing: number;
-  treeSize: number;
-  envelopes: EnvelopeInfo[];
-  roadBorders: Segment[];
-  buildings: BuildingInfo[];
-  trees: { center: Point }[];
-  laneGuides: { p1: Point; p2: Point }[];
-  markings: MarkingInfo[];
-  zoom?: number;
-  offset?: Point;
-}
-
 class World {
   graph: Graph;
   roadWidth: number;
@@ -85,7 +67,7 @@ class World {
     this.generate();
   }
 
-  static load(info: WorldInfo): World {
+  static load(info: World): World {
     // Create a world with default graph, properties will be overwritten
     const world = new World(new Graph());
     // Load graph structure first

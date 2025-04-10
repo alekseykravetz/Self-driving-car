@@ -1,34 +1,25 @@
-interface EnvelopeInfo {
-  skeleton: { p1: Point; p2: Point };
-  polygon: {
-    points: Point[];
-    segments: {
-      p1: Point;
-      p2: Point;
-      oneWay: boolean;
-    }[];
-  };
-}
-
 class Envelope {
-  private skeleton?: Segment;
-  public polygon?: Polygon;
+  private skeleton: Segment;
+  public polygon: Polygon;
 
   constructor(
-    skeleton: Segment | undefined,
-    width: number | undefined = 10,
+    skeleton: Segment,
+    width: number = 10,
     roundness: number = 1,
+    generatedPolygon?: Polygon,
   ) {
-    if (skeleton) {
-      this.skeleton = skeleton;
+    this.skeleton = skeleton;
+    if (generatedPolygon) {
+      this.polygon = generatedPolygon;
+    } else {
       this.polygon = this.#generatePolygon(width, roundness);
     }
   }
 
-  static load(info: EnvelopeInfo) {
-    const env = new Envelope(undefined, undefined);
-    env.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
-    env.polygon = Polygon.load(info.polygon);
+  static load(info: Envelope, width: number = 10, roundness: number = 1) {
+    const skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
+    const polygon = Polygon.load(info.polygon);
+    const env = new Envelope(skeleton, width, roundness, polygon);
     return env;
   }
 

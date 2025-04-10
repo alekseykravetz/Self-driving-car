@@ -2,17 +2,19 @@
 class Envelope {
   skeleton;
   polygon;
-  constructor(skeleton, width = 10, roundness = 1) {
-    if (skeleton) {
-      this.skeleton = skeleton;
+  constructor(skeleton, width = 10, roundness = 1, generatedPolygon) {
+    this.skeleton = skeleton;
+    if (generatedPolygon) {
+      this.polygon = generatedPolygon;
+    } else {
       this.polygon = this.#generatePolygon(width, roundness);
     }
   }
 
-  static load(info) {
-    const env = new Envelope(undefined, undefined);
-    env.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
-    env.polygon = Polygon.load(info.polygon);
+  static load(info, width = 10, roundness = 1) {
+    const skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
+    const polygon = Polygon.load(info.polygon);
+    const env = new Envelope(skeleton, width, roundness, polygon);
     return env;
   }
 

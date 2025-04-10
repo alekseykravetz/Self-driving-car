@@ -1,12 +1,3 @@
-type GraphInfo = {
-  points: { x: number; y: number }[];
-  segments: {
-    p1: { x: number; y: number };
-    p2: { x: number; y: number };
-    oneWay: boolean;
-  }[];
-};
-
 type ShortestPathPoint = Point & {
   distance: number;
   visited: boolean;
@@ -22,7 +13,7 @@ class Graph {
     this.segments = segments;
   }
 
-  static load(info: GraphInfo): Graph {
+  static load(info: Graph): Graph {
     const points = info.points.map((i) => new Point(i.x, i.y));
     const segments = info.segments.map(
       (i) =>

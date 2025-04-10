@@ -1,7 +1,3 @@
-interface PolygonInfo {
-  points: Point[];
-}
-
 class Polygon {
   points: Point[];
   segments: Segment[];
@@ -14,7 +10,7 @@ class Polygon {
     }
   }
 
-  static load(info: PolygonInfo): Polygon {
+  static load(info: Polygon): Polygon {
     return new Polygon(info.points.map((p) => new Point(p.x, p.y)));
   }
 

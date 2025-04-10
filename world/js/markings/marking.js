@@ -9,7 +9,7 @@ class Marking {
   support; // The centerline segment
   polygon; // The bounding polygon
   // Type identifier - subclasses should override this
-  type = 'marking';
+  type = 'marking'; // Allow known types or other strings
   /**
    * Base class for road markings.
    * @param center The center point of the marking.
