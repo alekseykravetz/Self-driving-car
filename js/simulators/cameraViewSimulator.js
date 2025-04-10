@@ -96,8 +96,8 @@ class CameraViewSimulator {
       this.miniMapCanvas,
       this.world.graph,
       this.miniMapCanvas.width,
-      this.cars,
     );
+    this.miniMap.cars = this.cars;
   }
 
   loadWorldFromFile(e) {

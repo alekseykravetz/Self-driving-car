@@ -1,7 +1,3 @@
-declare class NeuralNetwork {
-  constructor(neuronCounts: number[]);
-  static feedForward(givenInputs: number[], network: NeuralNetwork): number[];
-}
 declare function polysIntersect(poly1: Point[], poly2: Point[]): boolean;
 
 type CarControls = Controls | PhoneControls | CameraControls;
@@ -20,6 +16,7 @@ interface CarInfo {
 }
 
 class Car {
+  name?: string;
   x: number;
   y: number;
   width: number;
@@ -41,6 +38,10 @@ class Car {
   mask: HTMLCanvasElement;
   polygon: Point[];
   engine?: Engine;
+
+  //todo: fix this
+  finishTime?: number;
+  progress?: number;
 
   constructor(
     x: number,

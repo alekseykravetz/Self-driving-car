@@ -1,9 +1,21 @@
+interface IMiniMapCar {
+  x: number;
+  y: number;
+  damaged: boolean;
+}
+
+interface IMiniMapDrawOptions {
+  roadColor?: string;
+  carColor?: string;
+}
+
 class MiniMap {
   private canvas: HTMLCanvasElement;
   private graph: Graph;
   private size: number;
   private scaler: number;
   private ctx: CanvasRenderingContext2D;
+  public cars: IMiniMapCar[] = [];
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -22,7 +34,10 @@ class MiniMap {
     this.ctx = canvas.getContext('2d')!;
   }
 
-  update(viewPoint: Point): void {
+  update(
+    viewPoint: Point,
+    { roadColor = 'white', carColor = 'blue' }: IMiniMapDrawOptions = {},
+  ): void {
     this.ctx.clearRect(0, 0, this.size, this.size);
 
     const scaledViewPoint: Point = scale(viewPoint, -this.scaler);
@@ -35,14 +50,28 @@ class MiniMap {
     this.ctx.scale(this.scaler, this.scaler);
 
     for (const segment of this.graph.segments) {
-      segment.draw(this.ctx, { width: 3 / this.scaler, color: '#BBB' });
+      segment.draw(this.ctx, { width: 3 / this.scaler, color: roadColor });
+    }
+
+    for (const car of this.cars) {
+      this.ctx.beginPath();
+      this.ctx.fillStyle = car.damaged ? 'gray' : 'red';
+      this.ctx.strokeStyle = 'white';
+      this.ctx.lineWidth = 2 / this.scaler;
+      this.ctx.arc(car.x, car.y, 3 / this.scaler, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.stroke();
+      // new Point(car.x, car.y).draw(this.ctx, {
+      //   color: car.damaged ? 'gray' : 'red',
+      //   size: 5 / this.scaler,
+      // });
     }
 
     this.ctx.restore();
 
     new Point(this.size / 2, this.size / 2).draw(this.ctx, {
       size: 12,
-      color: 'red',
+      color: carColor,
       outline: true,
     });
   }

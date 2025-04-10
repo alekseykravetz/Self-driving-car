@@ -1,5 +1,6 @@
 'use strict';
 class Car {
+  name;
   x;
   y;
   width;
@@ -21,6 +22,9 @@ class Car {
   mask;
   polygon;
   engine;
+  //todo: fix this
+  finishTime;
+  progress;
   constructor(
     x,
     y,

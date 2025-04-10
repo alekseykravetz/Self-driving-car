@@ -68,17 +68,14 @@ class WorldEditor {
     this.#addEventListeners(); // Add listeners after elements are assigned
 
     // Attempt to load world from localStorage or initialize a new one
-    // if (typeof world === 'undefined') {
-    //   const worldString = localStorage.getItem('world');
-    //   const worldInfo = worldString ? JSON.parse(worldString) : null;
+    if (typeof world === 'undefined') {
+      const worldString = localStorage.getItem('world');
+      const worldInfo = worldString ? JSON.parse(worldString) : null;
 
-    //   this.#initializeWorldEditor(worldInfo);
-    // } else {
-    //   this.#initializeWorldEditor(world); // todo: fix - global world info
-    // }
-    const worldString = localStorage.getItem('world');
-    const worldInfo = worldString ? JSON.parse(worldString) : null;
-    this.#initializeWorldEditor(worldInfo);
+      this.#initializeWorldEditor(worldInfo);
+    } else {
+      this.#initializeWorldEditor(world); // todo: fix - global world info
+    }
   }
 
   /** Assigns DOM elements to class properties. */
@@ -150,8 +147,12 @@ class WorldEditor {
   }
 
   /** Initializes or re-initializes the world, viewport, minimap, and tools. */
-  #initializeWorldEditor(worldInfo: WorldInfo | null): void {
-    this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+  #initializeWorldEditor(worldInfo: World | WorldInfo | null): void {
+    if (worldInfo instanceof World) {
+      this.world = worldInfo;
+    } else {
+      this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+    }
 
     // Initialize Viewport after World is loaded (uses world zoom/offset)
     this.viewport = new Viewport(
@@ -428,7 +429,7 @@ class WorldEditor {
 
     // Update and draw the MiniMap
     this.miniMapViewport.reset(); // Reset minimap viewport if separate
-    this.miniMap.update(viewPoint); // Update minimap based on main viewpoint
+    this.miniMap.update(viewPoint, { roadColor: '#BBB', carColor: 'red' }); // Update minimap based on main viewpoint
   }
 
   /** Animation loop using requestAnimationFrame. */

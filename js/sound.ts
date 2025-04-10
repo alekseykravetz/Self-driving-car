@@ -11,6 +11,7 @@ function taDaa(): void {
  */
 function explode(): void {
   const audioContext: AudioContext = new (window.AudioContext ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).webkitAudioContext)();
   const numOscillators: number = 10;
 
@@ -41,6 +42,7 @@ function explode(): void {
  */
 function beep(frequency: number, waveType: OscillatorType = 'sine'): void {
   const audioContext: AudioContext = new (window.AudioContext ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).webkitAudioContext)();
   const osc: OscillatorNode = audioContext.createOscillator();
   const envelope: GainNode = audioContext.createGain();
@@ -77,6 +79,7 @@ class Engine {
 
   constructor() {
     this.audioContext = new (window.AudioContext ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).webkitAudioContext)();
     const currentTime = this.audioContext.currentTime;
 

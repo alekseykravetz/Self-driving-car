@@ -1,4 +1,7 @@
-'use strict';
+// Placeholder declaration for the assumed getRGBA function
+// This function likely takes a number (weight/bias/activation) and returns a CSS color string.
+declare function getRGBA(value: number): string;
+
 /**
  * Provides static methods to draw a NeuralNetwork on an HTML Canvas.
  */
@@ -8,20 +11,25 @@ class Visualizer {
    * @param ctx - The 2D rendering context of the canvas.
    * @param network - The NeuralNetwork instance to draw.
    */
-  static drawNetwork(ctx, network) {
+  static drawNetwork(
+    ctx: CanvasRenderingContext2D,
+    network: NeuralNetwork,
+  ): void {
     // Define margins and calculate drawing area dimensions
-    const margin = 50;
-    const left = margin;
-    const top = margin;
-    const width = ctx.canvas.width - margin * 2;
-    const height = ctx.canvas.height - margin * 2;
+    const margin: number = 50;
+    const left: number = margin;
+    const top: number = margin;
+    const width: number = ctx.canvas.width - margin * 2;
+    const height: number = ctx.canvas.height - margin * 2;
+
     // Calculate the vertical space allocated for each level
-    const levelHeight = height / network.levels.length;
+    const levelHeight: number = height / network.levels.length;
+
     // Draw levels from bottom (output) to top (input)
     // This ensures connections are drawn under the nodes of the next layer up
-    for (let i = network.levels.length - 1; i >= 0; i--) {
+    for (let i: number = network.levels.length - 1; i >= 0; i--) {
       // Calculate the vertical position (top edge) of the current level
-      const levelTop =
+      const levelTop: number =
         top +
         lerp(
           height - levelHeight, // Bottom-most position
@@ -29,8 +37,10 @@ class Visualizer {
           // Interpolation factor based on level index
           network.levels.length === 1 ? 0.5 : i / (network.levels.length - 1),
         );
+
       // Set line style for drawing level boundaries (optional visualization aid)
       ctx.setLineDash([7, 3]); // Dashed line
+
       // Draw the current level
       Visualizer.drawLevel(
         ctx,
@@ -40,7 +50,7 @@ class Visualizer {
         width,
         levelHeight,
         // Provide labels only for the output layer (last layer, index network.levels.length - 1)
-        i === network.levels.length - 1 ? ['↥', '↤', '↦', '↧'] : [],
+        i === network.levels.length - 1 ? ['↥', '↤', '↦', '↧'] : [], // Example labels ['⬆️', '⬅️', '➡️', '⬇️']
       );
       ctx.setLineDash([]); // Reset line dash
     }
@@ -56,28 +66,38 @@ class Visualizer {
    * @param height - The height allocated for drawing the level.
    * @param outputLabels - An array of strings to label the output neurons (if any).
    */
-  static drawLevel(ctx, level, left, top, width, height, outputLabels) {
+  static drawLevel(
+    ctx: CanvasRenderingContext2D,
+    level: Level,
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    outputLabels: string[],
+  ): void {
     // Calculate right and bottom boundaries based on inputs
-    const right = left + width;
-    const bottom = top + height;
+    const right: number = left + width;
+    const bottom: number = top + height;
+
     // Destructure level properties for easier access
     const { inputs, outputs, weights, biases } = level;
-    const nodeRadius = 18; // Radius of the neuron visualization
+    const nodeRadius: number = 18; // Radius of the neuron visualization
+
     // --- Draw connections (weights) ---
     // Iterate through each input neuron of this level
-    for (let i = 0; i < inputs.length; i++) {
+    for (let i: number = 0; i < inputs.length; i++) {
       // Iterate through each output neuron of this level
-      for (let j = 0; j < outputs.length; j++) {
+      for (let j: number = 0; j < outputs.length; j++) {
         ctx.beginPath();
         // Line starts from the input node position (bottom of the level drawing area)
         ctx.moveTo(
           Visualizer.getNodeX(inputs, i, left, right), // x-coord of input node i
-          bottom,
+          bottom, // y-coord (bottom edge)
         );
         // Line ends at the output node position (top of the level drawing area)
         ctx.lineTo(
           Visualizer.getNodeX(outputs, j, left, right), // x-coord of output node j
-          top,
+          top, // y-coord (top edge)
         );
         // Style the connection line based on the weight value
         ctx.lineWidth = 2;
@@ -86,9 +106,10 @@ class Visualizer {
         ctx.stroke();
       }
     }
+
     // --- Draw input nodes --- (Represented at the bottom of the level's area)
-    for (let i = 0; i < inputs.length; i++) {
-      const x = Visualizer.getNodeX(inputs, i, left, right);
+    for (let i: number = 0; i < inputs.length; i++) {
+      const x: number = Visualizer.getNodeX(inputs, i, left, right);
       // Draw outer circle (border)
       ctx.beginPath();
       ctx.arc(x, bottom, nodeRadius, 0, Math.PI * 2);
@@ -101,9 +122,10 @@ class Visualizer {
       ctx.fillStyle = getRGBA(inputs[i]);
       ctx.fill();
     }
+
     // --- Draw output nodes --- (Represented at the top of the level's area)
-    for (let i = 0; i < outputs.length; i++) {
-      const x = Visualizer.getNodeX(outputs, i, left, right);
+    for (let i: number = 0; i < outputs.length; i++) {
+      const x: number = Visualizer.getNodeX(outputs, i, left, right);
       // Draw outer circle (border)
       ctx.beginPath();
       ctx.arc(x, top, nodeRadius, 0, Math.PI * 2);
@@ -115,6 +137,7 @@ class Visualizer {
       // Use the assumed getRGBA function to color based on output activation
       ctx.fillStyle = getRGBA(outputs[i]);
       ctx.fill();
+
       // Draw bias visualization (dashed circle around the output node)
       ctx.beginPath();
       ctx.lineWidth = 2;
@@ -124,6 +147,7 @@ class Visualizer {
       ctx.setLineDash([3, 3]); // Dashed line for bias
       ctx.stroke();
       ctx.setLineDash([]); // Reset line dash
+
       // Draw output labels if provided
       if (outputLabels[i]) {
         ctx.beginPath();
@@ -150,7 +174,12 @@ class Visualizer {
    * @param right - The right boundary coordinate.
    * @returns The calculated x-coordinate for the node.
    */
-  static getNodeX(nodes, index, left, right) {
+  private static getNodeX(
+    nodes: number[],
+    index: number,
+    left: number,
+    right: number,
+  ): number {
     // Use linear interpolation to find the position
     return lerp(
       left, // Start position
