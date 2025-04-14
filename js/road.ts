@@ -1,9 +1,3 @@
-// Define an interface for a 2D point
-interface IPoint {
-  x: number;
-  y: number;
-}
-
 class Road {
   x: number;
   width: number;
@@ -12,7 +6,7 @@ class Road {
   right: number;
   top: number;
   bottom: number;
-  borders: [IPoint, IPoint][]; // An array of tuples, each containing two Points representing a border line segment
+  borders: Point[][]; // An array of tuples, each containing two Points representing a border line segment
 
   constructor(x: number, width: number, laneCount: number = 3) {
     this.x = x;
@@ -28,10 +22,10 @@ class Road {
     this.bottom = infinity;
 
     // Define the corner points for the road borders
-    const topLeft: IPoint = { x: this.left, y: this.top };
-    const topRight: IPoint = { x: this.right, y: this.top };
-    const bottomLeft: IPoint = { x: this.left, y: this.bottom };
-    const bottomRight: IPoint = { x: this.right, y: this.bottom };
+    const topLeft: Point = { x: this.left, y: this.top } as Point;
+    const topRight: Point = { x: this.right, y: this.top } as Point;
+    const bottomLeft: Point = { x: this.left, y: this.bottom } as Point;
+    const bottomRight: Point = { x: this.right, y: this.bottom } as Point;
 
     // Store the borders as pairs of points (line segments)
     this.borders = [
@@ -76,7 +70,7 @@ class Road {
 
     // Draw solid road borders
     ctx.setLineDash([]); // Reset line dash to solid
-    this.borders.forEach((border: [IPoint, IPoint]) => {
+    this.borders.forEach((border: Point[]) => {
       ctx.beginPath();
       ctx.moveTo(border[0].x, border[0].y); // Start at the first point of the border segment
       ctx.lineTo(border[1].x, border[1].y); // End at the second point of the border segment

@@ -70,15 +70,3 @@ class Road {
     });
   }
 }
-// Example Usage (requires an HTML canvas element with id="myCanvas"):
-/*
-const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-if (canvas) {
-    canvas.width = 200;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-        const road = new Road(canvas.width / 2, canvas.width * 0.9);
-        road.draw(ctx);
-    }
-}
-*/

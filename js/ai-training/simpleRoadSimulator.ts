@@ -1,30 +1,38 @@
-'use strict';
-const gameCanvas = document.getElementById('gameCanvas');
+const gameCanvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 gameCanvas.width = 200;
 gameCanvas.style.backgroundColor = 'lightgray';
-const gameCtx = gameCanvas.getContext('2d');
-const networkCanvas = document.getElementById('networkCanvas');
+const gameCtx = gameCanvas.getContext('2d')!;
+
+const networkCanvas = document.getElementById(
+  'networkCanvas',
+) as HTMLCanvasElement;
 networkCanvas.width = 300;
-const networkCtx = networkCanvas.getContext('2d');
+const networkCtx = networkCanvas.getContext('2d')!;
+
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
-const startAngle = angle(new Point(0, -1)) + Math.PI / 2;
+
+const startAngle: number = angle(new Point(0, -1)) + Math.PI / 2;
+
 // Generate AI cars
-const N = 100;
-const cars = generateCars(N);
+const N: number = 100;
+const cars: Car[] = generateCars(N);
+
 // Track the best performing car (initially the first one)
-let bestCar = cars[0];
+let bestCar: Car = cars[0];
+
 // Load saved brain from localStorage if available
 const storedBrain = localStorage.getItem('bestBrain');
 if (storedBrain) {
   for (let i = 0; i < cars.length; i++) {
     cars[i].brain = JSON.parse(storedBrain);
     if (i !== 0) {
-      NeuralNetwork.mutate(cars[i].brain, 0.1);
+      NeuralNetwork.mutate(cars[i].brain!, 0.1);
     }
   }
 }
+
 // Create dummy traffic cars
-const traffic = [
+const traffic: Car[] = [
   new Car(
     road.getLaneCenter(1),
     -100,
@@ -96,13 +104,14 @@ const traffic = [
     getRandomColor(),
   ),
 ];
+
 /**
  * Generates an array of AI-controlled Car instances.
  * @param n - The number of cars to generate.
  * @returns An array of Car objects.
  */
-function generateCars(n) {
-  const generatedCars = [];
+function generateCars(n: number): Car[] {
+  const generatedCars: Car[] = [];
   for (let i = 1; i <= n; i++) {
     generatedCars.push(
       new Car(road.getLaneCenter(1), 100, 30, 50, 'AI', startAngle, 3, 'blue'),
@@ -114,7 +123,7 @@ function generateCars(n) {
 /**
  * Saves the brain of the best performing car to localStorage.
  */
-function save() {
+function save(): void {
   if (bestCar && bestCar.brain) {
     localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain));
     console.log('Best brain saved.');
@@ -126,42 +135,51 @@ function save() {
 /**
  * Removes the saved brain from localStorage.
  */
-function discard() {
+function discard(): void {
   localStorage.removeItem('bestBrain');
   console.log('Stored brain discarded.');
 }
 
 // Start the animation loop
 animate();
+
 /**
  * The main animation loop function. Updates and draws the simulation state.
  * @param time - The timestamp provided by requestAnimationFrame (optional).
  */
-function animate(time) {
+function animate(time?: number): void {
   // Update traffic cars
   for (let i = 0; i < traffic.length; i++) {
-    traffic[i].update(road.borders, []);
+    traffic[i].update(road.borders as Point[][], []);
   }
   // Update AI cars
   for (let i = 0; i < cars.length; i++) {
-    cars[i].update(road.borders, traffic);
+    cars[i].update(road.borders as Point[][], traffic);
   }
+
   // Find the best car (the one that has traveled furthest up the screen - lowest y value)
   // Using non-null assertion assuming 'cars' array is never empty and 'find' will succeed.
-  bestCar = cars.find((c) => c.y === Math.min(...cars.map((c) => c.y)));
+  bestCar = cars.find(
+    (c: Car) => c.y === Math.min(...cars.map((c: Car) => c.y)),
+  )!;
+
   // Adjust canvas heights to fill window (can cause reflow, consider optimizing if needed)
   gameCanvas.height = window.innerHeight;
   networkCanvas.height = window.innerHeight;
+
   // --- Draw Game Canvas ---
   gameCtx.save();
   // Center the view on the best car vertically
   gameCtx.translate(0, -bestCar.y + gameCanvas.height * 0.7);
+
   // Draw the road
   road.draw(gameCtx);
+
   // Draw traffic cars
   for (let i = 0; i < traffic.length; i++) {
     traffic[i].draw(gameCtx);
   }
+
   // Draw AI cars with transparency
   gameCtx.globalAlpha = 0.2;
   for (let i = 0; i < cars.length; i++) {
@@ -170,7 +188,9 @@ function animate(time) {
   // Draw the best car without transparency (and potentially with sensors/details)
   gameCtx.globalAlpha = 1;
   bestCar.draw(gameCtx, true);
+
   gameCtx.restore();
+
   // --- Draw Network Canvas ---
   // Animate the network visualization's line dashes
   networkCtx.lineDashOffset = -(time || 0) / 50;
@@ -178,6 +198,7 @@ function animate(time) {
   if (bestCar && bestCar.brain) {
     Visualizer.drawNetwork(networkCtx, bestCar.brain);
   }
+
   // Request the next frame
   requestAnimationFrame(animate);
 }
