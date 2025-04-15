@@ -117,12 +117,6 @@ class Polygon {
     return intersectionCount % 2 === 1;
   }
 
-  drawSegments(ctx: CanvasRenderingContext2D): void {
-    for (const seg of this.segments) {
-      seg.draw(ctx, { color: getRandomColor(), width: 5 });
-    }
-  }
-
   draw(
     ctx: CanvasRenderingContext2D,
     {

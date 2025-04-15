@@ -19,7 +19,7 @@ class Race {
   frameCount: number = 0;
   started: boolean = false;
 
-  loadWorldInput!: HTMLInputElement;
+  loadWorldInput: HTMLInputElement | null = null;
   statistics!: HTMLElement;
   counter!: HTMLElement;
 
@@ -93,11 +93,14 @@ class Race {
   #addEventListeners(): void {
     this.loadWorldInput = document.getElementById(
       'loadWorldInput',
-    )! as HTMLInputElement;
-    this.loadWorldInput.addEventListener(
-      'change',
-      this.loadWorldFromFile.bind(this),
-    );
+    ) as HTMLInputElement | null;
+    // not all race games have Load World Input
+    if (this.loadWorldInput) {
+      this.loadWorldInput.addEventListener(
+        'change',
+        this.loadWorldFromFile.bind(this),
+      );
+    }
     this.statistics = document.getElementById('statistics')!;
     this.counter = document.getElementById('counter')!;
   }

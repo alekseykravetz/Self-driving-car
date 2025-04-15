@@ -106,17 +106,16 @@ class CameraViewSimulator {
       }
     }
     this.camera = new Camera(this.myCar);
-    // Initialize MiniMap
     this.miniMap = new MiniMap(
       this.miniMapCanvas,
       this.world.graph,
       this.miniMapCanvas.width,
     );
-    this.miniMap.cars = this.cars; // Assign cars to minimap
+    this.miniMap.cars = this.cars;
   }
 
   loadWorldFromFile(e) {
-    const input = e.target; // Type assertion
+    const input = e.target;
     const worldFile = input.files?.[0];
     if (!worldFile) {
       alert('No file selected');

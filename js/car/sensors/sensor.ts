@@ -2,8 +2,6 @@ interface IntersectionPoint extends Point {
   offset: number; // Distance from ray start to intersection
 }
 
-declare function lerp(a: number, b: number, t: number): number;
-
 class Sensor {
   car: Car;
   rayCount: number;

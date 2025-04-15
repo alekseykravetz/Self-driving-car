@@ -16,7 +16,7 @@ class Race {
   roadBorders = null;
   frameCount = 0;
   started = false;
-  loadWorldInput;
+  loadWorldInput = null;
   statistics;
   counter;
   constructor(gameCanvas, cameraCanvas, miniMapCanvas, controls = null) {
@@ -72,10 +72,13 @@ class Race {
 
   #addEventListeners() {
     this.loadWorldInput = document.getElementById('loadWorldInput');
-    this.loadWorldInput.addEventListener(
-      'change',
-      this.loadWorldFromFile.bind(this),
-    );
+    // not all race games have Load World Input
+    if (this.loadWorldInput) {
+      this.loadWorldInput.addEventListener(
+        'change',
+        this.loadWorldFromFile.bind(this),
+      );
+    }
     this.statistics = document.getElementById('statistics');
     this.counter = document.getElementById('counter');
   }

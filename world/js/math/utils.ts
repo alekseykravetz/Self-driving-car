@@ -126,11 +126,6 @@ function degToRad(degree: number): number {
   return (degree * Math.PI) / 180;
 }
 
-function getRandomColor(): string {
-  const hue = 290 + Math.random() * 260; //not blue
-  return `hsl(${hue}, 100%, 60%)`;
-}
-
 function getFake3dPoint(point: Point, viewPoint: Point, height: number): Point {
   const dir = normalize(subtract(point, viewPoint));
   const dist = distance(point, viewPoint);

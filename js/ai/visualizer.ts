@@ -1,7 +1,3 @@
-// Placeholder declaration for the assumed getRGBA function
-// This function likely takes a number (weight/bias/activation) and returns a CSS color string.
-declare function getRGBA(value: number): string;
-
 /**
  * Provides static methods to draw a NeuralNetwork on an HTML Canvas.
  */

@@ -1,5 +1,3 @@
-declare function polysIntersect(poly1: Point[], poly2: Point[]): boolean;
-
 type CarControls = Controls | PhoneControls | CameraControls;
 
 interface CarInfo {
