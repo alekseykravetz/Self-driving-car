@@ -8,6 +8,7 @@ class GraphEditor {
   hovered = null;
   dragging = false;
   mouse = null; // Current mouse position (relative to viewport/canvas)
+  shortestPath = null;
   // Store bound functions for correct 'this' and easy removal
   boundMouseDown;
   boundMouseMove;
@@ -74,16 +75,21 @@ class GraphEditor {
     if (this.mouse) {
       if (e.key === 's') {
         this.startPoint = this.mouse;
-        console.log('Start point set:', this.startPoint);
       }
       if (e.key === 'e') {
         this.endPoint = this.mouse;
-        console.log('End point set:', this.endPoint);
+      }
+      if (e.key === 'c') {
+        this.startPoint = null;
+        this.endPoint = null;
+        this.shortestPath = null;
       }
     }
     if (this.startPoint && this.endPoint) {
-      // todo: global world reference needs to be handled appropriately
-      // world.generateCorridor(this.startPoint, this.endPoint);
+      this.shortestPath = this.graph.getShortestPath(
+        this.startPoint,
+        this.endPoint,
+      );
     }
   }
 
@@ -169,6 +175,11 @@ class GraphEditor {
     this.graph.dispose();
     this.selected = null;
     this.hovered = null;
+    this.dragging = false;
+    this.mouse = null;
+    this.shortestPath = null;
+    this.startPoint = null;
+    this.endPoint = null;
   }
 
   /**
@@ -185,6 +196,11 @@ class GraphEditor {
         dash: [3, 3],
       });
       this.selected.draw(this.ctx, { outline: true });
+    }
+    if (this.shortestPath) {
+      this.shortestPath.forEach((seg) => {
+        seg.draw(this.ctx, { color: 'red', width: 4 });
+      });
     }
   }
 }

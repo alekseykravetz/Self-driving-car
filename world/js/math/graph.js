@@ -79,6 +79,33 @@ class Graph {
   }
 
   getShortestPath(start, end) {
+    const startSeg = getNearestSegment(start, this.segments);
+    const endSeg = getNearestSegment(end, this.segments);
+    const { point: projStart } = startSeg.projectPoint(start);
+    const { point: projEnd } = endSeg.projectPoint(end);
+    this.points.push(projStart);
+    this.points.push(projEnd);
+    const tempSegments = [
+      new Segment(startSeg.p1, projStart),
+      new Segment(projStart, startSeg.p2),
+      new Segment(endSeg.p1, projEnd),
+      new Segment(projEnd, endSeg.p2),
+    ];
+    if (startSeg.equals(endSeg)) {
+      tempSegments.push(new Segment(projStart, projEnd));
+    }
+    this.segments = this.segments.concat(tempSegments);
+    const path = this.#getShortestPath(projStart, projEnd);
+    this.removePoint(projStart);
+    this.removePoint(projEnd);
+    const segments = [];
+    for (let i = 1; i < path.length; i++) {
+      segments.push(new Segment(path[i - 1], path[i]));
+    }
+    return segments;
+  }
+
+  #getShortestPath(start, end) {
     for (const point of this.points) {
       point.distance = Number.MAX_SAFE_INTEGER;
       point.visited = false;
