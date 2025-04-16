@@ -8,6 +8,8 @@ class GraphEditor {
   private hovered: Point | null = null;
   private dragging: boolean = false;
   private mouse: Point | null = null; // Current mouse position (relative to viewport/canvas)
+  private isOneWay: boolean = false;
+
   public shortestPath?: Segment[] | null = null;
 
   // Store bound functions for correct 'this' and easy removal
@@ -16,6 +18,7 @@ class GraphEditor {
   private boundMouseUp: () => void;
   private boundContextMenu: (event: MouseEvent) => void;
   private boundKeyDown: (event: KeyboardEvent) => void;
+  private boundKeyUp: (event: KeyboardEvent) => void;
 
   // Temporary points for specific operations (like corridor generation)
   private startPoint: Point | null = null;
@@ -36,6 +39,7 @@ class GraphEditor {
     };
     this.boundContextMenu = (e: MouseEvent) => e.preventDefault();
     this.boundKeyDown = this.#handleKeyDown.bind(this);
+    this.boundKeyUp = this.#handleKeyUp.bind(this);
   }
 
   /**
@@ -63,6 +67,7 @@ class GraphEditor {
     this.canvas.addEventListener('mouseup', this.boundMouseUp);
     this.canvas.addEventListener('contextmenu', this.boundContextMenu);
     window.addEventListener('keydown', this.boundKeyDown);
+    window.addEventListener('keyup', this.boundKeyUp);
   }
 
   #removeEventListeners(): void {
@@ -84,11 +89,16 @@ class GraphEditor {
       if (e.key === 'e') {
         this.endPoint = this.mouse;
       }
-      if (e.key === 'c') {
-        this.startPoint = null;
-        this.endPoint = null;
-        this.shortestPath = null;
-      }
+    }
+
+    if (e.key === 'c') {
+      this.startPoint = null;
+      this.endPoint = null;
+      this.shortestPath = null;
+    }
+    if (e.key === 'o') {
+      this.isOneWay = true;
+      console.log(this.isOneWay);
     }
 
     if (this.startPoint && this.endPoint) {
@@ -96,6 +106,13 @@ class GraphEditor {
         this.startPoint,
         this.endPoint,
       );
+    }
+  }
+
+  #handleKeyUp(e: KeyboardEvent): void {
+    if (e.key === 'o') {
+      this.isOneWay = false;
+      console.log(this.isOneWay);
     }
   }
 
@@ -159,7 +176,9 @@ class GraphEditor {
   #selectPoint(point: Point): void {
     if (this.selected && this.selected !== point) {
       // If a point was already selected, try to create a segment to the new point
-      this.graph.tryAddSegment(new Segment(this.selected, point));
+      this.graph.tryAddSegment(
+        new Segment(this.selected, point, this.isOneWay),
+      );
     }
     // Set the clicked point as the currently selected point
     this.selected = point;

@@ -8,6 +8,7 @@ class GraphEditor {
   hovered = null;
   dragging = false;
   mouse = null; // Current mouse position (relative to viewport/canvas)
+  isOneWay = false;
   shortestPath = null;
   // Store bound functions for correct 'this' and easy removal
   boundMouseDown;
@@ -15,6 +16,7 @@ class GraphEditor {
   boundMouseUp;
   boundContextMenu;
   boundKeyDown;
+  boundKeyUp;
   // Temporary points for specific operations (like corridor generation)
   startPoint = null;
   endPoint = null;
@@ -31,6 +33,7 @@ class GraphEditor {
     };
     this.boundContextMenu = (e) => e.preventDefault();
     this.boundKeyDown = this.#handleKeyDown.bind(this);
+    this.boundKeyUp = this.#handleKeyUp.bind(this);
   }
 
   /**
@@ -58,6 +61,7 @@ class GraphEditor {
     this.canvas.addEventListener('mouseup', this.boundMouseUp);
     this.canvas.addEventListener('contextmenu', this.boundContextMenu);
     window.addEventListener('keydown', this.boundKeyDown);
+    window.addEventListener('keyup', this.boundKeyUp);
   }
 
   #removeEventListeners() {
@@ -79,17 +83,28 @@ class GraphEditor {
       if (e.key === 'e') {
         this.endPoint = this.mouse;
       }
-      if (e.key === 'c') {
-        this.startPoint = null;
-        this.endPoint = null;
-        this.shortestPath = null;
-      }
+    }
+    if (e.key === 'c') {
+      this.startPoint = null;
+      this.endPoint = null;
+      this.shortestPath = null;
+    }
+    if (e.key === 'o') {
+      this.isOneWay = true;
+      console.log(this.isOneWay);
     }
     if (this.startPoint && this.endPoint) {
       this.shortestPath = this.graph.getShortestPath(
         this.startPoint,
         this.endPoint,
       );
+    }
+  }
+
+  #handleKeyUp(e) {
+    if (e.key === 'o') {
+      this.isOneWay = false;
+      console.log(this.isOneWay);
     }
   }
 
@@ -151,7 +166,9 @@ class GraphEditor {
   #selectPoint(point) {
     if (this.selected && this.selected !== point) {
       // If a point was already selected, try to create a segment to the new point
-      this.graph.tryAddSegment(new Segment(this.selected, point));
+      this.graph.tryAddSegment(
+        new Segment(this.selected, point, this.isOneWay),
+      );
     }
     // Set the clicked point as the currently selected point
     this.selected = point;
