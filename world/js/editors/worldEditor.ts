@@ -419,7 +419,7 @@ class WorldEditor {
     this.world.draw(this.ctx, viewPoint);
 
     // Draw editor previews (e.g., marking intent) with transparency
-    this.ctx.globalAlpha = this.mode === 'graph' ? 0.3 : 0;
+    this.ctx.globalAlpha = this.mode === 'graph' ? 0.5 : 0.2;
     if (this.tools) {
       for (const tool of Object.values(this.tools)) {
         tool.editor.display(); // Call display method of active editor

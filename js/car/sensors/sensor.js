@@ -17,47 +17,30 @@ class Sensor {
     this.readings = [];
   }
 
-  update(roadBorders, traffic) {
+  update(polygons = []) {
     this.#castRays();
     this.readings = []; // Reset readings for the new update cycle
     for (let i = 0; i < this.rays.length; i++) {
-      this.readings.push(this.#getReading(this.rays[i], roadBorders, traffic));
+      this.readings.push(this.#getReading(this.rays[i], polygons));
     }
   }
 
-  #getReading(ray, roadBorders, traffic) {
+  #getReading(ray, polygons) {
     let touches = [];
-    // Check intersections with road borders
-    for (let i = 0; i < roadBorders.length; i++) {
-      // Check if roadBorders[i] represents a line segment [P1, P2]
-      if (roadBorders[i].length >= 2) {
+    // Check intersections with polygons (road borders, traffic cars)
+    for (let i = 0; i < polygons.length; i++) {
+      if (polygons[i].length >= 2) {
         const touch = getIntersection(
           ray[0], // Ray start
           ray[1], // Ray end (max length)
-          roadBorders[i][0], // Border segment start
-          roadBorders[i][1],
+          polygons[i][0], // Border segment start
+          polygons[i][1],
         );
         if (touch) {
           touches.push(touch);
         }
       } else {
-        console.warn(`Road border segment ${i} has less than 2 points.`);
-      }
-    }
-    // Check intersections with traffic cars
-    for (let i = 0; i < traffic.length; i++) {
-      const poly = traffic[i].polygon;
-      // Check intersection with each segment of the traffic car's polygon
-      for (let j = 0; j < poly.length; j++) {
-        const touch = getIntersection(
-          ray[0],
-          ray[1],
-          poly[j], // Polygon vertex j
-          poly[(j + 1) % poly.length],
-        );
-        if (touch) {
-          touches.push(touch);
-        }
+        console.warn(`The polygon at index ${i} has less than 2 points.`);
       }
     }
     if (touches.length === 0) {

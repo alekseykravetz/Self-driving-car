@@ -223,7 +223,7 @@ class Simulator {
     // Update cars
     for (let i = 0; i < this.cars.length; i++) {
       // Pass road borders and empty traffic array
-      this.cars[i].update(this.roadBorders, []);
+      this.cars[i].update(this.roadBorders);
     }
     // Fitness function
     // this.bestCar = this.cars.find(

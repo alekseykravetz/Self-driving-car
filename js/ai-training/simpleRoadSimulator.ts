@@ -150,11 +150,15 @@ animate();
 function animate(time?: number): void {
   // Update traffic cars
   for (let i = 0; i < traffic.length; i++) {
-    traffic[i].update(road.borders, []);
+    traffic[i].update(road.borders);
   }
   // Update AI cars
+  const polygons: Point[][] = [
+    ...road.borders,
+    ...traffic.map((c: Car) => c.polygon),
+  ];
   for (let i = 0; i < cars.length; i++) {
-    cars[i].update(road.borders, traffic);
+    cars[i].update(polygons);
   }
 
   // Find the best car (the one that has traveled furthest up the screen - lowest y value)

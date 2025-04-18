@@ -323,7 +323,7 @@ class Race {
       return;
     if (this.started) {
       for (let i = 0; i < this.cars.length; i++) {
-        this.cars[i].update(this.roadBorders ?? [], []);
+        this.cars[i].update(this.roadBorders ?? []);
       }
     }
     for (const car of this.cars) {

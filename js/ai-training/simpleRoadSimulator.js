@@ -140,11 +140,12 @@ animate();
 function animate(time) {
   // Update traffic cars
   for (let i = 0; i < traffic.length; i++) {
-    traffic[i].update(road.borders, []);
+    traffic[i].update(road.borders);
   }
   // Update AI cars
+  const polygons = [...road.borders, ...traffic.map((c) => c.polygon)];
   for (let i = 0; i < cars.length; i++) {
-    cars[i].update(road.borders, traffic);
+    cars[i].update(polygons);
   }
   // Find the best car (the one that has traveled furthest up the screen - lowest y value)
   // Using non-null assertion assuming 'cars' array is never empty and 'find' will succeed.

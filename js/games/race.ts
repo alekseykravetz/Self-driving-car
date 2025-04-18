@@ -380,7 +380,7 @@ class Race {
 
     if (this.started) {
       for (let i = 0; i < this.cars.length; i++) {
-        this.cars[i].update(this.roadBorders ?? [], []);
+        this.cars[i].update(this.roadBorders ?? []);
       }
     }
 

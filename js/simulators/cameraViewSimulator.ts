@@ -214,9 +214,9 @@ class CameraViewSimulator {
       return;
     }
 
-    // Update all cars (passing empty borders/traffic as per original code)
+    // Update all cars
     for (let i = 0; i < this.cars.length; i++) {
-      this.cars[i].update([], []);
+      this.cars[i].update();
     }
 
     // Update world state for drawing purposes

@@ -68,7 +68,7 @@ class Car {
       maskCtx.drawImage(this.image, 0, 0, this.width, this.height);
     };
     this.polygon = this.#createPolygon();
-    this.update([], []);
+    this.update();
   }
 
   load(info) {
@@ -85,12 +85,12 @@ class Car {
   }
 
   // todo: remove traffic, merge with road borders (polygons intersection check)
-  update(roadBorders, traffic) {
+  update(polygons = []) {
     if (!this.damaged) {
       this.#move();
       this.fitness += this.speed;
       this.polygon = this.#createPolygon();
-      this.damaged = this.#assessDamage(roadBorders, traffic);
+      this.damaged = this.#assessDamage(polygons);
       if (this.damaged) {
         this.speed = 0;
         if (this.type === 'KEYS') {
@@ -99,7 +99,7 @@ class Car {
       }
     }
     if (this.sensor && this.brain) {
-      this.sensor.update(roadBorders, traffic);
+      this.sensor.update(polygons);
       const offsets = this.sensor.readings
         .map((s) => (s === null ? 0 : 1 - s.offset))
         .concat([this.speed / this.maxSpeed]);
@@ -118,14 +118,9 @@ class Car {
     }
   }
 
-  #assessDamage(roadBorders, traffic) {
-    for (let i = 0; i < roadBorders.length; i++) {
-      if (polysIntersect(this.polygon, roadBorders[i])) {
-        return true;
-      }
-    }
-    for (let i = 0; i < traffic.length; i++) {
-      if (polysIntersect(this.polygon, traffic[i].polygon)) {
+  #assessDamage(polygons) {
+    for (let i = 0; i < polygons.length; i++) {
+      if (polysIntersect(this.polygon, polygons[i])) {
         return true;
       }
     }
