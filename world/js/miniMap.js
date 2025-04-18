@@ -26,14 +26,24 @@ class MiniMap {
     );
     this.ctx.scale(this.scaler, this.scaler);
     for (const segment of this.graph.segments) {
-      segment.draw(this.ctx, { width: 3 / this.scaler, color: roadColor });
+      segment.draw(this.ctx, {
+        width: 3 / this.scaler,
+        color: roadColor,
+        cap: 'round',
+      });
     }
     for (const car of this.cars) {
       this.ctx.beginPath();
-      this.ctx.fillStyle = car.damaged ? 'gray' : 'red';
+      this.ctx.fillStyle = car.damaged ? 'gray' : car.color || 'red';
       this.ctx.strokeStyle = 'white';
-      this.ctx.lineWidth = 2 / this.scaler;
-      this.ctx.arc(car.x, car.y, 3 / this.scaler, 0, Math.PI * 2);
+      this.ctx.lineWidth = (car.damaged ? 1 : 2) / this.scaler;
+      this.ctx.arc(
+        car.x,
+        car.y,
+        (car.damaged ? 2 : 3) / this.scaler,
+        0,
+        Math.PI * 2,
+      );
       this.ctx.fill();
       this.ctx.stroke();
       // new Point(car.x, car.y).draw(this.ctx, {

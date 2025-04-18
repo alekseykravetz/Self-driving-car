@@ -109,7 +109,6 @@ class Car {
     }
   }
 
-  // todo: remove traffic, merge with road borders (polygons intersection check)
   update(polygons: Point[][] = []): void {
     if (!this.damaged) {
       this.#move();
