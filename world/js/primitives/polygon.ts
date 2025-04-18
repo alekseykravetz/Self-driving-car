@@ -124,12 +124,7 @@ class Polygon {
       lineWidth = 2,
       fill = 'rgba(0,0,255,0.3)',
       join = 'miter',
-    }: {
-      stroke?: string;
-      lineWidth?: number;
-      fill?: string;
-      join?: CanvasLineJoin;
-    } = {},
+    }: PolygonDrawOptions = {},
   ): void {
     ctx.beginPath();
     ctx.fillStyle = fill;
