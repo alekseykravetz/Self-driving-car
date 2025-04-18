@@ -235,10 +235,11 @@ class WorldEditor {
 
   /** Disposes the graph editor and clears world markings. */
   dispose() {
-    this.tools?.graph.editor.dispose?.(); // Optional chaining for dispose
-    if (this.world) {
-      this.world.markings.length = 0; // Clear markings array
-    }
+    // this.tools?.graph.editor.dispose?.(); // Optional chaining for dispose
+    // if (this.world) {
+    //   this.world.markings.length = 0; // Clear markings array
+    // }
+    this.#initializeWorldEditor(null);
     console.log('Graph disposed and markings cleared.');
   }
 

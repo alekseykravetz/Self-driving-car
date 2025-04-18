@@ -1,6 +1,3 @@
-interface Car {
-  draw(ctx: CanvasRenderingContext2D, drawSensors?: boolean): void;
-}
 interface Corridor {
   borders: Segment[];
   skeleton: Segment[];
@@ -105,11 +102,7 @@ class World {
     this.envelopes.length = 0; // Clear array while keeping reference
     for (const segment of this.graph.segments) {
       this.envelopes.push(
-        new Envelope(
-          segment,
-          segment.oneWay ? this.roadWidth / 2 : this.roadWidth, // todo: fix very small one way roads
-          this.roadRoundness,
-        ),
+        new Envelope(segment, this.roadWidth, this.roadRoundness),
       );
     }
 
@@ -162,11 +155,7 @@ class World {
     const tempEnvelopes: Envelope[] = [];
     for (const segment of this.graph.segments) {
       tempEnvelopes.push(
-        new Envelope(
-          segment,
-          segment.oneWay ? 2 : this.roadWidth / 2, // todo: fix very small one way roads
-          this.roadRoundness,
-        ),
+        new Envelope(segment, this.roadWidth / 2, this.roadRoundness),
       );
     }
 
@@ -405,9 +394,11 @@ class World {
     }
     // Draw lane separators (dashed lines for two-way roads)
     for (const seg of this.graph.segments) {
-      if (!seg.oneWay) {
-        seg.draw(ctx, { color: 'white', width: 4, dash: [10, 20] });
-      }
+      seg.draw(ctx, {
+        color: 'white',
+        width: 4,
+        dash: [10, seg.oneWay ? 10 : 20],
+      });
     }
     // Draw road borders (solid white lines)
     for (const seg of this.roadBorders) {
