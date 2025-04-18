@@ -8,6 +8,7 @@ class WorldEditor {
   miniMap = null;
   miniMapViewport = null;
   tools = null;
+  mode = 'graph';
   oldGraphHash = null;
   generateWorld = true;
   // DOM Element References, Use definite assignment assertion
@@ -181,6 +182,7 @@ class WorldEditor {
   /** Sets the active editor mode. */
   setMode(mode) {
     if (!this.tools) return; // Guard against tools not being initialized
+    this.mode = mode;
     this.disableEditors(); // Disable all editors first
     this.tools[mode].button.style.backgroundColor = 'white';
     this.tools[mode].button.style.filter = '';
@@ -355,7 +357,7 @@ class WorldEditor {
     // Draw the world
     this.world.draw(this.ctx, viewPoint);
     // Draw editor previews (e.g., marking intent) with transparency
-    this.ctx.globalAlpha = 0.3;
+    this.ctx.globalAlpha = this.mode === 'graph' ? 0.3 : 0;
     if (this.tools) {
       for (const tool of Object.values(this.tools)) {
         tool.editor.display(); // Call display method of active editor

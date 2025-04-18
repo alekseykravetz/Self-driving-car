@@ -124,13 +124,10 @@ class Osm {
         if (prevPoint && currentPoint) {
           // Determine if the way is one-way based on tags
           const oneWayTag = String(way.tags.oneway ?? 'no').toLowerCase(); // Default to 'no' if undefined
+          const isRoundabout = way.tags.junction === 'roundabout';
           const lanesTag = way.tags.lanes;
           const isOneWay =
-            oneWayTag === 'yes' ||
-            oneWayTag === 'true' ||
-            oneWayTag === '1' ||
-            oneWayTag === '-1' || // Include -1?
-            lanesTag === '1';
+            oneWayTag === 'yes' || lanesTag === '1' || isRoundabout;
 
           // Create and add the new Segment
           segments.push(new Segment(prevPoint, currentPoint, isOneWay));

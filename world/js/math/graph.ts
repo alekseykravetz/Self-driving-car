@@ -177,9 +177,9 @@ class Graph {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    // for (let segment of this.segments) {
-    //   segment.draw(ctx);
-    // }
+    for (let segment of this.segments) {
+      segment.draw(ctx);
+    }
     for (let point of this.points) {
       point.draw(ctx);
     }

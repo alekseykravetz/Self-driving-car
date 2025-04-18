@@ -90,9 +90,9 @@ class World {
     this.buildings = [];
     this.trees = [];
     if (generateWorld) {
-      this.laneGuides.push(...this.#generateLaneGuides());
       const roadPolygons = this.envelopes.map((envelope) => envelope.polygon);
       this.roadBorders.push(...Polygon.union(roadPolygons));
+      this.laneGuides.push(...this.#generateLaneGuides());
       this.buildings = this.#generateBuildings();
       this.trees = this.#generateTrees();
     }
@@ -329,13 +329,60 @@ class World {
         marking.draw(ctx);
       }
     }
-    // Draw lane separators (dashed lines for two-way roads)
+    // Draw lane separators or direction arrows
     for (const seg of this.graph.segments) {
-      seg.draw(ctx, {
-        color: 'white',
-        width: 4,
-        dash: [10, seg.oneWay ? 10 : 20],
-      });
+      if (seg.oneWay) {
+        // Draw direction arrows for one-way roads
+        const arrowSpacing = 200;
+        const arrowLength = 20;
+        const arrowAngle = Math.PI / 8;
+        const len = seg.length();
+        if (len < arrowLength * 2) continue;
+        const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
+        const dirVector = seg.directionVector();
+        const dir =
+          magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
+        // Store original context state
+        const originalLineCap = ctx.lineCap;
+        const originalLineWidth = ctx.lineWidth;
+        // Set arrow style
+        ctx.strokeStyle = 'white';
+        ctx.fillStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'butt';
+        for (let i = 0; i < numArrows; i++) {
+          const t = (i + 0.5) / numArrows;
+          const clampedT = Math.max(0, Math.min(1, t));
+          const tip = lerp2D(seg.p1, seg.p2, clampedT);
+          const arrowBaseDir = scale(dir, -1);
+          const start1 = add(
+            tip,
+            scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
+          );
+          const start2 = add(
+            tip,
+            scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
+          );
+          // Draw arrow (start1 to tip and tip to start2)
+          ctx.beginPath();
+          ctx.moveTo(start1.x, start1.y);
+          ctx.lineTo(tip.x, tip.y);
+          ctx.lineTo(start2.x, start2.y);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fill();
+        }
+        // Restore original context state
+        ctx.lineCap = originalLineCap;
+        ctx.lineWidth = originalLineWidth;
+      } else {
+        // Draw dashed lines for two-way roads
+        seg.draw(ctx, {
+          color: 'white',
+          width: 4,
+          dash: [15, 25],
+        });
+      }
     }
     // Draw road borders (solid white lines)
     for (const seg of this.roadBorders) {
@@ -346,6 +393,7 @@ class World {
         seg.draw(ctx, { color: 'red', width: 4 });
       }
     }
+    // Draw cars
     ctx.globalAlpha = 0.2;
     for (const car of this.cars) {
       car.draw(ctx);
@@ -354,6 +402,7 @@ class World {
     if (this.bestCar) {
       this.bestCar.draw(ctx, true);
     }
+    // Draw buildings and trees (sorted by distance)
     const items = [...this.buildings, ...this.trees].filter(
       (i) => i.base.distanceToPoint(viewPoint) < renderRadius,
     );
@@ -364,8 +413,9 @@ class World {
     for (const item of items) {
       item.draw(ctx, viewPoint);
     }
+    // Optional: Draw lane guides for debugging
     // for (const seg of this.laneGuides) {
-    //   seg.draw(ctx);
+    //   seg.draw(ctx, { color: 'cyan', width: 1 });
     // }
   }
 }

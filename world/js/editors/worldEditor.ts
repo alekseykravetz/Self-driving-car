@@ -17,6 +17,7 @@ type EditorMode =
   | 'light'
   | 'target'
   | 'yield';
+
 type Tools = {
   [key in EditorMode]: {
     button: HTMLButtonElement;
@@ -34,6 +35,7 @@ class WorldEditor {
   private miniMap: MiniMap | null = null;
   private miniMapViewport: Viewport | null = null;
   private tools: Tools | null = null;
+  private mode: EditorMode = 'graph';
   private oldGraphHash: string | null = null;
 
   private generateWorld: boolean = true;
@@ -225,6 +227,7 @@ class WorldEditor {
   /** Sets the active editor mode. */
   setMode(mode: EditorMode): void {
     if (!this.tools) return; // Guard against tools not being initialized
+    this.mode = mode;
     this.disableEditors(); // Disable all editors first
     this.tools[mode].button.style.backgroundColor = 'white';
     this.tools[mode].button.style.filter = '';
@@ -416,7 +419,7 @@ class WorldEditor {
     this.world.draw(this.ctx, viewPoint);
 
     // Draw editor previews (e.g., marking intent) with transparency
-    this.ctx.globalAlpha = 0.3;
+    this.ctx.globalAlpha = this.mode === 'graph' ? 0.3 : 0;
     if (this.tools) {
       for (const tool of Object.values(this.tools)) {
         tool.editor.display(); // Call display method of active editor

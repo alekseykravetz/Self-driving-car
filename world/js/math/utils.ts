@@ -122,6 +122,12 @@ function invLerp(a: number, b: number, v: number): number {
   return (v - a) / (b - a);
 }
 
+function rotate(p: Point, angle: number): Point {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return new Point(p.x * cos - p.y * sin, p.x * sin + p.y * cos);
+}
+
 function degToRad(degree: number): number {
   return (degree * Math.PI) / 180;
 }
