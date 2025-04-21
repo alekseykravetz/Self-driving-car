@@ -32,7 +32,7 @@ class Race {
       const worldInfo = worldString ? JSON.parse(worldString) : null;
       this.#initializeRace(worldInfo);
     } else {
-      this.#initializeRace(world); // todo: fix global world
+      this.#initializeRace(world); // note: global world
     }
     if (this.controls && this.myCar) {
       this.myCar.controls = this.controls;

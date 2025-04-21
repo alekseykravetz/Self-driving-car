@@ -35,7 +35,7 @@ class CameraViewSimulator {
 
       this.#initializeRace(worldInfo);
     } else {
-      this.#initializeRace(world); // todo: fix global world info
+      this.#initializeRace(world); // note: global world
     }
 
     // Start animation loop

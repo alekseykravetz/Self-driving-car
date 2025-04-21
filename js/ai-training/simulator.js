@@ -30,7 +30,7 @@ class Simulator {
       const worldInfo = worldString ? JSON.parse(worldString) : null;
       this.#initializeSimulator(worldInfo);
     } else {
-      this.#initializeSimulator(world); // todo: fix global world
+      this.#initializeSimulator(world); // note: global world
     }
     // Start animation loop
     this.animate(0); // Start animation loop immediately

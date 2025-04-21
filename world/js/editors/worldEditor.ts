@@ -76,7 +76,7 @@ class WorldEditor {
 
       this.#initializeWorldEditor(worldInfo);
     } else {
-      this.#initializeWorldEditor(world); // todo: fix - global world info
+      this.#initializeWorldEditor(world); // note: global world
     }
   }
 

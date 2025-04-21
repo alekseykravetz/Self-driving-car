@@ -42,7 +42,7 @@ class WorldEditor {
       const worldInfo = worldString ? JSON.parse(worldString) : null;
       this.#initializeWorldEditor(worldInfo);
     } else {
-      this.#initializeWorldEditor(world); // todo: fix - global world info
+      this.#initializeWorldEditor(world); // note: global world
     }
   }
 
