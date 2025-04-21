@@ -22,7 +22,6 @@ class World {
   cars: Car[];
   bestCar: Car | null;
 
-  frameCount: number;
   corridor: Corridor | null = null;
 
   zoom?: number;
@@ -57,7 +56,6 @@ class World {
     this.cars = [];
 
     this.bestCar = null;
-    this.frameCount = 0;
 
     this.generate();
   }
@@ -301,7 +299,7 @@ class World {
     renderRadius: number = 1000,
   ): void {
     // Update traffic light states before drawing
-    this.trafficManager.update(this.frameCount);
+    this.trafficManager.update();
 
     // Draw road envelopes
     for (const env of this.envelopes) {
@@ -417,8 +415,5 @@ class World {
     // for (const seg of this.laneGuides) {
     //   seg.draw(ctx, { color: 'cyan', width: 1 });
     // }
-
-    // Increment frameCount at the end of the draw/update cycle
-    this.frameCount++;
   }
 }

@@ -15,7 +15,6 @@ class World {
   markings;
   cars;
   bestCar;
-  frameCount;
   corridor = null;
   zoom;
   offset;
@@ -45,7 +44,6 @@ class World {
     this.trafficManager = new TrafficManager(this);
     this.cars = [];
     this.bestCar = null;
-    this.frameCount = 0;
     this.generate();
   }
 
@@ -256,7 +254,7 @@ class World {
 
   draw(ctx, viewPoint, showStartMarkings = true, renderRadius = 1000) {
     // Update traffic light states before drawing
-    this.trafficManager.update(this.frameCount);
+    this.trafficManager.update();
     // Draw road envelopes
     for (const env of this.envelopes) {
       env.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
@@ -355,7 +353,5 @@ class World {
     // for (const seg of this.laneGuides) {
     //   seg.draw(ctx, { color: 'cyan', width: 1 });
     // }
-    // Increment frameCount at the end of the draw/update cycle
-    this.frameCount++;
   }
 }

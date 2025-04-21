@@ -2,8 +2,10 @@
 class TrafficManager {
   world;
   controlCenters;
+  frameCount;
   constructor(world) {
     this.world = world;
+    this.frameCount = 0;
     this.#initializeControlCenters();
   }
 
@@ -68,7 +70,7 @@ class TrafficManager {
   }
 
   // Updates the state of all managed traffic lights based on time/frameCount
-  update(frameCount) {
+  update() {
     this.#initializeControlCenters(); // todo: fix not init lights on each update (problem with markings and graph changes outside)
     if (!this.controlCenters.length) return; // Nothing to update
     // Define light cycle durations (same as in initialization)
@@ -76,7 +78,7 @@ class TrafficManager {
     const yellowDuration = 1; // seconds
     // Determine current state based on frame count (assuming 60 FPS target)
     // Consider using time delta for frame-rate independence if needed
-    const tick = Math.floor(frameCount / 60);
+    const tick = Math.floor(this.frameCount / 60);
     for (const center of this.controlCenters) {
       // Ensure ticks is defined and non-zero
       if (!center.ticks || !center.lights.length) continue;
@@ -99,5 +101,7 @@ class TrafficManager {
         }
       }
     }
+    // Increment frameCount at the end of the draw/update cycle
+    this.frameCount++;
   }
 }
