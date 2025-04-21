@@ -19,6 +19,7 @@ class World {
   corridor = null;
   zoom;
   offset;
+  trafficManager;
   constructor(
     graph,
     roadWidth = 100,
@@ -41,6 +42,7 @@ class World {
     this.trees = [];
     this.laneGuides = [];
     this.markings = [];
+    this.trafficManager = new TrafficManager(this);
     this.cars = [];
     this.bestCar = null;
     this.frameCount = 0;
@@ -69,6 +71,7 @@ class World {
     world.trees = info.trees.map((t) => new Tree(t.center, info.treeSize));
     world.laneGuides = info.laneGuides.map((g) => new Segment(g.p1, g.p2));
     world.markings = info.markings.map((m) => Marking.load(m));
+    world.trafficManager = new TrafficManager(world);
     // Load view state if available
     world.zoom = info.zoom;
     world.offset = info.offset;
@@ -84,7 +87,6 @@ class World {
         new Envelope(segment, this.roadWidth, this.roadRoundness),
       );
     }
-    // Clear and regenerate world elements if requested
     this.laneGuides.length = 0;
     this.roadBorders.length = 0;
     this.buildings = [];
@@ -252,74 +254,10 @@ class World {
     return bases.map((b) => new Building(b));
   }
 
-  #getIntersections() {
-    const subset = [];
-    for (const point of this.graph.points) {
-      let degree = 0;
-      for (const seg of this.graph.segments) {
-        if (seg.includes(point)) {
-          degree++;
-        }
-      }
-      if (degree > 2) {
-        subset.push(point);
-      }
-    }
-    return subset;
-  }
-
-  #updateLights() {
-    const lights = this.markings.filter((m) => m instanceof Light);
-    if (!lights.length) return;
-    const intersections = this.#getIntersections();
-    if (intersections.length === 0) return; // No intersections to control lights
-    const controlCenters = [];
-    for (const light of lights) {
-      const point = getNearestPoint(light.center, intersections);
-      let controlCenter = controlCenters.find((c) => c.equals(point));
-      if (!controlCenter) {
-        controlCenter = new Point(point.x, point.y);
-        controlCenter.lights = [light];
-        controlCenters.push(controlCenter);
-      } else {
-        controlCenter.lights.push(light);
-      }
-    }
-    // Define light cycle durations
-    const greenDuration = 2; // seconds
-    const yellowDuration = 1; // seconds
-    // Calculate ticks per full cycle for each control center
-    for (const center of controlCenters) {
-      center.ticks = center.lights.length * (greenDuration + yellowDuration);
-    }
-    // Determine current state based on frame count (assuming 60 FPS)
-    const tick = Math.floor(this.frameCount / 60);
-    for (const center of controlCenters) {
-      if (!center.ticks || center.ticks === 0) continue; // Avoid division by zero if no lights/ticks
-      const currentTickInCycle = tick % center.ticks;
-      const cycleSegmentDuration = greenDuration + yellowDuration;
-      const greenYellowIndex = Math.floor(
-        currentTickInCycle / cycleSegmentDuration,
-      );
-      const stateWithinSegment = currentTickInCycle % cycleSegmentDuration;
-      const currentPhase =
-        stateWithinSegment < greenDuration ? 'green' : 'yellow';
-      // Update the state of each light controlled by this center
-      for (let i = 0; i < center.lights.length; i++) {
-        if (i === greenYellowIndex) {
-          center.lights[i].state = currentPhase;
-        } else {
-          center.lights[i].state = 'red';
-        }
-      }
-    }
-    this.frameCount++; // Increment frame count for next update
-  }
-
   draw(ctx, viewPoint, showStartMarkings = true, renderRadius = 1000) {
     // Update traffic light states before drawing
-    this.#updateLights();
-    // Draw road envelopes (base road color/shape)
+    this.trafficManager.update(this.frameCount);
+    // Draw road envelopes
     for (const env of this.envelopes) {
       env.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
     }
@@ -417,5 +355,7 @@ class World {
     // for (const seg of this.laneGuides) {
     //   seg.draw(ctx, { color: 'cyan', width: 1 });
     // }
+    // Increment frameCount at the end of the draw/update cycle
+    this.frameCount++;
   }
 }
