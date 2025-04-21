@@ -7,7 +7,7 @@ class Road {
   right;
   top;
   bottom;
-  borders; // An array of tuples, each containing two Points representing a border line segment
+  borders;
   constructor(x, width, laneCount = 3) {
     this.x = x;
     this.width = width;

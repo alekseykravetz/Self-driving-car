@@ -270,7 +270,7 @@ class World {
 
   #updateLights() {
     const lights = this.markings.filter((m) => m instanceof Light);
-    if (lights.length === 0) return; // No lights to update
+    if (!lights.length) return;
     const intersections = this.#getIntersections();
     if (intersections.length === 0) return; // No intersections to control lights
     const controlCenters = [];

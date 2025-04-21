@@ -55,9 +55,6 @@ function beep(frequency, waveType = 'sine') {
   envelope.connect(audioContext.destination);
 }
 
-/**
- * Represents a simple engine sound synthesizer.
- */
 class Engine {
   audioContext;
   osc;

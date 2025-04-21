@@ -1,7 +1,7 @@
 type LightState = 'off' | 'green' | 'yellow' | 'red';
 
 class Light extends Marking {
-  public state: LightState;
+  public state: LightState = 'off';
   border: Segment;
   readonly type: string = 'light';
 
@@ -14,9 +14,7 @@ class Light extends Marking {
   constructor(center: Point, directionVector: Point, width: number) {
     super(center, directionVector, width, 18);
 
-    this.state = 'off';
     this.border = this.polygon.segments[0];
-    this.type = 'light';
   }
 
   /**
@@ -33,7 +31,6 @@ class Light extends Marking {
     );
 
     // Calculate the positions of the individual lights along the line
-    // Assumes lerp2D returns actual Point instances with a draw method
     const greenPoint: Point = lerp2D(line.p1, line.p2, 0.2);
     const yellowPoint: Point = lerp2D(line.p1, line.p2, 0.5);
     const redPoint: Point = lerp2D(line.p1, line.p2, 0.8);
@@ -66,7 +63,6 @@ class Light extends Marking {
       // If state is 'off', no bright light is drawn.
       case 'off':
       default:
-        // No action needed for 'off' state
         break;
     }
   }

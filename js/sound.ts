@@ -63,9 +63,6 @@ function beep(frequency: number, waveType: OscillatorType = 'sine'): void {
   envelope.connect(audioContext.destination);
 }
 
-/**
- * Represents a simple engine sound synthesizer.
- */
 class Engine {
   private audioContext: AudioContext;
   private osc: OscillatorNode;

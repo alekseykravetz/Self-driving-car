@@ -6,7 +6,7 @@ class Road {
   right: number;
   top: number;
   bottom: number;
-  borders: Point[][]; // An array of tuples, each containing two Points representing a border line segment
+  borders: [Point, Point][];
 
   constructor(x: number, width: number, laneCount: number = 3) {
     this.x = x;
@@ -70,7 +70,7 @@ class Road {
 
     // Draw solid road borders
     ctx.setLineDash([]); // Reset line dash to solid
-    this.borders.forEach((border: Point[]) => {
+    this.borders.forEach((border: [Point, Point]) => {
       ctx.beginPath();
       ctx.moveTo(border[0].x, border[0].y); // Start at the first point of the border segment
       ctx.lineTo(border[1].x, border[1].y); // End at the second point of the border segment

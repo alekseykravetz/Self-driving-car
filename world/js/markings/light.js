@@ -1,6 +1,6 @@
 'use strict';
 class Light extends Marking {
-  state;
+  state = 'off';
   border;
   type = 'light';
   /**
@@ -11,9 +11,7 @@ class Light extends Marking {
    */
   constructor(center, directionVector, width) {
     super(center, directionVector, width, 18);
-    this.state = 'off';
     this.border = this.polygon.segments[0];
-    this.type = 'light';
   }
 
   /**
@@ -29,7 +27,6 @@ class Light extends Marking {
       add(this.center, scale(perp, -this.width / 2)),
     );
     // Calculate the positions of the individual lights along the line
-    // Assumes lerp2D returns actual Point instances with a draw method
     const greenPoint = lerp2D(line.p1, line.p2, 0.2);
     const yellowPoint = lerp2D(line.p1, line.p2, 0.5);
     const redPoint = lerp2D(line.p1, line.p2, 0.8);
@@ -58,7 +55,6 @@ class Light extends Marking {
       // If state is 'off', no bright light is drawn.
       case 'off':
       default:
-        // No action needed for 'off' state
         break;
     }
   }
