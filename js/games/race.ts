@@ -118,14 +118,12 @@ class Race {
       this.generateCars(this.N, 'AI'),
     );
     this.myCar = this.cars[0];
-
     const bestBrainString = localStorage.getItem('bestBrain');
     if (bestBrainString) {
-      const bestBrain = JSON.parse(bestBrainString);
       for (let i = 0; i < this.cars.length; i++) {
-        this.cars[i].brain = bestBrain;
+        this.cars[i].brain = JSON.parse(bestBrainString!); // note: json parse for each car is required because of deep clone brain object
         if (i > 1) {
-          // Mutate only AI cars (assuming first car is player and second the best ai)
+          // Mutate only AI cars (first car is player and second the best ai)
           NeuralNetwork.mutate(this.cars[i].brain!, 0.1);
         }
       }
