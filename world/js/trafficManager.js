@@ -5,14 +5,14 @@ class TrafficManager {
   controlCenters;
   frameCount;
   constructor(graph, markings = []) {
-    this.graph = graph;
+    this.graph = graph; // todo: avoid serializing the graph object during save world as it a part of it already
     this.markings = markings;
     this.frameCount = 0;
     this.#initializeControlCenters();
   }
 
-  // Finds points where more than 2 segments meet
-  #getIntersections() {
+  // Crossroads, an intersection of two or more roads. Finds graph points where more than 2 segments meet
+  #getCrossroads() {
     const subset = [];
     for (const point of this.graph.points) {
       let degree = 0;
@@ -33,8 +33,8 @@ class TrafficManager {
     // Filter only Light instances from all markings
     const lights = this.markings.filter((m) => m instanceof Light);
     if (!lights.length) return; // No lights to manage
-    const intersections = this.#getIntersections();
-    if (intersections.length === 0) {
+    const crossroadPoints = this.#getCrossroads();
+    if (crossroadPoints.length === 0) {
       // Maybe handle lights not at intersections differently or log a warning
       // console.warn("No intersections found to control lights.");
       // For now, we'll just stop if no intersections exist.
@@ -42,8 +42,11 @@ class TrafficManager {
     }
     for (const light of lights) {
       // Ensure getNearestPoint is available and handles potential null result
-      const intersectionPoint = getNearestPoint(light.center, intersections);
-      if (!intersectionPoint) {
+      const nearestCrossroadPoint = getNearestPoint(
+        light.center,
+        crossroadPoints,
+      );
+      if (!nearestCrossroadPoint) {
         console.warn(
           'Could not find a near intersection for a light at:',
           light.center,
@@ -51,11 +54,14 @@ class TrafficManager {
         continue; // Skip this light if no intersection is close enough
       }
       let controlCenter = this.controlCenters.find((c) =>
-        c.equals(intersectionPoint),
+        c.equals(nearestCrossroadPoint),
       );
       if (!controlCenter) {
         // Create a new point object for the control center to avoid modifying graph points
-        controlCenter = new Point(intersectionPoint.x, intersectionPoint.y);
+        controlCenter = new Point(
+          nearestCrossroadPoint.x,
+          nearestCrossroadPoint.y,
+        );
         controlCenter.lights = [light];
         this.controlCenters.push(controlCenter);
       } else {
