@@ -1,13 +1,18 @@
-'use strict';
 class Crossing extends Marking {
-  type = 'crossing';
-  borders;
-  constructor(center, directionVector, width, height) {
+  override type: string = 'crossing';
+  borders: Segment[];
+  constructor(
+    center: Point,
+    directionVector: Point,
+    width: number,
+    height: number,
+  ) {
     super(center, directionVector, width, height);
+
     this.borders = [this.polygon.segments[0], this.polygon.segments[2]];
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     const perp = perpendicular(this.directionVector);
     const line = new Segment(
       add(this.center, scale(perp, this.width / 2)),
