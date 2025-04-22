@@ -5,12 +5,14 @@ type lightControlCenterPoint = Point & {
 };
 
 class TrafficManager {
-  world: World;
+  graph: Graph;
+  markings: Marking[];
   controlCenters!: lightControlCenterPoint[];
   frameCount: number;
 
-  constructor(world: World) {
-    this.world = world;
+  constructor(graph: Graph, markings: Marking[] = []) {
+    this.graph = graph;
+    this.markings = markings;
     this.frameCount = 0;
 
     this.#initializeControlCenters();
@@ -19,9 +21,9 @@ class TrafficManager {
   // Finds points where more than 2 segments meet
   #getIntersections(): Point[] {
     const subset: Point[] = [];
-    for (const point of this.world.graph.points) {
+    for (const point of this.graph.points) {
       let degree = 0;
-      for (const seg of this.world.graph.segments) {
+      for (const seg of this.graph.segments) {
         if (seg.includes(point)) {
           degree++;
         }
@@ -37,9 +39,7 @@ class TrafficManager {
   #initializeControlCenters(): void {
     this.controlCenters = []; // Reset
     // Filter only Light instances from all markings
-    const lights = this.world.markings.filter(
-      (m): m is Light => m instanceof Light,
-    );
+    const lights = this.markings.filter((m): m is Light => m instanceof Light);
     if (!lights.length) return; // No lights to manage
 
     const intersections = this.#getIntersections();

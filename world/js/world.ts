@@ -55,7 +55,7 @@ class World {
     this.laneGuides = [];
 
     this.markings = [];
-    this.trafficManager = new TrafficManager(this);
+    this.trafficManager = new TrafficManager(this.graph, this.markings);
     this.cars = [];
     this.bestCar = null;
 
@@ -86,7 +86,7 @@ class World {
     world.trees = info.trees.map((t) => new Tree(t.center, info.treeSize));
     world.laneGuides = info.laneGuides.map((g) => new Segment(g.p1, g.p2));
     world.markings = info.markings.map((m) => Marking.load(m)!);
-    world.trafficManager = new TrafficManager(world);
+    world.trafficManager = new TrafficManager(world.graph, world.markings);
 
     // Load view state if available
     world.zoom = info.zoom;

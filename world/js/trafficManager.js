@@ -1,10 +1,12 @@
 'use strict';
 class TrafficManager {
-  world;
+  graph;
+  markings;
   controlCenters;
   frameCount;
-  constructor(world) {
-    this.world = world;
+  constructor(graph, markings = []) {
+    this.graph = graph;
+    this.markings = markings;
     this.frameCount = 0;
     this.#initializeControlCenters();
   }
@@ -12,9 +14,9 @@ class TrafficManager {
   // Finds points where more than 2 segments meet
   #getIntersections() {
     const subset = [];
-    for (const point of this.world.graph.points) {
+    for (const point of this.graph.points) {
       let degree = 0;
-      for (const seg of this.world.graph.segments) {
+      for (const seg of this.graph.segments) {
         if (seg.includes(point)) {
           degree++;
         }
@@ -29,7 +31,7 @@ class TrafficManager {
   #initializeControlCenters() {
     this.controlCenters = []; // Reset
     // Filter only Light instances from all markings
-    const lights = this.world.markings.filter((m) => m instanceof Light);
+    const lights = this.markings.filter((m) => m instanceof Light);
     if (!lights.length) return; // No lights to manage
     const intersections = this.#getIntersections();
     if (intersections.length === 0) {
