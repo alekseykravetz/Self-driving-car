@@ -35,7 +35,7 @@ class MiniMap {
     this.ctx = canvas.getContext('2d')!;
   }
 
-  update(
+  draw(
     viewPoint: Point,
     { roadColor = 'white', carColor = 'blue' }: IMiniMapDrawOptions = {},
   ): void {

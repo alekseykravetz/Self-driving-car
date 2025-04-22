@@ -4,30 +4,32 @@ interface Corridor {
 }
 
 class World {
-  graph: Graph;
-  roadWidth: number;
-  roadRoundness: number;
-  buildingWidth: number;
-  buildingMinLength: number;
-  spacing: number;
-  treeSize: number;
+  public graph: Graph; //todo: make it private
+  public roadWidth: number; //todo: make it private
 
-  envelopes: Envelope[];
-  roadBorders: Segment[];
+  private roadRoundness: number;
+  private buildingWidth: number;
+  private buildingMinLength: number;
+  private spacing: number;
+  private treeSize: number;
+
+  // Generated world data
+  private envelopes: Envelope[]; // Road shape from graph.segments (draw as asphalt style, more wider then road borders itself)
+  public roadBorders: Segment[]; // Polygon union of envelops (road shape)
   buildings: Building[];
   trees: Tree[];
   laneGuides: Segment[];
+
   markings: Marking[];
-
-  cars: Car[];
-  bestCar: Car | null;
-
+  trafficManager: TrafficManager;
   corridor: Corridor | null = null;
 
+  // Viewport state
   zoom?: number;
   offset?: Point;
 
-  trafficManager: TrafficManager;
+  cars: Car[];
+  bestCar: Car | null;
 
   constructor(
     graph: Graph,
@@ -51,10 +53,10 @@ class World {
     this.buildings = [];
     this.trees = [];
     this.laneGuides = [];
+
     this.markings = [];
     this.trafficManager = new TrafficManager(this);
     this.cars = [];
-
     this.bestCar = null;
 
     this.generate();
@@ -96,17 +98,18 @@ class World {
   }
 
   generate(generateWorld: boolean = true): void {
-    this.envelopes.length = 0; // Clear array while keeping reference
+    // Clear array while keeping reference
+    this.envelopes.length = 0;
+    this.laneGuides.length = 0;
+    this.roadBorders.length = 0;
+    this.buildings = [];
+    this.trees = [];
+
     for (const segment of this.graph.segments) {
       this.envelopes.push(
         new Envelope(segment, this.roadWidth, this.roadRoundness),
       );
     }
-
-    this.laneGuides.length = 0;
-    this.roadBorders.length = 0;
-    this.buildings = [];
-    this.trees = [];
 
     if (generateWorld) {
       const roadPolygons = this.envelopes.map((envelope) => envelope.polygon!);
@@ -301,16 +304,14 @@ class World {
     // Update traffic light states before drawing
     this.trafficManager.update();
 
-    // Draw road envelopes
+    // Draw road envelopes (asphalt style, more wider then road borders itself)
     for (const env of this.envelopes) {
       env.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
     }
 
-    // Draw road markings (yield, stop, start, crosswalks, lights)
-    for (const marking of this.markings) {
-      if (!(marking instanceof Start) || showStartMarkings) {
-        marking.draw(ctx);
-      }
+    // Draw road borders (solid white lines)
+    for (const seg of this.roadBorders) {
+      seg.draw(ctx, { color: 'white', width: 4 });
     }
 
     // Draw lane separators or direction arrows
@@ -378,9 +379,11 @@ class World {
       }
     }
 
-    // Draw road borders (solid white lines)
-    for (const seg of this.roadBorders) {
-      seg.draw(ctx, { color: 'white', width: 4 });
+    // Draw road markings (yield, stop, start, crosswalks, lights)
+    for (const marking of this.markings) {
+      if (!(marking instanceof Start) || showStartMarkings) {
+        marking.draw(ctx);
+      }
     }
 
     if (this.corridor) {

@@ -427,9 +427,10 @@ class WorldEditor {
     }
     this.ctx.globalAlpha = 1.0; // Reset alpha
 
-    // Update and draw the MiniMap
-    this.miniMapViewport.reset(); // Reset minimap viewport if separate
-    this.miniMap.update(viewPoint, { roadColor: '#BBB', carColor: 'red' }); // Update minimap based on main viewpoint
+    // Update MiniMapViewPort
+    this.miniMapViewport.reset();
+    // Draw the MiniMap
+    this.miniMap.draw(viewPoint, { roadColor: '#BBB', carColor: 'red' }); // Update minimap based on main viewpoint
   }
 
   /** Animation loop using requestAnimationFrame. */

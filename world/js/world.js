@@ -1,24 +1,26 @@
 'use strict';
 class World {
-  graph;
-  roadWidth;
+  graph; //todo: make it private
+  roadWidth; //todo: make it private
   roadRoundness;
   buildingWidth;
   buildingMinLength;
   spacing;
   treeSize;
-  envelopes;
-  roadBorders;
+  // Generated world data
+  envelopes; // Road shape from graph.segments (draw as asphalt style, more wider then road borders itself)
+  roadBorders; // Polygon union of envelops (road shape)
   buildings;
   trees;
   laneGuides;
   markings;
-  cars;
-  bestCar;
+  trafficManager;
   corridor = null;
+  // Viewport state
   zoom;
   offset;
-  trafficManager;
+  cars;
+  bestCar;
   constructor(
     graph,
     roadWidth = 100,
@@ -79,16 +81,17 @@ class World {
   }
 
   generate(generateWorld = true) {
-    this.envelopes.length = 0; // Clear array while keeping reference
+    // Clear array while keeping reference
+    this.envelopes.length = 0;
+    this.laneGuides.length = 0;
+    this.roadBorders.length = 0;
+    this.buildings = [];
+    this.trees = [];
     for (const segment of this.graph.segments) {
       this.envelopes.push(
         new Envelope(segment, this.roadWidth, this.roadRoundness),
       );
     }
-    this.laneGuides.length = 0;
-    this.roadBorders.length = 0;
-    this.buildings = [];
-    this.trees = [];
     if (generateWorld) {
       const roadPolygons = this.envelopes.map((envelope) => envelope.polygon);
       this.roadBorders.push(...Polygon.union(roadPolygons));
@@ -255,15 +258,13 @@ class World {
   draw(ctx, viewPoint, showStartMarkings = true, renderRadius = 1000) {
     // Update traffic light states before drawing
     this.trafficManager.update();
-    // Draw road envelopes
+    // Draw road envelopes (asphalt style, more wider then road borders itself)
     for (const env of this.envelopes) {
       env.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
     }
-    // Draw road markings (yield, stop, start, crosswalks, lights)
-    for (const marking of this.markings) {
-      if (!(marking instanceof Start) || showStartMarkings) {
-        marking.draw(ctx);
-      }
+    // Draw road borders (solid white lines)
+    for (const seg of this.roadBorders) {
+      seg.draw(ctx, { color: 'white', width: 4 });
     }
     // Draw lane separators or direction arrows
     for (const seg of this.graph.segments) {
@@ -320,9 +321,11 @@ class World {
         });
       }
     }
-    // Draw road borders (solid white lines)
-    for (const seg of this.roadBorders) {
-      seg.draw(ctx, { color: 'white', width: 4 });
+    // Draw road markings (yield, stop, start, crosswalks, lights)
+    for (const marking of this.markings) {
+      if (!(marking instanceof Start) || showStartMarkings) {
+        marking.draw(ctx);
+      }
     }
     if (this.corridor) {
       for (const seg of this.corridor.borders) {

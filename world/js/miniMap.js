@@ -16,7 +16,7 @@ class MiniMap {
     this.ctx = canvas.getContext('2d');
   }
 
-  update(viewPoint, { roadColor = 'white', carColor = 'blue' } = {}) {
+  draw(viewPoint, { roadColor = 'white', carColor = 'blue' } = {}) {
     this.ctx.clearRect(0, 0, this.size, this.size);
     const scaledViewPoint = scale(viewPoint, -this.scaler);
     this.ctx.save();

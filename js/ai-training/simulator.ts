@@ -298,8 +298,8 @@ class Simulator {
     // Draw the world onto the game canvas
     this.world.draw(this.gameCtx, viewPoint, false); // Draw world elements
 
-    // Update and draw the minimap
-    this.miniMap.update(viewPoint); // Update minimap (might draw itself or prepare data)
+    // Draw the minimap
+    this.miniMap.draw(viewPoint);
 
     // Clear and draw the neural network visualization
     this.networkCtx.lineDashOffset = -time / 50;

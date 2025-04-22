@@ -238,8 +238,8 @@ class CameraViewSimulator {
     // Draw world elements on game canvas
     this.world.draw(this.gameCtx, viewPoint, false);
 
-    // Update and potentially draw minimap
-    this.miniMap.update(viewPoint);
+    // Draw the minimap
+    this.miniMap.draw(viewPoint);
     // Rotate the minimap canvas itself to match car orientation
     this.miniMapCanvas.style.transform = `rotate(${this.myCar.angle}rad)`;
 

@@ -398,7 +398,7 @@ class Race {
     // Use scale function if Point has scale method or it's a global function
     const viewPoint = scale(this.viewport.getOffset(), -1); // Or scale(this.viewport.getOffset(), -1)
     this.world.draw(this.gameCtx, viewPoint, false);
-    this.miniMap.update(viewPoint);
+    this.miniMap.draw(viewPoint);
     this.miniMapCanvas.style.transform = `rotate(${this.myCar.angle}rad)`;
 
     for (let i = 0; i < this.cars.length; i++) {
