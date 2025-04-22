@@ -86,10 +86,10 @@ class Graph {
     this.points.push(projStart);
     this.points.push(projEnd);
     const tempSegments = [
-      new Segment(startSeg.p1, projStart),
-      new Segment(projStart, startSeg.p2),
-      new Segment(endSeg.p1, projEnd),
-      new Segment(projEnd, endSeg.p2),
+      new Segment(startSeg.p1, projStart, startSeg.oneWay),
+      new Segment(projStart, startSeg.p2, startSeg.oneWay),
+      new Segment(endSeg.p1, projEnd, endSeg.oneWay),
+      new Segment(projEnd, endSeg.p2, endSeg.oneWay),
     ];
     if (startSeg.equals(endSeg)) {
       tempSegments.push(new Segment(projStart, projEnd));
