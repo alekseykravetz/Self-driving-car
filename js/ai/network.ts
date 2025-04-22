@@ -1,5 +1,4 @@
 class NeuralNetwork {
-  // Declare public member with type Level[]
   public levels: Level[];
 
   constructor(neuronCounts: number[]) {
@@ -31,7 +30,7 @@ class NeuralNetwork {
       for (let i: number = 0; i < level.biases.length; i++) {
         level.biases[i] = lerp(
           level.biases[i],
-          Math.random() * 2 - 1, // Target random value
+          Math.random() * 2 - 1, // Target random value between -1 and 1
           amount, // Degree of mutation
         );
       }
@@ -40,7 +39,7 @@ class NeuralNetwork {
         for (let j: number = 0; j < level.weights[i].length; j++) {
           level.weights[i][j] = lerp(
             level.weights[i][j],
-            Math.random() * 2 - 1, // Target random value
+            Math.random() * 2 - 1, // Target random value between -1 and 1
             amount, // Degree of mutation
           );
         }
@@ -50,11 +49,10 @@ class NeuralNetwork {
 }
 
 class Level {
-  // Declare public members with types
   public inputs: number[];
   public outputs: number[];
   public biases: number[];
-  public weights: number[][]; // Array of arrays of numbers
+  public weights: number[][];
 
   constructor(inputCount: number, outputCount: number) {
     this.inputs = new Array(inputCount);
@@ -63,15 +61,12 @@ class Level {
 
     this.weights = [];
     for (let i: number = 0; i < inputCount; i++) {
-      // Each element of weights is an array of numbers
       this.weights[i] = new Array(outputCount);
     }
 
-    // Call the static private method to initialize weights and biases
     Level.randomize(this);
   }
 
-  // Use 'private static' for TypeScript private static methods
   private static randomize(level: Level): void {
     // Initialize weights with random values between -1 and 1
     for (let i: number = 0; i < level.inputs.length; i++) {
