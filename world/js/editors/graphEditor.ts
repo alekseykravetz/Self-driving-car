@@ -10,19 +10,17 @@ class GraphEditor {
   private mouse: Point | null = null; // Current mouse position (relative to viewport/canvas)
   private isOneWay: boolean = false;
 
+  // Temporary points for finding shortest path operation
+  private startPoint: Point | null = null;
+  private endPoint: Point | null = null;
   public shortestPath?: Segment[] | null = null;
 
-  // Store bound functions for correct 'this' and easy removal
   private boundMouseDown: (event: MouseEvent) => void;
   private boundMouseMove: (event: MouseEvent) => void;
   private boundMouseUp: () => void;
   private boundContextMenu: (event: MouseEvent) => void;
   private boundKeyDown: (event: KeyboardEvent) => void;
   private boundKeyUp: (event: KeyboardEvent) => void;
-
-  // Temporary points for specific operations (like corridor generation)
-  private startPoint: Point | null = null;
-  private endPoint: Point | null = null;
 
   constructor(viewport: Viewport, graph: Graph) {
     this.viewport = viewport;
@@ -31,7 +29,6 @@ class GraphEditor {
 
     this.ctx = this.canvas.getContext('2d')!;
 
-    // Initialize bound functions in the constructor
     this.boundMouseDown = this.#handleMouseDown.bind(this);
     this.boundMouseMove = this.#handleMouseMove.bind(this);
     this.boundMouseUp = () => {
@@ -40,25 +37,6 @@ class GraphEditor {
     this.boundContextMenu = (e: MouseEvent) => e.preventDefault();
     this.boundKeyDown = this.#handleKeyDown.bind(this);
     this.boundKeyUp = this.#handleKeyUp.bind(this);
-  }
-
-  /**
-   * Activates the graph editor by adding event listeners.
-   */
-  public enable(): void {
-    this.#addEventListeners();
-  }
-
-  /**
-   * Deactivates the graph editor by removing event listeners and resetting state.
-   */
-  public disable(): void {
-    this.#removeEventListeners();
-    this.selected = null;
-    this.hovered = null;
-    this.dragging = false;
-    this.startPoint = null;
-    this.endPoint = null;
   }
 
   #addEventListeners(): void {
@@ -78,9 +56,22 @@ class GraphEditor {
     window.removeEventListener('keydown', this.boundKeyDown);
   }
 
-  /**
-   * Handles keyboard events for specific editor actions.
-   */
+  // Activates the graph editor by adding event listeners.
+  public enable(): void {
+    this.#addEventListeners();
+  }
+
+  // Deactivates the graph editor by removing event listeners and resetting state.
+  public disable(): void {
+    this.#removeEventListeners();
+    this.selected = null;
+    this.hovered = null;
+    this.dragging = false;
+    this.startPoint = null;
+    this.endPoint = null;
+  }
+
+  // Handles keyboard events for specific editor actions like finding shortest path or creating one way segments.
   #handleKeyDown(e: KeyboardEvent): void {
     if (this.mouse) {
       if (e.key === 's') {
@@ -98,7 +89,6 @@ class GraphEditor {
     }
     if (e.key === 'o') {
       this.isOneWay = true;
-      console.log(this.isOneWay);
     }
 
     if (this.startPoint && this.endPoint) {
@@ -116,9 +106,7 @@ class GraphEditor {
     }
   }
 
-  /**
-   * Handles mouse movement over the canvas. Updates hovered state and drags selected points.
-   */
+  // Handles mouse movement over the canvas. Updates hovered state and drags selected points.
   #handleMouseMove(e: MouseEvent): void {
     this.mouse = this.viewport.getMouse(e, true);
     this.hovered = getNearestPoint(
@@ -134,9 +122,7 @@ class GraphEditor {
     }
   }
 
-  /**
-   * Handles mouse button presses on the canvas. Manages point selection, creation, and removal.
-   */
+  // Handles mouse button presses on the canvas. Manages point selection, creation, and removal.
   #handleMouseDown(e: MouseEvent): void {
     // Right-click (button === 2)
     if (e.button === 2) {
@@ -152,7 +138,6 @@ class GraphEditor {
     // Left-click (button === 0)
     if (e.button === 0) {
       if (this.mouse) {
-        // Ensure mouse position is available
         if (this.hovered) {
           // If clicking on an existing point (hovered)
           this.#selectPoint(this.hovered); // Select it (and try to add segment if another was selected)
@@ -180,7 +165,6 @@ class GraphEditor {
         new Segment(this.selected, point, this.isOneWay),
       );
     }
-    // Set the clicked point as the currently selected point
     this.selected = point;
   }
 
@@ -189,12 +173,6 @@ class GraphEditor {
     this.hovered = null;
     if (this.selected === point) {
       this.selected = null;
-    }
-    if (this.startPoint === point) {
-      this.startPoint = null;
-    }
-    if (this.endPoint === point) {
-      this.endPoint = null;
     }
   }
 
@@ -209,9 +187,8 @@ class GraphEditor {
     this.endPoint = null;
   }
 
-  /**
-   * Renders the graph and editor-specific visuals (hovered, selected points, intent line) onto the canvas.
-   */
+  // todo: change name to draw in all editors
+  // Renders the graph and editor-specific visuals (hovered, selected points, intent line) onto the canvas.
   public display(): void {
     this.graph.draw(this.ctx);
 
