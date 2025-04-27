@@ -1,4 +1,3 @@
-// Base type for editors used in the 'tools' object
 interface Editor {
   enable(): void;
   disable(): void;
@@ -6,8 +5,7 @@ interface Editor {
   dispose?(): void; // Optional dispose method (GraphEditor has it)
 }
 
-// Structure for the 'tools' object, mapping mode names to tool info
-type EditorMode =
+type EditorType =
   | 'graph'
   | 'marking'
   | 'stop'
@@ -18,8 +16,8 @@ type EditorMode =
   | 'target'
   | 'yield';
 
-type Tools = {
-  [key in EditorMode]: {
+type Editors = {
+  [key in EditorType]: {
     button: HTMLButtonElement;
     editor: Editor;
   };
@@ -30,12 +28,12 @@ class WorldEditor {
   private ctx: CanvasRenderingContext2D;
   private miniMapCanvas: HTMLCanvasElement;
 
-  private world: World | null = null;
-  private viewport: Viewport | null = null;
-  private miniMap: MiniMap | null = null;
-  private miniMapViewport: Viewport | null = null;
-  private tools: Tools | null = null;
-  private mode: EditorMode = 'graph';
+  private world!: World;
+  private viewport!: Viewport;
+  private miniMap!: MiniMap;
+  private miniMapViewport!: Viewport;
+  private editors!: Editors;
+  private mode: EditorType = 'graph';
   private oldGraphHash: string | null = null;
 
   private generateWorld: boolean = true;
@@ -66,10 +64,9 @@ class WorldEditor {
 
     this.miniMapCanvas = miniMapCanvas;
 
-    this.#assignElementReferences(); // Assign DOM elements
-    this.#addEventListeners(); // Add listeners after elements are assigned
+    this.#assignElementReferences();
+    this.#addEventListeners();
 
-    // Attempt to load world from localStorage or initialize a new one
     if (typeof world === 'undefined') {
       const worldString = localStorage.getItem('world');
       const worldInfo = worldString ? JSON.parse(worldString) : null;
@@ -80,7 +77,7 @@ class WorldEditor {
     }
   }
 
-  /** Assigns DOM elements to class properties. */
+  /* Assigns DOM elements to class properties. */
   #assignElementReferences(): void {
     // Helper function to get elements and type cast
     const getElement = <T extends HTMLElement>(id: string): T => {
@@ -111,7 +108,7 @@ class WorldEditor {
     this.lightBtn = getElement<HTMLButtonElement>('lightBtn');
   }
 
-  /** Adds event listeners to DOM elements. */
+  /* Adds event listeners to DOM elements. */
   #addEventListeners(): void {
     this.worldGenerationInput.addEventListener(
       'change',
@@ -148,27 +145,22 @@ class WorldEditor {
     this.lightBtn.addEventListener('click', () => this.setMode('light'));
   }
 
-  /** Initializes or re-initializes the world, viewport, minimap, and tools. */
+  /* Initializes or re-initializes the world, viewport, minimap, and tools. */
   #initializeWorldEditor(worldInfo: World | null): void {
     this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
 
-    // Initialize Viewport after World is loaded (uses world zoom/offset)
     this.viewport = new Viewport(
       this.canvas,
       this.world.zoom,
       this.world.offset,
     );
 
-    // Initialize Editors after World and Viewport
-    this.tools = this.initializeEditors(this.viewport, this.world);
+    this.editors = this.initializeEditors(this.viewport, this.world);
 
-    // Store initial graph hash
     this.oldGraphHash = this.world.graph.hash();
 
-    // Set initial mode
     this.setMode('graph');
 
-    // Initialize MiniMap after World graph is ready
     this.miniMap = new MiniMap(
       this.miniMapCanvas,
       this.world.graph,
@@ -176,16 +168,13 @@ class WorldEditor {
       0.03, // Scaler
     );
 
-    // Optional: Viewport for MiniMap if it has separate controls
     this.miniMapViewport = new Viewport(this.miniMapCanvas);
 
-    // Set initial state for world generation checkbox
     this.worldGenerationInput.checked = this.generateWorld;
   }
 
-  /** Creates instances of all editor tools. */
-  initializeEditors(viewport: Viewport, world: World): Tools {
-    // Type assertion needed as object is built incrementally
+  /* Creates instances of all editor tools. */
+  initializeEditors(viewport: Viewport, world: World): Editors {
     const tools = {
       graph: {
         button: this.graphBtn,
@@ -220,34 +209,30 @@ class WorldEditor {
         button: this.yieldBtn,
         editor: new YieldEditor(viewport, world),
       },
-    } as Tools; // Assert final type
+    } as Editors; // Assert final type
     return tools;
   }
 
-  /** Sets the active editor mode. */
-  setMode(mode: EditorMode): void {
-    if (!this.tools) return; // Guard against tools not being initialized
+  /* Sets the active editor mode. */
+  setMode(mode: EditorType): void {
     this.mode = mode;
     this.disableEditors(); // Disable all editors first
-    this.tools[mode].button.style.backgroundColor = 'white';
-    this.tools[mode].button.style.filter = '';
-    this.tools[mode].editor.enable(); // Enable the selected editor
+    this.editors[mode].button.style.backgroundColor = 'white';
+    this.editors[mode].button.style.filter = '';
+    this.editors[mode].editor.enable(); // Enable the selected editor
   }
 
-  /** Disables all editor tools and resets button styles. */
+  /* Disables all editor tools and resets button styles. */
   disableEditors(): void {
-    if (!this.tools) return;
-    for (const tool of Object.values(this.tools)) {
+    for (const tool of Object.values(this.editors)) {
       tool.button.style.backgroundColor = 'gray';
       tool.button.style.filter = 'grayscale(100%)';
       tool.editor.disable();
     }
   }
 
-  /** Saves the current world state to localStorage and triggers a file download. */
+  /* Saves the current world state to localStorage and triggers a file download. */
   save(): void {
-    if (!this.world || !this.viewport) return;
-
     // Update world state with current viewport settings
     this.world.zoom = this.viewport.zoom;
     this.world.offset = this.viewport.offset;
@@ -286,17 +271,14 @@ class WorldEditor {
     document.body.removeChild(element); // Clean up
   }
 
-  /** Disposes the graph editor and clears world markings. */
+  /* Disposes the graph editor and clears world markings. */
   dispose(): void {
-    // this.tools?.graph.editor.dispose?.(); // Optional chaining for dispose
-    // if (this.world) {
-    //   this.world.markings.length = 0; // Clear markings array
-    // }
+    // this.editors.graph.editor.dispose?.();
+    // this.world.markings.length = 0;
     this.#initializeWorldEditor(null);
-    console.log('Graph disposed and markings cleared.');
   }
 
-  /** Handles the file input change event for loading a world. */
+  /* Handles the file input change event for loading a world. */
   loadWorldFromFile(e: Event): void {
     const input = e.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) {
@@ -315,7 +297,7 @@ class WorldEditor {
     };
   }
 
-  /** Processes the content read from the loaded world file. */
+  /* Processes the content read from the loaded world file. */
   #onLoadWorldFromFileRead(e: ProgressEvent<FileReader>): void {
     if (!e.target?.result || typeof e.target.result !== 'string') {
       alert('Failed to read file content.');
@@ -346,17 +328,17 @@ class WorldEditor {
     }
   }
 
-  /** Displays the OSM data input panel. */
+  /* Displays the OSM data input panel. */
   openOsmPanel(): void {
     this.osmPanel.style.display = 'block';
   }
 
-  /** Hides the OSM data input panel. */
+  /* Hides the OSM data input panel. */
   closeOsmPanel(): void {
     this.osmPanel.style.display = 'none';
   }
 
-  /** Parses OSM data from the text area and updates the world graph. */
+  /* Parses OSM data from the text area and updates the world graph. */
   parseOsmData(): void {
     const osmData = this.osmDataContainer.value;
     if (!osmData) {
@@ -376,12 +358,10 @@ class WorldEditor {
     try {
       // Use the Osm utility to parse roads
       const result = Osm.parseRoads(osmDataJson);
-      if (!this.world) return; // Should not happen if initialized
       // Update the world's graph
       this.world.graph.points = result.points;
       this.world.graph.segments = result.segments;
       this.oldGraphHash = null; // Force regeneration on next draw
-      console.log('OSM data parsed and graph updated.');
       this.closeOsmPanel(); // Close panel on success
     } catch (error) {
       alert(`Error processing OSM data: ${error}`);
@@ -389,18 +369,15 @@ class WorldEditor {
     }
   }
 
-  /** Toggles the flag for generating world geometry (buildings, trees). */
+  /* Toggles the flag for generating world geometry (buildings, trees). */
   toggleWorldGeneration(): void {
     this.generateWorld = !this.generateWorld;
     this.worldGenerationInput.checked = this.generateWorld; // Sync checkbox
     this.oldGraphHash = null; // Force potential regeneration on next draw
   }
 
-  /** Main draw loop called by animate. */
+  /* Main draw loop called by animate. */
   draw(): void {
-    if (!this.world || !this.viewport || !this.miniMap || !this.miniMapViewport)
-      return; // Ensure all components are initialized
-
     // Reset viewport transforms
     this.viewport.reset();
 
@@ -420,10 +397,8 @@ class WorldEditor {
 
     // Draw editor previews (e.g., marking intent) with transparency
     this.ctx.globalAlpha = this.mode === 'graph' ? 0.5 : 0.2;
-    if (this.tools) {
-      for (const tool of Object.values(this.tools)) {
-        tool.editor.display(); // Call display method of active editor
-      }
+    for (const tool of Object.values(this.editors)) {
+      tool.editor.display(); // Call display method of active editor
     }
     this.ctx.globalAlpha = 1.0; // Reset alpha
 
@@ -433,10 +408,9 @@ class WorldEditor {
     this.miniMap.draw(viewPoint, { roadColor: '#BBB', carColor: 'red' }); // Update minimap based on main viewpoint
   }
 
-  /** Animation loop using requestAnimationFrame. */
+  /* Animation loop using requestAnimationFrame. */
   animate(): void {
-    this.draw(); // Call the main draw function
-    // Request the next frame, binding 'this' context
+    this.draw();
     requestAnimationFrame(this.animate.bind(this));
   }
 }
