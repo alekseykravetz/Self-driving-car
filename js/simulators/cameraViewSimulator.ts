@@ -246,6 +246,7 @@ class CameraViewSimulator {
     // Update and draw camera perspective
     this.camera.move(this.myCar); // Update camera position based on car
     this.camera.draw(this.gameCtx); // Draw camera view boundaries/info on game canvas (optional)
+    // this.camera.drawFrustum(this.gameCtx); // Draw camera view boundaries/info on game canvas (optional)
     // Render the camera's perspective onto the camera canvas
     this.camera.render(this.cameraCtx, this.world, this.gameCtx);
   }
