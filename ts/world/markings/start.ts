@@ -20,7 +20,7 @@ class Start extends Marking {
     super(center, directionVector, width, height);
 
     this.image = new Image();
-    this.image.src = 'assets/world/car.png';
+    this.image.src = '/assets/world/car.png';
     this.image.onerror = () => {
       console.error(`Failed to load start marking image: ${this.image.src}`);
     };
