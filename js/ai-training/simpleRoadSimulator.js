@@ -6,96 +6,128 @@ const gameCtx = gameCanvas.getContext('2d');
 const networkCanvas = document.getElementById('networkCanvas');
 networkCanvas.width = 300;
 const networkCtx = networkCanvas.getContext('2d');
+const carCountInput = document.getElementById('carCount');
+const thresholdInput = document.getElementById('threshold');
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 const startAngle = angle(new Point(0, -1)) + Math.PI / 2;
-// Generate AI cars
-const N = 100;
-const cars = generateCars(N);
-// Track the best performing car (initially the first one)
+// Population variables
+let N = parseInt(carCountInput.value) || 100;
+let cars = generateCars(N);
 let bestCar = cars[0];
-// Load saved brain from localStorage if available
-const storedBrain = localStorage.getItem('bestBrain');
-if (storedBrain) {
-  for (let i = 0; i < cars.length; i++) {
-    cars[i].brain = JSON.parse(storedBrain);
-    if (i !== 0) {
-      NeuralNetwork.mutate(cars[i].brain, 0.1);
+let traffic = generateTraffic();
+// Initial load
+updateCarsWithBrain();
+/**
+ * Loads the saved brain and applies mutations based on the threshold.
+ */
+function updateCarsWithBrain() {
+  const storedBrain = localStorage.getItem('bestBrain');
+  const threshold = parseFloat(thresholdInput.value) || 0.1;
+  if (storedBrain) {
+    for (let i = 0; i < cars.length; i++) {
+      cars[i].brain = JSON.parse(storedBrain);
+      if (i !== 0) {
+        NeuralNetwork.mutate(cars[i].brain, threshold);
+      }
     }
   }
 }
-// Create dummy traffic cars
-const traffic = [
-  new Car(
-    road.getLaneCenter(1),
-    -100,
-    30,
-    50,
-    'DUMMY',
-    startAngle,
-    2,
-    getRandomColor(),
-  ),
-  new Car(
-    road.getLaneCenter(0),
-    -300,
-    30,
-    50,
-    'DUMMY',
-    startAngle,
-    2,
-    getRandomColor(),
-  ),
-  new Car(
-    road.getLaneCenter(2),
-    -300,
-    30,
-    50,
-    'DUMMY',
-    startAngle,
-    2,
-    getRandomColor(),
-  ),
-  new Car(
-    road.getLaneCenter(0),
-    -500,
-    30,
-    50,
-    'DUMMY',
-    startAngle,
-    2,
-    getRandomColor(),
-  ),
-  new Car(
-    road.getLaneCenter(1),
-    -500,
-    30,
-    50,
-    'DUMMY',
-    startAngle,
-    2,
-    getRandomColor(),
-  ),
-  new Car(
-    road.getLaneCenter(1),
-    -700,
-    30,
-    50,
-    'DUMMY',
-    startAngle,
-    2,
-    getRandomColor(),
-  ),
-  new Car(
-    road.getLaneCenter(2),
-    -700,
-    30,
-    50,
-    'DUMMY',
-    startAngle,
-    2,
-    getRandomColor(),
-  ),
-];
+
+cars.push(
+  new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
+);
+/**
+ * Restarts the training with current UI settings.
+ */
+function restart() {
+  N = parseInt(carCountInput.value) || 100;
+  cars = generateCars(N);
+  bestCar = cars[0];
+  updateCarsWithBrain();
+  traffic = generateTraffic();
+  cars.push(
+    new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
+  );
+  console.log(`Training restarted with ${N} cars.`);
+}
+
+function generateTraffic() {
+  // Create dummy traffic cars
+  const traffic = [
+    new Car(
+      road.getLaneCenter(1),
+      -100,
+      30,
+      50,
+      'DUMMY',
+      startAngle,
+      2,
+      getRandomColor(),
+    ),
+    new Car(
+      road.getLaneCenter(0),
+      -300,
+      30,
+      50,
+      'DUMMY',
+      startAngle,
+      2,
+      getRandomColor(),
+    ),
+    new Car(
+      road.getLaneCenter(2),
+      -300,
+      30,
+      50,
+      'DUMMY',
+      startAngle,
+      2,
+      getRandomColor(),
+    ),
+    new Car(
+      road.getLaneCenter(0),
+      -500,
+      30,
+      50,
+      'DUMMY',
+      startAngle,
+      2,
+      getRandomColor(),
+    ),
+    new Car(
+      road.getLaneCenter(1),
+      -500,
+      30,
+      50,
+      'DUMMY',
+      startAngle,
+      2,
+      getRandomColor(),
+    ),
+    new Car(
+      road.getLaneCenter(1),
+      -700,
+      30,
+      50,
+      'DUMMY',
+      startAngle,
+      2,
+      getRandomColor(),
+    ),
+    new Car(
+      road.getLaneCenter(2),
+      -700,
+      30,
+      50,
+      'DUMMY',
+      startAngle,
+      2,
+      getRandomColor(),
+    ),
+  ];
+  return traffic;
+}
+
 /**
  * Generates an array of AI-controlled Car instances.
  * @param n - The number of cars to generate.
