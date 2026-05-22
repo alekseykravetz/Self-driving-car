@@ -51,7 +51,7 @@ class Car {
     this.useBrain = controlType === 'AI';
     if (controlType !== 'DUMMY') {
       this.sensor = new Sensor(this);
-      this.brain = new NeuralNetwork([this.sensor.rayCount, 6, 4]);
+      this.brain = new NeuralNetwork([this.sensor.rayCount + 1, 6, 4]);
     }
     this.controls = new Controls(controlType);
     this.image = new Image();
@@ -196,42 +196,44 @@ class Car {
     this.y -= Math.cos(this.angle) * this.speed;
   }
 
-  draw(ctx, drawSensor = false) {
+  draw(ctx, drawSensor = false, drawMask = true) {
     if (this.sensor && drawSensor) {
       this.sensor.draw(ctx);
     }
-    // Original polygon drawing commented out, kept for reference
-    // if (this.damaged) {
-    //   ctx.fillStyle = 'gray';
-    // } else {
-    //   ctx.fillStyle = this.color;
-    // }
-    // ctx.beginPath();
-    // ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
-    // for (let i = 1; i < this.polygon.length; i++) {
-    //   ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
-    // }
-    // ctx.fill();
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(-this.angle);
-    if (!this.damaged) {
+    if (drawMask) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(-this.angle);
+      if (!this.damaged) {
+        ctx.drawImage(
+          this.mask,
+          -this.width / 2,
+          -this.height / 2,
+          this.width,
+          this.height,
+        );
+        ctx.globalCompositeOperation = 'multiply';
+      }
       ctx.drawImage(
-        this.mask,
+        this.image,
         -this.width / 2,
         -this.height / 2,
         this.width,
         this.height,
       );
-      ctx.globalCompositeOperation = 'multiply';
+      ctx.restore(); // Restores composite operation and transform
+    } else {
+      if (this.damaged) {
+        ctx.fillStyle = 'gray';
+      } else {
+        ctx.fillStyle = this.color;
+      }
+      ctx.beginPath();
+      ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
+      for (let i = 1; i < this.polygon.length; i++) {
+        ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
+      }
+      ctx.fill();
     }
-    ctx.drawImage(
-      this.image,
-      -this.width / 2,
-      -this.height / 2,
-      this.width,
-      this.height,
-    );
-    ctx.restore(); // Restores composite operation and transform
   }
 }

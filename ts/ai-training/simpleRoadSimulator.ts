@@ -49,7 +49,7 @@ cars.push(
  * Restarts the training with current UI settings.
  */
 function restart(): void {
-  N = parseInt(carCountInput.value) || 100;
+  N = parseInt(carCountInput.value);
   cars = generateCars(N);
   bestCar = cars[0];
   updateCarsWithBrain();
@@ -218,14 +218,18 @@ function animate(time?: number): void {
     traffic[i].draw(gameCtx);
   }
 
+  const drawMasks = N <= 300; // Only draw masks if there are fewer than 300 cars for performance
+  // Draw AI cars with transparency
+  gameCtx.globalAlpha = 0.2;
+
   // Draw AI cars with transparency
   gameCtx.globalAlpha = 0.2;
   for (let i = 0; i < cars.length; i++) {
-    cars[i].draw(gameCtx);
+    cars[i].draw(gameCtx, false, drawMasks);
   }
   // Draw the best car without transparency (and potentially with sensors/details)
   gameCtx.globalAlpha = 1;
-  bestCar.draw(gameCtx, true);
+  bestCar.draw(gameCtx, true, drawMasks);
 
   gameCtx.restore();
 
