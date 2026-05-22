@@ -46,6 +46,43 @@ class NeuralNetwork {
       }
     });
   }
+
+  /**
+   * Static method to combine traits from two networks (crossover).
+   * It randomly selects biases and weights from either network1 or network2.
+   */
+  static crossover(network1, network2) {
+    const child = JSON.parse(JSON.stringify(network1));
+    for (let i = 0; i < child.levels.length; i++) {
+      const level1 = network1.levels[i];
+      const level2 = network2.levels[i];
+      const childLevel = child.levels[i];
+      // Crossover biases
+      for (let j = 0; j < childLevel.biases.length; j++) {
+        childLevel.biases[j] =
+          Math.random() < 0.5 ? level1.biases[j] : level2.biases[j];
+      }
+      // Crossover weights
+      for (let j = 0; j < childLevel.weights.length; j++) {
+        for (let k = 0; k < childLevel.weights[j].length; k++) {
+          childLevel.weights[j][k] =
+            Math.random() < 0.5 ? level1.weights[j][k] : level2.weights[j][k];
+        }
+      }
+    }
+    return child;
+  }
+
+  /**
+   * Generates a new network by crossing over and mutating from a pool of networks.
+   */
+  static mutateFromPool(networks, amount = 0.1) {
+    const parent1 = networks[Math.floor(Math.random() * networks.length)];
+    const parent2 = networks[Math.floor(Math.random() * networks.length)];
+    const child = NeuralNetwork.crossover(parent1, parent2);
+    NeuralNetwork.mutate(child, amount);
+    return child;
+  }
 }
 class Level {
   inputs;

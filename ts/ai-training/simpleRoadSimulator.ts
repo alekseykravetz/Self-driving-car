@@ -29,16 +29,31 @@ let traffic: Car[] = generateTraffic();
 updateCarsWithBrain();
 
 /**
- * Loads the saved brain and applies mutations based on the threshold.
+ * Loads the saved brain(s) and applies evolution/mutation based on the threshold.
+ * It supports both a single best brain and a pool of top brains for crossover.
  */
 function updateCarsWithBrain(): void {
+  const storedBrains = localStorage.getItem('bestBrains');
   const storedBrain = localStorage.getItem('bestBrain');
   const threshold = parseFloat(thresholdInput.value) || 0.1;
-  if (storedBrain) {
+
+  let pool: NeuralNetwork[] = [];
+  if (storedBrains) {
+    pool = JSON.parse(storedBrains);
+  } else if (storedBrain) {
+    pool = [JSON.parse(storedBrain)];
+  }
+
+  if (pool.length > 0) {
     for (let i = 0; i < cars.length; i++) {
-      cars[i].brain = JSON.parse(storedBrain);
-      if (i !== 0) {
-        NeuralNetwork.mutate(cars[i].brain!, threshold);
+      if (i < pool.length) {
+        // Keep the best performers from the previous save as they are
+        cars[i].brain = JSON.parse(JSON.stringify(pool[i]));
+      } else {
+        // Generate new cars by mutating from the pool (crossover + mutation)
+        cars[i].brain = NeuralNetwork.mutateFromPool(pool, threshold);
+        // For pure mutation without crossover, use the following line instead:
+        // cars[i].brain = NeuralNetwork.mutate(pool[Math.floor(Math.random() * pool.length)], threshold);
       }
     }
   }
@@ -50,13 +65,38 @@ cars.push(
 
 /**
  * Restarts the training with current UI settings.
+ * It uses the top performing cars from the current run to seed the next generation.
  */
 function restart(): void {
   N = parseInt(carCountInput.value);
+
+  // Identify top performers from current run to allow immediate evolution
+  const sortedCars = cars
+    .filter((c: Car) => c.brain && c.type !== 'KEYS')
+    .sort((a, b) => a.y - b.y);
+  const bestPool = sortedCars.slice(0, 5).map((c: Car) => c.brain);
+
   cars = generateCars(N);
   bestCar = cars[0];
-  updateCarsWithBrain();
   traffic = generateTraffic();
+
+  const threshold = parseFloat(thresholdInput.value) || 0.1;
+
+  if (bestPool.length > 0) {
+    console.log(`Evolving next generation from ${bestPool.length} top cars.`);
+    for (let i = 0; i < cars.length; i++) {
+      if (i < bestPool.length) {
+        cars[i].brain = JSON.parse(JSON.stringify(bestPool[i]));
+      } else {
+        cars[i].brain = NeuralNetwork.mutateFromPool(
+          bestPool as NeuralNetwork[],
+          threshold,
+        );
+      }
+    }
+  } else {
+    updateCarsWithBrain();
+  }
 
   cars.push(
     new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
@@ -158,23 +198,31 @@ function generateCars(n: number): Car[] {
 }
 
 /**
- * Saves the brain of the best performing car to localStorage.
+ * Saves the brains of the top performing cars to localStorage.
  */
 function save(): void {
-  if (bestCar && bestCar.brain) {
-    localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain));
-    console.log('Best brain saved.');
+  const sortedCars = cars
+    .filter((c: Car) => c.brain && c.type !== 'KEYS')
+    .sort((a, b) => a.y - b.y);
+  const bestPool = sortedCars.slice(0, 5).map((c: Car) => c.brain);
+
+  if (bestPool.length > 0) {
+    localStorage.setItem('bestBrains', JSON.stringify(bestPool));
+    // Also save the single best for backward compatibility
+    localStorage.setItem('bestBrain', JSON.stringify(bestPool[0]));
+    console.log(`Saved top ${bestPool.length} brains.`);
   } else {
-    console.warn('Could not save brain: bestCar or bestCar.brain is missing.');
+    console.warn('Could not save brains: no cars with brains found.');
   }
 }
 
 /**
- * Removes the saved brain from localStorage.
+ * Removes the saved brains from localStorage.
  */
 function discard(): void {
   localStorage.removeItem('bestBrain');
-  console.log('Stored brain discarded.');
+  localStorage.removeItem('bestBrains');
+  console.log('Stored brains discarded.');
 }
 
 // Start the animation loop
