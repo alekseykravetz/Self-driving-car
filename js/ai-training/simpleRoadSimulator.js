@@ -8,6 +8,7 @@ networkCanvas.width = 300;
 const networkCtx = networkCanvas.getContext('2d');
 const carCountInput = document.getElementById('carCount');
 const thresholdInput = document.getElementById('threshold');
+const showVisualizerCheckbox = document.getElementById('showVisualizer');
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 const startAngle = angle(new Point(0, -1)) + Math.PI / 2;
 // Population variables
@@ -208,11 +209,16 @@ function animate(time) {
   bestCar.draw(gameCtx, true, drawMasks);
   gameCtx.restore();
   // --- Draw Network Canvas ---
-  // Animate the network visualization's line dashes
-  networkCtx.lineDashOffset = -(time || 0) / 50;
-  // Draw the neural network of the best car
-  if (bestCar && bestCar.brain) {
-    Visualizer.drawNetwork(networkCtx, bestCar.brain);
+  if (showVisualizerCheckbox.checked) {
+    networkCanvas.style.display = 'block';
+    // Animate the network visualization's line dashes
+    networkCtx.lineDashOffset = -(time || 0) / 50;
+    // Draw the neural network of the best car
+    if (bestCar && bestCar.brain) {
+      Visualizer.drawNetwork(networkCtx, bestCar.brain);
+    }
+  } else {
+    networkCanvas.style.display = 'none';
   }
   // Request the next frame
   requestAnimationFrame(animate);

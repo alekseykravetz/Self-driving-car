@@ -11,6 +11,9 @@ const networkCtx = networkCanvas.getContext('2d')!;
 
 const carCountInput = document.getElementById('carCount') as HTMLInputElement;
 const thresholdInput = document.getElementById('threshold') as HTMLInputElement;
+const showVisualizerCheckbox = document.getElementById(
+  'showVisualizer',
+) as HTMLInputElement;
 
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 
@@ -234,11 +237,16 @@ function animate(time?: number): void {
   gameCtx.restore();
 
   // --- Draw Network Canvas ---
-  // Animate the network visualization's line dashes
-  networkCtx.lineDashOffset = -(time || 0) / 50;
-  // Draw the neural network of the best car
-  if (bestCar && bestCar.brain) {
-    Visualizer.drawNetwork(networkCtx, bestCar.brain);
+  if (showVisualizerCheckbox.checked) {
+    networkCanvas.style.display = 'block';
+    // Animate the network visualization's line dashes
+    networkCtx.lineDashOffset = -(time || 0) / 50;
+    // Draw the neural network of the best car
+    if (bestCar && bestCar.brain) {
+      Visualizer.drawNetwork(networkCtx, bestCar.brain);
+    }
+  } else {
+    networkCanvas.style.display = 'none';
   }
 
   // Request the next frame

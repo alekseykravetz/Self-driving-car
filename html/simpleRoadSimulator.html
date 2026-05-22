@@ -25,14 +25,20 @@
       <input
         type="number"
         id="threshold"
-        value="0.1"
-        step="0.01"
-        min="0"
+        value="0.2"
+        step="0.05"
+        min="0.001"
         max="1"
         title="Mutation threshold (amount)"
         style="width: 50px"
       />
       <button onclick="restart()" title="Restart Training">🔄</button>
+      <input
+        type="checkbox"
+        id="showVisualizer"
+        checked
+        title="Show Visualizer"
+      />
     </div>
 
     <canvas id="networkCanvas"></canvas>
