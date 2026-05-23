@@ -52,7 +52,11 @@ class NeuralNetwork {
    * It randomly selects biases and weights from either network1 or network2.
    */
   static crossover(network1, network2) {
-    const child = JSON.parse(JSON.stringify(network1));
+    const architecture = [
+      network1.levels[0].inputs.length,
+      ...network1.levels.map((l) => l.outputs.length),
+    ];
+    const child = new NeuralNetwork(architecture);
     for (let i = 0; i < child.levels.length; i++) {
       const level1 = network1.levels[i];
       const level2 = network2.levels[i];

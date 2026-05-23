@@ -40,6 +40,8 @@ function updateCarsWithBrain() {
       } else {
         // Generate new cars by mutating from the pool (crossover + mutation)
         cars[i].brain = NeuralNetwork.mutateFromPool(pool, threshold);
+        // For pure mutation without crossover, use the following line instead:
+        // cars[i].brain = NeuralNetwork.mutate(pool[Math.floor(Math.random() * pool.length)], threshold);
       }
     }
   }

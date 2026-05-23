@@ -55,7 +55,11 @@ class NeuralNetwork {
     network1: NeuralNetwork,
     network2: NeuralNetwork,
   ): NeuralNetwork {
-    const child = JSON.parse(JSON.stringify(network1)) as NeuralNetwork;
+    const architecture = [
+      network1.levels[0].inputs.length,
+      ...network1.levels.map((l) => l.outputs.length),
+    ];
+    const child = new NeuralNetwork(architecture);
     for (let i = 0; i < child.levels.length; i++) {
       const level1 = network1.levels[i];
       const level2 = network2.levels[i];
