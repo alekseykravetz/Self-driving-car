@@ -209,21 +209,34 @@ animate();
  * @param time - The timestamp provided by requestAnimationFrame (optional).
  */
 function animate(time) {
+  // Adjust canvas heights to fill window early to have accurate viewport info
+  gameCanvas.height = window.innerHeight;
+  networkCanvas.height = window.innerHeight;
+  // Determine viewport boundaries in world space
+  const viewportTop = bestCar.y - gameCanvas.height * 0.7;
+  const viewportBottom = bestCar.y + gameCanvas.height * 0.3;
   // Update traffic cars
   for (let i = 0; i < traffic.length; i++) {
     traffic[i].update(road.borders);
   }
   // Update AI cars
   const polygons = [...road.borders, ...traffic.map((c) => c.polygon)];
+  let minNextY = Infinity;
+  let nextBestCar = bestCar;
   for (let i = 0; i < cars.length; i++) {
-    cars[i].update(polygons);
+    const car = cars[i];
+    // Only update if within visible range + generous buffer (1000px)
+    // Sensors need some lead time to see obstacles
+    if (car.y > viewportTop - 1000 && car.y < viewportBottom + 1000) {
+      car.update(polygons);
+    }
+    // Efficiently track best car in the same pass
+    if (car.y < minNextY) {
+      minNextY = car.y;
+      nextBestCar = car;
+    }
   }
-  // Find the best car (the one that has traveled furthest up the screen - lowest y value)
-  // Using non-null assertion assuming 'cars' array is never empty and 'find' will succeed.
-  bestCar = cars.find((c) => c.y === Math.min(...cars.map((c) => c.y)));
-  // Adjust canvas heights to fill window (can cause reflow, consider optimizing if needed)
-  gameCanvas.height = window.innerHeight;
-  networkCanvas.height = window.innerHeight;
+  bestCar = nextBestCar;
   // --- Draw Game Canvas ---
   gameCtx.save();
   // Center the view on the best car vertically
@@ -232,15 +245,23 @@ function animate(time) {
   road.draw(gameCtx);
   // Draw traffic cars
   for (let i = 0; i < traffic.length; i++) {
-    traffic[i].draw(gameCtx);
+    // Only draw traffic if on screen
+    if (
+      traffic[i].y > viewportTop - 100 &&
+      traffic[i].y < viewportBottom + 100
+    ) {
+      traffic[i].draw(gameCtx);
+    }
   }
   const drawMasks = N <= 300; // Only draw masks if there are fewer than 300 cars for performance
   // Draw AI cars with transparency
   gameCtx.globalAlpha = 0.2;
-  // Draw AI cars with transparency
-  gameCtx.globalAlpha = 0.2;
   for (let i = 0; i < cars.length; i++) {
-    cars[i].draw(gameCtx, false, drawMasks);
+    const car = cars[i];
+    // Only draw AI cars if on screen
+    if (car.y > viewportTop - 100 && car.y < viewportBottom + 100) {
+      car.draw(gameCtx, false, drawMasks);
+    }
   }
   // Draw the best car without transparency (and potentially with sensors/details)
   gameCtx.globalAlpha = 1;
