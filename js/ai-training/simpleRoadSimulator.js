@@ -16,6 +16,7 @@ const statGenEl = document.getElementById('stat-gen');
 const statAliveEl = document.getElementById('stat-alive');
 const statDeadEl = document.getElementById('stat-dead');
 const statFrozenEl = document.getElementById('stat-frozen');
+const statDistEl = document.getElementById('stat-dist');
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 const startAngle = angle(new Point(0, -1)) + Math.PI / 2;
 // Population variables
@@ -32,6 +33,9 @@ let paused = false;
 let animationFrameId = -1;
 // Generation counter (increments each restart)
 let iteration = 0;
+// All-time furthest y reached (most negative); persists across restarts
+const CAR_START_Y = 100;
+let maxDistancePassed = 0;
 // Initial load
 updateCarsWithBrain();
 /**
@@ -287,11 +291,12 @@ function drawCarName(ctx, car) {
 /**
  * Writes live simulation stats into the stats panel DOM elements.
  */
-function updateStatsDisplay(alive, dead, frozen) {
+function updateStatsDisplay(alive, dead, frozen, maxDist) {
   statGenEl.textContent = String(iteration);
   statAliveEl.textContent = String(alive);
   statDeadEl.textContent = String(dead);
   statFrozenEl.textContent = String(frozen);
+  statDistEl.textContent = String(maxDist);
 }
 
 // Start the animation loop
@@ -326,20 +331,24 @@ function animate(time) {
     const car = cars[i];
     if (car.type === 'KEYS') continue;
     const inRange = car.y > viewportTop - 1000 && car.y < viewportBottom + 1000;
-    if (inRange) {
-      car.update(polygons);
-    } else if (!car.damaged) {
-      // Alive car outside the update window — effectively frozen
-      frozenCount++;
-    }
     if (car.damaged) {
       deadCount++;
-    } else {
+    } else if (inRange) {
+      // Undamaged and in range — actively driving, counts as alive
+      car.update(polygons);
       aliveCount++;
+    } else {
+      // Undamaged but outside the update window — frozen/idle, not counted as alive
+      frozenCount++;
     }
   }
+  // Track all-time max distance (cars start at y=100; more negative = further ahead)
+  const currentDist = Math.round(CAR_START_Y - bestCar.y);
+  if (currentDist > maxDistancePassed) {
+    maxDistancePassed = currentDist;
+  }
   // Update stats display every frame
-  updateStatsDisplay(aliveCount, deadCount, frozenCount);
+  updateStatsDisplay(aliveCount, deadCount, frozenCount, maxDistancePassed);
   // --- Identify best pool from AI brain cars ---
   const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
   const aiBrainCars = cars.filter((c) => c.brain && c.type !== 'KEYS');
