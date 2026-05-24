@@ -58,7 +58,9 @@ updateCarsWithBrain();
 function togglePause(): void {
   paused = !paused;
   pauseBtn.textContent = paused ? '▶️' : '⏸️';
-  if (!paused) {
+  if (paused) {
+    cancelAnimationFrame(animationFrameId);
+  } else {
     // Resume: kick off the loop again
     animationFrameId = requestAnimationFrame(animate);
   }
@@ -349,6 +351,11 @@ function animate(time?: number): void {
   // --- Dynamic traffic: generate rows infinitely ahead of the best car ---
   const TRAFFIC_LOOKAHEAD = 1500;
   const TRAFFIC_ROW_GAP = 200;
+  const TRAFFIC_SPEED = 2; // must match the speed passed to DUMMY Car constructors
+
+  // Keep lastGeneratedTrafficY in sync with how far traffic has moved this frame
+  lastGeneratedTrafficY -= TRAFFIC_SPEED;
+
   while (lastGeneratedTrafficY > bestCar.y - TRAFFIC_LOOKAHEAD) {
     lastGeneratedTrafficY -= TRAFFIC_ROW_GAP;
     traffic.push(...generateTrafficRow(lastGeneratedTrafficY));
@@ -374,7 +381,6 @@ function animate(time?: number): void {
 
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
-    if (car.type === 'KEYS') continue;
 
     const inRange = car.y > viewportTop - 1000 && car.y < viewportBottom + 1000;
 
