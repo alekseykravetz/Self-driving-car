@@ -10,35 +10,80 @@
     <canvas id="gameCanvas"></canvas>
 
     <div id="verticalButtons">
-      <button onclick="save()">💾</button>
-      <button onclick="discard()">🗑️</button>
-      <input
-        type="number"
-        id="carCount"
-        value="100"
-        min="0"
-        max="5000"
-        step="100"
-        title="Number of cars"
-        style="width: 50px"
-      />
-      <input
-        type="number"
-        id="threshold"
-        value="0.2"
-        step="0.05"
-        min="0.001"
-        max="1"
-        title="Mutation threshold (amount)"
-        style="width: 50px"
-      />
-      <button onclick="restart()" title="Restart Training">🔄</button>
-      <input
-        type="checkbox"
-        id="showVisualizer"
-        checked
-        title="Show Visualizer"
-      />
+      <div class="ctrl">
+        <span class="ctrl-label">Save</span>
+        <button onclick="save()">💾</button>
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Discard</span>
+        <button onclick="discard()">🗑️</button>
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Cars</span>
+        <input
+          type="number"
+          id="carCount"
+          value="100"
+          min="0"
+          max="5000"
+          step="100"
+          title="Number of AI cars in the population"
+        />
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Pool</span>
+        <input
+          type="number"
+          id="poolCount"
+          value="5"
+          min="1"
+          max="20"
+          step="1"
+          title="Number of top cars kept in the best pool"
+        />
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Mutation</span>
+        <input
+          type="number"
+          id="threshold"
+          value="0.2"
+          step="0.05"
+          min="0.001"
+          max="1"
+          title="Mutation amount applied each generation"
+        />
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Restart</span>
+        <button
+          onclick="restart()"
+          title="Restart training with current settings"
+        >
+          🔄
+        </button>
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Network</span>
+        <input
+          type="checkbox"
+          id="showVisualizer"
+          checked
+          title="Show neural network visualizer"
+        />
+      </div>
     </div>
 
     <canvas id="networkCanvas"></canvas>

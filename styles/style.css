@@ -15,11 +15,87 @@ body.main-page {
   text-align: center;
 }
 
+/* ── Control panel ─────────────────────────────────────────────── */
 #verticalButtons {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 10px 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  min-width: 80px;
 }
 
+/* Each labelled control */
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Small uppercase label above every control */
+.ctrl-label {
+  font-size: 9px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Thin separator between logical groups */
+.ctrl-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 2px 0;
+}
+
+/* Buttons */
+#verticalButtons button {
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  background-color: lightgray;
+  font-size: 16px;
+  line-height: 1;
+  width: 100%;
+}
+#verticalButtons button:hover {
+  background: white;
+}
+
+/* Number inputs */
+#verticalButtons input[type='number'] {
+  width: 64px;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 5px;
+  font-size: 13px;
+  text-align: center;
+  background: lightgray;
+  cursor: text;
+  box-sizing: border-box;
+}
+#verticalButtons input[type='number']:focus {
+  outline: 2px solid gold;
+  background: white;
+}
+
+/* Checkbox */
+#verticalButtons input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin: 0;
+  accent-color: gold;
+}
+
+/* ── Legacy / other shared styles ──────────────────────────────── */
 label {
   display: flex;
   justify-content: center;
@@ -43,8 +119,8 @@ input[type='file'] {
   display: none;
 }
 
+/* ── Canvases ──────────────────────────────────────────────────── */
 #gameCanvas {
-  /* background: lightgray; */
   background: #2a5;
 }
 
@@ -60,7 +136,7 @@ input[type='file'] {
   background-image: linear-gradient(#8cf, white 70%);
 }
 
-/* Race Game styles */
+/* ── Race Game styles ──────────────────────────────────────────── */
 .miniMap {
   position: absolute;
   right: 20px;

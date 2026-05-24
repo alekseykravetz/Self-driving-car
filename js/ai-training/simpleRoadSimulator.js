@@ -8,19 +8,24 @@ networkCanvas.width = 300;
 const networkCtx = networkCanvas.getContext('2d');
 const carCountInput = document.getElementById('carCount');
 const thresholdInput = document.getElementById('threshold');
+const poolCountInput = document.getElementById('poolCount');
 const showVisualizerCheckbox = document.getElementById('showVisualizer');
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 const startAngle = angle(new Point(0, -1)) + Math.PI / 2;
 // Population variables
 let N = parseInt(carCountInput.value) || 100;
+let poolSize = parseInt(poolCountInput.value) || 5;
 let cars = generateCars(N);
 let bestCar = cars[0];
+let bestPool = [];
 let traffic = generateTraffic();
+// Tracks the furthest-ahead traffic row that has been generated (most negative y)
+let lastGeneratedTrafficY = -700;
 // Initial load
 updateCarsWithBrain();
 /**
  * Loads the saved brain(s) and applies evolution/mutation based on the threshold.
- * It supports both a single best brain and a pool of top brains for crossover.
+ * Supports both a single best brain and a pool of top brains for crossover.
  */
 function updateCarsWithBrain() {
   const storedBrains = localStorage.getItem('bestBrains');
@@ -35,10 +40,8 @@ function updateCarsWithBrain() {
   if (pool.length > 0) {
     for (let i = 0; i < cars.length; i++) {
       if (i < pool.length) {
-        // Keep the best performers from the previous save as they are
         cars[i].brain = JSON.parse(JSON.stringify(pool[i]));
       } else {
-        // Generate new cars by mutating from the pool (crossover + mutation)
         cars[i].brain = NeuralNetwork.mutateFromPool(pool, threshold);
         // For pure mutation without crossover, use the following line instead:
         // cars[i].brain = NeuralNetwork.mutate(pool[Math.floor(Math.random() * pool.length)], threshold);
@@ -52,26 +55,31 @@ cars.push(
 );
 /**
  * Restarts the training with current UI settings.
- * It uses the top performing cars from the current run to seed the next generation.
+ * Uses the top performing cars from the current run to seed the next generation.
+ * Pool size is read from the input and persisted across restarts.
  */
 function restart() {
   N = parseInt(carCountInput.value);
-  // Identify top performers from current run to allow immediate evolution
+  poolSize = parseInt(poolCountInput.value) || 5;
   const sortedCars = cars
     .filter((c) => c.brain && c.type !== 'KEYS')
     .sort((a, b) => a.y - b.y);
-  const bestPool = sortedCars.slice(0, 5).map((c) => c.brain);
+  const bestBrainPool = sortedCars.slice(0, poolSize).map((c) => c.brain);
   cars = generateCars(N);
   bestCar = cars[0];
+  bestPool = [];
   traffic = generateTraffic();
+  lastGeneratedTrafficY = -700;
   const threshold = parseFloat(thresholdInput.value) || 0.1;
-  if (bestPool.length > 0) {
-    console.log(`Evolving next generation from ${bestPool.length} top cars.`);
+  if (bestBrainPool.length > 0) {
+    console.log(
+      `Evolving next generation from ${bestBrainPool.length} top cars.`,
+    );
     for (let i = 0; i < cars.length; i++) {
-      if (i < bestPool.length) {
-        cars[i].brain = JSON.parse(JSON.stringify(bestPool[i]));
+      if (i < bestBrainPool.length) {
+        cars[i].brain = JSON.parse(JSON.stringify(bestBrainPool[i]));
       } else {
-        cars[i].brain = NeuralNetwork.mutateFromPool(bestPool, threshold);
+        cars[i].brain = NeuralNetwork.mutateFromPool(bestBrainPool, threshold);
       }
     }
   } else {
@@ -83,9 +91,13 @@ function restart() {
   console.log(`Training restarted with ${N} cars.`);
 }
 
+/**
+ * Returns the hardcoded initial traffic cars.
+ * Each row has at least one empty lane, matching the dynamic generation pattern.
+ */
 function generateTraffic() {
-  // Create dummy traffic cars
-  const traffic = [
+  return [
+    // Row at y=-100: lane 1 only (lane 0 and 2 empty)
     new Car(
       road.getLaneCenter(1),
       -100,
@@ -96,6 +108,7 @@ function generateTraffic() {
       2,
       getRandomColor(),
     ),
+    // Row at y=-300: lanes 0 and 2 (lane 1 empty)
     new Car(
       road.getLaneCenter(0),
       -300,
@@ -116,6 +129,7 @@ function generateTraffic() {
       2,
       getRandomColor(),
     ),
+    // Row at y=-500: lanes 0 and 1 (lane 2 empty)
     new Car(
       road.getLaneCenter(0),
       -500,
@@ -136,6 +150,7 @@ function generateTraffic() {
       2,
       getRandomColor(),
     ),
+    // Row at y=-700: lanes 1 and 2 (lane 0 empty)
     new Car(
       road.getLaneCenter(1),
       -700,
@@ -157,13 +172,36 @@ function generateTraffic() {
       getRandomColor(),
     ),
   ];
-  return traffic;
+}
+
+/**
+ * Generates a single dynamic traffic row at the given y coordinate.
+ * Randomly picks 1 or 2 lanes to fill, always leaving at least one lane empty.
+ */
+function generateTrafficRow(y) {
+  const laneCount = 3;
+  // At most laneCount-1 filled → always at least 1 empty lane
+  const filledCount = Math.floor(Math.random() * (laneCount - 1)) + 1; // 1 or 2
+  const shuffledLanes = [0, 1, 2].sort(() => Math.random() - 0.5);
+  const activeLanes = shuffledLanes.slice(0, filledCount);
+  return activeLanes.map(
+    (lane) =>
+      new Car(
+        road.getLaneCenter(lane),
+        y,
+        30,
+        50,
+        'DUMMY',
+        startAngle,
+        2,
+        getRandomColor(),
+      ),
+  );
 }
 
 /**
  * Generates an array of AI-controlled Car instances.
  * @param n - The number of cars to generate.
- * @returns An array of Car objects.
  */
 function generateCars(n) {
   const generatedCars = [];
@@ -177,17 +215,21 @@ function generateCars(n) {
 
 /**
  * Saves the brains of the top performing cars to localStorage.
+ * Uses the current pool count input value.
  */
 function save() {
+  const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
   const sortedCars = cars
     .filter((c) => c.brain && c.type !== 'KEYS')
     .sort((a, b) => a.y - b.y);
-  const bestPool = sortedCars.slice(0, 5).map((c) => c.brain);
-  if (bestPool.length > 0) {
-    localStorage.setItem('bestBrains', JSON.stringify(bestPool));
+  const bestBrainPool = sortedCars
+    .slice(0, currentPoolSize)
+    .map((c) => c.brain);
+  if (bestBrainPool.length > 0) {
+    localStorage.setItem('bestBrains', JSON.stringify(bestBrainPool));
     // Also save the single best for backward compatibility
-    localStorage.setItem('bestBrain', JSON.stringify(bestPool[0]));
-    console.log(`Saved top ${bestPool.length} brains.`);
+    localStorage.setItem('bestBrain', JSON.stringify(bestBrainPool[0]));
+    console.log(`Saved top ${bestBrainPool.length} brains.`);
   } else {
     console.warn('Could not save brains: no cars with brains found.');
   }
@@ -202,50 +244,89 @@ function discard() {
   console.log('Stored brains discarded.');
 }
 
+/** Gold highlight color used for all cars in the best pool. */
+const POOL_COLOR = 'gold';
+/**
+ * Draws the car's pool rank label (#1, #2 …) at the car's center in world space.
+ * Assumes the canvas context already has the camera translate applied.
+ */
+function drawCarName(ctx, car) {
+  if (!car.name) return;
+  ctx.save();
+  ctx.font = 'bold 13px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.9)';
+  ctx.shadowBlur = 5;
+  ctx.fillStyle = 'white';
+  ctx.fillText(`#${car.name}`, car.x, car.y);
+  ctx.restore();
+}
+
 // Start the animation loop
 animate();
 /**
- * The main animation loop function. Updates and draws the simulation state.
+ * The main animation loop. Updates and draws the simulation state each frame.
  * @param time - The timestamp provided by requestAnimationFrame (optional).
  */
 function animate(time) {
-  // Adjust canvas heights to fill window early to have accurate viewport info
+  // Resize canvases to fill window
   gameCanvas.height = window.innerHeight;
   networkCanvas.height = window.innerHeight;
-  // Determine viewport boundaries in world space
+  // Determine viewport boundaries in world space (based on previous frame's bestCar)
   const viewportTop = bestCar.y - gameCanvas.height * 0.7;
   const viewportBottom = bestCar.y + gameCanvas.height * 0.3;
+  // --- Dynamic traffic: generate rows infinitely ahead of the best car ---
+  const TRAFFIC_LOOKAHEAD = 1500;
+  const TRAFFIC_ROW_GAP = 200;
+  while (lastGeneratedTrafficY > bestCar.y - TRAFFIC_LOOKAHEAD) {
+    lastGeneratedTrafficY -= TRAFFIC_ROW_GAP;
+    const row = generateTrafficRow(lastGeneratedTrafficY);
+    traffic.push(...row);
+  }
+  // Cull traffic cars that have fallen far behind the best car
+  traffic = traffic.filter((c) => c.y < bestCar.y + 600);
   // Update traffic cars
   for (let i = 0; i < traffic.length; i++) {
     traffic[i].update(road.borders);
   }
-  // Update AI cars
+  // Build polygon list for collision detection
   const polygons = [...road.borders, ...traffic.map((c) => c.polygon)];
-  let minNextY = Infinity;
-  let nextBestCar = bestCar;
+  // Update AI cars (only those near the visible area for performance)
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
-    // Only update if within visible range + generous buffer (1000px)
-    // Sensors need some lead time to see obstacles
     if (car.y > viewportTop - 1000 && car.y < viewportBottom + 1000) {
       car.update(polygons);
     }
-    // Efficiently track best car in the same pass
-    if (car.y < minNextY) {
-      minNextY = car.y;
-      nextBestCar = car;
-    }
   }
-  bestCar = nextBestCar;
+  // --- Identify and update the best pool ---
+  const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
+  // Collect all AI brain cars (excludes KEYS car)
+  const aiBrainCars = cars.filter((c) => c.brain && c.type !== 'KEYS');
+  // Sort by y ascending: most negative y = furthest ahead
+  aiBrainCars.sort((a, b) => a.y - b.y);
+  bestPool = aiBrainCars.slice(0, currentPoolSize);
+  // Clear previous names, then assign pool rank labels (#1 = furthest ahead)
+  for (const car of aiBrainCars) {
+    car.name = undefined;
+  }
+  for (let i = 0; i < bestPool.length; i++) {
+    bestPool[i].name = String(i + 1);
+  }
+  // Best car is always the #1 pool member
+  if (bestPool.length > 0) {
+    bestCar = bestPool[0];
+  }
+  const poolSet = new Set(bestPool);
+  const drawMasks = N <= 300; // skip expensive image masks when too many cars
   // --- Draw Game Canvas ---
   gameCtx.save();
-  // Center the view on the best car vertically
+  // Translate camera to keep best car at 70% from top
   gameCtx.translate(0, -bestCar.y + gameCanvas.height * 0.7);
-  // Draw the road
+  // Draw road
   road.draw(gameCtx);
   // Draw traffic cars
   for (let i = 0; i < traffic.length; i++) {
-    // Only draw traffic if on screen
     if (
       traffic[i].y > viewportTop - 100 &&
       traffic[i].y < viewportBottom + 100
@@ -253,19 +334,38 @@ function animate(time) {
       traffic[i].draw(gameCtx);
     }
   }
-  const drawMasks = N <= 300; // Only draw masks if there are fewer than 300 cars for performance
-  // Draw AI cars with transparency
+  // Draw regular AI cars (semi-transparent); skip pool members and KEYS car
   gameCtx.globalAlpha = 0.2;
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
-    // Only draw AI cars if on screen
+    if (poolSet.has(car) || car.type === 'KEYS') continue;
     if (car.y > viewportTop - 100 && car.y < viewportBottom + 100) {
       car.draw(gameCtx, false, drawMasks);
     }
   }
-  // Draw the best car without transparency (and potentially with sensors/details)
+  // Draw pool cars at full opacity with gold color, sensors, and rank labels.
+  // Draw from last (lowest rank) to first (#1) so #1 renders on top.
   gameCtx.globalAlpha = 1;
-  bestCar.draw(gameCtx, true, drawMasks);
+  for (let i = bestPool.length - 1; i >= 0; i--) {
+    const car = bestPool[i];
+    if (car.y > viewportTop - 100 && car.y < viewportBottom + 100) {
+      const originalColor = car.color;
+      car.color = POOL_COLOR;
+      car.draw(gameCtx, true, true);
+      car.color = originalColor;
+      drawCarName(gameCtx, car);
+    }
+  }
+  // Draw the user-controlled KEYS car at full opacity (always red, no pool treatment)
+  gameCtx.globalAlpha = 1;
+  const keysCar = cars.find((c) => c.type === 'KEYS');
+  if (
+    keysCar &&
+    keysCar.y > viewportTop - 100 &&
+    keysCar.y < viewportBottom + 100
+  ) {
+    keysCar.draw(gameCtx, false, drawMasks);
+  }
   gameCtx.restore();
   // --- Draw Network Canvas ---
   if (showVisualizerCheckbox.checked) {
@@ -279,6 +379,5 @@ function animate(time) {
   } else {
     networkCanvas.style.display = 'none';
   }
-  // Request the next frame
   requestAnimationFrame(animate);
 }
