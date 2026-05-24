@@ -24,10 +24,56 @@ body.main-page {
   padding: 10px 8px;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
-  min-width: 80px;
+  min-width: 88px;
 }
 
-/* Each labelled control */
+/* Thin separator between logical groups */
+.ctrl-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 2px 0;
+}
+
+/* ── Stats panel ───────────────────────────────────────────────── */
+#statsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 2px 2px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 2px;
+}
+
+.stat-emoji {
+  font-size: 12px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.stat-label {
+  font-size: 10px;
+  font-family: Arial, sans-serif;
+  color: #999;
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.stat-value {
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 700;
+  color: #e8e8e8;
+  min-width: 24px;
+  text-align: right;
+}
+
+/* ── Individual controls ───────────────────────────────────────── */
 .ctrl {
   display: flex;
   flex-direction: column;
@@ -35,7 +81,6 @@ body.main-page {
   gap: 3px;
 }
 
-/* Small uppercase label above every control */
 .ctrl-label {
   font-size: 9px;
   font-family: Arial, sans-serif;
@@ -45,13 +90,6 @@ body.main-page {
   letter-spacing: 0.6px;
   user-select: none;
   white-space: nowrap;
-}
-
-/* Thin separator between logical groups */
-.ctrl-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.15);
-  margin: 2px 0;
 }
 
 /* Buttons */
@@ -71,7 +109,7 @@ body.main-page {
 
 /* Number inputs */
 #verticalButtons input[type='number'] {
-  width: 64px;
+  width: 100%;
   border: none;
   border-radius: 5px;
   padding: 4px 5px;
@@ -95,7 +133,7 @@ body.main-page {
   accent-color: gold;
 }
 
-/* ── Legacy / other shared styles ──────────────────────────────── */
+/* ── Legacy / shared styles ────────────────────────────────────── */
 label {
   display: flex;
   justify-content: center;

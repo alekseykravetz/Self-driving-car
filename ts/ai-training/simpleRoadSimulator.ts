@@ -15,9 +15,15 @@ const poolCountInput = document.getElementById('poolCount') as HTMLInputElement;
 const showVisualizerCheckbox = document.getElementById(
   'showVisualizer',
 ) as HTMLInputElement;
+const pauseBtn = document.getElementById('pauseBtn') as HTMLButtonElement;
+
+// Stats DOM elements
+const statGenEl = document.getElementById('stat-gen')!;
+const statAliveEl = document.getElementById('stat-alive')!;
+const statDeadEl = document.getElementById('stat-dead')!;
+const statFrozenEl = document.getElementById('stat-frozen')!;
 
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
-
 const startAngle: number = angle(new Point(0, -1)) + Math.PI / 2;
 
 // Population variables
@@ -31,8 +37,27 @@ let traffic: Car[] = generateTraffic();
 // Tracks the furthest-ahead traffic row that has been generated (most negative y)
 let lastGeneratedTrafficY: number = -700;
 
+// Loop control
+let paused: boolean = false;
+let animationFrameId: number = -1;
+
+// Generation counter (increments each restart)
+let iteration: number = 0;
+
 // Initial load
 updateCarsWithBrain();
+
+/**
+ * Toggles the animation loop pause state and updates the button label.
+ */
+function togglePause(): void {
+  paused = !paused;
+  pauseBtn.textContent = paused ? '▶️' : '⏸️';
+  if (!paused) {
+    // Resume: kick off the loop again
+    animationFrameId = requestAnimationFrame(animate);
+  }
+}
 
 /**
  * Loads the saved brain(s) and applies evolution/mutation based on the threshold.
@@ -69,10 +94,10 @@ cars.push(
 
 /**
  * Restarts the training with current UI settings.
- * Uses the top performing cars from the current run to seed the next generation.
- * Pool size is read from the input and persisted across restarts.
+ * Increments the generation counter and seeds from top performers.
  */
 function restart(): void {
+  iteration++;
   N = parseInt(carCountInput.value);
   poolSize = parseInt(poolCountInput.value) || 5;
 
@@ -110,16 +135,20 @@ function restart(): void {
   cars.push(
     new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
   );
-  console.log(`Training restarted with ${N} cars.`);
+
+  // If paused, resume so the new generation is visible immediately
+  if (paused) togglePause();
+
+  console.log(`Generation ${iteration} started with ${N} cars.`);
 }
 
 /**
  * Returns the hardcoded initial traffic cars.
- * Each row has at least one empty lane, matching the dynamic generation pattern.
+ * Each row has at least one empty lane.
  */
 function generateTraffic(): Car[] {
   return [
-    // Row at y=-100: lane 1 only (lane 0 and 2 empty)
+    // Row y=-100: lane 1 only
     new Car(
       road.getLaneCenter(1),
       -100,
@@ -130,7 +159,7 @@ function generateTraffic(): Car[] {
       2,
       getRandomColor(),
     ),
-    // Row at y=-300: lanes 0 and 2 (lane 1 empty)
+    // Row y=-300: lanes 0 and 2
     new Car(
       road.getLaneCenter(0),
       -300,
@@ -151,7 +180,7 @@ function generateTraffic(): Car[] {
       2,
       getRandomColor(),
     ),
-    // Row at y=-500: lanes 0 and 1 (lane 2 empty)
+    // Row y=-500: lanes 0 and 1
     new Car(
       road.getLaneCenter(0),
       -500,
@@ -172,7 +201,7 @@ function generateTraffic(): Car[] {
       2,
       getRandomColor(),
     ),
-    // Row at y=-700: lanes 1 and 2 (lane 0 empty)
+    // Row y=-700: lanes 1 and 2
     new Car(
       road.getLaneCenter(1),
       -700,
@@ -198,15 +227,13 @@ function generateTraffic(): Car[] {
 
 /**
  * Generates a single dynamic traffic row at the given y coordinate.
- * Randomly picks 1 or 2 lanes to fill, always leaving at least one lane empty.
+ * Randomly fills 1 or 2 of the 3 lanes, always leaving at least one empty.
  */
 function generateTrafficRow(y: number): Car[] {
   const laneCount = 3;
-  // At most laneCount-1 filled → always at least 1 empty lane
   const filledCount = Math.floor(Math.random() * (laneCount - 1)) + 1; // 1 or 2
   const shuffledLanes = [0, 1, 2].sort(() => Math.random() - 0.5);
   const activeLanes = shuffledLanes.slice(0, filledCount);
-
   return activeLanes.map(
     (lane) =>
       new Car(
@@ -224,7 +251,6 @@ function generateTrafficRow(y: number): Car[] {
 
 /**
  * Generates an array of AI-controlled Car instances.
- * @param n - The number of cars to generate.
  */
 function generateCars(n: number): Car[] {
   const generatedCars: Car[] = [];
@@ -238,7 +264,6 @@ function generateCars(n: number): Car[] {
 
 /**
  * Saves the brains of the top performing cars to localStorage.
- * Uses the current pool count input value.
  */
 function save(): void {
   const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
@@ -251,7 +276,6 @@ function save(): void {
 
   if (bestBrainPool.length > 0) {
     localStorage.setItem('bestBrains', JSON.stringify(bestBrainPool));
-    // Also save the single best for backward compatibility
     localStorage.setItem('bestBrain', JSON.stringify(bestBrainPool[0]));
     console.log(`Saved top ${bestBrainPool.length} brains.`);
   } else {
@@ -272,7 +296,7 @@ function discard(): void {
 const POOL_COLOR = 'gold';
 
 /**
- * Draws the car's pool rank label (#1, #2 …) at the car's center in world space.
+ * Draws the car's pool rank label (#1, #2 …) at the car's world-space centre.
  * Assumes the canvas context already has the camera translate applied.
  */
 function drawCarName(ctx: CanvasRenderingContext2D, car: Car): void {
@@ -288,19 +312,26 @@ function drawCarName(ctx: CanvasRenderingContext2D, car: Car): void {
   ctx.restore();
 }
 
+/**
+ * Writes live simulation stats into the stats panel DOM elements.
+ */
+function updateStatsDisplay(alive: number, dead: number, frozen: number): void {
+  statGenEl.textContent = String(iteration);
+  statAliveEl.textContent = String(alive);
+  statDeadEl.textContent = String(dead);
+  statFrozenEl.textContent = String(frozen);
+}
+
 // Start the animation loop
-animate();
+animationFrameId = requestAnimationFrame(animate);
 
 /**
  * The main animation loop. Updates and draws the simulation state each frame.
- * @param time - The timestamp provided by requestAnimationFrame (optional).
  */
 function animate(time?: number): void {
-  // Resize canvases to fill window
   gameCanvas.height = window.innerHeight;
   networkCanvas.height = window.innerHeight;
 
-  // Determine viewport boundaries in world space (based on previous frame's bestCar)
   const viewportTop = bestCar.y - gameCanvas.height * 0.7;
   const viewportBottom = bestCar.y + gameCanvas.height * 0.3;
 
@@ -309,8 +340,7 @@ function animate(time?: number): void {
   const TRAFFIC_ROW_GAP = 200;
   while (lastGeneratedTrafficY > bestCar.y - TRAFFIC_LOOKAHEAD) {
     lastGeneratedTrafficY -= TRAFFIC_ROW_GAP;
-    const row = generateTrafficRow(lastGeneratedTrafficY);
-    traffic.push(...row);
+    traffic.push(...generateTrafficRow(lastGeneratedTrafficY));
   }
 
   // Cull traffic cars that have fallen far behind the best car
@@ -321,30 +351,46 @@ function animate(time?: number): void {
     traffic[i].update(road.borders);
   }
 
-  // Build polygon list for collision detection
   const polygons: Point[][] = [
     ...road.borders,
     ...traffic.map((c: Car) => c.polygon),
   ];
 
-  // Update AI cars (only those near the visible area for performance)
+  // --- Update AI cars; tally live stats in the same pass ---
+  let aliveCount = 0;
+  let deadCount = 0;
+  let frozenCount = 0; // alive (not damaged) but outside the update range
+
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
-    if (car.y > viewportTop - 1000 && car.y < viewportBottom + 1000) {
+    if (car.type === 'KEYS') continue;
+
+    const inRange = car.y > viewportTop - 1000 && car.y < viewportBottom + 1000;
+
+    if (inRange) {
       car.update(polygons);
+    } else if (!car.damaged) {
+      // Alive car outside the update window — effectively frozen
+      frozenCount++;
+    }
+
+    if (car.damaged) {
+      deadCount++;
+    } else {
+      aliveCount++;
     }
   }
 
-  // --- Identify and update the best pool ---
-  const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
+  // Update stats display every frame
+  updateStatsDisplay(aliveCount, deadCount, frozenCount);
 
-  // Collect all AI brain cars (excludes KEYS car)
+  // --- Identify best pool from AI brain cars ---
+  const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
   const aiBrainCars = cars.filter((c) => c.brain && c.type !== 'KEYS');
-  // Sort by y ascending: most negative y = furthest ahead
   aiBrainCars.sort((a, b) => a.y - b.y);
   bestPool = aiBrainCars.slice(0, currentPoolSize);
 
-  // Clear previous names, then assign pool rank labels (#1 = furthest ahead)
+  // Assign / clear pool rank names
   for (const car of aiBrainCars) {
     car.name = undefined;
   }
@@ -352,23 +398,20 @@ function animate(time?: number): void {
     bestPool[i].name = String(i + 1);
   }
 
-  // Best car is always the #1 pool member
   if (bestPool.length > 0) {
     bestCar = bestPool[0];
   }
 
   const poolSet = new Set<Car>(bestPool);
-  const drawMasks = N <= 300; // skip expensive image masks when too many cars
+  const drawMasks = N <= 300;
 
   // --- Draw Game Canvas ---
   gameCtx.save();
-  // Translate camera to keep best car at 70% from top
   gameCtx.translate(0, -bestCar.y + gameCanvas.height * 0.7);
 
-  // Draw road
   road.draw(gameCtx);
 
-  // Draw traffic cars
+  // Traffic
   for (let i = 0; i < traffic.length; i++) {
     if (
       traffic[i].y > viewportTop - 100 &&
@@ -378,7 +421,7 @@ function animate(time?: number): void {
     }
   }
 
-  // Draw regular AI cars (semi-transparent); skip pool members and KEYS car
+  // Regular AI cars — semi-transparent; skip pool members and KEYS car
   gameCtx.globalAlpha = 0.2;
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
@@ -388,8 +431,7 @@ function animate(time?: number): void {
     }
   }
 
-  // Draw pool cars at full opacity with gold color, sensors, and rank labels.
-  // Draw from last (lowest rank) to first (#1) so #1 renders on top.
+  // Pool cars — full opacity, gold, sensors, rank labels (draw low-rank first so #1 is on top)
   gameCtx.globalAlpha = 1;
   for (let i = bestPool.length - 1; i >= 0; i--) {
     const car = bestPool[i];
@@ -402,7 +444,7 @@ function animate(time?: number): void {
     }
   }
 
-  // Draw the user-controlled KEYS car at full opacity (always red, no pool treatment)
+  // KEYS (user-controlled) car — full opacity, original red
   gameCtx.globalAlpha = 1;
   const keysCar = cars.find((c) => c.type === 'KEYS');
   if (
@@ -428,5 +470,8 @@ function animate(time?: number): void {
     networkCanvas.style.display = 'none';
   }
 
-  requestAnimationFrame(animate);
+  // Schedule next frame only when not paused
+  if (!paused) {
+    animationFrameId = requestAnimationFrame(animate);
+  }
 }

@@ -10,6 +10,33 @@
     <canvas id="gameCanvas"></canvas>
 
     <div id="verticalButtons">
+      <!-- ── Stats ───────────────────────────────────────── -->
+      <div id="statsPanel">
+        <div class="stat-row">
+          <span class="stat-emoji">🧬</span>
+          <span class="stat-label">Gen</span>
+          <span class="stat-value" id="stat-gen">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-emoji">🟢</span>
+          <span class="stat-label">Alive</span>
+          <span class="stat-value" id="stat-alive">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-emoji">💀</span>
+          <span class="stat-label">Dead</span>
+          <span class="stat-value" id="stat-dead">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-emoji">❄️</span>
+          <span class="stat-label">Idle</span>
+          <span class="stat-value" id="stat-frozen">0</span>
+        </div>
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <!-- ── Persist ─────────────────────────────────────── -->
       <div class="ctrl">
         <span class="ctrl-label">Save</span>
         <button onclick="save()">💾</button>
@@ -22,6 +49,7 @@
 
       <div class="ctrl-divider"></div>
 
+      <!-- ── Parameters ──────────────────────────────────── -->
       <div class="ctrl">
         <span class="ctrl-label">Cars</span>
         <input
@@ -63,6 +91,7 @@
 
       <div class="ctrl-divider"></div>
 
+      <!-- ── Playback ─────────────────────────────────────── -->
       <div class="ctrl">
         <span class="ctrl-label">Restart</span>
         <button
@@ -73,8 +102,20 @@
         </button>
       </div>
 
+      <div class="ctrl">
+        <span class="ctrl-label">Pause</span>
+        <button
+          id="pauseBtn"
+          onclick="togglePause()"
+          title="Pause / resume the simulation"
+        >
+          ⏸️
+        </button>
+      </div>
+
       <div class="ctrl-divider"></div>
 
+      <!-- ── Display ──────────────────────────────────────── -->
       <div class="ctrl">
         <span class="ctrl-label">Network</span>
         <input
