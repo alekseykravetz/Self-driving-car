@@ -11,6 +11,13 @@ A shared control system that manages the genetic training logic and UI controls 
 - **Persistence**: Handles saving/loading the top-performing brains pool to local storage.
 - **Crossover & Mutation**: Employs genetic crossover between top parents in the best pool, combined with mutation based on the threshold.
 
+## Shared Simulator Utilities (`ts/ai-training/simulatorUtils.ts`)
+
+A utility module containing shared visualization and drawing logic used across simulators.
+
+- **`drawCarName`**: Draws the pool rank label (e.g., `#1`, `#2`) centered at the car's location with a high-contrast shadow.
+- **`drawSimulatorCars`**: Orchestrates drawing regular AI cars (semi-transparent), pool cars (fully opaque, custom highlight color, sensors, rank labels), and the player/KEYS car.
+
 ## Main Simulator (`ts/ai-training/simulator.ts`)
 
 The primary environment for training autonomous cars using genetic algorithms on custom worlds and road maps.

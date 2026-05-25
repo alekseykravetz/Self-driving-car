@@ -194,23 +194,6 @@ function generateCars(n: number): Car[] {
 const POOL_COLOR = 'gold';
 
 /**
- * Draws the car's pool rank label (#1, #2 …) at the car's world-space centre.
- * Assumes the canvas context already has the camera translate applied.
- */
-function drawCarName(ctx: CanvasRenderingContext2D, car: Car): void {
-  if (!car.name) return;
-  ctx.save();
-  ctx.font = 'bold 13px monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0,0,0,0.9)';
-  ctx.shadowBlur = 5;
-  ctx.fillStyle = 'white';
-  ctx.fillText(`#${car.name}`, car.x, car.y);
-  ctx.restore();
-}
-
-/**
  * The main animation loop. Updates and draws the simulation state each frame.
  */
 function animate(time?: number): void {
@@ -287,7 +270,6 @@ function animate(time?: number): void {
   }
   bestPool = res.bestPool;
 
-  const poolSet = new Set<Car>(bestPool);
   const settings = trainingManager.getSettings();
   const drawMasks = settings.carCount <= 300;
 
@@ -307,39 +289,15 @@ function animate(time?: number): void {
     }
   }
 
-  // Regular AI cars — semi-transparent; skip pool members and KEYS car
-  gameCtx.globalAlpha = 0.2;
-  for (let i = 0; i < cars.length; i++) {
-    const car = cars[i];
-    if (poolSet.has(car) || car.type === 'KEYS') continue;
-    if (car.y > viewportTop - 100 && car.y < viewportBottom + 100) {
-      car.draw(gameCtx, false, drawMasks);
-    }
-  }
-
-  // Pool cars — full opacity, gold, sensors, rank labels (draw low-rank first so #1 is on top)
-  gameCtx.globalAlpha = 1;
-  for (let i = bestPool.length - 1; i >= 0; i--) {
-    const car = bestPool[i];
-    if (car.y > viewportTop - 100 && car.y < viewportBottom + 100) {
-      const originalColor = car.color;
-      car.color = POOL_COLOR;
-      car.draw(gameCtx, true, true);
-      car.color = originalColor;
-      drawCarName(gameCtx, car);
-    }
-  }
-
-  // KEYS (user-controlled) car — full opacity, original red
-  gameCtx.globalAlpha = 1;
-  const keysCar = cars.find((c) => c.type === 'KEYS');
-  if (
-    keysCar &&
-    keysCar.y > viewportTop - 100 &&
-    keysCar.y < viewportBottom + 100
-  ) {
-    keysCar.draw(gameCtx, false, drawMasks);
-  }
+  drawSimulatorCars(
+    gameCtx,
+    cars,
+    bestPool,
+    viewportTop - 100,
+    viewportBottom + 100,
+    drawMasks,
+    POOL_COLOR,
+  );
 
   gameCtx.restore();
 

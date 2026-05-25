@@ -249,49 +249,17 @@ class Simulator {
     // Draw cars customly inside viewport coordinate space
     const viewportTop = this.bestCar.y - this.gameCanvas.height * 2;
     const viewportBottom = this.bestCar.y + this.gameCanvas.height * 2;
-    const poolSet = new Set(bestPool);
     const settings = this.trainingManager.getSettings();
     const drawMasks = settings.carCount <= 300;
-    // 1. Regular AI cars — semi-transparent
-    this.gameCtx.save();
-    this.gameCtx.globalAlpha = 0.2;
-    for (let i = 0; i < this.cars.length; i++) {
-      const car = this.cars[i];
-      if (poolSet.has(car) || car.type === 'KEYS') continue;
-      if (car.y > viewportTop && car.y < viewportBottom) {
-        car.draw(this.gameCtx, false, drawMasks);
-      }
-    }
-    this.gameCtx.restore();
-    // 2. Pool cars — full opacity, gold, sensors, rank labels
-    this.gameCtx.save();
-    this.gameCtx.globalAlpha = 1;
-    for (let i = bestPool.length - 1; i >= 0; i--) {
-      const car = bestPool[i];
-      if (car.y > viewportTop && car.y < viewportBottom) {
-        const originalColor = car.color;
-        car.color = 'gold';
-        car.draw(this.gameCtx, true, true);
-        car.color = originalColor;
-        if (car.name) {
-          this.gameCtx.save();
-          this.gameCtx.font = 'bold 13px monospace';
-          this.gameCtx.textAlign = 'center';
-          this.gameCtx.textBaseline = 'middle';
-          this.gameCtx.shadowColor = 'rgba(0,0,0,0.9)';
-          this.gameCtx.shadowBlur = 5;
-          this.gameCtx.fillStyle = 'white';
-          this.gameCtx.fillText(`#${car.name}`, car.x, car.y);
-          this.gameCtx.restore();
-        }
-      }
-    }
-    this.gameCtx.restore();
-    // 3. KEYS car — full opacity
-    const keysCar = this.cars.find((c) => c.type === 'KEYS');
-    if (keysCar && keysCar.y > viewportTop && keysCar.y < viewportBottom) {
-      keysCar.draw(this.gameCtx, false, drawMasks);
-    }
+    drawSimulatorCars(
+      this.gameCtx,
+      this.cars,
+      bestPool,
+      viewportTop,
+      viewportBottom,
+      drawMasks,
+      'gold',
+    );
     // Restore references for minimap
     this.world.cars = this.cars;
     this.world.bestCar = this.bestCar;
