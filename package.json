@@ -4,7 +4,7 @@
   "main": "main.js",
   "scripts": {
     "start": "concurrently \"npm run tsc:watch\" \"npm run serve\" \"npm run fix:all\"",
-    "serve": "serve -p 8080",
+    "serve": "serve -p 9090",
     "tsc:watch": "tsc --watch",
     "watch:fix": "onchange -i \"ts/**/*.ts\" \"html/**/*.html\" \"styles/**/*.css\" -- npm run fix:all",
     "fix:all": "npm run format && npm run lint",

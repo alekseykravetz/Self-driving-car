@@ -1,49 +1,284 @@
-# Neural Network & Evolution
+# Neural Network & Neuroevolution
 
-The "brain" of the autonomous vehicles is implemented in `ts/neural-network/`.
+The AI brain system in `ts/neural-network/` implements a feedforward neural network trained via genetic algorithms (no backpropagation). The network makes binary decisions about car controls each frame.
 
-## Network Structure (`ts/neural-network/network.ts`)
+---
 
-The `NeuralNetwork` is a simple feedforward network composed of multiple `Level` objects.
+## Network Architecture (`ts/neural-network/network.ts`)
 
-### Levels
+### Level (Single Layer)
 
-Each `Level` represents a layer of neurons:
+```typescript
+class Level {
+  inputs: number[]; // Values received from previous layer
+  outputs: number[]; // Computed activations
+  weights: number[][]; // weights[i][o] = connection strength input_i → output_o
+  biases: number[]; // One bias per output neuron
 
-- **Inputs**: Received from the previous level (or sensors for the first level).
-- **Outputs**: Calculated based on weighted sums of inputs and biases.
-- **Weights**: Define the strength of connections between neurons in adjacent levels.
-- **Biases**: Shift the activation function for each output neuron.
-- **Activation Function**: A step function is used—if the weighted sum exceeds the bias, the neuron fires (outputs 1), otherwise it outputs 0.
+  static feedForward(givenInputs: number[], level: Level): number[];
+  static randomize(level: Level): void;
+}
+```
 
-### Feedforward Mechanism
+**Initialization** (`randomize`):
 
-The network processes data from input to output:
+- All weights set to random values in range `[-1, 1]`
+- All biases set to random values in range `[-1, 1]`
 
-1.  **Input Layer**: Receives sensor offsets and current car speed.
-2.  **Hidden Layers**: Extract features from the sensor data.
-3.  **Output Layer**: Produces 4 values representing `Forward`, `Left`, `Right`, and `Reverse`.
+**Feedforward** (per level):
 
-## Genetic Algorithm
+```
+For each output neuron o:
+  sum = 0
+  for each input i:
+    sum += inputs[i] * weights[i][o]
 
-The simulation uses a genetic algorithm to "train" the neural networks.
+  if (sum > biases[o]):
+    outputs[o] = 1    // Neuron fires
+  else:
+    outputs[o] = 0    // Neuron silent
+```
 
-### Mutation
+**Activation function**: Binary step (threshold at bias value). This produces crisp on/off decisions — the car either turns or doesn't, accelerates or doesn't.
 
-Instead of traditional backpropagation, the network is trained through evolution:
+---
 
-1.  **Selection**: The car that travels the furthest (highest `fitness`) is saved.
-2.  **Variation**: New generations are created by cloning the best brain and applying random **mutations**.
-3.  **Mutation Rate**: The `amount` parameter in `NeuralNetwork.mutate()` determines how much the weights and biases are nudged toward new random values.
+### NeuralNetwork (Multi-Layer)
 
-### Persistence
+```typescript
+class NeuralNetwork {
+  levels: Level[];
 
-Brains are serialized as JSON and can be saved to local storage or external files (e.g., `saves/bestBrain.txt`). This allows the simulation to preserve progress across sessions.
+  constructor(neuronCounts: number[]); // e.g., [6, 6, 4]
+  static feedForward(givenInputs: number[], network: NeuralNetwork): number[];
+  static mutate(network: NeuralNetwork, amount: number): void;
+  static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork;
+  static mutateFromPool(
+    networks: NeuralNetwork[],
+    amount: number,
+  ): NeuralNetwork;
+}
+```
+
+**Constructor**:
+Creates `neuronCounts.length - 1` levels, connecting consecutive layer sizes.
+Example: `[6, 6, 4]` → Level(6→6) + Level(6→4) = 2 levels.
+
+**Feedforward** (full network):
+
+```
+output = Level.feedForward(inputs, levels[0])
+for i = 1 to levels.length-1:
+  output = Level.feedForward(output, levels[i])
+return output
+```
+
+---
+
+## Typical Network Configuration
+
+```
+┌─────────────────────────────────┐
+│ INPUT LAYER (6 neurons)         │
+│  [ray1, ray2, ray3, ray4, ray5, │
+│   speed]                        │
+└────────────────┬────────────────┘
+                 │ 6×6 = 36 weights
+┌────────────────▼────────────────┐
+│ HIDDEN LAYER (6 neurons)        │
+│  Feature extraction             │
+└────────────────┬────────────────┘
+                 │ 6×4 = 24 weights
+┌────────────────▼────────────────┐
+│ OUTPUT LAYER (4 neurons)        │
+│  [forward, left, right, reverse]│
+└─────────────────────────────────┘
+
+Total parameters: 36 + 24 + 6 + 4 = 70 (weights + biases)
+```
+
+**Inputs**: 5 sensor readings (1 - offset, so closer = higher) + normalized speed
+**Outputs**: Binary decisions mapped to `controls.forward/left/right/reverse`
+
+---
+
+## Genetic Algorithm (Neuroevolution)
+
+### Mutation (`NeuralNetwork.mutate`)
+
+```typescript
+static mutate(network: NeuralNetwork, amount: number): void {
+  for each level:
+    for each bias:
+      bias = lerp(bias, random(-1, 1), amount)
+    for each weight:
+      weight = lerp(weight, random(-1, 1), amount)
+}
+```
+
+- `amount = 0` → no change (exact copy)
+- `amount = 0.1` → 10% nudge toward random value (subtle variation)
+- `amount = 1` → completely random (fresh network)
+
+This smoothly interpolates between preservation and randomization.
+
+### Crossover (`NeuralNetwork.crossover`)
+
+```typescript
+static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork {
+  child = clone(net1)
+  for each level:
+    for each bias:
+      if (random() > 0.5) bias = net2.bias
+    for each weight:
+      if (random() > 0.5) weight = net2.weight
+  return child
+}
+```
+
+Randomly selects each gene (weight/bias) from one of two parents. Produces offspring with traits from both.
+
+### Pool-Based Evolution (`NeuralNetwork.mutateFromPool`)
+
+```typescript
+static mutateFromPool(networks: NeuralNetwork[], amount: number): NeuralNetwork {
+  parent1 = networks[randomIndex]
+  parent2 = networks[randomIndex]
+  child = crossover(parent1, parent2)
+  mutate(child, amount)
+  return child
+}
+```
+
+1. Select two random parents from the top-performing pool
+2. Crossover their genes
+3. Apply mutation
+4. Return new individual
+
+---
+
+## Training Manager Integration
+
+The `TrainingManager` orchestrates the evolutionary process:
+
+```
+Generation N:
+  1. Take bestPool[] (top K brains from previous generation)
+  2. Generate carCount cars:
+     - First K cars: exact copies of pool members (elitism)
+     - Remaining cars: mutateFromPool(pool, mutationRate)
+  3. Run simulation until all damaged or timeout
+  4. Evaluate fitness for each car
+  5. Sort by fitness, take top K → new bestPool[]
+  6. Save to localStorage
+  7. Repeat
+```
+
+### Configurable Parameters (via UI)
+
+| Parameter     | Range     | Default | Effect                          |
+| ------------- | --------- | ------- | ------------------------------- |
+| Car Count     | 0–5000    | 100     | Population size per generation  |
+| Pool Size     | 1–20      | 5       | Number of elite survivors       |
+| Mutation Rate | 0.001–1.0 | 0.1     | How much to randomize offspring |
+
+### Selection Pressure
+
+- **Elitism**: Top K brains survive unchanged
+- **Fitness-proportional**: Higher fitness = more likely to be in pool
+- **Diversity**: Random crossover between pool members prevents convergence
+- **Exploration**: Mutation rate controls exploration vs exploitation
+
+---
 
 ## Network Visualizer (`ts/neural-network/visualizer.ts`)
 
-A dedicated UI component that renders the neural network's architecture in real-time.
+Real-time rendering of the neural network's internal state.
 
-- **Nodes**: Represent neurons (brighter colors indicate higher activity).
-- **Edges**: Represent weights (color and thickness indicate weight strength and polarity).
-- **Interactivity**: Shows the live activations as the car navigates the environment.
+```typescript
+class Visualizer {
+  static drawNetwork(
+    ctx: CanvasRenderingContext2D,
+    network: NeuralNetwork,
+  ): void;
+  static drawLevel(
+    ctx,
+    level,
+    left,
+    top,
+    width,
+    height,
+    labels?: string[],
+  ): void;
+}
+```
+
+### Visual Elements
+
+**Nodes (Neurons)**:
+
+- Circle with black outline
+- Inner fill colored by activation:
+  - Red = high positive activation (close to 1)
+  - Blue = high negative / zero activation
+  - White = neutral
+- Output nodes also show bias as a dashed ring
+
+**Connections (Weights)**:
+
+- Lines connecting input nodes to output nodes
+- Color: `getRGBA(weight)` — red for positive, blue for negative
+- Thickness proportional to |weight|
+
+**Labels** (output layer only):
+
+- ↥ = Forward
+- ↤ = Left
+- ↦ = Right
+- ↧ = Reverse
+
+### Layout
+
+```
+┌─────────────────────────────────────┐
+│  Output Layer       ↥  ↤  ↦  ↧    │  (top)
+│        ↕ connections                │
+│  Hidden Layer       ○  ○  ○  ○  ○  ○│
+│        ↕ connections                │
+│  Input Layer        ○  ○  ○  ○  ○  ○│  (bottom)
+└─────────────────────────────────────┘
+```
+
+Levels are drawn bottom-to-top (input at bottom, output at top).
+
+---
+
+## Persistence
+
+### Save
+
+```typescript
+localStorage.setItem('bestBrain', JSON.stringify(bestNetwork));
+localStorage.setItem('bestBrains', JSON.stringify(topKNetworks));
+```
+
+### Load
+
+```typescript
+const saved = JSON.parse(localStorage.getItem('bestBrain'));
+// Apply to car: car.brain = saved
+```
+
+### Export (`.car` files)
+
+Car files include the full network structure plus physics/sensor parameters:
+
+```javascript
+const carData = ({
+  brain: { levels: [{ inputs: [...], outputs: [...], weights: [[...]], biases: [...] }, ...] },
+  maxSpeed: 3,
+  friction: 0.05,
+  acceleration: 0.2,
+  sensor: { rayCount: 5, raySpread: 1.57, rayLength: 150, rayOffset: 0 }
+})
+```

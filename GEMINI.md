@@ -1,27 +1,178 @@
-# Self-driving Car Project Instructions
+# AI Agent Instructions — Self-Driving Car Simulator
 
-This project is a simulation of a self-driving car using TypeScript. It runs as a static site and uses `tsc` for compilation.
+This document provides context for AI coding agents working on this project.
 
-## 🏗️ Architecture
+---
 
-- **Math-First**: All geometric logic lives in `ts/math/`. Use existing primitives (`Point`, `Segment`, `Polygon`) instead of raw objects.
-- **Physics**: Car movement is in `ts/car/car.ts`. Collision detection is polygon-based.
-- **AI**: The brain is in `ts/neural-network/network.ts`. It's a feedforward network with a step activation function.
-- **World**: The `World` class in `ts/world-editor/world.ts` manages the environment.
+## Project Identity
 
-## 🛠️ Workflows
+- **Name**: Self-Driving Car Simulator
+- **Language**: TypeScript (source in `ts/`, compiled output in `js/`)
+- **Runtime**: Browser (Canvas 2D API, no Node.js runtime)
+- **Dependencies**: Zero runtime dependencies. Dev-only: TypeScript, ESLint, Prettier, serve, concurrently, onchange
+- **Bundler**: None. Uses `tsc` to compile TS → JS. HTML files load scripts via `<script>` tags in dependency order.
 
-- **Compilation**: Always run `npm run start` (or `npx tsc`) after changing `.ts` files.
-- **Linting**: Run `npm run lint:fix` to keep code clean.
-- **Documentation**: If you add a new module or significantly change existing logic, update the corresponding file in the `docs/` directory.
+---
 
-## 🧪 Testing
+## Architecture Rules
 
-- Currently, the project relies on visual validation in the simulator.
-- For new features, verify them by running the relevant simulation in `html/simulator.html` or `html/world.html`.
+1. **No bundlers** — Do not add Webpack, Vite, Rollup, esbuild, or similar. The project intentionally uses direct script loading.
+2. **No runtime dependencies** — Everything is implemented from scratch. Do not add npm packages for geometry, neural networks, physics, etc.
+3. **Global scope** — All classes are globals. No ES module `import`/`export` at runtime. TypeScript files compile to plain JS that attaches to `window`.
+4. **HTML controls load order** — When adding new modules, you must add `<script>` tags in the correct dependency order to relevant HTML files.
+5. **Canvas 2D only** — No WebGL, no Three.js. Rendering uses the standard Canvas 2D API.
+6. **Composition over inheritance** — Cars contain sensors, controls, and networks as separate objects. Markings use subclass hierarchy but most systems prefer composition.
 
-## 📌 Conventions
+---
 
-- Prefer explicit composition over inheritance.
-- Use private/protected members where appropriate.
-- Maintain the static server (`serve`) workflow; do not add bundlers like Webpack or Vite unless explicitly requested.
+## Build & Dev Workflow
+
+```bash
+npm install          # Install dev dependencies
+npm start            # Runs: tsc --watch + serve -p 9090 + auto-format/lint
+```
+
+- TypeScript compiler watches `ts/**/*.ts` → outputs to `js/**/*.js`
+- Static server at http://localhost:9090
+- ESLint + Prettier auto-fix on file changes
+
+### Key Commands
+
+| Command             | Purpose               |
+| ------------------- | --------------------- |
+| `npm start`         | Full dev environment  |
+| `npm run tsc:watch` | TypeScript watch only |
+| `npm run serve`     | Static server only    |
+| `npm run format`    | Prettier format all   |
+| `npm run lint`      | ESLint fix all        |
+
+---
+
+## Code Conventions
+
+- **Formatting**: Prettier with `singleQuote: true`
+- **Naming**: PascalCase for classes, camelCase for functions/variables
+- **Private members**: Use `#` prefix (ES2022 private fields)
+- **Type declarations**: Global types in `ts/types.ts`, editor types in `ts/world-editor/types.ts`
+- **Static methods**: Prefer static factory methods (`World.load()`, `Graph.load()`, `Marking.load()`)
+- **Drawing**: Classes own their `draw(ctx, ...options)` method
+- **Serialization**: Objects know how to serialize/deserialize themselves via `static load(info)`
+
+---
+
+## Project Structure
+
+```
+ts/                         # TypeScript source (THE source of truth)
+├── math/                   # Geometric primitives, graph, OSM import
+│   ├── primitives/         # Point, Segment, Polygon, Envelope
+│   ├── graph/              # Graph with Dijkstra pathfinding
+│   ├── osm-importer/       # OpenStreetMap data parser
+│   └── utils.ts            # Vector math, lerp, intersections
+├── car/                    # Vehicle system
+│   ├── car.ts              # Physics, collision, AI integration
+│   ├── sensors/            # Ray-casting perception
+│   └── controls/           # Input: keyboard, phone, camera, AI
+├── neural-network/         # Feedforward network + visualizer
+├── world-editor/           # World generation + editing tools
+│   ├── world.ts            # Procedural generation
+│   ├── trafficManager.ts   # Traffic light cycling
+│   ├── editors/            # Interactive editors (graph, markings)
+│   ├── items/              # Building, Tree (3D rendering)
+│   └── markings/           # Start, Stop, Light, Crossing, etc.
+├── ai-training/            # Training simulators + genetic algorithm
+├── simulators/             # Camera view simulator
+├── games/                  # Racing mode
+├── viewport/               # Pan/zoom transformation
+├── mini-map/               # Scaled world overview
+├── camera.ts               # 3D perspective projection
+├── sound.ts                # Audio synthesis
+├── road.ts                 # Simple straight road
+├── utils.ts                # Collision helpers
+└── types.ts                # Global type declarations
+
+js/                         # Compiled output (DO NOT EDIT DIRECTLY)
+html/                       # HTML entry points (load scripts in order)
+styles/                     # CSS stylesheets
+assets/                     # Images and sprites
+saves/                      # World maps, trained brains, OSM data
+docs/                       # Technical documentation
+```
+
+---
+
+## Adding New Features
+
+### Adding a new TypeScript module:
+
+1. Create the `.ts` file in the appropriate `ts/` subdirectory
+2. The class/function will be a global (no exports needed)
+3. Add `<script src="/js/path/to/file.js">` to all HTML files that need it
+4. Ensure the script tag comes AFTER its dependencies
+5. Add the class name to `eslint.config.mjs` globals if needed (to suppress lint warnings)
+6. Run `npm start` — tsc will compile it automatically
+
+### Adding a new marking type:
+
+1. Create `ts/world-editor/markings/newMarking.ts` extending `Marking`
+2. Create `ts/world-editor/editors/newMarkingEditor.ts` extending `MarkingEditor`
+3. Add to `Marking.load()` switch statement for deserialization
+4. Add editor activation in `worldEditor.ts`
+5. Add script tags to `html/world.html` and simulator HTML files
+
+### Adding a new simulation mode:
+
+1. Create TypeScript class in `ts/ai-training/` or `ts/simulators/`
+2. Create HTML file in `html/` with all required script tags
+3. Add link to `index.html` landing page
+4. Wire up `TrainingManager` if using genetic training
+
+---
+
+## Key Design Decisions to Preserve
+
+- **Binary step activation** in neural network (not sigmoid/ReLU) — produces crisp decisions
+- **Genetic algorithm only** (no backpropagation) — simpler, produces emergent behaviors
+- **Polygon.union()** for road generation — critical algorithm, handle with care
+- **Painter's algorithm** for 3D rendering — no depth buffer, sort by distance
+- **No module system at runtime** — all globals, HTML controls initialization order
+- **localStorage for brain persistence** — simple, no server needed
+
+---
+
+## Testing
+
+- No automated test suite — validation is visual
+- Test by running the relevant simulator HTML page
+- For physics changes: test in `simpleRoadSimulator.html`
+- For world changes: test in `world.html` editor
+- For rendering: test in `cameraViewSimulator.html`
+- For AI training: verify in `simulator.html` that cars still learn
+
+---
+
+## Documentation
+
+Update `docs/*.md` when making significant changes:
+
+- `Architecture.md` — System overview and module relationships
+- `Math.md` — Geometric primitives and algorithms
+- `Physics.md` — Car dynamics and collision
+- `NeuralNetwork.md` — Brain architecture and evolution
+- `WorldEditor.md` — World generation and editing
+- `Simulators.md` — Training environments
+- `Camera.md` — 3D projection system
+- `Controls.md` — Input systems
+
+---
+
+## Common Gotchas
+
+1. **Script order matters** — If you get "X is not defined", the script tag is in wrong order
+2. **tsc output** — Never edit `js/` files directly; always edit `ts/` source
+3. **Polygon.union()** — Complex algorithm, mutations can break road rendering
+4. **Global namespace** — Class names must be unique across all files
+5. **Canvas coordinate system** — Y-axis is inverted (positive = down)
+6. **Car angle convention** — 0 = facing up, positive = clockwise
+7. **Sensor offset inversion** — Readings are `1 - offset` before feeding to network
+8. **World files** — Use JS variable assignment syntax, not pure JSON
