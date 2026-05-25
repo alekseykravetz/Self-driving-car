@@ -44,12 +44,12 @@
       <!-- ── Persist ─────────────────────────────────────── -->
       <div class="ctrl">
         <span class="ctrl-label">Save</span>
-        <button onclick="save()">💾</button>
+        <button id="saveBtn">💾</button>
       </div>
 
       <div class="ctrl">
         <span class="ctrl-label">Discard</span>
-        <button onclick="discard()">🗑️</button>
+        <button id="discardBtn">🗑️</button>
       </div>
 
       <div class="ctrl-divider"></div>
@@ -99,23 +99,14 @@
       <!-- ── Playback ─────────────────────────────────────── -->
       <div class="ctrl">
         <span class="ctrl-label">Restart</span>
-        <button
-          onclick="restart()"
-          title="Restart training with current settings"
-        >
+        <button id="restartBtn" title="Restart training with current settings">
           🔄
         </button>
       </div>
 
       <div class="ctrl">
         <span class="ctrl-label">Pause</span>
-        <button
-          id="pauseBtn"
-          onclick="togglePause()"
-          title="Pause / resume the simulation"
-        >
-          ⏸️
-        </button>
+        <button id="pauseBtn" title="Pause / resume the simulation">⏸️</button>
       </div>
 
       <div class="ctrl-divider"></div>
@@ -145,6 +136,7 @@
     <script src="/js/road.js"></script>
     <script src="/js/car/controls/controls.js"></script>
     <script src="/js/car/car.js"></script>
+    <script src="/js/ai-training/trainingManager.js"></script>
     <script src="/js/ai-training/simpleRoadSimulator.js"></script>
   </body>
 </html>

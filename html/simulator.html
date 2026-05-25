@@ -8,13 +8,128 @@
     <canvas id="gameCanvas"></canvas>
 
     <div id="verticalButtons">
-      <label for="loadWorldInput" class="file-input-label">
-        📁
-        <input type="file" id="loadWorldInput" accept=".world" />
-      </label>
-      &nbsp;
-      <button id="saveBtn">💾</button>
-      <button id="discardBtn">🗑️</button>
+      <!-- ── World Loader ────────────────────────────────── -->
+      <div class="ctrl">
+        <span class="ctrl-label">Load Map</span>
+        <label for="loadWorldInput" class="file-input-label">
+          📁
+          <input type="file" id="loadWorldInput" accept=".world" />
+        </label>
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <!-- ── Stats ───────────────────────────────────────── -->
+      <div id="statsPanel">
+        <div class="stat-row">
+          <span class="stat-emoji">🧬</span>
+          <span class="stat-label">Gen</span>
+          <span class="stat-value" id="stat-gen">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-emoji">🟢</span>
+          <span class="stat-label">Alive</span>
+          <span class="stat-value" id="stat-alive">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-emoji">💀</span>
+          <span class="stat-label">Dead</span>
+          <span class="stat-value" id="stat-dead">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-emoji">❄️</span>
+          <span class="stat-label">Idle</span>
+          <span class="stat-value" id="stat-frozen">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-emoji">🛣️</span>
+          <span class="stat-label">Best</span>
+          <span class="stat-value" id="stat-dist">0</span>
+        </div>
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <!-- ── Persist ─────────────────────────────────────── -->
+      <div class="ctrl">
+        <span class="ctrl-label">Save</span>
+        <button id="saveBtn">💾</button>
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Discard</span>
+        <button id="discardBtn">🗑️</button>
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <!-- ── Parameters ──────────────────────────────────── -->
+      <div class="ctrl">
+        <span class="ctrl-label">Cars</span>
+        <input
+          type="number"
+          id="carCount"
+          value="100"
+          min="0"
+          max="5000"
+          step="100"
+          title="Number of AI cars in the population"
+        />
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Pool</span>
+        <input
+          type="number"
+          id="poolCount"
+          value="2"
+          min="1"
+          max="20"
+          step="1"
+          title="Number of top cars kept in the best pool"
+        />
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Mutation</span>
+        <input
+          type="number"
+          id="threshold"
+          value="0.2"
+          step="0.05"
+          min="0.001"
+          max="1"
+          title="Mutation amount applied each generation"
+        />
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <!-- ── Playback ─────────────────────────────────────── -->
+      <div class="ctrl">
+        <span class="ctrl-label">Restart</span>
+        <button id="restartBtn" title="Restart training with current settings">
+          🔄
+        </button>
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">Pause</span>
+        <button id="pauseBtn" title="Pause / resume the simulation">⏸️</button>
+      </div>
+
+      <div class="ctrl-divider"></div>
+
+      <!-- ── Display ──────────────────────────────────────── -->
+      <div class="ctrl">
+        <span class="ctrl-label">Network</span>
+        <input
+          type="checkbox"
+          id="showVisualizer"
+          checked
+          title="Show neural network visualizer"
+        />
+      </div>
     </div>
 
     <div>
@@ -70,6 +185,7 @@
     <script src="/js/utils.js"></script>
     <script src="/js/car/controls/controls.js"></script>
     <script src="/js/car/car.js"></script>
+    <script src="/js/ai-training/trainingManager.js"></script>
     <script src="/js/ai-training/simulator.js"></script>
 
     <script>

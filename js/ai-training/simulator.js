@@ -4,27 +4,60 @@ class Simulator {
   gameCtx;
   networkCanvas;
   networkCtx;
-  miniMapCanvas; // Assuming it has a context too if drawn on
+  miniMapCanvas;
   world = null;
   viewport = null;
   miniMap = null;
-  N = 100;
-  cars = null;
+  cars = [];
   bestCar = null;
   roadBorders = null;
-  // DOM Elements - asserting non-null assuming they exist in the HTML
-  saveBtn;
-  discardBtn;
+  // DOM Elements
   loadWorldInput;
+  // Loop control
+  animationFrameId = -1;
+  // Training Manager
+  trainingManager;
   constructor(gameCanvas, networkCanvas, miniMapCanvas) {
     this.gameCanvas = gameCanvas;
-    // Use non-null assertion assuming getContext('2d') won't return null
     this.gameCtx = gameCanvas.getContext('2d');
     this.networkCanvas = networkCanvas;
     this.networkCtx = networkCanvas.getContext('2d');
     this.miniMapCanvas = miniMapCanvas;
-    // Get DOM elements and add listeners
-    this.#addEventListeners();
+    // Load file input listener
+    this.loadWorldInput = document.getElementById('loadWorldInput');
+    this.loadWorldInput.addEventListener(
+      'change',
+      this.#loadWorldFromFile.bind(this),
+    );
+    // Create training manager
+    this.trainingManager = new TrainingManager({
+      getCars: () => this.cars,
+      evaluateFitness: (car) => car.fitness,
+      onRestart: (bestBrainPool) => {
+        const settings = this.trainingManager.getSettings();
+        this.cars = [
+          ...this.generateCars(1, 'KEYS'),
+          ...this.generateCars(settings.carCount, 'AI'),
+        ];
+        this.bestCar = this.cars[0];
+        this.trainingManager.applyBrainPool(this.cars, bestBrainPool);
+        if (this.world) this.world.cars = this.cars;
+        if (this.miniMap) this.miniMap.cars = this.cars;
+        this.#updateRoadBorders();
+        console.log(
+          `Generation ${this.trainingManager.iteration} started with ${settings.carCount} cars.`,
+        );
+      },
+      onPauseToggle: (paused) => {
+        if (paused) {
+          cancelAnimationFrame(this.animationFrameId);
+        } else {
+          this.animationFrameId = requestAnimationFrame(
+            this.animate.bind(this),
+          );
+        }
+      },
+    });
     if (typeof world === 'undefined') {
       const worldString = localStorage.getItem('world');
       const worldInfo = worldString ? JSON.parse(worldString) : null;
@@ -33,7 +66,7 @@ class Simulator {
       this.#initializeSimulator(world); // note: global world
     }
     // Start animation loop
-    this.animate(0); // Start animation loop immediately
+    this.animate(0);
   }
 
   generateCars(n, type) {
@@ -41,14 +74,13 @@ class Simulator {
       console.error('World not initialized in generateCars');
       return [];
     }
-    // Use type guard for filtering and ensure 'm' is treated as 'Start'
     const startMarkings = this.world.markings.filter((m) => m instanceof Start);
     const startPoint = startMarkings.length
       ? startMarkings[0].center
-      : new Point(100, 100); // Default start point
+      : new Point(100, 100);
     const direction = startMarkings.length
       ? startMarkings[0].directionVector
-      : new Point(0, -1); // Default direction (up)
+      : new Point(0, -1);
     const startAngle = -angle(direction) + Math.PI / 2;
     const cars = [];
     for (let i = 1; i <= n; i++) {
@@ -74,23 +106,9 @@ class Simulator {
     return cars;
   }
 
-  #addEventListeners() {
-    this.saveBtn = document.getElementById('saveBtn');
-    this.discardBtn = document.getElementById('discardBtn');
-    this.loadWorldInput = document.getElementById('loadWorldInput');
-    this.saveBtn.addEventListener('click', this.save.bind(this));
-    this.discardBtn.addEventListener('click', this.discard.bind(this));
-    this.loadWorldInput.addEventListener(
-      'change',
-      this.#loadWorldFromFile.bind(this),
-    );
-  }
-
   #initializeSimulator(worldInfo) {
     console.log('Initializing simulator with world info:', worldInfo);
-    // Create world (either loaded or new)
     this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
-    // Initialize Viewport and MiniMap
     this.viewport = new Viewport(
       this.gameCanvas,
       this.world.zoom,
@@ -101,23 +119,18 @@ class Simulator {
       this.world.graph,
       this.miniMapCanvas.width,
     );
-    // Generate cars
+    const settings = this.trainingManager.getSettings();
     this.cars = [
-      ...this.generateCars(1, 'KEYS'), // One player-controlled car
-      ...this.generateCars(this.N, 'AI'), // N AI cars
+      ...this.generateCars(1, 'KEYS'),
+      ...this.generateCars(settings.carCount, 'AI'),
     ];
     this.bestCar = this.cars[0];
-    // Load brain from localStorage if available
-    const bestBrainString = localStorage.getItem('bestBrain');
-    if (bestBrainString) {
-      for (let i = 0; i < this.cars.length; i++) {
-        this.cars[i].brain = JSON.parse(bestBrainString);
-        if (i > 1) {
-          NeuralNetwork.mutate(this.cars[i].brain, 0.1);
-        }
-      }
-    }
-    // Determine road borders for collision detection
+    this.trainingManager.updateCarsWithBrain(this.cars);
+    this.#updateRoadBorders();
+  }
+
+  #updateRoadBorders() {
+    if (!this.world) return;
     const target = this.world.markings.find((m) => m instanceof Target);
     if (target && this.bestCar) {
       this.world.generateCorridor(
@@ -128,29 +141,8 @@ class Simulator {
         ? this.world.corridor.borders.map((s) => [s.p1, s.p2])
         : null;
     } else {
-      // Fallback to using road borders if no target or corridor generation fails
-      this.roadBorders = [
-        // ...this.localWorld.buildings
-        //   .map((b) => b.base.segments)
-        //   .flat()
-        //   .map((s) => [s.p1, s.p2]),
-        ...this.world.roadBorders.map((s) => [s.p1, s.p2]),
-      ];
+      this.roadBorders = [...this.world.roadBorders.map((s) => [s.p1, s.p2])];
     }
-  }
-
-  save() {
-    if (this.bestCar && this.bestCar.brain) {
-      localStorage.setItem('bestBrain', JSON.stringify(this.bestCar.brain));
-      console.log('Best brain saved to localStorage.');
-    } else {
-      console.warn('Cannot save: No best car or best car has no brain.');
-    }
-  }
-
-  discard() {
-    localStorage.removeItem('bestBrain');
-    console.log('Best brain removed from localStorage.');
   }
 
   #loadWorldFromFile(e) {
@@ -158,7 +150,6 @@ class Simulator {
     const worldFile = input.files?.[0];
     if (!worldFile) {
       alert('No file selected');
-      // Clear the input value so the same file can be selected again if needed
       input.value = '';
       return;
     }
@@ -175,7 +166,6 @@ class Simulator {
     const worldFileContent = e.target.result;
     let worldJsonString = null;
     try {
-      // Attempt to extract JSON assuming format `variableName = ({...});` or just `({...})`
       const startIndex = worldFileContent.indexOf('(');
       const endIndex = worldFileContent.lastIndexOf(')');
       if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
@@ -184,7 +174,6 @@ class Simulator {
         worldFileContent.trim().startsWith('{') &&
         worldFileContent.trim().endsWith('}')
       ) {
-        // Handle case where it's just the JSON object
         worldJsonString = worldFileContent.trim();
       }
     } catch (error) {
@@ -210,64 +199,125 @@ class Simulator {
 
   draw(time) {
     if (
-      !this.cars ||
+      !this.cars.length ||
       !this.world ||
       !this.viewport ||
       !this.miniMap ||
       !this.roadBorders ||
       !this.bestCar
     ) {
-      // console.warn("Simulator draw called before full initialization.");
-      return; // Don't draw if essential components aren't ready
+      return;
     }
     // Update cars
+    let aliveCount = 0;
+    let deadCount = 0;
+    let frozenCount = 0;
     for (let i = 0; i < this.cars.length; i++) {
-      // Pass road borders and empty traffic array
-      this.cars[i].update(this.roadBorders);
+      const car = this.cars[i];
+      if (car.damaged) {
+        deadCount++;
+      } else {
+        car.update(this.roadBorders);
+        aliveCount++;
+      }
     }
-    // Fitness function
-    // this.bestCar = this.cars.find(
-    //   (c) => c.fitness === Math.max(...this.cars.map((c) => c.fitness)),
-    // );
-    // Find the car with the highest fitness
-    this.bestCar = this.cars.reduce(
-      (best, current) => (current.fitness > best.fitness ? current : best),
-      this.cars[0] || null,
+    // Update fitness distance metric
+    const bestFitness = this.bestCar ? Math.round(this.bestCar.fitness) : 0;
+    this.trainingManager.updateDistance(bestFitness);
+    // Update stats display
+    this.trainingManager.updateStatsDisplay(
+      aliveCount,
+      deadCount,
+      frozenCount,
+      this.trainingManager.maxDistancePassed,
     );
-    if (!this.bestCar) return; // Exit if no best car found (e.g., cars array empty)
-    // Update world and minimap references
-    this.world.cars = this.cars;
-    this.world.bestCar = this.bestCar;
-    this.miniMap.cars = this.cars; // Update minimap with current cars
-    // Center viewport on the best car
+    // Update best car and best pool
+    const res = this.trainingManager.updateBestCarAndPool(this.cars);
+    if (res.bestCar) {
+      this.bestCar = res.bestCar;
+    }
+    const bestPool = res.bestPool;
+    // Viewport camera centering
     this.viewport.offset.x = -this.bestCar.x;
     this.viewport.offset.y = -this.bestCar.y;
-    // --- Drawing ---
-    // Reset main canvas viewport
-    this.viewport.reset(); // Applies zoom and offset transformations
-    // Calculate the view point for drawing (center of the viewport in world coordinates)
-    const viewPoint = scale(this.viewport.getOffset(), -1); // Assuming scale inverts the offset
-    // Draw the world onto the game canvas
-    this.world.draw(this.gameCtx, viewPoint, false); // Draw world elements
-    // Draw the minimap
+    this.viewport.reset();
+    const viewPoint = scale(this.viewport.getOffset(), -1);
+    // Draw world without cars (draw them ourselves to show pool rankings)
+    this.world.cars = [];
+    this.world.bestCar = null;
+    this.world.draw(this.gameCtx, viewPoint, false);
+    // Draw cars customly inside viewport coordinate space
+    const viewportTop = this.bestCar.y - this.gameCanvas.height * 2;
+    const viewportBottom = this.bestCar.y + this.gameCanvas.height * 2;
+    const poolSet = new Set(bestPool);
+    const settings = this.trainingManager.getSettings();
+    const drawMasks = settings.carCount <= 300;
+    // 1. Regular AI cars — semi-transparent
+    this.gameCtx.save();
+    this.gameCtx.globalAlpha = 0.2;
+    for (let i = 0; i < this.cars.length; i++) {
+      const car = this.cars[i];
+      if (poolSet.has(car) || car.type === 'KEYS') continue;
+      if (car.y > viewportTop && car.y < viewportBottom) {
+        car.draw(this.gameCtx, false, drawMasks);
+      }
+    }
+    this.gameCtx.restore();
+    // 2. Pool cars — full opacity, gold, sensors, rank labels
+    this.gameCtx.save();
+    this.gameCtx.globalAlpha = 1;
+    for (let i = bestPool.length - 1; i >= 0; i--) {
+      const car = bestPool[i];
+      if (car.y > viewportTop && car.y < viewportBottom) {
+        const originalColor = car.color;
+        car.color = 'gold';
+        car.draw(this.gameCtx, true, true);
+        car.color = originalColor;
+        if (car.name) {
+          this.gameCtx.save();
+          this.gameCtx.font = 'bold 13px monospace';
+          this.gameCtx.textAlign = 'center';
+          this.gameCtx.textBaseline = 'middle';
+          this.gameCtx.shadowColor = 'rgba(0,0,0,0.9)';
+          this.gameCtx.shadowBlur = 5;
+          this.gameCtx.fillStyle = 'white';
+          this.gameCtx.fillText(`#${car.name}`, car.x, car.y);
+          this.gameCtx.restore();
+        }
+      }
+    }
+    this.gameCtx.restore();
+    // 3. KEYS car — full opacity
+    const keysCar = this.cars.find((c) => c.type === 'KEYS');
+    if (keysCar && keysCar.y > viewportTop && keysCar.y < viewportBottom) {
+      keysCar.draw(this.gameCtx, false, drawMasks);
+    }
+    // Restore references for minimap
+    this.world.cars = this.cars;
+    this.world.bestCar = this.bestCar;
+    this.miniMap.cars = this.cars;
     this.miniMap.draw(viewPoint);
-    // Clear and draw the neural network visualization
-    this.networkCtx.lineDashOffset = -time / 50;
-    this.networkCtx.clearRect(
-      0,
-      0,
-      this.networkCanvas.width,
-      this.networkCanvas.height,
-    );
-    if (this.bestCar.brain) {
-      Visualizer.drawNetwork(this.networkCtx, this.bestCar.brain);
+    if (this.trainingManager.showVisualizer) {
+      this.networkCanvas.style.display = 'block';
+      this.networkCtx.lineDashOffset = -time / 50;
+      this.networkCtx.clearRect(
+        0,
+        0,
+        this.networkCanvas.width,
+        this.networkCanvas.height,
+      );
+      if (this.bestCar.brain) {
+        Visualizer.drawNetwork(this.networkCtx, this.bestCar.brain);
+      }
+    } else {
+      this.networkCanvas.style.display = 'none';
     }
   }
 
-  // Animation loop
   animate(time) {
     this.draw(time);
-    // Bind 'this' to ensure the correct context in the next animation frame
-    requestAnimationFrame(this.animate.bind(this));
+    if (!this.trainingManager.paused) {
+      this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
+    }
   }
 }

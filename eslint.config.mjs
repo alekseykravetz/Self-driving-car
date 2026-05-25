@@ -19,7 +19,7 @@ const pluginsAndRules = {
       'warn',
       {
         varsIgnorePattern:
-          '^(world|carInfo|PointDrawOptions|SegmentDrawOptions|PolygonDrawOptions|Point|Segment|Envelope|Polygon|Graph|Osm|getNearestPoint|getNearestSegment|distance|average|dot|cross|add|subtract|scale|normalize|magnitude|perpendicular|translate|angle|getIntersection|lerp|lerp2D|invLerp|rotate|degToRad|getRandomColor|getFake3dPoint|Building|Tree|WorldEditor|GraphEditor|MarkingEditor|StartEditor|TargetEditor|CrossingEditor|ParkingEditor|LightEditor|StopEditor|YieldEditor|Marking|Start|Target|Crossing|Parking|Light|Stop|Yield|TrafficManager|World|Viewport|Simulator|CameraViewSimulator|Camera|CameraControls|Car|constants|Controls|MarkerDetector|MiniMap|NeuralNetwork|PhoneControls|Race|Road|Sensor|Engine|taDaa|explode|beep|Visualizer|polysIntersect|getRGBA|save|discard|restart)$',
+          '^(world|carInfo|PointDrawOptions|SegmentDrawOptions|PolygonDrawOptions|Point|Segment|Envelope|Polygon|Graph|Osm|getNearestPoint|getNearestSegment|distance|average|dot|cross|add|subtract|scale|normalize|magnitude|perpendicular|translate|angle|getIntersection|lerp|lerp2D|invLerp|rotate|degToRad|getRandomColor|getFake3dPoint|Building|Tree|WorldEditor|GraphEditor|MarkingEditor|StartEditor|TargetEditor|CrossingEditor|ParkingEditor|LightEditor|StopEditor|YieldEditor|Marking|Start|Target|Crossing|Parking|Light|Stop|Yield|TrafficManager|World|Viewport|Simulator|CameraViewSimulator|Camera|CameraControls|Car|constants|Controls|MarkerDetector|MiniMap|NeuralNetwork|PhoneControls|Race|Road|Sensor|Engine|taDaa|explode|beep|Visualizer|polysIntersect|getRGBA|save|discard|restart|TrainingManager)$',
       },
     ],
     'padding-line-between-statements': [
@@ -156,6 +156,7 @@ const myGlobals = {
     counter: 'readonly',
     statistics: 'readonly',
     started: 'writable',
+    TrainingManager: 'readonly',
   },
 };
 

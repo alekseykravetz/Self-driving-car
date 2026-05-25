@@ -9,145 +9,66 @@ const networkCanvas = document.getElementById(
 networkCanvas.width = 300;
 const networkCtx = networkCanvas.getContext('2d')!;
 
-const carCountInput = document.getElementById('carCount') as HTMLInputElement;
-const thresholdInput = document.getElementById('threshold') as HTMLInputElement;
-const poolCountInput = document.getElementById('poolCount') as HTMLInputElement;
-const showVisualizerCheckbox = document.getElementById(
-  'showVisualizer',
-) as HTMLInputElement;
-const pauseBtn = document.getElementById('pauseBtn') as HTMLButtonElement;
-
-// Stats DOM elements
-const statGenEl = document.getElementById('stat-gen')!;
-const statAliveEl = document.getElementById('stat-alive')!;
-const statDeadEl = document.getElementById('stat-dead')!;
-const statFrozenEl = document.getElementById('stat-frozen')!;
-const statDistEl = document.getElementById('stat-dist')!;
-
 const road = new Road(gameCanvas.width / 2, gameCanvas.width * 0.9);
 const startAngle: number = angle(new Point(0, -1)) + Math.PI / 2;
 
+const CAR_START_Y = 100;
+
 // Population variables
-let N: number = parseInt(carCountInput.value) || 100;
-let poolSize: number = parseInt(poolCountInput.value) || 5;
-let cars: Car[] = generateCars(N);
-let bestCar: Car = cars[0];
+let cars: Car[] = [];
+let bestCar: Car;
 let bestPool: Car[] = [];
-let traffic: Car[] = generateTraffic();
+let traffic: Car[] = [];
 
 // Tracks the furthest-ahead traffic row that has been generated (most negative y)
 let lastGeneratedTrafficY: number = -700;
 
 // Loop control
-let paused: boolean = false;
 let animationFrameId: number = -1;
 
-// Generation counter (increments each restart)
-let iteration: number = 0;
+const trainingManager = new TrainingManager({
+  getCars: () => cars,
+  evaluateFitness: (car: Car) => CAR_START_Y - car.y,
+  onRestart: (bestBrainPool: NeuralNetwork[]) => {
+    const settings = trainingManager.getSettings();
+    cars = generateCars(settings.carCount);
+    bestCar = cars[0];
+    bestPool = [];
+    traffic = generateTraffic();
+    lastGeneratedTrafficY = -700;
 
-// All-time furthest y reached (most negative); persists across restarts
-const CAR_START_Y = 100;
-let maxDistancePassed: number = 0;
+    trainingManager.applyBrainPool(cars, bestBrainPool);
 
-// Initial load
-updateCarsWithBrain();
+    cars.push(
+      new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
+    );
 
-/**
- * Toggles the animation loop pause state and updates the button label.
- */
-function togglePause(): void {
-  paused = !paused;
-  pauseBtn.textContent = paused ? '▶️' : '⏸️';
-  if (paused) {
-    cancelAnimationFrame(animationFrameId);
-  } else {
-    // Resume: kick off the loop again
-    animationFrameId = requestAnimationFrame(animate);
-  }
-}
-
-/**
- * Loads the saved brain(s) and applies evolution/mutation based on the threshold.
- * Supports both a single best brain and a pool of top brains for crossover.
- */
-function updateCarsWithBrain(): void {
-  const storedBrains = localStorage.getItem('bestBrains');
-  const storedBrain = localStorage.getItem('bestBrain');
-  const threshold = parseFloat(thresholdInput.value) || 0.1;
-
-  let pool: NeuralNetwork[] = [];
-  if (storedBrains) {
-    pool = JSON.parse(storedBrains);
-  } else if (storedBrain) {
-    pool = [JSON.parse(storedBrain)];
-  }
-
-  if (pool.length > 0) {
-    for (let i = 0; i < cars.length; i++) {
-      if (i < pool.length) {
-        cars[i].brain = JSON.parse(JSON.stringify(pool[i]));
-      } else {
-        cars[i].brain = NeuralNetwork.mutateFromPool(pool, threshold);
-        // For pure mutation without crossover, use the following line instead:
-        // cars[i].brain = NeuralNetwork.mutate(pool[Math.floor(Math.random() * pool.length)], threshold);
-      }
+    console.log(
+      `Generation ${trainingManager.iteration} started with ${settings.carCount} cars.`,
+    );
+  },
+  onPauseToggle: (isPaused: boolean) => {
+    if (isPaused) {
+      cancelAnimationFrame(animationFrameId);
+    } else {
+      animationFrameId = requestAnimationFrame(animate);
     }
-  }
-}
+  },
+});
 
+// Initial population setup
+const initialSettings = trainingManager.getSettings();
+cars = generateCars(initialSettings.carCount);
+bestCar = cars[0];
+trainingManager.updateCarsWithBrain(cars);
 cars.push(
   new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
 );
 
-/**
- * Restarts the training with current UI settings.
- * Increments the generation counter and seeds from top performers.
- */
-function restart(): void {
-  iteration++;
-  N = parseInt(carCountInput.value);
-  poolSize = parseInt(poolCountInput.value) || 5;
+traffic = generateTraffic();
 
-  const sortedCars = cars
-    .filter((c: Car) => c.brain && c.type !== 'KEYS')
-    .sort((a, b) => a.y - b.y);
-  const bestBrainPool = sortedCars.slice(0, poolSize).map((c: Car) => c.brain);
-
-  cars = generateCars(N);
-  bestCar = cars[0];
-  bestPool = [];
-  traffic = generateTraffic();
-  lastGeneratedTrafficY = -700;
-
-  const threshold = parseFloat(thresholdInput.value) || 0.1;
-
-  if (bestBrainPool.length > 0) {
-    console.log(
-      `Evolving next generation from ${bestBrainPool.length} top cars.`,
-    );
-    for (let i = 0; i < cars.length; i++) {
-      if (i < bestBrainPool.length) {
-        cars[i].brain = JSON.parse(JSON.stringify(bestBrainPool[i]));
-      } else {
-        cars[i].brain = NeuralNetwork.mutateFromPool(
-          bestBrainPool as NeuralNetwork[],
-          threshold,
-        );
-      }
-    }
-  } else {
-    updateCarsWithBrain();
-  }
-
-  cars.push(
-    new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
-  );
-
-  // If paused, resume so the new generation is visible immediately
-  if (paused) togglePause();
-
-  console.log(`Generation ${iteration} started with ${N} cars.`);
-}
+// Start the animation loop
+animationFrameId = requestAnimationFrame(animate);
 
 /**
  * Returns the hardcoded initial traffic cars.
@@ -269,36 +190,6 @@ function generateCars(n: number): Car[] {
   return generatedCars;
 }
 
-/**
- * Saves the brains of the top performing cars to localStorage.
- */
-function save(): void {
-  const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
-  const sortedCars = cars
-    .filter((c: Car) => c.brain && c.type !== 'KEYS')
-    .sort((a, b) => a.y - b.y);
-  const bestBrainPool = sortedCars
-    .slice(0, currentPoolSize)
-    .map((c: Car) => c.brain);
-
-  if (bestBrainPool.length > 0) {
-    localStorage.setItem('bestBrains', JSON.stringify(bestBrainPool));
-    localStorage.setItem('bestBrain', JSON.stringify(bestBrainPool[0]));
-    console.log(`Saved top ${bestBrainPool.length} brains.`);
-  } else {
-    console.warn('Could not save brains: no cars with brains found.');
-  }
-}
-
-/**
- * Removes the saved brains from localStorage.
- */
-function discard(): void {
-  localStorage.removeItem('bestBrain');
-  localStorage.removeItem('bestBrains');
-  console.log('Stored brains discarded.');
-}
-
 /** Gold highlight color used for all cars in the best pool. */
 const POOL_COLOR = 'gold';
 
@@ -318,25 +209,6 @@ function drawCarName(ctx: CanvasRenderingContext2D, car: Car): void {
   ctx.fillText(`#${car.name}`, car.x, car.y);
   ctx.restore();
 }
-
-/**
- * Writes live simulation stats into the stats panel DOM elements.
- */
-function updateStatsDisplay(
-  alive: number,
-  dead: number,
-  frozen: number,
-  maxDist: number,
-): void {
-  statGenEl.textContent = String(iteration);
-  statAliveEl.textContent = String(alive);
-  statDeadEl.textContent = String(dead);
-  statFrozenEl.textContent = String(frozen);
-  statDistEl.textContent = String(maxDist);
-}
-
-// Start the animation loop
-animationFrameId = requestAnimationFrame(animate);
 
 /**
  * The main animation loop. Updates and draws the simulation state each frame.
@@ -398,33 +270,26 @@ function animate(time?: number): void {
 
   // Track all-time max distance (cars start at y=100; more negative = further ahead)
   const currentDist = Math.round(CAR_START_Y - bestCar.y);
-  if (currentDist > maxDistancePassed) {
-    maxDistancePassed = currentDist;
-  }
+  trainingManager.updateDistance(currentDist);
 
   // Update stats display every frame
-  updateStatsDisplay(aliveCount, deadCount, frozenCount, maxDistancePassed);
+  trainingManager.updateStatsDisplay(
+    aliveCount,
+    deadCount,
+    frozenCount,
+    trainingManager.maxDistancePassed,
+  );
 
   // --- Identify best pool from AI brain cars ---
-  const currentPoolSize = parseInt(poolCountInput.value) || poolSize;
-  const aiBrainCars = cars.filter((c) => c.brain && c.type !== 'KEYS');
-  aiBrainCars.sort((a, b) => a.y - b.y);
-  bestPool = aiBrainCars.slice(0, currentPoolSize);
-
-  // Assign / clear pool rank names
-  for (const car of aiBrainCars) {
-    car.name = undefined;
+  const res = trainingManager.updateBestCarAndPool(cars);
+  if (res.bestCar) {
+    bestCar = res.bestCar;
   }
-  for (let i = 0; i < bestPool.length; i++) {
-    bestPool[i].name = String(i + 1);
-  }
-
-  if (bestPool.length > 0) {
-    bestCar = bestPool[0];
-  }
+  bestPool = res.bestPool;
 
   const poolSet = new Set<Car>(bestPool);
-  const drawMasks = N <= 300;
+  const settings = trainingManager.getSettings();
+  const drawMasks = settings.carCount <= 300;
 
   // --- Draw Game Canvas ---
   gameCtx.save();
@@ -479,7 +344,7 @@ function animate(time?: number): void {
   gameCtx.restore();
 
   // --- Draw Network Canvas ---
-  if (showVisualizerCheckbox.checked) {
+  if (trainingManager.showVisualizer) {
     networkCanvas.style.display = 'block';
     // Animate the network visualization's line dashes
     networkCtx.lineDashOffset = -(time || 0) / 50;
@@ -492,7 +357,7 @@ function animate(time?: number): void {
   }
 
   // Schedule next frame only when not paused
-  if (!paused) {
+  if (!trainingManager.paused) {
     animationFrameId = requestAnimationFrame(animate);
   }
 }
