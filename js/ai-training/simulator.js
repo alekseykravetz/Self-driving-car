@@ -208,7 +208,19 @@ class Simulator {
     ) {
       return;
     }
-    // Update cars
+    // Pre-compute midpoints and half-lengths for each border segment (for spatial filtering)
+    const PROXIMITY_THRESHOLD = 250; // sensor ray length (150) + car size + buffer
+    const borderMidpoints = [];
+    for (let i = 0; i < this.roadBorders.length; i++) {
+      const seg = this.roadBorders[i];
+      const mx = (seg[0].x + seg[1].x) * 0.5;
+      const my = (seg[0].y + seg[1].y) * 0.5;
+      const dx = seg[1].x - seg[0].x;
+      const dy = seg[1].y - seg[0].y;
+      const halfLen = Math.sqrt(dx * dx + dy * dy) * 0.5;
+      borderMidpoints.push({ mx, my, halfLen });
+    }
+    // Update cars with spatial filtering
     let aliveCount = 0;
     let deadCount = 0;
     let frozenCount = 0;
@@ -217,7 +229,17 @@ class Simulator {
       if (car.damaged) {
         deadCount++;
       } else {
-        car.update(this.roadBorders);
+        // Only pass nearby road border segments to the car
+        const nearbyBorders = [];
+        const threshold = PROXIMITY_THRESHOLD;
+        for (let j = 0; j < this.roadBorders.length; j++) {
+          const { mx, my, halfLen } = borderMidpoints[j];
+          const dist = Math.abs(mx - car.x) + Math.abs(my - car.y);
+          if (dist < threshold + halfLen) {
+            nearbyBorders.push(this.roadBorders[j]);
+          }
+        }
+        car.update(nearbyBorders);
         aliveCount++;
       }
     }

@@ -125,6 +125,13 @@ Uses `polysIntersect(carPolygon, obstacle)` which checks all pairs of edges for 
 
 If any intersection found: `damaged = true`, car stops updating.
 
+> **Performance note**: With large populations (500+ cars), each car only
+> receives _nearby_ polygons via spatial filtering (proximity threshold ≈ 250 px).
+> This avoids the O(cars × total_polygons) explosion that would otherwise make
+> sensor ray-casting and collision detection prohibitively expensive. See
+> `simpleRoadSimulator.ts` (binary-search on y-sorted traffic) and `simulator.ts`
+> (Manhattan-distance filter on border segment midpoints).
+
 ---
 
 ### AI Integration

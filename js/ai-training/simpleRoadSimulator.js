@@ -201,7 +201,10 @@ function animate(time) {
   for (let i = 0; i < traffic.length; i++) {
     traffic[i].update(road.borders);
   }
-  const polygons = [...road.borders, ...traffic.map((c) => c.polygon)];
+  // Sort traffic by y for efficient binary-search spatial lookups
+  traffic.sort((a, b) => a.y - b.y);
+  // Proximity threshold: sensor ray length (150) + car height (50) + buffer
+  const PROXIMITY_THRESHOLD = 250;
   // --- Update AI cars; tally live stats in the same pass ---
   let aliveCount = 0;
   let deadCount = 0;
@@ -212,8 +215,23 @@ function animate(time) {
     if (car.damaged) {
       deadCount++;
     } else if (inRange) {
-      // Undamaged and in range — actively driving, counts as alive
-      car.update(polygons);
+      // Build per-car polygons with only nearby traffic (binary search on sorted array)
+      const nearbyPolygons = [...road.borders];
+      const minY = car.y - PROXIMITY_THRESHOLD;
+      const maxY = car.y + PROXIMITY_THRESHOLD;
+      // Binary search for first traffic car with y >= minY
+      let lo = 0;
+      let hi = traffic.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (traffic[mid].y < minY) lo = mid + 1;
+        else hi = mid;
+      }
+      // Scan forward from lo while within range
+      for (let j = lo; j < traffic.length && traffic[j].y <= maxY; j++) {
+        nearbyPolygons.push(traffic[j].polygon);
+      }
+      car.update(nearbyPolygons);
       aliveCount++;
     } else {
       // Undamaged but outside the update window — frozen/idle, not counted as alive
