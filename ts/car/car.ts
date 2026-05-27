@@ -1,10 +1,12 @@
 type CarControls = Controls | PhoneControls | CameraControls;
 
 interface CarInfo {
-  brain: NeuralNetwork;
+  brain?: NeuralNetwork;
   maxSpeed: number;
   friction: number;
   acceleration: number;
+  width: number;
+  height: number;
   sensor: {
     rayCount: number;
     raySpread: number;
@@ -97,16 +99,37 @@ class Car {
   }
 
   load(info: CarInfo): void {
-    this.brain = info.brain;
+    if (info.brain) {
+      this.brain = info.brain;
+    }
     this.maxSpeed = info.maxSpeed;
     this.friction = info.friction;
     this.acceleration = info.acceleration;
+    if (info.width) this.width = info.width;
+    if (info.height) this.height = info.height;
     if (this.sensor) {
       this.sensor.rayCount = info.sensor.rayCount;
       this.sensor.raySpread = info.sensor.raySpread;
       this.sensor.rayLength = info.sensor.rayLength;
       this.sensor.rayOffset = info.sensor.rayOffset;
     }
+  }
+
+  toInfo(): CarInfo {
+    return {
+      brain: this.brain ? JSON.parse(JSON.stringify(this.brain)) : undefined,
+      maxSpeed: this.maxSpeed,
+      friction: this.friction,
+      acceleration: this.acceleration,
+      width: this.width,
+      height: this.height,
+      sensor: {
+        rayCount: this.sensor?.rayCount ?? 5,
+        raySpread: this.sensor?.raySpread ?? Math.PI / 2,
+        rayLength: this.sensor?.rayLength ?? 150,
+        rayOffset: this.sensor?.rayOffset ?? 0,
+      },
+    };
   }
 
   update(polygons: Point[][] = []): void {

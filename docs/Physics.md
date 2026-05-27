@@ -10,10 +10,12 @@ The `ts/car/` directory implements vehicle dynamics, environmental perception vi
 
 ```typescript
 interface CarInfo {
-  brain: NeuralNetwork
+  brain?: NeuralNetwork       // Optional — omitted if saving config without brain
   maxSpeed: number
   friction: number
   acceleration: number
+  width: number
+  height: number
   sensor: { rayCount: number; raySpread: number; rayLength: number; rayOffset: number }
 }
 
@@ -44,8 +46,23 @@ class Car {
   // Methods
   update(polygons: Point[][]): void
   draw(ctx, drawSensor?: boolean, drawMask?: boolean): void
+  load(info: CarInfo): void         // Apply config to this car
+  toInfo(): CarInfo                 // Serialize car state to CarInfo
 }
 ```
+
+### Serialization
+
+`Car.toInfo()` captures the full car configuration as a `CarInfo` object:
+
+- Physics: maxSpeed, acceleration, friction
+- Size: width, height
+- Sensor: rayCount, rayLength, raySpread, rayOffset
+- Brain: deep-cloned neural network (or undefined if no brain)
+
+`Car.load(info)` applies a `CarInfo` to the car. If `info.brain` is present it's loaded; if `info.width`/`info.height` are present they override car dimensions. Sensor config is applied directly to the sensor instance.
+
+**File format** (`.car` files): Plain JSON object matching the `CarInfo` interface. Legacy files using `let carInfo = {...}` format are also supported for loading.
 
 ### Movement Model
 

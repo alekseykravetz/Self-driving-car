@@ -16,6 +16,18 @@ class TrainingManager {
   restartBtn = null;
   saveBtn = null;
   discardBtn = null;
+  // Car config DOM elements
+  carMaxSpeedInput = null;
+  carAccelerationInput = null;
+  carFrictionInput = null;
+  carWidthInput = null;
+  carHeightInput = null;
+  carRayCountInput = null;
+  carRayLengthInput = null;
+  carRaySpreadInput = null;
+  carRayOffsetInput = null;
+  saveCarBtn = null;
+  loadCarInput = null;
   statGenEl = null;
   statAliveEl = null;
   statDeadEl = null;
@@ -39,11 +51,25 @@ class TrainingManager {
     this.restartBtn = document.getElementById('restartBtn');
     this.saveBtn = document.getElementById('saveBtn');
     this.discardBtn = document.getElementById('discardBtn');
+    // Car config inputs
+    this.carMaxSpeedInput = document.getElementById('carMaxSpeed');
+    this.carAccelerationInput = document.getElementById('carAcceleration');
+    this.carFrictionInput = document.getElementById('carFriction');
+    this.carWidthInput = document.getElementById('carWidth');
+    this.carHeightInput = document.getElementById('carHeight');
+    this.carRayCountInput = document.getElementById('carRayCount');
+    this.carRayLengthInput = document.getElementById('carRayLength');
+    this.carRaySpreadInput = document.getElementById('carRaySpread');
+    this.carRayOffsetInput = document.getElementById('carRayOffset');
+    this.saveCarBtn = document.getElementById('saveCarBtn');
+    this.loadCarInput = document.getElementById('loadCarInput');
     this.statGenEl = document.getElementById('stat-gen');
     this.statAliveEl = document.getElementById('stat-alive');
     this.statDeadEl = document.getElementById('stat-dead');
     this.statFrozenEl = document.getElementById('stat-frozen');
     this.statDistEl = document.getElementById('stat-dist');
+    // Initialize car config from localStorage or global carInfo
+    this.#loadInitialCarConfig();
   }
 
   addEventListeners() {
@@ -58,6 +84,14 @@ class TrainingManager {
     }
     if (this.discardBtn) {
       this.discardBtn.addEventListener('click', () => this.discard());
+    }
+    if (this.saveCarBtn) {
+      this.saveCarBtn.addEventListener('click', () => this.saveCarToFile());
+    }
+    if (this.loadCarInput) {
+      this.loadCarInput.addEventListener('change', (e) =>
+        this.#loadCarFromFile(e),
+      );
     }
   }
 
@@ -170,12 +204,180 @@ class TrainingManager {
     } else {
       console.warn('Could not save brains: no cars with brains found.');
     }
+    // Also save full car config to localStorage
+    const carSettings = this.getCarSettings();
+    localStorage.setItem('bestCarInfo', JSON.stringify(carSettings));
+    console.log('Car config saved to localStorage.');
   }
 
   discard() {
     localStorage.removeItem('bestBrain');
     localStorage.removeItem('bestBrains');
-    console.log('Stored brains discarded from localStorage.');
+    localStorage.removeItem('bestCarInfo');
+    console.log('Stored brains and car config discarded from localStorage.');
+  }
+
+  getCarSettings() {
+    return {
+      maxSpeed: this.carMaxSpeedInput
+        ? parseFloat(this.carMaxSpeedInput.value) || 3
+        : 3,
+      acceleration: this.carAccelerationInput
+        ? parseFloat(this.carAccelerationInput.value) || 0.2
+        : 0.2,
+      friction: this.carFrictionInput
+        ? parseFloat(this.carFrictionInput.value) || 0.05
+        : 0.05,
+      width: this.carWidthInput ? parseInt(this.carWidthInput.value) || 30 : 30,
+      height: this.carHeightInput
+        ? parseInt(this.carHeightInput.value) || 50
+        : 50,
+      sensor: {
+        rayCount: this.carRayCountInput
+          ? parseInt(this.carRayCountInput.value) || 5
+          : 5,
+        rayLength: this.carRayLengthInput
+          ? parseInt(this.carRayLengthInput.value) || 150
+          : 150,
+        raySpread: this.carRaySpreadInput
+          ? parseFloat(this.carRaySpreadInput.value) || Math.PI / 2
+          : Math.PI / 2,
+        rayOffset: this.carRayOffsetInput
+          ? parseFloat(this.carRayOffsetInput.value) || 0
+          : 0,
+      },
+    };
+  }
+
+  setCarSettings(info) {
+    if (this.carMaxSpeedInput)
+      this.carMaxSpeedInput.value = String(info.maxSpeed);
+    if (this.carAccelerationInput)
+      this.carAccelerationInput.value = String(info.acceleration);
+    if (this.carFrictionInput)
+      this.carFrictionInput.value = String(info.friction);
+    if (this.carWidthInput) this.carWidthInput.value = String(info.width);
+    if (this.carHeightInput) this.carHeightInput.value = String(info.height);
+    if (this.carRayCountInput)
+      this.carRayCountInput.value = String(info.sensor.rayCount);
+    if (this.carRayLengthInput)
+      this.carRayLengthInput.value = String(info.sensor.rayLength);
+    if (this.carRaySpreadInput)
+      this.carRaySpreadInput.value = String(info.sensor.raySpread);
+    if (this.carRayOffsetInput)
+      this.carRayOffsetInput.value = String(info.sensor.rayOffset);
+  }
+
+  applyCarSettingsToCars(cars) {
+    const config = this.getCarSettings();
+    for (const car of cars) {
+      car.maxSpeed = config.maxSpeed;
+      car.acceleration = config.acceleration;
+      car.friction = config.friction;
+      car.width = config.width;
+      car.height = config.height;
+      if (car.sensor) {
+        const rayCountChanged = car.sensor.rayCount !== config.sensor.rayCount;
+        car.sensor.rayCount = config.sensor.rayCount;
+        car.sensor.rayLength = config.sensor.rayLength;
+        car.sensor.raySpread = config.sensor.raySpread;
+        car.sensor.rayOffset = config.sensor.rayOffset;
+        // Rebuild brain if ray count changed and brain exists
+        if (rayCountChanged && car.brain) {
+          car.brain = new NeuralNetwork([config.sensor.rayCount + 1, 6, 4]);
+        }
+      }
+    }
+  }
+
+  saveCarToFile() {
+    const cars = this.getCars();
+    const sortedCars = cars
+      .filter((c) => c.brain && c.type !== 'KEYS')
+      .sort((a, b) => this.evaluateFitness(b) - this.evaluateFitness(a));
+    const bestCar = sortedCars.length > 0 ? sortedCars[0] : null;
+    const carInfo = bestCar ? bestCar.toInfo() : this.getCarSettings();
+    const json = JSON.stringify(carInfo, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'car.car';
+    a.click();
+    URL.revokeObjectURL(url);
+    console.log('Car config saved to file.');
+  }
+
+  #loadCarFromFile(e) {
+    const input = e.target;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (!event.target?.result) return;
+      const content = event.target.result;
+      const carInfo = this.#parseCarFile(content);
+      if (carInfo) {
+        this.setCarSettings(carInfo);
+        // Store brain from loaded file if present
+        if (carInfo.brain) {
+          localStorage.setItem('bestBrain', JSON.stringify(carInfo.brain));
+          localStorage.setItem('bestBrains', JSON.stringify([carInfo.brain]));
+        }
+        localStorage.setItem('bestCarInfo', JSON.stringify(carInfo));
+        console.log('Car config loaded from file.');
+      } else {
+        alert('Failed to parse car file.');
+      }
+      input.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  #parseCarFile(content) {
+    try {
+      // Try plain JSON first
+      const trimmed = content.trim();
+      if (trimmed.startsWith('{')) {
+        return JSON.parse(trimmed);
+      }
+      // Legacy format: let carInfo = { ... }
+      const match = content.match(/=\s*([\s\S]*?)\s*;?\s*$/);
+      if (match) {
+        // Remove trailing semicolons and whitespace
+        let jsonStr = match[1].trim();
+        if (jsonStr.endsWith(';')) jsonStr = jsonStr.slice(0, -1).trim();
+        return JSON.parse(jsonStr);
+      }
+      return null;
+    } catch (err) {
+      console.error('Error parsing car file:', err);
+      return null;
+    }
+  }
+
+  #loadInitialCarConfig() {
+    // Priority: localStorage > global carInfo > defaults (already in HTML)
+    const stored = localStorage.getItem('bestCarInfo');
+    if (stored) {
+      try {
+        const info = JSON.parse(stored);
+        this.setCarSettings(info);
+        return;
+      } catch (e) {
+        console.warn('Failed to parse stored car config', e);
+      }
+    }
+    // Check global carInfo (from legacy script tag)
+    if (typeof carInfo !== 'undefined') {
+      this.setCarSettings(carInfo);
+      if (carInfo.brain) {
+        localStorage.setItem('bestBrain', JSON.stringify(carInfo.brain));
+        localStorage.setItem('bestBrains', JSON.stringify([carInfo.brain]));
+      }
+      localStorage.setItem('bestCarInfo', JSON.stringify(carInfo));
+      console.log('Global Car info loaded to localStorage.');
+    }
   }
 
   updateDistance(currentDist) {

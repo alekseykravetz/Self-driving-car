@@ -23,15 +23,27 @@ const trainingManager = new TrainingManager({
   evaluateFitness: (car) => CAR_START_Y - car.y,
   onRestart: (bestBrainPool) => {
     const settings = trainingManager.getSettings();
-    cars = generateCars(settings.carCount);
+    const carConfig = trainingManager.getCarSettings();
+    cars = generateCars(settings.carCount, carConfig);
     bestCar = cars[0];
     bestPool = [];
     traffic = generateTraffic();
     lastGeneratedTrafficY = -700;
+    trainingManager.applyCarSettingsToCars(cars);
     trainingManager.applyBrainPool(cars, bestBrainPool);
-    cars.push(
-      new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
+    const keysCar = new Car(
+      road.getLaneCenter(1),
+      100,
+      carConfig.width,
+      carConfig.height,
+      'KEYS',
+      startAngle,
+      carConfig.maxSpeed,
+      'red',
     );
+    keysCar.acceleration = carConfig.acceleration;
+    keysCar.friction = carConfig.friction;
+    cars.push(keysCar);
     console.log(
       `Generation ${trainingManager.iteration} started with ${settings.carCount} cars.`,
     );
@@ -46,12 +58,24 @@ const trainingManager = new TrainingManager({
 });
 // Initial population setup
 const initialSettings = trainingManager.getSettings();
-cars = generateCars(initialSettings.carCount);
+const initialCarConfig = trainingManager.getCarSettings();
+cars = generateCars(initialSettings.carCount, initialCarConfig);
 bestCar = cars[0];
+trainingManager.applyCarSettingsToCars(cars);
 trainingManager.updateCarsWithBrain(cars);
-cars.push(
-  new Car(road.getLaneCenter(1), 100, 30, 50, 'KEYS', startAngle, 3, 'red'),
+const initialKeysCar = new Car(
+  road.getLaneCenter(1),
+  100,
+  initialCarConfig.width,
+  initialCarConfig.height,
+  'KEYS',
+  startAngle,
+  initialCarConfig.maxSpeed,
+  'red',
 );
+initialKeysCar.acceleration = initialCarConfig.acceleration;
+initialKeysCar.friction = initialCarConfig.friction;
+cars.push(initialKeysCar);
 traffic = generateTraffic();
 // Start the animation loop
 animationFrameId = requestAnimationFrame(animate);
@@ -165,11 +189,20 @@ function generateTrafficRow(y) {
 /**
  * Generates an array of AI-controlled Car instances.
  */
-function generateCars(n) {
+function generateCars(n, config) {
   const generatedCars = [];
   for (let i = 1; i <= n; i++) {
     generatedCars.push(
-      new Car(road.getLaneCenter(1), 100, 30, 50, 'AI', startAngle, 3, 'blue'),
+      new Car(
+        road.getLaneCenter(1),
+        100,
+        config.width,
+        config.height,
+        'AI',
+        startAngle,
+        config.maxSpeed,
+        'blue',
+      ),
     );
   }
   return generatedCars;

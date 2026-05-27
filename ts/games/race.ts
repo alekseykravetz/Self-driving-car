@@ -82,7 +82,11 @@ class Race {
       );
       car.name = type === 'AI' ? 'AI ' + i : 'Player ' + i;
 
-      if (typeof carInfo !== 'undefined') {
+      // Load car config from localStorage or legacy global
+      const storedCarInfo = localStorage.getItem('bestCarInfo');
+      if (storedCarInfo) {
+        car.load(JSON.parse(storedCarInfo));
+      } else if (typeof carInfo !== 'undefined') {
         car.load(carInfo);
       }
       cars.push(car);

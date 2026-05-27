@@ -40,6 +40,7 @@ class Simulator {
           ...this.generateCars(settings.carCount, 'AI'),
         ];
         this.bestCar = this.cars[0];
+        this.trainingManager.applyCarSettingsToCars(this.cars);
         this.trainingManager.applyBrainPool(this.cars, bestBrainPool);
         if (this.world) this.world.cars = this.cars;
         if (this.miniMap) this.miniMap.cars = this.cars;
@@ -82,25 +83,21 @@ class Simulator {
       ? startMarkings[0].directionVector
       : new Point(0, -1);
     const startAngle = -angle(direction) + Math.PI / 2;
+    const config = this.trainingManager.getCarSettings();
     const cars = [];
     for (let i = 1; i <= n; i++) {
       const color = type === 'AI' ? getRandomColor() : 'blue';
       const car = new Car(
         startPoint.x,
         startPoint.y,
-        30, // width
-        50, // height
+        config.width,
+        config.height,
         type,
         startAngle,
-        3, // maxSpeed
+        config.maxSpeed,
         color,
       );
       car.name = type === 'AI' ? `AI ${i}` : `Player ${i}`;
-      if (typeof carInfo !== 'undefined') {
-        car.load(carInfo);
-      } else {
-        console.warn('carInfo not found for car.load()');
-      }
       cars.push(car);
     }
     return cars;
@@ -125,6 +122,7 @@ class Simulator {
       ...this.generateCars(settings.carCount, 'AI'),
     ];
     this.bestCar = this.cars[0];
+    this.trainingManager.applyCarSettingsToCars(this.cars);
     this.trainingManager.updateCarsWithBrain(this.cars);
     this.#updateRoadBorders();
   }

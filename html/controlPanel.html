@@ -120,3 +120,139 @@
     title="Show neural network visualizer"
   />
 </div>
+
+<div class="ctrl-divider"></div>
+
+<!-- ── Car Config ──────────────────────────────────── -->
+<div class="ctrl">
+  <span class="ctrl-label">Max Speed</span>
+  <input
+    type="number"
+    id="carMaxSpeed"
+    value="3"
+    step="0.5"
+    min="1"
+    max="20"
+    title="Car maximum speed"
+  />
+</div>
+
+<div class="ctrl">
+  <span class="ctrl-label">Accel</span>
+  <input
+    type="number"
+    id="carAcceleration"
+    value="0.2"
+    step="0.01"
+    min="0.01"
+    max="1"
+    title="Car acceleration"
+  />
+</div>
+
+<div class="ctrl">
+  <span class="ctrl-label">Friction</span>
+  <input
+    type="number"
+    id="carFriction"
+    value="0.05"
+    step="0.01"
+    min="0.01"
+    max="0.5"
+    title="Car friction"
+  />
+</div>
+
+<!-- <div class="ctrl">
+  <span class="ctrl-label">Width</span>
+  <input
+    type="number"
+    id="carWidth"
+    value="30"
+    step="5"
+    min="10"
+    max="100"
+    title="Car width"
+  />
+</div>
+
+<div class="ctrl">
+  <span class="ctrl-label">Height</span>
+  <input
+    type="number"
+    id="carHeight"
+    value="50"
+    step="5"
+    min="20"
+    max="150"
+    title="Car height"
+  />
+</div> -->
+
+<div class="ctrl">
+  <span class="ctrl-label">Rays</span>
+  <input
+    type="number"
+    id="carRayCount"
+    value="5"
+    step="1"
+    min="1"
+    max="20"
+    title="Sensor ray count"
+  />
+</div>
+
+<div class="ctrl">
+  <span class="ctrl-label">Ray Len</span>
+  <input
+    type="number"
+    id="carRayLength"
+    value="150"
+    step="10"
+    min="50"
+    max="500"
+    title="Sensor ray length"
+  />
+</div>
+
+<div class="ctrl">
+  <span class="ctrl-label">Ray Spread</span>
+  <input
+    type="number"
+    id="carRaySpread"
+    value="1.57"
+    step="0.1"
+    min="0.1"
+    max="6.28"
+    title="Sensor ray spread (radians)"
+  />
+</div>
+
+<div class="ctrl">
+  <span class="ctrl-label">Ray Offset</span>
+  <input
+    type="number"
+    id="carRayOffset"
+    value="0"
+    step="0.1"
+    min="-3.14"
+    max="3.14"
+    title="Sensor ray offset (radians)"
+  />
+</div>
+
+<div class="ctrl-divider"></div>
+
+<!-- ── Save / Load Car ─────────────────────────────── -->
+<div class="ctrl">
+  <span class="ctrl-label">Save Car</span>
+  <button id="saveCarBtn" title="Download car config as .car file">📥</button>
+</div>
+
+<div class="ctrl">
+  <span class="ctrl-label">Load Car</span>
+  <label for="loadCarInput" class="file-input-label">
+    📂
+    <input type="file" id="loadCarInput" accept=".car,.json" />
+  </label>
+</div>

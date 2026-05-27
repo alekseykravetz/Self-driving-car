@@ -30,17 +30,30 @@ class TrainingManager {
   poolCountInput: HTMLInputElement     // Elite pool size
   statGenEl, statAliveEl, statDeadEl, statFrozenEl, statDistEl: HTMLElement
 
-  // Methods
+  // Car config UI elements
+  carMaxSpeedInput, carAccelerationInput, carFrictionInput: HTMLInputElement
+  carWidthInput, carHeightInput: HTMLInputElement
+  carRayCountInput, carRayLengthInput, carRaySpreadInput, carRayOffsetInput: HTMLInputElement
+  saveCarBtn: HTMLButtonElement
+  loadCarInput: HTMLInputElement
+
+  // Training methods
   getSettings(): { carCount: number; poolSize: number; mutationRate: number }
   togglePause(forceState?: boolean): void
   restart(): void
-  save(): void
-  discard(): void
+  save(): void                                    // Saves brains + car config to localStorage
+  discard(): void                                 // Removes all saved data from localStorage
   updateCarsWithBrain(cars: Car[]): void
   applyBrainPool(cars: Car[], bestBrainPool: NeuralNetwork[]): void
   updateDistance(currentDist: number): void
   updateStatsDisplay(alive, dead, frozen, maxDist): void
   updateBestCarAndPool(cars: Car[]): { bestCar: Car; bestPool: Car[] }
+
+  // Car config methods
+  getCarSettings(): CarInfo                       // Reads car config from UI inputs
+  setCarSettings(info: CarInfo): void             // Populates UI inputs from CarInfo
+  applyCarSettingsToCars(cars: Car[]): void       // Applies config to all cars (rebuilds brain if rayCount changes)
+  saveCarToFile(): void                           // Downloads best car as .car JSON file
 }
 ```
 
@@ -48,22 +61,32 @@ class TrainingManager {
 
 ```
 ┌─────────────────────────────────────────────┐
-│ 1. Load bestBrains from localStorage        │
-│ 2. Generate N cars                          │
+│ 1. Load bestBrains + bestCarInfo from       │
+│    localStorage (or legacy global carInfo)   │
+│ 2. Generate N cars with car config from UI  │
 │ 3. Apply brains:                            │
 │    - First K: exact copies (elitism)        │
 │    - Rest: mutateFromPool(pool, rate)       │
+│ 4. Apply car config to all cars:            │
+│    - Physics: maxSpeed, acceleration,       │
+│      friction                               │
+│    - Size: width, height                    │
+│    - Sensors: rayCount, rayLength,          │
+│      raySpread, rayOffset                   │
+│    - If rayCount changed: rebuild brain     │
+│      architecture [rayCount+1, 6, 4]        │
 ├─────────────────────────────────────────────┤
-│ 4. Simulation runs...                       │
+│ 5. Simulation runs...                       │
 │    - Each frame: update all cars            │
 │    - Track alive/dead/frozen counts         │
 │    - Update best distance stat              │
 ├─────────────────────────────────────────────┤
-│ 5. User clicks "Save" or auto-save:        │
+│ 6. User clicks "Save":                     │
 │    - Sort cars by fitness                   │
 │    - Take top K → new bestPool             │
-│    - Store in localStorage                  │
-│ 6. Restart → back to step 1                │
+│    - Store brains + full CarInfo in         │
+│      localStorage                           │
+│ 7. Restart → back to step 1                │
 └─────────────────────────────────────────────┘
 ```
 
@@ -71,16 +94,28 @@ class TrainingManager {
 
 Loaded via XMLHttpRequest into simulator pages. Contains:
 
-| Control       | Type       | Range     | Purpose                             |
-| ------------- | ---------- | --------- | ----------------------------------- |
-| Car Count     | Slider     | 0–5000    | Population per generation           |
-| Pool Size     | Slider     | 1–20      | Number of elite survivors           |
-| Mutation Rate | Slider     | 0.001–1.0 | Randomization strength              |
-| Save          | Button     | —         | Persist best brains to localStorage |
-| Discard       | Button     | —         | Clear saved brains                  |
-| Pause         | Button     | —         | Toggle simulation pause             |
-| Restart       | Button     | —         | New generation from current pool    |
-| Load World    | File input | .world    | Load custom map                     |
+| Control       | Type       | Range      | Purpose                                       |
+| ------------- | ---------- | ---------- | --------------------------------------------- |
+| Car Count     | Number     | 0–5000     | Population per generation                     |
+| Pool Size     | Number     | 1–20       | Number of elite survivors                     |
+| Mutation Rate | Number     | 0.001–1.0  | Randomization strength                        |
+| Save          | Button     | —          | Persist brains + car config to localStorage   |
+| Discard       | Button     | —          | Clear all saved data from localStorage        |
+| Pause         | Button     | —          | Toggle simulation pause                       |
+| Restart       | Button     | —          | New generation from current pool              |
+| Load World    | File input | .world     | Load custom map                               |
+| Network       | Checkbox   | —          | Show/hide neural network visualizer           |
+| Max Speed     | Number     | 1–20       | Car maximum speed                             |
+| Accel         | Number     | 0.01–1     | Car acceleration per frame                    |
+| Friction      | Number     | 0.01–0.5   | Car friction per frame                        |
+| Width         | Number     | 10–100     | Car body width (px)                           |
+| Height        | Number     | 20–150     | Car body height (px)                          |
+| Rays          | Number     | 1–20       | Sensor ray count                              |
+| Ray Len       | Number     | 50–500     | Sensor ray length (px)                        |
+| Ray Spread    | Number     | 0.1–6.28   | Sensor angular spread (radians)               |
+| Ray Offset    | Number     | -3.14–3.14 | Sensor angular offset (radians)               |
+| Save Car      | Button     | —          | Download best car as `.car` JSON file         |
+| Load Car      | File input | .car/.json | Load car config from file (updates UI + cars) |
 
 **Statistics display**:
 

@@ -226,39 +226,61 @@ fitness = distance traveled along corridor
 ### Generation Cycle
 
 ```
-1. generateCars(N) → each gets mutated brain from pool
-2. animate() loop → all cars drive simultaneously
-3. Cars crash → marked damaged, stop updating
-4. All dead or timeout → evaluate fitness
-5. Top K cars → bestPool[]
-6. Save bestBrain to localStorage
-7. restart() → new generation from pool + mutations
+1. generateCars(N) → use car config from UI (physics, size, sensors)
+2. Apply brains from pool (top K unmodified, rest mutated)
+3. applyCarSettingsToCars() → ensure physics/sensors match UI config
+4. animate() loop → all cars drive simultaneously
+5. Cars crash → marked damaged, stop updating
+6. All dead or timeout → evaluate fitness
+7. Top K cars → bestPool[]
+8. Save: brains + full CarInfo to localStorage
+9. restart() → new generation from pool + mutations + current car config
 ```
 
 ---
 
 ## Persistence Layer
 
-### LocalStorage
+### LocalStorage Keys
 
-- `bestBrain` — JSON of single top-performing `NeuralNetwork`
-- `bestBrains` — JSON array of top K networks (breeding pool)
+| Key           | Content                                                    |
+| ------------- | ---------------------------------------------------------- |
+| `bestBrain`   | JSON of single top-performing `NeuralNetwork`              |
+| `bestBrains`  | JSON array of top K networks (breeding pool)               |
+| `bestCarInfo` | JSON `CarInfo` object (physics, size, sensors, best brain) |
+| `world`       | JSON world state (used by some pages as fallback)          |
 
 ### File System (saves/)
 
 - `.world` files — Complete world state (graph, roads, buildings, markings, viewport)
-- `.car` files — Car configuration (brain, physics params, sensor config)
+- `.car` files — Car configuration as plain JSON (`CarInfo` object: brain, physics, sensors, size)
 - `.json` files — Raw OpenStreetMap data for import
 
 ### Serialization Format
 
-World and car files use JavaScript variable assignment syntax:
+World files use JavaScript variable assignment syntax:
 
 ```javascript
 const worldVariable = ({ graph: {...}, roadWidth: 100, ... })
 ```
 
-Parsed at load time via regex extraction + `JSON.parse()` or `eval()`.
+Parsed at load time via regex extraction + `JSON.parse()`.
+
+Car files (`.car`) are saved as plain JSON objects:
+
+```json
+{
+  "maxSpeed": 8,
+  "acceleration": 0.08,
+  "friction": 0.04,
+  "width": 30,
+  "height": 50,
+  "sensor": { "rayCount": 2, "rayLength": 350, "raySpread": 0.8, "rayOffset": -0.4 },
+  "brain": { "levels": [...] }
+}
+```
+
+Legacy `.car` files using `let carInfo = {...}` format are also supported for loading (backward compatibility).
 
 ---
 
