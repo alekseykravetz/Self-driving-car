@@ -14,10 +14,7 @@ const startAngle: number = angle(new Point(0, -1)) + Math.PI / 2;
 
 const CAR_START_Y = 100;
 
-// Population variables
-let cars: Car[] = [];
-let bestCar: Car;
-let bestPool: Car[] = [];
+// Traffic state
 let traffic: Car[] = [];
 
 // Tracks the furthest-ahead traffic row that has been generated (most negative y)
@@ -27,37 +24,15 @@ let lastGeneratedTrafficY: number = -700;
 let animationFrameId: number = -1;
 
 const trainingManager = new TrainingManager({
-  getCars: () => cars,
   evaluateFitness: (car: Car) => CAR_START_Y - car.y,
-  onRestart: (bestBrainPool: NeuralNetwork[]) => {
-    const settings = trainingManager.getSettings();
-    const carConfig = trainingManager.getCarSettings();
-    cars = generateCars(settings.carCount, carConfig);
-    bestCar = cars[0];
-    bestPool = [];
+  getStartInfo: () => ({
+    x: road.getLaneCenter(1),
+    y: CAR_START_Y,
+    angle: startAngle,
+  }),
+  onCarsCreated: () => {
     traffic = generateTraffic();
     lastGeneratedTrafficY = -700;
-
-    trainingManager.applyCarSettingsToCars(cars);
-    trainingManager.applyBrainPool(cars, bestBrainPool);
-
-    const keysCar = new Car(
-      road.getLaneCenter(1),
-      100,
-      carConfig.width,
-      carConfig.height,
-      'KEYS',
-      startAngle,
-      carConfig.maxSpeed,
-      'red',
-    );
-    keysCar.acceleration = carConfig.acceleration;
-    keysCar.friction = carConfig.friction;
-    cars.push(keysCar);
-
-    console.log(
-      `Generation ${trainingManager.iteration} started with ${settings.carCount} cars.`,
-    );
   },
   onPauseToggle: (isPaused: boolean) => {
     if (isPaused) {
@@ -69,27 +44,7 @@ const trainingManager = new TrainingManager({
 });
 
 // Initial population setup
-const initialSettings = trainingManager.getSettings();
-const initialCarConfig = trainingManager.getCarSettings();
-cars = generateCars(initialSettings.carCount, initialCarConfig);
-bestCar = cars[0];
-trainingManager.applyCarSettingsToCars(cars);
-trainingManager.updateCarsWithBrain(cars);
-
-const initialKeysCar = new Car(
-  road.getLaneCenter(1),
-  100,
-  initialCarConfig.width,
-  initialCarConfig.height,
-  'KEYS',
-  startAngle,
-  initialCarConfig.maxSpeed,
-  'red',
-);
-initialKeysCar.acceleration = initialCarConfig.acceleration;
-initialKeysCar.friction = initialCarConfig.friction;
-cars.push(initialKeysCar);
-
+trainingManager.initializeCars();
 traffic = generateTraffic();
 
 // Start the animation loop
@@ -202,28 +157,6 @@ function generateTrafficRow(y: number): Car[] {
   );
 }
 
-/**
- * Generates an array of AI-controlled Car instances.
- */
-function generateCars(n: number, config: CarInfo): Car[] {
-  const generatedCars: Car[] = [];
-  for (let i = 1; i <= n; i++) {
-    generatedCars.push(
-      new Car(
-        road.getLaneCenter(1),
-        100,
-        config.width,
-        config.height,
-        'AI',
-        startAngle,
-        config.maxSpeed,
-        'blue',
-      ),
-    );
-  }
-  return generatedCars;
-}
-
 /** Gold highlight color used for all cars in the best pool. */
 const POOL_COLOR = 'gold';
 
@@ -233,6 +166,9 @@ const POOL_COLOR = 'gold';
 function animate(time?: number): void {
   gameCanvas.height = window.innerHeight;
   networkCanvas.height = window.innerHeight;
+
+  const cars = trainingManager.cars;
+  const bestCar = trainingManager.bestCar || cars[0];
 
   const viewportTop = bestCar.y - gameCanvas.height * 0.7;
   const viewportBottom = bestCar.y + gameCanvas.height * 0.3;
@@ -316,11 +252,7 @@ function animate(time?: number): void {
   );
 
   // --- Identify best pool from AI brain cars ---
-  const res = trainingManager.updateBestCarAndPool(cars);
-  if (res.bestCar) {
-    bestCar = res.bestCar;
-  }
-  bestPool = res.bestPool;
+  trainingManager.updateBestCarAndPool();
 
   const settings = trainingManager.getSettings();
   const drawMasks = settings.carCount <= 300;
@@ -344,7 +276,7 @@ function animate(time?: number): void {
   drawSimulatorCars(
     gameCtx,
     cars,
-    bestPool,
+    trainingManager.bestPool,
     viewportTop - 100,
     viewportBottom + 100,
     drawMasks,

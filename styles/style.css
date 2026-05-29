@@ -19,38 +19,66 @@ body.main-page {
 #verticalButtons {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 4px;
-  padding: 10px 8px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-  min-width: 88px;
+  gap: 0;
+  padding: 0;
+  background: rgba(15, 15, 20, 0.92);
+  border-radius: 12px;
+  min-width: 180px;
+  max-width: 200px;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-/* Thin separator between logical groups */
-.ctrl-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.15);
-  margin: 2px 0;
+#verticalButtons::-webkit-scrollbar {
+  width: 4px;
+}
+#verticalButtons::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* ── Panel sections ────────────────────────────────────────────── */
+.panel-section {
+  padding: 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.panel-section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-size: 10px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* ── Stats panel ───────────────────────────────────────────────── */
 #statsPanel {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 4px 2px 2px;
+  gap: 4px;
 }
 
 .stat-row {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 2px;
+  gap: 6px;
+  padding: 3px 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
 }
 
 .stat-emoji {
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -58,79 +86,216 @@ body.main-page {
 .stat-label {
   font-size: 10px;
   font-family: Arial, sans-serif;
-  color: #999;
+  color: #888;
   flex: 1;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
 
 .stat-value {
-  font-size: 11px;
+  font-size: 12px;
   font-family: monospace;
   font-weight: 700;
   color: #e8e8e8;
-  min-width: 24px;
+  min-width: 28px;
   text-align: right;
+}
+
+/* ── Button groups ─────────────────────────────────────────────── */
+.btn-group-large {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.btn-row:last-child {
+  margin-bottom: 0;
+}
+.btn-row > * {
+  flex: 1;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.btn-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Large action buttons */
+.btn-lg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+  box-sizing: border-box;
+}
+.btn-lg:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.02);
+}
+.btn-lg:active {
+  transform: scale(0.98);
+}
+.btn-lg.btn-primary {
+  background: rgba(80, 180, 80, 0.25);
+  color: #7ddf7d;
+  border: 1px solid rgba(80, 180, 80, 0.3);
+}
+.btn-lg.btn-primary:hover {
+  background: rgba(80, 180, 80, 0.4);
+}
+.btn-lg.btn-danger {
+  background: rgba(200, 60, 60, 0.2);
+  color: #e88;
+  border: 1px solid rgba(200, 60, 60, 0.25);
+}
+.btn-lg.btn-danger:hover {
+  background: rgba(200, 60, 60, 0.35);
+}
+
+/* Small buttons */
+.btn-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  padding: 0 8px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ccc;
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  transition: background 0.15s;
+  box-sizing: border-box;
+}
+.btn-sm:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+.btn-sm.btn-danger-outline {
+  border: 1px solid rgba(200, 60, 60, 0.3);
+  color: #c88;
+}
+.btn-sm.btn-danger-outline:hover {
+  background: rgba(200, 60, 60, 0.2);
+  color: #e88;
+}
+
+/* ── Parameter grid ────────────────────────────────────────────── */
+.param-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 /* ── Individual controls ───────────────────────────────────────── */
 .ctrl {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 3px;
+}
+
+/* ── Toggle row (checkbox) ─────────────────────────────────────── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px;
+}
+
+/* ── Car Config 2-column grid ──────────────────────────────────── */
+.car-config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
 }
 
 .ctrl-label {
   font-size: 9px;
   font-family: Arial, sans-serif;
   font-weight: 700;
-  color: #aaa;
+  color: #888;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   user-select: none;
   white-space: nowrap;
 }
 
-/* Buttons */
-#verticalButtons button {
+/* Buttons (legacy fallback) */
+#verticalButtons button:not(.btn-lg):not(.btn-sm) {
   border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
+  border-radius: 6px;
+  padding: 6px 10px;
   cursor: pointer;
-  background-color: lightgray;
-  font-size: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  font-size: 14px;
   line-height: 1;
   width: 100%;
+  transition: background 0.15s;
 }
-#verticalButtons button:hover {
-  background: white;
+#verticalButtons button:not(.btn-lg):not(.btn-sm):hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Number inputs */
 #verticalButtons input[type='number'] {
   width: 100%;
-  border: none;
-  border-radius: 5px;
-  padding: 4px 5px;
-  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 5px 6px;
+  font-size: 12px;
   text-align: center;
-  background: lightgray;
+  background: rgba(255, 255, 255, 0.07);
+  color: #e0e0e0;
   cursor: text;
   box-sizing: border-box;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 #verticalButtons input[type='number']:focus {
-  outline: 2px solid gold;
-  background: white;
+  outline: none;
+  border-color: rgba(255, 200, 50, 0.6);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* Checkbox */
 #verticalButtons input[type='checkbox'] {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
   margin: 0;
-  accent-color: gold;
+  accent-color: #5cb85c;
 }
 
 /* ── Legacy / shared styles ────────────────────────────────────── */
@@ -151,6 +316,32 @@ button,
 button:hover,
 .file-input-label:hover {
   background: white;
+}
+
+/* File input label inside panel */
+#verticalButtons .file-input-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  padding: 0 8px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ccc;
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  margin: 0;
+  transition: background 0.15s;
+  box-sizing: border-box;
+}
+#verticalButtons .file-input-label:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
 }
 
 input[type='file'] {

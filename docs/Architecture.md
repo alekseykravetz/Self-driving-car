@@ -83,6 +83,10 @@ graph TD
     World --> Simulator
     World --> Race
     World --> CameraViewSim
+    WorldLoader --> Simulator
+    WorldLoader --> Race
+    WorldLoader --> CameraViewSim
+    WorldLoader --> WorldEditor
     Sensor --> Car
     Controls --> Car
     NeuralNetwork --> Car
@@ -158,13 +162,37 @@ Environment generation and interactive editing.
 
 Training environments and genetic algorithm orchestration.
 
-| Module                   | Responsibility                                           |
-| ------------------------ | -------------------------------------------------------- |
-| `trainingManager.ts`     | Population management, fitness evaluation, pool breeding |
-| `simulator.ts`           | Full-world training with custom maps                     |
-| `simpleRoadSimulator.ts` | Straight 3-lane road with random traffic                 |
-| `simulatorUtils.ts`      | Shared car drawing with pool highlighting                |
-| `cameraViewSimulator.ts` | 3D perspective training environment                      |
+| Module                   | Responsibility                                                         |
+| ------------------------ | ---------------------------------------------------------------------- |
+| `trainingManager.ts`     | Car generation, population state, fitness, pool breeding, UI controls  |
+| `simulator.ts`           | Full-world animation/rendering (delegates training to TrainingManager) |
+| `simpleRoadSimulator.ts` | Straight 3-lane road animation + traffic generation                    |
+| `simulatorUtils.ts`      | Shared car drawing with pool highlighting                              |
+| `cameraViewSimulator.ts` | 3D perspective training environment                                    |
+
+**TrainingManager** is the single source of truth for training state:
+
+- Owns `cars[]`, `bestCar`, `bestPool`
+- Generates cars internally (simulators provide only `getStartInfo(): {x, y, angle}`)
+- Manages two distinct operations:
+  - **Next Generation** (🧬) — keeps top brains from current pool, mutates the rest
+  - **New Training** (🔄) — resets to generation 0 with no brains (fresh start)
+- Auto-triggers new training when car parameters (speed, rays, etc.) change
+- Handles brain persistence (save/load/discard from localStorage and .car files)
+
+### 5b. World Loader (`ts/world-loader/`)
+
+| Module           | Responsibility                                         |
+| ---------------- | ------------------------------------------------------ |
+| `worldLoader.ts` | Reusable file-input handler for loading `.world` files |
+
+`WorldLoader` is a shared utility used by all pages that support loading world files. It:
+
+- Attaches to an existing `#loadWorldInput` element (or creates one at top-left corner)
+- Reads the file, extracts JSON from `World.load({...})` format or raw JSON
+- Invokes a callback with the parsed world data
+
+Usage: `new WorldLoader((worldInfo) => this.#initializeXxx(worldInfo))`
 
 ### 6. Viewport & Rendering (`ts/viewport/`, `ts/mini-map/`, `ts/camera.ts`)
 
@@ -226,16 +254,34 @@ fitness = distance traveled along corridor
 ### Generation Cycle
 
 ```
-1. generateCars(N) → use car config from UI (physics, size, sensors)
+1. TrainingManager.generateCars(N) → uses getStartInfo() + car config from UI
 2. Apply brains from pool (top K unmodified, rest mutated)
 3. applyCarSettingsToCars() → ensure physics/sensors match UI config
-4. animate() loop → all cars drive simultaneously
-5. Cars crash → marked damaged, stop updating
-6. All dead or timeout → evaluate fitness
-7. Top K cars → bestPool[]
-8. Save: brains + full CarInfo to localStorage
-9. restart() → new generation from pool + mutations + current car config
+4. onCarsCreated() → simulator updates references (world.cars, miniMap, etc.)
+5. animate() loop → all cars drive simultaneously
+6. Cars crash → marked damaged, stop updating
+7. All dead or user clicks:
+   - "Next Gen" (🧬) → nextGeneration() → top K pool + mutations
+   - "New Train" (🔄) → newTraining() → generation 0, no brains
+8. Top K cars → bestPool[] (tracked per frame)
+9. Save: brains + full CarInfo to localStorage
 ```
+
+### Car Parameter Changes
+
+When any car config input changes (maxSpeed, acceleration, friction, width, height,
+rayCount, rayLength, raySpread, rayOffset), TrainingManager automatically calls
+`newTraining()` — this ensures the neural network input layer matches the new sensor
+configuration and physics are consistent from generation 0.
+
+### Loading Car Files
+
+When a `.car` file is loaded:
+
+1. Car settings UI is updated
+2. If the file contains a brain → stored to localStorage
+3. If no brain → stored brains are cleared
+4. `newTraining()` is triggered (fresh start with new config)
 
 ---
 
@@ -288,17 +334,17 @@ Legacy `.car` files using `let carInfo = {...}` format are also supported for lo
 
 Each HTML file is a standalone application that loads the required subset of modules:
 
-| File                       | Modules Loaded                      | Purpose              |
-| -------------------------- | ----------------------------------- | -------------------- |
-| `index.html`               | None (links only)                   | Landing page         |
-| `simpleRoadSimulator.html` | Car, Network, Road, TrainingManager | Basic training       |
-| `simulator.html`           | Full stack                          | World-based training |
-| `cameraViewSimulator.html` | Full stack + Camera                 | 3D perspective       |
-| `race.html`                | Full stack + Race + Camera          | Keyboard racing      |
-| `race-camera.html`         | Full + CameraControls               | Webcam racing        |
-| `race-phone.html`          | Full + PhoneControls                | Mobile racing        |
-| `world.html`               | World + Editors + Viewport          | Map creation         |
-| `controlPanel.html`        | N/A (loaded via XHR)                | Reusable training UI |
+| File                       | Modules Loaded                           | Purpose              |
+| -------------------------- | ---------------------------------------- | -------------------- |
+| `index.html`               | None (links only)                        | Landing page         |
+| `simpleRoadSimulator.html` | Car, Network, Road, TrainingManager      | Basic training       |
+| `simulator.html`           | Full stack + WorldLoader                 | World-based training |
+| `cameraViewSimulator.html` | Full stack + Camera + WorldLoader        | 3D perspective       |
+| `race.html`                | Full stack + Race + Camera + WorldLoader | Keyboard racing      |
+| `race-camera.html`         | Full + CameraControls                    | Webcam racing        |
+| `race-phone.html`          | Full + PhoneControls                     | Mobile racing        |
+| `world.html`               | World + Editors + Viewport + WorldLoader | Map creation         |
+| `controlPanel.html`        | N/A (loaded via XHR)                     | Reusable training UI |
 
 ---
 

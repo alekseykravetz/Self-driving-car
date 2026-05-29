@@ -550,7 +550,9 @@ class Camera implements ICameraPoint {
           : [],
       ),
     ]);
-    const carPolygons: Polygon[] = this.#extrudeCar(filteredCarBase?.[0] || []);
+    const carPolygons: Polygon[] = filteredCarBase.length
+      ? this.#extrudeCar(filteredCarBase[0])
+      : [];
 
     // Filter car shadows (don't extrude)
     const carShadowBases: Polygon[] = this.#filter(

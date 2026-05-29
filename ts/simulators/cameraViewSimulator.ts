@@ -9,12 +9,11 @@ class CameraViewSimulator {
   private camera: Camera | null = null;
   private viewport: Viewport | null = null;
   private miniMap: MiniMap | null = null;
+  private roadBorders: Point[][] | null = null;
 
-  private N: number = 0; // Default AI cars for this mode
+  private N: number = 10; // Default AI cars for this mode
   private cars: Car[] | null = null;
   private myCar: Car | null = null; // The player's car
-
-  private loadWorldInput?: HTMLInputElement;
 
   constructor(
     gameCanvas: HTMLCanvasElement,
@@ -27,7 +26,7 @@ class CameraViewSimulator {
     this.cameraCtx = cameraCanvas.getContext('2d')!; // Assert non-null
     this.miniMapCanvas = miniMapCanvas;
 
-    this.#addEventListeners();
+    new WorldLoader((worldInfo) => this.#initializeRace(worldInfo as World));
 
     if (typeof world === 'undefined') {
       const worldString = localStorage.getItem('world');
@@ -86,21 +85,10 @@ class CameraViewSimulator {
     return cars;
   }
 
-  #addEventListeners(): void {
-    this.loadWorldInput = document.getElementById(
-      'loadWorldInput',
-    ) as HTMLInputElement;
-    if (this.loadWorldInput) {
-      this.loadWorldInput.addEventListener(
-        'change',
-        this.loadWorldFromFile.bind(this),
-      );
-    }
-  }
-
   #initializeRace(worldInfo: World | null): void {
     console.log('Initializing race with world info:', worldInfo);
     this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+    this.roadBorders = [...this.world.roadBorders.map((s) => [s.p1, s.p2])];
 
     this.viewport = new Viewport(
       this.gameCanvas,
@@ -142,69 +130,6 @@ class CameraViewSimulator {
     this.miniMap.cars = this.cars;
   }
 
-  private loadWorldFromFile(e: Event): void {
-    const input = e.target as HTMLInputElement;
-    const worldFile = input.files?.[0];
-
-    if (!worldFile) {
-      alert('No file selected');
-      input.value = ''; // Clear input
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = this.#onLoadWorldFromFileRead.bind(this);
-    reader.onerror = () => {
-      alert(`Error reading file: ${reader.error}`);
-      input.value = ''; // Clear input on error
-    };
-    reader.readAsText(worldFile);
-  }
-
-  #onLoadWorldFromFileRead(e: ProgressEvent<FileReader>): void {
-    if (!e.target?.result) {
-      alert('Could not read file content');
-      return;
-    }
-    const worldFileContent = e.target.result as string;
-
-    let worldJsonString: string | null = null;
-    try {
-      // Attempt to extract JSON assuming format `variableName = ({...});` or just `({...})`
-      const startIndex = worldFileContent.indexOf('(');
-      const endIndex = worldFileContent.lastIndexOf(')');
-      if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
-        worldJsonString = worldFileContent.substring(startIndex + 1, endIndex);
-      } else if (
-        worldFileContent.trim().startsWith('{') &&
-        worldFileContent.trim().endsWith('}')
-      ) {
-        // Handle case where it's just the JSON object
-        worldJsonString = worldFileContent.trim();
-      }
-    } catch (error) {
-      console.error('Error processing world file content:', error);
-      alert('Error processing world file content. Check console for details.');
-      return;
-    }
-
-    if (!worldJsonString) {
-      alert(
-        'Could not extract world data from the file. Ensure it contains a valid JSON object within parentheses or as the main content.',
-      );
-      return;
-    }
-
-    try {
-      const worldInfo = JSON.parse(worldJsonString);
-      this.#initializeRace(worldInfo);
-    } catch (error) {
-      console.error('Error parsing world JSON:', error);
-      alert('Failed to parse world data. Ensure the file contains valid JSON.');
-      return;
-    }
-  }
-
   private draw(): void {
     // Check for initialization before drawing
     if (
@@ -220,8 +145,39 @@ class CameraViewSimulator {
     }
 
     // Update all cars
+    // for (let i = 0; i < this.cars.length; i++) {
+    //   this.cars[i].update();
+    //   this.cars[i].update(this.roadBorders || []);
+    // }
+
+    const roadBorders = this.roadBorders || [];
+
+    // Pre-compute midpoints and half-lengths for each border segment (for spatial filtering)
+    const PROXIMITY_THRESHOLD = 250; // sensor ray length (150) + car size + buffer
+    const borderMidpoints: { mx: number; my: number; halfLen: number }[] = [];
+    for (let i = 0; i < roadBorders.length; i++) {
+      const seg = roadBorders[i];
+      const mx = (seg[0].x + seg[1].x) * 0.5;
+      const my = (seg[0].y + seg[1].y) * 0.5;
+      const dx = seg[1].x - seg[0].x;
+      const dy = seg[1].y - seg[0].y;
+      const halfLen = Math.sqrt(dx * dx + dy * dy) * 0.5;
+      borderMidpoints.push({ mx, my, halfLen });
+    }
+
     for (let i = 0; i < this.cars.length; i++) {
-      this.cars[i].update();
+      const car = this.cars[i];
+      // Only pass nearby road border segments to the car
+      const nearbyBorders: Point[][] = [];
+      const threshold = PROXIMITY_THRESHOLD;
+      for (let j = 0; j < roadBorders.length; j++) {
+        const { mx, my, halfLen } = borderMidpoints[j];
+        const dist = Math.abs(mx - car.x) + Math.abs(my - car.y);
+        if (dist < threshold + halfLen) {
+          nearbyBorders.push(roadBorders[j]);
+        }
+      }
+      car.update(nearbyBorders);
     }
 
     // Update world state for drawing purposes

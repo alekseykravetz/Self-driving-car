@@ -6,56 +6,70 @@ The project provides multiple simulation environments for training and testing a
 
 ## Training Manager (`ts/ai-training/trainingManager.ts`)
 
-The shared control system orchestrating genetic training across all simulators.
+The central training orchestrator that owns all population state and car generation logic. Simulators are thin animation shells that delegate training decisions to this class.
 
 ### Class Structure
 
 ```typescript
 interface TrainingManagerOptions {
-  getCars: () => Car[]
-  evaluateFitness: (car: Car) => number
-  onRestart: (bestBrainPool: NeuralNetwork[]) => void
-  onPauseToggle?: (paused: boolean) => void
+  evaluateFitness: (car: Car) => number;
+  getStartInfo: () => { x: number; y: number; angle: number };
+  onCarsCreated: (cars: Car[]) => void;
+  onPauseToggle?: (paused: boolean) => void;
 }
 
 class TrainingManager {
-  // State
-  iteration: number
-  maxDistancePassed: number
-  paused: boolean
+  // Public state (read by simulators for rendering)
+  cars: Car[];
+  bestCar: Car | null;
+  bestPool: Car[];
+  iteration: number;
+  maxDistancePassed: number;
+  paused: boolean;
 
-  // UI Elements (bound from controlPanel.html)
-  carCountInput: HTMLInputElement      // Population size
-  thresholdInput: HTMLInputElement     // Mutation rate
-  poolCountInput: HTMLInputElement     // Elite pool size
-  statGenEl, statAliveEl, statDeadEl, statFrozenEl, statDistEl: HTMLElement
+  // Car generation (fully internal)
+  private generateCars(n, type, config): Car[]; // Uses getStartInfo() for position
 
-  // Car config UI elements
-  carMaxSpeedInput, carAccelerationInput, carFrictionInput: HTMLInputElement
-  carWidthInput, carHeightInput: HTMLInputElement
-  carRayCountInput, carRayLengthInput, carRaySpreadInput, carRayOffsetInput: HTMLInputElement
-  saveCarBtn: HTMLButtonElement
-  loadCarInput: HTMLInputElement
+  // Training lifecycle
+  initializeCars(): void; // First-time setup (loads brains from localStorage)
+  nextGeneration(): void; // Keeps top brains, mutates rest, increments gen
+  newTraining(): void; // Resets to gen 0, no brains (fresh start)
 
-  // Training methods
-  getSettings(): { carCount: number; poolSize: number; mutationRate: number }
-  togglePause(forceState?: boolean): void
-  restart(): void
-  save(): void                                    // Saves brains + car config to localStorage
-  discard(): void                                 // Removes all saved data from localStorage
-  updateCarsWithBrain(cars: Car[]): void
-  applyBrainPool(cars: Car[], bestBrainPool: NeuralNetwork[]): void
-  updateDistance(currentDist: number): void
-  updateStatsDisplay(alive, dead, frozen, maxDist): void
-  updateBestCarAndPool(cars: Car[]): { bestCar: Car; bestPool: Car[] }
+  // Per-frame updates
+  updateDistance(currentDist): void;
+  updateStatsDisplay(alive, dead, frozen, maxDist): void;
+  updateBestCarAndPool(): void;
 
-  // Car config methods
-  getCarSettings(): CarInfo                       // Reads car config from UI inputs
-  setCarSettings(info: CarInfo): void             // Populates UI inputs from CarInfo
-  applyCarSettingsToCars(cars: Car[]): void       // Applies config to all cars (rebuilds brain if rayCount changes)
-  saveCarToFile(): void                           // Downloads best car as .car JSON file
+  // Brain management
+  updateCarsWithBrain(cars): void; // Apply brains from localStorage
+  applyBrainPool(cars, pool): void; // Apply brains from in-memory pool
+  save(): void; // Persist brains + car config to localStorage
+  discard(): void; // Clear all saved data
+
+  // Car config
+  getSettings(): { carCount; poolSize; mutationRate };
+  getCarSettings(): CarInfo;
+  setCarSettings(info): void;
+  applyCarSettingsToCars(cars): void;
+
+  // File I/O
+  saveCarToFile(): void; // Download best car as .car JSON
+  // loadCarFromFile → auto-triggers newTraining()
 }
 ```
+
+### Key Design Decisions
+
+1. **TrainingManager generates cars** — simulators only provide `getStartInfo()` (position + angle). This eliminates duplicated car-creation logic.
+
+2. **Two distinct restart modes**:
+
+   - `nextGeneration()` — preserves learning (elitism + mutation)
+   - `newTraining()` — clean slate (no brains, generation counter reset)
+
+3. **Auto-restart on config change** — all car parameter inputs have `change` listeners that call `newTraining()`. This ensures neural network architecture matches sensor config from generation 0.
+
+4. **Loading .car files triggers fresh training** — if the file has no brain, stored brains are cleared; either way, `newTraining()` is called so the new config takes effect immediately.
 
 ### Genetic Algorithm Workflow
 
@@ -63,16 +77,13 @@ class TrainingManager {
 ┌─────────────────────────────────────────────┐
 │ 1. Load bestBrains + bestCarInfo from       │
 │    localStorage (or legacy global carInfo)   │
-│ 2. Generate N cars with car config from UI  │
+│ 2. generateCars(N) using getStartInfo() +   │
+│    car config from UI                       │
 │ 3. Apply brains:                            │
 │    - First K: exact copies (elitism)        │
 │    - Rest: mutateFromPool(pool, rate)       │
-│ 4. Apply car config to all cars:            │
-│    - Physics: maxSpeed, acceleration,       │
-│      friction                               │
-│    - Size: width, height                    │
-│    - Sensors: rayCount, rayLength,          │
-│      raySpread, rayOffset                   │
+│ 4. applyCarSettingsToCars() → ensure        │
+│    physics/sensors match UI config          │
 │    - If rayCount changed: rebuild brain     │
 │      architecture [rayCount+1, 6, 4]        │
 ├─────────────────────────────────────────────┤
@@ -80,13 +91,15 @@ class TrainingManager {
 │    - Each frame: update all cars            │
 │    - Track alive/dead/frozen counts         │
 │    - Update best distance stat              │
+│    - updateBestCarAndPool() per frame       │
 ├─────────────────────────────────────────────┤
-│ 6. User clicks "Save":                     │
-│    - Sort cars by fitness                   │
-│    - Take top K → new bestPool             │
-│    - Store brains + full CarInfo in         │
-│      localStorage                           │
-│ 7. Restart → back to step 1                │
+│ 6. User clicks "Next Gen" (🧬):            │
+│    - Sort by fitness, take top K brains     │
+│    - nextGeneration() → gen++ + mutations   │
+│ 7. User clicks "New Train" (🔄):           │
+│    - newTraining() → gen=0, no brains       │
+│ 8. User clicks "Save" (💾):                │
+│    - Top K brains + CarInfo → localStorage  │
 └─────────────────────────────────────────────┘
 ```
 
@@ -102,20 +115,23 @@ Loaded via XMLHttpRequest into simulator pages. Contains:
 | Save          | Button     | —          | Persist brains + car config to localStorage   |
 | Discard       | Button     | —          | Clear all saved data from localStorage        |
 | Pause         | Button     | —          | Toggle simulation pause                       |
-| Restart       | Button     | —          | New generation from current pool              |
+| Next Gen      | Button     | —          | Next generation (keeps top brains + mutates)  |
+| New Train     | Button     | —          | Fresh training (gen 0, no brains)             |
 | Load World    | File input | .world     | Load custom map                               |
 | Network       | Checkbox   | —          | Show/hide neural network visualizer           |
-| Max Speed     | Number     | 1–20       | Car maximum speed                             |
-| Accel         | Number     | 0.01–1     | Car acceleration per frame                    |
-| Friction      | Number     | 0.01–0.5   | Car friction per frame                        |
-| Width         | Number     | 10–100     | Car body width (px)                           |
-| Height        | Number     | 20–150     | Car body height (px)                          |
-| Rays          | Number     | 1–20       | Sensor ray count                              |
-| Ray Len       | Number     | 50–500     | Sensor ray length (px)                        |
-| Ray Spread    | Number     | 0.1–6.28   | Sensor angular spread (radians)               |
-| Ray Offset    | Number     | -3.14–3.14 | Sensor angular offset (radians)               |
+| Max Speed     | Number     | 1–20       | Car maximum speed (change → new training)     |
+| Accel         | Number     | 0.01–1     | Car acceleration (change → new training)      |
+| Friction      | Number     | 0.01–0.5   | Car friction (change → new training)          |
+| Width         | Number     | 10–100     | Car body width (change → new training)        |
+| Height        | Number     | 20–150     | Car body height (change → new training)       |
+| Rays          | Number     | 1–20       | Sensor ray count (change → new training)      |
+| Ray Len       | Number     | 50–500     | Sensor ray length (change → new training)     |
+| Ray Spread    | Number     | 0.1–6.28   | Sensor angular spread (change → new training) |
+| Ray Offset    | Number     | -3.14–3.14 | Sensor angular offset (change → new training) |
 | Save Car      | Button     | —          | Download best car as `.car` JSON file         |
-| Load Car      | File input | .car/.json | Load car config from file (updates UI + cars) |
+| Load Car      | File input | .car/.json | Load car config (triggers new training)       |
+
+**Car config layout**: Uses a 2-column CSS grid (`.car-config-grid`) to fit on small screens.
 
 **Statistics display**:
 
@@ -138,12 +154,19 @@ const road = new Road(canvas.width / 2, canvas.width * 0.9, 3); // Centered, 3 l
 const CAR_START_Y = 100;
 
 const trainingManager = new TrainingManager({
-  getCars: () => cars,
   evaluateFitness: (car) => CAR_START_Y - car.y, // Distance = upward travel
-  onRestart: (pool) => {
-    /* regenerate cars with pool */
+  getStartInfo: () => ({
+    x: road.getLaneCenter(1),
+    y: CAR_START_Y,
+    angle: startAngle,
+  }),
+  onCarsCreated: () => {
+    traffic = generateTraffic();
+    lastGeneratedTrafficY = -700;
   },
 });
+
+trainingManager.initializeCars();
 ```
 
 ### Traffic Generation
@@ -191,10 +214,8 @@ class Simulator {
   world: World | null;
   viewport: Viewport | null;
   miniMap: MiniMap | null;
-  cars: Car[];
-  bestCar: Car | null;
   roadBorders: Point[][] | null;
-  trainingManager: TrainingManager;
+  trainingManager: TrainingManager; // Owns cars, bestCar, bestPool
 }
 ```
 
@@ -203,7 +224,7 @@ class Simulator {
 1. Load `.world` file (from file input or default)
 2. `World.load(worldInfo)` → reconstruct full world
 3. `world.generateCorridor(start, end)` → define training path
-4. Generate cars at start marking position
+4. TrainingManager generates cars at start marking position via `getStartInfo()`
 5. Apply brain pool from localStorage
 6. Begin animation loop
 
@@ -220,20 +241,23 @@ class Simulator {
 
 ```typescript
 animate(time) {
+  const cars = trainingManager.cars;
+  const bestCar = trainingManager.bestCar;
+
   // Update all cars against nearby road borders only (spatial filtering)
   for (car of cars) car.update(nearbyBorders)
 
-  // Find best performer
-  { bestCar, bestPool } = trainingManager.updateBestCarAndPool(cars)
+  // Update training state
+  trainingManager.updateBestCarAndPool()
 
   // Center viewport on best car
   viewport.offset = { x: -bestCar.x, y: -bestCar.y }
 
   // Draw world, cars, network, mini-map
   world.draw(ctx, viewPoint)
-  drawSimulatorCars(ctx, cars, bestPool, ...)
+  drawSimulatorCars(ctx, cars, trainingManager.bestPool, ...)
   Visualizer.drawNetwork(networkCtx, bestCar.brain)
-  miniMap.draw(viewPoint, { cars })
+  miniMap.draw(viewPoint)
 
   requestAnimationFrame(animate)
 }

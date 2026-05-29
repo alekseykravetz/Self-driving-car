@@ -16,7 +16,6 @@ class Race {
   roadBorders = null;
   frameCount = 0;
   started = false;
-  loadWorldInput = null;
   statistics;
   counter;
   constructor(gameCanvas, cameraCanvas, miniMapCanvas, controls = null) {
@@ -75,14 +74,7 @@ class Race {
   }
 
   #addEventListeners() {
-    this.loadWorldInput = document.getElementById('loadWorldInput');
-    // not all race games have Load World Input
-    if (this.loadWorldInput) {
-      this.loadWorldInput.addEventListener(
-        'change',
-        this.loadWorldFromFile.bind(this),
-      );
-    }
+    new WorldLoader((worldInfo) => this.#initializeRace(worldInfo));
     this.statistics = document.getElementById('statistics');
     this.counter = document.getElementById('counter');
   }
@@ -149,59 +141,6 @@ class Race {
     }
     this.animate();
     this.startCounter();
-  }
-
-  loadWorldFromFile(e) {
-    const input = e.target;
-    const worldFile = input.files?.[0];
-    if (!worldFile) {
-      alert('No file selected');
-      return;
-    }
-    const reader = new FileReader();
-    reader.readAsText(worldFile);
-    reader.onload = (event) => this.#onLoadWorldFromFileRead(event);
-  }
-
-  #onLoadWorldFromFileRead(e) {
-    if (!e.target?.result) {
-      alert('Could not read file content');
-      return;
-    }
-    const worldFileContent = e.target.result;
-    let worldJsonString = null;
-    try {
-      // Attempt to extract JSON assuming format `variableName = ({...});` or just `({...})`
-      const startIndex = worldFileContent.indexOf('(');
-      const endIndex = worldFileContent.lastIndexOf(')');
-      if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
-        worldJsonString = worldFileContent.substring(startIndex + 1, endIndex);
-      } else if (
-        worldFileContent.trim().startsWith('{') &&
-        worldFileContent.trim().endsWith('}')
-      ) {
-        // Handle case where it's just the JSON object
-        worldJsonString = worldFileContent.trim();
-      }
-    } catch (error) {
-      console.error('Error processing world file content:', error);
-      alert('Error processing world file content. Check console for details.');
-      return;
-    }
-    if (!worldJsonString) {
-      alert(
-        'Could not extract world data from the file. Ensure it contains a valid JSON object within parentheses or as the main content.',
-      );
-      return;
-    }
-    try {
-      const worldInfo = JSON.parse(worldJsonString);
-      this.#initializeRace(worldInfo);
-    } catch (error) {
-      console.error('Error parsing world JSON:', error);
-      alert('Failed to parse world data. Ensure the file contains valid JSON.');
-      return;
-    }
   }
 
   updateCarProgress(car) {

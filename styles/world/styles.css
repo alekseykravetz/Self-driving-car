@@ -1,16 +1,45 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   background: black;
   text-align: center;
   overflow: hidden;
+  width: 100vw;
+  height: 100vh;
 }
 
 h1 {
   color: white;
   font-family: Arial;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
 }
 
 #myCanvas {
   background-color: #2a5;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  border-radius: 8px;
+  outline: 2px solid black;
 }
 
 button,

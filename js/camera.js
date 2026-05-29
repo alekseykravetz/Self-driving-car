@@ -472,7 +472,9 @@ class Camera {
           : [],
       ),
     ]);
-    const carPolygons = this.#extrudeCar(filteredCarBase?.[0] || []);
+    const carPolygons = filteredCarBase.length
+      ? this.#extrudeCar(filteredCarBase[0])
+      : [];
     // Filter car shadows (don't extrude)
     const carShadowBases = this.#filter(
       world.cars.map(

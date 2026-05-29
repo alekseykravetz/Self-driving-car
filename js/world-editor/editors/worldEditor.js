@@ -15,7 +15,6 @@ class WorldEditor {
   worldGenerationInput;
   saveBtn;
   disposeBtn;
-  loadWorldInput;
   openOsmPanelBtn;
   osmPanel;
   closeOsmPanelBtn;
@@ -56,7 +55,6 @@ class WorldEditor {
     this.worldGenerationInput = getElement('worldGenerationInput');
     this.saveBtn = getElement('saveBtn');
     this.disposeBtn = getElement('disposeBtn');
-    this.loadWorldInput = getElement('loadWorldInput');
     this.openOsmPanelBtn = getElement('openOsmPanelBtn');
     this.osmPanel = getElement('osmPanel');
     this.closeOsmPanelBtn = getElement('closeOsmPanelBtn');
@@ -81,10 +79,7 @@ class WorldEditor {
     );
     this.saveBtn.addEventListener('click', this.save.bind(this));
     this.disposeBtn.addEventListener('click', this.dispose.bind(this));
-    this.loadWorldInput.addEventListener(
-      'change',
-      this.loadWorldFromFile.bind(this),
-    );
+    new WorldLoader((worldInfo) => this.#initializeWorldEditor(worldInfo));
     this.openOsmPanelBtn.addEventListener(
       'click',
       this.openOsmPanel.bind(this),
@@ -228,52 +223,6 @@ class WorldEditor {
     // this.editors.graph.editor.dispose?.();
     // this.world.markings.length = 0;
     this.#initializeWorldEditor(null);
-  }
-
-  /* Handles the file input change event for loading a world. */
-  loadWorldFromFile(e) {
-    const input = e.target;
-    if (!input.files || input.files.length === 0) {
-      alert('No file selected.');
-      return;
-    }
-    const worldFile = input.files[0];
-    const reader = new FileReader();
-    reader.readAsText(worldFile);
-    // Assign onload handler with correct 'this' context
-    reader.onload = (event) => this.#onLoadWorldFromFileRead(event);
-    reader.onerror = () => {
-      alert(`Error reading file: ${reader.error}`);
-    };
-  }
-
-  /* Processes the content read from the loaded world file. */
-  #onLoadWorldFromFileRead(e) {
-    if (!e.target?.result || typeof e.target.result !== 'string') {
-      alert('Failed to read file content.');
-      return;
-    }
-    const worldFileContent = e.target.result;
-    // Extract the JSON part from the "const world = World.load(...);" structure
-    const startIndex = worldFileContent.indexOf('(');
-    const endIndex = worldFileContent.lastIndexOf(')');
-    if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
-      alert('Invalid file format. Expected "const world = World.load({...});"');
-      return;
-    }
-    const worldJsonString = worldFileContent.substring(
-      startIndex + 1,
-      endIndex,
-    );
-    try {
-      const worldInfo = JSON.parse(worldJsonString);
-      // Re-initialize the editor with the loaded world data
-      this.#initializeWorldEditor(worldInfo);
-      console.log('World loaded successfully from file.');
-    } catch (error) {
-      alert(`Failed to parse world data from file: ${error}`);
-      console.error('Error parsing world JSON:', error);
-    }
   }
 
   /* Displays the OSM data input panel. */

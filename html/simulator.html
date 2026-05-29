@@ -6,6 +6,16 @@
   </head>
   <body>
     <canvas id="gameCanvas"></canvas>
+    <canvas id="cameraCanvas"></canvas>
+
+    <label
+      for="loadWorldInput"
+      class="file-input-label"
+      style="position: absolute; left: 0; top: 0"
+    >
+      📁
+      <input type="file" id="loadWorldInput" accept=".world" />
+    </label>
 
     <div id="verticalButtons"></div>
     <script>
@@ -67,6 +77,7 @@
     <!-- <script src="/saves/right_hand_rule.car"></script> -->
     <!-- <script src="/saves/right_hand_rule_racer.car"></script> -->
 
+    <script src="/js/camera.js"></script>
     <script src="/js/sound.js"></script>
     <script src="/js/neural-network/visualizer.js"></script>
     <script src="/js/neural-network/network.js"></script>
@@ -76,15 +87,23 @@
     <script src="/js/car/car.js"></script>
     <script src="/js/ai-training/trainingManager.js"></script>
     <script src="/js/ai-training/simulatorUtils.js"></script>
+    <script src="/js/world-loader/worldLoader.js"></script>
     <script src="/js/ai-training/simulator.js"></script>
 
     <script>
       const rightPanelWidth = 300;
-      const buttonsPanelWidth = 30;
+      const buttonsPanelWidth = 200;
+      const cameraViewWidth = 400;
 
       gameCanvas.width =
-        window.innerWidth - rightPanelWidth - buttonsPanelWidth;
+        window.innerWidth -
+        rightPanelWidth -
+        buttonsPanelWidth -
+        cameraViewWidth;
       gameCanvas.height = window.innerHeight;
+
+      cameraCanvas.width = cameraViewWidth;
+      cameraCanvas.height = window.innerHeight;
 
       networkCanvas.width = rightPanelWidth;
       networkCanvas.height = window.innerHeight - rightPanelWidth;
@@ -92,7 +111,12 @@
       miniMapCanvas.width = rightPanelWidth;
       miniMapCanvas.height = rightPanelWidth;
 
-      const simulator = new Simulator(gameCanvas, networkCanvas, miniMapCanvas);
+      const simulator = new Simulator(
+        gameCanvas,
+        networkCanvas,
+        miniMapCanvas,
+        cameraCanvas,
+      );
     </script>
   </body>
 </html>

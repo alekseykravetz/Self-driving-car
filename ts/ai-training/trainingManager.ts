@@ -1,7 +1,7 @@
 interface TrainingManagerOptions {
-  getCars: () => Car[];
   evaluateFitness: (car: Car) => number;
-  onRestart: (bestBrainPool: NeuralNetwork[]) => void;
+  getStartInfo: () => { x: number; y: number; angle: number };
+  onCarsCreated: (cars: Car[]) => void;
   onPauseToggle?: (paused: boolean) => void;
 }
 
@@ -9,10 +9,13 @@ class TrainingManager {
   public iteration: number = 0;
   public maxDistancePassed: number = 0;
   public paused: boolean = false;
+  public cars: Car[] = [];
+  public bestCar: Car | null = null;
+  public bestPool: Car[] = [];
 
-  private getCars: () => Car[];
   private evaluateFitness: (car: Car) => number;
-  private onRestartCallback: (bestBrainPool: NeuralNetwork[]) => void;
+  private getStartInfo: () => { x: number; y: number; angle: number };
+  private onCarsCreatedCallback: (cars: Car[]) => void;
   private onPauseToggleCallback?: (paused: boolean) => void;
 
   // DOM Elements
@@ -20,8 +23,10 @@ class TrainingManager {
   private thresholdInput: HTMLInputElement | null = null;
   private poolCountInput: HTMLInputElement | null = null;
   private showVisualizerCheckbox: HTMLInputElement | null = null;
+  private showCameraViewCheckbox: HTMLInputElement | null = null;
   private pauseBtn: HTMLButtonElement | null = null;
-  private restartBtn: HTMLButtonElement | null = null;
+  private nextGenBtn: HTMLButtonElement | null = null;
+  private newTrainingBtn: HTMLButtonElement | null = null;
   private saveBtn: HTMLButtonElement | null = null;
   private discardBtn: HTMLButtonElement | null = null;
 
@@ -45,9 +50,9 @@ class TrainingManager {
   private statDistEl: HTMLElement | null = null;
 
   constructor(options: TrainingManagerOptions) {
-    this.getCars = options.getCars;
     this.evaluateFitness = options.evaluateFitness;
-    this.onRestartCallback = options.onRestart;
+    this.getStartInfo = options.getStartInfo;
+    this.onCarsCreatedCallback = options.onCarsCreated;
     this.onPauseToggleCallback = options.onPauseToggle;
 
     this.initDOMElements();
@@ -67,11 +72,17 @@ class TrainingManager {
     this.showVisualizerCheckbox = document.getElementById(
       'showVisualizer',
     ) as HTMLInputElement | null;
+    this.showCameraViewCheckbox = document.getElementById(
+      'showCameraView',
+    ) as HTMLInputElement | null;
     this.pauseBtn = document.getElementById(
       'pauseBtn',
     ) as HTMLButtonElement | null;
-    this.restartBtn = document.getElementById(
-      'restartBtn',
+    this.nextGenBtn = document.getElementById(
+      'nextGenBtn',
+    ) as HTMLButtonElement | null;
+    this.newTrainingBtn = document.getElementById(
+      'newTrainingBtn',
     ) as HTMLButtonElement | null;
     this.saveBtn = document.getElementById(
       'saveBtn',
@@ -129,8 +140,11 @@ class TrainingManager {
     if (this.pauseBtn) {
       this.pauseBtn.addEventListener('click', () => this.togglePause());
     }
-    if (this.restartBtn) {
-      this.restartBtn.addEventListener('click', () => this.restart());
+    if (this.nextGenBtn) {
+      this.nextGenBtn.addEventListener('click', () => this.nextGeneration());
+    }
+    if (this.newTrainingBtn) {
+      this.newTrainingBtn.addEventListener('click', () => this.newTraining());
     }
     if (this.saveBtn) {
       this.saveBtn.addEventListener('click', () => this.save());
@@ -145,6 +159,24 @@ class TrainingManager {
       this.loadCarInput.addEventListener('change', (e) =>
         this.#loadCarFromFile(e),
       );
+    }
+
+    // Auto-restart training when car params change
+    const carParamInputs = [
+      this.carMaxSpeedInput,
+      this.carAccelerationInput,
+      this.carFrictionInput,
+      this.carWidthInput,
+      this.carHeightInput,
+      this.carRayCountInput,
+      this.carRayLengthInput,
+      this.carRaySpreadInput,
+      this.carRayOffsetInput,
+    ];
+    for (const input of carParamInputs) {
+      if (input) {
+        input.addEventListener('change', () => this.newTraining());
+      }
     }
   }
 
@@ -171,6 +203,12 @@ class TrainingManager {
       : true;
   }
 
+  public get showCameraView(): boolean {
+    return this.showCameraViewCheckbox
+      ? this.showCameraViewCheckbox.checked
+      : true;
+  }
+
   public togglePause(forceState?: boolean): void {
     this.paused = forceState !== undefined ? forceState : !this.paused;
     if (this.pauseBtn) {
@@ -181,12 +219,12 @@ class TrainingManager {
     }
   }
 
-  public restart(): void {
+  public nextGeneration(): void {
     this.iteration++;
-    const cars = this.getCars();
+    this.maxDistancePassed = 0;
     const settings = this.getSettings();
 
-    const sortedCars = cars
+    const sortedCars = this.cars
       .filter((c: Car) => c.brain && c.type !== 'KEYS')
       .sort((a, b) => this.evaluateFitness(b) - this.evaluateFitness(a));
 
@@ -198,7 +236,76 @@ class TrainingManager {
       this.togglePause(false);
     }
 
-    this.onRestartCallback(bestBrainPool);
+    this.#createCarsWithBrainPool(bestBrainPool);
+  }
+
+  public newTraining(): void {
+    this.iteration = 0;
+    this.maxDistancePassed = 0;
+
+    if (this.paused) {
+      this.togglePause(false);
+    }
+
+    this.#createCarsWithBrainPool([]);
+  }
+
+  /** Shared logic: create cars and apply brains from pool or localStorage. */
+  #createCarsWithBrainPool(bestBrainPool: NeuralNetwork[]): void {
+    const settings = this.getSettings();
+    const config = this.getCarSettings();
+    const aiCars = this.generateCars(settings.carCount, 'AI', config);
+    const keysCar = this.generateCars(1, 'KEYS', config);
+    this.cars = [...keysCar, ...aiCars];
+    this.bestCar = this.cars[0];
+    this.bestPool = [];
+
+    this.applyCarSettingsToCars(this.cars);
+    this.applyBrainPool(this.cars, bestBrainPool);
+
+    this.onCarsCreatedCallback(this.cars);
+
+    console.log(
+      `Generation ${this.iteration} started with ${settings.carCount} cars.`,
+    );
+  }
+
+  /** Called once at startup to create the initial population. */
+  public initializeCars(): void {
+    const settings = this.getSettings();
+    const config = this.getCarSettings();
+    const aiCars = this.generateCars(settings.carCount, 'AI', config);
+    const keysCar = this.generateCars(1, 'KEYS', config);
+    this.cars = [...keysCar, ...aiCars];
+    this.bestCar = this.cars[0];
+
+    this.applyCarSettingsToCars(this.cars);
+    this.updateCarsWithBrain(this.cars);
+
+    this.onCarsCreatedCallback(this.cars);
+  }
+
+  /** Creates n cars of the given type at the start position. */
+  private generateCars(n: number, type: string, config: CarInfo): Car[] {
+    const start = this.getStartInfo();
+    const cars: Car[] = [];
+    const color = type === 'AI' ? 'blue' : 'red';
+    for (let i = 1; i <= n; i++) {
+      const car = new Car(
+        start.x,
+        start.y,
+        config.width,
+        config.height,
+        type,
+        start.angle,
+        config.maxSpeed,
+        color,
+      );
+      car.acceleration = config.acceleration;
+      car.friction = config.friction;
+      cars.push(car);
+    }
+    return cars;
   }
 
   public updateCarsWithBrain(cars: Car[]): void {
@@ -252,9 +359,8 @@ class TrainingManager {
   }
 
   public save(): void {
-    const cars = this.getCars();
     const settings = this.getSettings();
-    const sortedCars = cars
+    const sortedCars = this.cars
       .filter((c: Car) => c.brain && c.type !== 'KEYS')
       .sort((a, b) => this.evaluateFitness(b) - this.evaluateFitness(a));
 
@@ -357,8 +463,7 @@ class TrainingManager {
   }
 
   public saveCarToFile(): void {
-    const cars = this.getCars();
-    const sortedCars = cars
+    const sortedCars = this.cars
       .filter((c: Car) => c.brain && c.type !== 'KEYS')
       .sort((a, b) => this.evaluateFitness(b) - this.evaluateFitness(a));
 
@@ -392,9 +497,15 @@ class TrainingManager {
         if (carInfo.brain) {
           localStorage.setItem('bestBrain', JSON.stringify(carInfo.brain));
           localStorage.setItem('bestBrains', JSON.stringify([carInfo.brain]));
+        } else {
+          // No brain in file — clear stored brains to start fresh
+          localStorage.removeItem('bestBrain');
+          localStorage.removeItem('bestBrains');
         }
         localStorage.setItem('bestCarInfo', JSON.stringify(carInfo));
         console.log('Car config loaded from file.');
+        // Start a fresh training with the new car config
+        this.newTraining();
       } else {
         alert('Failed to parse car file.');
       }
@@ -469,26 +580,22 @@ class TrainingManager {
     if (this.statDistEl) this.statDistEl.textContent = String(maxDist);
   }
 
-  public updateBestCarAndPool(cars: Car[]): {
-    bestCar: Car | null;
-    bestPool: Car[];
-  } {
+  public updateBestCarAndPool(): void {
     const settings = this.getSettings();
-    const aiBrainCars = cars.filter((c) => c.brain && c.type !== 'KEYS');
+    const aiBrainCars = this.cars.filter((c) => c.brain && c.type !== 'KEYS');
     aiBrainCars.sort(
       (a, b) => this.evaluateFitness(b) - this.evaluateFitness(a),
     );
 
-    const bestPool = aiBrainCars.slice(0, settings.poolSize);
+    this.bestPool = aiBrainCars.slice(0, settings.poolSize);
 
     for (const car of aiBrainCars) {
       car.name = undefined;
     }
-    for (let i = 0; i < bestPool.length; i++) {
-      bestPool[i].name = String(i + 1);
+    for (let i = 0; i < this.bestPool.length; i++) {
+      this.bestPool[i].name = String(i + 1);
     }
 
-    const bestCar = bestPool.length > 0 ? bestPool[0] : null;
-    return { bestCar, bestPool };
+    this.bestCar = this.bestPool.length > 0 ? this.bestPool[0] : null;
   }
 }

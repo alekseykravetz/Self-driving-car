@@ -18,12 +18,6 @@
         if (xhr.status === 200) {
           const container = document.getElementById('verticalButtons');
           container.innerHTML = xhr.responseText;
-          const worldLoaderCtrl = container.querySelector('#worldLoaderCtrl');
-          const worldLoaderDivider = container.querySelector(
-            '#worldLoaderDivider',
-          );
-          if (worldLoaderCtrl) worldLoaderCtrl.style.display = 'none';
-          if (worldLoaderDivider) worldLoaderDivider.style.display = 'none';
         }
       })();
     </script>

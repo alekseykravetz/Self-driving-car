@@ -70,6 +70,7 @@
     <script src="/js/world-editor/markings/yield.js"></script>
     <script src="/js/world-editor/editors/markingEditor.js"></script>
     <script src="/js/world-editor/editors/worldEditor.js"></script>
+    <script src="/js/world-loader/worldLoader.js"></script>
     <script src="/js/world-editor/editors/graphEditor.js"></script>
     <script src="/js/world-editor/editors/stopEditor.js"></script>
     <script src="/js/world-editor/editors/startEditor.js"></script>
@@ -96,13 +97,23 @@
     <!-- <script src="/saves/path_finding.world"></script> -->
 
     <script>
-      myCanvas.width = 800;
-      myCanvas.height = 490;
+      function resizeCanvas() {
+        myCanvas.width = window.innerWidth;
+        myCanvas.height = window.innerHeight;
+      }
+
+      resizeCanvas();
 
       miniMapCanvas.width = 150;
       miniMapCanvas.height = 150;
 
       const worldEditor = new WorldEditor(myCanvas, miniMapCanvas);
+
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        worldEditor.animate();
+      });
+
       worldEditor.animate();
     </script>
   </body>
