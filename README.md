@@ -67,15 +67,14 @@ Open [http://localhost:9090](http://localhost:9090) in your browser to see the l
 
 ## Simulation Modes
 
-| Mode              | URL Path                         | Description                                                              |
-| ----------------- | -------------------------------- | ------------------------------------------------------------------------ |
-| **Simple Road**   | `/html/simpleRoadSimulator.html` | 3-lane straight road with random traffic — ideal for initial training    |
-| **Simulator**     | `/html/simulator.html`           | Full world simulation with custom maps, corridors, and advanced training |
-| **Camera View**   | `/html/cameraViewSimulator.html` | 3D perspective rendering from the car's viewpoint                        |
-| **Race**          | `/html/race.html`                | Competitive racing with keyboard controls vs AI                          |
-| **Race (Camera)** | `/html/race-camera.html`         | Race controlled via webcam marker detection                              |
-| **Race (Phone)**  | `/html/race-phone.html`          | Race controlled via phone tilt (device orientation)                      |
-| **World Editor**  | `/html/world.html`               | Full-featured map creation and editing tool                              |
+| Mode              | URL Path                      | Description                                                              |
+| ----------------- | ----------------------------- | ------------------------------------------------------------------------ |
+| **Simple Road**   | `/html/simulator?mode=simple` | 3-lane straight road with random traffic — ideal for initial training    |
+| **Simulator**     | `/html/simulator`             | Full world simulation with custom maps, corridors, and advanced training |
+| **Race**          | `/html/race`                  | Competitive racing with keyboard controls vs AI                          |
+| **Race (Camera)** | `/html/race?mode=camera`      | Race controlled via webcam marker detection                              |
+| **Race (Phone)**  | `/html/race?mode=phone`       | Race controlled via phone tilt (device orientation)                      |
+| **World Editor**  | `/html/world`                 | Full-featured map creation and editing tool                              |
 
 ---
 
@@ -179,13 +178,15 @@ Self-driving-car/
 │   │       └── yield.ts        # Yield line
 │   │
 │   ├── ai-training/
-│   │   ├── trainingManager.ts  # Genetic algorithm orchestration & UI
-│   │   ├── simulator.ts        # Full world training environment
-│   │   ├── simpleRoadSimulator.ts  # Straight road training
-│   │   └── simulatorUtils.ts   # Shared drawing utilities
+│   │   ├── trainingManagerPanel.ts # Custom element: training UI + genetic algorithm
+│   │   ├── topControlsPanel.ts    # Custom element: border/tracking mode controls
+│   │   ├── viewControlsPanel.ts   # Custom element: layout & visibility toggles
+│   │   ├── simulator.ts           # Unified training environment (world + simple modes)
+│   │   ├── trafficGenerator.ts    # Dynamic traffic generation for simple mode
+│   │   └── simulatorUtils.ts      # Shared drawing utilities
 │   │
-│   ├── simulators/
-│   │   └── cameraViewSimulator.ts  # 3D perspective simulation
+│   ├── simple-world/
+│   │   └── simpleWorld.ts      # Lightweight IWorld: straight 3-lane road
 │   │
 │   ├── games/
 │   │   └── race.ts             # Racing mode with countdown & scoring
@@ -196,9 +197,10 @@ Self-driving-car/
 │   ├── mini-map/
 │   │   └── miniMap.ts          # Scaled world overview
 │   │
-│   ├── camera.ts               # 3D perspective camera with frustum culling
-│   ├── camera_new_ai_ver.ts    # Experimental AI vision camera
-│   ├── road.ts                 # Simple straight road (for basic simulator)
+│   ├── camera/
+│   │   ├── types.ts            # Camera interfaces
+│   │   ├── extrusion.ts        # 3D extrusion helpers (buildings, cars, trees)
+│   │   └── camera.ts           # 3D perspective camera with frustum culling
 │   ├── sound.ts                # Audio effects (engine, beep, explosion)
 │   ├── types.ts                # Global type declarations
 │   └── utils.ts                # Collision helpers, color utilities
@@ -207,14 +209,9 @@ Self-driving-car/
 │   └── (mirrors ts/ structure)
 │
 ├── html/                       # HTML entry points for each mode
-│   ├── simulator.html
-│   ├── simpleRoadSimulator.html
-│   ├── cameraViewSimulator.html
-│   ├── race.html
-│   ├── race-camera.html
-│   ├── race-phone.html
-│   ├── world.html
-│   └── controlPanel.html       # Reusable training UI (loaded via XHR)
+│   ├── simulator.html          # Both world mode and ?mode=simple
+│   ├── race.html               # All race modes via ?mode=camera|phone
+│   └── world.html              # Map creation
 │
 ├── styles/
 │   ├── style.css               # Main page styles

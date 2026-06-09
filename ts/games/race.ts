@@ -6,6 +6,10 @@ class Race {
   miniMapCanvas: HTMLCanvasElement;
   controls: Controls | null;
 
+  topControlsPanel!: TopControlsPanelElement;
+  racePanel!: HTMLElement;
+  carsInput!: HTMLInputElement;
+
   world!: World;
   camera: Camera | null = null;
   viewport: Viewport | null = null;
@@ -18,6 +22,7 @@ class Race {
 
   frameCount: number = 0;
   started: boolean = false;
+  animating: boolean = false;
 
   statistics!: HTMLElement;
   counter!: HTMLElement;
@@ -66,37 +71,154 @@ class Race {
       : new Point(0, -1);
     const startAngle = -angle(direction) + Math.PI / 2;
 
+    const pool = type === 'AI' ? this.#loadPoolFromStorage() : [];
+
     const cars: Car[] = [];
     for (let i = 1; i <= n; i++) {
       const color = type === 'AI' ? getRandomColor() : 'blue';
-      const car = new Car(
-        startPoint.x,
-        startPoint.y,
-        30,
-        50,
-        type,
-        startAngle,
-        3,
+      const car = new Car({
+        x: startPoint.x,
+        y: startPoint.y,
+        controlType: type,
+        angle: startAngle,
         color,
-      );
+      });
       car.name = type === 'AI' ? 'AI ' + i : 'Player ' + i;
 
-      // Load car config from localStorage or legacy global
-      const storedCarInfo = localStorage.getItem('bestCarInfo');
-      if (storedCarInfo) {
-        car.load(JSON.parse(storedCarInfo));
-      } else if (typeof carInfo !== 'undefined') {
-        car.load(carInfo);
+      if (type === 'AI') {
+        const poolIndex = i - 1; // 0-based index for AI cars
+        if (poolIndex < pool.length) {
+          // Apply pool car as-is (no mutation)
+          car.load(pool[poolIndex]);
+        } else if (pool.length > 0) {
+          // Beyond pool: mutated copy of pool[0]
+          car.load(pool[0]);
+          if (car.brain) {
+            NeuralNetwork.mutate(car.brain, 0.1);
+          }
+        } else if (typeof carInfo !== 'undefined') {
+          car.load(carInfo);
+        }
+      } else {
+        // KEYS car: load from global carInfo only (never from pool)
+        if (typeof carInfo !== 'undefined') {
+          car.load(carInfo);
+        }
       }
       cars.push(car);
     }
     return cars;
   }
 
+  #loadPoolFromStorage(): CarInfo[] {
+    const stored = localStorage.getItem('bestPool');
+    if (stored) {
+      try {
+        return JSON.parse(stored) as CarInfo[];
+      } catch {
+        // fall through
+      }
+    }
+    // Legacy migration
+    const legacyBrains = localStorage.getItem('bestBrains');
+    const legacyBrain = localStorage.getItem('bestBrain');
+    const legacyConfig = localStorage.getItem('bestCarInfo');
+    if (legacyBrains || legacyBrain) {
+      let brains: NeuralNetwork[] = [];
+      if (legacyBrains) {
+        brains = JSON.parse(legacyBrains);
+      } else if (legacyBrain) {
+        brains = [JSON.parse(legacyBrain)];
+      }
+      const baseConfig: CarInfo = legacyConfig
+        ? JSON.parse(legacyConfig)
+        : {
+            maxSpeed: 3,
+            acceleration: 0.2,
+            friction: 0.05,
+            width: 30,
+            height: 50,
+            sensor: {
+              rayCount: 5,
+              rayLength: 150,
+              raySpread: Math.PI / 2,
+              rayOffset: 0,
+            },
+          };
+      const pool: CarInfo[] = brains.map((brain) => ({
+        ...baseConfig,
+        sensor: { ...baseConfig.sensor },
+        brain,
+      }));
+      localStorage.setItem('bestPool', JSON.stringify(pool));
+      localStorage.removeItem('bestBrain');
+      localStorage.removeItem('bestBrains');
+      localStorage.removeItem('bestCarInfo');
+      return pool;
+    }
+    return [];
+  }
+
   #addEventListeners(): void {
+    this.topControlsPanel = document.querySelector(
+      'top-controls-panel',
+    ) as TopControlsPanelElement;
+
+    // World loading via WorldLoader (binds to #loadWorldInput inside the panel)
     new WorldLoader((worldInfo) => this.#initializeRace(worldInfo as World));
+
+    // Car loading via CarLoader (binds to #loadCarInput inside the panel)
+    new CarLoader((carInfos: CarInfo[]) => this.#handleCarsLoaded(carInfos));
+
     this.statistics = document.getElementById('statistics')!;
     this.counter = document.getElementById('counter')!;
+
+    this.#createRacePanel();
+  }
+
+  #createRacePanel(): void {
+    this.racePanel = document.createElement('div');
+    this.racePanel.id = 'racePanel';
+
+    const label = document.createElement('label');
+    label.textContent = 'Cars:';
+    label.className = 'race-panel-label';
+
+    this.carsInput = document.createElement('input');
+    this.carsInput.type = 'number';
+    this.carsInput.id = 'carsInRaceInput';
+    this.carsInput.min = '1';
+    this.carsInput.max = '100';
+    this.carsInput.value = String(this.N);
+    this.carsInput.addEventListener('change', () => {
+      const val = parseInt(this.carsInput.value);
+      if (val > 0) {
+        this.N = val;
+      }
+    });
+
+    const restartBtn = document.createElement('button');
+    restartBtn.id = 'restartRaceBtn';
+    restartBtn.textContent = '🔄 Restart';
+    restartBtn.className = 'race-panel-btn';
+    restartBtn.addEventListener('click', () =>
+      this.#initializeRace(this.world),
+    );
+
+    label.appendChild(this.carsInput);
+    this.racePanel.appendChild(label);
+    this.racePanel.appendChild(restartBtn);
+    document.body.appendChild(this.racePanel);
+  }
+
+  #handleCarsLoaded(carInfos: CarInfo[]): void {
+    if (carInfos.length === 0) return;
+
+    // Store full pool (all cars, regardless of different params)
+    localStorage.setItem('bestPool', JSON.stringify(carInfos));
+
+    // Restart race with new pool
+    this.#initializeRace(this.world);
   }
 
   #initializeRace(worldInfo: World | null): void {
@@ -112,18 +234,11 @@ class Race {
       this.generateCars(this.N, 'AI'),
     );
     this.myCar = this.cars[0];
-    const bestBrainString = localStorage.getItem('bestBrain');
-    if (bestBrainString) {
-      for (let i = 0; i < this.cars.length; i++) {
-        this.cars[i].brain = JSON.parse(bestBrainString!); // note: json parse for each car is required because of deep clone brain object
-        if (i > 1) {
-          // Mutate only AI cars (first car is player and second the best ai)
-          NeuralNetwork.mutate(this.cars[i].brain!, 0.1);
-        }
-      }
-    }
 
     if (!this.myCar) throw new Error('Player car not created');
+    if (this.controls) {
+      this.myCar.controls = this.controls;
+    }
     this.camera = new Camera(this.myCar);
 
     const target = this.world.markings.find(
@@ -172,7 +287,11 @@ class Race {
       this.statistics.appendChild(div);
     }
 
-    this.animate();
+    this.started = false;
+    if (!this.animating) {
+      this.animating = true;
+      this.animate();
+    }
     this.startCounter();
   }
 
@@ -261,45 +380,7 @@ class Race {
     const bordersToCheck: Segment[] = this.world.corridor
       ? this.world.corridor.skeleton
       : this.world.roadBorders;
-
-    if (bordersToCheck.length === 0) return;
-
-    const segment = getNearestSegment(new Point(car.x, car.y), bordersToCheck);
-    if (!segment) return;
-
-    const correctors = car.polygon.map((p: Point) => {
-      const proj = segment.projectPoint(p);
-      // Use p2 if projection offset is beyond segment end (approx > 1)
-      const projPoint = proj.offset > 1 ? segment.p2 : proj.point;
-      return subtract(projPoint, p);
-    });
-
-    if (correctors.length === 0) return;
-
-    const magnitudes = correctors.map((p: Point) => magnitude(p));
-    const maxMagnitude = Math.max(...magnitudes);
-
-    // Find the first corrector with the max magnitude
-    const correctorIndex = magnitudes.findIndex((mag) => mag === maxMagnitude);
-    if (correctorIndex === -1) return; // Should not happen if correctors is not empty
-
-    const corrector = correctors[correctorIndex];
-    const normalizedCorrector = normalize(corrector);
-
-    // Assuming polygon points are [front-right, front-left, back-left, back-right]
-    // Indices 0 and 3 (right side) vs 1 and 2 (left side) might be more robust
-    // This logic seems specific to the car's polygon structure.
-    if (correctorIndex === 0 || correctorIndex === 3) {
-      // Assuming these are right-side points
-      car.angle += 0.1;
-    } else {
-      // Assuming these are left-side points (1 and 2)
-      car.angle -= 0.1;
-    }
-
-    car.x += normalizedCorrector.x;
-    car.y += normalizedCorrector.y;
-    car.damaged = false; // Reset damage after correction? Seems intended.
+    handleCollisionWithRoadBorders(car, bordersToCheck);
   }
 
   draw(): void {
@@ -312,30 +393,38 @@ class Race {
     )
       return;
 
+    const borderMode = this.topControlsPanel.borderMode;
+
     if (this.started) {
       for (let i = 0; i < this.cars.length; i++) {
-        this.cars[i].update(this.roadBorders ?? []);
+        const car = this.cars[i];
+        if (car.damaged && borderMode === 'collision') {
+          this.handleCollisionWithRoadBorders(car);
+        }
+        const borders: [Point, Point][] =
+          borderMode === 'none' ? [] : (this.roadBorders ?? []);
+        car.update(borders);
       }
     }
 
-    for (const car of this.cars) {
-      if (car.damaged) {
-        this.handleCollisionWithRoadBorders(car);
-      }
-    }
+    // Determine tracking target
+    const trackTarget = this.#getTrackTarget();
 
     this.world.cars = this.cars;
-    this.world.bestCar = this.myCar;
+    this.world.bestCar = trackTarget ?? this.myCar;
 
-    this.viewport.offset.x = -this.myCar.x;
-    this.viewport.offset.y = -this.myCar.y;
+    if (trackTarget) {
+      this.viewport.offset.x = -trackTarget.x;
+      this.viewport.offset.y = -trackTarget.y;
+    }
 
     this.viewport.reset();
-    // Use scale function if Point has scale method or it's a global function
-    const viewPoint = scale(this.viewport.getOffset(), -1); // Or scale(this.viewport.getOffset(), -1)
+    const viewPoint = scale(this.viewport.getOffset(), -1);
     this.world.draw(this.gameCtx, viewPoint, false);
     this.miniMap.draw(viewPoint);
-    this.miniMapCanvas.style.transform = `rotate(${this.myCar.angle}rad)`;
+    // Rotate the minimap canvas itself to match tracked car orientation
+    const rotationTarget = trackTarget ?? this.myCar;
+    this.miniMapCanvas.style.transform = `rotate(${rotationTarget.angle}rad)`;
 
     for (let i = 0; i < this.cars.length; i++) {
       this.updateCarProgress(this.cars[i]);
@@ -349,23 +438,43 @@ class Race {
       stat.style.color =
         this.cars[i].type === 'AI' ? 'white' : this.cars[i].color;
       stat.innerText = `${i + 1}: ${this.cars[i].name} ${this.cars[i].damaged ? '💀' : ''}`;
-      // stat.innerText = `${i + 1}: ${(this.cars[i].progress * 100).toFixed(1)}%`;
       stat.style.backgroundColor =
         this.cars[i].type === 'AI' ? 'black' : 'white';
       if (this.cars[i].finishTime) {
         stat.innerHTML +=
           '<span style="float: right;">' +
-          (this.cars[i].finishTime! / 60).toFixed(1) + // Assuming 60 FPS
+          (this.cars[i].finishTime! / 60).toFixed(1) +
           's </span>';
       }
     }
 
-    this.camera.move(this.myCar);
-    // this.camera.draw(this.gameCtx); // Optional drawing of camera bounds
-    this.camera.render(this.cameraCtx, this.world);
+    const cameraTarget = trackTarget ?? this.myCar;
+    this.camera.move(cameraTarget);
+    this.camera.render(this.cameraCtx, this.world, {
+      keyCar: this.myCar,
+      traffic: this.cars.filter((c) => c !== cameraTarget),
+    });
 
     if (this.started) {
       this.frameCount++;
+    }
+  }
+
+  #getTrackTarget(): Car | null {
+    switch (this.topControlsPanel.trackingMode) {
+      case 'none':
+        return null;
+      case 'best':
+        // Best car by progress (first in sorted order, but sorting happens later in draw)
+        // Use live progress: find car with highest progress
+        if (this.cars && this.cars.length > 0) {
+          return this.cars.reduce((best, car) =>
+            (car.progress ?? 0) > (best.progress ?? 0) ? car : best,
+          );
+        }
+        return this.myCar;
+      case 'keys':
+        return this.myCar;
     }
   }
 

@@ -5,36 +5,22 @@
     <link rel="stylesheet" href="/styles/style.css" />
   </head>
   <body>
-    <canvas id="gameCanvas"></canvas>
-    <canvas id="cameraCanvas"></canvas>
-
-    <label
-      for="loadWorldInput"
-      class="file-input-label"
-      style="position: absolute; left: 0; top: 0"
-    >
-      📁
-      <input type="file" id="loadWorldInput" accept=".world" />
-    </label>
-
-    <div id="verticalButtons"></div>
-    <script>
-      (function () {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/html/controlPanel.html', false);
-        xhr.send(null);
-        if (xhr.status === 200) {
-          document.getElementById('verticalButtons').innerHTML =
-            xhr.responseText;
-        }
-      })();
-    </script>
-
-    <div>
-      <canvas id="networkCanvas"></canvas>
-      <canvas id="miniMapCanvas"></canvas>
+    <div id="simulatorLayout">
+      <canvas id="gameCanvas"></canvas>
+      <canvas id="cameraCanvas"></canvas>
+      <div id="rightPanel">
+        <canvas id="networkCanvas"></canvas>
+        <canvas id="miniMapCanvas"></canvas>
+      </div>
+      <training-manager-panel></training-manager-panel>
     </div>
 
+    <top-controls-panel></top-controls-panel>
+    <view-controls-panel></view-controls-panel>
+
+    <script src="/js/ai-training/topControlsPanel.js"></script>
+    <script src="/js/ai-training/viewControlsPanel.js"></script>
+    <script src="/js/ai-training/trainingManagerPanel.js"></script>
     <script src="/js/world-editor/world.js"></script>
     <script src="/js/mini-map/miniMap.js"></script>
     <script src="/js/viewport/viewport.js"></script>
@@ -77,7 +63,9 @@
     <!-- <script src="/saves/right_hand_rule.car"></script> -->
     <!-- <script src="/saves/right_hand_rule_racer.car"></script> -->
 
-    <script src="/js/camera.js"></script>
+    <script src="/js/camera/types.js"></script>
+    <script src="/js/camera/extrusion.js"></script>
+    <script src="/js/camera/camera.js"></script>
     <script src="/js/sound.js"></script>
     <script src="/js/neural-network/visualizer.js"></script>
     <script src="/js/neural-network/network.js"></script>
@@ -85,32 +73,14 @@
     <script src="/js/utils.js"></script>
     <script src="/js/car/controls/controls.js"></script>
     <script src="/js/car/car.js"></script>
-    <script src="/js/ai-training/trainingManager.js"></script>
+    <script src="/js/simple-world/simpleWorld.js"></script>
+    <script src="/js/ai-training/trafficGenerator.js"></script>
     <script src="/js/ai-training/simulatorUtils.js"></script>
     <script src="/js/world-loader/worldLoader.js"></script>
+    <script src="/js/car-loader/carLoader.js"></script>
     <script src="/js/ai-training/simulator.js"></script>
 
     <script>
-      const rightPanelWidth = 300;
-      const buttonsPanelWidth = 200;
-      const cameraViewWidth = 400;
-
-      gameCanvas.width =
-        window.innerWidth -
-        rightPanelWidth -
-        buttonsPanelWidth -
-        cameraViewWidth;
-      gameCanvas.height = window.innerHeight;
-
-      cameraCanvas.width = cameraViewWidth;
-      cameraCanvas.height = window.innerHeight;
-
-      networkCanvas.width = rightPanelWidth;
-      networkCanvas.height = window.innerHeight - rightPanelWidth;
-
-      miniMapCanvas.width = rightPanelWidth;
-      miniMapCanvas.height = rightPanelWidth;
-
       const simulator = new Simulator(
         gameCanvas,
         networkCanvas,

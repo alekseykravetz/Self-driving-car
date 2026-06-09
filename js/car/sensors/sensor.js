@@ -7,12 +7,12 @@ class Sensor {
   rayOffset; // Added for potential adjustment of sensor origin relative to car center
   rays; // Array of [startPoint, endPoint] for each ray
   readings; // Array of intersection results or null
-  constructor(car) {
+  constructor(car, config) {
     this.car = car;
-    this.rayCount = 5;
-    this.rayLength = 150;
-    this.raySpread = Math.PI / 2; // 90 degrees spread
-    this.rayOffset = 0; // Offset along the car's angle
+    this.rayCount = config?.rayCount ?? 5;
+    this.rayLength = config?.rayLength ?? 150;
+    this.raySpread = config?.raySpread ?? Math.PI / 2; // 90 degrees spread
+    this.rayOffset = config?.rayOffset ?? 0; // Offset along the car's angle
     this.rays = [];
     this.readings = [];
   }

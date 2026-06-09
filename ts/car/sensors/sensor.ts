@@ -12,12 +12,20 @@ class Sensor {
   rays: Point[][]; // Array of [startPoint, endPoint] for each ray
   readings: (IntersectionPoint | null)[]; // Array of intersection results or null
 
-  constructor(car: Car) {
+  constructor(
+    car: Car,
+    config?: {
+      rayCount?: number;
+      raySpread?: number;
+      rayLength?: number;
+      rayOffset?: number;
+    },
+  ) {
     this.car = car;
-    this.rayCount = 5;
-    this.rayLength = 150;
-    this.raySpread = Math.PI / 2; // 90 degrees spread
-    this.rayOffset = 0; // Offset along the car's angle
+    this.rayCount = config?.rayCount ?? 5;
+    this.rayLength = config?.rayLength ?? 150;
+    this.raySpread = config?.raySpread ?? Math.PI / 2; // 90 degrees spread
+    this.rayOffset = config?.rayOffset ?? 0; // Offset along the car's angle
 
     this.rays = [];
     this.readings = [];

@@ -7,18 +7,12 @@
   <body>
     <canvas id="gameCanvas"></canvas>
     <canvas id="cameraCanvas"></canvas>
+    <canvas id="ironManCanvas" style="display: none"></canvas>
     <canvas id="miniMapCanvas" class="miniMap"></canvas>
     <div id="statistics"></div>
     <div id="counter"></div>
 
-    <label
-      for="loadWorldInput"
-      class="file-input-label"
-      style="position: absolute; left: 0; top: 0"
-    >
-      📁
-      <input type="file" id="loadWorldInput" accept=".world" />
-    </label>
+    <top-controls-panel></top-controls-panel>
 
     <script src="/js/world-editor/world.js"></script>
     <script src="/js/mini-map/miniMap.js"></script>
@@ -60,7 +54,12 @@
     <!-- <script src="/saves/right_hand_rule.car"></script> -->
     <script src="/saves/right_hand_rule_racer.car"></script>
 
-    <script src="/js/camera.js"></script>
+    <script src="/js/car/controls/phoneControls.js"></script>
+    <script src="/js/car/controls/markerDetector.js"></script>
+    <script src="/js/car/controls/cameraControls.js"></script>
+    <script src="/js/camera/types.js"></script>
+    <script src="/js/camera/extrusion.js"></script>
+    <script src="/js/camera/camera.js"></script>
     <script src="/js/sound.js"></script>
     <script src="/js/neural-network/visualizer.js"></script>
     <script src="/js/neural-network/network.js"></script>
@@ -68,30 +67,58 @@
     <script src="/js/utils.js"></script>
     <script src="/js/car/controls/controls.js"></script>
     <script src="/js/car/car.js"></script>
+    <script src="/js/ai-training/simulatorUtils.js"></script>
     <script src="/js/world-loader/worldLoader.js"></script>
+    <script src="/js/car-loader/carLoader.js"></script>
+    <script src="/js/ai-training/topControlsPanel.js"></script>
     <script src="/js/games/race.js"></script>
 
     <script>
-      gameCanvas.height = window.innerHeight / 2;
-      cameraCanvas.height = window.innerHeight / 2;
-      // gameCanvas.height = 0;
-      // cameraCanvas.height = window.innerHeight;
-      // gameCanvas.height = window.innerHeight;
-      // cameraCanvas.height = 0;
+      const params = new URLSearchParams(window.location.search);
+      const mode = params.get('mode') || 'default';
 
       gameCanvas.width = window.innerWidth;
       cameraCanvas.width = window.innerWidth;
-
       document.body.style.flexDirection = 'column';
 
       const rightPanelWidth = 250;
       miniMapCanvas.width = rightPanelWidth;
       miniMapCanvas.height = rightPanelWidth;
 
+      let controls = null;
+
+      if (mode === 'camera') {
+        gameCanvas.height = 0;
+        cameraCanvas.height = window.innerHeight;
+        ironManCanvas.style.display = '';
+        controls = new CameraControls(ironManCanvas);
+      } else if (mode === 'phone') {
+        gameCanvas.height = 0;
+        cameraCanvas.height = window.innerHeight;
+        cameraCanvas.style.cssText =
+          'top:50%;left:50%;position:absolute;transform:translate(-50%,-50%)';
+        miniMapCanvas.style.display = 'none';
+        statistics.style.display = 'none';
+        document.querySelector('top-controls-panel').style.display = 'none';
+        controls = new PhoneControls(cameraCanvas);
+        document.addEventListener('click', () => {
+          const el = document.body;
+          (
+            el.requestFullscreen ||
+            el.webkitRequestFullscreen ||
+            el.mozRequestFullScreen ||
+            el.msRequestFullscreen
+          )?.call(el);
+        });
+      } else {
+        gameCanvas.height = window.innerHeight / 2;
+        cameraCanvas.height = window.innerHeight / 2;
+      }
+
       statistics.style.width = `${rightPanelWidth}px`;
       statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
 
-      const race = new Race(gameCanvas, cameraCanvas, miniMapCanvas);
+      const race = new Race(gameCanvas, cameraCanvas, miniMapCanvas, controls);
     </script>
   </body>
 </html>

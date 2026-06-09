@@ -5,29 +5,96 @@
     <title>Self‑Driving Car Simulator</title>
     <link rel="stylesheet" href="/styles/style.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
       rel="stylesheet"
     />
   </head>
   <body class="main-page">
-    <section class="hero">
+    <header class="landing-header">
       <h1>Self‑Driving Car Simulator</h1>
       <p class="subtitle">
-        Explore autonomous navigation in a realistic 2D world.
+        Train neural networks, race against AI, and build your own worlds.
       </p>
-      <div class="cta-grid">
-        <a class="cta-button" href="html/simpleRoadSimulator.html"
-          >Simple Road</a
-        >
-        <a class="cta-button" href="html/simulator.html">Simulator</a>
-        <a class="cta-button" href="html/cameraViewSimulator.html"
-          >Camera View</a
-        >
-        <a class="cta-button" href="html/race.html">Race</a>
-        <a class="cta-button" href="html/race-camera.html">Race (Camera)</a>
-        <a class="cta-button" href="html/race-phone.html">Race (Phone)</a>
-        <a class="cta-button" href="html/world.html">World Editor</a>
-      </div>
-    </section>
+    </header>
+
+    <main class="landing-sections">
+      <!-- Section 1: AI Training Simulators -->
+      <section class="landing-card">
+        <div class="card-icon">🧠</div>
+        <h2>AI Training Simulators</h2>
+        <p class="card-desc">
+          Evolve neural networks through neuroevolution. Watch cars learn to
+          navigate roads using genetic algorithms and sensor-based perception.
+        </p>
+        <div class="card-links">
+          <a class="card-btn" href="html/simulator?mode=simple">
+            <span class="btn-icon">🛣️</span>
+            <span>
+              <strong>Simple Road</strong>
+              <small>3-lane straight road with traffic</small>
+            </span>
+          </a>
+          <a class="card-btn" href="html/simulator.html">
+            <span class="btn-icon">🌐</span>
+            <span>
+              <strong>Full Simulator</strong>
+              <small>Custom maps, camera view & advanced training</small>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 2: Games -->
+      <section class="landing-card">
+        <div class="card-icon">🏁</div>
+        <h2>Games</h2>
+        <p class="card-desc">
+          Race against AI opponents using keyboard, webcam markers, or phone
+          tilt. Test your driving skills on custom tracks.
+        </p>
+        <div class="card-links">
+          <a class="card-btn" href="html/race.html">
+            <span class="btn-icon">⌨️</span>
+            <span>
+              <strong>Race</strong>
+              <small>Keyboard controls vs AI</small>
+            </span>
+          </a>
+          <a class="card-btn" href="html/race?mode=camera">
+            <span class="btn-icon">📷</span>
+            <span>
+              <strong>Race (Camera)</strong>
+              <small>Steer with webcam markers</small>
+            </span>
+          </a>
+          <a class="card-btn" href="html/race?mode=phone">
+            <span class="btn-icon">📱</span>
+            <span>
+              <strong>Race (Phone)</strong>
+              <small>Tilt your phone to steer</small>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 3: World Editor -->
+      <section class="landing-card">
+        <div class="card-icon">🗺️</div>
+        <h2>World Editor</h2>
+        <p class="card-desc">
+          Design custom road networks, place buildings, trees, traffic lights,
+          and more. Import real-world maps from OpenStreetMap.
+        </p>
+        <div class="card-links">
+          <a class="card-btn" href="html/world.html">
+            <span class="btn-icon">✏️</span>
+            <span>
+              <strong>Open Editor</strong>
+              <small>Create and edit worlds</small>
+            </span>
+          </a>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

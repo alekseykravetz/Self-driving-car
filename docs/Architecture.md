@@ -58,11 +58,15 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 <script src="/js/neural-network/network.js"></script>
 <script src="/js/neural-network/visualizer.js"></script>
 
-<!-- 6. Simulator-specific code -->
-<script src="/js/ai-training/trainingManager.js"></script>
+<!-- 6. Custom element panels (must load before DOM parses their tags) -->
+<script src="/js/ai-training/topControlsPanel.js"></script>
+<script src="/js/ai-training/viewControlsPanel.js"></script>
+<script src="/js/ai-training/trainingManagerPanel.js"></script>
+
+<!-- 7. Simulator-specific code -->
 <script src="/js/ai-training/simulator.js"></script>
 
-<!-- 7. Inline initialization -->
+<!-- 8. Inline initialization -->
 <script>
   const simulator = new Simulator(canvas, networkCanvas, miniMapCanvas);
 </script>
@@ -80,24 +84,23 @@ graph TD
     Graph --> World
     Polygon --> World
     Envelope --> World
-    World --> Simulator
+    World -->|IWorld| Simulator
+    SimpleWorld -->|IWorld| Simulator
     World --> Race
-    World --> CameraViewSim
     WorldLoader --> Simulator
     WorldLoader --> Race
-    WorldLoader --> CameraViewSim
     WorldLoader --> WorldEditor
     Sensor --> Car
     Controls --> Car
     NeuralNetwork --> Car
     Car --> Simulator
     Car --> Race
-    TrainingManager --> Simulator
+    TrainingManagerPanel --> Simulator
     Viewport --> Simulator
     Viewport --> Race
     MiniMap --> Simulator
     MiniMap --> Race
-    Camera --> CameraViewSim
+    Camera --> Simulator
     Camera --> Race
     TrafficManager --> World
 ```
@@ -158,52 +161,78 @@ Environment generation and interactive editing.
 | `items/tree.ts`            | Procedural multi-level tree with noisy canopy              |
 | `markings/*.ts`            | Traffic marking types (start, stop, light, crossing, etc.) |
 
-### 5. Simulators & Training (`ts/ai-training/`, `ts/simulators/`)
+### 5. Simulators & Training (`ts/ai-training/`, `ts/simple-world/`)
 
 Training environments and genetic algorithm orchestration.
 
-| Module                   | Responsibility                                                         |
-| ------------------------ | ---------------------------------------------------------------------- |
-| `trainingManager.ts`     | Car generation, population state, fitness, pool breeding, UI controls  |
-| `simulator.ts`           | Full-world animation/rendering (delegates training to TrainingManager) |
-| `simpleRoadSimulator.ts` | Straight 3-lane road animation + traffic generation                    |
-| `simulatorUtils.ts`      | Shared car drawing with pool highlighting                              |
-| `cameraViewSimulator.ts` | 3D perspective training environment                                    |
+| Module                    | Responsibility                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| `trainingManagerPanel.ts` | Custom element: training UI + genetic algorithm orchestration + car generation |
+| `topControlsPanel.ts`     | Custom element: border mode, tracking mode, world loader controls              |
+| `viewControlsPanel.ts`    | Custom element: layout toggle, camera/visualizer/minimap visibility            |
+| `simulator.ts`            | Unified simulator: world mode (default) + simple mode (`?mode=simple`)         |
+| `trafficGenerator.ts`     | Traffic row generation for simple mode (extracted, generic via `IWorld`)       |
+| `simulatorUtils.ts`       | Shared car drawing with pool highlighting + collision response utility         |
+| `simpleWorld.ts`          | Lightweight `IWorld` implementation: straight 3-lane road with lane helpers    |
 
-**TrainingManager** is the single source of truth for training state:
+**`<training-manager-panel>`** is the single source of truth for training state:
 
+- Custom HTML element (`TrainingManagerPanelElement`) that owns both UI and logic
 - Owns `cars[]`, `bestCar`, `bestPool`
 - Generates cars internally (simulators provide only `getStartInfo(): {x, y, angle}`)
+- Configured at runtime via `element.configure(options)` with callbacks
 - Manages two distinct operations:
   - **Next Generation** (🧬) — keeps top brains from current pool, mutates the rest
   - **New Training** (🔄) — resets to generation 0 with no brains (fresh start)
 - Auto-triggers new training when car parameters (speed, rays, etc.) change
 - Handles brain persistence (save/load/discard from localStorage and .car files)
 
-### 5b. World Loader (`ts/world-loader/`)
+### 5b. Reusable Loaders (`ts/world-loader/`, `ts/car-loader/`)
 
-| Module           | Responsibility                                         |
-| ---------------- | ------------------------------------------------------ |
-| `worldLoader.ts` | Reusable file-input handler for loading `.world` files |
+| Module                    | Responsibility                                               |
+| ------------------------- | ------------------------------------------------------------ |
+| `worldLoader.ts`          | Reusable file-input handler for loading `.world` files       |
+| `car-loader/carLoader.ts` | Reusable file-input handler for loading `.car`/`.json` files |
 
-`WorldLoader` is a shared utility used by all pages that support loading world files. It:
+#### WorldLoader
 
-- Attaches to an existing `#loadWorldInput` element (or creates one at top-left corner)
-- Reads the file, extracts JSON from `World.load({...})` format or raw JSON
+Shared utility used by all pages that support loading world files. It:
+
+- Binds to an existing `#loadWorldInput` element by ID (or creates one at top-left corner)
+- Reads the file, extracts JSON from `World.load({...})` format via `indexOf("(")`/`lastIndexOf(")")`, or accepts raw JSON
 - Invokes a callback with the parsed world data
+
+> **Important:** `.world` files use the format `const world = World.load({...});`. Do NOT re-implement parsing — always reuse `WorldLoader`.
 
 Usage: `new WorldLoader((worldInfo) => this.#initializeXxx(worldInfo))`
 
-### 6. Viewport & Rendering (`ts/viewport/`, `ts/mini-map/`, `ts/camera.ts`)
+#### CarLoader
+
+Shared utility for loading one or more `.car`/`.json` files. It:
+
+- Binds to an existing `#loadCarInput` element by ID (or creates a hidden one)
+- Supports `multiple` file selection
+- Parses both pure JSON and assignment syntax (`let carInfo = {...};`)
+- Invokes callback with `CarInfo[]` array of all successfully parsed files
+- Provides static helpers: `CarLoader.parseCarFile(content)`, `CarLoader.allParamsMatch(cars)`, `CarLoader.compareCarParams(a, b)`
+
+Usage: `new CarLoader((carInfos: CarInfo[]) => this.#handleCarsLoaded(carInfos))`
+
+#### Integration with TopControlsPanel
+
+Both loaders bind by element ID (`#loadWorldInput`, `#loadCarInput`). The `<top-controls-panel>` custom element contains both inputs in its template, so when it's present in the DOM, simply instantiate `new WorldLoader(...)` and `new CarLoader(...)` — they will find and attach to the panel's inputs automatically. No custom event handling or file parsing is needed.
+
+### 6. Viewport & Rendering (`ts/viewport/`, `ts/mini-map/`, `ts/camera/`)
 
 View transformation and display systems.
 
-| Module                 | Responsibility                          |
-| ---------------------- | --------------------------------------- |
-| `viewport/viewport.ts` | Zoom, pan, coordinate transformation    |
-| `mini-map/miniMap.ts`  | Scaled overview of world and cars       |
-| `camera.ts`            | 3D frustum-based perspective projection |
-| `camera_new_ai_ver.ts` | Experimental AI-oriented camera (WIP)   |
+| Module                 | Responsibility                                                   |
+| ---------------------- | ---------------------------------------------------------------- |
+| `viewport/viewport.ts` | Zoom, pan, coordinate transformation                             |
+| `mini-map/miniMap.ts`  | Scaled overview of world and cars                                |
+| `camera/types.ts`      | Camera interfaces (`ICameraPoint`, `ICameraRenderOptions`, etc.) |
+| `camera/extrusion.ts`  | 3D extrusion helpers (buildings, cars, trees)                    |
+| `camera/camera.ts`     | Frustum-based perspective projection & rendering                 |
 
 ### 7. Games & Utilities (`ts/games/`, `ts/`)
 
@@ -213,7 +242,6 @@ Racing mode and shared helpers.
 | --------------- | --------------------------------------------- |
 | `games/race.ts` | Racing with countdown, progress, AI opponents |
 | `sound.ts`      | Audio synthesis (engine, beep, explosion)     |
-| `road.ts`       | Simple straight road for basic simulator      |
 | `utils.ts`      | `polysIntersect`, `getRGBA`, `getRandomColor` |
 | `types.ts`      | Global type declarations                      |
 
@@ -254,7 +282,7 @@ fitness = distance traveled along corridor
 ### Generation Cycle
 
 ```
-1. TrainingManager.generateCars(N) → uses getStartInfo() + car config from UI
+1. trainingManager.initializeCars() → uses getStartInfo() + car config from UI
 2. Apply brains from pool (top K unmodified, rest mutated)
 3. applyCarSettingsToCars() → ensure physics/sensors match UI config
 4. onCarsCreated() → simulator updates references (world.cars, miniMap, etc.)
@@ -334,22 +362,18 @@ Legacy `.car` files using `let carInfo = {...}` format are also supported for lo
 
 Each HTML file is a standalone application that loads the required subset of modules:
 
-| File                       | Modules Loaded                           | Purpose              |
-| -------------------------- | ---------------------------------------- | -------------------- |
-| `index.html`               | None (links only)                        | Landing page         |
-| `simpleRoadSimulator.html` | Car, Network, Road, TrainingManager      | Basic training       |
-| `simulator.html`           | Full stack + WorldLoader                 | World-based training |
-| `cameraViewSimulator.html` | Full stack + Camera + WorldLoader        | 3D perspective       |
-| `race.html`                | Full stack + Race + Camera + WorldLoader | Keyboard racing      |
-| `race-camera.html`         | Full + CameraControls                    | Webcam racing        |
-| `race-phone.html`          | Full + PhoneControls                     | Mobile racing        |
-| `world.html`               | World + Editors + Viewport + WorldLoader | Map creation         |
-| `controlPanel.html`        | N/A (loaded via XHR)                     | Reusable training UI |
+| File             | Modules Loaded                                                                           | Purpose                     |
+| ---------------- | ---------------------------------------------------------------------------------------- | --------------------------- |
+| `index.html`     | None (links only)                                                                        | Landing page                |
+| `simulator.html` | Full stack + SimpleWorld + TrafficGenerator                                              | All training modes          |
+| `race.html`      | Full stack + Race + SimUtils + WorldLoader + CarLoader + TopControlsPanel + All Controls | All race modes (URL params) |
+| `world.html`     | World + Editors + Viewport + WorldLoader                                                 | Map creation                |
 
 ---
 
 ## Design Patterns
 
+- **Custom HTML Elements** — UI panels (`<training-manager-panel>`, `<top-controls-panel>`, `<view-controls-panel>`) are self-contained custom elements that own their template, DOM queries, event listeners, and exposed state
 - **Composition over inheritance** — Cars contain Sensors, Controls, and NeuralNetworks as separate objects
 - **Static factory methods** — `World.load()`, `Graph.load()`, `Marking.load()` for deserialization
 - **Painter's algorithm** — 3D objects sorted by distance and drawn back-to-front

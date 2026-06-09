@@ -142,11 +142,25 @@ Uses `polysIntersect(carPolygon, obstacle)` which checks all pairs of edges for 
 
 If any intersection found: `damaged = true`, car stops updating.
 
+#### Collision Response (`handleCollisionWithRoadBorders`)
+
+An alternative to the default "stop on damage" behavior. Defined in `simulatorUtils.ts` as a shared utility used by both the Simulator (collision border mode) and Race mode:
+
+1. Find the nearest road skeleton/border segment to the car's position
+2. Project each polygon corner onto that segment
+3. Compute correction vector for each corner (segment point → polygon point)
+4. Select the corner with the maximum correction magnitude
+5. Adjust angle: +0.1 rad for right-side hits (polygon indices 0, 3), −0.1 for left (1, 2)
+6. Translate car by the normalized correction vector
+7. Reset `damaged = false` → car continues driving
+
+This enables "bouncing off walls" behavior instead of instant death on collision.
+
 > **Performance note**: With large populations (500+ cars), each car only
 > receives _nearby_ polygons via spatial filtering (proximity threshold ≈ 250 px).
 > This avoids the O(cars × total_polygons) explosion that would otherwise make
 > sensor ray-casting and collision detection prohibitively expensive. See
-> `simpleRoadSimulator.ts` (binary-search on y-sorted traffic) and `simulator.ts`
+> `simulator.ts` simple mode (binary-search on y-sorted traffic) and world mode
 > (Manhattan-distance filter on border segment midpoints).
 
 ---

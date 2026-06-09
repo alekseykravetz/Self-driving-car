@@ -159,7 +159,7 @@ static mutateFromPool(networks: NeuralNetwork[], amount: number): NeuralNetwork 
 
 ## Training Manager Integration
 
-The `TrainingManager` orchestrates the evolutionary process:
+The `<training-manager-panel>` custom element (`TrainingManagerPanelElement`) orchestrates the evolutionary process:
 
 ```
 Generation N:

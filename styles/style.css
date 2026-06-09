@@ -1,5 +1,12 @@
 body {
   margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body:not(.main-page) {
@@ -10,32 +17,182 @@ body:not(.main-page) {
   align-items: center;
 }
 
+/* Override for simulator page which uses its own layout */
+body:has(#simulatorLayout) {
+  display: block;
+}
+
 body.main-page {
-  background: lightgray;
+  background: #0f0f14;
+  color: #e8e8e8;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Simulator layout ──────────────────────────────────────────── */
+#simulatorLayout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  gap: 0;
+}
+
+#simulatorLayout canvas {
+  display: block;
+}
+
+#rightPanel {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  order: 10;
+}
+
+#rightPanel.hidden {
+  display: none;
+}
+
+/* ── Landing page ──────────────────────────────────────────────── */
+.landing-header {
+  padding: 60px 20px 30px;
   text-align: center;
 }
 
-/* ── Control panel ─────────────────────────────────────────────── */
-#verticalButtons {
+.landing-header h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin: 0 0 12px;
+  background: linear-gradient(135deg, #7ddf7d, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.landing-header .subtitle {
+  font-size: 1.1rem;
+  color: #888;
+  margin: 0;
+}
+
+.landing-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
+}
+
+.landing-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: left;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.landing-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.landing-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: #fff;
+}
+
+.card-desc {
+  font-size: 0.9rem;
+  color: #999;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+.card-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+}
+
+.card-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(125, 223, 125, 0.3);
+  transform: translateX(4px);
+}
+
+.card-btn .btn-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.card-btn span {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-btn strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e8e8e8;
+}
+
+.card-btn small {
+  font-size: 0.78rem;
+  color: #777;
+  margin-top: 2px;
+}
+
+/* ── Training Manager Panel ─────────────────────────────────────────────── */
+#trainingManagerPanel {
   display: flex;
   flex-direction: column;
   gap: 0;
   padding: 0;
   background: rgba(15, 15, 20, 0.92);
-  border-radius: 12px;
+  border-radius: 0;
   min-width: 180px;
   max-width: 200px;
+  width: 200px;
+  flex-shrink: 0;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
+  order: 20;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-#verticalButtons::-webkit-scrollbar {
+#trainingManagerPanel::-webkit-scrollbar {
   width: 4px;
 }
-#verticalButtons::-webkit-scrollbar-thumb {
+#trainingManagerPanel::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
 }
@@ -59,6 +216,9 @@ body.main-page {
   margin-bottom: 8px;
   padding-bottom: 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* ── Stats panel ───────────────────────────────────────────────── */
@@ -75,6 +235,20 @@ body.main-page {
   padding: 3px 6px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 6px;
+}
+
+.stat-row-toggle {
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    background 0.2s;
+}
+.stat-row-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.stat-row-toggle.disabled {
+  opacity: 0.35;
+  text-decoration: line-through;
 }
 
 .stat-emoji {
@@ -99,6 +273,73 @@ body.main-page {
   color: #e8e8e8;
   min-width: 28px;
   text-align: right;
+}
+
+/* ── Status dots ───────────────────────────────────────────────── */
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: auto;
+  vertical-align: middle;
+  background: #555;
+}
+.status-dot.green {
+  background: #5cb85c;
+  box-shadow: 0 0 3px rgba(92, 184, 92, 0.6);
+}
+.status-dot.red {
+  background: #d9534f;
+  box-shadow: 0 0 3px rgba(217, 83, 79, 0.6);
+}
+.status-dot.orange {
+  background: #f0ad4e;
+  box-shadow: 0 0 3px rgba(240, 173, 78, 0.6);
+}
+
+/* ── Pool table ────────────────────────────────────────────────── */
+.pool-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  font-family: Arial, sans-serif;
+}
+.pool-table th {
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
+.pool-table td {
+  padding: 2px 4px;
+  color: #ccc;
+  font-family: monospace;
+  font-size: 11px;
+}
+.pool-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+.pool-table th:last-child,
+.pool-table td:last-child {
+  text-align: right;
+}
+.pool-table tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.pool-table tr:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.pool-table tr.selected {
+  background: rgba(66, 165, 245, 0.25);
+  outline: 1px solid rgba(66, 165, 245, 0.5);
+}
+.pool-table tr.selected td {
+  color: #fff;
 }
 
 /* ── Button groups ─────────────────────────────────────────────── */
@@ -208,6 +449,14 @@ body.main-page {
   background: rgba(200, 60, 60, 0.2);
   color: #e88;
 }
+.btn-sm.btn-success-outline {
+  border: 1px solid rgba(60, 200, 60, 0.3);
+  color: #8c8;
+}
+.btn-sm.btn-success-outline:hover {
+  background: rgba(60, 200, 60, 0.2);
+  color: #8e8;
+}
 
 /* ── Parameter grid ────────────────────────────────────────────── */
 .param-grid {
@@ -239,6 +488,10 @@ body.main-page {
   gap: 6px;
 }
 
+.car-config-grid .ctrl-wide {
+  grid-column: 1 / -1;
+}
+
 .ctrl-label {
   font-size: 9px;
   font-family: Arial, sans-serif;
@@ -250,8 +503,14 @@ body.main-page {
   white-space: nowrap;
 }
 
+.ctrl-label.secondary {
+  font-weight: 400;
+  color: #666;
+  margin-left: 8px;
+}
+
 /* Buttons (legacy fallback) */
-#verticalButtons button:not(.btn-lg):not(.btn-sm) {
+#trainingManagerPanel button:not(.btn-lg):not(.btn-sm):not(.num-btn) {
   border: none;
   border-radius: 6px;
   padding: 6px 10px;
@@ -263,12 +522,12 @@ body.main-page {
   width: 100%;
   transition: background 0.15s;
 }
-#verticalButtons button:not(.btn-lg):not(.btn-sm):hover {
+#trainingManagerPanel button:not(.btn-lg):not(.btn-sm):not(.num-btn):hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
 /* Number inputs */
-#verticalButtons input[type='number'] {
+#trainingManagerPanel input[type='number'] {
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
@@ -283,14 +542,54 @@ body.main-page {
     border-color 0.15s,
     background 0.15s;
 }
-#verticalButtons input[type='number']:focus {
+#trainingManagerPanel input[type='number']:focus {
   outline: none;
   border-color: rgba(255, 200, 50, 0.6);
   background: rgba(255, 255, 255, 0.12);
 }
 
+/* ── Custom number input row (training params) ─────────────────── */
+.num-input-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.num-input-row input[type='number'] {
+  flex: 1;
+  min-width: 0;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.num-input-row input[type='number']::-webkit-inner-spin-button,
+.num-input-row input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.num-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 10px;
+  line-height: 1;
+  flex-shrink: 0;
+  flex-grow: 0;
+  transition: background 0.15s;
+}
+.num-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
 /* Checkbox */
-#verticalButtons input[type='checkbox'] {
+#trainingManagerPanel input[type='checkbox'] {
   width: 18px;
   height: 18px;
   cursor: pointer;
@@ -319,7 +618,7 @@ button:hover,
 }
 
 /* File input label inside panel */
-#verticalButtons .file-input-label {
+#trainingManagerPanel .file-input-label {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -339,7 +638,7 @@ button:hover,
   transition: background 0.15s;
   box-sizing: border-box;
 }
-#verticalButtons .file-input-label:hover {
+#trainingManagerPanel .file-input-label:hover {
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
@@ -348,21 +647,219 @@ input[type='file'] {
   display: none;
 }
 
+/* ── Top Controls (floating panel near world loader) ───────────── */
+#topControls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+#topControls .file-input-label {
+  position: static;
+  margin: 0;
+}
+
+.top-controls-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 16px;
+  padding: 0;
+}
+
+.controls-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.controls-group-label {
+  font-size: 9px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.controls-separator {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 4px;
+}
+
+.border-mode-group {
+  display: flex;
+  gap: 2px;
+}
+
+.border-mode-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  opacity: 0.5;
+}
+
+.border-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  opacity: 0.8;
+}
+
+.border-mode-btn.active {
+  background: rgba(255, 255, 255, 0.3);
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  opacity: 1;
+}
+
+/* ── View Controls (floating panel top center) ─────────────────── */
+#viewControls {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.view-toggles {
+  display: flex;
+  gap: 8px;
+}
+
+.view-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  user-select: none;
+}
+
+.view-toggle-label input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+  accent-color: #5cb85c;
+}
+
 /* ── Canvases ──────────────────────────────────────────────────── */
 #gameCanvas {
   background: #2a5;
+  display: block;
 }
 
 #networkCanvas {
   background: black;
+  display: block;
 }
 
 #miniMapCanvas {
   background: black;
+  display: block;
 }
 
 #cameraCanvas {
   background-image: linear-gradient(#8cf, white 70%);
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ── Race Panel (top center) ───────────────────────────────────── */
+#racePanel {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 6px 14px;
+  border-radius: 8px;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.race-panel-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+#carsInRaceInput {
+  width: 50px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+#carsInRaceInput:focus {
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.race-panel-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  padding: 0 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.race-panel-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* ── Race Game styles ──────────────────────────────────────────── */

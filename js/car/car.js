@@ -15,6 +15,7 @@ class Car {
   damaged;
   fitness;
   useBrain;
+  hiddenLayers;
   sensor;
   brain;
   controls;
@@ -25,40 +26,36 @@ class Car {
   //todo: fix this
   finishTime;
   progress;
-  constructor(
-    x,
-    y,
-    width,
-    height,
-    controlType,
-    angle = 0,
-    maxSpeed = 3,
-    color = 'blue',
-  ) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.color = color;
-    this.type = controlType;
+  constructor(opts) {
+    this.x = opts.x;
+    this.y = opts.y;
+    this.width = opts.width ?? 30;
+    this.height = opts.height ?? 50;
+    this.color = opts.color ?? 'blue';
+    this.type = opts.controlType;
     this.speed = 0;
-    this.acceleration = 0.2;
-    this.maxSpeed = maxSpeed;
-    this.friction = 0.05;
-    this.angle = angle;
+    this.acceleration = opts.acceleration ?? 0.2;
+    this.maxSpeed = opts.maxSpeed ?? 3;
+    this.friction = opts.friction ?? 0.05;
+    this.angle = opts.angle ?? 0;
     this.damaged = false;
     this.fitness = 0;
-    this.useBrain = controlType === 'AI';
-    if (controlType !== 'DUMMY') {
-      this.sensor = new Sensor(this);
-      this.brain = new NeuralNetwork([this.sensor.rayCount + 1, 6, 4]);
+    this.hiddenLayers = opts.hiddenLayers ?? [6];
+    this.useBrain = opts.controlType === 'AI';
+    if (opts.controlType !== 'DUMMY') {
+      this.sensor = new Sensor(this, opts.sensor);
+      this.brain = new NeuralNetwork([
+        this.sensor.rayCount + 1,
+        ...this.hiddenLayers,
+        4,
+      ]);
     }
-    this.controls = new Controls(controlType);
+    this.controls = new Controls(opts.controlType);
     this.image = new Image();
     this.image.src = '/assets/car.png';
     this.mask = document.createElement('canvas');
-    this.mask.width = width;
-    this.mask.height = height;
+    this.mask.width = this.width;
+    this.mask.height = this.height;
     const maskCtx = this.mask.getContext('2d');
     this.image.onload = () => {
       maskCtx.fillStyle = this.color;
@@ -73,7 +70,10 @@ class Car {
 
   load(info) {
     if (info.brain) {
-      this.brain = info.brain;
+      this.brain = JSON.parse(JSON.stringify(info.brain));
+    }
+    if (info.hiddenLayers) {
+      this.hiddenLayers = [...info.hiddenLayers];
     }
     this.maxSpeed = info.maxSpeed;
     this.friction = info.friction;
@@ -96,6 +96,7 @@ class Car {
       acceleration: this.acceleration,
       width: this.width,
       height: this.height,
+      hiddenLayers: [...this.hiddenLayers],
       sensor: {
         rayCount: this.sensor?.rayCount ?? 5,
         raySpread: this.sensor?.raySpread ?? Math.PI / 2,

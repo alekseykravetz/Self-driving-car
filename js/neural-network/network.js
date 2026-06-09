@@ -87,6 +87,22 @@ class NeuralNetwork {
     NeuralNetwork.mutate(child, amount);
     return child;
   }
+
+  /**
+   * Safe version of mutateFromPool that deep-copies parents before crossover,
+   * preventing mutation of the original pool references.
+   */
+  static toMutatedFromPool(networks, amount = 0.1) {
+    const parent1 = JSON.parse(
+      JSON.stringify(networks[Math.floor(Math.random() * networks.length)]),
+    );
+    const parent2 = JSON.parse(
+      JSON.stringify(networks[Math.floor(Math.random() * networks.length)]),
+    );
+    const child = NeuralNetwork.crossover(parent1, parent2);
+    NeuralNetwork.mutate(child, amount);
+    return child;
+  }
 }
 class Level {
   inputs;

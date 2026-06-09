@@ -3,7 +3,7 @@ interface Corridor {
   skeleton: Segment[];
 }
 
-class World {
+class World implements IWorld {
   public graph: Graph; //todo: make it private
   public roadWidth: number; //todo: make it private
 

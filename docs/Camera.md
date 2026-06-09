@@ -1,40 +1,58 @@
 # Camera & 3D Rendering
 
-The camera system in `ts/camera.ts` provides pseudo-3D perspective rendering by projecting 2D world geometry into a first-person viewpoint.
+The camera system in `ts/camera/` provides pseudo-3D perspective rendering by projecting 2D world geometry into a first-person viewpoint.
 
 ---
 
-## Camera Class (`ts/camera.ts`)
+## File Structure (`ts/camera/`)
+
+| File           | Responsibility                                                         |
+| -------------- | ---------------------------------------------------------------------- |
+| `types.ts`     | Interfaces (`ICameraPoint`, `IColoredPolygon`, `ICameraRenderOptions`) |
+| `extrusion.ts` | Pure geometry functions for 3D extrusion (buildings, cars, trees)      |
+| `camera.ts`    | Camera class (movement, frustum, projection, filtering, rendering)     |
+
+---
+
+## Camera Class (`ts/camera/camera.ts`)
 
 ### Structure
 
 ```typescript
 interface ICameraPoint {
-  x: number
-  y: number
-  angle: number
+  x: number;
+  y: number;
+  angle: number;
 }
 
-class Camera {
+interface ICameraRenderOptions {
+  keyCar?: Car;               // The car the camera follows (always extruded as detailed 3D)
+  bestCar?: Car;              // Best AI car (extruded with gold highlight)
+  traffic?: Car[];            // Traffic cars (extruded as smaller 3D shapes)
+  debugCtx?: CanvasRenderingContext2D; // Optional debug context for raw polygon drawing
+}
+
+class Camera implements ICameraPoint {
   // Position
   x, y: number           // World position
-  z: number              // Height (elevation)
+  z: number              // Height (elevation, fixed at -40)
   angle: number          // Heading direction
 
   // Configuration
-  range: number          // View distance
-  distanceBehind: number // Offset behind target car
+  range: number          // View distance (default 1000)
+  distanceBehind: number // Offset behind target car (default 100)
 
   // Frustum points
   center: Point          // Camera position
   tip: Point             // Front of view cone
-  left: Point            // Left edge of view
-  right: Point           // Right edge of view
-  polygon: Polygon       // View frustum as polygon (for culling)
+  left: Point            // Left edge of view (45° left)
+  right: Point           // Right edge of view (45° right)
+  polygon: Polygon       // View frustum as triangle polygon (for culling)
 
   // Methods
   move(target: ICameraPoint): void
   simpleMove(target: ICameraPoint): void
+  render(ctx, world, options?: ICameraRenderOptions): void
   draw(ctx: CanvasRenderingContext2D): void
 }
 ```
@@ -48,9 +66,9 @@ class Camera {
 ```typescript
 move(target: ICameraPoint) {
   const t = 0.15  // Interpolation factor (smoothing)
-  this.x = lerp(this.x, target.x, t)
-  this.y = lerp(this.y, target.y, t)
-  this.angle = lerpAngle(this.angle, target.angle, t)
+  this.x = lerp(this.x, target.x + distanceBehind * sin(angle), t)
+  this.y = lerp(this.y, target.y + distanceBehind * cos(angle), t)
+  this.angle = lerp(this.angle, target.angle, t)
   this.#updateFrustumPoints()
 }
 ```
@@ -64,19 +82,18 @@ Sets position directly without interpolation — used for initial placement or t
 ### Frustum Update (`#updateFrustumPoints`)
 
 ```
-center = (x - sin(angle) * distanceBehind,
-          y - cos(angle) * distanceBehind)
+center = (x, y)   // Camera's own position
 
 tip = (x - sin(angle) * range,
        y - cos(angle) * range)
 
-left = (center.x - sin(angle - fov/2) * range,
-        center.y - cos(angle - fov/2) * range)
+left = (x - sin(angle - π/4) * range,
+        y - cos(angle - π/4) * range)
 
-right = (center.x - sin(angle + fov/2) * range,
-         center.y - cos(angle + fov/2) * range)
+right = (x - sin(angle + π/4) * range,
+         y - cos(angle + π/4) * range)
 
-polygon = Polygon([center, left, right])  // Triangle frustum
+polygon = Polygon([center, left, right])  // Triangle frustum (90° FOV)
 ```
 
 ---
@@ -87,38 +104,41 @@ Before rendering, all world polygons are tested against the camera's triangular 
 
 ```typescript
 #filter(polygons: Polygon[]): Polygon[] {
-  return polygons.filter(poly =>
-    poly.intersectsPolygon(this.polygon) ||
-    this.polygon.containsPolygon(poly)
-  )
+  for (const polygon of polygons) {
+    if (polygon.intersectsPolygon(this.polygon)) {
+      // Break at intersection, keep points inside frustum
+      ...
+    } else if (this.polygon.containsPolygon(polygon)) {
+      // Fully inside — keep as is
+    }
+  }
 }
 ```
 
-Only polygons that overlap or are inside the frustum are rendered. This significantly reduces draw calls for large worlds.
+Only polygons that overlap or are inside the frustum are rendered. Polygons that intersect the frustum boundary are clipped at the intersection points.
 
 ---
 
 ## 3D Projection (`#projectPoint`)
 
-Converts world 2D coordinates to screen perspective coordinates:
+Converts world 2D+Z coordinates to screen perspective coordinates:
 
 ```typescript
 #projectPoint(ctx: CanvasRenderingContext2D, p: Point): Point {
-  // Vector from camera center to point
-  const seg = new Segment(this.center, p)
-  const dist = seg.length()
+  // Project p onto camera's forward axis (center → tip)
+  const segment = new Segment(this.center, this.tip)
+  const { point: p1 } = segment.projectPoint(p)
 
-  // Forward distance (dot product with camera direction)
-  const forwardDist = dot(subtract(p, this.center), cameraDirection)
+  // Lateral offset via cross product
+  const c = cross(subtract(p1, camera), subtract(p, camera))
+  const x = (sign(c) * distance(p, p1)) / distance(camera, p1)
 
-  // Lateral offset (cross product for screen X)
-  const lateralDist = cross(subtract(p, this.center), cameraDirection)
+  // Vertical offset from Z
+  const y = (p.z - this.z) / distance(camera, p1)
 
-  // Perspective division
-  const screenX = ctx.canvas.width / 2 + (lateralDist / forwardDist) * focalLength
-  const screenY = ctx.canvas.height / 2 - (p.z / forwardDist) * focalLength
-
-  return new Point(screenX, screenY)
+  // Scale to canvas coordinates
+  const scaler = max(canvas.width / 2, canvas.height / 2)
+  return new Point(cX + x * scaler, cY + y * scaler)
 }
 ```
 
@@ -126,84 +146,128 @@ Objects further away appear smaller and closer to the horizon. Objects to the le
 
 ---
 
-## 3D Extrusion (`#extrude`)
+## 3D Extrusion
 
-Converts flat 2D polygons (buildings, trees) into 3D prisms:
+### Buildings (`#extrude`)
+
+Converts flat 2D polygons into 3D prisms (sides + ceiling):
 
 ```typescript
-#extrude(polygons: Polygon[], height: number): Polygon[] {
-  const result = []
-  for (const poly of polygons) {
-    // Create top face by projecting each point upward
-    const topPoints = poly.points.map(p =>
-      this.#projectPoint(ctx, new Point(p.x, p.y, height))
-    )
-    const bottomPoints = poly.points.map(p =>
-      this.#projectPoint(ctx, new Point(p.x, p.y, 0))
-    )
-
-    // Create side faces connecting bottom edges to top edges
-    for (let i = 0; i < poly.points.length; i++) {
-      const next = (i + 1) % poly.points.length
-      result.push(new Polygon([
-        bottomPoints[i], bottomPoints[next],
-        topPoints[next], topPoints[i]
-      ]))
-    }
-
-    // Add top face
-    result.push(new Polygon(topPoints))
-  }
-  return result
+#extrude(polygons: Polygon[], height: number = 10): Polygon[] {
+  // For each polygon:
+  //   1. Create ceiling by copying points with z = -height
+  //   2. Create side quads connecting base edges to ceiling edges
+  //   3. Return [...sides, ceiling]
 }
 ```
 
----
+### Trees (`#extrudeTrees`)
 
-## Rendering Pipeline (`draw`)
-
-```
-1. Get all world polygons (buildings, trees, road borders)
-2. Filter by frustum (cull invisible objects)
-3. For each visible polygon:
-   a. Project all points to screen space
-   b. Extrude to create 3D faces (sides + top)
-4. Sort all faces by average distance to camera (far → near)
-5. Draw in order (painter's algorithm — far objects first)
-6. Apply depth-based shading (darker = further)
-```
-
-### Depth Shading
-
-Objects further from the camera are drawn slightly darker, creating a fog/depth effect:
-
-```
-alpha = 1 - (distance / maxRange)
-fillColor = rgba(baseColor, alpha)
-```
-
----
-
-## Usage in Simulators
-
-### Camera View Simulator
+Creates simple cone shapes from base polygons to a single centroid peak. This approach is robust regardless of how many base points survive the camera frustum clipping:
 
 ```typescript
-const camera = new Camera(gameCanvas.width, gameCanvas.height);
+#extrudeTrees(polygons: Polygon[], height: number = 200): Polygon[] {
+  for (const polygon of polygons) {
+    // Calculate centroid of base as the peak point
+    const centroid = getCentroid(polygon.points)
+    centroid.z = -height
 
-// Each frame:
-camera.move({ x: myCar.x, y: myCar.y, angle: myCar.angle });
-camera.draw(cameraCtx); // Renders 3D view
+    // Create triangular faces from each base edge to the peak
+    for (let i = 0; i < polygon.points.length; i++) {
+      sides.push(new Polygon([points[i], points[i+1], centroid]))
+    }
+  }
+}
 ```
 
-### Race Mode
+### Cars (`#extrudeCar`)
+
+Creates a detailed car model with:
+
+- Tapered front/back
+- Base polygon with 10 points (front, quarter, middle, quarter, back × 2 sides)
+- Lower sides (base → midline), upper sides (midline → ceiling)
+- Shaped roof with sloped front/back
+
+---
+
+## Render Options & Car Extrusion
+
+The `render` method accepts `ICameraRenderOptions` to control which cars are extruded:
+
+| Option    | Style                                             | Purpose                                         |
+| --------- | ------------------------------------------------- | ----------------------------------------------- |
+| `keyCar`  | Car's own color, full detail                      | The car the camera follows (player/tracked car) |
+| `bestCar` | Gold highlight (`rgba(255, 200, 0, 0.6)`)         | Best AI car when different from keyCar          |
+| `traffic` | Car's own color, slightly smaller (h=12, wheel=4) | Traffic/opponent cars                           |
+
+**Fallback behavior:** If no `keyCar` is provided, `world.bestCar` is used as the extruded car (backward compatible).
+
+**Car shadows:** All `world.cars` that are NOT the `keyCar` or `bestCar` are drawn as flat gray shadows on the ground.
+
+### Usage in Simple Mode Simulator
 
 ```typescript
-// Split screen: world view (left) + camera view (right)
+const keysCar = cars.find((c) => c.type === 'KEYS');
+camera.move(bestCar);
+camera.render(cameraCtx, world, {
+  keyCar: keysCar || bestCar,
+  bestCar: keysCar ? bestCar : undefined,
+  traffic: this.traffic,
+});
+```
+
+### Usage in World Mode Simulator
+
+```typescript
+const keysCar = cars.find((c) => c.type === 'KEYS');
+camera.move(cameraTarget);
+camera.render(cameraCtx, world, {
+  keyCar: keysCar || currentBestCar,
+  bestCar: keysCar ? currentBestCar : undefined,
+  debugCtx,
+});
+```
+
+### Usage in Race Game
+
+```typescript
 camera.move(myCar);
-world.draw(worldCtx, viewPoint); // Top-down
-camera.draw(cameraCtx); // 3D perspective
+camera.render(cameraCtx, world, {
+  keyCar: myCar,
+  traffic: cars.filter((c) => c !== myCar),
+});
 ```
+
+---
+
+## Rendering Pipeline (`render`)
+
+```
+1. Gather world geometry (buildings, trees, road borders)
+2. Filter by frustum (cull/clip invisible objects)
+3. Extrude filtered polygons to 3D:
+   - Buildings: height 200, gray
+   - Trees: cone shape, green
+   - Roads: height 10
+   - Key car: full detail car model
+   - Best car: full detail, gold
+   - Traffic: slightly smaller car models
+4. Project all 3D polygon points to 2D screen space
+5. Draw in layer order with fog effect:
+   alpha = max(0, (1 - distance/range)²)
+6. Optionally draw raw polygons to debug context
+```
+
+### Layer Order (back to front)
+
+1. Car shadows (flat, gray)
+2. Road polygons
+3. Building polygons
+4. Tree polygons
+5. Traffic car polygons
+6. Best car polygons
+7. Key car polygons (always on top)
 
 ---
 
@@ -221,13 +285,3 @@ function getFake3dPoint(point: Point, viewPoint: Point, height: number): Point {
 ```
 
 This creates a "pseudo-3D" effect in the top-down view by offsetting building tops away from the viewer, giving a parallax depth illusion without full perspective projection.
-
----
-
-## Experimental: AI Camera (`ts/camera_new_ai_ver.ts`)
-
-A work-in-progress alternative camera implementation designed for vision-based AI training. Currently contains commented-out experimental code for:
-
-- Direct pixel-based environment perception
-- Frame-by-frame image analysis for neural network input
-- Alternative to ray-casting sensor system

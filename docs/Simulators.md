@@ -4,9 +4,26 @@ The project provides multiple simulation environments for training and testing a
 
 ---
 
-## Training Manager (`ts/ai-training/trainingManager.ts`)
+## Training Manager (`ts/ai-training/trainingManagerPanel.ts`)
 
-The central training orchestrator that owns all population state and car generation logic. Simulators are thin animation shells that delegate training decisions to this class.
+The central training orchestrator — a custom HTML element (`<training-manager-panel>`) that owns both the UI panel and all population/training state. Simulators are thin animation shells that configure this element with callbacks and read its public state.
+
+### Custom Element Pattern
+
+All simulator panels follow the same custom element pattern:
+
+| Element                       | Tag                        | Responsibility                                   |
+| ----------------------------- | -------------------------- | ------------------------------------------------ |
+| `TrainingManagerPanelElement` | `<training-manager-panel>` | Training UI + genetic algorithm + car generation |
+| `TopControlsPanelElement`     | `<top-controls-panel>`     | Border mode, tracking mode, world file loading   |
+| `ViewControlsPanelElement`    | `<view-controls-panel>`    | Layout toggle, camera/visualizer/minimap toggles |
+
+Each element:
+
+1. Renders its own HTML template in `connectedCallback()`
+2. Queries its own DOM subtree via `this.querySelector()` (scoped, not global)
+3. Binds event listeners internally
+4. Exposes state via public properties/getters and accepts callbacks via setter methods
 
 ### Class Structure
 
@@ -18,7 +35,7 @@ interface TrainingManagerOptions {
   onPauseToggle?: (paused: boolean) => void;
 }
 
-class TrainingManager {
+class TrainingManagerPanelElement extends HTMLElement {
   // Public state (read by simulators for rendering)
   cars: Car[];
   bestCar: Car | null;
@@ -27,8 +44,9 @@ class TrainingManager {
   maxDistancePassed: number;
   paused: boolean;
 
-  // Car generation (fully internal)
-  private generateCars(n, type, config): Car[]; // Uses getStartInfo() for position
+  // Lifecycle
+  connectedCallback(): void; // Renders template HTML
+  configure(options): void; // Sets callbacks, inits DOM refs & listeners
 
   // Training lifecycle
   initializeCars(): void; // First-time setup (loads brains from localStorage)
@@ -56,11 +74,37 @@ class TrainingManager {
   saveCarToFile(): void; // Download best car as .car JSON
   // loadCarFromFile → auto-triggers newTraining()
 }
+
+customElements.define('training-manager-panel', TrainingManagerPanelElement);
+```
+
+### Usage in Simulator
+
+```typescript
+// Get element from DOM (already rendered by browser via <training-manager-panel> tag)
+this.trainingManager = document.querySelector(
+  'training-manager-panel',
+) as TrainingManagerPanelElement;
+
+// Configure with callbacks
+this.trainingManager.configure({
+  evaluateFitness: (car) => car.fitness,
+  getStartInfo: () => this.#getStartInfo(),
+  onCarsCreated: (cars) => {
+    this.world.cars = cars;
+  },
+  onPauseToggle: (paused) => {
+    /* cancel/resume animation */
+  },
+});
+
+// Initialize population
+this.trainingManager.initializeCars();
 ```
 
 ### Key Design Decisions
 
-1. **TrainingManager generates cars** — simulators only provide `getStartInfo()` (position + angle). This eliminates duplicated car-creation logic.
+1. **TrainingManagerPanelElement generates cars** — simulators only provide `getStartInfo()` (position + angle). This eliminates duplicated car-creation logic.
 
 2. **Two distinct restart modes**:
 
@@ -103,9 +147,9 @@ class TrainingManager {
 └─────────────────────────────────────────────┘
 ```
 
-### Control Panel UI (`html/controlPanel.html`)
+### Control Panel UI (`<training-manager-panel>`)
 
-Loaded via XMLHttpRequest into simulator pages. Contains:
+The training panel is a custom HTML element that renders its own template. It is placed directly in the HTML:
 
 | Control       | Type       | Range      | Purpose                                       |
 | ------------- | ---------- | ---------- | --------------------------------------------- |
@@ -139,62 +183,96 @@ Loaded via XMLHttpRequest into simulator pages. Contains:
 - Alive / Dead / Frozen car counts
 - Best distance (all-time)
 
+**Pool Statistics table** (below Statistics):
+
+- Displays the current best pool cars ordered by fitness (best first)
+- Columns: rank (#), car name, fitness value
+- Car names are assigned as the pool index+1 — this lets you see if the same cars from a previous generation remain dominant
+
+**Status dots** (colored indicators on section titles):
+
+Each dot shows the localStorage sync state for that section:
+
+| Section    | Green                                  | Orange                                         | Red                  |
+| ---------- | -------------------------------------- | ---------------------------------------------- | -------------------- |
+| Storage    | `bestBrains` exists in localStorage    | —                                              | No stored brains     |
+| Pool       | Stored pool length matches pool size   | Stored pool length differs from current config | No stored brains     |
+| Car Config | Stored config matches current controls | At least one parameter differs                 | No stored car config |
+
 ---
 
-## Simple Road Simulator (`ts/ai-training/simpleRoadSimulator.ts`)
+## Simple Road Simulator (Simple Mode)
 
 ### Purpose
 
-Entry-level training environment — a straight 3-lane road with random traffic obstacles. Ideal for initial neural network evolution before testing on complex maps.
+Entry-level training environment — a straight 3-lane road with random traffic obstacles. Ideal for initial neural network evolution before testing on complex maps. Now unified into the main Simulator via `?mode=simple` URL parameter.
 
-### Setup
+### Access
+
+Navigate to `/html/simulator?mode=simple` (or click "Simple Road" on the landing page).
+
+### Architecture
+
+Simple mode reuses the `Simulator` class with a different initialization path:
 
 ```typescript
-const road = new Road(canvas.width / 2, canvas.width * 0.9, 3); // Centered, 3 lanes
-const CAR_START_Y = 100;
-
-const trainingManager = new TrainingManager({
-  evaluateFitness: (car) => CAR_START_Y - car.y, // Distance = upward travel
-  getStartInfo: () => ({
-    x: road.getLaneCenter(1),
-    y: CAR_START_Y,
-    angle: startAngle,
-  }),
-  onCarsCreated: () => {
-    traffic = generateTraffic();
-    lastGeneratedTrafficY = -700;
-  },
-});
-
-trainingManager.initializeCars();
+// Mode detected from URL parameter
+const params = new URLSearchParams(window.location.search);
+this.mode = params.get('mode') === 'simple' ? 'simple' : 'world';
 ```
 
-### Traffic Generation
+Instead of loading a `.world` file, simple mode creates a `SimpleWorld` instance — a lightweight `IWorld` implementation:
+
+```typescript
+class SimpleWorld implements IWorld {
+  graph: Graph; // Minimal 2-node graph
+  roadBorders: Segment[]; // Two vertical border segments (left + right edges)
+  buildings: Building[]; // Empty array (no 3D buildings)
+  trees: Tree[]; // Empty array (no trees)
+  corridor: null; // No pathfinding needed
+  markings: Marking[]; // One synthetic Start marking
+  cars: Car[];
+  bestCar: Car | null;
+
+  getLaneCenter(laneIndex: number): number;
+  getLaneCount(): number;
+  generateCorridor(): void; // No-op
+  draw(ctx, viewPoint): void; // Renders lane dividers + borders
+}
+```
+
+### Traffic Generation (`ts/ai-training/trafficGenerator.ts`)
 
 ```
-generateTrafficRow(y):
-  - Choose 1-2 of 3 lanes to block (always leave at least 1 gap)
+generateInitialTraffic(getLaneCenter, startAngle):
+  - Hardcoded 7 cars in rows at y = -100, -300, -500, -700
+  - Each row has at least one empty lane
+
+generateTrafficRow(y, getLaneCenter, laneCount, startAngle):
+  - Choose 1-2 lanes to block (always leave at least 1 gap)
   - Place DUMMY cars in blocked lanes at position y
-  - DUMMY cars drive forward at ~2 speed
+  - DUMMY cars drive forward at speed 2
 
-Initial traffic rows at: y = -100, -300, -500, -700
-Dynamic: New rows generated ahead of leader, old rows culled behind
-
-Spatial optimization: Traffic sorted by y each frame;
-  each AI car uses binary search to find only nearby traffic (±250 px).
+Dynamic generation (in draw loop):
+  - New rows spawned 1500 units ahead of leader
+  - Old rows culled 600 units behind
+  - Traffic sorted by y each frame for binary-search spatial lookups
 ```
 
-### Visualization
+### UI in Simple Mode
 
-- **Road**: Gray with white lane dividers (dashed)
-- **Regular AI cars**: 20% opacity (semi-transparent)
-- **Pool cars**: 100% opacity, gold border, rank labels (#1, #2...)
-- **Sensors**: Visible on pool cars only
-- **Network canvas**: Shows best car's brain in real-time
+- **Hidden**: Top controls (border mode, tracking mode, world loader)
+- **Visible**: View controls (layout toggle, 3D camera, network visualizer toggles)
+- **Visible**: Training control panel (car count, mutation, save/discard/restart)
+- **Disabled**: Mini-map checkbox (no minimap data for straight road)
+
+### 3D Camera in Simple Mode
+
+The Camera works with `SimpleWorld` because it only reads `world.buildings` (empty), `world.trees` (empty), `world.roadBorders` (valid segments), `world.bestCar`, and `world.cars`. Result: renders the road surface and cars in 3D perspective with no buildings or trees visible.
 
 ### Fitness
 
-`fitness = CAR_START_Y - car.y` — simply how far upward the car traveled.
+`fitness = startY - car.y` — how far upward the car traveled from the start position.
 
 ---
 
@@ -202,20 +280,55 @@ Spatial optimization: Traffic sorted by y each frame;
 
 ### Purpose
 
-Full-featured training environment that loads custom world maps with roads, buildings, intersections, and corridors. The primary environment for advanced training.
+Unified training environment supporting two modes:
+
+- **World mode** (default): Loads custom world maps with roads, buildings, intersections, and corridors
+- **Simple mode** (`?mode=simple`): Straight 3-lane road with dynamic traffic (see above)
+
+### IWorld Interface (`ts/world-editor/types.ts`)
+
+Both `World` and `SimpleWorld` implement the `IWorld` interface, allowing the Simulator, Camera, and other components to work with either representation:
+
+```typescript
+interface IWorld {
+  graph: Graph;
+  cars: Car[];
+  bestCar: Car | null;
+  markings: Marking[];
+  roadBorders: Segment[];
+  corridor: Corridor | null;
+  buildings: Building[];
+  trees: Tree[];
+  zoom?: number;
+  offset?: Point;
+  generateCorridor(start: Point, end: Point): void;
+  draw(
+    ctx: CanvasRenderingContext2D,
+    viewPoint: Point,
+    showStartMarkings?: boolean,
+  ): void;
+}
+```
 
 ### Class Structure
 
 ```typescript
 class Simulator {
+  mode: 'world' | 'simple'; // Detected from URL ?mode= param
   gameCanvas: HTMLCanvasElement;
   networkCanvas: HTMLCanvasElement;
   miniMapCanvas: HTMLCanvasElement;
-  world: World | null;
+  cameraCanvas: HTMLCanvasElement;
+  world: IWorld | null; // World or SimpleWorld
   viewport: Viewport | null;
   miniMap: MiniMap | null;
+  camera: Camera | null;
   roadBorders: Point[][] | null;
-  trainingManager: TrainingManager; // Owns cars, bestCar, bestPool
+  traffic: Car[]; // Simple mode only
+  lastGeneratedTrafficY: number; // Simple mode only
+  borderMode: 'none' | 'damage' | 'collision'; // Default: 'damage'
+  trackingMode: 'none' | 'best' | 'keys'; // Default: 'best'
+  trainingManager: TrainingManagerPanelElement;
 }
 ```
 
@@ -224,7 +337,7 @@ class Simulator {
 1. Load `.world` file (from file input or default)
 2. `World.load(worldInfo)` → reconstruct full world
 3. `world.generateCorridor(start, end)` → define training path
-4. TrainingManager generates cars at start marking position via `getStartInfo()`
+4. TrainingManagerPanelElement generates cars at start marking position via `getStartInfo()`
 5. Apply brain pool from localStorage
 6. Begin animation loop
 
@@ -235,7 +348,33 @@ class Simulator {
 - **Viewport following**: Camera centers on best car with zoom/pan
 - **Mini-map**: Shows all car positions on the full world graph
 - **Network visualizer**: Best car's brain displayed in real-time
+- **3D Camera view**: Optional perspective rendering following best car
 - **Full obstacles**: Road borders + buildings as collision polygons
+- **Border mode selection**: Three modes for how cars interact with road borders
+
+### Border Modes
+
+The simulator provides three radio-button options (displayed in the `<top-controls-panel>` custom element) for how cars interact with road borders:
+
+| Mode       | Icon | Behavior                                                   |
+| ---------- | ---- | ---------------------------------------------------------- |
+| No borders | 🚫   | Cars ignore road borders entirely (no collision detection) |
+| Damage     | 💀   | Cars are marked as damaged on collision and stop (default) |
+| Collision  | 🛡️   | Cars are pushed back onto the road and continue driving    |
+
+The collision mode uses the shared `handleCollisionWithRoadBorders()` utility, which projects car polygon points onto the nearest road skeleton segment and corrects position/angle.
+
+### Tracking Modes
+
+The `<top-controls-panel>` element also includes a **Tracking** radio-button group that controls which car the viewport and 3D camera follow:
+
+| Mode     | Icon | Behavior                                                     |
+| -------- | ---- | ------------------------------------------------------------ |
+| No track | ✋   | Viewport stays in place; user can freely drag/pan the canvas |
+| Best car | 🏆   | Centers viewport + camera on the best-fitness car (default)  |
+| Keys car | 🎮   | Centers viewport + camera on the user-controlled (KEYS) car  |
+
+When tracking is disabled (`none`), the viewport offset is not updated each frame, allowing the user to explore the world freely. The KEYS car is always present alongside AI cars (generated first with `controlType = "KEYS"`), so the user can drive manually and switch the view to follow it.
 
 ### Animation Loop
 
@@ -244,20 +383,33 @@ animate(time) {
   const cars = trainingManager.cars;
   const bestCar = trainingManager.bestCar;
 
-  // Update all cars against nearby road borders only (spatial filtering)
-  for (car of cars) car.update(nearbyBorders)
+  // Update cars based on borderMode:
+  for (car of cars) {
+    if (car.damaged && borderMode !== 'collision') {
+      deadCount++; // Skip damaged cars
+    } else {
+      if (car.damaged && borderMode === 'collision') {
+        handleCollisionWithRoadBorders(car, bordersToCheck);
+      }
+      // Pass nearby borders (empty array if borderMode === 'none')
+      car.update(borderMode === 'none' ? [] : nearbyBorders);
+    }
+  }
 
   // Update training state
   trainingManager.updateBestCarAndPool()
 
-  // Center viewport on best car
-  viewport.offset = { x: -bestCar.x, y: -bestCar.y }
+  // Center viewport based on tracking mode (none / best / keys)
+  const target = getTrackTarget(bestCar) // null if 'none'
+  if (target) viewport.offset = { x: -target.x, y: -target.y }
 
-  // Draw world, cars, network, mini-map
+  // Draw world, cars, network, mini-map, camera
   world.draw(ctx, viewPoint)
   drawSimulatorCars(ctx, cars, trainingManager.bestPool, ...)
   Visualizer.drawNetwork(networkCtx, bestCar.brain)
   miniMap.draw(viewPoint)
+  if (target) camera.move(target)
+  camera.render(cameraCtx, world)
 
   requestAnimationFrame(animate)
 }
@@ -287,54 +439,6 @@ a 10× speedup at 500+ car populations.
 
 ---
 
-## Camera View Simulator (`ts/simulators/cameraViewSimulator.ts`)
-
-### Purpose
-
-Explores vision-based navigation by rendering the world from the car's perspective using 3D projection.
-
-### Class Structure
-
-```typescript
-class CameraViewSimulator {
-  gameCanvas: HTMLCanvasElement; // Top-down world view
-  cameraCanvas: HTMLCanvasElement; // 3D perspective view
-  miniMapCanvas: HTMLCanvasElement;
-  world: World;
-  camera: Camera;
-  viewport: Viewport;
-  miniMap: MiniMap;
-  cars: Car[];
-  myCar: Car | null;
-}
-````
-
-### Key Features
-
-- **Split view**: Top-down world + 3D camera perspective side by side
-- **Camera following**: 3D camera positioned behind and above the car
-- **Frustum culling**: Only renders objects within camera's field of view
-- **3D projection**: Buildings and trees rendered with perspective depth
-- **Rotated mini-map**: Aligned with car's heading for intuitive navigation
-
-### Rendering Pipeline
-
-```
-1. Top-down canvas:
-   - Standard world rendering
-   - Car position indicator
-   - Camera frustum visualization
-
-2. Camera canvas:
-   - Camera.move(car) → update position/angle
-   - Filter objects by frustum intersection
-   - Project 2D polygons to 3D perspective
-   - Sort by distance (painter's algorithm)
-   - Draw with depth-based shading
-```
-
----
-
 ## Simulator Utilities (`ts/ai-training/simulatorUtils.ts`)
 
 Shared rendering logic for the training simulators.
@@ -354,6 +458,18 @@ Draws rank label (#1, #2, etc.) centered at car position with:
 - White text with black shadow for contrast
 - Font size proportional to car size
 
+### `handleCollisionWithRoadBorders(car, bordersToCheck)`
+
+Shared collision-response utility used by both the Simulator (in collision mode) and Race mode. Algorithm:
+
+1. Find nearest segment from `bordersToCheck` (corridor skeleton or road borders)
+2. Project each polygon corner onto that segment
+3. Compute correction vectors (segment projection point → polygon point)
+4. Select the corner with the largest correction magnitude
+5. Adjust car angle (±0.1 rad based on which side hit: indices 0,3 → right, 1,2 → left)
+6. Move car by the normalized correction vector
+7. Reset `car.damaged = false` so the car continues driving
+
 ---
 
 ## Racing Mode (`ts/games/race.ts`)
@@ -367,6 +483,7 @@ Competitive mode where the player races against AI cars on a corridor path.
 ```typescript
 class Race {
   gameCanvas, cameraCanvas, miniMapCanvas: HTMLCanvasElement
+  topControlsPanel: TopControlsPanelElement
   world: World
   camera: Camera
   viewport: Viewport
@@ -385,22 +502,67 @@ class Race {
 ```
 1. Load world with Start + Target markings
 2. Generate corridor (start → target)
-3. Create player car + AI opponents
-4. AI brains: loaded from localStorage, top 2 unmutated, rest mutated at 0.1
+3. Create player car (KEYS) + AI opponents
+4. AI brains: loaded from pool in localStorage
+   - Cars within pool size get exact pool configs (no mutation)
+   - Cars beyond pool size get mutated copies of pool[0]
+   - Player (KEYS) car is never modified by pool
 5. Countdown: 3... 2... 1... GO! (with sound effects)
 6. Race starts: all cars drive simultaneously
-7. Progress tracked: distance along corridor / total corridor length
-8. First to progress >= 1.0 wins
-9. Finish time displayed
+7. Border mode from TopControlsPanel controls collision behavior
+8. Progress tracked: distance along corridor / total corridor length
+9. First to progress >= 1.0 wins
+10. Finish time displayed
 ```
+
+### Top Controls Panel Integration
+
+Race uses `<top-controls-panel>` (same as Simulator) for all controls:
+
+- **World loading**: `WorldLoader` binds to `#loadWorldInput` inside the panel
+- **Car pool loading**: `CarLoader` binds to `#loadCarInput` inside the panel. Accepts ALL selected `.car` files regardless of param differences (unlike Simulator which requires matching params). Each pool car is applied as-is to its corresponding AI car.
+- **Border mode**: Controls how cars interact with road borders (same 3 modes as Simulator)
+- **Tracking mode**: Controls which car the viewport/camera follows
+
+### Car Pool Loading (Race-Specific Behavior)
+
+Unlike the Simulator (which rejects car files with different parameters), Race mode accepts ALL loaded car files into the pool:
+
+1. All `.car` files are parsed and stored as-is in `localStorage("bestPool")`
+2. AI cars `[0..poolSize-1]` receive exact pool configs (brain + physics + sensors) — no mutation
+3. AI cars beyond pool size receive mutated copies of `pool[0]`
+4. The KEYS car (player) is never affected by pool loading
+5. Race reinitializes with the new pool
+
+This allows racing different car configurations against each other (e.g., a fast car with few sensors vs. a slow car with many sensors).
+
+### Collision Handling
+
+Collision behavior is now controlled by the panel's border mode:
+
+| Mode      | Behavior in Race                                          |
+| --------- | --------------------------------------------------------- |
+| None 🚫   | Cars ignore road borders (sensors see nothing)            |
+| Damage 💀 | Cars are damaged on collision and stop driving (default)  |
+| Collision 🛡️ | Cars are pushed back onto road and continue (old behavior) |
+
+The collision mode uses the shared `handleCollisionWithRoadBorders()` utility from `simulatorUtils.ts`.
+
+### Tracking Modes in Race
+
+| Mode     | Behavior                                    |
+| -------- | ------------------------------------------- |
+| None ✋  | Viewport stays in place (free drag/pan)     |
+| Best 🏆  | Follows the leading car by progress         |
+| Keys 🎮  | Follows the player-controlled car (default) |
 
 ### Controls
 
-| Mode     | Input                   | File               |
-| -------- | ----------------------- | ------------------ |
-| Keyboard | WASD/Arrows             | `race.html`        |
-| Camera   | Blue markers via webcam | `race-camera.html` |
-| Phone    | Device tilt             | `race-phone.html`  |
+| Mode     | Input                   | URL                      |
+| -------- | ----------------------- | ------------------------ |
+| Keyboard | WASD/Arrows             | `race.html`              |
+| Camera   | Blue markers via webcam | `race.html?mode=camera`  |
+| Phone    | Device tilt             | `race.html?mode=phone`   |
 
 ### Sound Effects
 
@@ -470,3 +632,4 @@ class MiniMap {
 - Cars drawn as small circles (gray if damaged, else car color)
 - Viewport center highlighted
 - Everything scaled to fit mini-map canvas size
+````

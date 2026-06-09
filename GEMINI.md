@@ -81,13 +81,12 @@ ts/                         # TypeScript source (THE source of truth)
 │   ├── items/              # Building, Tree (3D rendering)
 │   └── markings/           # Start, Stop, Light, Crossing, etc.
 ├── ai-training/            # Training simulators + genetic algorithm
-├── simulators/             # Camera view simulator
+├── simple-world/           # Lightweight IWorld for simple road training
 ├── games/                  # Racing mode
 ├── viewport/               # Pan/zoom transformation
 ├── mini-map/               # Scaled world overview
 ├── camera.ts               # 3D perspective projection
 ├── sound.ts                # Audio synthesis
-├── road.ts                 # Simple straight road
 ├── utils.ts                # Collision helpers
 └── types.ts                # Global type declarations
 
@@ -122,10 +121,12 @@ docs/                       # Technical documentation
 
 ### Adding a new simulation mode:
 
-1. Create TypeScript class in `ts/ai-training/` or `ts/simulators/`
-2. Create HTML file in `html/` with all required script tags
-3. Add link to `index.html` landing page
-4. Wire up `TrainingManager` if using genetic training
+1. Create a new `IWorld` implementation in `ts/` (e.g., `ts/simple-world/simpleWorld.ts`)
+2. Add mode detection to `Simulator` constructor via URL parameter (e.g., `?mode=mymode`)
+3. Add `#initMyMode()` and `#drawMyMode()` methods to `Simulator`
+4. Add script tag to `html/simulator.html` in correct dependency order
+5. Add link to `index.html` landing page (use clean URL: `html/simulator?mode=mymode`)
+6. Register new globals in `eslint.config.mjs`
 
 ---
 
@@ -144,9 +145,9 @@ docs/                       # Technical documentation
 
 - No automated test suite — validation is visual
 - Test by running the relevant simulator HTML page
-- For physics changes: test in `simpleRoadSimulator.html`
+- For simple road training: test at `simulator.html?mode=simple`
 - For world changes: test in `world.html` editor
-- For rendering: test in `cameraViewSimulator.html`
+- For rendering: test in `simulator.html`
 - For AI training: verify in `simulator.html` that cars still learn
 
 ---
