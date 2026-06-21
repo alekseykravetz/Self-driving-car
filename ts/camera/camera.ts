@@ -126,7 +126,7 @@ class Camera implements ICameraPoint {
    * Gathers, filters, and extrudes all relevant polygons from the world for rendering.
    */
   #getPolygons(world: IWorld, options: ICameraRenderOptions = {}): Polygon[] {
-    const { keyCar, bestCar, traffic } = options;
+    const { keyCar, bestCar, cars = [], traffic } = options;
 
     // Buildings
     const buildingPolygons: Polygon[] = extrudePolygons(
@@ -141,8 +141,8 @@ class Camera implements ICameraPoint {
     );
 
     // Road borders
-    const roadSegments: Segment[] = world.corridor
-      ? world.corridor.borders
+    const roadSegments: Segment[] = world.corridors.length
+      ? world.corridors.flatMap((c: Corridor) => c.borders)
       : world.roadBorders || [];
     const roadPolygons: Polygon[] = extrudePolygons(
       this.#filter(roadSegments.map((s: Segment) => new Polygon([s.p1, s.p2]))),
@@ -191,7 +191,7 @@ class Camera implements ICameraPoint {
 
     // Best car (highlighted, separate from keyCar)
     let bestCarPolygons: Polygon[] = [];
-    const bestCarSource = bestCar || (!keyCar ? world.bestCar : null);
+    const bestCarSource = bestCar ?? null;
     if (
       bestCarSource &&
       bestCarSource !== keyCar &&
@@ -216,7 +216,7 @@ class Camera implements ICameraPoint {
 
     // Car shadows (flat projections)
     const carShadowBases: Polygon[] = this.#filter(
-      world.cars
+      cars
         .filter((c) => c !== keyCar && c !== bestCarSource)
         .map(
           (c) =>

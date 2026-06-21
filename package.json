@@ -5,6 +5,7 @@
   "scripts": {
     "start": "concurrently \"npm run tsc:watch\" \"npm run serve\" \"npm run fix:all\"",
     "serve": "serve -p 9090",
+    "publish:site": "bash scripts/publish-site.sh",
     "tsc:watch": "tsc --watch",
     "watch:fix": "onchange -i \"ts/**/*.ts\" \"html/**/*.html\" \"styles/**/*.css\" -- npm run fix:all",
     "fix:all": "npm run format && npm run lint",

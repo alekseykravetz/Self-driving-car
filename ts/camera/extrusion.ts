@@ -214,34 +214,77 @@ function extrudeCarShape(
 }
 
 /**
- * Extrudes tree base polygons into cone-shaped trees using a single centroid peak.
+ * Extrudes tree base polygons into trees with a trunk and an elevated cone canopy.
  * @param polygons - An array of 2D Polygons representing tree bases.
- * @param height - The height of the tree peak. Defaults to 200.
+ * @param height - The total height of the tree. Defaults to 200.
  */
 function extrudeTreeShapes(
   polygons: Polygon[],
   height: number = 200,
 ): Polygon[] {
   const extrudedPolygons: Polygon[] = [];
+  const trunkRatio: number = 0.3;
+  const canopyBaseRatio: number = 0.3;
+  const trunkHeight: number = height * trunkRatio;
+  const canopyBaseHeight: number = height * canopyBaseRatio - 20; // Slight gap between trunk top and canopy base
 
   for (const polygon of polygons) {
     const centroid = getCentroid(polygon.points);
-    centroid.z = -height;
 
-    const sides: Polygon[] = [];
-    for (let i: number = 0; i < polygon.points.length; i++) {
-      const p1: Point = polygon.points[i];
-      const p2: Point = polygon.points[(i + 1) % polygon.points.length];
-      sides.push(new Polygon([p1, p2, centroid]));
+    // Trunk: narrow cylinder from ground to trunkHeight
+    const trunkRadius: number = 0.15;
+    const trunkBase: Point[] = polygon.points.map(
+      (p: Point) =>
+        new Point(
+          lerp(centroid.x, p.x, trunkRadius),
+          lerp(centroid.y, p.y, trunkRadius),
+          0,
+        ),
+    );
+    const trunkTop: Point[] = trunkBase.map(
+      (p: Point) => new Point(p.x, p.y, -trunkHeight),
+    );
+
+    // Trunk sides
+    for (let i: number = 0; i < trunkBase.length; i++) {
+      const next: number = (i + 1) % trunkBase.length;
+      const trunkSide: Polygon = new Polygon([
+        trunkBase[i],
+        trunkBase[next],
+        trunkTop[next],
+        trunkTop[i],
+      ]);
+      const cPoly = trunkSide as IColoredPolygon;
+      cPoly.fill = 'rgba(100, 60, 20, 0.4)';
+      cPoly.stroke = 'rgba(100, 60, 20, 0.4)';
+      extrudedPolygons.push(trunkSide);
     }
 
-    sides.forEach((poly: Polygon) => {
-      const cPoly = poly as IColoredPolygon;
+    // Canopy: cone from canopyBaseHeight to full height
+    const canopyBase: Point[] = polygon.points.map(
+      (p: Point) => new Point(p.x, p.y, -canopyBaseHeight),
+    );
+    const peak: Point = new Point(centroid.x, centroid.y, -height);
+
+    for (let i: number = 0; i < canopyBase.length; i++) {
+      const next: number = (i + 1) % canopyBase.length;
+      const side: Polygon = new Polygon([
+        canopyBase[i],
+        canopyBase[next],
+        peak,
+      ]);
+      const cPoly = side as IColoredPolygon;
       cPoly.fill = 'rgba(34, 196, 74, 0.2)';
       cPoly.stroke = 'rgba(34, 196, 74, 0.2)';
-    });
+      extrudedPolygons.push(side);
+    }
 
-    extrudedPolygons.push(...sides);
+    // Canopy bottom cap
+    const canopyBottom: Polygon = new Polygon(canopyBase);
+    const cBottom = canopyBottom as IColoredPolygon;
+    cBottom.fill = 'rgba(34, 196, 74, 0.15)';
+    cBottom.stroke = 'rgba(34, 196, 74, 0.15)';
+    extrudedPolygons.push(canopyBottom);
   }
   return extrudedPolygons;
 }

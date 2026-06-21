@@ -30,7 +30,7 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 ### Script Load Order (typical HTML page)
 
 ```html
-<!-- 1. Math primitives -->
+<!-- 1. Math primitives (no dependencies) -->
 <script src="/js/math/primitives/point.js"></script>
 <script src="/js/math/primitives/segment.js"></script>
 <script src="/js/math/primitives/polygon.js"></script>
@@ -38,39 +38,45 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 <script src="/js/math/graph/graph.js"></script>
 <script src="/js/math/utils.js"></script>
 
-<!-- 2. World system -->
-<script src="/js/world-editor/world.js"></script>
-<script src="/js/world-editor/items/building.js"></script>
-<script src="/js/world-editor/items/tree.js"></script>
-<script src="/js/world-editor/markings/*.js"></script>
-<script src="/js/world-editor/trafficManager.js"></script>
+<!-- 2. World system (depends on math) -->
+<script src="/js/world/corridor.js"></script>
+<script src="/js/world/generation/worldGenerator.js"></script>
+<script src="/js/world/world.js"></script>
+<script src="/js/world/items/building.js"></script>
+<script src="/js/world/items/tree.js"></script>
+<script src="/js/world/markings/*.js"></script>
+<script src="/js/world/trafficManager.js"></script>
 
-<!-- 3. Viewport & Mini-map -->
+<!-- 3. Viewport & Mini-map (depends on math) -->
 <script src="/js/viewport/viewport.js"></script>
 <script src="/js/mini-map/miniMap.js"></script>
 
-<!-- 4. Car system -->
+<!-- 4. Car system (depends on math) -->
 <script src="/js/car/sensors/sensor.js"></script>
 <script src="/js/car/controls/controls.js"></script>
 <script src="/js/car/car.js"></script>
 
-<!-- 5. Neural network -->
+<!-- 5. Neural network (standalone) -->
 <script src="/js/neural-network/network.js"></script>
 <script src="/js/neural-network/visualizer.js"></script>
 
 <!-- 6. Custom element panels (must load before DOM parses their tags) -->
-<script src="/js/ai-training/topControlsPanel.js"></script>
-<script src="/js/ai-training/viewControlsPanel.js"></script>
-<script src="/js/ai-training/trainingManagerPanel.js"></script>
+<script src="/js/panels/worldToolbar.js"></script>
+<script src="/js/simulator/panels/layoutToolbar.js"></script>
+<script src="/js/simulator/panels/animationLoopToolbar.js"></script>
+<script src="/js/panels/shortcutsToolbar.js"></script>
+<script src="/js/simulator/training/trainingPanel.js"></script>
 
 <!-- 7. Simulator-specific code -->
-<script src="/js/ai-training/simulator.js"></script>
+<script src="/js/simulator/training/trainingSimulator.js"></script>
 
 <!-- 8. Inline initialization -->
 <script>
-  const simulator = new Simulator(canvas, networkCanvas, miniMapCanvas);
+  const simulator = new TrainingSimulator(canvas, networkCanvas, miniMapCanvas);
 </script>
 ```
+
+**Critical rule:** When adding new modules, you must add `<script>` tags in the correct dependency order to all relevant HTML files. A class must be defined before any other class references it.
 
 ---
 
@@ -84,23 +90,29 @@ graph TD
     Graph --> World
     Polygon --> World
     Envelope --> World
-    World -->|IWorld| Simulator
-    SimpleWorld -->|IWorld| Simulator
+    World -->|IWorld| TrainingSimulator
+    SimpleWorld -->|IWorld| TrainingSimulator
     World --> Race
-    WorldLoader --> Simulator
+    WorldLoader --> TrainingSimulator
     WorldLoader --> Race
     WorldLoader --> WorldEditor
     Sensor --> Car
     Controls --> Car
     NeuralNetwork --> Car
-    Car --> Simulator
+    Car --> TrainingSimulator
     Car --> Race
-    TrainingManagerPanel --> Simulator
-    Viewport --> Simulator
+    Car --> TrafficSimulator
+    TrainingPanel --> TrainingSimulator
+    SimulatorShell --> TrainingSimulator
+    SimulatorShell --> TrafficSimulator
+    TrafficPanel --> TrafficSimulator
+    World -->|IWorld| TrafficSimulator
+    WorldLoader --> TrafficSimulator
+    Viewport --> TrainingSimulator
     Viewport --> Race
-    MiniMap --> Simulator
+    MiniMap --> TrainingSimulator
     MiniMap --> Race
-    Camera --> Simulator
+    Camera --> TrainingSimulator
     Camera --> Race
     TrafficManager --> World
 ```
@@ -145,105 +157,115 @@ The AI brain and its visualization.
 | `network.ts`    | Feedforward network, Level class, mutation, crossover |
 | `visualizer.ts` | Real-time rendering of activations, weights, biases   |
 
-### 4. World Editor (`ts/world-editor/`)
+### 4. World Editor (`ts/world/`)
 
 Environment generation and interactive editing.
 
-| Module                     | Responsibility                                             |
-| -------------------------- | ---------------------------------------------------------- |
-| `world.ts`                 | Road generation, building/tree placement, corridor paths   |
-| `trafficManager.ts`        | Traffic light cycling and intersection coordination        |
-| `editors/worldEditor.ts`   | Master editor coordinator                                  |
-| `editors/graphEditor.ts`   | Road network point/segment manipulation                    |
-| `editors/markingEditor.ts` | Base class for all marking placement tools                 |
-| `editors/*Editor.ts`       | Specialized editors (light, stop, start, target, etc.)     |
-| `items/building.ts`        | 3D building rendering with perspective                     |
-| `items/tree.ts`            | Procedural multi-level tree with noisy canopy              |
-| `markings/*.ts`            | Traffic marking types (start, stop, light, crossing, etc.) |
+| Module                         | Responsibility                                               |
+| ------------------------------ | ------------------------------------------------------------ |
+| `world.ts`                     | World class structure, properties, draw, static loader       |
+| `generation/worldGenerator.ts` | Procedural road/lane/separator/building/tree generation      |
+| `corridor.ts`                  | Standalone drivable-path object (authored or on-the-fly)     |
+| `trafficManager.ts`            | Traffic light cycling and intersection coordination          |
+| `types.ts`                     | Editor-specific type declarations (IWorld, etc.)             |
+| `editors/worldEditor.ts`       | Master editor coordinator                                    |
+| `editors/graphEditor.ts`       | Road network point/segment manipulation (one-way + hard-sep) |
+| `editors/corridorEditor.ts`    | Authors corridor world objects (start→end, tunnel mode)      |
+| `editors/markingEditor.ts`     | Base class for all marking placement tools                   |
+| `editors/*Editor.ts`           | Specialized editors (light, stop, start, target, etc.)       |
+| `items/building.ts`            | 3D building rendering with perspective                       |
+| `items/tree.ts`                | Procedural multi-level tree with noisy canopy                |
+| `markings/*.ts`                | Traffic marking types (start, stop, light, crossing, etc.)   |
 
-### 5. Simulators & Training (`ts/ai-training/`, `ts/simple-world/`)
+### 5. Simulators & Training (`ts/simulator/training/`, `ts/world/simple/`)
 
 Training environments and genetic algorithm orchestration.
 
-| Module                    | Responsibility                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------ |
-| `trainingManagerPanel.ts` | Custom element: training UI + genetic algorithm orchestration + car generation |
-| `topControlsPanel.ts`     | Custom element: border mode, tracking mode, world loader controls              |
-| `viewControlsPanel.ts`    | Custom element: layout toggle, camera/visualizer/minimap visibility            |
-| `simulator.ts`            | Unified simulator: world mode (default) + simple mode (`?mode=simple`)         |
-| `trafficGenerator.ts`     | Traffic row generation for simple mode (extracted, generic via `IWorld`)       |
-| `simulatorUtils.ts`       | Shared car drawing with pool highlighting + collision response utility         |
-| `simpleWorld.ts`          | Lightweight `IWorld` implementation: straight 3-lane road with lane helpers    |
+| Module                        | Responsibility                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| `trainingPanel.ts`            | Custom element: training UI + genetic algorithm orchestration + car generation |
+| `trainingSimulator.ts`        | Unified simulator: world mode (default) + simple mode (`?mode=simple`)         |
+| `genetics/poolManager.ts`     | Pure functions for car creation, brain application, pool sorting               |
+| `genetics/storageManager.ts`  | localStorage persistence: load/save/discard/legacy migration                   |
+| `modes/trafficFactory.ts`     | Traffic row generation for simple mode                                         |
+| `modes/simpleModeBehavior.ts` | Simple-mode update loop: traffic spawning, car updates, idle detection         |
+| `modes/borderCollision.ts`    | Collision response: push cars back onto road instead of stopping               |
+| `rendering/layoutManager.ts`  | Canvas resize logic for multi-panel layout                                     |
+| `rendering/carRenderer.ts`    | Simulator-specific car drawing: pool highlighting, name labels, layering       |
+| `templates/`                  | HTML template strings for custom elements                                      |
 
-**`<training-manager-panel>`** is the single source of truth for training state:
+### 5a. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`)
 
-- Custom HTML element (`TrainingManagerPanelElement`) that owns both UI and logic
-- Owns `cars[]`, `bestCar`, `bestPool`
-- Generates cars internally (simulators provide only `getStartInfo(): {x, y, angle}`)
-- Configured at runtime via `element.configure(options)` with callbacks
-- Manages two distinct operations:
-  - **Next Generation** (🧬) — keeps top brains from current pool, mutates the rest
-  - **New Training** (🔄) — resets to generation 0 with no brains (fresh start)
-- Auto-triggers new training when car parameters (speed, rays, etc.) change
-- Handles brain persistence (save/load/discard from localStorage and .car files)
+Scaffolding shared by every canvas-based simulator, plus the Live Traffic Jam
+simulator built on it.
 
-### 5b. Reusable Loaders (`ts/world-loader/`, `ts/car-loader/`)
+| Module                        | Responsibility                                                                                                                                                             |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `core/simulatorShell.ts`      | Abstract base class: canvases/contexts, viewport/camera/mini-map, panel refs, responsive layout, network visualizer, and the render-throttled `requestAnimationFrame` loop |
+| `traffic/trafficSimulator.ts` | Live Traffic Jam: loads a world, spawns self-driving cars on click, car-vs-car collision with “ghosting” of wrecks                                                         |
+| `traffic/trafficPanel.ts`     | Custom element `<traffic-panel>`: per-car list (swatch, status, speed, distance, read-only config) + select/remove/clear/pause controls                                    |
+| `traffic/templates/`          | HTML template strings for the traffic panel                                                                                                                                |
 
-| Module                    | Responsibility                                               |
-| ------------------------- | ------------------------------------------------------------ |
-| `worldLoader.ts`          | Reusable file-input handler for loading `.world` files       |
-| `car-loader/carLoader.ts` | Reusable file-input handler for loading `.car`/`.json` files |
+Both `TrainingSimulator` (`ts/simulator/training/trainingSimulator.ts`) and `TrafficSimulator` extend
+`SimulatorShell`, which owns the generic, non-domain scaffolding so each
+simulator only implements its own `update()` / `draw()` behaviour.
 
-#### WorldLoader
+### 5b. Reusable Loaders (`ts/world/loader/`, `ts/car/loader/`)
 
-Shared utility used by all pages that support loading world files. It:
-
-- Binds to an existing `#loadWorldInput` element by ID (or creates one at top-left corner)
-- Reads the file, extracts JSON from `World.load({...})` format via `indexOf("(")`/`lastIndexOf(")")`, or accepts raw JSON
-- Invokes a callback with the parsed world data
-
-> **Important:** `.world` files use the format `const world = World.load({...});`. Do NOT re-implement parsing — always reuse `WorldLoader`.
-
-Usage: `new WorldLoader((worldInfo) => this.#initializeXxx(worldInfo))`
-
-#### CarLoader
-
-Shared utility for loading one or more `.car`/`.json` files. It:
-
-- Binds to an existing `#loadCarInput` element by ID (or creates a hidden one)
-- Supports `multiple` file selection
-- Parses both pure JSON and assignment syntax (`let carInfo = {...};`)
-- Invokes callback with `CarInfo[]` array of all successfully parsed files
-- Provides static helpers: `CarLoader.parseCarFile(content)`, `CarLoader.allParamsMatch(cars)`, `CarLoader.compareCarParams(a, b)`
-
-Usage: `new CarLoader((carInfos: CarInfo[]) => this.#handleCarsLoaded(carInfos))`
-
-#### Integration with TopControlsPanel
-
-Both loaders bind by element ID (`#loadWorldInput`, `#loadCarInput`). The `<top-controls-panel>` custom element contains both inputs in its template, so when it's present in the DOM, simply instantiate `new WorldLoader(...)` and `new CarLoader(...)` — they will find and attach to the panel's inputs automatically. No custom event handling or file parsing is needed.
+| Module                        | Responsibility                                               |
+| ----------------------------- | ------------------------------------------------------------ |
+| `world/loader/worldLoader.ts` | Reusable file-input handler for loading `.world` files       |
+| `car/loader/carLoader.ts`     | Reusable file-input handler for loading `.car`/`.json` files |
 
 ### 6. Viewport & Rendering (`ts/viewport/`, `ts/mini-map/`, `ts/camera/`)
 
-View transformation and display systems.
-
 | Module                 | Responsibility                                                   |
 | ---------------------- | ---------------------------------------------------------------- |
-| `viewport/viewport.ts` | Zoom, pan, coordinate transformation                             |
-| `mini-map/miniMap.ts`  | Scaled overview of world and cars                                |
+| `viewport/viewport.ts` | Zoom, pan, coordinate transformation (2D top-down)               |
+| `mini-map/miniMap.ts`  | Scaled overview of world graph and car positions                 |
 | `camera/types.ts`      | Camera interfaces (`ICameraPoint`, `ICameraRenderOptions`, etc.) |
 | `camera/extrusion.ts`  | 3D extrusion helpers (buildings, cars, trees)                    |
-| `camera/camera.ts`     | Frustum-based perspective projection & rendering                 |
+| `camera/camera.ts`     | Frustum-based perspective projection & 3D rendering              |
 
-### 7. Games & Utilities (`ts/games/`, `ts/`)
+### 7. Games, Audio & Utilities (`ts/games/`, `ts/audio/`, `ts/`)
 
-Racing mode and shared helpers.
+| Module           | Responsibility                                    |
+| ---------------- | ------------------------------------------------- |
+| `games/race.ts`  | Racing with countdown, progress, AI opponents     |
+| `audio/sound.ts` | Audio synthesis (beep, explosion, ta-daa fanfare) |
+| `utils.ts`       | `polysIntersect`, `getRGBA`, `getRandomColor`     |
+| `types.ts`       | Global type/interface declarations                |
 
-| Module          | Responsibility                                |
-| --------------- | --------------------------------------------- |
-| `games/race.ts` | Racing with countdown, progress, AI opponents |
-| `sound.ts`      | Audio synthesis (engine, beep, explosion)     |
-| `utils.ts`      | `polysIntersect`, `getRGBA`, `getRandomColor` |
-| `types.ts`      | Global type declarations                      |
+### 8. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
+
+| Module                    | Tag                        | Responsibility                                                                |
+| ------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
+| `worldToolbar.ts`         | `<world-toolbar>`          | File I/O, border/tracking mode, camera debug toggle                           |
+| `layoutToolbar.ts`        | `<layout-toolbar>`         | Layout toggle, camera/network/minimap visibility                              |
+| `animationLoopToolbar.ts` | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control)                         |
+| `shortcutsToolbar.ts`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |
+
+> `worldToolbar.ts` lives in the shared `ts/panels/` directory (not the
+> simulator domain) because it is reused by the simulator, race, Live Traffic
+> Jam, and World Editor pages. Its World group exposes editor-only Save /
+> Dispose / OSM-Import buttons (revealed via `showWorldEditorActions()`), and
+> simulator-only groups (Car, Borders, Tracking, Debug) are hidden in the editor
+> via `hideGroups(...)`. `layoutToolbar.ts` and `animationLoopToolbar.ts` remain
+> in `ts/simulator/panels/`. `shortcutsToolbar.ts` also lives in the shared
+> `ts/panels/` directory and is used by the World Editor, Live Traffic Jam, and
+> Training Simulator pages; each page calls `setShortcuts(defs)` with only the
+> keys it uses. Toggle indicators (`O` one-way, `R` reverse heading) are
+> click-latchable; the owner keeps the latch state (effective = latched OR
+> key-held).
+
+> All three floating toolbars are grouped inside the `#simulatorToolbar` flex
+> container (top of the page, panels left-to-right with a gap). The pause state
+> and `renderInterval` are owned by `<animation-loop-toolbar>` and read by
+> `SimulatorShell` — shared across both the training and Live Traffic Jam pages.
+
+> The `<world-toolbar>` also hosts the **Spawn Car** picker (🚕 dropdown), shown
+> only on the Live Traffic Jam page via `showSpawnCarPicker()`. It selects which
+> stored/loaded car configuration is painted onto the road on the next click.
 
 ---
 
@@ -255,10 +277,10 @@ Racing mode and shared helpers.
 Sensor.update()
     │
     ▼
-rays[] ──intersect──▶ roadBorders, buildings, cars
+rays[] ──intersect──▶ roadBorders, buildings, traffic cars
     │
     ▼
-readings[] (normalized 0-1 offsets)
+readings[] (normalized 0-1 offsets, closer = higher value)
     │
     ▼
 NeuralNetwork.feedForward(readings + speed)
@@ -271,45 +293,34 @@ Car.#move() ── physics update ──▶ new position/angle
     │
     ▼
 Car.#assessDamage() ── polygon intersection ──▶ damaged?
+    │                                            │
+    ▼ (if borderMode === 'collision')            │
+handleCollisionWithRoadBorders() ── push back    │
+    │                                            │
+    ▼                                            ▼
+TrainingManager.updateBestCarAndPool()    car stops (dead)
     │
     ▼
-TrainingManager.updateBestCarAndPool()
-    │
-    ▼
-fitness = distance traveled along corridor
+fitness = distance traveled along corridor/road
 ```
 
 ### Generation Cycle
 
 ```
-1. trainingManager.initializeCars() → uses getStartInfo() + car config from UI
-2. Apply brains from pool (top K unmodified, rest mutated)
-3. applyCarSettingsToCars() → ensure physics/sensors match UI config
-4. onCarsCreated() → simulator updates references (world.cars, miniMap, etc.)
-5. animate() loop → all cars drive simultaneously
-6. Cars crash → marked damaged, stop updating
-7. All dead or user clicks:
-   - "Next Gen" (🧬) → nextGeneration() → top K pool + mutations
-   - "New Train" (🔄) → newTraining() → generation 0, no brains
-8. Top K cars → bestPool[] (tracked per frame)
-9. Save: brains + full CarInfo to localStorage
+1. trainingManager.initializeCars()
+   → createCarsForTraining(count, type, config, startInfo)  [poolManager.ts]
+2. applyPoolToCars(cars, pool, mutationRate)                [poolManager.ts]
+   → First K cars: exact copies from pool (elitism)
+   → Rest: crossover(random parent1, random parent2) + mutate(rate)
+3. onCarsCreated(cars) callback → simulator refreshes borders, camera, etc.
+   (cars are passed into `world.draw()` / `camera.render()` at draw time)
+4. animate() loop → all cars drive simultaneously
+5. Cars crash → marked damaged, stop updating (or bounce back in collision mode)
+6. User action:
+   - "Next Gen" (🧬) → getTopCarInfoPool() → saves top K → initializeCars()
+   - "New Train" (🔄) → clears pool → initializeCars() from scratch
+7. "Save" (💾) → savePoolToStorage(topK) → localStorage["bestPool"]
 ```
-
-### Car Parameter Changes
-
-When any car config input changes (maxSpeed, acceleration, friction, width, height,
-rayCount, rayLength, raySpread, rayOffset), TrainingManager automatically calls
-`newTraining()` — this ensures the neural network input layer matches the new sensor
-configuration and physics are consistent from generation 0.
-
-### Loading Car Files
-
-When a `.car` file is loaded:
-
-1. Car settings UI is updated
-2. If the file contains a brain → stored to localStorage
-3. If no brain → stored brains are cleared
-4. `newTraining()` is triggered (fresh start with new config)
 
 ---
 
@@ -317,66 +328,181 @@ When a `.car` file is loaded:
 
 ### LocalStorage Keys
 
-| Key           | Content                                                    |
-| ------------- | ---------------------------------------------------------- |
-| `bestBrain`   | JSON of single top-performing `NeuralNetwork`              |
-| `bestBrains`  | JSON array of top K networks (breeding pool)               |
-| `bestCarInfo` | JSON `CarInfo` object (physics, size, sensors, best brain) |
-| `world`       | JSON world state (used by some pages as fallback)          |
+| Key                 | Content                                            | Format            |
+| ------------------- | -------------------------------------------------- | ----------------- |
+| `bestPool`          | Array of top-performing car configs with brains    | JSON `CarInfo[]`  |
+| `raceCars`          | Cars loaded via the race "Load car(s)" button      | JSON `CarInfo[]`  |
+| `world`             | World state (used as fallback when no file loaded) | JSON world object |
+| `store:activeWorld` | Active store world filename                        | string            |
+| `store:activeCar`   | Active store car filenames (multi-select)          | JSON `string[]`   |
 
-### File System (saves/)
+> The race composes its grid from `bestPool` (read-only) + active store cars +
+> `raceCars`, applying each car as-is with **no mutation** (mutation is
+> training-only). The race "Load car(s)" button writes `raceCars`, never `bestPool`.
 
-- `.world` files — Complete world state (graph, roads, buildings, markings, viewport)
-- `.car` files — Car configuration as plain JSON (`CarInfo` object: brain, physics, sensors, size)
-- `.json` files — Raw OpenStreetMap data for import
+**Legacy keys** (auto-migrated to `bestPool` on first load):
 
-### Serialization Format
+| Key           | Content                             |
+| ------------- | ----------------------------------- |
+| `bestBrain`   | Single top-performing NeuralNetwork |
+| `bestBrains`  | Array of top K networks             |
+| `bestCarInfo` | CarInfo object (physics + sensors)  |
 
-World files use JavaScript variable assignment syntax:
+### File System (`saves/`)
 
-```javascript
-const worldVariable = ({ graph: {...}, roadWidth: 100, ... })
-```
-
-Parsed at load time via regex extraction + `JSON.parse()`.
-
-Car files (`.car`) are saved as plain JSON objects:
-
-```json
-{
-  "maxSpeed": 8,
-  "acceleration": 0.08,
-  "friction": 0.04,
-  "width": 30,
-  "height": 50,
-  "sensor": { "rayCount": 2, "rayLength": 350, "raySpread": 0.8, "rayOffset": -0.4 },
-  "brain": { "levels": [...] }
-}
-```
-
-Legacy `.car` files using `let carInfo = {...}` format are also supported for loading (backward compatibility).
+| Extension | Content                                             | Example                  |
+| --------- | --------------------------------------------------- | ------------------------ |
+| `.world`  | Complete world state (graph, roads, markings, zoom) | `big_with_target.world`  |
+| `.car`    | Car configuration as JSON (`CarInfo` with brain)    | `right_hand_rule.car`    |
+| `.json`   | Raw OpenStreetMap data for import                   | `ashkelon-osm-data.json` |
 
 ---
 
 ## HTML Entry Points
 
-Each HTML file is a standalone application that loads the required subset of modules:
+| File             | Key Modules                                                    | Purpose                          |
+| ---------------- | -------------------------------------------------------------- | -------------------------------- |
+| `index.html`     | None (static links only)                                       | Landing page with mode selection |
+| `simulator.html` | Full stack + SimpleWorld + TrafficFactory + SimpleModeBehavior | AI training (both modes)         |
+| `race.html`      | Full stack + Race + Sound + WorldLoader + CarLoader + Controls | All race modes via URL params    |
+| `world.html`     | World + Editors + Viewport + WorldLoader + OSM importer        | Map creation & editing           |
 
-| File             | Modules Loaded                                                                           | Purpose                     |
-| ---------------- | ---------------------------------------------------------------------------------------- | --------------------------- |
-| `index.html`     | None (links only)                                                                        | Landing page                |
-| `simulator.html` | Full stack + SimpleWorld + TrafficGenerator                                              | All training modes          |
-| `race.html`      | Full stack + Race + SimUtils + WorldLoader + CarLoader + TopControlsPanel + All Controls | All race modes (URL params) |
-| `world.html`     | World + Editors + Viewport + WorldLoader                                                 | Map creation                |
+---
+
+## Type System
+
+### Global Interfaces (`ts/types.ts`)
+
+```typescript
+declare let carInfo: CarInfo | undefined; // From .car file inline scripts
+declare let world: World | undefined; // From .world file inline scripts
+```
+
+### IWorld Interface (`ts/world/types.ts`)
+
+```typescript
+interface IWorld {
+  graph: Graph;
+  markings: Marking[];
+  roadBorders: Segment[];
+  corridors: Corridor[];
+  buildings: Building[];
+  trees: Tree[];
+  zoom?: number;
+  offset?: Point;
+  generateCorridor(start: Point, end: Point): void;
+  draw(ctx: CanvasRenderingContext2D, options: WorldDrawOptions): void;
+}
+
+interface WorldDrawOptions {
+  viewPoint: Point;
+  cars?: Car[]; // Cars to render (draw-time input, not world state)
+  bestCar?: Car | null; // Highlighted car drawn with its sensor rays
+  showStartMarkings?: boolean;
+  renderRadius?: number;
+  carAlpha?: number;
+  showCarNames?: boolean;
+}
+
+// Corridor is a class in ts/world/corridor.ts (not an interface):
+class Corridor {
+  borders: Segment[]; // For collision detection
+  skeleton: Segment[]; // For progress measurement
+  openStart: boolean; // Start cap removed (open / tunnel)
+  openEnd: boolean; // End cap removed (open / tunnel)
+}
+```
 
 ---
 
 ## Design Patterns
 
-- **Custom HTML Elements** — UI panels (`<training-manager-panel>`, `<top-controls-panel>`, `<view-controls-panel>`) are self-contained custom elements that own their template, DOM queries, event listeners, and exposed state
-- **Composition over inheritance** — Cars contain Sensors, Controls, and NeuralNetworks as separate objects
-- **Static factory methods** — `World.load()`, `Graph.load()`, `Marking.load()` for deserialization
-- **Painter's algorithm** — 3D objects sorted by distance and drawn back-to-front
-- **Genetic pool breeding** — Top K parents produce offspring via random gene selection + mutation
-- **Ray casting** — Both sensor perception and point-in-polygon testing use ray intersection
-- **Envelope wrapping** — Roads generated by wrapping graph segments in rounded polygons, then unioning
+| Pattern                    | Usage                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------ |
+| **Custom HTML Elements**   | UI panels self-contain template, DOM queries, event listeners, and public state      |
+| **Composition**            | Cars contain Sensors, Controls, and NeuralNetworks as separate objects               |
+| **Static factory methods** | `World.load()`, `Graph.load()`, `Marking.load()` for deserialization                 |
+| **Painter's algorithm**    | 3D objects sorted by distance and drawn back-to-front                                |
+| **Genetic pool breeding**  | Top K parents produce offspring via random crossover + mutation                      |
+| **Ray casting**            | Sensor perception and point-in-polygon containment testing                           |
+| **Envelope wrapping**      | Roads generated by wrapping graph segments in rounded polygons, then unioning        |
+| **Interface polymorphism** | `IWorld` lets TrainingSimulator/Camera work with both `World` and `SimpleWorld`      |
+| **Spatial filtering**      | Binary-search or Manhattan-distance to reduce per-car collision checks               |
+| **Pure functions**         | `poolManager.ts`, `trafficFactory.ts` — stateless logic extracted from UI components |
+
+---
+
+## Performance Considerations
+
+The simulator is tuned to run very large populations (tens of thousands of cars)
+without the physics loop stalling. Optimizations fall into three buckets:
+**spatial filtering**, **allocation-free hot loops**, and **render/UI decoupling**.
+
+### Spatial Filtering (Critical for Large Populations)
+
+With thousands of cars, each needing ray-intersection and collision against road
+borders every frame, a naive O(cars × rays × segments) is prohibitive.
+
+| Mode   | Strategy                                                                   | Effective reduction  |
+| ------ | -------------------------------------------------------------------------- | -------------------- |
+| Simple | Traffic sorted by Y; binary-search for cars within ±400px                  | ~100→5 per car       |
+| World  | Spatial Hash Grid broad phase + exact per-car narrow-phase distance filter | full map→~10 per car |
+
+The world-mode grid query radius is derived from `sensor.rayLength`, so it scales
+with each car's actual reach (see `updateWorldCars` in [Simulators](Simulators.md)
+and the [Spatial Hash Grid](Math.md#spatial-hash-grid-tsmathspatialgridts)).
+
+### Allocation-Free Hot Loops (GC Reduction)
+
+Per-frame garbage was a major source of minor-GC pauses at scale. The hot paths
+were rewritten to allocate nothing per car/ray/segment:
+
+- **Sensor `#getReading`** — single pass tracking the closest offset (no per-ray
+  array/`map`/spread/`find`), builds the hit point once for the winner.
+- **`getIntersectionOffset`** — number-returning intersection used by the sensor
+  and `polysIntersect`, replacing the `{x,y,offset}` object in boolean/offset-only
+  contexts.
+- **`polysIntersect` + AABB pre-filter** — `#assessDamage` rejects far obstacles
+  with a bounding-box test before any edge math, and the 2-point border duplicate
+  edge is skipped.
+- **`SpatialHashGrid.query`** — index buckets + an `Int32Array` stamp for dedup,
+  eliminating a per-query `Set`.
+- **Top-K pool selection** — `getTopAICars` picks the best `poolSize` cars in one
+  partial-selection pass instead of `filter` + full `sort` of the whole
+  population every frame.
+
+### Rendering & UI Decoupling
+
+- **Render throttle**: physics steps every animation frame, but the draw pass
+  runs once per `renderInterval` frames (user-adjustable in the
+  animation-loop-toolbar panel). Heavy frames no longer drag the simulation rate down — the picture
+  updates less often, training throughput is unchanged.
+- **Batched alpha + per-car transform**: regular cars set `globalAlpha` once for
+  the whole batch and draw their sprite via a manual transform inverse instead of
+  paying a `save`/`restore` pair each — removing ~2 context-state ops per car.
+- **Throttled panel DOM**: the pool table (`innerHTML` rebuild) and status dots
+  (a `localStorage` read) refresh ~4×/sec instead of every frame.
+- **Viewport culling**: cars outside the visible X/Y bounds are skipped entirely.
+- **Camera frustum**: triangular polygon clips world geometry before projection.
+- **Mini-map**: uses a pre-scaled graph (×0.05) rather than full geometry.
+- **Cached mask sprites**: pre-composited color sprites drawn with a single
+  `drawImage` (see [Simulators](Simulators.md)).
+
+> **Note:** none of these change simulation _behavior_. Brains, mutation,
+> crossover, fitness, sensing results, and collision outcomes are identical —
+> only speed changed. Saved `.car` brains load and run exactly as before.
+
+---
+
+## Code Conventions
+
+| Convention               | Rule                                                                                                                        |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Formatting               | Prettier with `singleQuote: true`                                                                                           |
+| Class naming             | PascalCase (`NeuralNetwork`, `SimpleWorld`)                                                                                 |
+| Function/variable naming | camelCase (`createCarsForTraining`, `roadBorders`)                                                                          |
+| Private members          | `#` prefix (ES2022 private fields)                                                                                          |
+| Serialization            | `static load(info)` factory + instance `toInfo()` method                                                                    |
+| Drawing                  | Each class owns its `draw(ctx, options?)` method; options are typed interfaces (`CarDrawOptions`, `WorldDrawOptions`, etc.) |
+| Templates                | HTML template strings in `templates/` subdirectories                                                                        |
+| Custom elements          | `connectedCallback()` renders template, `configure()` binds                                                                 |

@@ -6,14 +6,12 @@ class Race {
   cameraCtx;
   miniMapCanvas;
   controls;
-  topControlsPanel;
+  toolbarPanel;
   racePanel;
-  carsInput;
   world;
   camera = null;
   viewport = null;
   miniMap = null;
-  N = 10;
   cars = null;
   myCar = null;
   roadBorders = null;
@@ -30,19 +28,24 @@ class Race {
     this.miniMapCanvas = miniMapCanvas;
     this.controls = controls;
     this.#addEventListeners();
-    if (typeof world === 'undefined') {
-      const worldString = localStorage.getItem('world');
-      const worldInfo = worldString ? JSON.parse(worldString) : null;
-      this.#initializeRace(worldInfo);
-    } else {
-      this.#initializeRace(world); // note: global world
-    }
+    const storeWorld =
+      StoreManager.getActiveWorld() ?? StoreManager.getEditorWorld();
+    const worldInfo = storeWorld ?? null;
+    this.#initializeRace(worldInfo);
     if (this.controls && this.myCar) {
       this.myCar.controls = this.controls;
     }
+    // In phone-controls mode the toolbar is hidden, so default the camera to
+    // follow the player's car instead of the best AI.
+    if (
+      typeof PhoneControls !== 'undefined' &&
+      this.controls instanceof PhoneControls
+    ) {
+      this.toolbarPanel.setTrackingMode('keys');
+    }
   }
 
-  generateCars(n, type) {
+  generateCars() {
     const startMarkings = this.world.markings.filter((m) => m instanceof Start);
     const startPoint = startMarkings.length
       ? startMarkings[0].center
@@ -51,98 +54,60 @@ class Race {
       ? startMarkings[0].directionVector
       : new Point(0, -1);
     const startAngle = -angle(direction) + Math.PI / 2;
-    const pool = type === 'AI' ? this.#loadPoolFromStorage() : [];
+    // Two independent AI car sources (all applied as-is, no mutation):
+    //  1. training results pool (read-only)
+    //  2. cars selected in the world panel (store or loaded; multiple or none)
+    const pool = loadPoolFromStorage();
+    const selected = StoreManager.getActiveCars();
+    const aiSources = [...pool, ...selected];
+    // Player car physical params come from the first available source
+    // (brain is intentionally not applied — the player drives manually).
+    const keyParams = pool[0] ?? selected[0] ?? null;
     const cars = [];
-    for (let i = 1; i <= n; i++) {
-      const color = type === 'AI' ? getRandomColor() : 'blue';
+    const keyCar = new Car({
+      x: startPoint.x,
+      y: startPoint.y,
+      controlType: 'KEYS',
+      angle: startAngle,
+      color: 'blue',
+    });
+    keyCar.name = 'Player';
+    if (keyParams) {
+      keyCar.load({ ...keyParams, brain: undefined });
+      keyCar.brain = undefined;
+    }
+    cars.push(keyCar);
+    let i = 1;
+    for (const info of aiSources) {
       const car = new Car({
         x: startPoint.x,
         y: startPoint.y,
-        controlType: type,
+        controlType: 'AI',
         angle: startAngle,
-        color,
+        color: getRandomColor(),
       });
-      car.name = type === 'AI' ? 'AI ' + i : 'Player ' + i;
-      if (type === 'AI') {
-        const poolIndex = i - 1; // 0-based index for AI cars
-        if (poolIndex < pool.length) {
-          // Apply pool car as-is (no mutation)
-          car.load(pool[poolIndex]);
-        } else if (pool.length > 0) {
-          // Beyond pool: mutated copy of pool[0]
-          car.load(pool[0]);
-          if (car.brain) {
-            NeuralNetwork.mutate(car.brain, 0.1);
-          }
-        } else if (typeof carInfo !== 'undefined') {
-          car.load(carInfo);
-        }
-      } else {
-        // KEYS car: load from global carInfo only (never from pool)
-        if (typeof carInfo !== 'undefined') {
-          car.load(carInfo);
-        }
-      }
+      car.name = 'AI ' + i;
+      car.load(info);
       cars.push(car);
+      i++;
     }
     return cars;
   }
 
-  #loadPoolFromStorage() {
-    const stored = localStorage.getItem('bestPool');
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        // fall through
-      }
-    }
-    // Legacy migration
-    const legacyBrains = localStorage.getItem('bestBrains');
-    const legacyBrain = localStorage.getItem('bestBrain');
-    const legacyConfig = localStorage.getItem('bestCarInfo');
-    if (legacyBrains || legacyBrain) {
-      let brains = [];
-      if (legacyBrains) {
-        brains = JSON.parse(legacyBrains);
-      } else if (legacyBrain) {
-        brains = [JSON.parse(legacyBrain)];
-      }
-      const baseConfig = legacyConfig
-        ? JSON.parse(legacyConfig)
-        : {
-            maxSpeed: 3,
-            acceleration: 0.2,
-            friction: 0.05,
-            width: 30,
-            height: 50,
-            sensor: {
-              rayCount: 5,
-              rayLength: 150,
-              raySpread: Math.PI / 2,
-              rayOffset: 0,
-            },
-          };
-      const pool = brains.map((brain) => ({
-        ...baseConfig,
-        sensor: { ...baseConfig.sensor },
-        brain,
-      }));
-      localStorage.setItem('bestPool', JSON.stringify(pool));
-      localStorage.removeItem('bestBrain');
-      localStorage.removeItem('bestBrains');
-      localStorage.removeItem('bestCarInfo');
-      return pool;
-    }
-    return [];
-  }
-
   #addEventListeners() {
-    this.topControlsPanel = document.querySelector('top-controls-panel');
-    // World loading via WorldLoader (binds to #loadWorldInput inside the panel)
-    new WorldLoader((worldInfo) => this.#initializeRace(worldInfo));
-    // Car loading via CarLoader (binds to #loadCarInput inside the panel)
-    new CarLoader((carInfos) => this.#handleCarsLoaded(carInfos));
+    this.toolbarPanel = document.querySelector('world-toolbar');
+    // Keep the active viewport's wheel behavior in sync with the toolbar toggle
+    this.toolbarPanel.setViewportModeListener((mode) =>
+      this.viewport?.setMode(mode),
+    );
+    // World + car selectors. Loading a file adds it to the library without
+    // applying it; the user picks a world to race and the car(s) to add.
+    this.toolbarPanel.configureSelectors({
+      carMode: 'multi',
+      onWorldSelected: (entry) => this.#initializeRace(entry?.data ?? null),
+    });
+    // Camera debug overlay is not implemented in the race game.
+    this.toolbarPanel.hideCameraDebug();
     this.statistics = document.getElementById('statistics');
     this.counter = document.getElementById('counter');
     this.#createRacePanel();
@@ -151,21 +116,11 @@ class Race {
   #createRacePanel() {
     this.racePanel = document.createElement('div');
     this.racePanel.id = 'racePanel';
-    const label = document.createElement('label');
-    label.textContent = 'Cars:';
-    label.className = 'race-panel-label';
-    this.carsInput = document.createElement('input');
-    this.carsInput.type = 'number';
-    this.carsInput.id = 'carsInRaceInput';
-    this.carsInput.min = '1';
-    this.carsInput.max = '100';
-    this.carsInput.value = String(this.N);
-    this.carsInput.addEventListener('change', () => {
-      const val = parseInt(this.carsInput.value);
-      if (val > 0) {
-        this.N = val;
-      }
-    });
+    const group = document.createElement('div');
+    group.className = 'controls-group';
+    const label = document.createElement('span');
+    label.className = 'controls-group-label';
+    label.textContent = 'Race';
     const restartBtn = document.createElement('button');
     restartBtn.id = 'restartRaceBtn';
     restartBtn.textContent = '🔄 Restart';
@@ -173,18 +128,12 @@ class Race {
     restartBtn.addEventListener('click', () =>
       this.#initializeRace(this.world),
     );
-    label.appendChild(this.carsInput);
-    this.racePanel.appendChild(label);
-    this.racePanel.appendChild(restartBtn);
-    document.body.appendChild(this.racePanel);
-  }
-
-  #handleCarsLoaded(carInfos) {
-    if (carInfos.length === 0) return;
-    // Store full pool (all cars, regardless of different params)
-    localStorage.setItem('bestPool', JSON.stringify(carInfos));
-    // Restart race with new pool
-    this.#initializeRace(this.world);
+    group.appendChild(label);
+    group.appendChild(restartBtn);
+    this.racePanel.appendChild(group);
+    const toolbar =
+      document.getElementById('simulatorToolbar') ?? document.body;
+    toolbar.appendChild(this.racePanel);
   }
 
   #initializeRace(worldInfo) {
@@ -194,9 +143,8 @@ class Race {
       this.world.zoom,
       this.world.offset,
     );
-    this.cars = this.generateCars(1, 'KEYS').concat(
-      this.generateCars(this.N, 'AI'),
-    );
+    this.viewport.setMode(this.toolbarPanel.viewportMode);
+    this.cars = this.generateCars();
     this.myCar = this.cars[0];
     if (!this.myCar) throw new Error('Player car not created');
     if (this.controls) {
@@ -213,7 +161,11 @@ class Race {
       if (!this.world.corridor) throw new Error('Corridor generation failed');
       this.roadBorders = this.world.corridor.borders.map((s) => [s.p1, s.p2]);
     } else {
-      this.roadBorders = this.world.roadBorders.map((s) => [s.p1, s.p2]);
+      this.roadBorders = [
+        ...this.world.roadBorders,
+        ...this.world.separatorBorders,
+        ...this.world.corridors.flatMap((c) => c.borders),
+      ].map((s) => [s.p1, s.p2]);
     }
     if (this.world.corridor) {
       const miniMapGraph = new Graph([], this.world.corridor.skeleton);
@@ -230,7 +182,6 @@ class Race {
         this.miniMapCanvas.width,
       );
     }
-    this.miniMap.cars = this.cars;
     this.statistics.innerHTML = ''; // Clear previous stats
     for (let i = 0; i < this.cars.length; i++) {
       const div = document.createElement('div');
@@ -307,7 +258,7 @@ class Race {
             this.started = true;
             this.frameCount = 0;
             if (this.myCar) {
-              this.myCar.engine = new Engine();
+              this.myCar.engine = new SoundEngine();
             }
             // Special code part for video camera controls
             if (
@@ -326,7 +277,7 @@ class Race {
   handleCollisionWithRoadBorders(car) {
     const bordersToCheck = this.world.corridor
       ? this.world.corridor.skeleton
-      : this.world.roadBorders;
+      : [...this.world.roadBorders, ...this.world.separatorBorders];
     handleCollisionWithRoadBorders(car, bordersToCheck);
   }
 
@@ -339,7 +290,7 @@ class Race {
       !this.miniMap
     )
       return;
-    const borderMode = this.topControlsPanel.borderMode;
+    const borderMode = this.toolbarPanel.borderMode;
     if (this.started) {
       for (let i = 0; i < this.cars.length; i++) {
         const car = this.cars[i];
@@ -352,24 +303,32 @@ class Race {
     }
     // Determine tracking target
     const trackTarget = this.#getTrackTarget();
-    this.world.cars = this.cars;
-    this.world.bestCar = trackTarget ?? this.myCar;
+    const worldBestCar = trackTarget ?? this.myCar;
     if (trackTarget) {
       this.viewport.offset.x = -trackTarget.x;
       this.viewport.offset.y = -trackTarget.y;
     }
     this.viewport.reset();
     const viewPoint = scale(this.viewport.getOffset(), -1);
-    this.world.draw(this.gameCtx, viewPoint, false);
-    this.miniMap.draw(viewPoint);
+    this.world.draw(this.gameCtx, {
+      viewPoint,
+      cars: this.cars,
+      bestCar: worldBestCar,
+      showStartMarkings: false,
+      carAlpha: 1,
+      showCarNames: true,
+    });
+    this.miniMap.draw({ viewPoint, cars: this.cars });
     // Rotate the minimap canvas itself to match tracked car orientation
     const rotationTarget = trackTarget ?? this.myCar;
     this.miniMapCanvas.style.transform = `rotate(${rotationTarget.angle}rad)`;
     for (let i = 0; i < this.cars.length; i++) {
       this.updateCarProgress(this.cars[i]);
     }
-    // Sort cars based on progress (descending)
-    this.cars.sort((a, b) => b.progress - a.progress);
+    // Sort cars based on progress (descending) — only if corridor exists
+    if (this.world.corridor) {
+      this.cars.sort((a, b) => (b.progress ?? 0) - (a.progress ?? 0));
+    }
     // Update statistics display
     for (let i = 0; i < this.cars.length; i++) {
       const stat = document.getElementById('stat_' + i);
@@ -386,10 +345,16 @@ class Race {
       }
     }
     const cameraTarget = trackTarget ?? this.myCar;
-    this.camera.move(cameraTarget);
+    // Only move the camera while actively tracking a car; when tracking is
+    // turned off ('none') the camera stays where it is, like the simulator.
+    if (trackTarget) {
+      this.camera.move(trackTarget);
+    }
     this.camera.render(this.cameraCtx, this.world, {
       keyCar: this.myCar,
-      traffic: this.cars.filter((c) => c !== cameraTarget),
+      bestCar: cameraTarget !== this.myCar ? cameraTarget : undefined,
+      cars: this.cars,
+      traffic: this.cars.filter((c) => c !== this.myCar && c !== cameraTarget),
     });
     if (this.started) {
       this.frameCount++;
@@ -397,18 +362,23 @@ class Race {
   }
 
   #getTrackTarget() {
-    switch (this.topControlsPanel.trackingMode) {
+    switch (this.toolbarPanel.trackingMode) {
       case 'none':
         return null;
-      case 'best':
-        // Best car by progress (first in sorted order, but sorting happens later in draw)
-        // Use live progress: find car with highest progress
-        if (this.cars && this.cars.length > 0) {
-          return this.cars.reduce((best, car) =>
-            (car.progress ?? 0) > (best.progress ?? 0) ? car : best,
-          );
-        }
-        return this.myCar;
+      case 'best': {
+        // "Best" follows the leading AI opponent (the player already has the
+        // dedicated "keys" tracking mode). Rank by corridor progress when a
+        // corridor exists; otherwise fall back to fitness (accumulated speed),
+        // which is always available, so we don't just stick to the first AI.
+        const aiCars = this.cars?.filter((car) => car !== this.myCar) ?? [];
+        if (aiCars.length === 0) return this.myCar;
+        const score = this.world.corridor
+          ? (car) => car.progress ?? 0
+          : (car) => car.fitness;
+        return aiCars.reduce((best, car) =>
+          score(car) > score(best) ? car : best,
+        );
+      }
       case 'keys':
         return this.myCar;
     }

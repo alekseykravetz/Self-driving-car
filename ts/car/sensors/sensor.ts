@@ -40,35 +40,50 @@ class Sensor {
   }
 
   #getReading(ray: Point[], polygons: Point[][]): IntersectionPoint | null {
-    let touches: IntersectionPoint[] = [];
+    // Single allocation-free pass: track the closest intersection's offset
+    // directly, then build the point once for the winner. This avoids a
+    // per-segment object allocation and runs for every ray of every car.
+    let minOffset = Infinity;
 
     // Check intersections with polygons (road borders, traffic cars)
     for (let i = 0; i < polygons.length; i++) {
-      if (polygons[i].length >= 2) {
-        const touch = getIntersection(
+      const poly = polygons[i];
+      if (poly.length < 2) {
+        console.warn(`The polygon at index ${i} has less than 2 points.`);
+        continue;
+      }
+
+      // Iterate over every edge of the polygon and keep the closest hit.
+      // A road border is a 2-point segment (a single edge), while a traffic
+      // car is a closed polygon (4 corners). Previously only the first edge
+      // (poly[0]->poly[1]) was tested, so a ray would lock onto the traffic
+      // car's front edge and miss the nearer back/side edges. Treating a
+      // 2-point entry as one open edge keeps border behaviour unchanged while
+      // closing the polygon for cars (including the final poly[n-1]->poly[0]).
+      const edgeCount = poly.length === 2 ? 1 : poly.length;
+      for (let j = 0; j < edgeCount; j++) {
+        const offset = getIntersectionOffset(
           ray[0], // Ray start
           ray[1], // Ray end (max length)
-          polygons[i][0], // Border segment start
-          polygons[i][1], // Border segment end
+          poly[j], // Edge start
+          poly[(j + 1) % poly.length], // Edge end (wraps to close the polygon)
         );
-        if (touch) {
-          touches.push(touch as IntersectionPoint);
+        if (offset >= 0 && offset < minOffset) {
+          minOffset = offset;
         }
-      } else {
-        console.warn(`The polygon at index ${i} has less than 2 points.`);
       }
     }
 
-    if (touches.length === 0) {
-      return null; // No intersection found for this ray
-    } else {
-      // Find the closest intersection point
-      const offsets = touches.map((e) => e.offset);
-      const minOffset = Math.min(...offsets);
-      // Find the touch object corresponding to the minimum offset
-      // Need to handle potential floating point inaccuracies if multiple touches have the exact same minOffset
-      return touches.find((e) => e.offset === minOffset)!;
+    if (minOffset === Infinity) {
+      return null;
     }
+
+    // Build the intersection point for the closest hit only.
+    return {
+      x: lerp(ray[0].x, ray[1].x, minOffset),
+      y: lerp(ray[0].y, ray[1].y, minOffset),
+      offset: minOffset,
+    } as IntersectionPoint;
   }
 
   #castRays(): void {
@@ -100,28 +115,41 @@ class Sensor {
 
   // Draw the sensor rays and readings (for debugging/visualization)
   draw(ctx: CanvasRenderingContext2D): void {
-    for (let i = 0; i < this.rayCount; i++) {
-      // Determine the endpoint for drawing: either the intersection point or the full ray length
-      let endPoint: Point = this.rays[i][1]; // Default to max ray length endpoint
-      if (this.readings[i]) {
-        endPoint = this.readings[i] as Point; // Use intersection point if available
+    // Iterate over the rays that were actually cast, not rayCount. The two can
+    // diverge when rayCount is changed (e.g. via load()) without the sensor
+    // being updated again — as happens for the brainless player car in race,
+    // whose sensor is never re-cast. Using rayCount there indexes past the end
+    // of `rays` and throws "Cannot read properties of undefined".
+    for (let i = 0; i < this.rays.length; i++) {
+      const reading = this.readings[i];
+
+      // No hit: draw the full-length ray at half opacity.
+      if (!reading) {
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'yellow';
+        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y); // Start at car position
+        ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y); // To full ray length
+        ctx.stroke();
+        ctx.restore();
+        continue;
       }
 
-      // Draw the part of the ray up to the intersection (or potential intersection)
+      // Draw only the part of the ray from the car up to the intersection.
       ctx.beginPath();
       ctx.lineWidth = 2;
-      ctx.strokeStyle = 'yellow'; // Color for the detected part of the ray
+      ctx.strokeStyle = 'yellow';
       ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y); // Start at car position
-      ctx.lineTo(endPoint.x, endPoint.y); // Line to intersection/end point
+      ctx.lineTo(reading.x, reading.y); // Line to the intersection point
       ctx.stroke();
 
-      // Draw the remaining part of the ray (beyond the intersection)
+      // Mark the intersection point with a small filled yellow circle.
       ctx.beginPath();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'black'; // Color for the part of the ray beyond intersection
-      ctx.moveTo(this.rays[i][1].x, this.rays[i][1].y); // Start at max ray length endpoint
-      ctx.lineTo(endPoint.x, endPoint.y); // Line back to intersection/end point
-      ctx.stroke();
+      ctx.fillStyle = 'yellow';
+      ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 }

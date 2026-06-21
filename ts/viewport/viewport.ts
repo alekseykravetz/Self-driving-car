@@ -5,6 +5,13 @@ interface DragState {
   active: boolean;
 }
 
+/**
+ * Controls how the scroll wheel behaves:
+ * - 'mouse': wheel scroll zooms directly (no modifier needed).
+ * - 'touchpad': two-finger scroll pans; pinch / Ctrl+scroll zooms.
+ */
+type ViewportMode = 'mouse' | 'touchpad';
+
 class Viewport {
   public canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -12,6 +19,7 @@ class Viewport {
   public zoom: number;
   public center: Point; // Center of the canvas element itself
   public offset: Point; // Offset of the world origin relative to the scaled canvas center
+  public mode: ViewportMode = 'mouse'; // Wheel behavior (mouse vs. touchpad)
   // Internal state for handling panning/dragging
   private drag: DragState = {
     start: new Point(0, 0), // Position where drag started
@@ -19,6 +27,10 @@ class Viewport {
     offset: new Point(0, 0), // Vector difference (end - start)
     active: false, // Is a drag currently in progress?
   };
+
+  // Timer used to commit a touchpad pan once two-finger scrolling stops,
+  // mirroring the way a mouse drag commits on mouseup.
+  private wheelPanCommitTimer: ReturnType<typeof setTimeout> | null = null;
 
   private boundHandleMouseWheel: (e: WheelEvent) => void;
   private boundHandleMouseDown: (e: MouseEvent) => void;
@@ -97,6 +109,14 @@ class Viewport {
     return add(this.offset, this.drag.offset);
   }
 
+  /**
+   * Sets the wheel-input mode.
+   * @param mode - 'mouse' (wheel zooms) or 'touchpad' (wheel pans, Ctrl/pinch zooms).
+   */
+  public setMode(mode: ViewportMode): void {
+    this.mode = mode;
+  }
+
   #addEventListeners(): void {
     this.canvas.addEventListener('wheel', this.boundHandleMouseWheel, {
       passive: false,
@@ -162,14 +182,52 @@ class Viewport {
   }
 
   /**
-   * Handles the mousewheel event to adjust the zoom level.
+   * Handles the mousewheel event to adjust zoom or pan.
+   * - 'mouse' mode: wheel scroll zooms directly (Ctrl/pinch also zooms).
+   * - 'touchpad' mode: two-finger scroll pans; Ctrl+scroll or pinch zooms.
    * @param e - The WheelEvent object.
    */
   #handleMouseWheel(e: WheelEvent): void {
     e.preventDefault();
-    const direction = Math.sign(e.deltaY); // -1 for wheel up (zoom in), 1 for wheel down (zoom out)
-    const step = 0.1;
-    this.zoom -= direction * step; // Adjust zoom (subtracting direction reverses zoom sense)
-    this.zoom = Math.max(1, Math.min(5, this.zoom)); // Clamp zoom between 1x and 5x (adjust as needed)
+
+    // In mouse mode the wheel always zooms. In touchpad mode only a pinch
+    // gesture or an explicit Ctrl+scroll zooms; plain scrolling pans.
+    if (this.mode === 'mouse' || e.ctrlKey) {
+      // Zoom in/out
+      const direction = Math.sign(e.deltaY);
+      const step = 0.1;
+      this.zoom -= direction * step;
+      this.zoom = Math.max(1, Math.min(5, this.zoom));
+    } else {
+      // Two-finger scroll on trackpad → pan.
+      // Accumulate the pan into the temporary drag offset (the same layer the
+      // mouse middle-drag uses) so it stays visible even while an external
+      // owner — e.g. car tracking — keeps overwriting the permanent offset.
+      this.drag.active = true;
+      this.drag.offset = add(
+        this.drag.offset,
+        new Point(-e.deltaX * this.zoom, -e.deltaY * this.zoom),
+      );
+      // Commit the accumulated pan once scrolling pauses, like a mouseup.
+      this.#scheduleWheelPanCommit();
+    }
+  }
+
+  /**
+   * Commits the accumulated touchpad pan from the temporary drag offset into
+   * the permanent offset after two-finger scrolling stops. This mirrors the
+   * mouseup behaviour: on free-panning pages the pan persists, while on
+   * tracking pages the permanent offset is overwritten next frame so the view
+   * snaps back to the tracked target.
+   */
+  #scheduleWheelPanCommit(): void {
+    if (this.wheelPanCommitTimer !== null) {
+      clearTimeout(this.wheelPanCommitTimer);
+    }
+    this.wheelPanCommitTimer = setTimeout(() => {
+      this.offset = add(this.offset, this.drag.offset);
+      this.#resetDrag();
+      this.wheelPanCommitTimer = null;
+    }, 150);
   }
 }

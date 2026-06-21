@@ -1,0 +1,44 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Self-Driving Car Simulator logo">
+  <defs>
+    <linearGradient id="sdcGrad" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7ddf7d" />
+      <stop offset="1" stop-color="#4ecdc4" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sensor rays fanning from the front of the car -->
+  <g stroke="url(#sdcGrad)" stroke-width="2" stroke-linecap="round" opacity="0.55">
+    <line x1="32" y1="18" x2="32" y2="4" />
+    <line x1="32" y1="18" x2="18" y2="7" />
+    <line x1="32" y1="18" x2="46" y2="7" />
+  </g>
+  <g fill="url(#sdcGrad)">
+    <circle cx="32" cy="4" r="2.4" />
+    <circle cx="18" cy="7" r="2.4" />
+    <circle cx="46" cy="7" r="2.4" />
+  </g>
+
+  <!-- Wheels -->
+  <g fill="url(#sdcGrad)" opacity="0.8">
+    <rect x="13" y="24" width="6" height="11" rx="3" />
+    <rect x="45" y="24" width="6" height="11" rx="3" />
+    <rect x="13" y="42" width="6" height="11" rx="3" />
+    <rect x="45" y="42" width="6" height="11" rx="3" />
+  </g>
+
+  <!-- Top-down car body (tapered toward the front) -->
+  <path
+    d="M32 18
+       C26 18 22 22 21 28
+       L20.5 50
+       C20.5 55 24 58 32 58
+       C40 58 43.5 55 43.5 50
+       L43 28
+       C42 22 38 18 32 18 Z"
+    fill="url(#sdcGrad)"
+  />
+  <!-- Windshield / cabin -->
+  <path d="M25 28 C27 25 37 25 39 28 L37 37 L27 37 Z" fill="#0f0f14" opacity="0.85" />
+  <!-- Rear window -->
+  <rect x="26" y="44" width="12" height="8" rx="2.5" fill="#0f0f14" opacity="0.45" />
+</svg>

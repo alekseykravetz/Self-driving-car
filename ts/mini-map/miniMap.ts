@@ -5,18 +5,12 @@ interface IMiniMapCar {
   color: string;
 }
 
-interface IMiniMapDrawOptions {
-  roadColor?: string;
-  carColor?: string;
-}
-
 class MiniMap {
   private canvas: HTMLCanvasElement;
   private graph: Graph;
   private size: number;
   private scaler: number;
   private ctx: CanvasRenderingContext2D;
-  public cars: IMiniMapCar[] = [];
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -35,11 +29,27 @@ class MiniMap {
     this.ctx = canvas.getContext('2d')!;
   }
 
-  draw(
-    viewPoint: Point,
-    { roadColor = 'white', carColor = 'blue' }: IMiniMapDrawOptions = {},
-  ): void {
-    this.ctx.clearRect(0, 0, this.size, this.size);
+  draw(options: MiniMapDrawOptions): void {
+    const {
+      viewPoint,
+      cars,
+      roadColor = 'white',
+      carColor = 'blue',
+      backgroundColor,
+    } = options;
+
+    // When a backgroundColor is given, paint it onto the canvas itself rather
+    // than leaving the pixels transparent and relying on the CSS background.
+    // The floating mini-map is a `position: fixed` canvas, and Chrome keeps a
+    // stale (black) CSS background painted on its compositing layer after the
+    // class toggles. Filling the bitmap (which repaints every frame) sidesteps
+    // that bug entirely.
+    if (backgroundColor) {
+      this.ctx.fillStyle = backgroundColor;
+      this.ctx.fillRect(0, 0, this.size, this.size);
+    } else {
+      this.ctx.clearRect(0, 0, this.size, this.size);
+    }
 
     const scaledViewPoint: Point = scale(viewPoint, -this.scaler);
 
@@ -58,7 +68,7 @@ class MiniMap {
       });
     }
 
-    for (const car of this.cars) {
+    for (const car of cars) {
       this.ctx.beginPath();
       this.ctx.fillStyle = car.damaged ? 'gray' : car.color || 'red';
       this.ctx.strokeStyle = 'white';

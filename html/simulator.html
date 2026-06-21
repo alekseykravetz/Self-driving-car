@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>Self-driving car - Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
     <link rel="stylesheet" href="/styles/style.css" />
   </head>
   <body>
@@ -12,81 +14,99 @@
         <canvas id="networkCanvas"></canvas>
         <canvas id="miniMapCanvas"></canvas>
       </div>
-      <training-manager-panel></training-manager-panel>
+      <training-panel></training-panel>
     </div>
 
-    <top-controls-panel></top-controls-panel>
-    <view-controls-panel></view-controls-panel>
+    <training-init-modal></training-init-modal>
 
-    <script src="/js/ai-training/topControlsPanel.js"></script>
-    <script src="/js/ai-training/viewControlsPanel.js"></script>
-    <script src="/js/ai-training/trainingManagerPanel.js"></script>
-    <script src="/js/world-editor/world.js"></script>
+    <div id="simulatorToolbar">
+      <world-toolbar></world-toolbar>
+      <layout-toolbar></layout-toolbar>
+      <animation-loop-toolbar></animation-loop-toolbar>
+      <shortcuts-toolbar></shortcuts-toolbar>
+    </div>
+
+    <script src="/js/panels/templates/worldToolbarTemplate.js"></script>
+    <script src="/js/simulator/panels/templates/layoutToolbarTemplate.js"></script>
+    <script src="/js/simulator/panels/templates/animationLoopToolbarTemplate.js"></script>
+    <script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
+    <script src="/js/simulator/training/templates/trainingPanelTemplate.js"></script>
+    <script src="/js/simulator/training/templates/trainingInitModalTemplate.js"></script>
+    <script src="/js/panels/worldToolbar.js"></script>
+    <script src="/js/simulator/panels/layoutToolbar.js"></script>
+    <script src="/js/simulator/panels/animationLoopToolbar.js"></script>
+    <script src="/js/panels/shortcutsToolbar.js"></script>
+    <script src="/js/simulator/training/trainingPanel.js"></script>
+    <script src="/js/world/corridor.js"></script>
+    <script src="/js/world/generation/worldGenerator.js"></script>
+    <script src="/js/world/world.js"></script>
     <script src="/js/mini-map/miniMap.js"></script>
     <script src="/js/viewport/viewport.js"></script>
-    <script src="/js/world-editor/trafficManager.js"></script>
-    <script src="/js/world-editor/markings/marking.js"></script>
-    <script src="/js/world-editor/markings/stop.js"></script>
-    <script src="/js/world-editor/markings/start.js"></script>
-    <script src="/js/world-editor/markings/crossing.js"></script>
-    <script src="/js/world-editor/markings/parking.js"></script>
-    <script src="/js/world-editor/markings/light.js"></script>
-    <script src="/js/world-editor/markings/target.js"></script>
-    <script src="/js/world-editor/markings/yield.js"></script>
-    <script src="/js/world-editor/editors/markingEditor.js"></script>
-    <script src="/js/world-editor/editors/graphEditor.js"></script>
-    <script src="/js/world-editor/editors/stopEditor.js"></script>
-    <script src="/js/world-editor/editors/startEditor.js"></script>
-    <script src="/js/world-editor/editors/crossingEditor.js"></script>
-    <script src="/js/world-editor/editors/parkingEditor.js"></script>
-    <script src="/js/world-editor/editors/lightEditor.js"></script>
-    <script src="/js/world-editor/editors/targetEditor.js"></script>
-    <script src="/js/world-editor/editors/yieldEditor.js"></script>
-    <script src="/js/world-editor/items/tree.js"></script>
-    <script src="/js/world-editor/items/building.js"></script>
+    <script src="/js/world/trafficManager.js"></script>
+    <script src="/js/world/markings/marking.js"></script>
+    <script src="/js/world/markings/stop.js"></script>
+    <script src="/js/world/markings/start.js"></script>
+    <script src="/js/world/markings/crossing.js"></script>
+    <script src="/js/world/markings/parking.js"></script>
+    <script src="/js/world/markings/light.js"></script>
+    <script src="/js/world/markings/target.js"></script>
+    <script src="/js/world/markings/yield.js"></script>
+    <script src="/js/world/editors/markingEditor.js"></script>
+    <script src="/js/world/editors/graphEditor.js"></script>
+    <script src="/js/world/editors/stopEditor.js"></script>
+    <script src="/js/world/editors/startEditor.js"></script>
+    <script src="/js/world/editors/crossingEditor.js"></script>
+    <script src="/js/world/editors/parkingEditor.js"></script>
+    <script src="/js/world/editors/lightEditor.js"></script>
+    <script src="/js/world/editors/targetEditor.js"></script>
+    <script src="/js/world/editors/yieldEditor.js"></script>
+    <script src="/js/world/items/tree.js"></script>
+    <script src="/js/world/items/building.js"></script>
     <script src="/js/math/utils.js"></script>
     <script src="/js/math/graph/graph.js"></script>
     <script src="/js/math/primitives/point.js"></script>
     <script src="/js/math/primitives/segment.js"></script>
     <script src="/js/math/primitives/polygon.js"></script>
     <script src="/js/math/primitives/envelope.js"></script>
-
-    <!-- <script src="/saves/barnea.world"></script> -->
-    <!-- <script src="/saves/big.world"></script> -->
-    <!-- <script src="/saves/big_with_target.world"></script> -->
-    <!-- <script src="/saves/kohav-hazafon.world"></script> -->
-    <!-- <script src="/saves/ashkelon.world"></script> -->
-    <script src="/saves/path_finding.world"></script>
-    <!-- <script src="/saves/ir-hyain.world"></script> -->
-
-    <!-- Car config is now managed via UI/localStorage. Legacy .car files can be loaded via Load Car button -->
-    <!-- <script src="/saves/right_hand_rule.car"></script> -->
-    <!-- <script src="/saves/right_hand_rule_racer.car"></script> -->
+    <script src="/js/math/spatialGrid.js"></script>
 
     <script src="/js/camera/types.js"></script>
     <script src="/js/camera/extrusion.js"></script>
     <script src="/js/camera/camera.js"></script>
-    <script src="/js/sound.js"></script>
+    <script src="/js/audio/sound.js"></script>
     <script src="/js/neural-network/visualizer.js"></script>
     <script src="/js/neural-network/network.js"></script>
     <script src="/js/car/sensors/sensor.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/car/controls/controls.js"></script>
     <script src="/js/car/car.js"></script>
-    <script src="/js/simple-world/simpleWorld.js"></script>
-    <script src="/js/ai-training/trafficGenerator.js"></script>
-    <script src="/js/ai-training/simulatorUtils.js"></script>
-    <script src="/js/world-loader/worldLoader.js"></script>
-    <script src="/js/car-loader/carLoader.js"></script>
-    <script src="/js/ai-training/simulator.js"></script>
+    <script src="/js/world/simple/simpleWorld.js"></script>
+    <script src="/js/simulator/training/modes/trafficFactory.js"></script>
+    <script src="/js/simulator/training/modes/borderCollision.js"></script>
+    <script src="/js/simulator/training/rendering/carRenderer.js"></script>
+    <script src="/js/simulator/training/rendering/layoutManager.js"></script>
+    <script src="/js/simulator/training/modes/simpleModeBehavior.js"></script>
+    <script src="/js/simulator/training/modes/worldModeBehavior.js"></script>
+    <script src="/js/simulator/training/genetics/storageManager.js"></script>
+    <script src="/js/simulator/training/genetics/poolManager.js"></script>
+    <script src="/js/world/loader/worldLoader.js"></script>
+    <script src="/js/car/loader/carLoader.js"></script>
+    <script src="/js/store/types.js"></script>
+    <script src="/js/store/storeManager.js"></script>
+    <script src="/js/simulator/training/trainingInitModal.js"></script>
+    <script src="/js/simulator/core/simulatorShell.js"></script>
+    <script src="/js/simulator/training/trainingSimulator.js"></script>
 
     <script>
-      const simulator = new Simulator(
-        gameCanvas,
-        networkCanvas,
-        miniMapCanvas,
-        cameraCanvas,
-      );
+      (async () => {
+        await StoreManager.init();
+        const simulator = new TrainingSimulator(
+          gameCanvas,
+          networkCanvas,
+          miniMapCanvas,
+          cameraCanvas,
+        );
+      })();
     </script>
   </body>
 </html>

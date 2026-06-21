@@ -16,6 +16,7 @@ Cars learn to navigate procedurally-generated worlds through evolutionary select
 - **Real-time Neural Network Visualizer** — Live display of neuron activations, weights, and biases as cars drive
 - **3D Camera Perspective** — Pseudo-3D rendering with buildings, trees, and perspective projection
 - **Racing Mode** — Competitive races between player and AI cars with countdown, progress tracking, and sound effects
+- **Live Traffic Jam** — Click anywhere on a loaded world to drop trained cars that immediately drive themselves, collide with each other, and build an emergent traffic jam
 - **Traffic Simulation** — Coordinated traffic lights with green/yellow/red cycling at intersections
 - **Mini-Map** — Real-time overview of all cars and the world graph
 - **Save/Load System** — Persist worlds, trained brains, and car configurations to files or localStorage
@@ -67,14 +68,15 @@ Open [http://localhost:9090](http://localhost:9090) in your browser to see the l
 
 ## Simulation Modes
 
-| Mode              | URL Path                      | Description                                                              |
-| ----------------- | ----------------------------- | ------------------------------------------------------------------------ |
-| **Simple Road**   | `/html/simulator?mode=simple` | 3-lane straight road with random traffic — ideal for initial training    |
-| **Simulator**     | `/html/simulator`             | Full world simulation with custom maps, corridors, and advanced training |
-| **Race**          | `/html/race`                  | Competitive racing with keyboard controls vs AI                          |
-| **Race (Camera)** | `/html/race?mode=camera`      | Race controlled via webcam marker detection                              |
-| **Race (Phone)**  | `/html/race?mode=phone`       | Race controlled via phone tilt (device orientation)                      |
-| **World Editor**  | `/html/world`                 | Full-featured map creation and editing tool                              |
+| Mode                 | URL Path                      | Description                                                              |
+| -------------------- | ----------------------------- | ------------------------------------------------------------------------ |
+| **Simple Road**      | `/html/simulator?mode=simple` | 3-lane straight road with random traffic — ideal for initial training    |
+| **Simulator**        | `/html/simulator`             | Full world simulation with custom maps, corridors, and advanced training |
+| **Live Traffic Jam** | `/html/traffic`               | Click a loaded world to spawn self-driving cars and watch traffic emerge |
+| **Race**             | `/html/race`                  | Competitive racing with keyboard controls vs AI                          |
+| **Race (Camera)**    | `/html/race?mode=camera`      | Race controlled via webcam marker detection                              |
+| **Race (Phone)**     | `/html/race?mode=phone`       | Race controlled via phone tilt (device orientation)                      |
+| **World Editor**     | `/html/world`                 | Full-featured map creation and editing tool                              |
 
 ---
 
@@ -139,20 +141,22 @@ Self-driving-car/
 │   │   ├── car.ts              # Vehicle physics, collision, AI integration
 │   │   ├── sensors/
 │   │   │   └── sensor.ts       # Ray-casting perception system
-│   │   └── controls/
-│   │       ├── controls.ts     # Keyboard & AI control modes
-│   │       ├── phoneControls.ts    # Device orientation (tilt) steering
-│   │       ├── cameraControls.ts   # Webcam marker-based steering
-│   │       └── markerDetector.ts   # Blue marker K-means clustering
+│   │   ├── controls/
+│   │   │   ├── controls.ts     # Keyboard & AI control modes
+│   │   │   ├── phoneControls.ts    # Device orientation (tilt) steering
+│   │   │   ├── cameraControls.ts   # Webcam marker-based steering
+│   │   │   └── markerDetector.ts   # Blue marker K-means clustering
+│   │   └── loader/
+│   │       └── carLoader.ts    # .car/.json file-input loader
 │   │
 │   ├── neural-network/
 │   │   ├── network.ts          # Feedforward network, mutation, crossover
 │   │   └── visualizer.ts       # Real-time network state renderer
 │   │
-│   ├── world-editor/
+│   ├── world/
 │   │   ├── world.ts            # World generation (roads, buildings, trees)
 │   │   ├── trafficManager.ts   # Traffic light coordination
-│   │   ├── types.ts            # Shared editor types
+│   │   ├── types.ts            # Shared world/editor types (IWorld, Corridor)
 │   │   ├── editors/            # Interactive editing tools
 │   │   │   ├── worldEditor.ts  # Master editor coordinator
 │   │   │   ├── graphEditor.ts  # Road network point/segment editing
@@ -167,26 +171,53 @@ Self-driving-car/
 │   │   ├── items/              # Environmental objects
 │   │   │   ├── building.ts     # 3D building with perspective rendering
 │   │   │   └── tree.ts         # Procedural tree with layered canopy
-│   │   └── markings/           # Traffic marking types
-│   │       ├── marking.ts      # Base marking class
-│   │       ├── crossing.ts     # Pedestrian crossing
-│   │       ├── light.ts        # Traffic light
-│   │       ├── parking.ts      # Parking spot
-│   │       ├── start.ts        # Spawn point
-│   │       ├── stop.ts         # Stop line
-│   │       ├── target.ts       # Destination marker
-│   │       └── yield.ts        # Yield line
+│   │   ├── markings/           # Traffic marking types
+│   │   │   ├── marking.ts      # Base marking class
+│   │   │   ├── crossing.ts     # Pedestrian crossing
+│   │   │   ├── light.ts        # Traffic light
+│   │   │   ├── parking.ts      # Parking spot
+│   │   │   ├── start.ts        # Spawn point
+│   │   │   ├── stop.ts         # Stop line
+│   │   │   ├── target.ts       # Destination marker
+│   │   │   └── yield.ts        # Yield line
+│   │   ├── simple/
+│   │   │   └── simpleWorld.ts  # Lightweight IWorld: straight 3-lane road
+│   │   └── loader/
+│   │       └── worldLoader.ts  # .world file-input loader
 │   │
-│   ├── ai-training/
-│   │   ├── trainingManagerPanel.ts # Custom element: training UI + genetic algorithm
-│   │   ├── topControlsPanel.ts    # Custom element: border/tracking mode controls
-│   │   ├── viewControlsPanel.ts   # Custom element: layout & visibility toggles
-│   │   ├── simulator.ts           # Unified training environment (world + simple modes)
-│   │   ├── trafficGenerator.ts    # Dynamic traffic generation for simple mode
-│   │   └── simulatorUtils.ts      # Shared drawing utilities
+│   ├── simulator/              # Simulator domain (training, traffic, panels, core)
+│   │   ├── core/
+│   │   │   └── simulatorShell.ts   # Abstract base: canvases, viewport, camera, RAF loop
+│   │   ├── traffic/
+│   │   │   ├── trafficSimulator.ts # Live Traffic Jam: click-to-spawn self-driving cars
+│   │   │   ├── trafficPanel.ts     # Custom element <traffic-panel>: per-car stats list
+│   │   │   └── templates/          # HTML template strings for the traffic panel
+│   │   ├── panels/
+│   │   │   ├── worldToolbar.ts     # Custom element <world-toolbar>: border/tracking mode, file loading, camera debug
+│   │   │   ├── layoutToolbar.ts    # Custom element <layout-toolbar>: layout & visibility toggles
+│   │   │   ├── animationLoopToolbar.ts # Custom element <animation-loop-toolbar>: play/pause + render interval
+│   │   │   └── templates/          # HTML template strings for the panels
+│   │   └── training/
+│   │       ├── trainingSimulator.ts # Unified training environment (world + simple modes)
+│   │       ├── trainingPanel.ts     # Custom element <training-panel>: training UI + genetic algorithm
+│   │       ├── genetics/
+│   │       │   ├── poolManager.ts   # Car creation & pool/brain application
+│   │       │   └── storageManager.ts # localStorage persistence & .car file download
+│   │       ├── modes/
+│   │       │   ├── simpleModeBehavior.ts # Simple-mode traffic & car update loops
+│   │       │   ├── worldModeBehavior.ts  # World-mode car update loop
+│   │       │   ├── borderCollision.ts    # Collision correction with road borders
+│   │       │   └── trafficFactory.ts     # Dynamic traffic generation for simple mode
+│   │       ├── rendering/
+│   │       │   ├── carRenderer.ts   # Car drawing utilities (pool highlighting)
+│   │       │   └── layoutManager.ts # Canvas resize/layout logic
+│   │       └── templates/          # HTML template strings for the training panel
 │   │
-│   ├── simple-world/
-│   │   └── simpleWorld.ts      # Lightweight IWorld: straight 3-lane road
+│   ├── store/                  # Bundled store assets (worlds + cars)
+│   │   ├── storeManager.ts     # Singleton: fetches manifest + assets, active selection
+│   │   ├── storePanel.ts       # Custom element <store-panel>: landing-page browser
+│   │   ├── types.ts            # Store type definitions
+│   │   └── templates/          # HTML template for the store panel
 │   │
 │   ├── games/
 │   │   └── race.ts             # Racing mode with countdown & scoring
@@ -201,7 +232,9 @@ Self-driving-car/
 │   │   ├── types.ts            # Camera interfaces
 │   │   ├── extrusion.ts        # 3D extrusion helpers (buildings, cars, trees)
 │   │   └── camera.ts           # 3D perspective camera with frustum culling
-│   ├── sound.ts                # Audio effects (engine, beep, explosion)
+│   │
+│   ├── audio/
+│   │   └── sound.ts            # Audio effects (engine, beep, explosion)
 │   ├── types.ts                # Global type declarations
 │   └── utils.ts                # Collision helpers, color utilities
 │
@@ -210,6 +243,7 @@ Self-driving-car/
 │
 ├── html/                       # HTML entry points for each mode
 │   ├── simulator.html          # Both world mode and ?mode=simple
+│   ├── traffic.html            # Live Traffic Jam (click-to-spawn cars)
 │   ├── race.html               # All race modes via ?mode=camera|phone
 │   └── world.html              # Map creation
 │
@@ -227,14 +261,18 @@ Self-driving-car/
 │   └── *-osm-data.json        # OpenStreetMap import data
 │
 └── docs/                       # Technical documentation
-    ├── Architecture.md
-    ├── Math.md
-    ├── Physics.md
-    ├── NeuralNetwork.md
-    ├── WorldEditor.md
-    ├── Simulators.md
-    ├── Camera.md
-    └── Controls.md
+    ├── Architecture.md         # System overview & module graph
+    ├── Math.md                 # Geometric primitives & algorithms
+    ├── Physics.md              # Car dynamics & sensor system
+    ├── NeuralNetwork.md        # AI brain & genetic evolution
+    ├── WorldEditor.md          # World generation & editing
+    ├── Simulators.md           # Training environments & UI
+    ├── Camera.md               # 3D perspective rendering
+    ├── Controls.md             # Input systems (keyboard/phone/camera)
+    ├── Race.md                 # Racing mode & scoring
+    ├── Viewport.md             # Pan/zoom & mini-map
+    ├── SaveLoad.md             # Persistence & file formats
+    └── Sound.md                # Audio synthesis
 ```
 
 ---
@@ -256,18 +294,19 @@ This keeps the development loop instant: save a `.ts` file → `tsc` compiles �
 
 ### World Files (`.world`)
 
-JavaScript files containing a world definition object with graph, road parameters, buildings, trees, markings, and viewport state.
+JavaScript files containing a world definition object with graph, road parameters, buildings, trees, markings, and viewport state. Format: pure JSON object.
 
 ### Car Files (`.car`)
 
-JavaScript files containing a car configuration with neural network brain, physics parameters, and sensor settings.
+JSON files containing a car configuration with neural network brain, physics parameters, and sensor settings. See [Save & Load](docs/SaveLoad.md) for full format details.
 
-### LocalStorage Keys
+### LocalStorage
 
-| Key          | Contents                                          |
-| ------------ | ------------------------------------------------- |
-| `bestBrain`  | JSON of the single best-performing neural network |
-| `bestBrains` | JSON array of the top N networks (breeding pool)  |
+| Key        | Contents                                                              |
+| ---------- | --------------------------------------------------------------------- |
+| `bestPool` | JSON array of top-K car configs with brains (unified format)          |
+| `raceCars` | JSON array of car configs loaded via race mode's "Load car(s)" button |
+| `world`    | Last-loaded world state (fallback for race mode)                      |
 
 ---
 
@@ -275,16 +314,21 @@ JavaScript files containing a car configuration with neural network brain, physi
 
 Detailed technical documentation is maintained in the `docs/` directory:
 
-| Document                                | Description                                           |
-| --------------------------------------- | ----------------------------------------------------- |
-| [Architecture](docs/Architecture.md)    | System overview, module relationships, data flow      |
-| [Math](docs/Math.md)                    | Geometric primitives, graph system, vector operations |
-| [Physics](docs/Physics.md)              | Car dynamics, collision detection, sensor ray-casting |
-| [Neural Network](docs/NeuralNetwork.md) | Network structure, evolution, mutation, crossover     |
-| [World Editor](docs/WorldEditor.md)     | World generation, editors, markings, items            |
-| [Simulators](docs/Simulators.md)        | Training environments, genetic algorithm workflow     |
-| [Camera](docs/Camera.md)                | 3D perspective system, frustum culling, projection    |
-| [Controls](docs/Controls.md)            | Input systems: keyboard, phone, camera, AI            |
+| Document                                | Description                                               |
+| --------------------------------------- | --------------------------------------------------------- |
+| [Project Goal](docs/ProjectGoal.md)     | Vision, city-scale traffic simulation goals, performance  |
+| [Architecture](docs/Architecture.md)    | System overview, module graph, data flow, design patterns |
+| [Math](docs/Math.md)                    | Geometric primitives, polygon union, graph, OSM import    |
+| [Physics](docs/Physics.md)              | Car dynamics, sensors, collision detection & response     |
+| [Neural Network](docs/NeuralNetwork.md) | Network structure, feedforward, mutation, crossover, pool |
+| [World Editor](docs/WorldEditor.md)     | World generation pipeline, editors, markings, traffic     |
+| [Simulators](docs/Simulators.md)        | Training environments, genetic algorithm, panel UI        |
+| [Camera](docs/Camera.md)                | 3D perspective projection, frustum culling, extrusion     |
+| [Controls](docs/Controls.md)            | Keyboard, phone tilt, webcam markers, AI control modes    |
+| [Race](docs/Race.md)                    | Racing mode, corridor progress, countdown, AI opponents   |
+| [Viewport](docs/Viewport.md)            | Pan/zoom system, coordinate transforms, mini-map          |
+| [Save & Load](docs/SaveLoad.md)         | File formats, localStorage, legacy migration, loaders     |
+| [Sound](docs/Sound.md)                  | Web Audio API synthesis, beep, explosion, victory fanfare |
 
 ---
 

@@ -57,9 +57,63 @@ class Car {
   brain?: NeuralNetwork;
   controls: CarControls;
   image: HTMLImageElement;
-  mask: HTMLCanvasElement;
   polygon: Point[];
-  engine?: Engine;
+  engine?: SoundEngine;
+
+  /**
+   * Shared car sprite image, loaded once for all cars instead of per instance.
+   */
+  static #sharedImage: HTMLImageElement | null = null;
+
+  /**
+   * Cache of pre-composited (color-tinted) sprites keyed by
+   * `${color}|${width}|${height}`. The expensive fill + destination-atop +
+   * multiply compositing is done once per unique key and reused every frame by
+   * every car of that color/size — critical for rendering thousands of cars.
+   */
+  static #spriteCache: Map<string, HTMLCanvasElement> = new Map();
+
+  static #getSharedImage(): HTMLImageElement {
+    if (!Car.#sharedImage) {
+      const img = new Image();
+      img.src = '/assets/car.png';
+      Car.#sharedImage = img;
+    }
+    return Car.#sharedImage;
+  }
+
+  /**
+   * Returns the pre-composited sprite for the given color/size, building and
+   * caching it on first use. Returns null until the shared image has loaded.
+   */
+  static #getSprite(
+    color: string,
+    width: number,
+    height: number,
+  ): HTMLCanvasElement | null {
+    const img = Car.#getSharedImage();
+    if (!img.complete || img.naturalWidth === 0) return null;
+
+    const key = color + '|' + width + '|' + height;
+    let sprite = Car.#spriteCache.get(key);
+    if (!sprite) {
+      sprite = document.createElement('canvas');
+      sprite.width = width;
+      sprite.height = height;
+      const ctx = sprite.getContext('2d')!;
+      // Color silhouette: fill the body color, then clip to the car shape.
+      ctx.fillStyle = color;
+      ctx.rect(0, 0, width, height);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'destination-atop';
+      ctx.drawImage(img, 0, 0, width, height);
+      // Bake the detail shading (multiply) into the sprite once.
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.drawImage(img, 0, 0, width, height);
+      Car.#spriteCache.set(key, sprite);
+    }
+    return sprite;
+  }
 
   //todo: fix this
   finishTime?: number;
@@ -96,21 +150,7 @@ class Car {
     }
     this.controls = new Controls(opts.controlType);
 
-    this.image = new Image();
-    this.image.src = '/assets/car.png';
-
-    this.mask = document.createElement('canvas');
-    this.mask.width = this.width;
-    this.mask.height = this.height;
-
-    const maskCtx = this.mask.getContext('2d')!;
-    this.image.onload = () => {
-      maskCtx.fillStyle = this.color;
-      maskCtx.rect(0, 0, this.width, this.height);
-      maskCtx.fill();
-      maskCtx.globalCompositeOperation = 'destination-atop';
-      maskCtx.drawImage(this.image, 0, 0, this.width, this.height);
-    };
+    this.image = Car.#getSharedImage();
 
     this.polygon = this.#createPolygon();
     this.update();
@@ -180,6 +220,10 @@ class Car {
         this.controls.right = !!outputs[2];
         this.controls.reverse = !!outputs[3];
       }
+    } else if (this.sensor) {
+      // Keep the rays following the car (and reacting to borders) even when
+      // there is no brain — e.g. the player's manually-driven car.
+      this.sensor.update(polygons);
     }
     if (this.engine) {
       const percent = Math.abs(this.speed / this.maxSpeed);
@@ -189,8 +233,52 @@ class Car {
   }
 
   #assessDamage(polygons: Point[][]): boolean {
+    if (polygons.length === 0) return false;
+
+    // Car bounding box (axis-aligned) — cheap broad-phase reject. The shared
+    // narrow phase feeds every segment within sensor range (far larger than the
+    // car body), so most candidates here cannot possibly touch the car. An AABB
+    // test skips the full edge-edge check for those without changing behaviour:
+    // if the boxes do not overlap the polygons cannot intersect.
+    let carMinX = this.polygon[0].x;
+    let carMaxX = this.polygon[0].x;
+    let carMinY = this.polygon[0].y;
+    let carMaxY = this.polygon[0].y;
+    for (let i = 1; i < this.polygon.length; i++) {
+      const p = this.polygon[i];
+      if (p.x < carMinX) carMinX = p.x;
+      else if (p.x > carMaxX) carMaxX = p.x;
+      if (p.y < carMinY) carMinY = p.y;
+      else if (p.y > carMaxY) carMaxY = p.y;
+    }
+
     for (let i = 0; i < polygons.length; i++) {
-      if (polysIntersect(this.polygon, polygons[i])) {
+      const poly = polygons[i];
+
+      // Obstacle AABB.
+      let oMinX = poly[0].x;
+      let oMaxX = poly[0].x;
+      let oMinY = poly[0].y;
+      let oMaxY = poly[0].y;
+      for (let j = 1; j < poly.length; j++) {
+        const p = poly[j];
+        if (p.x < oMinX) oMinX = p.x;
+        else if (p.x > oMaxX) oMaxX = p.x;
+        if (p.y < oMinY) oMinY = p.y;
+        else if (p.y > oMaxY) oMaxY = p.y;
+      }
+
+      // Skip when the bounding boxes are disjoint.
+      if (
+        oMinX > carMaxX ||
+        oMaxX < carMinX ||
+        oMinY > carMaxY ||
+        oMaxY < carMinY
+      ) {
+        continue;
+      }
+
+      if (polysIntersect(this.polygon, poly)) {
         return true;
       }
     }
@@ -271,42 +359,59 @@ class Car {
     this.y -= Math.cos(this.angle) * this.speed;
   }
 
-  draw(
-    ctx: CanvasRenderingContext2D,
-    drawSensor: boolean = false,
-    drawMask: boolean = true,
-  ): void {
-    if (this.sensor && drawSensor) {
+  draw(ctx: CanvasRenderingContext2D, options: CarDrawOptions = {}): void {
+    const {
+      showSensor = false,
+      showMask = true,
+      colorOverride,
+      alpha,
+      showName = false,
+    } = options;
+
+    // Only the sensor and name paths mutate persistent context state
+    // (stroke/fill/shadow/font), so a save/restore pair is only needed when one
+    // of them runs. The common case — a masked regular car whose alpha is set
+    // in a batch by the caller — needs neither, which removes ~2 save+restore
+    // calls per car at large populations (the dominant cost in the profile).
+    const needsRestore = showSensor || showName;
+    if (needsRestore) ctx.save();
+
+    const prevAlpha = ctx.globalAlpha;
+    if (alpha !== undefined) {
+      ctx.globalAlpha = alpha;
+    }
+
+    if (this.sensor && showSensor) {
       this.sensor.draw(ctx);
     }
 
-    if (drawMask) {
-      ctx.save();
+    const effectiveColor = colorOverride ?? this.color;
+
+    if (showMask) {
+      const sprite = this.damaged
+        ? null
+        : Car.#getSprite(effectiveColor, this.width, this.height);
+      // Undamaged: draw the pre-composited color sprite (single drawImage).
+      // Damaged (or sprite not ready yet): fall back to the plain car image.
       ctx.translate(this.x, this.y);
       ctx.rotate(-this.angle);
-      if (!this.damaged) {
-        ctx.drawImage(
-          this.mask,
-          -this.width / 2,
-          -this.height / 2,
-          this.width,
-          this.height,
-        );
-        ctx.globalCompositeOperation = 'multiply';
-      }
       ctx.drawImage(
-        this.image,
+        sprite ?? this.image,
         -this.width / 2,
         -this.height / 2,
         this.width,
         this.height,
       );
-      ctx.restore(); // Restores composite operation and transform
+      // Undo the transform manually instead of paying for a save/restore pair.
+      // The viewport re-establishes its transform every frame via reset(), so
+      // any sub-pixel drift cannot accumulate across frames.
+      ctx.rotate(this.angle);
+      ctx.translate(-this.x, -this.y);
     } else {
       if (this.damaged) {
         ctx.fillStyle = 'gray';
       } else {
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = effectiveColor;
       }
       ctx.beginPath();
       ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
@@ -315,5 +420,20 @@ class Car {
       }
       ctx.fill();
     }
+
+    if (showName && this.name) {
+      ctx.font = 'bold 13px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 5;
+      ctx.fillStyle = 'white';
+      ctx.fillText(this.name, this.x, this.y);
+    }
+
+    if (alpha !== undefined) {
+      ctx.globalAlpha = prevAlpha;
+    }
+    if (needsRestore) ctx.restore();
   }
 }

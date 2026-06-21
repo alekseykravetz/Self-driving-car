@@ -15,6 +15,7 @@ class Graph {
           points.find((p) => p.equals(i.p1)),
           points.find((p) => p.equals(i.p2)),
           i.oneWay,
+          i.separated,
         ),
     );
     return new Graph(points, segments);
@@ -83,8 +84,6 @@ class Graph {
     const endSeg = getNearestSegment(end, this.segments);
     const { point: projStart } = startSeg.projectPoint(start);
     const { point: projEnd } = endSeg.projectPoint(end);
-    this.points.push(projStart);
-    this.points.push(projEnd);
     const tempSegments = [
       new Segment(startSeg.p1, projStart, startSeg.oneWay),
       new Segment(projStart, startSeg.p2, startSeg.oneWay),
@@ -94,10 +93,18 @@ class Graph {
     if (startSeg.equals(endSeg)) {
       tempSegments.push(new Segment(projStart, projEnd));
     }
-    this.segments = this.segments.concat(tempSegments);
+    // Run Dijkstra on a temporary augmented graph instead of mutating the real
+    // one. Reassigning fresh arrays (rather than push/removePoint) avoids a bug
+    // where a projected point that coincides with an existing vertex would,
+    // on removePoint, delete the REAL segments touching that vertex (equals-
+    // based matching). Restoring the original arrays guarantees no corruption.
+    const savedPoints = this.points;
+    const savedSegments = this.segments;
+    this.points = [...savedPoints, projStart, projEnd];
+    this.segments = [...savedSegments, ...tempSegments];
     const path = this.#getShortestPath(projStart, projEnd);
-    this.removePoint(projStart);
-    this.removePoint(projEnd);
+    this.points = savedPoints;
+    this.segments = savedSegments;
     const segments = [];
     for (let i = 1; i < path.length; i++) {
       segments.push(new Segment(path[i - 1], path[i]));

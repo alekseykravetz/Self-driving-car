@@ -1,20 +1,96 @@
 # Control Systems
 
-The project supports multiple input methods for controlling cars, from keyboard to camera-based marker tracking. All control systems provide the same interface: boolean flags for `forward`, `left`, `right`, and `reverse`.
+The project supports multiple input methods for controlling cars. All control systems provide the same interface: boolean flags for `forward`, `left`, `right`, and `reverse`.
+
+---
+
+## Keyboard & Gesture Shortcuts (Quick Reference)
+
+### Viewport Navigation (all pages)
+
+| Input                        | Action              |
+| ---------------------------- | ------------------- |
+| Middle-click drag            | Pan viewport        |
+| Scroll wheel                 | Zoom in/out (mouse) |
+| Two-finger scroll (trackpad) | Pan viewport        |
+| Pinch gesture (trackpad)     | Zoom in/out         |
+| Ctrl + scroll wheel          | Zoom in/out         |
+
+### Car Driving (Race / Simulator — KEYS mode)
+
+| Key                | Action               |
+| ------------------ | -------------------- |
+| `ArrowUp` / `W`    | Accelerate (forward) |
+| `ArrowDown` / `S`  | Brake / Reverse      |
+| `ArrowLeft` / `A`  | Steer left           |
+| `ArrowRight` / `D` | Steer right          |
+
+### Graph Editor (World Editor page)
+
+| Key        | Action                                                                   |
+| ---------- | ------------------------------------------------------------------------ |
+| `S`        | Mark hovered point as path **start**                                     |
+| `E`        | Mark hovered point as path **end**                                       |
+| `C`        | Clear computed shortest path (also clears start/end)                     |
+| `O` (hold) | Enable **one-way** mode while held; next segment created will be one-way |
+
+### Live Traffic Jam (Traffic page)
+
+| Key        | Action                                                        |
+| ---------- | ------------------------------------------------------------- |
+| `R` (hold) | Flip the spawn heading 180° while held (preview + next spawn) |
+
+---
+
+## Shortcuts Toolbar (`<shortcuts-toolbar>`)
+
+A shared floating toolbar (`ts/panels/shortcutsToolbar.ts`, tag
+`<shortcuts-toolbar>`) visualizes the keyboard shortcuts available on the current
+page. It sits inside the `#simulatorToolbar` flex container next to the other
+toolbar panels and is reused by the **World Editor**, **Live Traffic Jam**, and
+**Training Simulator** pages — each page calls `setShortcuts(defs)` with only the
+shortcuts it actually uses.
+
+Each indicator is one of two kinds:
+
+- **Momentary** (`S` / `E` / `C`, driving keys, `Ctrl`) — a one-shot or held key.
+  Display-only: it flashes / lights when the key fires. Driving keys and `Ctrl`
+  are flagged `display: true`, so the toolbar lights them itself from the
+  physical keys; behavior stays in `Controls` / `Viewport`.
+- **Toggle** (`O` one-way, `R` reverse heading) — a sticky mode key. **Click** the
+  indicator to latch the mode on permanently (click again to release). The
+  effective state is `latched OR key-held`, so you can still hold the physical
+  key for a momentary effect while unlatched.
+
+Component API:
+
+| Method                  | Purpose                                               |
+| ----------------------- | ----------------------------------------------------- |
+| `setShortcuts(defs)`    | Render the indicators (grouped, in declaration order) |
+| `flash(id)`             | Briefly highlight an indicator (one-shot action)      |
+| `setActive(id, active)` | Set the lit state of an indicator                     |
+| `setClickListener(fn)`  | Called with the indicator id when a toggle is clicked |
+
+The owner (e.g. `GraphEditor`, `TrafficSimulator`) keeps the behavior and the
+latch state, driving the indicator via `flash` / `setActive` and reacting to
+clicks via `setClickListener`.
 
 ---
 
 ## Control Interface
 
-All control systems ultimately set these flags consumed by `Car.#move()`:
+All control systems ultimately set these four boolean flags, consumed by `Car.#move()`:
 
 ```typescript
-// From controls:
-forward: boolean; // Accelerate
-left: boolean; // Steer left
-right: boolean; // Steer right
-reverse: boolean; // Decelerate / reverse
+interface ControlFlags {
+  forward: boolean; // Accelerate
+  left: boolean; // Steer left
+  right: boolean; // Steer right
+  reverse: boolean; // Decelerate / reverse
+}
 ```
+
+The `Car` class reads these flags once per frame during its physics update. The source of the flags is determined by the car's control type.
 
 ---
 
@@ -41,27 +117,55 @@ class Controls {
 
 ### Modes
 
-**KEYS Mode** — Human keyboard input:
+#### KEYS Mode — Human keyboard input
 
-- Registers `keydown` and `keyup` event listeners
-- Supported keys:
-  | Key | Action |
-  |-----|--------|
-  | `ArrowUp` / `W` | Forward |
-  | `ArrowLeft` / `A` | Left |
-  | `ArrowRight` / `D` | Right |
-  | `ArrowDown` / `S` | Reverse |
+Registers `keydown` and `keyup` event listeners on `document`:
 
-**DUMMY Mode** — Traffic cars:
+```typescript
+document.addEventListener('keydown', (e) => {
+  switch (e.key) {
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+      this.forward = true;
+      break;
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+      this.left = true;
+      break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+      this.right = true;
+      break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+      this.reverse = true;
+      break;
+  }
+});
 
-- Sets `forward = true` permanently
-- Car drives straight ahead at constant speed
-- Used for obstacle traffic in training
+document.addEventListener('keyup', (e) => {
+  // Same keys → set flag to false
+});
+```
 
-**AI Mode** — Neural network control:
+Both arrow keys and WASD are supported simultaneously.
 
-- No event listeners registered
-- `forward/left/right/reverse` set externally by neural network output each frame
+#### DUMMY Mode — Traffic cars
+
+```typescript
+// In constructor:
+this.forward = true; // Permanently set
+```
+
+DUMMY cars drive straight ahead at constant speed. No event listeners are registered. They serve as obstacles for the AI to learn to avoid.
+
+#### AI Mode — Neural network control
+
+No event listeners registered. The `forward`/`left`/`right`/`reverse` flags are set externally by the neural network output each frame (see Physics.md → AI Integration).
 
 ---
 
@@ -84,9 +188,9 @@ class PhoneControls {
 }
 ```
 
-### Tilt Detection
+### Tilt Detection (Steering)
 
-Listens to `devicemotion` event:
+Listens to `devicemotion` event for accelerometer data:
 
 ```typescript
 window.addEventListener('devicemotion', (e) => {
@@ -96,38 +200,52 @@ window.addEventListener('devicemotion', (e) => {
 });
 ```
 
-The tilt angle maps directly to the car's steering — tilting the phone left/right steers the car.
+The tilt angle maps directly to the car's steering angle — tilting the phone left/right steers the car proportionally.
 
-### Canvas Rotation
+### Canvas Rotation (Immersive Feedback)
 
-The entire canvas rotates to match the phone's tilt for an immersive feel:
+The entire game canvas rotates to match the phone's tilt for an immersive feel:
 
 ```typescript
-// Smooth interpolation
 const smoothingFactor = 0.4;
 displayAngle = lerp(displayAngle, tilt, smoothingFactor);
 canvas.style.transform = `rotate(${displayAngle}rad)`;
 ```
 
-### Touch Controls
+This creates the illusion that the road stays fixed while the phone (and car) rotate.
+
+### Touch Controls (Acceleration)
 
 ```typescript
 canvas.addEventListener('touchstart', () => {
   if (forward === 0) {
-    forward = 1;
+    forward = 1; // First tap: accelerate
     reverse = 0;
   } else {
-    forward = 0;
+    forward = 0; // Second tap: brake/reverse
     reverse = 1;
   }
 });
 ```
 
-Single tap toggles between forward and reverse.
+Single tap toggles between forward and reverse. Simple one-finger interaction for mobile use.
 
 ### Integration with Car
 
-The phone controls provide analog `tilt` rather than boolean `left/right`. The car integration maps tilt to steering angle directly rather than through discrete button presses.
+The Race class applies phone controls to the car's angle and forward/reverse flags:
+
+```typescript
+// Each frame in Race:
+if (this.phoneControls) {
+  this.myCar.angle = this.phoneControls.tilt; // Direct angle control
+  this.myCar.controls.forward = this.phoneControls.forward;
+  this.myCar.controls.reverse = this.phoneControls.reverse;
+}
+```
+
+### Activation
+
+Phone mode is activated via URL parameter: `/html/race?mode=phone`
 
 ---
 
@@ -135,187 +253,124 @@ The phone controls provide analog `tilt` rather than boolean `left/right`. The c
 
 ### Purpose
 
-Uses a webcam feed to detect physical blue markers (held by the player) and maps their position/distance to car controls. This enables gesture-based driving.
+Controls the car by detecting colored markers in the webcam feed. The player holds or moves physical colored markers (blue objects) in front of the camera.
 
-### Class Structure
+### Architecture
 
-```typescript
-class CameraControls {
-  video: HTMLVideoElement;
-  canvas: HTMLCanvasElement; // Display canvas
-  tempCanvas: HTMLCanvasElement; // Processing canvas (lower resolution)
-  tilt: number; // Steering angle from marker positions
-  forward: boolean;
-  reverse: boolean;
-  markerDetector: MarkerDetector;
-
-  constructor();
-}
+```
+┌──────────────────────────────────────────────┐
+│ Webcam Video Stream                          │
+│   → getUserMedia() captures camera feed      │
+└──────────────┬───────────────────────────────┘
+               │ drawImage(video) each frame
+┌──────────────▼───────────────────────────────┐
+│ Canvas Frame Buffer                          │
+│   → getImageData() extracts pixel array      │
+└──────────────┬───────────────────────────────┘
+               │ pixel RGB analysis
+┌──────────────▼───────────────────────────────┐
+│ MarkerDetector                               │
+│   → Finds blue pixels (R<100, G<100, B>150)  │
+│   → K-means clustering (K=2)                 │
+│   → Returns two marker center positions      │
+└──────────────┬───────────────────────────────┘
+               │ marker positions
+┌──────────────▼───────────────────────────────┐
+│ CameraControls                               │
+│   → Converts marker positions to car inputs  │
+│   → Left/right based on marker arrangement   │
+│   → Forward based on marker distance         │
+└──────────────────────────────────────────────┘
 ```
 
-### Camera Initialization
-
-```typescript
-#initializeCamera() {
-  navigator.mediaDevices.getUserMedia({
-    video: { facingMode: 'user' }   // Front camera
-  }).then(stream => {
-    video.srcObject = stream
-    video.play()
-    requestAnimationFrame(#loop)
-  })
-}
-```
-
-### Processing Loop
-
-Each frame:
-
-1. Draw video frame to `tempCanvas` (downscaled by 4× for performance)
-2. Mirror horizontally (front camera is mirrored)
-3. Get pixel data from `tempCanvas`
-4. Run `markerDetector.detect(imageData)` → `{leftMarker, rightMarker}`
-5. Process marker positions into controls
-
-### Marker → Controls Mapping
-
-```typescript
-#processMarkers(result: { leftMarker, rightMarker }) {
-  if (both markers detected) {
-    // Steering: angle between two markers
-    tilt = Math.atan2(
-      rightMarker.centroid.y - leftMarker.centroid.y,
-      rightMarker.centroid.x - leftMarker.centroid.x
-    )
-
-    // Speed: marker size vs expected size
-    const distance = markerRadius / expectedRadius
-    if (distance > threshold) forward = true
-    else reverse = true
-  }
-}
-```
-
-- **Steering**: Angle of the line connecting left and right markers
-- **Throttle**: How close the markers are to the camera (larger markers = closer = forward)
-
-### Visualization
-
-- Draws camera feed on display canvas
-- Lime dots on detected marker pixels
-- Circle at the midpoint of the two markers (virtual "steering wheel")
-- Status indicators for detection confidence
-
----
-
-## Marker Detector (`ts/car/controls/markerDetector.ts`)
-
-### Purpose
-
-Detects blue-colored physical markers in a camera image using pixel analysis and K-means clustering.
-
-### Class Structure
+### Marker Detection (`ts/car/controls/markerDetector.ts`)
 
 ```typescript
 class MarkerDetector {
-  threshold: HTMLInputElement; // Blueness threshold control
-  thresholdValue: number; // Current threshold (adjustable via mouse wheel)
-
-  detect(imgData: ImageData): {
-    leftMarker: Marker | null;
-    rightMarker: Marker | null;
-  };
+  detect(imageData: ImageData): { markers: Point[]; debug: ImageData };
 }
 ```
 
-### Detection Algorithm
+**Detection algorithm:**
 
-#### Step 1: Blue Pixel Extraction
+1. Scan all pixels in the frame
+2. Identify "blue" pixels where: R < 100 AND G < 100 AND B > 150
+3. Collect all blue pixel positions
+4. Run K-means clustering with K=2 to find two marker centers
+5. Return the two cluster centroids as marker positions
+
+**K-means clustering:**
+
+- Initialize two centroids at random blue pixel positions
+- Iterate: assign each blue pixel to nearest centroid, recompute centroids
+- Converge after ~10 iterations
+- Result: two marker center points
+
+### Steering Logic
 
 ```typescript
-for each pixel (r, g, b):
-  blueness = b - Math.max(r, g)
-  if (blueness > thresholdValue):
-    bluePixels.push({x, y})
+// Two markers detected: compute angle between them
+const markerAngle = Math.atan2(marker2.y - marker1.y, marker2.x - marker1.x);
+
+// Map to car controls
+controls.left = markerAngle > threshold;
+controls.right = markerAngle < -threshold;
+controls.forward = markerDistance < maxDistance;
 ```
 
-"Blueness" is defined as how much the blue channel exceeds red and green.
+The relative position and distance of the two markers controls the car.
 
-#### Step 2: K-Means Clustering (K=2)
+### Activation
+
+Camera mode is activated via URL parameter: `/html/race?mode=camera`
+
+Requires user permission for webcam access (`navigator.mediaDevices.getUserMedia`).
+
+---
+
+## Control Mode Selection (Race)
+
+The Race class selects the appropriate control system based on URL parameters:
 
 ```typescript
-// Initialize two cluster centers (left half, right half of image)
-let c1 = { x: width * 0.25, y: height / 2 }
-let c2 = { x: width * 0.75, y: height / 2 }
+const params = new URLSearchParams(window.location.search);
+const mode = params.get('mode');
 
-// Iterate until convergence:
-for (iterations) {
-  // Assign each blue pixel to nearest center
-  for (pixel of bluePixels) {
-    if (distance(pixel, c1) < distance(pixel, c2))
-      cluster1.push(pixel)
-    else
-      cluster2.push(pixel)
-  }
-  // Recompute centers
-  c1 = centroid(cluster1)
-  c2 = centroid(cluster2)
+switch (mode) {
+  case 'phone':
+    controls = null; // PhoneControls created separately
+    break;
+  case 'camera':
+    controls = null; // CameraControls created separately
+    break;
+  default:
+    controls = new Controls('KEYS'); // Standard keyboard
+    break;
 }
 ```
 
-#### Step 3: Marker Properties
+| URL Parameter  | Control System                      | Input Device  |
+| -------------- | ----------------------------------- | ------------- |
+| (none)         | `Controls('KEYS')`                  | Keyboard      |
+| `?mode=phone`  | `PhoneControls`                     | Accelerometer |
+| `?mode=camera` | `CameraControls` + `MarkerDetector` | Webcam        |
 
-For each cluster:
+---
 
-- **Centroid**: Average (x, y) of all pixels in cluster
-- **Radius**: Average distance from centroid to cluster pixels
-- **Point count**: Number of pixels (confidence metric)
+## Controls in Training (Simulator)
 
-#### Step 4: Left/Right Assignment
-
-The marker with the smaller X centroid is "left", the other is "right".
-
-### Threshold Adjustment
+The simulator always creates one KEYS car alongside the AI population:
 
 ```typescript
-canvas.addEventListener('wheel', (e) => {
-  thresholdValue += e.deltaY > 0 ? 1 : -1;
-  thresholdValue = clamp(thresholdValue, 0, 255);
-});
+// In getStartInfo callback, first car is KEYS type:
+createCarsForTraining(1, 'KEYS', config, startInfo); // Player car
+createCarsForTraining(count, 'AI', config, startInfo); // AI population
 ```
 
-Users can adjust the blue detection sensitivity via mouse wheel to account for different lighting conditions.
+This allows the user to:
 
----
+- Drive manually alongside AI cars
+- Switch camera tracking to follow the KEYS car
+- Compare human vs AI performance in real-time
 
-## Control System Comparison
-
-| System   | Input Device     | Steering        | Throttle       | Latency | Best For             |
-| -------- | ---------------- | --------------- | -------------- | ------- | -------------------- |
-| Keyboard | Computer         | Digital (L/R)   | Digital (F/R)  | Instant | Development/testing  |
-| AI       | Neural Network   | Binary          | Binary         | 1 frame | Training             |
-| Phone    | Accelerometer    | Analog (tilt)   | Touch toggle   | ~50ms   | Mobile demos         |
-| Camera   | Webcam + markers | Analog (angle)  | Distance-based | ~100ms  | Physical interaction |
-| DUMMY    | None             | None (straight) | Always forward | N/A     | Traffic obstacles    |
-
----
-
-## Integration Architecture
-
-```
-┌─────────────────────────────────────────┐
-│              Car.update()                │
-│                                         │
-│  if (type === 'AI' && brain):           │
-│    offsets = sensor.readings → [0-1]    │
-│    outputs = NeuralNetwork.feedForward() │
-│    controls.forward = outputs[0]        │
-│    controls.left    = outputs[1]        │
-│    controls.right   = outputs[2]        │
-│    controls.reverse = outputs[3]        │
-│                                         │
-│  Car.#move(controls) → physics update   │
-└─────────────────────────────────────────┘
-```
-
-All control systems converge to the same boolean interface, making the car physics completely agnostic to the input source.
+The KEYS car is never subject to genetic algorithm operations (selection, mutation, crossover) — it's purely for the human player.

@@ -14,6 +14,8 @@ interface ICameraRenderOptions {
   keyCar?: Car;
   /** The best AI car to extrude (highlighted). */
   bestCar?: Car;
+  /** All cars in the scene; non-key/non-best cars are drawn as flat shadows. */
+  cars?: Car[];
   /** Additional traffic cars to extrude as 3D boxes. */
   traffic?: Car[];
   /** Optional secondary 2D context for drawing the raw 3D polygons (debug). */

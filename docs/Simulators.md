@@ -1,22 +1,93 @@
 # Simulators & Training Environments
 
-The project provides multiple simulation environments for training and testing autonomous cars, each suited to different complexity levels and use cases.
+The project provides multiple simulation environments for training and testing autonomous cars. All training is orchestrated by the `<training-panel>` custom element.
 
 ---
 
-## Training Manager (`ts/ai-training/trainingManagerPanel.ts`)
+## Simulator Shell (`ts/simulator/core/simulatorShell.ts`)
 
-The central training orchestrator — a custom HTML element (`<training-manager-panel>`) that owns both the UI panel and all population/training state. Simulators are thin animation shells that configure this element with callbacks and read its public state.
+Every canvas-based simulator shares the same non-domain scaffolding: four
+canvases, a viewport/camera/mini-map, the shared world-toolbar / layout-toolbar /
+animation-loop-toolbar panels, responsive layout, the neural-network visualizer,
+and a render-throttled animation loop. That scaffolding lives in one reusable
+abstract base class, `SimulatorShell`, so each concrete simulator only writes its
+own behaviour.
+
+```typescript
+abstract class SimulatorShell {
+  // Owned scaffolding (protected, available to subclasses)
+  protected gameCanvas / gameCtx;
+  protected networkCanvas / networkCtx;
+  protected miniMapCanvas;
+  protected cameraCanvas / cameraCtx;
+  protected viewport: Viewport | null;
+  protected miniMap: MiniMap | null;
+  protected camera: Camera | null;
+  protected toolbarPanel: WorldToolbarElement;
+  protected layoutToolbar: LayoutToolbarElement;
+
+  constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas);
+
+  // Shared helpers
+  protected resizeLayout(): void;                       // responsive multi-panel resize
+  protected drawNetworkVisualizer(time, brain): void;   // gated by the visualizer toggle
+  protected animate(time: number): void;                // render-throttled RAF loop
+
+  // Subclass hooks
+  protected abstract update(): void;        // per-frame physics/state step
+  protected abstract draw(time: number): void;  // per-render draw pass
+  protected isPaused(): boolean;            // default: never paused
+  protected onPausedRender(): void;         // default: no-op
+}
+```
+
+### Responsibilities split
+
+| Concern                                       | Owner             |
+| --------------------------------------------- | ----------------- |
+| Canvases + 2D contexts                        | `SimulatorShell`  |
+| Viewport / camera / mini-map references       | `SimulatorShell`  |
+| Toolbar + layout-toolbar panel wiring         | `SimulatorShell`  |
+| Responsive layout + mobile defaults           | `SimulatorShell`  |
+| Network visualizer rendering                  | `SimulatorShell`  |
+| Render-throttled `requestAnimationFrame` loop | `SimulatorShell`  |
+| World loading, car physics, spawning, fitness | Concrete subclass |
+
+### Animation loop contract
+
+`animate()` runs every frame and is never cancelled. It reads the live
+`renderInterval` from the animation-loop-toolbar panel, steps `update()` every
+frame (unless `isPaused()` returns true), and runs the heavier `draw()` pass only
+on render frames. The shared `isPaused()` reads the play/pause toggle owned by
+`<animation-loop-toolbar>`. While paused, render frames call `onPausedRender()`
+instead of `update()`. Subclasses call `this.animate(0)` once at the end of their
+constructor to start the loop.
+
+### Subclasses
+
+| Class               | File                                         | Page              |
+| ------------------- | -------------------------------------------- | ----------------- |
+| `TrainingSimulator` | `ts/simulator/training/trainingSimulator.ts` | `/html/simulator` |
+| `TrafficSimulator`  | `ts/simulator/traffic/trafficSimulator.ts`   | `/html/traffic`   |
+
+---
+
+## Training Manager (`ts/simulator/training/trainingPanel.ts`)
+
+The central training orchestrator — a custom HTML element that owns both the UI panel and all population/training state. Simulators are thin animation shells that configure this element with callbacks and read its public state.
 
 ### Custom Element Pattern
 
-All simulator panels follow the same custom element pattern:
+| Element                   | Tag                   | Responsibility                                                          |
+| ------------------------- | --------------------- | ----------------------------------------------------------------------- |
+| `TrainingPanelElement`    | `<training-panel>`    | Training UI + genetic algorithm + car generation                        |
+| `WorldToolbarElement`     | `<world-toolbar>`     | Border mode, tracking mode, world/car loading                           |
+| `LayoutToolbarElement`    | `<layout-toolbar>`    | Layout toggle, camera/visualizer/minimap toggles, render interval       |
+| `ShortcutsToolbarElement` | `<shortcuts-toolbar>` | Per-page keyboard-shortcut indicators (momentary + click-latch toggles) |
 
-| Element                       | Tag                        | Responsibility                                   |
-| ----------------------------- | -------------------------- | ------------------------------------------------ |
-| `TrainingManagerPanelElement` | `<training-manager-panel>` | Training UI + genetic algorithm + car generation |
-| `TopControlsPanelElement`     | `<top-controls-panel>`     | Border mode, tracking mode, world file loading   |
-| `ViewControlsPanelElement`    | `<view-controls-panel>`    | Layout toggle, camera/visualizer/minimap toggles |
+> `WorldToolbarElement` and `ShortcutsToolbarElement` live in the shared
+> `ts/panels/` directory (not the simulator domain) and are reused across the
+> simulator, race, Live Traffic Jam, and World Editor pages.
 
 Each element:
 
@@ -32,81 +103,75 @@ interface TrainingManagerOptions {
   evaluateFitness: (car: Car) => number;
   getStartInfo: () => { x: number; y: number; angle: number };
   onCarsCreated: (cars: Car[]) => void;
-  onPauseToggle?: (paused: boolean) => void;
 }
 
-class TrainingManagerPanelElement extends HTMLElement {
+class TrainingPanelElement extends HTMLElement {
   // Public state (read by simulators for rendering)
   cars: Car[];
   bestCar: Car | null;
   bestPool: Car[];
   iteration: number;
   maxDistancePassed: number;
-  paused: boolean;
 
   // Lifecycle
-  connectedCallback(): void; // Renders template HTML
-  configure(options): void; // Sets callbacks, inits DOM refs & listeners
+  connectedCallback(): void;
+  configure(options: TrainingManagerOptions): void;
 
   // Training lifecycle
-  initializeCars(): void; // First-time setup (loads brains from localStorage)
-  nextGeneration(): void; // Keeps top brains, mutates rest, increments gen
-  newTraining(): void; // Resets to gen 0, no brains (fresh start)
+  initializeCars(): void;
+  nextGeneration(): void;
+  newTraining(): void;
 
   // Per-frame updates
-  updateDistance(currentDist): void;
+  updateDistance(currentDist: number): void;
   updateStatsDisplay(alive, dead, frozen, maxDist): void;
   updateBestCarAndPool(): void;
 
   // Brain management
-  updateCarsWithBrain(cars): void; // Apply brains from localStorage
-  applyBrainPool(cars, pool): void; // Apply brains from in-memory pool
-  save(): void; // Persist brains + car config to localStorage
-  discard(): void; // Clear all saved data
+  save(): void;
+  discard(): void;
 
   // Car config
-  getSettings(): { carCount; poolSize; mutationRate };
+  getSettings(): {
+    carCount: number;
+    poolSize: number;
+    mutationRate: number;
+    idleRange: number;
+  };
   getCarSettings(): CarInfo;
-  setCarSettings(info): void;
-  applyCarSettingsToCars(cars): void;
+  setCarSettings(info: CarInfo): void;
+  applyCarSettingsToCars(cars: Car[]): void;
 
   // File I/O
-  saveCarToFile(): void; // Download best car as .car JSON
-  // loadCarFromFile → auto-triggers newTraining()
+  saveCarToFile(): void;
 }
 
-customElements.define('training-manager-panel', TrainingManagerPanelElement);
+customElements.define('training-panel', TrainingPanelElement);
 ```
 
-### Usage in Simulator
+### Configuration Flow
 
 ```typescript
-// Get element from DOM (already rendered by browser via <training-manager-panel> tag)
-this.trainingManager = document.querySelector(
-  'training-manager-panel',
-) as TrainingManagerPanelElement;
+// In TrainingSimulator constructor:
+this.trainingManager = document.querySelector('training-panel');
 
-// Configure with callbacks
 this.trainingManager.configure({
-  evaluateFitness: (car) => car.fitness,
-  getStartInfo: () => this.#getStartInfo(),
+  evaluateFitness: (car) => startInfo.y - car.y, // Simple mode: distance upward
+  getStartInfo: () => this.#getStartInfo(), // Spawn position + angle
   onCarsCreated: (cars) => {
-    this.world.cars = cars;
-  },
-  onPauseToggle: (paused) => {
-    /* cancel/resume animation */
+    this.#updateRoadBorders(); // Rebuild corridor/borders for new cars
+    this.animationLoopToolbar.setPaused(false); // Auto-resume on new cars
   },
 });
 
-// Initialize population
 this.trainingManager.initializeCars();
 ```
 
 ### Key Design Decisions
 
-1. **TrainingManagerPanelElement generates cars** — simulators only provide `getStartInfo()` (position + angle). This eliminates duplicated car-creation logic.
+1. **TrainingPanelElement generates cars** — simulators only provide `getStartInfo()` (position + angle). Car creation logic lives in one place.
 
-2. **Two distinct restart modes**:
+2. **Two distinct restart modes:**
 
    - `nextGeneration()` — preserves learning (elitism + mutation)
    - `newTraining()` — clean slate (no brains, generation counter reset)
@@ -118,86 +183,118 @@ this.trainingManager.initializeCars();
 ### Genetic Algorithm Workflow
 
 ```
-┌─────────────────────────────────────────────┐
-│ 1. Load bestBrains + bestCarInfo from       │
-│    localStorage (or legacy global carInfo)   │
-│ 2. generateCars(N) using getStartInfo() +   │
-│    car config from UI                       │
-│ 3. Apply brains:                            │
-│    - First K: exact copies (elitism)        │
-│    - Rest: mutateFromPool(pool, rate)       │
-│ 4. applyCarSettingsToCars() → ensure        │
-│    physics/sensors match UI config          │
-│    - If rayCount changed: rebuild brain     │
-│      architecture [rayCount+1, 6, 4]        │
-├─────────────────────────────────────────────┤
-│ 5. Simulation runs...                       │
-│    - Each frame: update all cars            │
-│    - Track alive/dead/frozen counts         │
-│    - Update best distance stat              │
-│    - updateBestCarAndPool() per frame       │
-├─────────────────────────────────────────────┤
-│ 6. User clicks "Next Gen" (🧬):            │
-│    - Sort by fitness, take top K brains     │
-│    - nextGeneration() → gen++ + mutations   │
-│ 7. User clicks "New Train" (🔄):           │
-│    - newTraining() → gen=0, no brains       │
-│ 8. User clicks "Save" (💾):                │
-│    - Top K brains + CarInfo → localStorage  │
-└─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│ 1. Load pool from localStorage (bestPool key)   │
+│    → If legacy keys exist: auto-migrate         │
+│ 2. createCarsForTraining(N, 'AI', config, pos)  │
+│ 3. applyPoolToCars(cars, pool, rate):           │
+│    - First K: exact brain copies (elitism)      │
+│    - Rest: toMutatedFromPool(brains, rate)      │
+│ 4. If rayCount changed: rebuild brain arch      │
+│    → New architecture: [rayCount+1, ...hidden, 4] │
+├─────────────────────────────────────────────────┤
+│ 5. Simulation runs...                           │
+│    - Each frame: update all cars                │
+│    - Track alive/dead/frozen counts             │
+│    - updateBestCarAndPool() per frame           │
+│    - Update best distance stat                  │
+├─────────────────────────────────────────────────┤
+│ 6. User clicks "Next Gen" (🧬):                │
+│    - getTopCarInfoPool(cars, fitness, K)        │
+│    - nextGeneration() → gen++ + reinitialize    │
+│ 7. User clicks "New Train" (🔄):               │
+│    - Opens the Training-Init modal (see below)  │
+│    - On Start: apply params/config + newTraining │
+│ 8. User clicks "Save" (💾):                    │
+│    - savePoolToStorage(topK)                    │
+└─────────────────────────────────────────────────┘
 ```
 
-### Control Panel UI (`<training-manager-panel>`)
+### Training-Init Modal
 
-The training panel is a custom HTML element that renders its own template. It is placed directly in the HTML:
+`<training-init-modal>` (`TrainingInitModalElement`,
+`ts/simulator/training/trainingInitModal.ts`) replaces the old confusing
+"New Training auto-behaviour + alerts". It opens:
 
-| Control       | Type       | Range      | Purpose                                       |
-| ------------- | ---------- | ---------- | --------------------------------------------- |
-| Car Count     | Number     | 0–5000     | Population per generation                     |
-| Pool Size     | Number     | 1–20       | Number of elite survivors                     |
-| Mutation Rate | Number     | 0.001–1.0  | Randomization strength                        |
-| Save          | Button     | —          | Persist brains + car config to localStorage   |
-| Discard       | Button     | —          | Clear all saved data from localStorage        |
-| Pause         | Button     | —          | Toggle simulation pause                       |
-| Next Gen      | Button     | —          | Next generation (keeps top brains + mutates)  |
-| New Train     | Button     | —          | Fresh training (gen 0, no brains)             |
-| Load World    | File input | .world     | Load custom map                               |
-| Network       | Checkbox   | —          | Show/hide neural network visualizer           |
-| Max Speed     | Number     | 1–20       | Car maximum speed (change → new training)     |
-| Accel         | Number     | 0.01–1     | Car acceleration (change → new training)      |
-| Friction      | Number     | 0.01–0.5   | Car friction (change → new training)          |
-| Width         | Number     | 10–100     | Car body width (change → new training)        |
-| Height        | Number     | 20–150     | Car body height (change → new training)       |
-| Rays          | Number     | 1–20       | Sensor ray count (change → new training)      |
-| Ray Len       | Number     | 50–500     | Sensor ray length (change → new training)     |
-| Ray Spread    | Number     | 0.1–6.28   | Sensor angular spread (change → new training) |
-| Ray Offset    | Number     | -3.14–3.14 | Sensor angular offset (change → new training) |
-| Save Car      | Button     | —          | Download best car as `.car` JSON file         |
-| Load Car      | File input | .car/.json | Load car config (triggers new training)       |
+- **On page entry** (`context: 'entry'`) — Cancel starts training with the
+  previous/default config.
+- **On "New Train" (🔄)** (`context: 'new'`) — Cancel keeps the current run
+  untouched.
 
-**Car config layout**: Uses a 2-column CSS grid (`.car-config-grid`) to fit on small screens.
+The modal collects, prefilled with current/default values:
 
-**Statistics display**:
+- **Training params** — car count, pool size, mutation rate, idle range.
+- **Car config** — height, width, hidden layers, max speed, accel, friction,
+  ray count / length / spread / offset.
+- **Brain source** — `fresh` (discard pool), `pool` (keep stored `bestPool`), or
+  `selected` (seed from the actively-selected store/loaded cars). Sources are
+  enabled only when available and parameter-compatible (via `CarLoader.allParamsMatch`);
+  choosing a non-`fresh` source **locks** the car-config fields to the source's
+  params. Default preference order: `pool` > `selected` > `fresh`.
 
-- Generation count
-- Alive / Dead / Frozen car counts
-- Best distance (all-time)
+Start applies the params/config (`setTrainingParams` + `setCarSettings`), seeds
+the pool per the chosen source, then runs `newTraining()`.
 
-**Pool Statistics table** (below Statistics):
+### Control Panel UI
 
-- Displays the current best pool cars ordered by fitness (best first)
-- Columns: rank (#), car name, fitness value
-- Car names are assigned as the pool index+1 — this lets you see if the same cars from a previous generation remain dominant
+| Control        | Type       | Range      | Purpose                                                            |
+| -------------- | ---------- | ---------- | ------------------------------------------------------------------ |
+| Car Count      | Number     | 0–5000     | Population per generation                                          |
+| Pool Size      | Number     | 1–20       | Number of elite survivors                                          |
+| Mutation Rate  | Number     | 0.001–1.0  | Randomization strength                                             |
+| Idle Range     | Number     | 200–20000  | Freeze cars farther than this from best car                        |
+| Save (💾)      | Button     | —          | Persist brains + car config to localStorage                        |
+| Discard (🗑️)   | Button     | —          | Clear all saved data from localStorage                             |
+| Pause (⏸️)     | Button     | —          | Toggle simulation pause                                            |
+| Next Gen (🧬)  | Button     | —          | Next generation (keeps top brains + mutates)                       |
+| New Train (🔄) | Button     | —          | Opens the Training-Init modal (params + car config + brain source) |
+| Max Speed      | Number     | 1–20       | Car maximum speed (change → new training)                          |
+| Accel          | Number     | 0.01–1     | Car acceleration (change → new training)                           |
+| Friction       | Number     | 0.01–0.5   | Car friction (change → new training)                               |
+| Width          | Number     | 10–100     | Car body width (change → new training)                             |
+| Height         | Number     | 20–150     | Car body height (change → new training)                            |
+| Rays           | Number     | 1–20       | Sensor ray count (change → new training)                           |
+| Ray Len        | Number     | 50–500     | Sensor ray length (change → new training)                          |
+| Ray Spread     | Number     | 0.1–6.28   | Sensor angular spread (change → new training)                      |
+| Ray Offset     | Number     | -3.14–3.14 | Sensor angular offset (change → new training)                      |
+| Save Car       | Button     | —          | Download best car as `.car` JSON file                              |
+| Load Car       | File input | .car/.json | Load car config (triggers new training)                            |
 
-**Status dots** (colored indicators on section titles):
+> **Render interval** lives in the separate `<layout-toolbar>` (not the
+> training panel): a `1 / N frames` number input (1–10, default 2) that throttles
+> the draw rate while physics keeps running every frame. Raise it to push very
+> large populations (the picture jumps but the sim keeps stepping). See
+> [Render Decoupling](#render-decoupling-physics-vs-draw-rate).
+>
+> **Panel DOM throttle.** `updateBestCarAndPool` selects the pool every frame but
+> only re-renders the pool table (`innerHTML`) and status dots (a `localStorage`
+> read) every ~15 frames. `save()`/`discard()` force an immediate refresh.
 
-Each dot shows the localStorage sync state for that section:
+### Statistics Display
 
-| Section    | Green                                  | Orange                                         | Red                  |
-| ---------- | -------------------------------------- | ---------------------------------------------- | -------------------- |
-| Storage    | `bestBrains` exists in localStorage    | —                                              | No stored brains     |
-| Pool       | Stored pool length matches pool size   | Stored pool length differs from current config | No stored brains     |
-| Car Config | Stored config matches current controls | At least one parameter differs                 | No stored car config |
+- **Generation count**: Current generation number
+- **Alive / Dead / Frozen**: Car status breakdown
+- **Best distance**: Maximum fitness value achieved (all-time for this session)
+
+### Pool Statistics Table
+
+Below the main stats, a table displays the current best pool:
+
+| Column  | Content               |
+| ------- | --------------------- |
+| #       | Rank (1 = best)       |
+| Name    | Pool index + 1        |
+| Fitness | Current fitness value |
+
+### Status Dots
+
+Colored indicators on section titles showing localStorage sync state:
+
+| Section    | Green                             | Orange                         | Red                  |
+| ---------- | --------------------------------- | ------------------------------ | -------------------- |
+| Storage    | `bestPool` exists in localStorage | —                              | No stored pool       |
+| Pool       | Stored pool size matches config   | Pool size mismatch with config | No stored pool       |
+| Car Config | Stored config matches UI controls | At least one parameter differs | No stored car config |
 
 ---
 
@@ -205,7 +302,7 @@ Each dot shows the localStorage sync state for that section:
 
 ### Purpose
 
-Entry-level training environment — a straight 3-lane road with random traffic obstacles. Ideal for initial neural network evolution before testing on complex maps. Now unified into the main Simulator via `?mode=simple` URL parameter.
+Entry-level training environment — a straight 3-lane road with random traffic obstacles. Ideal for initial neural network evolution before testing on complex maps.
 
 ### Access
 
@@ -213,20 +310,27 @@ Navigate to `/html/simulator?mode=simple` (or click "Simple Road" on the landing
 
 ### Architecture
 
-Simple mode reuses the `Simulator` class with a different initialization path:
+Simple mode reuses the `TrainingSimulator` class with a different initialization path:
 
 ```typescript
-// Mode detected from URL parameter
 const params = new URLSearchParams(window.location.search);
 this.mode = params.get('mode') === 'simple' ? 'simple' : 'world';
+
+if (this.mode === 'simple') {
+  this.#initSimpleMode(); // Creates SimpleWorld + traffic
+} else {
+  this.#initWorldMode(); // Loads .world file
+}
 ```
 
-Instead of loading a `.world` file, simple mode creates a `SimpleWorld` instance — a lightweight `IWorld` implementation:
+### SimpleWorld (`ts/world/simple/simpleWorld.ts`)
+
+A lightweight `IWorld` implementation:
 
 ```typescript
 class SimpleWorld implements IWorld {
-  graph: Graph; // Minimal 2-node graph
-  roadBorders: Segment[]; // Two vertical border segments (left + right edges)
+  graph: Graph; // Minimal 2-node graph (top → bottom)
+  roadBorders: Segment[]; // Two vertical segments (left + right edges)
   buildings: Building[]; // Empty array (no 3D buildings)
   trees: Tree[]; // Empty array (no trees)
   corridor: null; // No pathfinding needed
@@ -234,66 +338,148 @@ class SimpleWorld implements IWorld {
   cars: Car[];
   bestCar: Car | null;
 
-  getLaneCenter(laneIndex: number): number;
-  getLaneCount(): number;
-  generateCorridor(): void; // No-op
-  draw(ctx, viewPoint): void; // Renders lane dividers + borders
+  constructor(x: number, width: number, laneCount: number = 3);
+
+  getLaneCenter(laneIndex: number): number; // X-coord of lane center
+  getLaneCount(): number; // Number of lanes (default: 3)
+  generateCorridor(): void; // No-op (no corridor in simple mode)
+  draw(ctx, options: WorldDrawOptions): void; // Renders lane dividers + borders
 }
 ```
 
-### Traffic Generation (`ts/ai-training/trafficGenerator.ts`)
+**Road geometry:**
 
-```
-generateInitialTraffic(getLaneCenter, startAngle):
-  - Hardcoded 7 cars in rows at y = -100, -300, -500, -700
-  - Each row has at least one empty lane
+- Width: 180px (configurable)
+- Lanes: 3 (default)
+- Length: effectively infinite (top = -1,000,000, bottom = +1,000,000)
+- Borders: two vertical segments at left and right edges
 
-generateTrafficRow(y, getLaneCenter, laneCount, startAngle):
-  - Choose 1-2 lanes to block (always leave at least 1 gap)
-  - Place DUMMY cars in blocked lanes at position y
-  - DUMMY cars drive forward at speed 2
+**Lane centers:**
 
-Dynamic generation (in draw loop):
-  - New rows spawned 1500 units ahead of leader
-  - Old rows culled 600 units behind
-  - Traffic sorted by y each frame for binary-search spatial lookups
+```typescript
+getLaneCenter(laneIndex: number): number {
+  const laneWidth = this.width / this.laneCount;
+  return this.left + laneWidth / 2 + laneIndex * laneWidth;
+}
 ```
 
-### UI in Simple Mode
+### Traffic Generation (`ts/simulator/training/modes/trafficFactory.ts`)
 
-- **Hidden**: Top controls (border mode, tracking mode, world loader)
-- **Visible**: View controls (layout toggle, 3D camera, network visualizer toggles)
-- **Visible**: Training control panel (car count, mutation, save/discard/restart)
-- **Disabled**: Mini-map checkbox (no minimap data for straight road)
+#### Initial Traffic (`generateInitialTraffic`)
 
-### 3D Camera in Simple Mode
+Hardcoded 7 DUMMY cars in 4 rows:
 
-The Camera works with `SimpleWorld` because it only reads `world.buildings` (empty), `world.trees` (empty), `world.roadBorders` (valid segments), `world.bestCar`, and `world.cars`. Result: renders the road surface and cars in 3D perspective with no buildings or trees visible.
+| Row (Y)  | Occupied Lanes | Empty Lane |
+| -------- | -------------- | ---------- |
+| y = -100 | Lane 1         | 0, 2       |
+| y = -300 | Lanes 0, 2     | 1          |
+| y = -500 | Lanes 0, 1     | 2          |
+| y = -700 | Lanes 1, 2     | 0          |
 
-### Fitness
+Each row always has at least one empty lane, ensuring a path exists.
 
-`fitness = startY - car.y` — how far upward the car traveled from the start position.
+#### Dynamic Traffic (`generateTrafficRow`)
+
+```typescript
+function generateTrafficRow(y, getLaneCenter, laneCount, startAngle): Car[] {
+  // Randomly choose 1-2 lanes to block
+  // Always leave at least 1 lane empty
+  // Place DUMMY cars (maxSpeed: 2) in blocked lanes
+}
+```
+
+### Simple Mode Update Loop (`ts/simulator/training/modes/simpleModeBehavior.ts`)
+
+```typescript
+class SimpleSimState {
+  traffic: Car[];
+  lastGeneratedTrafficY: number;
+  simpleViewY: number;
+}
+
+function updateSimpleTraffic(state, bestCar, simpleWorld, roadBorders, startInfo): void {
+  // 1. Generate new traffic rows ahead of best car (1500px lookahead)
+  while (lastGeneratedTrafficY > bestCar.y - TRAFFIC_LOOKAHEAD) {
+    lastGeneratedTrafficY -= TRAFFIC_ROW_GAP;  // 200px between rows
+    traffic.push(...generateTrafficRow(...));
+  }
+
+  // 2. Cull traffic far behind start (don't cull based on bestCar!)
+  traffic = traffic.filter(c => c.y < startY + 600);
+
+  // 3. Update traffic cars (they drive forward at speed 2)
+  for (const car of traffic) car.update(roadBorders);
+
+  // 4. Sort by Y for binary-search spatial lookups
+  traffic.sort((a, b) => a.y - b.y);
+}
+
+function updateSimpleCars(
+  cars, state, roadBorders, idleEnabled, bestCar, idleRange,
+): { aliveCount; deadCount; frozenCount } {
+  // For each non-damaged car:
+  //   - Idle (freeze) if idleEnabled and it is farther than idleRange
+  //     from the best car (Euclidean distance) → frozenCount++
+  //   - Otherwise: pass the 2 road borders + binary-searched nearby
+  //     traffic (±400px in Y) and update
+}
+```
+
+> **Idle model:** cars far from the best car are frozen, keyed off a configurable
+> `idleRange` (Training panel → "Idle Range"). The earlier "stuck behind traffic"
+> timer (`simpleUpdateCycle` / `trafficIdleStart`) was removed in favor of this
+> single range-based rule, shared with world mode.
+
+**Key constants:**
+
+- `TRAFFIC_LOOKAHEAD`: 1500px ahead of best car
+- `TRAFFIC_ROW_GAP`: 200px between rows
+- `TRAFFIC_SPEED`: 2 px/frame (DUMMY cars)
+
+### Fitness (Simple Mode)
+
+```typescript
+evaluateFitness: (car) => startInfo.y - car.y;
+```
+
+How far upward the car traveled from start. Simple, effective for straight roads.
+
+### UI Differences (Simple Mode)
+
+| Element        | State      | Reason                            |
+| -------------- | ---------- | --------------------------------- |
+| World loader   | Hidden     | No world files in simple mode     |
+| Border mode    | Hidden     | Always damage mode                |
+| Mini-map       | Disabled   | No meaningful map to show         |
+| Camera debug   | Hidden     | Not supported                     |
+| Layout default | Camera-big | 3D view is primary in simple mode |
 
 ---
 
-## Main Simulator (`ts/ai-training/simulator.ts`)
+## Main Simulator — World Mode (`ts/simulator/training/trainingSimulator.ts`)
 
 ### Purpose
 
-Unified training environment supporting two modes:
+Full-featured training environment using custom world maps with roads, buildings, intersections, and defined training corridors.
 
-- **World mode** (default): Loads custom world maps with roads, buildings, intersections, and corridors
-- **Simple mode** (`?mode=simple`): Straight 3-lane road with dynamic traffic (see above)
+### Initialization Flow
 
-### IWorld Interface (`ts/world-editor/types.ts`)
+```
+1. Load .world file (from file input, localStorage fallback, or default)
+2. World.load(worldInfo) → reconstruct full world geometry
+3. world.generateCorridor(start, end) → define training path
+4. TrainingManager generates cars at start marking position
+5. Apply brain pool from localStorage
+6. Begin animation loop
+```
 
-Both `World` and `SimpleWorld` implement the `IWorld` interface, allowing the Simulator, Camera, and other components to work with either representation:
+### IWorld Interface
+
+Both `World` and `SimpleWorld` implement `IWorld`, allowing the TrainingSimulator and Camera to work with either:
 
 ```typescript
 interface IWorld {
   graph: Graph;
-  cars: Car[];
-  bestCar: Car | null;
   markings: Marking[];
   roadBorders: Segment[];
   corridor: Corridor | null;
@@ -302,334 +488,517 @@ interface IWorld {
   zoom?: number;
   offset?: Point;
   generateCorridor(start: Point, end: Point): void;
-  draw(
-    ctx: CanvasRenderingContext2D,
-    viewPoint: Point,
-    showStartMarkings?: boolean,
-  ): void;
+  draw(ctx, options: WorldDrawOptions): void;
+}
+
+interface WorldDrawOptions {
+  viewPoint: Point;
+  cars?: Car[]; // Cars to render (draw-time input, not world state)
+  bestCar?: Car | null; // Highlighted car drawn with its sensor rays
+  showStartMarkings?: boolean;
+  renderRadius?: number;
 }
 ```
-
-### Class Structure
-
-```typescript
-class Simulator {
-  mode: 'world' | 'simple'; // Detected from URL ?mode= param
-  gameCanvas: HTMLCanvasElement;
-  networkCanvas: HTMLCanvasElement;
-  miniMapCanvas: HTMLCanvasElement;
-  cameraCanvas: HTMLCanvasElement;
-  world: IWorld | null; // World or SimpleWorld
-  viewport: Viewport | null;
-  miniMap: MiniMap | null;
-  camera: Camera | null;
-  roadBorders: Point[][] | null;
-  traffic: Car[]; // Simple mode only
-  lastGeneratedTrafficY: number; // Simple mode only
-  borderMode: 'none' | 'damage' | 'collision'; // Default: 'damage'
-  trackingMode: 'none' | 'best' | 'keys'; // Default: 'best'
-  trainingManager: TrainingManagerPanelElement;
-}
-```
-
-### Initialization Flow
-
-1. Load `.world` file (from file input or default)
-2. `World.load(worldInfo)` → reconstruct full world
-3. `world.generateCorridor(start, end)` → define training path
-4. TrainingManagerPanelElement generates cars at start marking position via `getStartInfo()`
-5. Apply brain pool from localStorage
-6. Begin animation loop
-
-### Key Features
-
-- **Custom maps**: Load any `.world` file for diverse training environments
-- **Corridor-based fitness**: Distance along corridor skeleton, not just straight-line
-- **Viewport following**: Camera centers on best car with zoom/pan
-- **Mini-map**: Shows all car positions on the full world graph
-- **Network visualizer**: Best car's brain displayed in real-time
-- **3D Camera view**: Optional perspective rendering following best car
-- **Full obstacles**: Road borders + buildings as collision polygons
-- **Border mode selection**: Three modes for how cars interact with road borders
 
 ### Border Modes
 
-The simulator provides three radio-button options (displayed in the `<top-controls-panel>` custom element) for how cars interact with road borders:
+Three radio-button options in `<world-toolbar>`:
 
-| Mode       | Icon | Behavior                                                   |
-| ---------- | ---- | ---------------------------------------------------------- |
-| No borders | 🚫   | Cars ignore road borders entirely (no collision detection) |
-| Damage     | 💀   | Cars are marked as damaged on collision and stop (default) |
-| Collision  | 🛡️   | Cars are pushed back onto the road and continue driving    |
-
-The collision mode uses the shared `handleCollisionWithRoadBorders()` utility, which projects car polygon points onto the nearest road skeleton segment and corrects position/angle.
+| Mode       | Icon | Behavior                                                           |
+| ---------- | ---- | ------------------------------------------------------------------ |
+| No borders | 🚫   | Cars ignore road borders entirely (no collision detection)         |
+| Damage     | 💀   | Cars are marked damaged on collision and stop (default)            |
+| Collision  | 🛡️   | Cars are pushed back onto road and continue (`borderCollision.ts`) |
 
 ### Tracking Modes
 
-The `<top-controls-panel>` element also includes a **Tracking** radio-button group that controls which car the viewport and 3D camera follow:
+Radio-button group in `<world-toolbar>`:
 
-| Mode     | Icon | Behavior                                                     |
-| -------- | ---- | ------------------------------------------------------------ |
-| No track | ✋   | Viewport stays in place; user can freely drag/pan the canvas |
-| Best car | 🏆   | Centers viewport + camera on the best-fitness car (default)  |
-| Keys car | 🎮   | Centers viewport + camera on the user-controlled (KEYS) car  |
+| Mode     | Icon | Behavior                                            |
+| -------- | ---- | --------------------------------------------------- |
+| No track | ✋   | Viewport stays in place; user pans freely           |
+| Best car | 🏆   | Viewport + camera follow best-fitness car (default) |
+| Keys car | 🎮   | Viewport + camera follow user-controlled KEYS car   |
 
-When tracking is disabled (`none`), the viewport offset is not updated each frame, allowing the user to explore the world freely. The KEYS car is always present alongside AI cars (generated first with `controlType = "KEYS"`), so the user can drive manually and switch the view to follow it.
+### Animation Loop (Pseudocode)
 
-### Animation Loop
+The loop has three clearly separated concerns: **update**, **panel refresh**, and
+**draw**. The RAF always keeps running — pause only gates the update step.
 
 ```typescript
-animate(time) {
-  const cars = trainingManager.cars;
-  const bestCar = trainingManager.bestCar;
+animate(time: number): void {
+  const interval = animationLoopToolbar.renderInterval;
+  const render = framesSinceRender >= interval - 1;
+  framesSinceRender = render ? 0 : framesSinceRender + 1;
 
-  // Update cars based on borderMode:
-  for (car of cars) {
-    if (car.damaged && borderMode !== 'collision') {
-      deadCount++; // Skip damaged cars
-    } else {
-      if (car.damaged && borderMode === 'collision') {
-        handleCollisionWithRoadBorders(car, bordersToCheck);
-      }
-      // Pass nearby borders (empty array if borderMode === 'none')
-      car.update(borderMode === 'none' ? [] : nearbyBorders);
-    }
+  // --- UPDATE PHASE (skipped when paused) ---
+  if (!animationLoopToolbar.paused) {
+    // #updateSimple() or #updateWorld() depending on mode:
+    //   1. Update traffic / AI cars (physics + sensors)
+    //   2. Update training metrics (distance, alive/dead/frozen)
+    //   3. Update viewport offset (camera tracking)
+    //   4. camera.move(trackTarget)  ← tracking is an update concern
+    this.#update();
+  } else if (render) {
+    // While paused the world is frozen but the panel must stay reactive:
+    // pool table and indicator dots respond to settings changes.
+    trainingManager.updateBestCarAndPool();
   }
 
-  // Update training state
-  trainingManager.updateBestCarAndPool()
+  // --- DRAW PHASE (throttled, always runs) ---
+  if (render) {
+    // #drawSimple(time) or #drawWorld(time) depending on mode:
+    //   1. Resize canvases responsively
+    //   2. viewport.reset() + world.draw()
+    //   3. drawSimulatorCars() pool-ranked layers
+    //   4. Visualizer.drawNetwork() (if shown)
+    //   5. miniMap.draw() (if shown, world mode)
+    //   6. camera.render() (if shown) ← render only, move done in update
+    this.#draw(time);
+  }
 
-  // Center viewport based on tracking mode (none / best / keys)
-  const target = getTrackTarget(bestCar) // null if 'none'
-  if (target) viewport.offset = { x: -target.x, y: -target.y }
-
-  // Draw world, cars, network, mini-map, camera
-  world.draw(ctx, viewPoint)
-  drawSimulatorCars(ctx, cars, trainingManager.bestPool, ...)
-  Visualizer.drawNetwork(networkCtx, bestCar.brain)
-  miniMap.draw(viewPoint)
-  if (target) camera.move(target)
-  camera.render(cameraCtx, world)
-
-  requestAnimationFrame(animate)
+  // Loop always continues — pause never cancels the RAF.
+  requestAnimationFrame(this.animate.bind(this));
 }
 ```
+
+### Update/Draw Method Split
+
+Each mode has two private methods with clear ownership:
+
+| Method              | Mode   | Responsibility                                                                 |
+| ------------------- | ------ | ------------------------------------------------------------------------------ |
+| `#updateSimple()`   | Simple | Traffic + car physics, metrics, viewport offset, `camera.move()`               |
+| `#drawSimple(time)` | Simple | Canvas clear, road/traffic/car draw, network vis, `camera.render()`            |
+| `#updateWorld()`    | World  | Car physics via `updateWorldCars()`, metrics, viewport offset, `camera.move()` |
+| `#drawWorld(time)`  | World  | Canvas clear, world/car draw, minimap, network vis, `camera.render()`          |
+
+`camera.move(trackTarget)` belongs to the **update** phase — it advances the
+camera position every frame so 3D rendering uses an up-to-date eye position.
+`camera.render()` belongs to the **draw** phase and is only called on render frames.
+
+### Pause Behavior
+
+Pause **does not** cancel the animation loop. The `paused` flag is read inside
+`animate()` to gate `#update()` only:
+
+- Canvas keeps re-rendering the frozen state (world, cars, visualizer, camera)
+- Pool table and indicator dots refresh every ~15 render frames via `updateBestCarAndPool()`
+- Settings changes (pool count, save/discard) reflect immediately without resuming
+- Play/pause + render interval are owned by `<animation-loop-toolbar>`; the loop is always live
+
+### Render Decoupling (Physics vs Draw Rate)
+
+`animate` computes a `render` flag from a per-frame counter and the panel's
+`renderInterval` (1–10, default 2). **Physics updates every frame; the draw
+pass only runs when `render` is true.** This keeps the simulation stepping at
+the display rate (~60 Hz) even when rendering is the bottleneck — the canvas
+redraws less often (e.g. ~30 fps at interval 2). The value is user-adjustable
+in the [animation-loop-toolbar panel](#control-panel-ui) and applies to both
+world and simple modes. Training throughput and outcomes are unaffected — only
+visual smoothness.
+
+### World Mode Update Loop (`ts/simulator/training/modes/worldModeBehavior.ts`)
+
+The per-frame car-update phase is extracted out of `TrainingSimulator` into a free function,
+mirroring `updateSimpleCars()` in `simpleModeBehavior.ts`. The simulator only computes
+the inputs and reads the returned counts — it no longer owns the update logic:
+
+```typescript
+function updateWorldCars(
+  cars: Car[],
+  borderGrid: SpatialHashGrid,
+  borderMode: BorderMode,
+  collisionBorders: Segment[],
+  bestCar: Car,
+  idleEnabled: boolean,
+  idleRange: number,
+): { aliveCount: number; deadCount: number; frozenCount: number } {
+  // - 'collision' mode: push damaged cars back onto road (handleCollisionWithRoadBorders)
+  // - idle: freeze cars farther than idleRange from the best car (frozenCount++)
+  // - 'none' mode: cars receive no borders
+  // - otherwise: query the SpatialHashGrid for nearby borders (broad phase),
+  //   then keep only the segments actually within the car's reach (narrow phase)
+}
+```
+
+### Fitness (World Mode)
+
+```typescript
+evaluateFitness: (car) => car.fitness; // accumulated distance travelled
+```
+
+Each frame, `car.fitness += car.speed`, so fitness measures the total distance a
+car has driven — the furthest traveller is "best".
 
 ### Performance: Spatial Filtering
 
-With large populations (500+ cars), passing all road border segments to every
-car's `update()` becomes a bottleneck due to O(cars × rays × segments)
-intersection tests.
+Border and obstacle lookups are scoped per-car so each car only senses what it
+can actually reach. World mode uses a two-phase scheme on top of the
+[Spatial Hash Grid](Math.md#spatial-hash-grid-tsmathspatialgridts):
 
-Both simulators use **spatial proximity filtering** to reduce the work:
+| Obstacle type         | Filtering strategy                                               |
+| --------------------- | ---------------------------------------------------------------- |
+| Traffic (simple mode) | Sort by Y, binary-search for nearby range (±400 px)              |
+| Road borders (world)  | Grid query (broad phase) + exact per-car distance (narrow phase) |
 
-| Simulator   | Obstacle type         | Filtering strategy                                |
-| ----------- | --------------------- | ------------------------------------------------- |
-| Simple Road | Traffic cars (moving) | Sort traffic by y, binary-search for nearby range |
-| World       | Road borders (static) | Manhattan-distance filter using segment midpoints |
+**World-mode two-phase border filtering:**
 
-**Threshold**: 250 px (sensor ray length 150 + car height 50 + buffer).
+1. **Broad phase** — `borderGrid.query(car.x, car.y, reach + cellSize)` returns
+   every segment in the surrounding grid cells. `reach = max(sensor.rayLength, MIN)`,
+   so the query radius scales with the car's actual ray length (this fixed the
+   old bug where rays longer than a fixed threshold missed borders).
+2. **Narrow phase** — each candidate is kept only if its exact point-to-segment
+   distance is within `reach + halfCarDiagonal`, using a `sqrt`-free squared
+   distance (`pointToSegmentDistanceSq`). Cell neighbours that are technically
+   nearby but actually out of range are discarded.
 
-Each car only receives polygons/segments within this threshold, typically
-reducing the per-car polygon count from hundreds to ~5–15, yielding roughly
-a 10× speedup at 500+ car populations.
-}
+This reduces each car's per-frame polygon count from the full map down to the
+handful of borders it can really hit, while never dropping a reachable one.
 
-````
-
----
-
-## Simulator Utilities (`ts/ai-training/simulatorUtils.ts`)
-
-Shared rendering logic for the training simulators.
-
-### `drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor)`
-
-Drawing hierarchy:
-
-1. **Regular AI cars**: 20% alpha, skip pool members, viewport-culled
-2. **Pool cars**: 100% alpha, custom color border, visible sensors, rank label
-3. **KEYS car**: Always full opacity
-
-### `drawCarName(ctx, car)`
-
-Draws rank label (#1, #2, etc.) centered at car position with:
-
-- White text with black shadow for contrast
-- Font size proportional to car size
-
-### `handleCollisionWithRoadBorders(car, bordersToCheck)`
-
-Shared collision-response utility used by both the Simulator (in collision mode) and Race mode. Algorithm:
-
-1. Find nearest segment from `bordersToCheck` (corridor skeleton or road borders)
-2. Project each polygon corner onto that segment
-3. Compute correction vectors (segment projection point → polygon point)
-4. Select the corner with the largest correction magnitude
-5. Adjust car angle (±0.1 rad based on which side hit: indices 0,3 → right, 1,2 → left)
-6. Move car by the normalized correction vector
-7. Reset `car.damaged = false` so the car continues driving
+> Simple mode does **not** use the grid: it has only 2 (full-length) borders,
+> passed directly, plus the binary-searched traffic above.
 
 ---
 
-## Racing Mode (`ts/games/race.ts`)
+## Live Traffic Jam Simulator (`ts/simulator/traffic/trafficSimulator.ts`)
 
 ### Purpose
 
-Competitive mode where the player races against AI cars on a corridor path.
+An interactive sandbox where you paint trained cars onto a real world and watch
+them drive themselves. Instead of a population evolving toward a goal, the user
+manually drops cars one at a time and an emergent traffic jam forms as cars
+weave around each other and crash.
 
-### Class Structure
+### Access
+
+Navigate to `/html/traffic` (or click "Live Traffic Jam" 🚦 on the landing page).
+
+### Architecture
+
+`TrafficSimulator extends SimulatorShell` — it reuses all the shared scaffolding
+(canvases, viewport, camera, mini-map, panels, the RAF loop) and only implements
+the traffic-specific `update()` / `draw()` behaviour plus click-to-spawn.
 
 ```typescript
-class Race {
-  gameCanvas, cameraCanvas, miniMapCanvas: HTMLCanvasElement
-  topControlsPanel: TopControlsPanelElement
-  world: World
-  camera: Camera
-  viewport: Viewport
-  miniMap: MiniMap
-  cars: Car[]
-  myCar: Car | null
-  roadBorders: [Point, Point][]
-  frameCount: number
-  started: boolean
-  controls: Controls | null
+class TrafficSimulator extends SimulatorShell {
+  #world: World | null;
+  #roadBorders: GridSegment[];
+  #borderGrid: SpatialHashGrid; // broad-phase border lookups
+  #statsPanel: TrafficPanelElement;
+  #cars: Car[]; // single source of truth (panel is a view)
+  #spawnCount: number; // names cars "Car 1", "Car 2", …
+
+  protected update(): void; // step alive cars + follow selected car
+  protected draw(time): void; // world + cars (wrecks greyed) + camera + stats
+  protected isPaused(): boolean; // mirrors the stats-panel pause toggle
 }
 ```
 
-### Race Flow
+### Spawning a car
+
+The active world is loaded from `StoreManager.getActiveWorld()` (falling back to
+the editor world via `getEditorWorld()`). A **left-click** on the game canvas
+spawns a car at the clicked world point:
 
 ```
-1. Load world with Start + Target markings
-2. Generate corridor (start → target)
-3. Create player car (KEYS) + AI opponents
-4. AI brains: loaded from pool in localStorage
-   - Cars within pool size get exact pool configs (no mutation)
-   - Cars beyond pool size get mutated copies of pool[0]
-   - Player (KEYS) car is never modified by pool
-5. Countdown: 3... 2... 1... GO! (with sound effects)
-6. Race starts: all cars drive simultaneously
-7. Border mode from TopControlsPanel controls collision behavior
-8. Progress tracked: distance along corridor / total corridor length
-9. First to progress >= 1.0 wins
-10. Finish time displayed
+1. Read the single selected car from the toolbar Car selector
+   (toolbarPanel.getSelectedCars()[0]); alert if none selected
+2. point   = viewport.getMouse(event)        ← screen → world coords
+3. heading = face the nearest graph segment  ← getNearestSegment(point, …, 200)
+4. car = new Car({ controlType: 'AI', x, y, angle, color: random })
+         .load(selectedConfig)
+   car.name = `Car ${++spawnCount}`
+5. push to #cars and refresh the stats panel
 ```
 
-### Top Controls Panel Integration
+> **Left-click is free for spawning** — viewport panning uses the **middle**
+> mouse button, so painting cars never conflicts with panning the map.
+>
+> The spawn heading uses the same convention as the world-mode Start marking:
+> `angle = -angle(direction) + Math.PI / 2`.
 
-Race uses `<top-controls-panel>` (same as Simulator) for all controls:
+### Car picker (unified Car selector)
 
-- **World loading**: `WorldLoader` binds to `#loadWorldInput` inside the panel
-- **Car pool loading**: `CarLoader` binds to `#loadCarInput` inside the panel. Accepts ALL selected `.car` files regardless of param differences (unlike Simulator which requires matching params). Each pool car is applied as-is to its corresponding AI car.
-- **Border mode**: Controls how cars interact with road borders (same 3 modes as Simulator)
-- **Tracking mode**: Controls which car the viewport/camera follows
-
-### Car Pool Loading (Race-Specific Behavior)
-
-Unlike the Simulator (which rejects car files with different parameters), Race mode accepts ALL loaded car files into the pool:
-
-1. All `.car` files are parsed and stored as-is in `localStorage("bestPool")`
-2. AI cars `[0..poolSize-1]` receive exact pool configs (brain + physics + sensors) — no mutation
-3. AI cars beyond pool size receive mutated copies of `pool[0]`
-4. The KEYS car (player) is never affected by pool loading
-5. Race reinitializes with the new pool
-
-This allows racing different car configurations against each other (e.g., a fast car with few sensors vs. a slow car with many sensors).
-
-### Collision Handling
-
-Collision behavior is now controlled by the panel's border mode:
-
-| Mode      | Behavior in Race                                          |
-| --------- | --------------------------------------------------------- |
-| None 🚫   | Cars ignore road borders (sensors see nothing)            |
-| Damage 💀 | Cars are damaged on collision and stop driving (default)  |
-| Collision 🛡️ | Cars are pushed back onto road and continue (old behavior) |
-
-The collision mode uses the shared `handleCollisionWithRoadBorders()` utility from `simulatorUtils.ts`.
-
-### Tracking Modes in Race
-
-| Mode     | Behavior                                    |
-| -------- | ------------------------------------------- |
-| None ✋  | Viewport stays in place (free drag/pan)     |
-| Best 🏆  | Follows the leading car by progress         |
-| Keys 🎮  | Follows the player-controlled car (default) |
-
-### Controls
-
-| Mode     | Input                   | URL                      |
-| -------- | ----------------------- | ------------------------ |
-| Keyboard | WASD/Arrows             | `race.html`              |
-| Camera   | Blue markers via webcam | `race.html?mode=camera`  |
-| Phone    | Device tilt             | `race.html?mode=phone`   |
-
-### Sound Effects
+The traffic page uses the world toolbar's **unified Car selector** in
+**single-select** mode — the same selector used by Race (multi) and Training
+(single). It is configured during init via:
 
 ```typescript
-function taDaa(); // Victory celebration (frequency sweep)
-function explode(); // Crash (multi-oscillator noise)
-function beep(freq, waveType); // Countdown beep
+this.toolbarPanel.configureSelectors({
+  carMode: 'single',
+  onWorldSelected: (entry) => this.#loadWorld((entry?.data as World) ?? null),
+});
 ```
 
-Engine sound via `Engine` class — LFO-modulated oscillator with volume/pitch control based on car speed.
+The selector lists **every car across sources** (loaded → store) from
+`StoreManager.getAllCars()`. Spawning reads the active car via
+`toolbarPanel.getSelectedCars()[0]` (which returns `StoreManager.getActiveCars()`);
+if nothing is selected the user is prompted to pick a car first. The old
+`showSpawnCarPicker` / `setSpawnCars` / `getSelectedSpawnCar` /
+`setSpawnCarChangeListener` API has been removed.
+
+### Collision & ghosting
+
+Car physics treats every nearby obstacle polygon the same — road borders and
+other cars alike. The traffic simulator builds each alive car's obstacle set per
+frame and feeds it to `car.update(obstacles)`:
+
+| Obstacle source | Filtering                                                               |
+| --------------- | ----------------------------------------------------------------------- |
+| Road borders    | `SpatialHashGrid` broad phase + exact narrow-phase distance (sqrt-free) |
+| Other cars      | Distance-filtered O(n²) scan (small populations) over **alive** cars    |
+
+Both follow the toolbar **border mode**: when it is `none` there is no collision
+at all (free driving). When a car crashes it becomes **ghosted**:
+
+- It stays on the road, frozen, rendered grey (`showMask: false`).
+- It is excluded from every other car's obstacle set, so traffic flows around
+  the wreck without chain-reaction damage.
+
+### Statistics panel (`<traffic-panel>`)
+
+A side panel (`ts/simulator/traffic/trafficPanel.ts`) lists every placed car
+and is a pure view over the simulator's `#cars` array:
+
+| Column / control | Content                                             |
+| ---------------- | --------------------------------------------------- |
+| Colour swatch    | Car colour (grey when crashed)                      |
+| Name             | `Car N`                                             |
+| Status           | 🟢 alive / 💥 crashed                               |
+| Speed            | Live `car.speed`                                    |
+| Distance         | `Math.round(car.fitness)` (accumulated travel)      |
+| Config (caret)   | Expandable, read-only view of the car's full config |
+| Remove (✕)       | Drops a single car                                  |
+| Clear            | Drops all cars                                      |
+| Pause            | Toggles the simulation (drives `isPaused()`)        |
+
+`setCars(cars)` rebuilds the list when membership changes (spawn / remove /
+clear); `refresh()` updates the live values in place every render frame without
+destroying expand state.
+
+### Interactions
+
+| Listener     | Effect                                                       |
+| ------------ | ------------------------------------------------------------ |
+| Select (row) | Track that car — viewport offset + `camera.move()` follow it |
+| Remove (✕)   | Splice the car out of `#cars` and rebuild the list           |
+| Clear        | Empty `#cars` and rebuild the list                           |
+| Pause        | Freeze `update()` (canvas keeps redrawing)                   |
+
+### Differences from the training simulator
+
+| Aspect         | Training `TrainingSimulator`      | `TrafficSimulator`                       |
+| -------------- | --------------------------------- | ---------------------------------------- |
+| Population     | Generated by the training manager | Hand-placed by the user (click to spawn) |
+| Goal           | Evolve toward best fitness        | None — emergent traffic                  |
+| Car-vs-car     | No (cars ignore each other)       | Yes (with wreck ghosting)                |
+| Side panel     | `<training-panel>`                | `<traffic-panel>`                        |
+| Tracking       | Toolbar tracking mode (best/keys) | Stats-panel selection                    |
+| Toolbar extras | —                                 | Spawn Car picker; tracking group hidden  |
 
 ---
 
-## Viewport System (`ts/viewport/viewport.ts`)
+## Layout Management (`ts/simulator/training/rendering/layoutManager.ts`)
 
-### Transformation
+### Constants
 
 ```typescript
-class Viewport {
-  canvas: HTMLCanvasElement;
-  zoom: number; // 1.0 = normal, higher = zoomed out
-  center: Point; // Canvas center pixel
-  offset: Point; // World origin offset
-  drag: DragState; // Middle-mouse drag tracking
+const LAYOUT_CONTROL_PANEL_WIDTH = 200; // Training panel (left side)
+const LAYOUT_NETWORK_PANEL_WIDTH = 300; // Network + minimap panel (right side)
+const LAYOUT_SMALL_VIEW_WIDTH = 300; // Secondary view width
+```
+
+### Layout Modes
+
+```typescript
+type LayoutMode = 'topview-big' | 'camera-big';
+```
+
+| Mode          | Game Canvas            | Camera Canvas          |
+| ------------- | ---------------------- | ---------------------- |
+| `topview-big` | Main view (large)      | Secondary (300px wide) |
+| `camera-big`  | Secondary (300px wide) | Main view (large)      |
+
+### Resize Logic
+
+```typescript
+function resizeSimulatorLayout(canvases, panelState, viewport): void {
+  // 1. Calculate available width = window - controlPanel - rightPanel
+  //    (the network visualizer reserves width; a floating mini-map does not)
+  // 2. Split remaining between gameCanvas and cameraCanvas based on layout mode
+  // 3. Show/hide rightPanel based on showNetwork || showMiniMap
+  // 4. Allocate network canvas height (full or partial if minimap shown)
+  // 5. Float the mini-map (bottom-left overlay) when the visualizer is hidden
+  // 6. Update viewport center if it exists
 }
 ```
 
-**Transformation pipeline** (applied to canvas context):
+### Mini-map Placement
 
-```
-ctx.translate(center.x, center.y)    // Move origin to canvas center
-ctx.scale(1/zoom, 1/zoom)            // Apply zoom
-ctx.translate(offset.x + dragOffset.x, offset.y + dragOffset.y)  // Apply pan
-```
+The mini-map has two placements driven by the network-visualizer toggle:
 
-**Mouse → World coordinate conversion**:
+| Network visualizer | Mini-map placement                                          |
+| ------------------ | ----------------------------------------------------------- |
+| Visible            | Inline, stacked under the network canvas in the right panel |
+| Hidden             | Floating overlay, fixed in the **bottom-left** corner       |
 
-```
-worldPos = (canvasPos - center) * zoom - offset
-```
+When floating, the mini-map is taken out of flow (`#miniMapCanvas.floating`,
+`position: fixed`) so it no longer reserves the 300px right-panel width — the
+top-down/3D views expand to use the freed space (matching the world editor's
+floating mini-map style).
 
-**Controls**:
-| Input | Action |
-|-------|--------|
-| Scroll wheel | Zoom in/out (step: 0.1, range: 1–5×) |
-| Middle-click + drag | Pan viewport |
+### Panel Visibility
+
+| Panel              | Toggle                         | Default |
+| ------------------ | ------------------------------ | ------- |
+| Network visualizer | `<layout-toolbar>` toggle      | Visible |
+| Mini-map           | `<layout-toolbar>` toggle      | Visible |
+| 3D Camera          | `<layout-toolbar>` toggle      | Visible |
+| Right panel        | Auto (shown if network OR map) | Visible |
+
+> The right panel only reserves layout width when the **network visualizer** is
+> shown. A map-only state keeps the panel element present (so its canvas still
+> renders) but collapses it to zero width via the floating mini-map overlay.
 
 ---
 
-## Mini-Map System (`ts/mini-map/miniMap.ts`)
+## Car Renderer (`ts/simulator/training/rendering/carRenderer.ts`)
+
+### `drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor, prevPoolCars, prevPoolColor, viewportLeft, viewportRight)`
+
+Draws cars in layered order for visual clarity. Each car's `draw()` method is called with `CarDrawOptions` — no external state mutation:
 
 ```typescript
-class MiniMap {
-  canvas: HTMLCanvasElement;
-  graph: Graph;
-  size: number; // Canvas dimension in pixels
-  scaler: number; // World-to-minimap scale factor
-  cars: IMiniMapCar[];
-
-  draw(viewPoint: Point, options?: IMiniMapDrawOptions): void;
+interface CarDrawOptions {
+  showSensor?: boolean; // Draw sensor rays (default: false)
+  showMask?: boolean; // Use sprite image vs colored polygon (default: true)
+  colorOverride?: string; // Override car color without mutating car.color
+  alpha?: number; // Opacity (only set when differing from the batch default)
+  showName?: boolean; // Draw rank label (#1, #2, etc.)
 }
 ```
 
-**Rendering**:
+```
+Layer 1: Regular AI cars
+  - globalAlpha set to 0.2 ONCE for the whole batch (not per car)
+  - car.draw(ctx, { showMask: drawMasks })
+  - Skip pool cars and KEYS car
+  - Viewport culled on BOTH axes (only draw if x AND y within visible bounds)
 
-- All graph segments drawn as thin lines
-- Cars drawn as small circles (gray if damaged, else car color)
-- Viewport center highlighted
-- Everything scaled to fit mini-map canvas size
-````
+Layer 2: Previous pool cars (from last generation)
+  - car.draw(ctx, { colorOverride: 'lime', showMask: true, showName: true })
+  - Skip cars that are also in current pool
+
+Layer 3: Current pool cars
+  - car.draw(ctx, { colorOverride: 'gold', showMask: true, showName: true, showSensor: isBest })
+  - Only best car (#1) gets sensor ray rendering
+  - Drawn lowest-rank first so best is on top
+
+Layer 4: KEYS car (if present)
+  - car.draw(ctx, { showMask: drawMasks })
+  - Always visible
+```
+
+### Rendering performance: cached mask sprites
+
+`drawMasks` is enabled while `carCount <= 5000`. The mask is no longer rebuilt
+per frame: `Car` keeps one shared sprite image plus a static cache of
+pre-composited, color-tinted sprites keyed by `${color}|${width}|${height}`. The
+expensive fill + `destination-atop` + `multiply` compositing happens **once** per
+unique key; thereafter every car of that color/size draws with a single
+`drawImage`. This is what keeps masked rendering cheap at large populations (the
+threshold was raised from 500 to 5000 after this change). Damaged cars (or cars
+drawn before the sprite image has loaded) fall back to the plain car image.
+
+---
+
+## Pool Manager (`ts/simulator/training/genetics/poolManager.ts`)
+
+Pure functions for car population management:
+
+### `createCarsForTraining(count, type, config, startInfo): Car[]`
+
+Creates N identical cars at the start position with given physics/sensor config. All cars start with randomly initialized brains.
+
+### `brainsCompatible(a, b): boolean`
+
+Checks that two networks have identical topology (same number of levels; same
+input and output size at each level). Used as a guard in `applyPoolToCars` before
+any brain assignment.
+
+### `applyPoolToCars(cars, pool, mutationRate): void`
+
+Applies saved brains to the car population. Before each assignment, topology
+compatibility is checked — if the stored brain does not match the freshly-created
+car's architecture (e.g. user changed hidden layers), the assignment is silently
+skipped and the car keeps its randomly-initialized correct-topology brain:
+
+- First K cars (K = pool.length): exact copy of stored brain, **if compatible**
+- Remaining cars: `NeuralNetwork.toMutatedFromPool(brains, mutationRate)`, **if compatible**
+
+This fixes the bug where changing hidden layers had no visible effect — new cars
+were built with the correct topology but then immediately overwritten with
+incompatible stored brains.
+
+### `getSortedAICars(cars, evaluateFitness): Car[]`
+
+Returns AI cars sorted by fitness (best first). Excludes KEYS cars. Used by the
+infrequent paths (save, next-generation) that need a full ordering.
+
+### `getTopAICars(cars, evaluateFitness, k): Car[]`
+
+Returns just the top `k` AI cars by fitness, highest first, in a single
+partial-selection pass — **no full sort and no filtered-array allocation**.
+Equivalent to `getSortedAICars(...).slice(0, k)` but far cheaper for the
+**per-frame** `updateBestCarAndPool` call, where `k` (pool size, ≤20) is tiny
+relative to the population (thousands). Verified equivalent to the full-sort
+reference over randomized trials.
+
+### `getTopCarInfoPool(cars, evaluateFitness, poolSize): CarInfo[]`
+
+Returns the top K car configurations as `CarInfo[]` for storage/next generation.
+
+---
+
+## Storage Manager (`ts/simulator/training/genetics/storageManager.ts`)
+
+### `loadPoolFromStorage(fallbackConfig?): CarInfo[]`
+
+```
+1. Try unified key: localStorage.getItem('bestPool')
+2. If found: parse and return
+
+3. Legacy migration (auto-triggered on first load):
+   - Read 'bestBrains' or 'bestBrain' (old format: just networks)
+   - Read 'bestCarInfo' (old format: physics only)
+   - Combine into unified CarInfo[] pool
+   - Write to 'bestPool', delete legacy keys
+   - Log migration message
+
+4. If nothing found: return []
+```
+
+### `savePoolToStorage(pool: CarInfo[]): void`
+
+Writes `JSON.stringify(pool)` to `localStorage['bestPool']`.
+
+### `discardStoredPool(): void`
+
+Removes `bestPool` and all legacy keys from localStorage.
+
+### `loadRaceCars(): CarInfo[]` / `saveRaceCars(pool: CarInfo[]): void`
+
+Race-only car list persistence under the `raceCars` key. Used by the race "Load
+car(s)" button so race-loaded cars never overwrite the training pool. The
+simulator/training mode remains the sole owner of `bestPool`.
+
+### Store seeding (multi-select)
+
+On startup the training panel seeds the pool from the store's active cars when
+no `bestPool` exists. With multi-select store cars, the panel uses
+`StoreManager.getActiveCars()`:
+
+- If all selected cars share identical params (`CarLoader.allParamsMatch`), the
+  whole selection seeds the pool (`savePoolToStorage(activeCars)`).
+- Otherwise it alerts and seeds only the first selected car.

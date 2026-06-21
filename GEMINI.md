@@ -53,7 +53,7 @@ npm start            # Runs: tsc --watch + serve -p 9090 + auto-format/lint
 - **Formatting**: Prettier with `singleQuote: true`
 - **Naming**: PascalCase for classes, camelCase for functions/variables
 - **Private members**: Use `#` prefix (ES2022 private fields)
-- **Type declarations**: Global types in `ts/types.ts`, editor types in `ts/world-editor/types.ts`
+- **Type declarations**: Global types in `ts/types.ts`, world/editor types in `ts/world/types.ts`
 - **Static methods**: Prefer static factory methods (`World.load()`, `Graph.load()`, `Marking.load()`)
 - **Drawing**: Classes own their `draw(ctx, ...options)` method
 - **Serialization**: Objects know how to serialize/deserialize themselves via `static load(info)`
@@ -72,21 +72,31 @@ ts/                         # TypeScript source (THE source of truth)
 ├── car/                    # Vehicle system
 │   ├── car.ts              # Physics, collision, AI integration
 │   ├── sensors/            # Ray-casting perception
-│   └── controls/           # Input: keyboard, phone, camera, AI
+│   ├── controls/           # Input: keyboard, phone, camera, AI
+│   └── loader/             # .car/.json file-input loader
 ├── neural-network/         # Feedforward network + visualizer
-├── world-editor/           # World generation + editing tools
+├── world/                  # World generation + editing tools
 │   ├── world.ts            # Procedural generation
 │   ├── trafficManager.ts   # Traffic light cycling
 │   ├── editors/            # Interactive editors (graph, markings)
 │   ├── items/              # Building, Tree (3D rendering)
-│   └── markings/           # Start, Stop, Light, Crossing, etc.
-├── ai-training/            # Training simulators + genetic algorithm
-├── simple-world/           # Lightweight IWorld for simple road training
+│   ├── markings/           # Start, Stop, Light, Crossing, etc.
+│   ├── simple/             # Lightweight IWorld for simple road training
+│   └── loader/             # .world file-input loader
+├── simulator/              # Simulator domain
+│   ├── core/               # SimulatorShell: shared canvas/RAF scaffolding
+│   ├── traffic/            # Live Traffic Jam + <traffic-panel>
+│   ├── panels/             # <world-toolbar>, <layout-toolbar>, <animation-loop-toolbar>
+│   └── training/           # Training sim + <training-panel>
+│       ├── genetics/       # Pool + storage managers
+│       ├── modes/          # Simple/world update loops, traffic, collision
+│       └── rendering/      # Car renderer + layout manager
+├── store/                  # Bundled store assets + <store-panel>
 ├── games/                  # Racing mode
 ├── viewport/               # Pan/zoom transformation
 ├── mini-map/               # Scaled world overview
-├── camera.ts               # 3D perspective projection
-├── sound.ts                # Audio synthesis
+├── camera/                 # 3D perspective projection
+├── audio/                  # Audio synthesis (sound.ts)
 ├── utils.ts                # Collision helpers
 └── types.ts                # Global type declarations
 
@@ -113,17 +123,17 @@ docs/                       # Technical documentation
 
 ### Adding a new marking type:
 
-1. Create `ts/world-editor/markings/newMarking.ts` extending `Marking`
-2. Create `ts/world-editor/editors/newMarkingEditor.ts` extending `MarkingEditor`
+1. Create `ts/world/markings/newMarking.ts` extending `Marking`
+2. Create `ts/world/editors/newMarkingEditor.ts` extending `MarkingEditor`
 3. Add to `Marking.load()` switch statement for deserialization
 4. Add editor activation in `worldEditor.ts`
 5. Add script tags to `html/world.html` and simulator HTML files
 
 ### Adding a new simulation mode:
 
-1. Create a new `IWorld` implementation in `ts/` (e.g., `ts/simple-world/simpleWorld.ts`)
-2. Add mode detection to `Simulator` constructor via URL parameter (e.g., `?mode=mymode`)
-3. Add `#initMyMode()` and `#drawMyMode()` methods to `Simulator`
+1. Create a new `IWorld` implementation in `ts/` (e.g., `ts/world/simple/simpleWorld.ts`)
+2. Add mode detection to `TrainingSimulator` constructor via URL parameter (e.g., `?mode=mymode`)
+3. Add `#initMyMode()` and `#drawMyMode()` methods to `TrainingSimulator`
 4. Add script tag to `html/simulator.html` in correct dependency order
 5. Add link to `index.html` landing page (use clean URL: `html/simulator?mode=mymode`)
 6. Register new globals in `eslint.config.mjs`

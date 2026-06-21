@@ -9,6 +9,23 @@ body {
   box-sizing: border-box;
 }
 
+/* ── Global custom scrollbar ───────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 body:not(.main-page) {
   background: darkgray;
   overflow: hidden;
@@ -27,6 +44,7 @@ body.main-page {
   color: #e8e8e8;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* ── Simulator layout ──────────────────────────────────────────── */
@@ -55,22 +73,38 @@ body.main-page {
 
 /* ── Landing page ──────────────────────────────────────────────── */
 .landing-header {
-  padding: 60px 20px 30px;
+  padding: 24px 20px 12px;
   text-align: center;
 }
 
 .landing-header h1 {
-  font-size: 2.8rem;
+  font-size: 2rem;
   font-weight: 800;
-  margin: 0 0 12px;
+  margin: 0 0 6px;
   background: linear-gradient(135deg, #7ddf7d, #4ecdc4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+.landing-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  max-width: 100%;
+}
+
+.landing-logo {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  filter: drop-shadow(0 2px 8px rgba(78, 205, 196, 0.35));
+}
+
 .landing-header .subtitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #888;
   margin: 0;
 }
@@ -81,7 +115,7 @@ body.main-page {
   gap: 24px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 24px 60px;
+  padding: 12px 24px 40px;
 }
 
 .landing-card {
@@ -90,6 +124,10 @@ body.main-page {
   border-radius: 16px;
   padding: 32px 28px;
   text-align: left;
+  min-width: 0;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
   transition:
     border-color 0.2s,
     transform 0.2s;
@@ -185,16 +223,133 @@ body.main-page {
   overflow-y: auto;
   overflow-x: hidden;
   order: 20;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-#trainingManagerPanel::-webkit-scrollbar {
-  width: 4px;
+/* ── Traffic Stats Panel ────────────────────────────────────────── */
+#trafficStatsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: rgba(15, 15, 20, 0.92);
+  min-width: 180px;
+  max-width: 200px;
+  width: 200px;
+  flex-shrink: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  order: 20;
 }
-#trainingManagerPanel::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
+
+.traffic-count {
+  margin-top: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.traffic-empty {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.4;
+  padding: 4px 0;
+}
+
+.traffic-cars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.traffic-car-row {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  padding: 5px 6px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+}
+
+.traffic-car-row.selected {
+  border-color: rgba(255, 215, 0, 0.7);
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.traffic-car-row.crashed {
+  opacity: 0.65;
+}
+
+.traffic-car-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.traffic-car-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.traffic-car-name {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e8e8e8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.traffic-car-status {
+  font-size: 12px;
+}
+
+.traffic-car-remove {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.traffic-car-remove:hover {
+  color: #ff6b6b;
+}
+
+.traffic-car-metrics {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.traffic-car-config {
+  display: none;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.traffic-car-row.expanded .traffic-car-config {
+  display: block;
+}
+
+.traffic-car-config .cfg-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 1px 0;
+}
+
+.traffic-car-config .cfg-row b {
+  color: #d8d8d8;
 }
 
 /* ── Panel sections ────────────────────────────────────────────── */
@@ -273,6 +428,49 @@ body.main-page {
   color: #e8e8e8;
   min-width: 28px;
   text-align: right;
+}
+
+/* Combined Gen + Dist row: two emoji/label/value groups sharing one line. */
+.stat-row-double {
+  gap: 4px;
+}
+.stat-row-double .stat-label {
+  flex: 0 1 auto;
+}
+.stat-row-double .stat-value {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.stat-row-double .stat-emoji + .stat-label {
+  margin-left: 0;
+}
+.stat-row-double .stat-value + .stat-emoji {
+  margin-left: 4px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Compact idle-range input tucked under the Idle toggle row. */
+.idle-range-wrap {
+  margin-top: 2px;
+  display: flex;
+  justify-content: center;
+}
+.num-input-row-sm {
+  gap: 2px;
+}
+.num-input-row-sm input[type='number'] {
+  width: 48px;
+  flex: 0 0 auto;
+  padding: 2px 4px;
+  font-size: 11px;
+}
+.num-input-row-sm .num-btn {
+  width: 18px;
+  min-width: 18px;
+  max-width: 18px;
+  height: 18px;
+  font-size: 9px;
 }
 
 /* ── Status dots ───────────────────────────────────────────────── */
@@ -449,6 +647,14 @@ body.main-page {
   background: rgba(200, 60, 60, 0.2);
   color: #e88;
 }
+.btn-sm.btn-warning-outline {
+  border: 1px solid rgba(200, 150, 40, 0.3);
+  color: #ca8;
+}
+.btn-sm.btn-warning-outline:hover {
+  background: rgba(200, 150, 40, 0.2);
+  color: #ec9;
+}
 .btn-sm.btn-success-outline {
   border: 1px solid rgba(60, 200, 60, 0.3);
   color: #8c8;
@@ -484,12 +690,59 @@ body.main-page {
 /* ── Car Config 2-column grid ──────────────────────────────────── */
 .car-config-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 6px;
 }
 
 .car-config-grid .ctrl-wide {
   grid-column: 1 / -1;
+}
+
+/* ── Collapsible Car Config ────────────────────────────────────── */
+.section-title-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+.collapse-caret {
+  display: inline-block;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.5);
+  transition: transform 0.15s;
+  transform: rotate(90deg);
+}
+.car-config-section.collapsed .collapse-caret {
+  transform: rotate(0deg);
+}
+.car-config-section.collapsed .car-config-grid {
+  display: none;
+}
+.car-config-section:not(.collapsed) .car-config-summary {
+  display: none;
+}
+
+/* Collapsed summary: emoji + readonly value chips. */
+.car-config-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.cfg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 5px;
+}
+.cfg-chip-emoji {
+  font-size: 11px;
+  line-height: 1;
+}
+.cfg-chip-value {
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 700;
+  color: #e0e0e0;
 }
 
 .ctrl-label {
@@ -527,7 +780,8 @@ body.main-page {
 }
 
 /* Number inputs */
-#trainingManagerPanel input[type='number'] {
+#trainingManagerPanel input[type='number'],
+#trainingManagerPanel input[type='text'] {
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
@@ -542,7 +796,8 @@ body.main-page {
     border-color 0.15s,
     background 0.15s;
 }
-#trainingManagerPanel input[type='number']:focus {
+#trainingManagerPanel input[type='number']:focus,
+#trainingManagerPanel input[type='text']:focus {
   outline: none;
   border-color: rgba(255, 200, 50, 0.6);
   background: rgba(255, 255, 255, 0.12);
@@ -648,11 +903,19 @@ input[type='file'] {
 }
 
 /* ── Top Controls (floating panel near world loader) ───────────── */
-#topControls {
+#simulatorToolbar {
   position: absolute;
   top: 10px;
   left: 10px;
   z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 60%;
+}
+
+#topControls {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -708,6 +971,142 @@ input[type='file'] {
   gap: 2px;
 }
 
+.spawn-car-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.spawn-car-select {
+  height: 32px;
+  max-width: 140px;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 12px;
+  padding: 0 6px;
+  cursor: pointer;
+}
+
+.spawn-car-select option {
+  color: #000;
+}
+
+/* ── Asset pickers (world / car library popovers) ─────────────── */
+.asset-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.asset-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+  max-width: 300px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(20, 20, 25, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.asset-popover[hidden] {
+  display: none;
+}
+
+.asset-load-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.asset-load-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.asset-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.asset-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.asset-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.asset-item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-item-src {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.asset-empty {
+  padding: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+
+/* ── Selected world / car summary ─────────────────────────────── */
+.selected-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.selected-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 160px;
+}
+
+.selected-tag {
+  font-size: 11px;
+}
+
+.selected-name {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .border-mode-btn {
   display: flex;
   align-items: center;
@@ -734,13 +1133,15 @@ input[type='file'] {
   opacity: 1;
 }
 
-/* ── View Controls (floating panel top center) ─────────────────── */
-#viewControls {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+.border-mode-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.25;
+}
+
+/* ── Layout Toolbar (floating panel, grouped in #simulatorToolbar) ── */
+#layoutToolbar,
+#animationLoopToolbar,
+#shortcutsToolbar {
   display: flex;
   align-items: stretch;
   gap: 6px;
@@ -748,6 +1149,81 @@ input[type='file'] {
   padding: 6px 10px;
   border-radius: 8px;
   outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ── Keyboard shortcuts toolbar (<shortcuts-toolbar>) ── */
+#shortcutsToolbar .shortcuts-groups {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.shortcuts-keys {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.key-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 5px;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: bold;
+  color: #888;
+  background-color: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: default;
+  position: relative;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+  user-select: none;
+}
+
+.key-indicator.clickable {
+  cursor: pointer;
+}
+
+.key-indicator.active {
+  color: #fff;
+  background-color: #2a8a2a;
+  border-color: #4cdf4c;
+  box-shadow: 0 0 6px rgba(76, 223, 76, 0.6);
+}
+
+.key-indicator.flash {
+  color: #fff;
+  background-color: #c08020;
+  border-color: #ffb040;
+  box-shadow: 0 0 6px rgba(255, 176, 64, 0.6);
+}
+
+.key-indicator[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: normal;
+  max-width: 280px;
+  width: max-content;
+  z-index: 100;
+  pointer-events: none;
 }
 
 .view-toggles {
@@ -758,6 +1234,7 @@ input[type='file'] {
 .view-toggle-label {
   display: flex;
   align-items: center;
+  min-height: 32px;
   gap: 4px;
   cursor: pointer;
   font-size: 10px;
@@ -793,6 +1270,18 @@ input[type='file'] {
   display: block;
 }
 
+/* When the network visualizer is hidden, the mini-map floats as an overlay in
+   the bottom-left corner. It then mirrors the world editor's mini-map styling
+   (green backdrop) rather than the black backdrop that only matches when it
+   sits next to the network visualizer. */
+#miniMapCanvas.floating {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 5;
+  outline: 2px solid black;
+}
+
 #cameraCanvas {
   background-image: linear-gradient(#8cf, white 70%);
   display: block;
@@ -801,11 +1290,6 @@ input[type='file'] {
 
 /* ── Race Panel (top center) ───────────────────────────────────── */
 #racePanel {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -815,37 +1299,12 @@ input[type='file'] {
   outline: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.race-panel-label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-family: Arial, sans-serif;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-#carsInRaceInput {
-  width: 50px;
-  height: 28px;
-  border: none;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  font-size: 12px;
-  text-align: center;
-  padding: 0 4px;
-}
-
-#carsInRaceInput:focus {
-  outline: 1px solid rgba(255, 255, 255, 0.5);
-}
-
 .race-panel-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  height: 28px;
+  height: 32px;
   border: none;
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.15);
@@ -905,4 +1364,432 @@ input[type='file'] {
   width: 300px;
   border-radius: 10px;
   opacity: 50%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Store Manager Panel
+   ═══════════════════════════════════════════════════════════════ */
+
+store-panel {
+  display: block;
+  grid-column: span 2;
+  min-width: 0;
+}
+
+.store-panel {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-height: 500px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.store-panel:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.store-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.store-panel-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.store-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.store-tab {
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.store-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.store-tab.active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.5);
+  color: #fff;
+}
+
+.store-tab-count {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.store-tab.active .store-tab-count {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.store-tab-content {
+  display: none;
+}
+
+.store-tab-content.active {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.store-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.store-table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  background: #16161c;
+  z-index: 1;
+}
+
+.store-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.store-table th.sortable:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.store-table th.sortable::after {
+  content: '';
+  display: inline-block;
+  margin-left: 4px;
+  opacity: 0.4;
+}
+
+.store-table th.sortable.sort-asc::after {
+  content: '▲';
+  opacity: 0.9;
+}
+
+.store-table th.sortable.sort-desc::after {
+  content: '▼';
+  opacity: 0.9;
+}
+
+.store-table td {
+  padding: 8px 10px;
+  color: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.store-table tr:last-child td {
+  border-bottom: none;
+}
+
+.store-row-active {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.store-marker {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.store-source {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.store-empty {
+  text-align: center;
+  padding: 24px;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+.store-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.store-action-btn {
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+
+.store-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.store-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.store-export-btn:hover {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.store-table input[type='radio'] {
+  accent-color: #6366f1;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ── Mobile / phone layout (<= 768px) ──────────────────────────── */
+@media (max-width: 768px) {
+  /* Main page: stack landing cards full-width, one per row */
+  .landing-header {
+    padding: 32px 16px 16px;
+  }
+  .landing-header h1 {
+    font-size: 1.6rem;
+  }
+  .landing-logo {
+    width: 40px;
+    height: 40px;
+  }
+  .landing-header .subtitle {
+    font-size: 0.95rem;
+  }
+  .landing-sections {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+  .landing-card {
+    padding: 24px 20px;
+  }
+
+  store-panel {
+    grid-column: span 1;
+  }
+  .store-panel {
+    padding: 24px 20px;
+  }
+
+  /* Store worlds/cars tables: keep only Active + Filename columns */
+  .store-tab-content[data-content='worlds'] .store-table th:nth-child(n + 3),
+  .store-tab-content[data-content='worlds'] .store-table td:nth-child(n + 3),
+  .store-tab-content[data-content='cars'] .store-table th:nth-child(n + 3),
+  .store-tab-content[data-content='cars'] .store-table td:nth-child(n + 3) {
+    display: none;
+  }
+
+  /* Store localStorage table: hide the Size column */
+  .store-tab-content[data-content='localStorage'] .store-table th:nth-child(2),
+  .store-tab-content[data-content='localStorage'] .store-table td:nth-child(2) {
+    display: none;
+  }
+
+  /* Simulator toolbar: hide the Viewport and Borders sections */
+  #topControls [data-group='viewport'],
+  #topControls [data-group='viewport-sep'],
+  #topControls [data-group='borders'],
+  #topControls [data-group='borders-sep'] {
+    display: none;
+  }
+
+  /* Landing Games section: keep only the phone-tilt race option */
+  .landing-card a[href='html/race.html'],
+  .landing-card a[href='html/race.html?mode=camera'] {
+    display: none;
+  }
+
+  /* Simulator layout toolbar: fully hidden on phones (top-down view only) */
+  #layoutToolbar {
+    display: none;
+  }
+
+  /* Shrink the training manager panel so it fits fully on screen */
+  #trainingManagerPanel {
+    min-width: 140px;
+    max-width: 140px;
+    width: 140px;
+  }
+  #trainingManagerPanel .panel-section {
+    padding: 8px 6px;
+  }
+  #trainingManagerPanel .section-title {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+  #trainingManagerPanel input[type='number'],
+  #trainingManagerPanel input[type='text'] {
+    font-size: 11px;
+    padding: 4px 4px;
+  }
+
+  /* Reposition floating controls so they don't overlap or overflow */
+  #topControls {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px 6px;
+    max-width: calc(100vw - 20px);
+  }
+}
+
+/* ── Training-init modal ─────────────────────────────── */
+training-init-modal {
+  display: none;
+}
+
+training-init-modal.open {
+  display: block;
+}
+
+.ti-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  padding: 16px;
+}
+
+.ti-dialog {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: #1b1d24;
+  color: #e7e9ee;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  padding: 20px;
+}
+
+.ti-header {
+  margin-bottom: 12px;
+}
+
+.ti-title {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.ti-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ti-section {
+  margin-top: 16px;
+}
+
+.ti-section-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+}
+
+.ti-config-note {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-left: 6px;
+}
+
+.ti-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ti-source {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ti-source:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ti-source.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ti-source input {
+  margin-top: 3px;
+}
+
+.ti-source-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ti-source-name {
+  font-size: 0.9rem;
+}
+
+.ti-source-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ti-param-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.ti-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
 }

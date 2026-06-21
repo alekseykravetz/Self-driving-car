@@ -8,11 +8,15 @@ import tsParser from '@typescript-eslint/parser';
 /** Names that are allowed to be defined but unused (global script-tag functions/classes). */
 const allowedUnusedVars = [
   // types
-  'world',
-  'carInfo',
   'PointDrawOptions',
   'SegmentDrawOptions',
   'PolygonDrawOptions',
+  'CarDrawOptions',
+  'BuildingDrawOptions',
+  'TreeDrawOptions',
+  'MiniMapDrawOptions',
+  'IMiniMapCar',
+  'WorldDrawOptions',
   'IWorld',
   'Corridor',
 
@@ -21,6 +25,8 @@ const allowedUnusedVars = [
   'Segment',
   'Envelope',
   'Polygon',
+  'SpatialHashGrid',
+  'GridSegment',
 
   // math
   'Graph',
@@ -40,6 +46,7 @@ const allowedUnusedVars = [
   'translate',
   'angle',
   'getIntersection',
+  'getIntersectionOffset',
   'lerp',
   'lerp2D',
   'invLerp',
@@ -47,6 +54,9 @@ const allowedUnusedVars = [
   'degToRad',
   'getRandomColor',
   'getFake3dPoint',
+  'safeJsonParse',
+  'parseCarFileContent',
+  'compareCarInfoParams',
 
   // world items
   'Building',
@@ -63,6 +73,7 @@ const allowedUnusedVars = [
   'LightEditor',
   'StopEditor',
   'YieldEditor',
+  'CorridorEditor',
 
   // markings
   'Marking',
@@ -77,9 +88,11 @@ const allowedUnusedVars = [
   // world
   'TrafficManager',
   'World',
+  'WorldGenerator',
   'SimpleWorld',
   'Viewport',
-  'Simulator',
+  'TrainingSimulator',
+  'SimulatorShell',
   'Camera',
   'CameraControls',
 
@@ -95,7 +108,7 @@ const allowedUnusedVars = [
   'Sensor',
 
   // sound
-  'Engine',
+  'SoundEngine',
   'taDaa',
   'explode',
   'beep',
@@ -110,15 +123,44 @@ const allowedUnusedVars = [
 
   // training / simulator UI
   'TrainingManager',
-  'TrainingManagerPanelElement',
-  'TopControlsPanelElement',
-  'ViewControlsPanelElement',
+  'TrainingPanelElement',
+  'WorldToolbarElement',
+  'LayoutToolbarElement',
+  'AnimationLoopToolbarElement',
+  'ShortcutsToolbarElement',
+  'TrafficPanelElement',
+  'TrafficSimulator',
+  'WORLD_TOOLBAR_TEMPLATE',
+  'LAYOUT_TOOLBAR_TEMPLATE',
+  'ANIMATION_LOOP_TOOLBAR_TEMPLATE',
+  'SHORTCUTS_TOOLBAR_TEMPLATE',
+  'TRAINING_PANEL_TEMPLATE',
+  'TRAFFIC_PANEL_TEMPLATE',
   'BorderMode',
   'TrackingMode',
   'LayoutMode',
   'drawSimulatorCars',
-  'drawCarName',
   'handleCollisionWithRoadBorders',
+  'SimpleSimState',
+  'updateSimpleTraffic',
+  'updateSimpleCars',
+  'updateWorldCars',
+  'resizeSimulatorLayout',
+  'LAYOUT_CONTROL_PANEL_WIDTH',
+  'LAYOUT_NETWORK_PANEL_WIDTH',
+  'LAYOUT_SMALL_VIEW_WIDTH',
+  'createCarsForTraining',
+  'applyPoolToCars',
+  'inferHiddenLayers',
+  'getSortedAICars',
+  'getTopAICars',
+  'getTopCarInfoPool',
+  'loadPoolFromStorage',
+  'savePoolToStorage',
+  'discardStoredPool',
+  'loadRaceCars',
+  'saveRaceCars',
+  'downloadCarFiles',
 
   // loaders / traffic
   'WorldLoader',
@@ -143,6 +185,26 @@ const allowedUnusedVars = [
   'loadWorldFromStorage',
   'buildRoadBorders',
   'buildMiniMap',
+
+  // store
+  'StoreManager',
+  'StorePanelElement',
+  'STORE_PANEL_TEMPLATE',
+  'StoreManifest',
+  'StoreWorldEntry',
+  'StoreCarEntry',
+  'LocalStorageEntry',
+  'LoadedWorldEntry',
+  'LoadedCarEntry',
+  'UnifiedWorldEntry',
+  'UnifiedCarEntry',
+
+  // training-init modal
+  'TrainingInitModalElement',
+  'TRAINING_INIT_MODAL_TEMPLATE',
+  'TrainingInitDefaults',
+  'TrainingInitResult',
+  'TrainingInitOpenOptions',
 ];
 
 const varsIgnorePattern = `^(_|${allowedUnusedVars.join('|')})$`;
@@ -183,6 +245,12 @@ const myGlobals = {
     PointDrawOptions: 'readonly',
     SegmentDrawOptions: 'readonly',
     PolygonDrawOptions: 'readonly',
+    CarDrawOptions: 'readonly',
+    BuildingDrawOptions: 'readonly',
+    TreeDrawOptions: 'readonly',
+    MiniMapDrawOptions: 'readonly',
+    IMiniMapCar: 'readonly',
+    WorldDrawOptions: 'readonly',
     OsmData: 'readonly',
     Level: 'readonly',
     CarInfo: 'readonly',
@@ -194,6 +262,8 @@ const myGlobals = {
     Segment: 'readonly',
     Envelope: 'readonly',
     Polygon: 'readonly',
+    SpatialHashGrid: 'readonly',
+    GridSegment: 'readonly',
 
     // world math
     Graph: 'readonly',
@@ -214,6 +284,7 @@ const myGlobals = {
     translate: 'readonly',
     angle: 'readonly',
     getIntersection: 'readonly',
+    getIntersectionOffset: 'readonly',
     lerp: 'readonly',
     lerp2D: 'readonly',
     invLerp: 'readonly',
@@ -221,6 +292,7 @@ const myGlobals = {
     degToRad: 'readonly',
     getRandomColor: 'readonly',
     getFake3dPoint: 'readonly',
+    safeJsonParse: 'readonly',
 
     // world items
     Building: 'readonly',
@@ -236,6 +308,7 @@ const myGlobals = {
     LightEditor: 'readonly',
     StopEditor: 'readonly',
     YieldEditor: 'readonly',
+    CorridorEditor: 'readonly',
 
     // world markings
     Marking: 'readonly',
@@ -251,6 +324,7 @@ const myGlobals = {
     IWorld: 'readonly',
     Corridor: 'readonly',
     World: 'readonly',
+    WorldGenerator: 'readonly',
     SimpleWorld: 'readonly',
     Viewport: 'readonly',
     TrafficManager: 'readonly',
@@ -282,15 +356,20 @@ const myGlobals = {
 
     Sensor: 'readonly',
     // sound.js
-    Engine: 'readonly',
+    SoundEngine: 'readonly',
     taDaa: 'readonly',
     explode: 'readonly',
     beep: 'readonly',
     Visualizer: 'readonly',
 
     Simulator: 'readonly',
+    TrainingSimulator: 'readonly',
+    SimulatorShell: 'readonly',
     WorldLoader: 'readonly',
+    parseWorldFileContent: 'readonly',
     CarLoader: 'readonly',
+    parseCarFileContent: 'readonly',
+    compareCarInfoParams: 'readonly',
     generateInitialTraffic: 'readonly',
     generateTrafficRow: 'readonly',
 
@@ -312,17 +391,68 @@ const myGlobals = {
     statistics: 'readonly',
     started: 'writable',
     TrainingManager: 'readonly',
-    TrainingManagerPanelElement: 'readonly',
-    TopControlsPanelElement: 'readonly',
-    ViewControlsPanelElement: 'readonly',
+    TrainingPanelElement: 'readonly',
+    WorldToolbarElement: 'readonly',
+    LayoutToolbarElement: 'readonly',
+    AnimationLoopToolbarElement: 'readonly',
+    ShortcutsToolbarElement: 'readonly',
+    TrafficPanelElement: 'readonly',
+    TrafficSimulator: 'readonly',
+    WORLD_TOOLBAR_TEMPLATE: 'readonly',
+    LAYOUT_TOOLBAR_TEMPLATE: 'readonly',
+    ANIMATION_LOOP_TOOLBAR_TEMPLATE: 'readonly',
+    SHORTCUTS_TOOLBAR_TEMPLATE: 'readonly',
+    TRAINING_PANEL_TEMPLATE: 'readonly',
+    TRAFFIC_PANEL_TEMPLATE: 'readonly',
     drawSimulatorCars: 'readonly',
-    drawCarName: 'readonly',
     handleCollisionWithRoadBorders: 'readonly',
+    SimpleSimState: 'readonly',
+    updateSimpleTraffic: 'readonly',
+    updateSimpleCars: 'readonly',
+    updateWorldCars: 'readonly',
+    resizeSimulatorLayout: 'readonly',
+    LAYOUT_CONTROL_PANEL_WIDTH: 'readonly',
+    LAYOUT_NETWORK_PANEL_WIDTH: 'readonly',
+    LAYOUT_SMALL_VIEW_WIDTH: 'readonly',
+    createCarsForTraining: 'readonly',
+    applyPoolToCars: 'readonly',
+    inferHiddenLayers: 'readonly',
+    getSortedAICars: 'readonly',
+    getTopAICars: 'readonly',
+    getTopCarInfoPool: 'readonly',
+    loadPoolFromStorage: 'readonly',
+    savePoolToStorage: 'readonly',
+    discardStoredPool: 'readonly',
+    loadRaceCars: 'readonly',
+    saveRaceCars: 'readonly',
+    downloadCarFiles: 'readonly',
 
     // type aliases
     BorderMode: 'readonly',
     TrackingMode: 'readonly',
     LayoutMode: 'readonly',
+    LayoutCanvases: 'readonly',
+    LayoutPanelState: 'readonly',
+
+    // store
+    StoreManager: 'readonly',
+    StorePanelElement: 'readonly',
+    STORE_PANEL_TEMPLATE: 'readonly',
+    StoreManifest: 'readonly',
+    StoreWorldEntry: 'readonly',
+    StoreCarEntry: 'readonly',
+    LocalStorageEntry: 'readonly',
+    LoadedWorldEntry: 'readonly',
+    LoadedCarEntry: 'readonly',
+    UnifiedWorldEntry: 'readonly',
+    UnifiedCarEntry: 'readonly',
+
+    // training-init modal
+    TrainingInitModalElement: 'readonly',
+    TRAINING_INIT_MODAL_TEMPLATE: 'readonly',
+    TrainingInitDefaults: 'readonly',
+    TrainingInitResult: 'readonly',
+    TrainingInitOpenOptions: 'readonly',
   },
 };
 

@@ -110,6 +110,31 @@ function getIntersection(
   return null;
 }
 
+/**
+ * Offset-only segment intersection: returns the parametric distance `t`
+ * (0..1) from `a` to `b` where segment AB crosses segment CD, or -1 if they
+ * do not intersect. Unlike {@link getIntersection} this allocates nothing,
+ * so it is used in the sensor's per-ray/per-segment hot loop where only the
+ * closest offset matters; the actual point is computed once for the winner.
+ */
+function getIntersectionOffset(a: Point, b: Point, c: Point, d: Point): number {
+  const tTop = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
+  const uTop = (c.y - a.y) * (a.x - b.x) - (c.x - a.x) * (a.y - b.y);
+  const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
+
+  const epsilon = 0.001;
+  if (Math.abs(bottom) > epsilon) {
+    const t = tTop / bottom;
+    const u = uTop / bottom;
+
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+      return t;
+    }
+  }
+
+  return -1;
+}
+
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }

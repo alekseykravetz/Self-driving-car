@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Self-driving car - Live Traffic Jam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="stylesheet" href="/styles/style.css" />
+  </head>
+  <body>
+    <div id="simulatorLayout">
+      <canvas id="gameCanvas"></canvas>
+      <canvas id="cameraCanvas"></canvas>
+      <div id="rightPanel">
+        <canvas id="networkCanvas"></canvas>
+        <canvas id="miniMapCanvas"></canvas>
+      </div>
+      <traffic-panel></traffic-panel>
+    </div>
+
+    <div id="simulatorToolbar">
+      <world-toolbar></world-toolbar>
+      <layout-toolbar></layout-toolbar>
+      <animation-loop-toolbar></animation-loop-toolbar>
+      <shortcuts-toolbar></shortcuts-toolbar>
+    </div>
+
+    <script src="/js/panels/templates/worldToolbarTemplate.js"></script>
+    <script src="/js/simulator/panels/templates/layoutToolbarTemplate.js"></script>
+    <script src="/js/simulator/panels/templates/animationLoopToolbarTemplate.js"></script>
+    <script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
+    <script src="/js/simulator/traffic/templates/trafficPanelTemplate.js"></script>
+    <script src="/js/panels/worldToolbar.js"></script>
+    <script src="/js/simulator/panels/layoutToolbar.js"></script>
+    <script src="/js/simulator/panels/animationLoopToolbar.js"></script>
+    <script src="/js/panels/shortcutsToolbar.js"></script>
+    <script src="/js/simulator/traffic/trafficPanel.js"></script>
+    <script src="/js/world/corridor.js"></script>
+    <script src="/js/world/generation/worldGenerator.js"></script>
+    <script src="/js/world/world.js"></script>
+    <script src="/js/mini-map/miniMap.js"></script>
+    <script src="/js/viewport/viewport.js"></script>
+    <script src="/js/world/trafficManager.js"></script>
+    <script src="/js/world/markings/marking.js"></script>
+    <script src="/js/world/markings/stop.js"></script>
+    <script src="/js/world/markings/start.js"></script>
+    <script src="/js/world/markings/crossing.js"></script>
+    <script src="/js/world/markings/parking.js"></script>
+    <script src="/js/world/markings/light.js"></script>
+    <script src="/js/world/markings/target.js"></script>
+    <script src="/js/world/markings/yield.js"></script>
+    <script src="/js/world/editors/markingEditor.js"></script>
+    <script src="/js/world/editors/graphEditor.js"></script>
+    <script src="/js/world/editors/stopEditor.js"></script>
+    <script src="/js/world/editors/startEditor.js"></script>
+    <script src="/js/world/editors/crossingEditor.js"></script>
+    <script src="/js/world/editors/parkingEditor.js"></script>
+    <script src="/js/world/editors/lightEditor.js"></script>
+    <script src="/js/world/editors/targetEditor.js"></script>
+    <script src="/js/world/editors/yieldEditor.js"></script>
+    <script src="/js/world/items/tree.js"></script>
+    <script src="/js/world/items/building.js"></script>
+    <script src="/js/math/utils.js"></script>
+    <script src="/js/math/graph/graph.js"></script>
+    <script src="/js/math/primitives/point.js"></script>
+    <script src="/js/math/primitives/segment.js"></script>
+    <script src="/js/math/primitives/polygon.js"></script>
+    <script src="/js/math/primitives/envelope.js"></script>
+    <script src="/js/math/spatialGrid.js"></script>
+
+    <script src="/js/camera/types.js"></script>
+    <script src="/js/camera/extrusion.js"></script>
+    <script src="/js/camera/camera.js"></script>
+    <script src="/js/audio/sound.js"></script>
+    <script src="/js/neural-network/visualizer.js"></script>
+    <script src="/js/neural-network/network.js"></script>
+    <script src="/js/car/sensors/sensor.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/car/controls/controls.js"></script>
+    <script src="/js/car/car.js"></script>
+    <script src="/js/simulator/training/rendering/layoutManager.js"></script>
+    <script src="/js/world/loader/worldLoader.js"></script>
+    <script src="/js/car/loader/carLoader.js"></script>
+    <script src="/js/store/types.js"></script>
+    <script src="/js/store/storeManager.js"></script>
+    <script src="/js/simulator/core/simulatorShell.js"></script>
+    <script src="/js/simulator/traffic/trafficSimulator.js"></script>
+
+    <script>
+      (async () => {
+        await StoreManager.init();
+        const trafficSimulator = new TrafficSimulator(
+          gameCanvas,
+          networkCanvas,
+          miniMapCanvas,
+          cameraCanvas,
+        );
+      })();
+    </script>
+  </body>
+</html>

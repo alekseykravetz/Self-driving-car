@@ -1,0 +1,23 @@
+{
+  "worlds": [
+    "circle.world",
+    "circle_corridor.world",
+    "mirror.world",
+    "mirror_corridor.world",
+    "ashkelon-kohav-hazafon.world",
+    "barnea.world",
+    "ir-hyain.world"
+  ],
+  "cars": [
+    "best_b6_s3_rc5_rl150.car",
+    "best-1_b6_s3.5_rc5_rl150.car",
+    "best-2_b6_s3.5_rc5_rl150.car",
+    "best_b16_s5_rc11_rl150.car",
+    "best-2_b16_s5_rc11_rl150.car.car",
+    "best_b16x16_s8_rc15_rl200.car",
+    "best-rw_b16x16_s8_rc15_rl400.car",
+    "right_hand_rule.car",
+    "right_hand_rule_racer.car",
+    "right_hand_rule_racer2.car"
+  ]
+}

@@ -2,11 +2,13 @@ class Segment {
   p1: Point;
   p2: Point;
   oneWay: boolean;
+  separated: boolean;
 
-  constructor(p1: Point, p2: Point, oneWay = false) {
+  constructor(p1: Point, p2: Point, oneWay = false, separated = false) {
     this.p1 = p1;
     this.p2 = p2;
     this.oneWay = oneWay;
+    this.separated = separated;
   }
 
   length(): number {

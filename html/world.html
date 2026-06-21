@@ -2,11 +2,18 @@
 <html>
   <head>
     <title>World Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
     <link rel="stylesheet" href="/styles/world/styles.css" />
   </head>
   <body>
     <h1>World Editor</h1>
     <canvas id="myCanvas"></canvas>
+
+    <div id="simulatorToolbar">
+      <world-toolbar></world-toolbar>
+      <shortcuts-toolbar></shortcuts-toolbar>
+    </div>
     <canvas
       id="miniMapCanvas"
       style="
@@ -19,68 +26,138 @@
     ></canvas>
 
     <div id="controls">
-      <input id="worldGenerationInput" type="checkbox" />
-      <button id="disposeBtn">🗑️</button>
-      <button id="saveBtn">💾</button>
-      <label for="loadWorldInput" class="file-input-label">
-        📁
-        <input type="file" id="loadWorldInput" accept=".world" />
-      </label>
-      &nbsp;
-      <button id="openOsmPanelBtn">🗺️</button>
-      &nbsp; &nbsp;
-      <button id="graphBtn">🌐</button>
-      &nbsp;
-      <button id="markingBtn">🔲</button>
-      <button id="startBtn">🚙</button>
-      <button id="targetBtn">🎯</button>
-      <button id="stopBtn">🛑</button>
-      <button id="crossingBtn">🚶</button>
-      <button id="yieldBtn">⚠️</button>
-      <button id="parkingBtn">🅿️</button>
-      <button id="lightBtn">🚦</button>
+      <div class="controls-group">
+        <span class="group-title">Render</span>
+        <label
+          class="checkbox-label"
+          title="Toggle world regeneration on graph changes"
+        >
+          <input id="worldGenerationInput" type="checkbox" />
+          Generate
+        </label>
+      </div>
 
-      <div id="osmPanel" style="display: none">
-        <textarea
-          id="osmDataContainer"
-          rows="10"
-          cols="50"
-          placeholder="Paste OSM data here"
-        ></textarea>
-        <div>
-          <button id="parseOsmDataBtn">✔️</button>
-          <button id="closeOsmPanelBtn">❌</button>
-        </div>
+      <div class="controls-divider"></div>
+
+      <div class="controls-group">
+        <button
+          id="graphBtn"
+          title="Graph Editor — Add/remove road points and segments (Left-click: add, Right-click: connect, Drag: move)"
+        >
+          🌐
+        </button>
+        <button
+          id="markingBtn"
+          title="Marking Editor — Place generic road markings (Left-click: place, Right-click: remove)"
+        >
+          🔲
+        </button>
+      </div>
+
+      <div class="controls-divider"></div>
+
+      <div class="controls-group">
+        <button
+          id="startBtn"
+          title="Start — Place car spawn point (Left-click on road)"
+        >
+          🚙
+        </button>
+        <button
+          id="targetBtn"
+          title="Target — Place race destination (Left-click on road)"
+        >
+          🎯
+        </button>
+        <button
+          id="stopBtn"
+          title="Stop — Place stop line marking (Left-click on road)"
+        >
+          🛑
+        </button>
+        <button
+          id="crossingBtn"
+          title="Crossing — Place pedestrian crosswalk (Left-click on road)"
+        >
+          🚶
+        </button>
+        <button
+          id="yieldBtn"
+          title="Yield — Place yield sign marking (Left-click on road)"
+        >
+          ⚠️
+        </button>
+        <button
+          id="parkingBtn"
+          title="Parking — Place parking spot (Left-click on road)"
+        >
+          🅿️
+        </button>
+        <button
+          id="lightBtn"
+          title="Traffic Light — Place traffic light (Left-click on road)"
+        >
+          🚦
+        </button>
+        <button
+          id="corridorBtn"
+          title="Corridor — Build a corridor between two graph points (Left-click start, then end). Hold/latch T for an open tunnel."
+        >
+          🛤️
+        </button>
       </div>
     </div>
 
-    <script src="/js/world-editor/types.js"></script>
+    <div id="osmPanel" style="display: none">
+      <textarea
+        id="osmDataContainer"
+        rows="10"
+        cols="50"
+        placeholder="Paste OSM data here"
+      ></textarea>
+      <div>
+        <button id="parseOsmDataBtn">✔️</button>
+        <button id="closeOsmPanelBtn">❌</button>
+      </div>
+    </div>
 
-    <script src="/js/world-editor/world.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/world/types.js"></script>
+
+    <script src="/js/panels/templates/worldToolbarTemplate.js"></script>
+    <script src="/js/panels/worldToolbar.js"></script>
+
+    <script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
+    <script src="/js/panels/shortcutsToolbar.js"></script>
+
+    <script src="/js/world/corridor.js"></script>
+    <script src="/js/world/generation/worldGenerator.js"></script>
+    <script src="/js/world/world.js"></script>
     <script src="/js/viewport/viewport.js"></script>
-    <script src="/js/world-editor/trafficManager.js"></script>
+    <script src="/js/world/trafficManager.js"></script>
     <script src="/js/mini-map/miniMap.js"></script>
-    <script src="/js/world-editor/markings/marking.js"></script>
-    <script src="/js/world-editor/markings/stop.js"></script>
-    <script src="/js/world-editor/markings/start.js"></script>
-    <script src="/js/world-editor/markings/crossing.js"></script>
-    <script src="/js/world-editor/markings/parking.js"></script>
-    <script src="/js/world-editor/markings/light.js"></script>
-    <script src="/js/world-editor/markings/target.js"></script>
-    <script src="/js/world-editor/markings/yield.js"></script>
-    <script src="/js/world-editor/editors/markingEditor.js"></script>
-    <script src="/js/world-editor/editors/worldEditor.js"></script>
-    <script src="/js/world-loader/worldLoader.js"></script>
-    <script src="/js/world-editor/editors/graphEditor.js"></script>
-    <script src="/js/world-editor/editors/stopEditor.js"></script>
-    <script src="/js/world-editor/editors/startEditor.js"></script>
-    <script src="/js/world-editor/editors/crossingEditor.js"></script>
-    <script src="/js/world-editor/editors/parkingEditor.js"></script>
-    <script src="/js/world-editor/editors/lightEditor.js"></script>
-    <script src="/js/world-editor/editors/targetEditor.js"></script>
-    <script src="/js/world-editor/editors/yieldEditor.js"></script>
-    <script src="/js/world-editor/items/tree.js"></script>
-    <script src="/js/world-editor/items/building.js"></script>
+    <script src="/js/world/markings/marking.js"></script>
+    <script src="/js/world/markings/stop.js"></script>
+    <script src="/js/world/markings/start.js"></script>
+    <script src="/js/world/markings/crossing.js"></script>
+    <script src="/js/world/markings/parking.js"></script>
+    <script src="/js/world/markings/light.js"></script>
+    <script src="/js/world/markings/target.js"></script>
+    <script src="/js/world/markings/yield.js"></script>
+    <script src="/js/world/editors/markingEditor.js"></script>
+    <script src="/js/world/editors/worldEditor.js"></script>
+    <script src="/js/world/loader/worldLoader.js"></script>
+    <script src="/js/world/editors/graphEditor.js"></script>
+    <script src="/js/world/editors/stopEditor.js"></script>
+    <script src="/js/world/editors/startEditor.js"></script>
+    <script src="/js/world/editors/crossingEditor.js"></script>
+    <script src="/js/world/editors/parkingEditor.js"></script>
+    <script src="/js/world/editors/lightEditor.js"></script>
+    <script src="/js/world/editors/targetEditor.js"></script>
+    <script src="/js/world/editors/yieldEditor.js"></script>
+    <script src="/js/world/editors/corridorEditor.js"></script>
+    <script src="/js/world/items/tree.js"></script>
+    <script src="/js/world/items/building.js"></script>
     <script src="/js/math/utils.js"></script>
     <script src="/js/math/graph/graph.js"></script>
     <script src="/js/math/osm-importer/osm.js"></script>
@@ -89,32 +166,32 @@
     <script src="/js/math/primitives/polygon.js"></script>
     <script src="/js/math/primitives/envelope.js"></script>
 
-    <script src="/saves/barnea.world"></script>
-    <!-- <script src="/saves/kohav-hazafon.world"></script> -->
-    <!-- <script src="/saves/ir-hyain.world"></script> -->
-    <!-- <script src="/saves/kohav-hazafon-with-target.world"></script> -->
-    <!-- <script src="/saves/ashkelon.world"></script> -->
-    <!-- <script src="/saves/path_finding.world"></script> -->
+    <script src="/js/car/loader/carLoader.js"></script>
+    <script src="/js/store/types.js"></script>
+    <script src="/js/store/storeManager.js"></script>
 
     <script>
-      function resizeCanvas() {
-        myCanvas.width = window.innerWidth;
-        myCanvas.height = window.innerHeight;
-      }
+      (async () => {
+        await StoreManager.init();
+        function resizeCanvas() {
+          myCanvas.width = window.innerWidth;
+          myCanvas.height = window.innerHeight;
+        }
 
-      resizeCanvas();
-
-      miniMapCanvas.width = 150;
-      miniMapCanvas.height = 150;
-
-      const worldEditor = new WorldEditor(myCanvas, miniMapCanvas);
-
-      window.addEventListener('resize', () => {
         resizeCanvas();
-        worldEditor.animate();
-      });
 
-      worldEditor.animate();
+        miniMapCanvas.width = 150;
+        miniMapCanvas.height = 150;
+
+        const worldEditor = new WorldEditor(myCanvas, miniMapCanvas);
+
+        window.addEventListener('resize', () => {
+          resizeCanvas();
+          worldEditor.animate();
+        });
+
+        worldEditor.animate();
+      })();
     </script>
   </body>
 </html>

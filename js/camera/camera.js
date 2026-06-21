@@ -107,7 +107,7 @@ class Camera {
    * Gathers, filters, and extrudes all relevant polygons from the world for rendering.
    */
   #getPolygons(world, options = {}) {
-    const { keyCar, bestCar, traffic } = options;
+    const { keyCar, bestCar, cars = [], traffic } = options;
     // Buildings
     const buildingPolygons = extrudePolygons(
       this.#filter(world.buildings.map((b) => b.base)),
@@ -119,8 +119,8 @@ class Camera {
       200,
     );
     // Road borders
-    const roadSegments = world.corridor
-      ? world.corridor.borders
+    const roadSegments = world.corridors.length
+      ? world.corridors.flatMap((c) => c.borders)
       : world.roadBorders || [];
     const roadPolygons = extrudePolygons(
       this.#filter(roadSegments.map((s) => new Polygon([s.p1, s.p2]))),
@@ -162,7 +162,7 @@ class Camera {
     }
     // Best car (highlighted, separate from keyCar)
     let bestCarPolygons = [];
-    const bestCarSource = bestCar || (!keyCar ? world.bestCar : null);
+    const bestCarSource = bestCar ?? null;
     if (
       bestCarSource &&
       bestCarSource !== keyCar &&
@@ -184,7 +184,7 @@ class Camera {
     }
     // Car shadows (flat projections)
     const carShadowBases = this.#filter(
-      world.cars
+      cars
         .filter((c) => c !== keyCar && c !== bestCarSource)
         .map(
           (c) =>

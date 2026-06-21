@@ -1,24 +1,25 @@
 # World Editor & Environment
 
-The `ts/world-editor/` directory contains the procedural world generation system, interactive editing tools, traffic management, environmental items, and road markings.
+The `ts/world/` directory contains the procedural world generation system, interactive editing tools, traffic management, environmental items, and road markings.
 
 ---
 
-## World Generation (`ts/world-editor/world.ts`)
+## World Generation (`ts/world/world.ts`)
+
+The `World` class is intentionally lean: it holds the class structure, all world
+properties, the `draw` function and the static loader. The procedural
+generation logic lives in a dedicated `WorldGenerator`
+(`ts/world/generation/worldGenerator.ts`), and corridors are a standalone
+`Corridor` class (`ts/world/corridor.ts`).
 
 ### Class Structure
 
 ```typescript
-interface Corridor {
-  borders: Segment[];
-  skeleton: Segment[];
-}
-
-class World {
+class World implements IWorld {
   // Configuration
-  graph: Graph;
+  graph: Graph; // Road network (nodes + edges)
   roadWidth: number; // Default: 100
-  roadRoundness: number; // Default: 10
+  roadRoundness: number; // Default: 10 (arc points per envelope end)
   buildingWidth: number; // Width of building footprints
   buildingMinLength: number; // Minimum building side length
   spacing: number; // Gap between buildings and roads
@@ -26,101 +27,256 @@ class World {
 
   // Generated geometry
   envelopes: Envelope[]; // Road surface shapes
-  roadBorders: Segment[]; // Outer edges of roads
+  roadBorders: Segment[]; // Outer edges of roads (merged)
+  separatorBorders: Segment[]; // Hard-separation center lines (collision)
   buildings: Building[]; // Generated structures
   trees: Tree[]; // Placed vegetation
-  laneGuides: Segment[]; // Center-lane guidance lines
+  laneGuides: Segment[]; // Center-lane guidance lines (for markings)
   markings: Marking[]; // Traffic signs, lights, crossings
 
   // Simulation
   trafficManager: TrafficManager;
-  corridor: Corridor | null; // Racing path (start → target)
+  corridors: Corridor[]; // Authored or generated drivable paths
   cars: Car[]; // Active vehicles
+  bestCar: Car | null;
 
-  // Viewport state
+  // Viewport state (saved/loaded with world)
   zoom?: number;
   offset?: Point;
 
+  // Convenience: first corridor (or null), kept for race/training callers
+  get corridor(): Corridor | null;
+
   // Methods
-  generate(generateWorld?: boolean): void;
-  generateCorridor(start: Point, end: Point, extendEnd?: number): void;
+  generate(generateBuildings?: boolean): void; // delegates to WorldGenerator
+  generateCorridor(start: Point, end: Point, extendEnd?: boolean): void;
+  addCorridor(corridor: Corridor): void;
+  getCollisionBorders(): Segment[]; // roadBorders + separators + corridors
   static load(info: any): World;
-  draw(ctx, viewPoint, showStartMarkings?, renderRadius?): void;
+  draw(ctx, options: WorldDrawOptions): void;
 }
 ```
 
-### Road Generation Pipeline
+### Generation split (`generate(generateBuildings)`)
+
+`World.generate()` delegates to `WorldGenerator.generate(world, generateBuildings)`.
+Road geometry that the simulation depends on — `roadBorders`, `laneGuides`, and
+`separatorBorders` — is **always** built. Only the decorative `buildings` and
+`trees` are gated behind the `generateBuildings` flag (the editor's "Generate"
+checkbox). This means lane guides remain available for marking placement even
+when world decoration is turned off.
+
+After regeneration, every marking is re-anchored to the (possibly changed)
+graph via `marking.reanchor(graph)` so markings follow road edits instead of
+being stranded at stale absolute positions.
+
+---
+
+## Road Generation Pipeline
 
 ```
 Graph segments
     │
-    ▼ (wrap each in Envelope)
-Envelopes[] (rounded rectangles)
+    ▼ (wrap each in Envelope with roadWidth + roadRoundness)
+Envelopes[] (rounded rectangles around each road segment)
     │
-    ▼ (Polygon.union)
-roadBorders[] (merged outer edges)
+    ▼ (Polygon.union — merge overlapping shapes)
+roadBorders[] (clean outer edges only — no internal boundaries)
     │
-    ▼ (half-width envelopes)
-laneGuides[] (center-lane markers)
+    ▼ (half-width envelopes along same segments)
+laneGuides[] (center-lane markers for marking placement)
 ```
 
-1. **Envelope creation**: Each graph segment gets wrapped in an Envelope with `roadWidth` and `roadRoundness`
-2. **Union operation**: All envelope polygons are merged via `Polygon.union()` to produce clean outer road borders (no internal edges between overlapping roads)
-3. **Lane guides**: Smaller envelopes (half width) generate lane center lines for AI navigation
-4. **One-way arrows**: Direction markings auto-generated for one-way segments
+### Step 1: Envelope Creation
 
-### Building Generation (`#generateBuildings`)
+Each graph segment is wrapped in an Envelope with the configured `roadWidth` and `roadRoundness`:
 
-1. Create wider envelopes around road segments (road + building width + spacing)
-2. Union these wider envelopes → extract guide segments
-3. Place building supports along these guides with minimum spacing
-4. Convert supports to rectangular polygons (building footprints)
-5. Filter: Remove buildings that overlap roads, other buildings, or are too close
+```typescript
+for (const segment of this.graph.segments) {
+  this.envelopes.push(
+    new Envelope(segment, this.roadWidth, this.roadRoundness),
+  );
+}
+```
 
-### Tree Generation (`#generateTrees`)
+Result: overlapping "pill-shaped" polygons where roads intersect.
 
-1. Find valid placement zones (not on roads, not inside buildings)
-2. Random placement attempts with rejection sampling
-3. Constraints:
-   - Minimum distance from other trees (spacing)
-   - Must be near roads/buildings (not isolated in empty space)
-   - Cannot overlap road borders or building footprints
-4. Each tree gets randomized size within a range
+### Step 2: Polygon Union
 
-### Corridor Generation (`generateCorridor`)
+All envelope polygons are merged via `Polygon.union()`:
 
-Used by racing and training modes to create a defined path:
+```typescript
+this.roadBorders = Polygon.union(this.envelopes.map((e) => e.polygon));
+```
 
-1. Find start marking and target marking positions
-2. Compute shortest path between them via `graph.getShortestPath()`
-3. Extend end point beyond target (for smooth finish detection)
-4. Generate envelopes around path segments
-5. Union envelopes → corridor borders
-6. Store `corridor.borders` (for collision) and `corridor.skeleton` (for progress measurement)
+This removes internal edges between overlapping roads, producing clean outer road borders only. Intersections become smooth joined areas.
 
-### Drawing
+### Step 3: Lane Guides
 
-The world draws in this order (painter's algorithm):
+Smaller envelopes (half width) generate lane center lines:
 
-1. Road envelopes (gray fill)
-2. Road borders (white lines)
-3. Lane markings (dashed center lines)
-4. Markings (traffic lights, stop signs, etc.)
-5. Buildings (3D perspective)
-6. Trees (3D perspective)
+```typescript
+for (const segment of this.graph.segments) {
+  laneGuides.push(
+    new Envelope(segment, this.roadWidth / 2, this.roadRoundness),
+  );
+}
+```
 
-Objects are sorted by distance to `viewPoint` for proper depth ordering.
+These guide segments are used for:
+
+- Marking placement (stop signs, traffic lights snap to lane guides)
+- One-way direction arrows
+- Lane marking rendering (dashed center lines)
+
+### Step 4: One-Way Arrows
+
+For each one-way segment in the graph, a direction arrow marking is auto-generated at the segment's midpoint.
 
 ---
 
-## Traffic Management (`ts/world-editor/trafficManager.ts`)
+## Building Generation (`wgGenerateBuildings`)
+
+```
+1. Create wider envelopes around road segments
+   width = roadWidth + buildingWidth + spacing × 2
+   → Defines the "building zone" around each road
+
+2. Union these wider envelopes → extract guide segments
+   → These are the potential building placement lines
+
+3. Place building supports along guide segments
+   - Walk along each guide at regular intervals
+   - Minimum spacing enforced between supports
+   - Each support is a short segment perpendicular to the guide
+
+4. Convert supports to rectangular polygons (building footprints)
+   - Each support → Building with random height variation
+
+5. Filter out invalid buildings:
+   - Overlaps road borders? → Remove
+   - Overlaps other buildings? → Remove
+   - Too close to road? → Remove
+   - Inside another building? → Remove
+```
+
+### Building Parameters
+
+| Parameter           | Effect                                  |
+| ------------------- | --------------------------------------- |
+| `buildingWidth`     | How deep buildings extend from the road |
+| `buildingMinLength` | Minimum length of building footprint    |
+| `spacing`           | Gap between buildings and road edge     |
+
+---
+
+## Tree Generation (`wgGenerateTrees`)
+
+Uses rejection sampling to place trees in valid positions:
+
+```
+1. Define valid placement zone:
+   - NOT on roads (outside road borders)
+   - NOT inside buildings
+   - Near roads or buildings (not isolated in empty space)
+
+2. Attempt random placements (many iterations):
+   For each attempt:
+     - Random position within world bounds
+     - Check constraints:
+       a. Minimum distance from other trees (prevent clustering)
+       b. Must be within proximity of a road or building
+       c. Cannot overlap road borders
+       d. Cannot overlap building footprints
+     - If all pass: place tree with randomized size
+
+3. Each tree gets:
+   - Random size within [treeSize × 0.5, treeSize × 1.5]
+   - Fixed height (200 units for 3D rendering)
+   - Simple circular base polygon for collision
+```
+
+---
+
+## Corridors (`ts/world/corridor.ts`)
+
+A `Corridor` is a standalone, drivable path through the road network. It is a
+reusable world object with its own consistent draw style, used both by the
+world editor (authored, multiple per world, saved with the world) and by the
+race game / training simulator (built on the fly between start and target).
+
+```typescript
+class Corridor {
+  borders: Segment[]; // Collision walls of the path
+  skeleton: Segment[]; // Center-line, used for progress measurement
+  openStart: boolean; // Start cap removed (open / tunnel)
+  openEnd: boolean; // End cap removed (open / tunnel)
+
+  static fromPath(skeleton, roadWidth, roadRoundness, options): Corridor;
+  static load(info): Corridor;
+  draw(ctx, { color, width }): void; // single source of truth for styling
+}
+```
+
+`Corridor.fromPath` unions road envelopes along the `skeleton`. When `openStart`
+or `openEnd` is set, the rounded end-cap border segments at that endpoint are
+removed so cars can pass straight through — this lets several corridors be
+chained into a longer path (e.g. a tunnel on a large map). The `extendEnd`
+option pushes the closing cap beyond the target (used by the race game so the
+finish line is reachable) independently of `openEnd`.
+
+`World.generateCorridor(start, end, extendEnd?)` builds a single corridor and
+replaces `world.corridors` with it. `World.addCorridor(corridor)` appends one
+(used by the corridor editor). Every corridor's `borders` are included in
+`World.getCollisionBorders()` alongside `roadBorders` and `separatorBorders`.
+
+**Corridor usage:**
+
+- **Borders**: Define the drivable area (cars that leave are damaged)
+- **Skeleton**: Center-line path for measuring how far a car has traveled (fitness in world mode)
+
+---
+
+## Hard-Separation Roads
+
+A two-way road segment can be marked as **hard-separated** (a solid white
+center line that cars cannot cross), modelled like the existing one-way flag:
+
+- `Segment.separated: boolean` (4th constructor arg, serialized in the graph).
+- `WorldGenerator` collects the center lines of `separated && !oneWay` segments
+  into `world.separatorBorders`, which act as collision borders.
+- `World.draw` renders separated two-way roads with a **solid** white center
+  line instead of the usual dashed lane separator.
+
+---
+
+## Drawing Order (Painter's Algorithm)
+
+The world draws in this order to ensure proper visual layering:
+
+```
+1. Road envelopes (gray fill) — flat road surface
+2. Road borders (white lines) — road edges
+3. Lane markings (dashed center lines) — lane separators
+4. Markings (traffic lights, stop signs, crossings)
+5. Buildings (3D perspective via getFake3dPoint)
+   → Sorted by distance to viewPoint (far first)
+6. Trees (3D perspective via getFake3dPoint)
+   → Sorted by distance to viewPoint (far first)
+```
+
+Buildings and trees are sorted by distance to the viewport center so that closer objects are drawn on top of farther ones (correct depth ordering in the top-down pseudo-3D view).
+
+---
+
+## Traffic Management (`ts/world/trafficManager.ts`)
 
 ### Class Structure
 
 ```typescript
 type lightControlCenterPoint = Point & {
-  lights: Light[];
-  ticks: number;
+  lights: Light[]; // All traffic lights at this intersection
+  ticks: number; // Frame counter for light cycling
 };
 
 class TrafficManager {
@@ -133,39 +289,60 @@ class TrafficManager {
 }
 ```
 
+### Initialization
+
+```
+1. Find all crossroads:
+   → Graph points with degree > 2 (3+ connected segments = intersection)
+
+2. Group all Light markings by nearest crossroad:
+   → For each Light in world.markings:
+     → Find nearest point in the crossroad set
+     → Assign light to that control center
+
+3. Create control centers:
+   → Each crossroad with lights becomes a controlCenter
+   → Contains: position, lights array, tick counter
+```
+
 ### Traffic Light Coordination
-
-**Initialization**:
-
-1. Find all crossroads (graph points with degree > 2, i.e., intersections)
-2. Group all Light markings by nearest crossroad
-3. Each crossroad becomes a `controlCenter` managing its lights
 
 **Update cycle** (each frame):
 
+```typescript
+for (const center of this.controlCenters) {
+  const greenDuration = 120; // 2 seconds at 60fps
+  const yellowDuration = 60; // 1 second at 60fps
+  const cycleDuration = center.lights.length * (greenDuration + yellowDuration);
+
+  const currentTick = this.frameCount % cycleDuration;
+
+  for (let i = 0; i < center.lights.length; i++) {
+    const offset = i * (greenDuration + yellowDuration);
+    const localTick = (currentTick - offset + cycleDuration) % cycleDuration;
+
+    if (localTick < greenDuration) {
+      center.lights[i].state = 'green';
+    } else if (localTick < greenDuration + yellowDuration) {
+      center.lights[i].state = 'yellow';
+    } else {
+      center.lights[i].state = 'red';
+    }
+  }
+}
 ```
-For each controlCenter:
-  greenDuration = 2 seconds (120 frames at 60fps)
-  yellowDuration = 1 second (60 frames)
-  cycleDuration = lights.count * (green + yellow)
 
-  currentTick = frameCount % cycleDuration
+**Coordination guarantee**: Only one direction is green at any intersection at a time. Lights cycle through green → yellow → red in sequence, with each direction getting equal time.
 
-  For each light in center:
-    phase = light's position in sequence
-    offset = phase * (green + yellow)
-    localTick = (currentTick - offset) % cycleDuration
+**Timing:**
 
-    if localTick < greenDuration:    light.state = "green"
-    elif localTick < green+yellow:   light.state = "yellow"
-    else:                            light.state = "red"
-```
-
-This ensures only one direction is green at any intersection at a time.
+- Green: 2 seconds (120 frames)
+- Yellow: 1 second (60 frames)
+- Full cycle: `N_lights × 3 seconds`
 
 ---
 
-## Markings System (`ts/world-editor/markings/`)
+## Markings System (`ts/world/markings/`)
 
 ### Base Class
 
@@ -181,45 +358,94 @@ type MarkingType =
   | 'target';
 
 class Marking {
-  center: Point; // Position on road
-  directionVector: Point; // Facing direction (from segment)
+  center: Point; // Position on road (snapped to lane guide)
+  directionVector: Point; // Facing direction (derived from guide segment)
   width: number; // Cross-road extent
   height: number; // Along-road extent
   support: Segment; // Central axis segment
   polygon: Polygon; // Collision/interaction area
   type: MarkingType;
+  anchor?: MarkingAnchor; // Graph-relative anchor (see below)
 
-  static load(info: any): Marking; // Factory method for deserialization
+  setAnchor(graph): void; // Capture a graph-relative anchor from current center
+  reanchor(graph): void; // Recompute center/direction from the anchor
+  static load(info: any): Marking; // Factory: dispatches to correct subclass
   draw(ctx): void;
 }
 ```
 
+#### Graph-relative anchoring
+
+Markings used to be stored purely as absolute positions, so editing or
+regenerating the road network left them stranded in place. Each marking now
+keeps an optional `anchor` describing its position **relative to a graph
+segment**:
+
+```typescript
+interface MarkingAnchor {
+  p1: Point; // Anchor segment endpoints (to re-find the segment)
+  p2: Point;
+  offset: number; // 0..1 position along the segment
+  lateral: number; // Signed perpendicular distance from the segment
+}
+```
+
+On regeneration, `World.generate` calls `marking.reanchor(graph)` for every
+marking. `reanchor` re-finds the anchor segment (by matching endpoints, falling
+back to the nearest segment) and recomputes `center` / `directionVector`, then
+rebuilds the marking geometry via a protected `rebuildGeometry()` hook
+(subclasses override it to refresh cached borders, e.g. `Stop.border`). If no
+matching segment exists, the marking keeps its last absolute position. Old
+saved worlds without an `anchor` still load and gain one the first time they are
+placed near a segment.
+
 ### Marking Types
 
-| Type     | File          | Description                              | Visual                   |
-| -------- | ------------- | ---------------------------------------- | ------------------------ |
-| Start    | `start.ts`    | Car spawn point with direction           | Blue car icon            |
-| Stop     | `stop.ts`     | Stop line (car must stop)                | Red border + "STOP" text |
-| Yield    | `yield.ts`    | Yield sign marking                       | Inverted triangle        |
-| Crossing | `crossing.ts` | Pedestrian crosswalk                     | White stripes            |
-| Light    | `light.ts`    | Traffic light (state managed externally) | Red/yellow/green circles |
-| Parking  | `parking.ts`  | Parking spot                             | "P" marking              |
-| Target   | `target.ts`   | Race destination / navigation goal       | Target circle            |
+| Type     | File          | Description                              | Visual                           |
+| -------- | ------------- | ---------------------------------------- | -------------------------------- |
+| Start    | `start.ts`    | Car spawn point with direction           | Blue car icon + direction arrow  |
+| Stop     | `stop.ts`     | Stop line (car must stop)                | Red border + "STOP" text         |
+| Yield    | `yield.ts`    | Yield sign marking                       | Inverted red/white triangle      |
+| Crossing | `crossing.ts` | Pedestrian crosswalk                     | White zebra stripes              |
+| Light    | `light.ts`    | Traffic light (state managed externally) | Red/yellow/green stacked circles |
+| Parking  | `parking.ts`  | Parking spot                             | "P" letter marking               |
+| Target   | `target.ts`   | Race destination / navigation goal       | Concentric target circles        |
 
-### Light Marking States
+### Light Marking
 
 ```typescript
 class Light extends Marking {
   state: 'green' | 'yellow' | 'red'; // Managed by TrafficManager
-  border: Segment; // Stop line for cars
+  border: Segment; // Stop line for cars approaching
 
-  draw(ctx): void; // Colored circle based on state
+  draw(ctx): void; // Draws colored circle based on current state
+}
+```
+
+The `state` property is updated externally by `TrafficManager.update()` each frame. The light itself just renders its current state.
+
+### Marking Serialization
+
+`Marking.load(info)` is a factory method that dispatches based on `info.type`:
+
+```typescript
+static load(info: any): Marking {
+  switch (info.type) {
+    case 'start': return new Start(center, dir, width, height);
+    case 'stop': return new Stop(center, dir, width, height);
+    case 'light': return new Light(center, dir, width, height);
+    case 'crossing': return new Crossing(center, dir, width, height);
+    case 'target': return new Target(center, dir, width, height);
+    case 'parking': return new Parking(center, dir, width, height);
+    case 'yield': return new Yield(center, dir, width, height);
+    default: return new Marking(center, dir, width, height);
+  }
 }
 ```
 
 ---
 
-## Editor System (`ts/world-editor/editors/`)
+## Editor System (`ts/world/editors/`)
 
 ### World Editor (Master Coordinator)
 
@@ -230,43 +456,66 @@ class WorldEditor {
   markingEditors: Map<string, MarkingEditor>;
   worldGenerationCheckbox: HTMLInputElement;
 
-  enable(editorType: string): void;
-  disable(): void;
-  save(): void;
-  load(worldInfo: any): void;
-  onGraphChange(): void;
+  enable(editorType: string): void; // Activate a specific editor
+  disable(): void; // Deactivate current editor
+  save(): void; // Save world to file
+  load(worldInfo: any): void; // Load world from file
+  onGraphChange(): void; // Triggers world.generate()
 }
 ```
 
-Manages which editor is active, triggers world regeneration when the graph changes, and handles save/load.
+Manages which editor is active at a time, triggers world regeneration when the graph changes, and handles save/load operations.
+
+The viewport wheel-mode toggle and the World file actions (load / save / dispose / OSM import) are hosted by the shared `<world-toolbar>`: the editor calls `showWorldEditorActions()` to reveal the Save/Dispose/OSM buttons, `hideGroups(...)` to hide the simulator-only groups, and `setViewportModeListener(...)` to drive `setViewportMode()`.
 
 ### Graph Editor (`graphEditor.ts`)
 
 The primary tool for designing the road network.
 
-**Mouse interactions**:
+**Mouse interactions:**
 
-- **Left-click on empty space**: Create new point
-- **Left-click on existing point**: Select it
-- **Right-click on second point**: Create segment connecting selected → hovered
-- **Drag**: Move selected point (graph segments follow)
-- **Right-click on empty space**: Deselect
+| Action                | Input                     | Effect                             |
+| --------------------- | ------------------------- | ---------------------------------- |
+| Create new point      | Left-click on empty space | Adds point to graph                |
+| Select existing point | Left-click on point       | Sets as "selected"                 |
+| Create segment        | Right-click on 2nd point  | Connects selected → hovered        |
+| Move point            | Drag selected point       | Relocates point (segments follow)  |
+| Deselect              | Right-click on empty      | Clears selection                   |
+| Delete point          | Left-click on selected    | Removes point + connected segments |
 
-**Keyboard shortcuts**:
-| Key | Action |
-|-----|--------|
-| `S` | Mark hovered point as path **start** |
-| `E` | Mark hovered point as path **end** |
-| `C` | Clear computed shortest path |
-| `O` | Toggle **one-way** mode for next segment |
-| `Delete` | Remove selected point and its segments |
+**Keyboard shortcuts:**
 
-**Visual feedback**:
+| Key        | Action                                                    |
+| ---------- | --------------------------------------------------------- |
+| `S`        | Mark hovered point as path **start** (for pathfinding)    |
+| `E`        | Mark hovered point as path **end** (for pathfinding)      |
+| `C`        | Clear computed shortest path (also clears start/end)      |
+| `O` (hold) | Enable **one-way** mode; next segment is directed         |
+| `H` (hold) | Enable **hard-separation** mode; next segment is split    |
+| `T` (hold) | Enable **tunnel** (open-ended) mode for the next corridor |
 
-- Hovered point: highlighted with larger radius
-- Selected point: distinct color
-- Shortest path: drawn in red
-- One-way segments: drawn with directional arrow
+These keys are mirrored in the shared `<shortcuts-toolbar>` (top-left). `S` / `E`
+/ `C` flash when pressed; `O` and `H` light while held and can be **clicked to
+latch** their mode on permanently (effective state = latched OR key-held). `T`
+belongs to the Corridor group and latches the open-ended (tunnel) corridor mode.
+
+**Visual feedback:**
+
+- Hovered point: highlighted with larger radius + outline
+- Selected point: distinct color (yellow)
+- Shortest path: drawn in red overlay
+- One-way segments: drawn with directional arrow at midpoint
+- Hard-separated segments: drawn with a solid white center line
+
+### Corridor Editor (`corridorEditor.ts`)
+
+Authors `Corridor` world objects. Left-click a first graph point to set the
+corridor start, then a second point to build a corridor along the shortest path
+between them and add it to `world.corridors`. Multiple corridors can be added.
+Hold or latch `T` (tunnel) to build the next corridor with **open ends**.
+Right-click removes the corridor nearest the cursor (or cancels an in-progress
+pick). Corridors are saved with the world and drawn via `Corridor.draw` for a
+consistent style everywhere.
 
 ### Marking Editor (Base Class)
 
@@ -275,121 +524,150 @@ class MarkingEditor {
   world: World;
   canvas: HTMLCanvasElement;
   viewport: Viewport;
-  markings: Marking[];
+  markings: Marking[]; // Reference to world.markings
   intent: Marking | null; // Preview of marking to place
 
-  enable(): void;
-  disable(): void;
+  enable(): void; // Start listening to mouse events
+  disable(): void; // Stop listening
   createMarking(center, directionVector): Marking; // Override in subclass
 }
 ```
 
-**Workflow**:
+**Workflow:**
 
 1. Mouse moves over road → snap to nearest lane guide segment
-2. Calculate center point and direction vector from segment
-3. Show preview marking (`intent`) at cursor position
-4. Left-click → add marking to world
-5. Right-click on existing → remove it
+2. Calculate center point and direction vector from segment orientation
+3. Show preview marking (`intent`) at cursor position (semi-transparent)
+4. Left-click → add marking to world permanently
+5. Right-click on existing marking → remove it
 
 ### Specialized Editors
 
-Each extends `MarkingEditor` with a specific `createMarking()` implementation:
+Each extends `MarkingEditor` and overrides `createMarking()`:
 
-| Editor         | File                | Creates                |
-| -------------- | ------------------- | ---------------------- |
-| StopEditor     | `stopEditor.ts`     | Stop markings          |
-| StartEditor    | `startEditor.ts`    | Start/spawn markings   |
-| LightEditor    | `lightEditor.ts`    | Traffic light markings |
-| CrossingEditor | `crossingEditor.ts` | Pedestrian crossings   |
-| TargetEditor   | `targetEditor.ts`   | Destination markers    |
-| ParkingEditor  | `parkingEditor.ts`  | Parking spots          |
-| YieldEditor    | `yieldEditor.ts`    | Yield signs            |
+| Editor         | File                | Creates        |
+| -------------- | ------------------- | -------------- |
+| StopEditor     | `stopEditor.ts`     | Stop markings  |
+| StartEditor    | `startEditor.ts`    | Start markings |
+| LightEditor    | `lightEditor.ts`    | Traffic lights |
+| CrossingEditor | `crossingEditor.ts` | Crosswalks     |
+| TargetEditor   | `targetEditor.ts`   | Target markers |
+| ParkingEditor  | `parkingEditor.ts`  | Parking spots  |
+| YieldEditor    | `yieldEditor.ts`    | Yield signs    |
 
 ---
 
-## Environmental Items (`ts/world-editor/items/`)
+## Environmental Items (`ts/world/items/`)
 
 ### Building (`building.ts`)
 
 ```typescript
 class Building {
-  base: Polygon; // 2D footprint
+  base: Polygon; // 2D footprint polygon
   height: number; // Vertical extent (default: 200)
 
-  draw(ctx, viewPoint): void;
+  draw(ctx, options: BuildingDrawOptions): void;
+}
+
+interface BuildingDrawOptions {
+  viewPoint: Point; // Camera position for 3D perspective
 }
 ```
 
-**3D Rendering**:
+**3D Rendering in Top-Down View:**
 
 1. Calculate top face by projecting base points upward using `getFake3dPoint()`
-2. Create 4 side polygons (connecting base edges to top edges)
-3. Sort sides by average distance to camera (painter's algorithm)
-4. Draw: furthest sides first, then roof, with shading for depth cues
+   - Each base corner → offset point based on distance/angle to viewPoint
+2. Create 4 side polygons (connecting base edges to corresponding top edges)
+3. Sort sides by average distance to viewPoint (far → near)
+4. Draw: furthest sides first, then roof
+5. Apply shading: sides darker based on angle, roof slightly lighter
 
-**Visual style**: White walls, slightly darkened roof, shadows based on angle to viewer.
+**Visual style**: White/light gray walls with subtle shading for depth perception.
 
 ### Tree (`tree.ts`)
 
 ```typescript
 class Tree {
-  center: Point; // Base position
+  center: Point; // Base position (world coordinates)
   size: number; // Canopy radius
   height: number; // Total height (default: 200)
-  base: Point[]; // Simple collision polygon
+  base: Point[]; // Simple collision polygon (circle approximation)
 
-  draw(ctx, viewPoint): void;
+  draw(ctx, options: TreeDrawOptions): void;
+}
+
+interface TreeDrawOptions {
+  viewPoint: Point; // Camera position for 3D perspective
 }
 ```
 
-**Procedural canopy** (`#generateLevel`):
+**Multi-level rendering:**
 
-1. Generate 7 vertical levels (layers) from base to top
-2. Each level is a polygon with `size * (1 - levelIndex/7)` radius
-3. Vertices have **noisy radius**: pseudo-random variation using `cos(angle * seed)` for consistent irregular shapes
-4. Colors interpolate from dark green (base) to bright green (top)
-5. Each level projected to 3D height using `getFake3dPoint()`
+Trees are drawn as layered circles with perspective offset:
 
-The noise is deterministic (same seed = same shape) so trees look consistent across frames.
+```
+1. Generate multiple "levels" (3-4 stacked circles)
+2. Each level:
+   - Slightly smaller radius (tapers toward top)
+   - Offset from center based on viewPoint direction (parallax)
+   - Higher levels offset more (perspective effect)
+3. Add noise to circle edges for organic appearance
+4. Color: varying green shades per level (darker at bottom)
+```
 
 ---
 
-## Serialization
+## World Serialization
 
-### World Save Format (`.world` files)
+### Save Format (`.world` files)
 
 ```javascript
-const worldData = ({
-  graph: {
-    points: [{ x: 100, y: 200 }, ...],
-    segments: [{ p1: { x: 100, y: 200 }, p2: { x: 300, y: 400 }, oneWay: false }, ...]
-  },
-  roadWidth: 100,
-  roadRoundness: 10,
-  buildingWidth: 150,
-  buildingMinLength: 150,
-  spacing: 50,
-  treeSize: 160,
-  envelopes: [...],
-  roadBorders: [...],
-  buildings: [...],
-  trees: [...],
-  laneGuides: [...],
-  markings: [{ center: {...}, directionVector: {...}, type: "light", ... }, ...],
-  zoom: 1.5,
-  offset: { x: -200, y: -100 }
-})
+const world = World.load({"graph":{"points":[{"x":100,"y":200},...],
+"segments":[{"p1":{"x":100,"y":200},"p2":{"x":300,"y":400},"oneWay":false},...]},
+"roadWidth":100,"roadRoundness":10,"buildingWidth":150,"buildingMinLength":150,
+"spacing":50,"treeSize":160,"envelopes":[...],"roadBorders":[...],
+"buildings":[...],"trees":[...],"laneGuides":[...],"markings":[...],
+"zoom":1.5,"offset":{"x":-200,"y":-150}});
 ```
 
 ### Loading
 
-`World.load(info)` reconstructs all objects:
+`World.load(info)` reconstructs the full world:
 
-- Points → `new Point(x, y)`
-- Segments → `new Segment(p1, p2)`
-- Graph → `Graph.load()`
-- Markings → `Marking.load()` (dispatches to correct subclass by `type`)
-- Envelopes → `new Envelope(skeleton, width, roundness, polygon)`
-- Buildings → `new Building(polygon, height)`
-- Trees → `new Tree(center, size, height)`
+1. Create Graph from points + segments
+2. Create World with graph + config parameters
+3. Recreate markings via `Marking.load()` factory
+4. Call `world.generate()` to rebuild envelopes, borders, buildings, trees
+5. Restore viewport state (zoom, offset)
+6. Initialize TrafficManager
+
+### WorldLoader Integration
+
+The `WorldLoader` utility handles file parsing:
+
+- Extracts JSON between first `(` and last `)` in the file content
+- Falls back to parsing the entire content as JSON
+- Passes parsed object to callback
+
+---
+
+## World Editor HTML (`html/world.html`)
+
+The world editor page provides a complete UI for map creation, split across two
+panels:
+
+- **Shared `<world-toolbar>`** (top-left, from `ts/panels/`): the **World** group
+  (Load 📁 / Save 💾 / Dispose 🗑️ / OSM Import 🗺️) and the **Viewport** mode
+  toggle (mouse vs. touchpad). The editor-only Save / Dispose / OSM buttons are
+  revealed via `showWorldEditorActions()`, while the simulator-only groups (Car,
+  Borders, Tracking, Debug) are hidden via `hideGroups(...)`.
+- **Shared `<shortcuts-toolbar>`** (top-left, from `ts/panels/`): visualizes the
+  graph-editor keys (`S` / `E` / `C` / `O`) plus the `Ctrl` zoom modifier. The
+  `O` one-way indicator is click-latchable. Replaces the old inline
+  `#keyIndicators` block that used to live in the bottom `#controls` panel.
+- **Bottom `#controls` panel**: editor-mode buttons (Graph, Marking, Stop, Start,
+  Light, Crossing, Target, Parking, Yield) and the auto-generate toggle.
+
+The OSM text-area panel (`#osmPanel`) stays in `world.html`; only its open button
+moved into the shared toolbar.
