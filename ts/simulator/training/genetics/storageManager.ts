@@ -27,17 +27,8 @@ function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
 
     const baseConfig: CarInfo = safeJsonParse<CarInfo>(legacyConfig) ??
       fallbackConfig ?? {
-        maxSpeed: 3,
-        acceleration: 0.2,
-        friction: 0.05,
-        width: 30,
-        height: 50,
-        sensor: {
-          rayCount: 5,
-          rayLength: 150,
-          raySpread: Math.PI / 2,
-          rayOffset: 0,
-        },
+        ...DEFAULT_CAR_CONFIG,
+        sensor: { ...DEFAULT_CAR_CONFIG.sensor },
       };
 
     const pool: CarInfo[] = brains.map((brain) => ({

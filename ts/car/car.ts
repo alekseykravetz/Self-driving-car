@@ -122,16 +122,16 @@ class Car {
   constructor(opts: CarOptions) {
     this.x = opts.x;
     this.y = opts.y;
-    this.width = opts.width ?? 30;
-    this.height = opts.height ?? 50;
+    this.width = opts.width ?? DEFAULT_CAR_CONFIG.width;
+    this.height = opts.height ?? DEFAULT_CAR_CONFIG.height;
 
     this.color = opts.color ?? 'blue';
     this.type = opts.controlType;
 
     this.speed = 0;
-    this.acceleration = opts.acceleration ?? 0.2;
-    this.maxSpeed = opts.maxSpeed ?? 3;
-    this.friction = opts.friction ?? 0.05;
+    this.acceleration = opts.acceleration ?? DEFAULT_CAR_CONFIG.acceleration;
+    this.maxSpeed = opts.maxSpeed ?? DEFAULT_CAR_CONFIG.maxSpeed;
+    this.friction = opts.friction ?? DEFAULT_CAR_CONFIG.friction;
     this.angle = opts.angle ?? 0;
     this.damaged = false;
 
@@ -186,10 +186,13 @@ class Car {
       height: this.height,
       hiddenLayers: [...this.hiddenLayers],
       sensor: {
-        rayCount: this.sensor?.rayCount ?? 5,
-        raySpread: this.sensor?.raySpread ?? Math.PI / 2,
-        rayLength: this.sensor?.rayLength ?? 150,
-        rayOffset: this.sensor?.rayOffset ?? 0,
+        rayCount: this.sensor?.rayCount ?? DEFAULT_CAR_CONFIG.sensor.rayCount,
+        raySpread:
+          this.sensor?.raySpread ?? DEFAULT_CAR_CONFIG.sensor.raySpread,
+        rayLength:
+          this.sensor?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength,
+        rayOffset:
+          this.sensor?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset,
       },
     };
   }

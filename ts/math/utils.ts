@@ -1,3 +1,20 @@
+const WORLD_PIXELS_PER_METER = 14;
+const METERS_PER_DEGREE_LATITUDE = 111000;
+
+const DEFAULT_CAR_CONFIG = {
+  maxSpeed: 3.24,
+  acceleration: 0.01,
+  friction: 0.002,
+  width: 25,
+  height: 63,
+  sensor: {
+    rayCount: 5,
+    rayLength: 150,
+    raySpread: Math.PI / 2,
+    rayOffset: 0,
+  },
+};
+
 function getNearestPoint(
   location: Point,
   points: Point[],

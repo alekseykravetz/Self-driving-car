@@ -309,8 +309,12 @@ class TrainingPanelElement extends HTMLElement {
       return value !== '' ? value : fallback;
     };
     const items: Array<[string, string, string]> = [
-      ['↕️', 'Height', v(this.carHeightInput, '50')],
-      ['↔️', 'Width', v(this.carWidthInput, '30')],
+      [
+        '↕️',
+        'Height',
+        v(this.carHeightInput, String(DEFAULT_CAR_CONFIG.height)),
+      ],
+      ['↔️', 'Width', v(this.carWidthInput, String(DEFAULT_CAR_CONFIG.width))],
       ['🧠', 'Hidden Layers', v(this.carHiddenLayersInput)],
       ['🚀', 'Max Speed', v(this.carMaxSpeedInput)],
       ['⚡', 'Accel', v(this.carAccelerationInput)],
@@ -349,11 +353,28 @@ class TrainingPanelElement extends HTMLElement {
       ? this.#parseHiddenLayers(this.carHiddenLayersInput.value)
       : [...this.hiddenLayers];
     return {
-      maxSpeed: this.#readNumericInput(this.carMaxSpeedInput, 3),
-      acceleration: this.#readNumericInput(this.carAccelerationInput, 0.2),
-      friction: this.#readNumericInput(this.carFrictionInput, 0.05),
-      width: this.#readNumericInput(this.carWidthInput, 30, true),
-      height: this.#readNumericInput(this.carHeightInput, 50, true),
+      maxSpeed: this.#readNumericInput(
+        this.carMaxSpeedInput,
+        DEFAULT_CAR_CONFIG.maxSpeed,
+      ),
+      acceleration: this.#readNumericInput(
+        this.carAccelerationInput,
+        DEFAULT_CAR_CONFIG.acceleration,
+      ),
+      friction: this.#readNumericInput(
+        this.carFrictionInput,
+        DEFAULT_CAR_CONFIG.friction,
+      ),
+      width: this.#readNumericInput(
+        this.carWidthInput,
+        DEFAULT_CAR_CONFIG.width,
+        true,
+      ),
+      height: this.#readNumericInput(
+        this.carHeightInput,
+        DEFAULT_CAR_CONFIG.height,
+        true,
+      ),
       hiddenLayers,
       sensor: {
         rayCount: this.#readNumericInput(this.carRayCountInput, 5, true),

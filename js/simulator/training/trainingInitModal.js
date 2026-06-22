@@ -216,11 +216,14 @@ class TrainingInitModalElement extends HTMLElement {
       this.querySelector('#tiCarHiddenLayers')?.value ?? '6',
     );
     return {
-      maxSpeed: this.#num('#tiCarMaxSpeed', 3),
-      acceleration: this.#num('#tiCarAcceleration', 0.2),
-      friction: this.#num('#tiCarFriction', 0.05),
-      width: this.#num('#tiCarWidth', 30, true),
-      height: this.#num('#tiCarHeight', 50, true),
+      maxSpeed: this.#num('#tiCarMaxSpeed', DEFAULT_CAR_CONFIG.maxSpeed),
+      acceleration: this.#num(
+        '#tiCarAcceleration',
+        DEFAULT_CAR_CONFIG.acceleration,
+      ),
+      friction: this.#num('#tiCarFriction', DEFAULT_CAR_CONFIG.friction),
+      width: this.#num('#tiCarWidth', DEFAULT_CAR_CONFIG.width, true),
+      height: this.#num('#tiCarHeight', DEFAULT_CAR_CONFIG.height, true),
       hiddenLayers: hidden,
       sensor: {
         rayCount: this.#num('#tiCarRayCount', 5, true),

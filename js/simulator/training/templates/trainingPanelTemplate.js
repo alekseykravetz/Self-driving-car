@@ -83,7 +83,7 @@ const TRAINING_PANEL_TEMPLATE = `
       <input
         type="number"
         id="carHeight"
-        value="50"
+        value="63"
         step="5"
         min="20"
         max="150"
@@ -96,7 +96,7 @@ const TRAINING_PANEL_TEMPLATE = `
       <input
         type="number"
         id="carWidth"
-        value="30"
+        value="25"
         step="5"
         min="10"
         max="100"
@@ -119,8 +119,8 @@ const TRAINING_PANEL_TEMPLATE = `
       <input
         type="number"
         id="carMaxSpeed"
-        value="3"
-        step="0.5"
+        value="3.24"
+        step="0.01"
         min="1"
         max="20"
         title="Car maximum speed"
@@ -132,9 +132,9 @@ const TRAINING_PANEL_TEMPLATE = `
       <input
         type="number"
         id="carAcceleration"
-        value="0.2"
-        step="0.01"
-        min="0.01"
+        value="0.01"
+        step="0.001"
+        min="0.001"
         max="1"
         title="Car acceleration"
       />
@@ -145,9 +145,9 @@ const TRAINING_PANEL_TEMPLATE = `
       <input
         type="number"
         id="carFriction"
-        value="0.05"
-        step="0.01"
-        min="0.01"
+        value="0.002"
+        step="0.001"
+        min="0.001"
         max="0.5"
         title="Car friction"
       />

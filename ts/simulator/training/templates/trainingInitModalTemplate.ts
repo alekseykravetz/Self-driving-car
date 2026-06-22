@@ -80,15 +80,15 @@ const TRAINING_INIT_MODAL_TEMPLATE = `
         </div>
         <div class="ctrl">
           <span class="ctrl-label">Max Speed</span>
-          <input type="number" id="tiCarMaxSpeed" min="1" max="20" step="0.5" />
+          <input type="number" id="tiCarMaxSpeed" min="1" max="20" step="0.01" />
         </div>
         <div class="ctrl">
           <span class="ctrl-label">Accel</span>
-          <input type="number" id="tiCarAcceleration" min="0.01" max="1" step="0.01" />
+          <input type="number" id="tiCarAcceleration" min="0.001" max="1" step="0.001" />
         </div>
         <div class="ctrl">
           <span class="ctrl-label">Friction</span>
-          <input type="number" id="tiCarFriction" min="0.01" max="0.5" step="0.01" />
+          <input type="number" id="tiCarFriction" min="0.001" max="0.5" step="0.001" />
         </div>
         <div class="ctrl">
           <span class="ctrl-label">Rays</span>

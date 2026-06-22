@@ -31,6 +31,9 @@ const allowedUnusedVars = [
   // math
   'Graph',
   'Osm',
+  'WORLD_PIXELS_PER_METER',
+  'METERS_PER_DEGREE_LATITUDE',
+  'DEFAULT_CAR_CONFIG',
   'getNearestPoint',
   'getNearestSegment',
   'distance',
@@ -268,6 +271,9 @@ const myGlobals = {
     // world math
     Graph: 'readonly',
     Osm: 'readonly',
+    WORLD_PIXELS_PER_METER: 'readonly',
+    METERS_PER_DEGREE_LATITUDE: 'readonly',
+    DEFAULT_CAR_CONFIG: 'readonly',
     // world math utils
     getNearestPoint: 'readonly',
     getNearestSegment: 'readonly',

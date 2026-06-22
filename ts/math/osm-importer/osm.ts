@@ -76,9 +76,10 @@ class Osm {
     // Calculate aspect ratio, handle deltaLat being zero
     const ar = deltaLat === 0 ? 1 : deltaLon / deltaLat;
 
-    // Calculate target canvas dimensions based on geographic range
-    // 1 degree latitude ~= 111 km (111000 meters). And * 10 is to scale our road width of 100px to 10 meters
-    const height = deltaLat * 111000 * 10;
+    // Calculate target canvas dimensions based on geographic range.
+    // At 14px/m, a 100px two-lane road maps to ~7.1m, close to real roads.
+    const height =
+      deltaLat * METERS_PER_DEGREE_LATITUDE * WORLD_PIXELS_PER_METER;
     // Adjust width based on aspect ratio and latitude (cosine correction for longitude distance)
     // Using average latitude might be slightly better than maxLat for large areas
     const avgLat = (minLat + maxLat) / 2;
