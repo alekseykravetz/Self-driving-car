@@ -242,9 +242,11 @@ class GraphEditor {
     }
     if (this.selected) {
       const intent = this.hovered ?? this.mouse;
-      new Segment(this.selected, intent).draw(this.ctx, {
+      const segment = new Segment(this.selected, intent);
+      segment.draw(this.ctx, {
         dash: [3, 3],
       });
+      this.#drawIntentMeasurements(segment);
       this.selected.draw(this.ctx, { outline: true });
     }
     if (this.shortestPath) {
@@ -252,5 +254,36 @@ class GraphEditor {
         seg.draw(this.ctx, { color: 'red', width: 4 });
       });
     }
+  }
+
+  #drawIntentMeasurements(segment) {
+    const lengthPx = segment.length();
+    if (lengthPx < 1) return;
+    const dir = subtract(segment.p2, segment.p1);
+    const angleFromStart = Math.atan2(dir.y, dir.x);
+    const label = `${formatMetersFromWorldPixels(lengthPx)}  ${formatDegrees(angleFromStart)}`;
+    const paddingX = 8;
+    const paddingY = 5;
+    const gap = 12 * this.viewport.zoom;
+    const fontSize = 13 * this.viewport.zoom;
+    const normal = perpendicular(normalize(dir));
+    const anchor = add(segment.p2, scale(normal, gap));
+    this.ctx.save();
+    this.ctx.font = `${fontSize}px Arial`;
+    this.ctx.textBaseline = 'middle';
+    const width = this.ctx.measureText(label).width + paddingX * 2;
+    const height = fontSize + paddingY * 2;
+    const x = anchor.x - width / 2;
+    const y = anchor.y - height / 2;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+    this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.28)';
+    this.ctx.lineWidth = 1 * this.viewport.zoom;
+    this.ctx.beginPath();
+    this.ctx.roundRect(x, y, width, height, 4 * this.viewport.zoom);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.fillStyle = '#111';
+    this.ctx.fillText(label, x + paddingX, anchor.y);
+    this.ctx.restore();
   }
 }

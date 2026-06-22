@@ -1,4 +1,5 @@
 const WORLD_PIXELS_PER_METER = 14;
+const SIMULATION_FPS = 60;
 const METERS_PER_DEGREE_LATITUDE = 111000;
 
 const DEFAULT_CAR_CONFIG = {
@@ -51,6 +52,38 @@ function getNearestSegment(
 
 function distance(p1: Point, p2: Point): number {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+function worldPixelsToMeters(px: number): number {
+  return px / WORLD_PIXELS_PER_METER;
+}
+
+function metersToWorldPixels(meters: number): number {
+  return meters * WORLD_PIXELS_PER_METER;
+}
+
+function pxPerFrameToKmh(pxPerFrame: number): number {
+  return (pxPerFrame * SIMULATION_FPS * 3.6) / WORLD_PIXELS_PER_METER;
+}
+
+function kmhToPxPerFrame(kmh: number): number {
+  return ((kmh / 3.6) * WORLD_PIXELS_PER_METER) / SIMULATION_FPS;
+}
+
+function radiansToDegrees(radians: number): number {
+  return (radians * 180) / Math.PI;
+}
+
+function formatMetersFromWorldPixels(px: number): string {
+  return `${worldPixelsToMeters(px).toFixed(1)} m`;
+}
+
+function formatKmhFromPxPerFrame(pxPerFrame: number): string {
+  return `${pxPerFrameToKmh(pxPerFrame).toFixed(1)} km/h`;
+}
+
+function formatDegrees(radians: number): string {
+  return `${radiansToDegrees(radians).toFixed(0)}°`;
 }
 
 function average(p1: Point, p2: Point): Point {

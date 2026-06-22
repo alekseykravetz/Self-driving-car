@@ -10,8 +10,6 @@ function generateInitialTraffic(getLaneCenter, startAngle) {
   return [
     // Row y=-100: lane 1 only
     new Car({
-      width: 30,
-      height: 50,
       x: getLaneCenter(1),
       y: -100,
       controlType: 'DUMMY',
@@ -21,8 +19,6 @@ function generateInitialTraffic(getLaneCenter, startAngle) {
     }),
     // Row y=-300: lanes 0 and 2
     new Car({
-      width: 30,
-      height: 50,
       x: getLaneCenter(0),
       y: -300,
       controlType: 'DUMMY',
@@ -31,8 +27,6 @@ function generateInitialTraffic(getLaneCenter, startAngle) {
       color: getRandomColor(),
     }),
     new Car({
-      width: 30,
-      height: 50,
       x: getLaneCenter(2),
       y: -300,
       controlType: 'DUMMY',
@@ -42,8 +36,6 @@ function generateInitialTraffic(getLaneCenter, startAngle) {
     }),
     // Row y=-500: lanes 0 and 1
     new Car({
-      width: 30,
-      height: 50,
       x: getLaneCenter(0),
       y: -500,
       controlType: 'DUMMY',
@@ -52,8 +44,6 @@ function generateInitialTraffic(getLaneCenter, startAngle) {
       color: getRandomColor(),
     }),
     new Car({
-      width: 30,
-      height: 50,
       x: getLaneCenter(1),
       y: -500,
       controlType: 'DUMMY',
@@ -63,8 +53,6 @@ function generateInitialTraffic(getLaneCenter, startAngle) {
     }),
     // Row y=-700: lanes 1 and 2
     new Car({
-      width: 30,
-      height: 50,
       x: getLaneCenter(1),
       y: -700,
       controlType: 'DUMMY',
@@ -73,8 +61,6 @@ function generateInitialTraffic(getLaneCenter, startAngle) {
       color: getRandomColor(),
     }),
     new Car({
-      width: 30,
-      height: 50,
       x: getLaneCenter(2),
       y: -700,
       controlType: 'DUMMY',
@@ -97,8 +83,6 @@ function generateTrafficRow(y, getLaneCenter, laneCount, startAngle) {
   return activeLanes.map(
     (lane) =>
       new Car({
-        width: 30,
-        height: 50,
         x: getLaneCenter(lane),
         y,
         controlType: 'DUMMY',
