@@ -249,8 +249,8 @@ the pool per the chosen source, then runs `newTraining()`.
 | Next Gen (🧬)  | Button     | —          | Next generation (keeps top brains + mutates)                       |
 | New Train (🔄) | Button     | —          | Opens the Training-Init modal (params + car config + brain source) |
 | Max Speed      | Number     | 1–20       | Car maximum speed (change → new training)                          |
-| Accel          | Number     | 0.01–1     | Car acceleration (change → new training)                           |
-| Friction       | Number     | 0.01–0.5   | Car friction (change → new training)                               |
+| Accel          | Number     | 0.001–1    | Car acceleration (change → new training)                           |
+| Friction       | Number     | 0.001–0.5  | Car friction (change → new training)                               |
 | Width          | Number     | 10–100     | Car body width (change → new training)                             |
 | Height         | Number     | 20–150     | Car body height (change → new training)                            |
 | Rays           | Number     | 1–20       | Sensor ray count (change → new training)                           |

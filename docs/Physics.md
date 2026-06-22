@@ -12,13 +12,13 @@ The `ts/car/` directory implements vehicle dynamics, environmental perception vi
 interface CarConstructorOptions {
   x: number;
   y: number;
-  width?: number; // Default: 30
-  height?: number; // Default: 50
+  width?: number; // Default: 25 (~1.8m at 14px/m)
+  height?: number; // Default: 63 (~4.5m at 14px/m)
   controlType?: string; // 'AI' | 'KEYS' | 'DUMMY'
   angle?: number; // Starting heading (radians, 0 = up)
-  maxSpeed?: number; // Default: 3
-  acceleration?: number; // Default: 0.2
-  friction?: number; // Default: 0.05
+  maxSpeed?: number; // Default: 3.24 (~50 km/h)
+  acceleration?: number; // Default: 0.01
+  friction?: number; // Default: 0.002
   color?: string; // Body color
   hiddenLayers?: number[]; // Neural network hidden layers (default: [6])
   sensor?: SensorConfig; // Ray-casting config
@@ -83,6 +83,48 @@ class Car {
 
 ## Movement Model
 
+### World Units
+
+The world scale is defined in `ts/math/utils.ts`:
+
+```typescript
+const WORLD_PIXELS_PER_METER = 14;
+```
+
+This means:
+
+| World value | Real distance |
+| ----------- | ------------- |
+| 1px         | 0.071m        |
+| 14px        | 1m            |
+| 49px        | 3.5m lane     |
+| 98-100px    | 2-lane road   |
+
+The default car is sized from real dimensions:
+
+| Real size | World size |
+| --------- | ---------- |
+| 1.8m wide | 25px wide  |
+| 4.5m long | 63px long  |
+
+### Unit Formulas
+
+The simulation updates once per animation frame. At the target 60 FPS:
+
+```
+meters = pixels / WORLD_PIXELS_PER_METER
+pixels = meters * WORLD_PIXELS_PER_METER
+
+m/s = pxPerFrame * 60 / WORLD_PIXELS_PER_METER
+km/h = pxPerFrame * 60 / WORLD_PIXELS_PER_METER * 3.6
+
+pxPerFrame = km/h / 3.6 * WORLD_PIXELS_PER_METER / 60
+pxPerFrame = km/h * 0.0648148    // when WORLD_PIXELS_PER_METER = 14
+
+px/frame² = m/s² * WORLD_PIXELS_PER_METER / 60²
+px/frame² = m/s² * 0.0038889     // when WORLD_PIXELS_PER_METER = 14
+```
+
 Each frame, `Car.#move()` executes this sequence:
 
 ### 1. Acceleration
@@ -92,19 +134,19 @@ if (controls.forward) speed += acceleration
 if (controls.reverse) speed -= acceleration
 ```
 
-### 2. Friction (always applied)
+### 2. Speed Capping
+
+```
+if (speed > maxSpeed) speed = maxSpeed
+if (speed < -maxSpeed / 2) speed = -maxSpeed / 2   // Reverse is 50% of forward
+```
+
+### 3. Friction (always applied)
 
 ```
 if (speed > 0) speed -= friction
 if (speed < 0) speed += friction
 if (|speed| < friction) speed = 0    // Prevent oscillation around zero
-```
-
-### 3. Speed Capping
-
-```
-if (speed > maxSpeed) speed = maxSpeed
-if (speed < -maxSpeed / 2) speed = -maxSpeed / 2   // Reverse is 50% of forward
 ```
 
 ### 4. Steering
@@ -130,16 +172,68 @@ y -= cos(angle) * speed    // Y-axis inverted (up = negative Y)
 - Friction brings the car to a natural stop when no input is applied
 - Maximum reverse speed is 50% of forward max speed
 - Steering rate is fixed at 0.03 rad/frame (~1.7°/frame at 60 FPS)
+- Because friction is always applied, the default forward net acceleration is
+  `0.01 - 0.002 = 0.008 px/frame²` while the accelerator is held.
 
 ### Default Parameters
 
-| Parameter      | Default | Unit      | Description              |
-| -------------- | ------- | --------- | ------------------------ |
-| `maxSpeed`     | 3       | px/frame  | Maximum forward velocity |
-| `acceleration` | 0.2     | px/frame² | Speed increase per frame |
-| `friction`     | 0.05    | px/frame² | Speed decrease per frame |
-| `width`        | 30      | px        | Car body width           |
-| `height`       | 50      | px        | Car body height          |
+| Parameter      | Default | Real-world meaning                | Description               |
+| -------------- | ------- | --------------------------------- | ------------------------- |
+| `maxSpeed`     | 3.24    | ~50 km/h                          | Maximum forward velocity  |
+| `acceleration` | 0.01    | ~2.57 m/s² before friction        | Speed increase per frame  |
+| `friction`     | 0.002   | ~0.51 m/s² coast-down             | Speed decrease per frame  |
+| `width`        | 25      | ~1.8m                             | Car body width            |
+| `height`       | 63      | ~4.5m                             | Car body height           |
+| reverse limit  | 1.62    | ~25 km/h                          | `maxSpeed / 2` backward   |
+| net accel      | 0.008   | ~2.06 m/s² while pressing forward | `acceleration - friction` |
+
+### Speed Reference Table
+
+At `WORLD_PIXELS_PER_METER = 14` and 60 FPS:
+
+| Road/use case       | km/h | m/s  | px/frame | Notes                    |
+| ------------------- | ---- | ---- | -------- | ------------------------ |
+| Parking / crawling  | 5    | 1.39 | 0.32     | Very slow maneuvering    |
+| School zone         | 20   | 5.56 | 1.30     | Slow urban traffic       |
+| Residential         | 30   | 8.33 | 1.94     | Calm neighborhood speed  |
+| City default        | 50   | 13.9 | 3.24     | Current default maxSpeed |
+| Fast urban arterial | 70   | 19.4 | 4.54     | Feels quick on city maps |
+| Highway             | 90   | 25.0 | 5.83     | Fast road                |
+| Motorway            | 100  | 27.8 | 6.48     | Highway default option   |
+| Fast motorway       | 130  | 36.1 | 8.43     | Very fast in-game        |
+
+Useful inverse checks:
+
+| px/frame | Approx km/h |
+| -------- | ----------- |
+| 1        | 15.4        |
+| 2        | 30.9        |
+| 3.24     | 50.0        |
+| 5        | 77.1        |
+| 8        | 123.4       |
+
+### Acceleration & Friction Reference
+
+Use these formulas when tuning:
+
+```
+realAccelerationMps2 = pxPerFrame2 * 60² / WORLD_PIXELS_PER_METER
+pxPerFrame2 = realAccelerationMps2 * WORLD_PIXELS_PER_METER / 60²
+```
+
+| Real behavior        | m/s² | px/frame² |
+| -------------------- | ---- | --------- |
+| Gentle coasting drag | 0.5  | 0.0019    |
+| Default friction     | 0.51 | 0.0020    |
+| Smooth acceleration  | 1.5  | 0.0058    |
+| Default acceleration | 2.57 | 0.0100    |
+| Strong acceleration  | 4.0  | 0.0156    |
+| Hard braking         | 8.0  | 0.0311    |
+
+The current controls use the same `acceleration` value for forward and reverse.
+There is no separate brake force yet, so pressing reverse while moving forward
+slows the car by roughly `acceleration + friction` per frame until speed crosses
+zero.
 
 ---
 
@@ -410,11 +504,11 @@ Plain JSON matching the `CarInfo` interface:
 
 ```json
 {
-  "maxSpeed": 8,
-  "acceleration": 0.08,
-  "friction": 0.04,
-  "width": 30,
-  "height": 50,
+  "maxSpeed": 3.24,
+  "acceleration": 0.01,
+  "friction": 0.002,
+  "width": 25,
+  "height": 63,
   "hiddenLayers": [6],
   "sensor": {
     "rayCount": 5,

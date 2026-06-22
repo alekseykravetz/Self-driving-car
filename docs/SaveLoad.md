@@ -40,11 +40,11 @@ The project uses two persistence mechanisms: browser localStorage for training s
 ```json
 [
   {
-    "maxSpeed": 3,
-    "acceleration": 0.2,
-    "friction": 0.05,
-    "width": 30,
-    "height": 50,
+    "maxSpeed": 3.24,
+    "acceleration": 0.01,
+    "friction": 0.002,
+    "width": 25,
+    "height": 63,
     "hiddenLayers": [6],
     "sensor": {
       "rayCount": 5,
@@ -154,11 +154,11 @@ const worldInfo = JSON.parse(content.trim());
 
 ```json
 {
-  "maxSpeed": 8,
-  "acceleration": 0.08,
-  "friction": 0.04,
-  "width": 30,
-  "height": 50,
+  "maxSpeed": 3.24,
+  "acceleration": 0.01,
+  "friction": 0.002,
+  "width": 25,
+  "height": 63,
   "hiddenLayers": [6],
   "sensor": { "rayCount": 2, "rayLength": 350, "raySpread": 0.8, "rayOffset": -0.4 },
   "brain": { "levels": [...] }

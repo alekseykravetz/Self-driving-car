@@ -519,8 +519,9 @@ class Osm {
    deltaLon = maxLon - minLon
 
 3. COMPUTE SCALE
-   height = deltaLat * 111000 * 10
-   // 1° latitude ≈ 111km, ×10 to match road width of 100px ≈ 10m
+   height = deltaLat * METERS_PER_DEGREE_LATITUDE * WORLD_PIXELS_PER_METER
+   // 1° latitude ≈ 111km, WORLD_PIXELS_PER_METER = 14
+   // 14px = 1m, so a 100px two-lane road is ≈7.1m
    ar = deltaLon / deltaLat (aspect ratio)
    width = height * ar * cos(avgLatitude)
    // Cosine correction for longitude distance at latitude
@@ -540,6 +541,34 @@ class Osm {
 
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)
+```
+
+### Real-World Scale
+
+The OSM importer uses the shared project scale from `ts/math/utils.ts`:
+
+```typescript
+const WORLD_PIXELS_PER_METER = 14;
+const METERS_PER_DEGREE_LATITUDE = 111000;
+```
+
+That gives:
+
+| Real distance | World distance |
+| ------------- | -------------- |
+| 1m            | 14px           |
+| 3.5m lane     | 49px           |
+| 7m road       | 98px           |
+| 10m           | 140px          |
+| 100m          | 1400px         |
+| 1km           | 14000px        |
+
+This makes the existing `100px` road envelope close to a real two-lane urban
+road rather than a wide `10m` road. Longitude still needs the cosine correction
+because one degree of longitude is shorter away from the equator:
+
+```
+width = height * (deltaLon / deltaLat) * cos(avgLatitude)
 ```
 
 ### Example Workflow
