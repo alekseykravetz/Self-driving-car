@@ -41,7 +41,7 @@ function updateWorldCars(
     if (
       idleEnabled &&
       car !== bestCar &&
-      Math.hypot(car.x - bestCar.x, car.y - bestCar.y) > idleRange &&
+      bestCar.fitness - car.fitness > idleRange &&
       !(car.damaged && borderMode === 'collision')
     ) {
       frozenCount++;
