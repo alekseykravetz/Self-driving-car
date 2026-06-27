@@ -395,6 +395,7 @@ class WorldEditor {
       tool.editor.display(); // Call display method of active editor
     }
     this.ctx.globalAlpha = 1.0; // Reset alpha
+    this.viewport.drawScaleIndicator(this.ctx);
     // Update MiniMapViewPort
     this.miniMapViewport.reset();
     // Draw the MiniMap
@@ -403,6 +404,8 @@ class WorldEditor {
       cars: [],
       roadColor: '#BBB',
       carColor: 'red',
+      viewport: this.miniMapViewport,
+      compactScaleIndicator: true,
     }); // Update minimap based on main viewpoint
   }
 

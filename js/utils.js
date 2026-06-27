@@ -52,3 +52,14 @@ function safeJsonParse(raw) {
     return null;
   }
 }
+
+/**
+ * Strip the final file extension from a display name.
+ * e.g. "circle.world" → "circle", "best_brain.car" → "best_brain".
+ * If there is no dot (or the dot is the first character), the name is returned
+ * unchanged.
+ */
+function stripFileExtension(name) {
+  const dot = name.lastIndexOf('.');
+  return dot > 0 ? name.slice(0, dot) : name;
+}

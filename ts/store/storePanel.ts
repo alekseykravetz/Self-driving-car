@@ -198,7 +198,7 @@ class StorePanelElement extends HTMLElement {
         (w) => `
       <tr class="${w.id === activeId ? 'store-row-active' : ''}">
         <td class="store-marker">${w.id === activeId ? '✓' : ''}</td>
-        <td>${w.name}</td>
+        <td>${stripFileExtension(w.name)}</td>
         <td class="store-source">${w.source}</td>
         <td class="store-marker">${w.hasStartMarker ? '✓' : '✗'}</td>
         <td class="store-marker">${w.hasEndMarker ? '✓' : '✗'}</td>
@@ -256,7 +256,7 @@ class StorePanelElement extends HTMLElement {
         (c) => `
       <tr class="${activeIds.has(c.id) ? 'store-row-active' : ''}">
         <td class="store-marker">${activeIds.has(c.id) ? '✓' : ''}</td>
-        <td>${c.name}</td>
+        <td>${stripFileExtension(c.name)}</td>
         <td class="store-source">${c.source}</td>
         <td>${spFormatHiddenLayers(c.data)}</td>
         <td>${c.data.maxSpeed}</td>

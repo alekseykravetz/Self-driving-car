@@ -86,6 +86,29 @@ function formatDegrees(radians: number): string {
   return `${radiansToDegrees(radians).toFixed(0)}°`;
 }
 
+/**
+ * Convert simulation frames to real-world seconds based on SIMULATION_FPS.
+ * At 60 FPS: 60 frames = 1 second
+ */
+function framesToSeconds(frames: number): number {
+  return frames / SIMULATION_FPS;
+}
+
+/**
+ * Format elapsed simulation time as HH:MM:SS string.
+ * @param frames Total elapsed simulation frames
+ * @returns Formatted time string like "00:05:30" for 5 minutes 30 seconds
+ */
+function formatElapsedTime(frames: number): string {
+  const totalSeconds = Math.floor(framesToSeconds(frames));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const pad = (num: number) => String(num).padStart(2, '0');
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
 function average(p1: Point, p2: Point): Point {
   return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
 }

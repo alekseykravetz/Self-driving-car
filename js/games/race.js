@@ -318,6 +318,7 @@ class Race {
       carAlpha: 1,
       showCarNames: true,
     });
+    this.viewport.drawScaleIndicator(this.gameCtx);
     this.miniMap.draw({ viewPoint, cars: this.cars });
     // Rotate the minimap canvas itself to match tracked car orientation
     const rotationTarget = trackTarget ?? this.myCar;

@@ -490,6 +490,7 @@ class TrainingSimulator extends SimulatorShell {
 
     this.viewport.reset();
     simpleWorld.draw(this.gameCtx, { viewPoint: new Point(0, 0) });
+    this.viewport.drawScaleIndicator(this.gameCtx);
 
     // Draw traffic
     for (let i = 0; i < this.simpleState.traffic.length; i++) {
@@ -614,6 +615,7 @@ class TrainingSimulator extends SimulatorShell {
 
     // Draw world without cars (we draw them ourselves to show pool rankings)
     this.world.draw(this.gameCtx, { viewPoint, showStartMarkings: false });
+    this.viewport.drawScaleIndicator(this.gameCtx);
 
     // Masks are cached, pre-composited sprites (one drawImage per car), so they
     // stay cheap even with very large populations.
@@ -692,12 +694,14 @@ class TrainingSimulator extends SimulatorShell {
     frozenCount: number,
   ): void {
     this.trainingManager.updateDistance(distance);
+    // Update bestCar first so the current-frame speed is available below.
+    this.trainingManager.updateBestCarAndPool();
     this.trainingManager.updateStatsDisplay(
       aliveCount,
       deadCount,
       frozenCount,
       this.trainingManager.maxDistancePassed,
+      this.trainingManager.bestCar?.speed ?? 0,
     );
-    this.trainingManager.updateBestCarAndPool();
   }
 }

@@ -15,6 +15,7 @@ type ViewportMode = 'mouse' | 'touchpad';
 class Viewport {
   public canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private scaleIndicator: ScaleIndicator;
 
   public zoom: number;
   public center: Point; // Center of the canvas element itself
@@ -56,6 +57,7 @@ class Viewport {
     this.center = new Point(canvas.width / 2, canvas.height / 2);
     // Initial offset: use provided one or default to negative center (world origin at top-left)
     this.offset = offset ?? scale(this.center, -1); // Nullish coalescing for default
+    this.scaleIndicator = new ScaleIndicator(canvas.width, canvas.height, this);
 
     // Bind event handlers
     this.boundHandleMouseWheel = this.#handleMouseWheel.bind(this);
@@ -71,6 +73,9 @@ class Viewport {
    * Should be called at the beginning of each render loop.
    */
   public reset(): void {
+    // Keep viewport center in sync with responsive canvas resizes.
+    this.center = new Point(this.canvas.width / 2, this.canvas.height / 2);
+
     this.ctx.restore(); // Restore to default state (clears previous transforms)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Clear the canvas
     this.ctx.save(); // Save the clean state before applying new transforms
@@ -107,6 +112,22 @@ class Viewport {
   public getOffset(): Point {
     // Total offset is the permanent offset plus the current drag offset
     return add(this.offset, this.drag.offset);
+  }
+
+  public getZoom(): number {
+    return this.zoom;
+  }
+
+  public getPixelsPerMeter(): number {
+    return WORLD_PIXELS_PER_METER / this.zoom;
+  }
+
+  public drawScaleIndicator(
+    ctx: CanvasRenderingContext2D = this.ctx,
+    viewportWidth: number = this.canvas.width,
+    viewportHeight: number = this.canvas.height,
+  ): void {
+    this.scaleIndicator.draw(ctx, viewportWidth, viewportHeight);
   }
 
   /**

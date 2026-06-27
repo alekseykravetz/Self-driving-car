@@ -131,6 +131,9 @@ class SimulatorShell {
     if (render) {
       this.draw(time);
     }
+    // Record the frame in the animation loop toolbar for time tracking
+    // Pass true as second parameter if this is a rendered frame
+    this.animationLoopToolbar.recordFrame(render);
     this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
   }
 }

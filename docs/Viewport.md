@@ -26,9 +26,20 @@ class Viewport {
   constructor(canvas: HTMLCanvasElement, zoom?: number, offset?: Point);
 
   // Transform methods
-  reset(): void; // Apply transform to context
+  reset(): void; // Apply transform to context (also syncs center to canvas size)
   getMouse(e: MouseEvent, subtractDragOffset?): Point; // Screen → world coords
   getOffset(): Point; // Total offset (permanent + drag)
+
+  // Zoom / scale accessors
+  getZoom(): number; // Returns current zoom value
+  getPixelsPerMeter(): number; // Returns WORLD_PIXELS_PER_METER / zoom
+
+  // Scale indicator
+  drawScaleIndicator(
+    ctx?: CanvasRenderingContext2D, // defaults to this.ctx
+    viewportWidth?: number, // defaults to canvas.width
+    viewportHeight?: number, // defaults to canvas.height
+  ): void;
 
   // Lifecycle
   // (Event listeners auto-attached in constructor)
@@ -73,6 +84,9 @@ Called at the start of each render loop:
 
 ```typescript
 reset(): void {
+  // Sync center to canvas dimensions (handles responsive resizes)
+  this.center = new Point(this.canvas.width / 2, this.canvas.height / 2);
+
   this.ctx.restore();   // Clear previous frame's transform
   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   this.ctx.save();      // Save clean state
@@ -250,12 +264,16 @@ interface MiniMapDrawOptions {
   roadColor?: string;
   carColor?: string;
   backgroundColor?: string;
+  viewport?: Viewport; // When provided, draws a ScaleIndicator overlay
+  compactScaleIndicator?: boolean; // true = inline mode (default), false = standard mode
 }
 ```
 
 > The mini-map is **stateless**: cars are passed into `draw()` every frame
 > rather than stored on the instance. `World.draw()` follows the same pattern —
 > cars/bestCar are `WorldDrawOptions` inputs, not `World` fields.
+
+When `viewport` is passed in `MiniMapDrawOptions`, a `ScaleIndicator` is lazy-initialized on first call and drawn in compact inline mode by default. The indicator uses the mini-map's own `scaler` as both `pixelsPerMeterMultiplier` and `zoomMultiplier` so the bar length and zoom text correctly reflect the mini-map scale.
 
 ### Rendering
 
@@ -312,3 +330,84 @@ this.miniMap = new MiniMap(miniMapCanvas, miniMapGraph, 300, 0.1);
 // Each frame:
 this.miniMap.draw({ viewPoint, cars: this.cars });
 ```
+
+---
+
+## Scale Indicator (`ts/viewport/scaleIndicator.ts`)
+
+The `ScaleIndicator` class draws a fixed-screen-space HUD overlay showing a distance scale bar and the current zoom level. It is owned by `Viewport` and exposed via `drawScaleIndicator()`.
+
+### Class Structure
+
+```typescript
+interface ScaleIndicatorOptions {
+  paddingX?: number; // Pixels from left edge (default: 20)
+  paddingY?: number; // Pixels from bottom edge (default: 20)
+  lineColor?: string; // Bar/text color (default: '#f5f5f5')
+  outlineColor?: string; // Shadow/outline color (default: 'rgba(0,0,0,0.8)')
+  fontSize?: number; // Label font size in px (default: 12)
+  lineWidth?: number; // Bar stroke width (default: 2)
+  scaleInMeters?: number; // Reference distance in meters (default: 10)
+  pixelsPerMeterMultiplier?: number; // Multiplier for non-1:1 canvases (default: 1)
+  zoomMultiplier?: number; // Multiplier for displayed zoom text (default: 1)
+  inlineStats?: boolean; // Compact inline layout (default: false)
+  statSeparator?: string; // Separator in inline mode (default: ' • ')
+}
+
+class ScaleIndicator {
+  constructor(
+    canvasWidth: number,
+    canvasHeight: number,
+    viewport: Viewport,
+    options?: ScaleIndicatorOptions,
+  );
+
+  update(viewportWidth?: number, viewportHeight?: number): void;
+  draw(
+    ctx: CanvasRenderingContext2D,
+    viewportWidth: number,
+    viewportHeight: number,
+  ): void;
+}
+```
+
+### Display Modes
+
+**Standard mode** (`inlineStats: false`, default — used on main canvas):
+
+```
+Zoom: 1.50x
+├────────────┤ 10 m
+```
+
+Zoom label above bar, distance label to the right.
+
+**Inline/compact mode** (`inlineStats: true` — used on mini-map):
+
+```
+├──────┤ 1.50x • 10 m
+```
+
+Zoom and scale on one line after the bar. Smaller font and padding.
+
+### Integration
+
+`Viewport` creates and owns a `ScaleIndicator` in its constructor. Call `drawScaleIndicator()` after all world/game drawing but before any other HUD elements:
+
+```typescript
+// In render loop — after world draw, before HUD:
+this.viewport.drawScaleIndicator(this.gameCtx);
+```
+
+For mini-map, pass the mini-map's own viewport in draw options:
+
+```typescript
+this.miniMap.draw({
+  viewPoint,
+  cars: [],
+  viewport: this.miniMapViewport,
+  compactScaleIndicator: true,
+});
+```
+
+The indicator draws in **screen space** (resets the canvas transform with `setTransform(1,0,0,1,0,0)`) so it always appears at the same position regardless of pan/zoom state.

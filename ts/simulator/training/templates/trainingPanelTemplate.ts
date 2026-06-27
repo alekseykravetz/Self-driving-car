@@ -27,13 +27,20 @@ const TRAINING_PANEL_TEMPLATE = `
 <div class="panel-section">
   <div class="section-title">Statistics</div>
   <div id="statsPanel">
-    <div class="stat-row stat-row-double">
+    <div class="stat-row">
       <span class="stat-emoji">🧬</span>
       <span class="stat-label">Gen</span>
       <span class="stat-value" id="stat-gen">0</span>
+    </div>
+    <div class="stat-row">
       <span class="stat-emoji">🛣️</span>
       <span class="stat-label">Dist</span>
       <span class="stat-value" id="stat-dist">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-emoji">💨</span>
+      <span class="stat-label">Speed</span>
+      <span class="stat-value" id="stat-speed">0 km/h</span>
     </div>
     <div class="stat-row">
       <span class="stat-emoji">🟢</span>
@@ -294,6 +301,7 @@ const TRAINING_PANEL_TEMPLATE = `
         <tr>
           <th>#</th>
           <th>Name</th>
+          <th>Speed</th>
           <th>Fitness</th>
         </tr>
       </thead>

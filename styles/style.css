@@ -971,6 +971,54 @@ input[type='file'] {
   gap: 2px;
 }
 
+.time-display-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.elapsed-time {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 45px;
+  text-align: center;
+}
+
+.reset-time-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.reset-time-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.reset-time-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fps-display {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  min-width: 45px;
+  text-align: center;
+}
+
 .spawn-car-picker {
   display: flex;
   align-items: center;
@@ -1168,8 +1216,8 @@ input[type='file'] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 26px;
-  height: 26px;
+  min-width: 32px;
+  height: 32px;
   padding: 0 5px;
   font-family: monospace;
   font-size: 13px;

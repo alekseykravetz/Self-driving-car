@@ -146,8 +146,8 @@ class TrafficPanelElement extends HTMLElement {
       const crashed = car.damaged;
       status.textContent = crashed ? '💥' : '🟢';
       status.title = crashed ? 'Crashed' : 'Driving';
-      speed.textContent = car.speed.toFixed(1);
-      dist.textContent = String(Math.round(car.fitness));
+      speed.textContent = formatKmhFromPxPerFrame(car.speed);
+      dist.textContent = formatMetersFromWorldPixels(car.fitness);
       swatch.style.background = crashed ? '#777' : car.color;
       row.classList.toggle('crashed', crashed);
       row.classList.toggle('selected', car === this.#selected);
@@ -201,11 +201,11 @@ class TrafficPanelElement extends HTMLElement {
     const metrics = document.createElement('div');
     metrics.className = 'traffic-car-metrics';
     const speedWrap = document.createElement('span');
-    speedWrap.title = 'Speed';
+    speedWrap.title = 'Speed (km/h)';
     const speed = document.createElement('b');
     speedWrap.append('⚡ ', speed);
     const distWrap = document.createElement('span');
-    distWrap.title = 'Distance travelled';
+    distWrap.title = 'Distance travelled (m)';
     const dist = document.createElement('b');
     distWrap.append('🛣️ ', dist);
     metrics.append(speedWrap, distWrap);

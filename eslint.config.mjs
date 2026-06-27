@@ -67,6 +67,7 @@ const allowedUnusedVars = [
   'getRandomColor',
   'getFake3dPoint',
   'safeJsonParse',
+  'stripFileExtension',
   'parseCarFileContent',
   'compareCarInfoParams',
 
@@ -103,6 +104,7 @@ const allowedUnusedVars = [
   'WorldGenerator',
   'SimpleWorld',
   'Viewport',
+  'ScaleIndicator',
   'TrainingSimulator',
   'SimulatorShell',
   'Camera',
@@ -317,6 +319,7 @@ const myGlobals = {
     getRandomColor: 'readonly',
     getFake3dPoint: 'readonly',
     safeJsonParse: 'readonly',
+    stripFileExtension: 'readonly',
 
     // world items
     Building: 'readonly',
@@ -351,6 +354,7 @@ const myGlobals = {
     WorldGenerator: 'readonly',
     SimpleWorld: 'readonly',
     Viewport: 'readonly',
+    ScaleIndicator: 'readonly',
     TrafficManager: 'readonly',
 
     // world editor

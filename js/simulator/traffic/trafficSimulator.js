@@ -280,6 +280,7 @@ class TrafficSimulator extends SimulatorShell {
     // Draw the world without its own cars; we render the placed cars ourselves
     // so we can grey-out wrecks and show the selected car's sensor.
     this.#world.draw(this.gameCtx, { viewPoint, showStartMarkings: false });
+    this.viewport.drawScaleIndicator(this.gameCtx);
     const selected = this.#statsPanel.getSelectedCar();
     for (let i = 0; i < this.#cars.length; i++) {
       const car = this.#cars[i];

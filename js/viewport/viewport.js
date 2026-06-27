@@ -2,6 +2,7 @@
 class Viewport {
   canvas;
   ctx;
+  scaleIndicator;
   zoom;
   center; // Center of the canvas element itself
   offset; // Offset of the world origin relative to the scaled canvas center
@@ -35,6 +36,7 @@ class Viewport {
     this.center = new Point(canvas.width / 2, canvas.height / 2);
     // Initial offset: use provided one or default to negative center (world origin at top-left)
     this.offset = offset ?? scale(this.center, -1); // Nullish coalescing for default
+    this.scaleIndicator = new ScaleIndicator(canvas.width, canvas.height, this);
     // Bind event handlers
     this.boundHandleMouseWheel = this.#handleMouseWheel.bind(this);
     this.boundHandleMouseDown = this.#handleMouseDown.bind(this);
@@ -48,6 +50,8 @@ class Viewport {
    * Should be called at the beginning of each render loop.
    */
   reset() {
+    // Keep viewport center in sync with responsive canvas resizes.
+    this.center = new Point(this.canvas.width / 2, this.canvas.height / 2);
     this.ctx.restore(); // Restore to default state (clears previous transforms)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Clear the canvas
     this.ctx.save(); // Save the clean state before applying new transforms
@@ -82,6 +86,22 @@ class Viewport {
   getOffset() {
     // Total offset is the permanent offset plus the current drag offset
     return add(this.offset, this.drag.offset);
+  }
+
+  getZoom() {
+    return this.zoom;
+  }
+
+  getPixelsPerMeter() {
+    return WORLD_PIXELS_PER_METER / this.zoom;
+  }
+
+  drawScaleIndicator(
+    ctx = this.ctx,
+    viewportWidth = this.canvas.width,
+    viewportHeight = this.canvas.height,
+  ) {
+    this.scaleIndicator.draw(ctx, viewportWidth, viewportHeight);
   }
 
   /**

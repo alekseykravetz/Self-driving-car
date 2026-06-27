@@ -63,6 +63,7 @@ class TrainingPanelElement extends HTMLElement {
   private statFrozenEl: HTMLElement | null = null;
   private statFrozenRow: HTMLElement | null = null;
   private statDistEl: HTMLElement | null = null;
+  private statSpeedEl: HTMLElement | null = null;
 
   // Pool table and status dots
   private poolTableBody: HTMLElement | null = null;
@@ -171,6 +172,7 @@ class TrainingPanelElement extends HTMLElement {
     this.statFrozenEl = this.querySelector('#stat-frozen');
     this.statFrozenRow = this.querySelector('#stat-frozen-row');
     this.statDistEl = this.querySelector('#stat-dist');
+    this.statSpeedEl = this.querySelector('#stat-speed');
 
     // Pool table and status dots
     this.poolTableBody = this.querySelector('#poolTableBody');
@@ -550,12 +552,20 @@ class TrainingPanelElement extends HTMLElement {
     dead: number,
     frozen: number,
     maxDist: number,
+    bestCarSpeed: number = 0,
   ): void {
     if (this.statGenEl) this.statGenEl.textContent = String(this.iteration);
     if (this.statAliveEl) this.statAliveEl.textContent = String(alive);
     if (this.statDeadEl) this.statDeadEl.textContent = String(dead);
     if (this.statFrozenEl) this.statFrozenEl.textContent = String(frozen);
-    if (this.statDistEl) this.statDistEl.textContent = String(maxDist);
+    if (this.statDistEl) {
+      this.statDistEl.textContent = formatMetersFromWorldPixels(maxDist);
+    }
+    if (this.statSpeedEl) {
+      this.statSpeedEl.textContent = formatKmhFromPxPerFrame(
+        Math.abs(bestCarSpeed),
+      );
+    }
   }
 
   public updateBestCarAndPool(): void {
@@ -592,12 +602,13 @@ class TrainingPanelElement extends HTMLElement {
     // single delegated listener attached in #addEventListeners.
     for (let i = 0; i < this.bestPool.length; i++) {
       const car = this.bestPool[i];
-      const fitness = Math.round(this.evaluateFitness(car));
+      const fitness = this.evaluateFitness(car);
       const name = car.name || '-';
 
       let row = body.children[i] as HTMLTableRowElement | undefined;
       if (!row) {
         row = document.createElement('tr');
+        row.appendChild(document.createElement('td'));
         row.appendChild(document.createElement('td'));
         row.appendChild(document.createElement('td'));
         row.appendChild(document.createElement('td'));
@@ -608,11 +619,15 @@ class TrainingPanelElement extends HTMLElement {
 
       const rankCell = row.children[0];
       const nameCell = row.children[1];
-      const fitnessCell = row.children[2];
+      const speedCell = row.children[2];
+      const fitnessCell = row.children[3];
       const rankText = String(i + 1);
-      const fitnessText = String(fitness);
+      const speedText = formatKmhFromPxPerFrame(Math.abs(car.speed));
+      const fitnessText = formatMetersFromWorldPixels(fitness);
       if (rankCell.textContent !== rankText) rankCell.textContent = rankText;
       if (nameCell.textContent !== name) nameCell.textContent = name;
+      if (speedCell.textContent !== speedText)
+        speedCell.textContent = speedText;
       if (fitnessCell.textContent !== fitnessText)
         fitnessCell.textContent = fitnessText;
 

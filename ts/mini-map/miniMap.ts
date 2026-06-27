@@ -11,6 +11,7 @@ class MiniMap {
   private size: number;
   private scaler: number;
   private ctx: CanvasRenderingContext2D;
+  private scaleIndicator: ScaleIndicator | null = null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -36,6 +37,8 @@ class MiniMap {
       roadColor = 'white',
       carColor = 'blue',
       backgroundColor,
+      viewport,
+      compactScaleIndicator = true,
     } = options;
 
     // When a backgroundColor is given, paint it onto the canvas itself rather
@@ -96,5 +99,27 @@ class MiniMap {
       color: carColor,
       outline: true,
     });
+
+    if (viewport) {
+      if (!this.scaleIndicator) {
+        this.scaleIndicator = new ScaleIndicator(
+          this.size,
+          this.size,
+          viewport,
+          {
+            paddingX: compactScaleIndicator ? 6 : 20,
+            paddingY: compactScaleIndicator ? 6 : 20,
+            fontSize: compactScaleIndicator ? 9 : 12,
+            lineWidth: compactScaleIndicator ? 1 : 2,
+            scaleInMeters: 10,
+            pixelsPerMeterMultiplier: this.scaler,
+            zoomMultiplier: this.scaler,
+            inlineStats: compactScaleIndicator,
+            statSeparator: ' • ',
+          },
+        );
+      }
+      this.scaleIndicator.draw(this.ctx, this.canvas.width, this.canvas.height);
+    }
   }
 }

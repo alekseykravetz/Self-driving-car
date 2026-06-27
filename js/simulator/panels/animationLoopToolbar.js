@@ -8,6 +8,13 @@
 class AnimationLoopToolbarElement extends HTMLElement {
   _paused = false;
   pauseBtn = null;
+  timeDisplay = null;
+  resetTimeBtn = null;
+  fpsDisplay = null;
+  elapsedFrames = 0;
+  renderedFrames = 0;
+  lastFpsUpdate = 0;
+  currentFps = 0;
   constructor() {
     super();
     this.id = 'animationLoopToolbar';
@@ -17,6 +24,13 @@ class AnimationLoopToolbarElement extends HTMLElement {
     this.innerHTML = AnimationLoopToolbarElement.template;
     this.pauseBtn = this.querySelector('#loopPauseBtn');
     this.pauseBtn?.addEventListener('click', () => this.togglePause());
+    this.timeDisplay = this.querySelector('#elapsedTimeDisplay');
+    this.resetTimeBtn = this.querySelector('#resetTimeBtn');
+    this.resetTimeBtn?.addEventListener('click', () => this.resetTime());
+    this.fpsDisplay = this.querySelector('#fpsDisplay');
+    this.lastFpsUpdate = performance.now();
+    this.updateTimeDisplay();
+    this.updateFpsDisplay();
   }
 
   /** Whether the simulation step is currently paused. */
@@ -34,6 +48,55 @@ class AnimationLoopToolbarElement extends HTMLElement {
     const value = el ? Math.round(Number(el.value)) : 1;
     if (!Number.isFinite(value)) return 1;
     return Math.min(10, Math.max(1, value));
+  }
+
+  /** Record one animation frame. Called by SimulatorShell.animate(). */
+  recordFrame(isRenderFrame = false) {
+    if (!this._paused) {
+      this.elapsedFrames++;
+      this.updateTimeDisplay();
+    }
+    if (isRenderFrame) {
+      this.renderedFrames++;
+      this.updateFpsCounter();
+    }
+  }
+
+  /** Get the total elapsed simulation frames. */
+  get elapsedTime() {
+    return this.elapsedFrames;
+  }
+
+  /** Reset the elapsed time counter to zero. */
+  resetTime() {
+    this.elapsedFrames = 0;
+    this.updateTimeDisplay();
+  }
+
+  /** Update the time display element with the current elapsed time. */
+  updateTimeDisplay() {
+    if (this.timeDisplay) {
+      this.timeDisplay.textContent = formatElapsedTime(this.elapsedFrames);
+    }
+  }
+
+  /** Update FPS counter once per second. */
+  updateFpsCounter() {
+    const now = performance.now();
+    const elapsed = now - this.lastFpsUpdate;
+    if (elapsed >= 1000) {
+      this.currentFps = Math.round((this.renderedFrames * 1000) / elapsed);
+      this.renderedFrames = 0;
+      this.lastFpsUpdate = now;
+      this.updateFpsDisplay();
+    }
+  }
+
+  /** Update the FPS display element. */
+  updateFpsDisplay() {
+    if (this.fpsDisplay) {
+      this.fpsDisplay.textContent = `${this.currentFps} fps`;
+    }
   }
 
   /** Toggle (or force) the paused state, syncing the button glyph. */

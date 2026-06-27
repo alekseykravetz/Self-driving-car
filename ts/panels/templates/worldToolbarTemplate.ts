@@ -9,7 +9,7 @@ const WORLD_TOOLBAR_TEMPLATE = `
             class="top-controls-btn"
             title="Load / select world"
           >
-            📁
+            🌍
           </button>
           <div id="worldPicker" class="asset-popover" hidden>
             <label for="loadWorldInput" class="file-input-label asset-load-btn">
@@ -20,28 +20,34 @@ const WORLD_TOOLBAR_TEMPLATE = `
           </div>
         </div>
         <button
-          id="saveBtn"
+          id="openOsmPanelBtn"
           class="top-controls-btn world-editor-action"
-          title="Save — Save world to file and localStorage"
+          title="Import from OSM — Paste OpenStreetMap data to generate roads"
           style="display: none"
+        >
+          🗺️
+        </button>
+      </div>
+    </div>
+
+    <div class="controls-separator world-editor-action" data-group="storage-sep" style="display: none"></div>
+
+    <div class="controls-group world-editor-action" data-group="storage" style="display: none">
+      <span class="controls-group-label">Storage</span>
+      <div class="border-mode-group">
+        <button
+          id="saveBtn"
+          class="top-controls-btn"
+          title="Save — Save world to file and localStorage"
         >
           💾
         </button>
         <button
           id="disposeBtn"
-          class="top-controls-btn world-editor-action"
-          title="Dispose — Clear all graph points and segments"
-          style="display: none"
+          class="top-controls-btn"
+          title="Clear — Reset all graph points and segments"
         >
-          🗑️
-        </button>
-        <button
-          id="openOsmPanelBtn"
-          class="top-controls-btn world-editor-action"
-          title="OSM Import — Paste OpenStreetMap data to generate roads"
-          style="display: none"
-        >
-          🗺️
+          ❌
         </button>
       </div>
     </div>
@@ -59,7 +65,7 @@ const WORLD_TOOLBAR_TEMPLATE = `
         </button>
         <div id="carPicker" class="asset-popover" hidden>
           <label for="loadCarInput" class="file-input-label asset-load-btn">
-            🚗 Load car(s) from file
+            📁 Load car(s) from file
             <input type="file" id="loadCarInput" accept=".car,.json" multiple />
           </label>
           <div id="carPickerList" class="asset-list"></div>
@@ -156,7 +162,7 @@ const WORLD_TOOLBAR_TEMPLATE = `
           class="border-mode-btn"
           title="Touchpad mode — two-finger scroll pans, hold Ctrl to zoom"
         >
-          🖐️
+          ☝️
         </button>
       </div>
     </div>

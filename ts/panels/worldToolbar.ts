@@ -154,7 +154,7 @@ class WorldToolbarElement extends HTMLElement {
           <input type="radio" name="wt-world" value="${w.id}" ${
             w.id === activeId ? 'checked' : ''
           } />
-          <span class="asset-item-name" title="${w.name}">${w.name}</span>
+          <span class="asset-item-name" title="${w.name}">${stripFileExtension(w.name)}</span>
           <span class="asset-item-src">${w.source}</span>
         </label>`,
       )
@@ -189,7 +189,7 @@ class WorldToolbarElement extends HTMLElement {
           <input type="${inputType}" name="wt-car" value="${c.id}" ${
             activeIds.has(c.id) ? 'checked' : ''
           } />
-          <span class="asset-item-name" title="${c.name}">${c.name}</span>
+          <span class="asset-item-name" title="${c.name}">${stripFileExtension(c.name)}</span>
           <span class="asset-item-src">${c.source}</span>
         </label>`,
       )
@@ -223,11 +223,23 @@ class WorldToolbarElement extends HTMLElement {
 
   #updateSelectedDisplay(): void {
     const worldEl = this.querySelector('#selectedWorldName');
-    if (worldEl) worldEl.textContent = StoreManager.getActiveWorldName() ?? '—';
-    const carEl = this.querySelector('#selectedCarNames');
+    if (worldEl) {
+      const rawName = StoreManager.getActiveWorldName() ?? null;
+      worldEl.textContent = rawName ? stripFileExtension(rawName) : '—';
+    }
+    const carEl = this.querySelector<HTMLElement>('#selectedCarNames');
     if (carEl) {
       const names = StoreManager.getActiveCarNames();
-      carEl.textContent = names.length ? names.join(', ') : '—';
+      if (names.length === 0) {
+        carEl.textContent = '—';
+        carEl.removeAttribute('title');
+      } else if (names.length === 1) {
+        carEl.textContent = stripFileExtension(names[0]);
+        carEl.removeAttribute('title');
+      } else {
+        carEl.textContent = `${names.length} car selected`;
+        carEl.title = names.map(stripFileExtension).join('\n');
+      }
     }
   }
 

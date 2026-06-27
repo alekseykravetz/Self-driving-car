@@ -466,7 +466,7 @@ class WorldEditor {
 
 Manages which editor is active at a time, triggers world regeneration when the graph changes, and handles save/load operations.
 
-The viewport wheel-mode toggle and the World file actions (load / save / dispose / OSM import) are hosted by the shared `<world-toolbar>`: the editor calls `showWorldEditorActions()` to reveal the Save/Dispose/OSM buttons, `hideGroups(...)` to hide the simulator-only groups, and `setViewportModeListener(...)` to drive `setViewportMode()`.
+The viewport wheel-mode toggle and the World file actions (load / OSM import) are hosted by the shared `<world-toolbar>`: the editor calls `showWorldEditorActions()` to reveal the OSM button and Storage group (Save / Clear), `hideGroups(...)` to hide the simulator-only groups, and `setViewportModeListener(...)` to drive `setViewportMode()`.
 
 ### Graph Editor (`graphEditor.ts`)
 
@@ -658,10 +658,12 @@ The world editor page provides a complete UI for map creation, split across two
 panels:
 
 - **Shared `<world-toolbar>`** (top-left, from `ts/panels/`): the **World** group
-  (Load 📁 / Save 💾 / Dispose 🗑️ / OSM Import 🗺️) and the **Viewport** mode
-  toggle (mouse vs. touchpad). The editor-only Save / Dispose / OSM buttons are
-  revealed via `showWorldEditorActions()`, while the simulator-only groups (Car,
-  Borders, Tracking, Debug) are hidden via `hideGroups(...)`.
+  (Load 🌍 / OSM Import 🗺️) and a **Storage** group (Save 💾 / Clear ❌), plus
+  the **Viewport** mode toggle (mouse 🖱️ vs. touchpad ☝️). The editor-only OSM,
+  Storage group and separator are revealed via `showWorldEditorActions()`, while
+  the simulator-only groups (Car, Borders, Tracking, Debug) are hidden via
+  `hideGroups(...)`. Toolbar order in editor mode: World → OSM → (separator) →
+  Storage → Car → Selected → Viewport → Debug.
 - **Shared `<shortcuts-toolbar>`** (top-left, from `ts/panels/`): visualizes the
   graph-editor keys (`S` / `E` / `C` / `O`) plus the `Ctrl` zoom modifier. The
   `O` one-way indicator is click-latchable. Replaces the old inline

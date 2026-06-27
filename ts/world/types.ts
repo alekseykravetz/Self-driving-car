@@ -48,6 +48,8 @@ interface MiniMapDrawOptions {
   roadColor?: string;
   carColor?: string;
   backgroundColor?: string;
+  viewport?: Viewport;
+  compactScaleIndicator?: boolean;
 }
 
 interface IWorld {

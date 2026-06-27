@@ -63,6 +63,55 @@ on render frames. The shared `isPaused()` reads the play/pause toggle owned by
 instead of `update()`. Subclasses call `this.animate(0)` once at the end of their
 constructor to start the loop.
 
+### Animation Loop Toolbar (`ts/simulator/panels/animationLoopToolbar.ts`)
+
+The `<animation-loop-toolbar>` custom element provides real-time controls and monitoring:
+
+**Features:**
+
+1. **Play/Pause Toggle** (⏸️ / ▶️)
+
+   - Pauses and resumes the simulation
+   - Respects pause state for time tracking
+   - Shared across all SimulatorShell pages
+
+2. **Render Interval Throttle** (e.g., "1 / 60")
+
+   - Controls how many animation frames pass between renders
+   - Physics always runs at full 60 FPS; only draw pass is throttled
+   - Higher values = more frames skipped = faster simulation with choppier visuals
+   - Useful for speeding up training without affecting physics accuracy
+
+3. **Elapsed Simulation Time** (HH:MM:SS)
+
+   - Displays time since simulation started
+   - Only counts frames when simulation is running
+   - Reset button (⟲) clears the counter
+   - Based on `SIMULATION_FPS = 60` constant (see Units.md)
+
+4. **Rendering FPS Counter** (0-60 fps)
+   - Shows actual rendering frames per second
+   - Reflects the effect of `renderInterval`
+   - Measured using `performance.now()`, updates once per second
+   - Example: `renderInterval = 60` shows ~1 FPS (only 1 of 60 frames rendered visually)
+
+**Code interface:**
+
+```typescript
+class AnimationLoopToolbarElement extends HTMLElement {
+  // State
+  get paused(): boolean;
+  get renderInterval(): number; // [1, 10]
+  get elapsedTime(): number; // total frames
+
+  // Control
+  togglePause(forceState?: boolean): void;
+  setPaused(paused: boolean): void;
+  resetTime(): void;
+  recordFrame(isRenderFrame: boolean = false): void; // called by SimulatorShell.animate()
+}
+```
+
 ### Subclasses
 
 | Class               | File                                         | Page              |
@@ -78,16 +127,17 @@ The central training orchestrator — a custom HTML element that owns both the U
 
 ### Custom Element Pattern
 
-| Element                   | Tag                   | Responsibility                                                          |
-| ------------------------- | --------------------- | ----------------------------------------------------------------------- |
-| `TrainingPanelElement`    | `<training-panel>`    | Training UI + genetic algorithm + car generation                        |
-| `WorldToolbarElement`     | `<world-toolbar>`     | Border mode, tracking mode, world/car loading                           |
-| `LayoutToolbarElement`    | `<layout-toolbar>`    | Layout toggle, camera/visualizer/minimap toggles, render interval       |
-| `ShortcutsToolbarElement` | `<shortcuts-toolbar>` | Per-page keyboard-shortcut indicators (momentary + click-latch toggles) |
+| Element                       | Tag                        | Responsibility                                                          |
+| ----------------------------- | -------------------------- | ----------------------------------------------------------------------- |
+| `TrainingPanelElement`        | `<training-panel>`         | Training UI + genetic algorithm + car generation                        |
+| `AnimationLoopToolbarElement` | `<animation-loop-toolbar>` | Play/pause, render throttle, time display, FPS counter                  |
+| `WorldToolbarElement`         | `<world-toolbar>`          | Border mode, tracking mode, world/car loading                           |
+| `LayoutToolbarElement`        | `<layout-toolbar>`         | Layout toggle, camera/visualizer/minimap toggles                        |
+| `ShortcutsToolbarElement`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary + click-latch toggles) |
 
-> `WorldToolbarElement` and `ShortcutsToolbarElement` live in the shared
-> `ts/panels/` directory (not the simulator domain) and are reused across the
-> simulator, race, Live Traffic Jam, and World Editor pages.
+> `AnimationLoopToolbarElement`, `WorldToolbarElement`, and `ShortcutsToolbarElement`
+> live in the shared `ts/panels/` directory (not the simulator domain) and are reused
+> across the simulator, race, Live Traffic Jam, and World Editor pages.
 
 Each element:
 
@@ -124,7 +174,7 @@ class TrainingPanelElement extends HTMLElement {
 
   // Per-frame updates
   updateDistance(currentDist: number): void;
-  updateStatsDisplay(alive, dead, frozen, maxDist): void;
+  updateStatsDisplay(alive, dead, frozen, maxDist, bestCarSpeed?): void;
   updateBestCarAndPool(): void;
 
   // Brain management

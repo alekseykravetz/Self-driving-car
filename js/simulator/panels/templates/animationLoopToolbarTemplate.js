@@ -34,4 +34,40 @@ const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
         />
       </label>
     </div>
+
+    <div class="controls-separator"></div>
+
+    <div class="controls-group">
+      <span class="controls-group-label">Play Time</span>
+      <div class="time-display-group">
+        <span
+          id="elapsedTimeDisplay"
+          class="elapsed-time"
+          title="Elapsed simulation time (HH:MM:SS)"
+        >
+          00:00:00
+        </span>
+        <button
+          type="button"
+          id="resetTimeBtn"
+          class="reset-time-btn"
+          title="Reset elapsed time"
+        >
+          ⟲
+        </button>
+      </div>
+    </div>
+
+    <div class="controls-separator"></div>
+
+    <div class="controls-group">
+      <span class="controls-group-label">FPS</span>
+      <span
+        id="fpsDisplay"
+        class="fps-display"
+        title="Actual rendering frames per second"
+      >
+        0 fps
+      </span>
+    </div>
 `;

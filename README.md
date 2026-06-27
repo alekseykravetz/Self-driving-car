@@ -320,6 +320,7 @@ Detailed technical documentation is maintained in the `docs/` directory:
 | [Architecture](docs/Architecture.md)    | System overview, module graph, data flow, design patterns |
 | [Math](docs/Math.md)                    | Geometric primitives, polygon union, graph, OSM import    |
 | [Physics](docs/Physics.md)              | Car dynamics, sensors, collision detection & response     |
+| [Units](docs/Units.md)                  | Unified unit system, conversions, formulas, and examples  |
 | [Neural Network](docs/NeuralNetwork.md) | Network structure, feedforward, mutation, crossover, pool |
 | [World Editor](docs/WorldEditor.md)     | World generation pipeline, editors, markings, traffic     |
 | [Simulators](docs/Simulators.md)        | Training environments, genetic algorithm, panel UI        |
