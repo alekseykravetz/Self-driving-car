@@ -503,6 +503,7 @@ belongs to the Corridor group and latches the open-ended (tunnel) corridor mode.
 
 - Hovered point: highlighted with larger radius + outline
 - Selected point: distinct color (yellow)
+- Intent segment: when a point is selected, dragging/hovering to draw a new segment displays a floating measurement badge showing the segment's length in meters and its angle in degrees
 - Shortest path: drawn in red overlay
 - One-way segments: drawn with directional arrow at midpoint
 - Hard-separated segments: drawn with a solid white center line

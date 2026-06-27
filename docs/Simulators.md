@@ -468,8 +468,8 @@ function updateSimpleCars(
   cars, state, roadBorders, idleEnabled, bestCar, idleRange,
 ): { aliveCount; deadCount; frozenCount } {
   // For each non-damaged car:
-  //   - Idle (freeze) if idleEnabled and it is farther than idleRange
-  //     from the best car (Euclidean distance) → frozenCount++
+  //   - Idle (freeze) if idleEnabled and its fitness is lower than the
+  //     best car's fitness by more than idleRange (fitness comparison) → frozenCount++
   //   - Otherwise: pass the 2 road borders + binary-searched nearby
   //     traffic (±400px in Y) and update
 }
@@ -665,7 +665,7 @@ function updateWorldCars(
   idleRange: number,
 ): { aliveCount: number; deadCount: number; frozenCount: number } {
   // - 'collision' mode: push damaged cars back onto road (handleCollisionWithRoadBorders)
-  // - idle: freeze cars farther than idleRange from the best car (frozenCount++)
+  // - idle: freeze cars whose fitness is lower than the best car's fitness by more than idleRange (frozenCount++)
   // - 'none' mode: cars receive no borders
   // - otherwise: query the SpatialHashGrid for nearby borders (broad phase),
   //   then keep only the segments actually within the car's reach (narrow phase)
