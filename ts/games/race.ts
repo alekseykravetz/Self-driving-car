@@ -158,6 +158,7 @@ class Race {
 
     const restartBtn = document.createElement('button');
     restartBtn.id = 'restartRaceBtn';
+    restartBtn.style.margin = '0';
     restartBtn.textContent = '🔄 Restart';
     restartBtn.className = 'race-panel-btn';
     restartBtn.addEventListener('click', () =>

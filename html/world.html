@@ -121,22 +121,21 @@
       </div>
     </div>
 
-    <script src="/js/utils.js"></script>
+    <!-- Core Math & Primitives (Foundation) -->
+    <script src="/js/math/primitives/point.js"></script>
+    <script src="/js/math/primitives/segment.js"></script>
+    <script src="/js/math/primitives/polygon.js"></script>
+    <script src="/js/math/primitives/envelope.js"></script>
+    <script src="/js/math/utils.js"></script>
+    <script src="/js/math/graph/graph.js"></script>
+    <script src="/js/math/osm-importer/osm.js"></script>
+
+    <!-- World System -->
     <script src="/js/world/types.js"></script>
-
-    <script src="/js/panels/templates/worldToolbarTemplate.js"></script>
-    <script src="/js/panels/worldToolbar.js"></script>
-
-    <script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
-    <script src="/js/panels/shortcutsToolbar.js"></script>
-
     <script src="/js/world/corridor.js"></script>
     <script src="/js/world/generation/worldGenerator.js"></script>
-    <script src="/js/world/world.js"></script>
-    <script src="/js/viewport/scaleIndicator.js"></script>
-    <script src="/js/viewport/viewport.js"></script>
-    <script src="/js/world/trafficManager.js"></script>
-    <script src="/js/mini-map/miniMap.js"></script>
+    <script src="/js/world/items/tree.js"></script>
+    <script src="/js/world/items/building.js"></script>
     <script src="/js/world/markings/marking.js"></script>
     <script src="/js/world/markings/stop.js"></script>
     <script src="/js/world/markings/start.js"></script>
@@ -146,8 +145,6 @@
     <script src="/js/world/markings/target.js"></script>
     <script src="/js/world/markings/yield.js"></script>
     <script src="/js/world/editors/markingEditor.js"></script>
-    <script src="/js/world/editors/worldEditor.js"></script>
-    <script src="/js/world/loader/worldLoader.js"></script>
     <script src="/js/world/editors/graphEditor.js"></script>
     <script src="/js/world/editors/stopEditor.js"></script>
     <script src="/js/world/editors/startEditor.js"></script>
@@ -157,19 +154,31 @@
     <script src="/js/world/editors/targetEditor.js"></script>
     <script src="/js/world/editors/yieldEditor.js"></script>
     <script src="/js/world/editors/corridorEditor.js"></script>
-    <script src="/js/world/items/tree.js"></script>
-    <script src="/js/world/items/building.js"></script>
-    <script src="/js/math/utils.js"></script>
-    <script src="/js/math/graph/graph.js"></script>
-    <script src="/js/math/osm-importer/osm.js"></script>
-    <script src="/js/math/primitives/point.js"></script>
-    <script src="/js/math/primitives/segment.js"></script>
-    <script src="/js/math/primitives/polygon.js"></script>
-    <script src="/js/math/primitives/envelope.js"></script>
+    <script src="/js/world/trafficManager.js"></script>
+    <script src="/js/world/world.js"></script>
+    <script src="/js/world/loader/worldLoader.js"></script>
+    <script src="/js/world/editors/worldEditor.js"></script>
 
+    <!-- Rendering & Viewport -->
+    <script src="/js/viewport/scaleIndicator.js"></script>
+    <script src="/js/viewport/viewport.js"></script>
+    <script src="/js/mini-map/miniMap.js"></script>
+
+    <!-- Core Utilities -->
+    <script src="/js/utils.js"></script>
     <script src="/js/car/loader/carLoader.js"></script>
+
+    <!-- Storage & Data Management -->
     <script src="/js/store/types.js"></script>
     <script src="/js/store/storeManager.js"></script>
+
+    <!-- UI Panel Templates (before components) -->
+    <script src="/js/panels/templates/worldToolbarTemplate.js"></script>
+    <script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
+
+    <!-- UI Components/Panels -->
+    <script src="/js/panels/worldToolbar.js"></script>
+    <script src="/js/panels/shortcutsToolbar.js"></script>
 
     <script>
       (async () => {

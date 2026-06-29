@@ -27,56 +27,130 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 - HTML files reference `/js/...` paths directly in ordered `<script>` tags
 - No import/export at runtime — all code attaches to global scope
 
-### Script Load Order (typical HTML page)
+### Script Load Order (Dependency Hierarchy)
+
+All HTML pages follow a strict dependency hierarchy to ensure modules load before their dependencies reference them. The order is organized by layer:
 
 ```html
-<!-- 1. Math primitives (no dependencies) -->
+<!-- Layer 1: Core Math & Primitives (Foundation — no dependencies) -->
 <script src="/js/math/primitives/point.js"></script>
 <script src="/js/math/primitives/segment.js"></script>
 <script src="/js/math/primitives/polygon.js"></script>
 <script src="/js/math/primitives/envelope.js"></script>
-<script src="/js/math/graph/graph.js"></script>
 <script src="/js/math/utils.js"></script>
+<script src="/js/math/graph/graph.js"></script>
+<script src="/js/math/spatialGrid.js"></script>
 
-<!-- 2. World system (depends on math) -->
+<!-- Layer 2: World System (depends on math primitives) -->
 <script src="/js/world/corridor.js"></script>
 <script src="/js/world/generation/worldGenerator.js"></script>
-<script src="/js/world/world.js"></script>
-<script src="/js/world/items/building.js"></script>
 <script src="/js/world/items/tree.js"></script>
-<script src="/js/world/markings/*.js"></script>
+<script src="/js/world/items/building.js"></script>
+<script src="/js/world/markings/marking.js"></script>
+<script src="/js/world/markings/stop.js"></script>
+<script src="/js/world/markings/start.js"></script>
+<script src="/js/world/markings/crossing.js"></script>
+<script src="/js/world/markings/parking.js"></script>
+<script src="/js/world/markings/light.js"></script>
+<script src="/js/world/markings/target.js"></script>
+<script src="/js/world/markings/yield.js"></script>
+<script src="/js/world/editors/markingEditor.js"></script>
+<script src="/js/world/editors/graphEditor.js"></script>
+<script src="/js/world/editors/stopEditor.js"></script>
+<script src="/js/world/editors/startEditor.js"></script>
+<script src="/js/world/editors/crossingEditor.js"></script>
+<script src="/js/world/editors/parkingEditor.js"></script>
+<script src="/js/world/editors/lightEditor.js"></script>
+<script src="/js/world/editors/targetEditor.js"></script>
+<script src="/js/world/editors/yieldEditor.js"></script>
 <script src="/js/world/trafficManager.js"></script>
+<script src="/js/world/world.js"></script>
+<script src="/js/world/simple/simpleWorld.js"></script>
+<script src="/js/world/loader/worldLoader.js"></script>
 
-<!-- 3. Viewport & Mini-map (depends on math) -->
+<!-- Layer 3: Rendering & Viewport (depends on math) -->
+<script src="/js/camera/types.js"></script>
+<script src="/js/camera/extrusion.js"></script>
+<script src="/js/camera/camera.js"></script>
+<script src="/js/viewport/scaleIndicator.js"></script>
 <script src="/js/viewport/viewport.js"></script>
 <script src="/js/mini-map/miniMap.js"></script>
 
-<!-- 4. Car system (depends on math) -->
+<!-- Layer 4: Audio (standalone) -->
+<script src="/js/audio/sound.js"></script>
+
+<!-- Layer 5: Core Utilities & Car System (depends on math + world) -->
+<script src="/js/utils.js"></script>
 <script src="/js/car/sensors/sensor.js"></script>
 <script src="/js/car/controls/controls.js"></script>
 <script src="/js/car/car.js"></script>
+<script src="/js/car/loader/carLoader.js"></script>
 
-<!-- 5. Neural network (standalone) -->
-<script src="/js/neural-network/network.js"></script>
+<!-- Layer 6: Neural Network (depends on core utilities) -->
 <script src="/js/neural-network/visualizer.js"></script>
+<script src="/js/neural-network/network.js"></script>
 
-<!-- 6. Custom element panels (must load before DOM parses their tags) -->
+<!-- Layer 7: Storage & Data Management (before simulators) -->
+<script src="/js/store/types.js"></script>
+<script src="/js/store/storeManager.js"></script>
+
+<!-- Layer 8: UI Panel Templates (before custom elements) -->
+<script src="/js/panels/templates/worldToolbarTemplate.js"></script>
+<script src="/js/simulator/panels/templates/layoutToolbarTemplate.js"></script>
+<script src="/js/simulator/panels/templates/animationLoopToolbarTemplate.js"></script>
+<script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
+<script src="/js/simulator/training/templates/trainingPanelTemplate.js"></script>
+<script src="/js/simulator/training/templates/trainingInitModalTemplate.js"></script>
+
+<!-- Layer 9: UI Components/Panels (custom elements) -->
 <script src="/js/panels/worldToolbar.js"></script>
 <script src="/js/simulator/panels/layoutToolbar.js"></script>
 <script src="/js/simulator/panels/animationLoopToolbar.js"></script>
 <script src="/js/panels/shortcutsToolbar.js"></script>
+
+<!-- Layer 10: Training & Simulator-Specific Modules (depends on everything) -->
+<script src="/js/simulator/training/modes/trafficFactory.js"></script>
+<script src="/js/simulator/training/modes/borderCollision.js"></script>
+<script src="/js/simulator/training/rendering/carRenderer.js"></script>
+<script src="/js/simulator/training/rendering/layoutManager.js"></script>
+<script src="/js/simulator/training/modes/simpleModeBehavior.js"></script>
+<script src="/js/simulator/training/modes/worldModeBehavior.js"></script>
+<script src="/js/simulator/training/genetics/storageManager.js"></script>
+<script src="/js/simulator/training/genetics/poolManager.js"></script>
+<script src="/js/simulator/training/trainingInitModal.js"></script>
 <script src="/js/simulator/training/trainingPanel.js"></script>
 
-<!-- 7. Simulator-specific code -->
+<!-- Layer 11: Simulator Core (final orchestrator) -->
+<script src="/js/simulator/core/simulatorShell.js"></script>
 <script src="/js/simulator/training/trainingSimulator.js"></script>
 
-<!-- 8. Inline initialization -->
+<!-- Layer 12: Inline Initialization (after all modules loaded) -->
 <script>
-  const simulator = new TrainingSimulator(canvas, networkCanvas, miniMapCanvas);
+  (async () => {
+    await StoreManager.init();
+    const simulator = new TrainingSimulator(
+      canvas,
+      networkCanvas,
+      miniMapCanvas,
+    );
+  })();
 </script>
 ```
 
-**Critical rule:** When adding new modules, you must add `<script>` tags in the correct dependency order to all relevant HTML files. A class must be defined before any other class references it.
+**Critical Rules:**
+
+1. **Core features first**: Math, World, and Rendering layers must load before any modules that use them
+2. **Templates before components**: UI templates must load before custom elements that reference them
+3. **Storage initialized early**: `StoreManager` must be available before simulators start
+4. **Global scope only**: No import/export at runtime; all classes attach to `window`
+5. **Add to all HTML files**: When adding new modules, update all relevant HTML files (`simulator.html`, `traffic.html`, `race.html`, `world.html`) with consistent ordering
+
+**HTML files affected:**
+
+- `html/simulator.html` — Training simulator
+- `html/traffic.html` — Live traffic simulation
+- `html/race.html` — Racing game
+- `html/world.html` — World editor
 
 ---
 
