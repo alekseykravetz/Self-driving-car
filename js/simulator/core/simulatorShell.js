@@ -21,11 +21,25 @@
  * the animation-loop-toolbar panel) so very large populations keep stepping even
  * when rendering dominates the frame budget.
  */
+/** localStorage key for the simulator's per-layer visibility preference. */
+const SIM_LAYERS_KEY = 'sim:worldLayers';
+/** Load the persisted simulator layer visibility, merged over the defaults. */
+function loadSimLayerVisibility() {
+  const stored = safeJsonParse(localStorage.getItem(SIM_LAYERS_KEY));
+  return { ...DEFAULT_LAYER_VISIBILITY, ...(stored ?? {}) };
+}
+
+/** Persist the simulator layer visibility preference. */
+function saveSimLayerVisibility(v) {
+  localStorage.setItem(SIM_LAYERS_KEY, JSON.stringify(v));
+}
+
 class SimulatorShell {
   gameCanvas;
   gameCtx;
   networkCanvas;
   networkCtx;
+  networkVisualizer = new NetworkVisualizer();
   miniMapCanvas;
   cameraCanvas;
   cameraCtx;
@@ -36,6 +50,10 @@ class SimulatorShell {
   toolbarPanel;
   layoutToolbar;
   animationLoopToolbar;
+  // Per-layer visibility for the top-down 2D view and the 3D camera view.
+  // Backed by the optional <world-layers-panel> and persisted to localStorage.
+  worldLayers = loadSimLayerVisibility();
+  worldLayersPanel = null;
   // Render throttle: physics runs every animation frame, the (heavier) render
   // pass only runs once per `renderInterval` frames (read live from the
   // animation-loop-toolbar panel).
@@ -56,10 +74,22 @@ class SimulatorShell {
     this.animationLoopToolbar = document.querySelector(
       'animation-loop-toolbar',
     );
+    // Optional world-layers panel: lets the user hide roads/markings/trees/
+    // buildings in both the 2D and 3D views. Absent on pages without it.
+    this.worldLayersPanel = document.querySelector('world-layers-panel');
+    if (this.worldLayersPanel) {
+      this.worldLayersPanel.hideItems(); // no regeneration in simulators
+      this.worldLayersPanel.setVisibility(this.worldLayers);
+      this.worldLayersPanel.setChangeListener((v) => {
+        this.worldLayers = v;
+        saveSimLayerVisibility(v);
+      });
+    }
     // Keep the active viewport's wheel behavior in sync with the toolbar toggle
     this.toolbarPanel.setViewportModeListener((mode) =>
       this.viewport?.setMode(mode),
     );
+    this.#wireNetworkInteractivity();
     // On phone-sized screens, hide the network visualizer and mini-map by
     // default. The matching CSS hides the related panel sections; this unchecks
     // the toggles the layout reads each frame. Kept in sync with the 768px CSS
@@ -67,6 +97,47 @@ class SimulatorShell {
     if (window.matchMedia('(max-width: 768px)').matches) {
       this.layoutToolbar.applyMobileDefaults();
     }
+  }
+
+  /**
+   * Wire hover/click/keyboard interactivity for the neural-network visualizer.
+   * Mouse coordinates are converted from client space to the canvas' internal
+   * pixel space so hit-testing stays correct under CSS scaling.
+   */
+  #wireNetworkInteractivity() {
+    const toCanvasCoords = (e) => {
+      const rect = this.networkCanvas.getBoundingClientRect();
+      const sx = rect.width ? this.networkCanvas.width / rect.width : 1;
+      const sy = rect.height ? this.networkCanvas.height / rect.height : 1;
+      return {
+        x: (e.clientX - rect.left) * sx,
+        y: (e.clientY - rect.top) * sy,
+      };
+    };
+    this.networkCanvas.addEventListener('mousemove', (e) => {
+      const { x, y } = toCanvasCoords(e);
+      const interactive = this.networkVisualizer.setMouse(x, y);
+      this.networkCanvas.style.cursor = interactive ? 'pointer' : 'default';
+    });
+    this.networkCanvas.addEventListener('mouseleave', () => {
+      this.networkVisualizer.clearMouse();
+      this.networkCanvas.style.cursor = 'default';
+    });
+    this.networkCanvas.addEventListener('click', (e) => {
+      const { x, y } = toCanvasCoords(e);
+      this.networkVisualizer.handleClick(x, y);
+    });
+    // `v` toggles the always-show-values density mode (ignored while typing).
+    window.addEventListener('keydown', (e) => {
+      const target = e.target;
+      const typing =
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable;
+      if (!typing && (e.key === 'v' || e.key === 'V')) {
+        this.networkVisualizer.toggleDensity();
+      }
+    });
   }
 
   /**
@@ -97,7 +168,6 @@ class SimulatorShell {
    */
   drawNetworkVisualizer(time, brain) {
     if (!this.layoutToolbar.showVisualizer) return;
-    this.networkCtx.lineDashOffset = -time / 50;
     this.networkCtx.clearRect(
       0,
       0,
@@ -105,7 +175,7 @@ class SimulatorShell {
       this.networkCanvas.height,
     );
     if (brain) {
-      Visualizer.drawNetwork(this.networkCtx, brain);
+      this.networkVisualizer.draw(this.networkCtx, brain, time);
     }
   }
 

@@ -12,6 +12,20 @@ function loadWorldCorridors(info) {
   return [];
 }
 
+/** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes. */
+function loadTreeInstance(inst, world) {
+  const p = inst.p ?? 0;
+  const prototype = world.treePrototypes[p] ?? world.treePrototypes[0];
+  return new Tree(
+    new Point(inst.x, inst.y),
+    world.treeSize,
+    prototype,
+    p,
+    inst.t ?? 0,
+    inst.s ?? 1,
+  );
+}
+
 class World {
   graph;
   roadWidth;
@@ -20,6 +34,11 @@ class World {
   buildingMinLength;
   spacing;
   treeSize;
+  // Tree decoration: a reproducible prototype set (seed + count) referenced by
+  // lightweight tree instances. Persisted as `decoration.treeSeed`/`Count`.
+  treeSeed = DEFAULT_TREE_SEED;
+  treePrototypeCount = DEFAULT_TREE_PROTOTYPE_COUNT;
+  treePrototypes = [];
   // Generated world data
   envelopes; // Road shape from graph.segments (asphalt, wider than the road borders)
   roadBorders; // Polygon union of envelopes (road shape)
@@ -65,9 +84,6 @@ class World {
     const world = new World(new Graph());
     // Load graph structure first
     world.graph = Graph.load(info.graph);
-    //this version trigger world generation and it is slower
-    // const graph = Graph.load(info.graph);
-    // const world = new World(graph);
     // Load world parameters
     world.roadWidth = info.roadWidth;
     world.roadRoundness = info.roadRoundness;
@@ -75,28 +91,94 @@ class World {
     world.buildingMinLength = info.buildingMinLength;
     world.spacing = info.spacing;
     world.treeSize = info.treeSize;
-    // Load generated geometry/entities
-    world.envelopes = info.envelopes.map((e) => Envelope.load(e));
-    world.roadBorders = info.roadBorders.map((s) => new Segment(s.p1, s.p2));
-    world.separatorBorders = (info.separatorBorders ?? []).map(
-      (s) => new Segment(new Point(s.p1.x, s.p1.y), new Point(s.p2.x, s.p2.y)),
-    );
-    world.buildings = info.buildings.map((building) => Building.load(building));
-    world.trees = info.trees.map((t) => new Tree(t.center, info.treeSize));
-    world.laneGuides = info.laneGuides.map((g) => new Segment(g.p1, g.p2));
-    world.markings = info.markings.map((m) => Marking.load(m));
+    // Load authored, must-have data.
+    world.markings = (info.markings ?? []).map((m) => Marking.load(m));
     world.corridors = loadWorldCorridors(info);
-    world.trafficManager = new TrafficManager(world.graph, world.markings);
-    // Load view state if available
     world.zoom = info.zoom;
     world.offset = info.offset;
-    // Note: This loaded world doesn't call generate() again,
-    // preserving the loaded state exactly.
+    // Rebuild cheap road geometry from the graph (dropped from v2 files, and
+    // recomputed rather than trusted even for v1 files — it is deterministic).
+    WorldGenerator.generateRoads(world);
+    const decoration = info.decoration;
+    if (decoration) {
+      // --- v2 lean format: compact decoration + reproducible prototypes ---
+      world.treeSeed = decoration.treeSeed ?? DEFAULT_TREE_SEED;
+      world.treePrototypeCount =
+        decoration.treePrototypeCount ?? DEFAULT_TREE_PROTOTYPE_COUNT;
+      world.treePrototypes = buildTreePrototypes(
+        world.treeSeed,
+        world.treePrototypeCount,
+      );
+      world.trees = (decoration.trees ?? []).map((inst) =>
+        loadTreeInstance(inst, world),
+      );
+      world.buildings = (decoration.buildings ?? []).map((b) =>
+        Building.loadFootprint(b),
+      );
+    } else {
+      // --- v1 back-compat: file carries baked geometry. Convert into the lean
+      // model so a re-save emits v2. Tree canopy shapes become prototype-based
+      // (they differ slightly from the baked originals); positions are kept. ---
+      world.treeSeed = DEFAULT_TREE_SEED;
+      world.treePrototypeCount = DEFAULT_TREE_PROTOTYPE_COUNT;
+      world.treePrototypes = buildTreePrototypes(
+        world.treeSeed,
+        world.treePrototypeCount,
+      );
+      const rand = mulberry32((world.treeSeed ^ 0x9e3779b9) >>> 0);
+      const legacyTrees = info.trees ?? [];
+      world.trees = legacyTrees.map((t) => {
+        const p = Math.floor(rand() * world.treePrototypeCount);
+        const type = rand() < 0.6 ? 0 : rand() < 0.5 ? 1 : 2;
+        const scale = lerp(0.8, 1.2, rand());
+        return new Tree(
+          new Point(t.center.x, t.center.y),
+          world.treeSize,
+          world.treePrototypes[p],
+          p,
+          type,
+          scale,
+        );
+      });
+      world.buildings = (info.buildings ?? []).map((b) => Building.load(b));
+    }
+    WorldGenerator.reanchorMarkings(world);
+    world.trafficManager = new TrafficManager(world.graph, world.markings);
     return world;
   }
 
-  generate(generateBuildings = true) {
-    WorldGenerator.generate(this, generateBuildings);
+  /**
+   * Serializes to the lean v2 world schema: must-have data (graph, params,
+   * markings, corridors, viewport) plus a compact `decoration` block (tree seed
+   * + prototype count + lightweight tree instances, and footprint-only
+   * buildings). Derived road geometry (envelopes, road borders, lane guides,
+   * separator borders) is intentionally dropped and rebuilt on load.
+   */
+  toJSON() {
+    return {
+      version: 2,
+      graph: this.graph,
+      roadWidth: this.roadWidth,
+      roadRoundness: this.roadRoundness,
+      buildingWidth: this.buildingWidth,
+      buildingMinLength: this.buildingMinLength,
+      spacing: this.spacing,
+      treeSize: this.treeSize,
+      markings: this.markings,
+      corridors: this.corridors,
+      zoom: this.zoom,
+      offset: this.offset,
+      decoration: {
+        treeSeed: this.treeSeed,
+        treePrototypeCount: this.treePrototypeCount,
+        trees: this.trees.map((t) => t.toInstance()),
+        buildings: this.buildings.map((b) => b.toFootprint()),
+      },
+    };
+  }
+
+  generate(opts) {
+    WorldGenerator.generate(this, opts);
   }
 
   /** Back-compat accessor: the primary (first) corridor, or null. */
@@ -146,18 +228,87 @@ class World {
       renderRadius = 1000,
       carAlpha = 0.2,
       showCarNames = false,
+      layers: layerOverrides,
     } = options;
+    const layers = {
+      ...DEFAULT_LAYER_VISIBILITY,
+      ...layerOverrides,
+    };
     // Update traffic light states before drawing
     this.trafficManager.update();
-    // Draw road envelopes (asphalt style, more wider then road borders itself)
-    for (const env of this.envelopes) {
-      env.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
+    if (layers.roads) {
+      // Draw road envelopes (asphalt style, more wider then road borders itself)
+      for (const env of this.envelopes) {
+        env.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
+      }
+      // Draw road borders (solid white lines)
+      for (const seg of this.roadBorders) {
+        seg.draw(ctx, { color: 'white', width: 4 });
+      }
+      // Draw lane separators or direction arrows
+      this.#drawLaneMarkings(ctx);
     }
-    // Draw road borders (solid white lines)
-    for (const seg of this.roadBorders) {
-      seg.draw(ctx, { color: 'white', width: 4 });
+    // Draw road markings (yield, stop, start, crosswalks, lights)
+    if (layers.markings) {
+      for (const marking of this.markings) {
+        if (!(marking instanceof Start) || showStartMarkings) {
+          marking.draw(ctx);
+        }
+      }
     }
-    // Draw lane separators or direction arrows
+    // Draw corridors (consistent style, owned by Corridor.draw)
+    if (layers.corridors) {
+      for (const corridor of this.corridors) {
+        corridor.draw(ctx);
+      }
+    }
+    // Draw cars (draw-time input, always shown)
+    for (const car of cars) {
+      car.draw(ctx, { alpha: carAlpha, showName: showCarNames });
+    }
+    if (bestCar) {
+      bestCar.draw(ctx, { showSensor: true, showName: showCarNames });
+    }
+    // Flat item placeholders (cheap outlines) for inspection on big maps.
+    if (layers.itemBases) {
+      for (const building of this.buildings) {
+        building.base.draw(ctx, {
+          fill: 'rgba(150,150,150,0.25)',
+          stroke: 'rgba(0,0,0,0.35)',
+          lineWidth: 2,
+        });
+      }
+      for (const tree of this.trees) {
+        tree.base.draw(ctx, {
+          fill: 'rgba(30,150,70,0.2)',
+          stroke: 'rgba(0,90,40,0.5)',
+          lineWidth: 2,
+        });
+      }
+    }
+    // Rendered pseudo-3D buildings and trees (distance-sorted, painter's order).
+    const renderBuildings = layers.buildings ? this.buildings : [];
+    const renderTrees = layers.trees ? this.trees : [];
+    if (renderBuildings.length || renderTrees.length) {
+      const items = [...renderBuildings, ...renderTrees].filter(
+        (i) => i.base.distanceToPoint(viewPoint) < renderRadius,
+      );
+      items.sort(
+        (a, b) =>
+          b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint),
+      );
+      for (const item of items) {
+        item.draw(ctx, { viewPoint });
+      }
+    }
+    // Optional: Draw lane guides for debugging
+    // for (const seg of this.laneGuides) {
+    //   seg.draw(ctx, { color: 'cyan', width: 1 });
+    // }
+  }
+
+  /** Draws one-way arrows, hard-separation center lines, and dashed dividers. */
+  #drawLaneMarkings(ctx) {
     for (const seg of this.graph.segments) {
       if (seg.oneWay) {
         // Draw direction arrows for one-way roads
@@ -218,37 +369,5 @@ class World {
         });
       }
     }
-    // Draw road markings (yield, stop, start, crosswalks, lights)
-    for (const marking of this.markings) {
-      if (!(marking instanceof Start) || showStartMarkings) {
-        marking.draw(ctx);
-      }
-    }
-    // Draw corridors (consistent style, owned by Corridor.draw)
-    for (const corridor of this.corridors) {
-      corridor.draw(ctx);
-    }
-    // Draw cars
-    for (const car of cars) {
-      car.draw(ctx, { alpha: carAlpha, showName: showCarNames });
-    }
-    if (bestCar) {
-      bestCar.draw(ctx, { showSensor: true, showName: showCarNames });
-    }
-    // Draw buildings and trees (sorted by distance)
-    const items = [...this.buildings, ...this.trees].filter(
-      (i) => i.base.distanceToPoint(viewPoint) < renderRadius,
-    );
-    items.sort(
-      (a, b) =>
-        b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint),
-    );
-    for (const item of items) {
-      item.draw(ctx, { viewPoint });
-    }
-    // Optional: Draw lane guides for debugging
-    // for (const seg of this.laneGuides) {
-    //   seg.draw(ctx, { color: 'cyan', width: 1 });
-    // }
   }
 }

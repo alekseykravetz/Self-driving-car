@@ -13,6 +13,7 @@
     <div id="simulatorToolbar">
       <world-toolbar></world-toolbar>
       <shortcuts-toolbar></shortcuts-toolbar>
+      <world-layers-panel></world-layers-panel>
     </div>
     <canvas
       id="miniMapCanvas"
@@ -26,19 +27,6 @@
     ></canvas>
 
     <div id="controls">
-      <div class="controls-group">
-        <span class="group-title">Render</span>
-        <label
-          class="checkbox-label"
-          title="Toggle world regeneration on graph changes"
-        >
-          <input id="worldGenerationInput" type="checkbox" />
-          Generate
-        </label>
-      </div>
-
-      <div class="controls-divider"></div>
-
       <div class="controls-group">
         <button
           id="graphBtn"
@@ -175,10 +163,12 @@
     <!-- UI Panel Templates (before components) -->
     <script src="/js/panels/templates/worldToolbarTemplate.js"></script>
     <script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
+    <script src="/js/panels/templates/worldLayersPanelTemplate.js"></script>
 
     <!-- UI Components/Panels -->
     <script src="/js/panels/worldToolbar.js"></script>
     <script src="/js/panels/shortcutsToolbar.js"></script>
+    <script src="/js/panels/worldLayersPanel.js"></script>
 
     <script>
       (async () => {

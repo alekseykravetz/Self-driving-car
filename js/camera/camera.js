@@ -107,17 +107,22 @@ class Camera {
    * Gathers, filters, and extrudes all relevant polygons from the world for rendering.
    */
   #getPolygons(world, options = {}) {
-    const { keyCar, bestCar, cars = [], traffic } = options;
+    const {
+      keyCar,
+      bestCar,
+      cars = [],
+      traffic,
+      showTrees = true,
+      showBuildings = true,
+    } = options;
     // Buildings
-    const buildingPolygons = extrudePolygons(
-      this.#filter(world.buildings.map((b) => b.base)),
-      200,
-    );
+    const buildingPolygons = showBuildings
+      ? extrudePolygons(this.#filter(world.buildings.map((b) => b.base)), 200)
+      : [];
     // Trees
-    const treePolygons = extrudeTreeShapes(
-      this.#filter(world.trees.map((t) => t.base)),
-      200,
-    );
+    const treePolygons = showTrees
+      ? extrudeTreeShapes(this.#filter(world.trees.map((t) => t.base)), 200)
+      : [];
     // Road borders
     const roadSegments = world.corridors.length
       ? world.corridors.flatMap((c) => c.borders)

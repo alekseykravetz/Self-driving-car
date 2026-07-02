@@ -18,6 +18,10 @@ interface ICameraRenderOptions {
   cars?: Car[];
   /** Additional traffic cars to extrude as 3D boxes. */
   traffic?: Car[];
+  /** When false, trees are omitted from the 3D scene (perf on big worlds). Default true. */
+  showTrees?: boolean;
+  /** When false, buildings are omitted from the 3D scene (perf on big worlds). Default true. */
+  showBuildings?: boolean;
   /** Optional secondary 2D context for drawing the raw 3D polygons (debug). */
   debugCtx?: CanvasRenderingContext2D;
 }

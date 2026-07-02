@@ -17,6 +17,11 @@ const allowedUnusedVars = [
   'MiniMapDrawOptions',
   'IMiniMapCar',
   'WorldDrawOptions',
+  'WorldLayerId',
+  'WorldLayerVisibility',
+  'DEFAULT_LAYER_VISIBILITY',
+  'WorldDecoration',
+  'BuildingFootprint',
   'IWorld',
   'Corridor',
 
@@ -71,10 +76,18 @@ const allowedUnusedVars = [
   'stripFileExtension',
   'parseCarFileContent',
   'compareCarInfoParams',
+  'mulberry32',
 
   // world items
   'Building',
   'Tree',
+  'TreePrototype',
+  'TreeInstance',
+  'buildTreePrototypes',
+  'TREE_VERTEX_COUNT',
+  'DEFAULT_TREE_SEED',
+  'DEFAULT_TREE_PROTOTYPE_COUNT',
+  'DEFAULT_TREE_PROTOTYPE',
 
   // editors
   'WorldEditor',
@@ -129,7 +142,7 @@ const allowedUnusedVars = [
   'beep',
 
   // visualizer / utils
-  'Visualizer',
+  'NetworkVisualizer',
   'polysIntersect',
   'getRGBA',
   'save',
@@ -149,6 +162,8 @@ const allowedUnusedVars = [
   'LAYOUT_TOOLBAR_TEMPLATE',
   'ANIMATION_LOOP_TOOLBAR_TEMPLATE',
   'SHORTCUTS_TOOLBAR_TEMPLATE',
+  'WorldLayersPanelElement',
+  'WORLD_LAYERS_PANEL_TEMPLATE',
   'TRAINING_PANEL_TEMPLATE',
   'TRAFFIC_PANEL_TEMPLATE',
   'BorderMode',
@@ -266,6 +281,20 @@ const myGlobals = {
     MiniMapDrawOptions: 'readonly',
     IMiniMapCar: 'readonly',
     WorldDrawOptions: 'readonly',
+    WorldLayerId: 'readonly',
+    WorldLayerVisibility: 'readonly',
+    DEFAULT_LAYER_VISIBILITY: 'readonly',
+    WorldDecoration: 'readonly',
+    BuildingFootprint: 'readonly',
+    TreePrototype: 'readonly',
+    TreeInstance: 'readonly',
+    buildTreePrototypes: 'readonly',
+    DEFAULT_TREE_SEED: 'readonly',
+    DEFAULT_TREE_PROTOTYPE_COUNT: 'readonly',
+    DEFAULT_TREE_PROTOTYPE: 'readonly',
+    mulberry32: 'readonly',
+    WorldLayersPanelElement: 'readonly',
+    WORLD_LAYERS_PANEL_TEMPLATE: 'readonly',
     OsmData: 'readonly',
     Level: 'readonly',
     CarInfo: 'readonly',
@@ -390,7 +419,7 @@ const myGlobals = {
     taDaa: 'readonly',
     explode: 'readonly',
     beep: 'readonly',
-    Visualizer: 'readonly',
+    NetworkVisualizer: 'readonly',
 
     Simulator: 'readonly',
     TrainingSimulator: 'readonly',
@@ -488,7 +517,19 @@ const myGlobals = {
 
 export default defineConfig([
   {
+    // Standalone Node tooling scripts (ESM, run via `node`, not loaded in a page).
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      parser: tsParser,
+      sourceType: 'module',
+      parserOptions: { project: null },
+      globals: { ...globals.node },
+    },
+    ...pluginsAndRules,
+  },
+  {
     files: ['**/*.{js,mjs,cjs}'],
+    ignores: ['scripts/**'],
     languageOptions: {
       parser: tsParser,
       sourceType: 'script',

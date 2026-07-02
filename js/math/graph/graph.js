@@ -21,8 +21,32 @@ class Graph {
     return new Graph(points, segments);
   }
 
+  /**
+   * Cheap change-detection signature. Folds point coordinates and segment
+   * endpoints/flags into a 32-bit hash (FNV-1a style). Runs every frame in the
+   * editor, so it deliberately avoids `JSON.stringify` — on large worlds that
+   * allocated a multi-megabyte string per frame and dominated the frame budget.
+   */
   hash() {
-    return JSON.stringify(this);
+    let h = 2166136261;
+    const mix = (n) => {
+      h ^= n | 0;
+      h = Math.imul(h, 16777619);
+    };
+    mix(this.points.length);
+    for (const p of this.points) {
+      mix(p.x * 1000);
+      mix(p.y * 1000);
+    }
+    mix(this.segments.length);
+    for (const s of this.segments) {
+      mix(s.p1.x * 1000);
+      mix(s.p1.y * 1000);
+      mix(s.p2.x * 1000);
+      mix(s.p2.y * 1000);
+      mix((s.oneWay ? 1 : 0) | (s.separated ? 2 : 0));
+    }
+    return (h >>> 0).toString(36);
   }
 
   addPoint(point) {

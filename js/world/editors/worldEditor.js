@@ -1,4 +1,17 @@
 'use strict';
+/** localStorage key for the editor's per-layer visibility preference. */
+const EDITOR_LAYERS_KEY = 'editor:worldLayers';
+/** Reads the persisted layer visibility, falling back to the defaults. */
+function loadLayerVisibility() {
+  const stored = safeJsonParse(localStorage.getItem(EDITOR_LAYERS_KEY));
+  return { ...DEFAULT_LAYER_VISIBILITY, ...(stored ?? {}) };
+}
+
+/** Persists the layer visibility preference. */
+function saveLayerVisibility(visibility) {
+  localStorage.setItem(EDITOR_LAYERS_KEY, JSON.stringify(visibility));
+}
+
 class WorldEditor {
   canvas;
   ctx;
@@ -11,9 +24,13 @@ class WorldEditor {
   mode = 'graph';
   viewportMode = 'mouse';
   oldGraphHash = null;
-  generateWorld = true;
+  // Per-layer visibility (local editor preference, persisted to localStorage —
+  // never saved into the world file).
+  layerVisibility = loadLayerVisibility();
+  // True when the graph changed after items were generated, so the rendered
+  // buildings/trees are outdated until the user hits Regenerate items.
+  itemsStale = false;
   // DOM Element References, Use definite assignment assertion
-  worldGenerationInput;
   saveBtn;
   disposeBtn;
   openOsmPanelBtn;
@@ -33,6 +50,7 @@ class WorldEditor {
   corridorBtn;
   worldToolbar;
   shortcutsToolbar;
+  worldLayersPanel;
   constructor(canvas, miniMapCanvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
@@ -57,7 +75,6 @@ class WorldEditor {
       if (!el) throw new Error(`Element with ID "${id}" not found.`);
       return el; // Use type assertion
     };
-    this.worldGenerationInput = getElement('worldGenerationInput');
     this.saveBtn = getElement('saveBtn');
     this.disposeBtn = getElement('disposeBtn');
     this.openOsmPanelBtn = getElement('openOsmPanelBtn');
@@ -77,14 +94,11 @@ class WorldEditor {
     this.corridorBtn = getElement('corridorBtn');
     this.worldToolbar = document.querySelector('world-toolbar');
     this.shortcutsToolbar = document.querySelector('shortcuts-toolbar');
+    this.worldLayersPanel = document.querySelector('world-layers-panel');
   }
 
   /* Adds event listeners to DOM elements. */
   #addEventListeners() {
-    this.worldGenerationInput.addEventListener(
-      'change',
-      this.toggleWorldGeneration.bind(this),
-    );
     this.saveBtn.addEventListener('click', this.save.bind(this));
     this.disposeBtn.addEventListener('click', this.dispose.bind(this));
     this.openOsmPanelBtn.addEventListener(
@@ -192,6 +206,13 @@ class WorldEditor {
       onWorldSelected: (entry) =>
         this.#initializeWorldEditor(entry?.data ?? null),
     });
+    // World Layers panel: per-layer visibility toggles + Regenerate items action.
+    this.worldLayersPanel.setVisibility(this.layerVisibility);
+    this.worldLayersPanel.setChangeListener((visibility) => {
+      this.layerVisibility = visibility;
+      saveLayerVisibility(visibility);
+    });
+    this.worldLayersPanel.setRegenerateListener(() => this.regenerateItems());
   }
 
   /* Initializes or re-initializes the world, viewport, minimap, and tools. */
@@ -214,7 +235,9 @@ class WorldEditor {
     );
     this.miniMapViewport = new Viewport(this.miniMapCanvas);
     this.miniMapViewport.setMode(this.viewportMode);
-    this.worldGenerationInput.checked = this.generateWorld;
+    // A freshly loaded/created world already has its items generated in memory.
+    this.itemsStale = false;
+    this.worldLayersPanel?.setStale(false);
   }
 
   /* Creates instances of all editor tools. */
@@ -367,31 +390,41 @@ class WorldEditor {
     }
   }
 
-  /* Toggles the flag for generating world geometry (buildings, trees). */
-  toggleWorldGeneration() {
-    this.generateWorld = !this.generateWorld;
-    this.worldGenerationInput.checked = this.generateWorld; // Sync checkbox
-    this.oldGraphHash = null; // Force potential regeneration on next draw
+  /* Rebuilds the expensive item placement (buildings + trees) on demand. */
+  regenerateItems() {
+    this.worldLayersPanel.setBusy(true);
+    // Yield once so the busy state paints before the heavy synchronous work.
+    setTimeout(() => {
+      this.world.generate({ roads: false, buildings: true, trees: true });
+      this.itemsStale = false;
+      this.worldLayersPanel.setStale(false);
+      this.worldLayersPanel.setBusy(false);
+    }, 0);
   }
 
   /* Main draw loop called by animate. */
   draw() {
     // Reset viewport transforms
     this.viewport.reset();
-    // Regenerate world geometry if graph has changed and generation is enabled
+    // On graph change, refresh only the cheap road geometry + marking anchors.
+    // Expensive item placement is left to the explicit Regenerate items action.
     const currentGraphHash = this.world.graph.hash();
     if (currentGraphHash !== this.oldGraphHash) {
-      console.log('Graph changed, regenerating world...');
-      this.world.generate(this.generateWorld);
+      WorldGenerator.generateRoads(this.world);
+      WorldGenerator.reanchorMarkings(this.world);
       this.oldGraphHash = currentGraphHash;
+      if (this.world.buildings.length || this.world.trees.length) {
+        this.itemsStale = true;
+        this.worldLayersPanel?.setStale(true);
+      }
     }
     // Get the current viewpoint based on viewport offset
     const viewPoint = scale(this.viewport.getOffset(), -1);
-    // Draw the world
-    this.world.draw(this.ctx, { viewPoint });
+    // Draw the world with the current per-layer visibility mask.
+    this.world.draw(this.ctx, { viewPoint, layers: this.layerVisibility });
     // Draw editor previews (e.g., marking intent) with transparency
     this.ctx.globalAlpha = this.mode === 'graph' ? 0.5 : 0.2;
-    for (const tool of Object.values(this.editors)) {
+    for (const [, tool] of Object.entries(this.editors)) {
       tool.editor.display(); // Call display method of active editor
     }
     this.ctx.globalAlpha = 1.0; // Reset alpha

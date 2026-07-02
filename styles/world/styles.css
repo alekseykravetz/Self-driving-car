@@ -291,6 +291,96 @@ input[type='file'] {
   top: calc(100% + 8px);
 }
 
+/* World Layers panel (<world-layers-panel>) — visibility toggles + regenerate
+   action. Shares the floating toolbar box styling. */
+#worldLayersPanel {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+#worldLayersPanel .world-layers-groups {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+#worldLayersPanel .controls-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+  flex: 0 1 auto;
+}
+
+#worldLayersPanel .controls-group-label {
+  font-size: 9px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  flex: 0 0 auto;
+  height: 11px;
+}
+
+#worldLayersPanel .controls-separator {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 4px;
+}
+
+#worldLayersPanel .world-layers-keys {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  flex: 0 0 auto;
+}
+
+#worldLayersPanel button {
+  font-size: 16px;
+  padding: 3px 6px;
+  transition:
+    filter 0.15s,
+    opacity 0.15s,
+    box-shadow 0.15s;
+}
+
+/* Tooltip below the button (panel sits at the top of the screen). */
+#worldLayersPanel button[title]:hover::after {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+
+/* "Items outdated" hint on the Regenerate button after a graph edit. */
+#worldLayersPanel #regenerateItemsBtn.stale {
+  box-shadow: 0 0 0 2px #f5a623;
+  animation: worldLayersPulse 1.4s ease-in-out infinite;
+}
+
+#worldLayersPanel #regenerateItemsBtn.busy {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@keyframes worldLayersPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.9);
+  }
+}
+
 #topControls .controls-group {
   display: flex;
   flex-direction: column;

@@ -134,10 +134,66 @@ Migration is transparent — happens automatically on first access. Legacy keys 
 
 ### World Files (`.world`)
 
-**Format**: Pure JSON object containing the complete world state:
+**Format**: Pure JSON object. Two schema versions exist; the loader accepts both.
 
-```json
-{"graph":{"points":[...],"segments":[...]},"roadWidth":100,...}
+#### v2 (lean) — current
+
+The editor now writes a **lean** world file that stores only must-have data plus
+a compact decoration block. Derived road geometry is **dropped** and rebuilt on
+load, and trees/buildings are stored as lightweight references rather than baked
+polygons. This shrinks files ~10–70× (e.g. `barnea` ~25 MB → ~0.35 MB).
+
+```jsonc
+{
+  "version": 2,
+  "graph": { "points": [...], "segments": [...] }, // must-have (source of truth)
+  "roadWidth": 100, "roadRoundness": 10,
+  "buildingWidth": 150, "buildingMinLength": 150, "spacing": 50, "treeSize": 160,
+  "markings": [...],      // authored, must-have
+  "corridors": [...],     // authored, must-have
+  "zoom": 1, "offset": { "x": 0, "y": 0 },
+
+  "decoration": {
+    "treeSeed": 123456,          // reproduces the canopy prototype SET
+    "treePrototypeCount": 8,     // N prototypes generated from the seed
+    // instances: position + prototype index (p) + scale (s) + render type (t)
+    "trees": [ { "x": 5712.6, "y": 3738.9, "p": 3, "s": 1.04, "t": 0 }, ... ],
+    // footprint points + height only (no redundant polygon `segments`)
+    "buildings": [ { "poly": [[x,y],[x,y],...], "h": 200 }, ... ]
+  }
+}
+```
+
+- **Dropped and rebuilt on load** (deterministic functions of the graph):
+  `envelopes`, `roadBorders`, `laneGuides`, `separatorBorders`. `World.load()`
+  calls `WorldGenerator.generateRoads()` to rebuild them.
+- **Tree prototypes**: `buildTreePrototypes(treeSeed, treePrototypeCount)` (in
+  `ts/world/items/tree.ts`, using the seeded `mulberry32` PRNG) reproduces a
+  small set of canopy noise profiles. Each tree instance references one by index
+  (`p`), plus a per-instance scale (`s`) and render type (`t`: `0` classic round,
+  `1` conifer, `2` broadleaf cluster). No 32-point polygon is stored per tree.
+- **Buildings**: `{ poly, h }` — footprint points + height; the `Polygon`
+  (and its internal `segments`) is rebuilt on load via `Building.loadFootprint`.
+- Serialization is driven by `World.toJSON()`; loading by `World.load()`.
+
+#### v1 (legacy) — still loadable
+
+Old files carry the full baked geometry (`envelopes`, `roadBorders`,
+`laneGuides`, per-tree canopy polygons, buildings with `segments`). Detected by
+the **absence** of `version`/`decoration`. `World.load()` loads them, rebuilds
+road geometry, and converts trees into the prototype model — so **re-saving a v1
+file emits v2**. Because v1 canopies were baked, exact tree silhouettes differ
+slightly after conversion; positions and counts are preserved.
+
+#### Migration script
+
+`scripts/migrate-worlds.mjs` (Node, no deps) converts committed `store/world/*.world`
+files from v1 to v2 in place, backing up each original to
+`store/world/_v1_backup/<name>.v1.bak`. Idempotent (skips files already v2).
+
+```bash
+node scripts/migrate-worlds.mjs --dry   # preview size reductions
+node scripts/migrate-worlds.mjs         # migrate in place (creates backups)
 ```
 
 **Parsing** (WorldLoader):
@@ -145,8 +201,6 @@ Migration is transparent — happens automatically on first access. Legacy keys 
 ```typescript
 const worldInfo = JSON.parse(content.trim());
 ```
-
-**Content**: Complete world state including graph, road config, generated geometry, markings, viewport state.
 
 ### Car Files (`.car`)
 

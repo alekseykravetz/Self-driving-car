@@ -1,3 +1,33 @@
+/** Axis-aligned bounding box, used to skip non-overlapping polygon pairs. */
+interface PolygonBounds {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+/** Computes the AABB of a polygon from its points. */
+function computePolygonBounds(polygon: Polygon): PolygonBounds {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const p of polygon.points) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+/** True if two AABBs overlap (a necessary condition for polygon overlap). */
+function boundsOverlap(a: PolygonBounds, b: PolygonBounds): boolean {
+  return (
+    a.minX <= b.maxX && a.maxX >= b.minX && a.minY <= b.maxY && a.maxY >= b.minY
+  );
+}
+
 class Polygon {
   points: Point[];
   segments: Segment[];
@@ -16,12 +46,28 @@ class Polygon {
 
   static union(polygons: Polygon[]): Segment[] {
     Polygon.multiBreak(polygons);
+    // Bounding boxes stay valid after break: intersection points added by
+    // break lie on existing edges, so they never extend a polygon's AABB.
+    const bounds = polygons.map((p) => computePolygonBounds(p));
     const keptSegments: Segment[] = [];
     for (let i = 0; i < polygons.length; i++) {
       for (const segment of polygons[i].segments) {
+        const midpoint = average(segment.p1, segment.p2);
         let keep = true;
         for (let j = 0; j < polygons.length; j++) {
-          if (i !== j && polygons[j].containsSegment(segment)) {
+          if (i === j) continue;
+          const b = bounds[j];
+          // A point outside polygon j's AABB is outside polygon j, so it
+          // cannot make this segment interior. Skip the expensive ray test.
+          if (
+            midpoint.x < b.minX ||
+            midpoint.x > b.maxX ||
+            midpoint.y < b.minY ||
+            midpoint.y > b.maxY
+          ) {
+            continue;
+          }
+          if (polygons[j].containsPoint(midpoint)) {
             keep = false;
             break;
           }
@@ -35,8 +81,13 @@ class Polygon {
   }
 
   static multiBreak(polygons: Polygon[]): void {
+    // Only break pairs whose bounding boxes overlap. Road envelopes overlap
+    // just their immediate neighbours, so this turns the all-pairs O(n^2)
+    // scan into near-linear work for large, spread-out networks.
+    const bounds = polygons.map((p) => computePolygonBounds(p));
     for (let i = 0; i < polygons.length - 1; i++) {
       for (let j = i + 1; j < polygons.length; j++) {
+        if (!boundsOverlap(bounds[i], bounds[j])) continue;
         Polygon.break(polygons[i], polygons[j]);
       }
     }

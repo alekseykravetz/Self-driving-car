@@ -1330,6 +1330,80 @@ input[type='file'] {
   accent-color: #5cb85c;
 }
 
+/* ── World Layers panel (<world-layers-panel>) ─────────────────────
+   Visibility toggles for the top-down 2D view and the 3D camera view.
+   Shares the floating toolbar box styling; self-contained button style so it
+   does not depend on the page's generic `button` rule. */
+#worldLayersPanel {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+#worldLayersPanel .world-layers-groups {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+#worldLayersPanel .world-layers-keys {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  flex: 0 0 auto;
+}
+
+#worldLayersPanel button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  position: relative;
+  transition:
+    filter 0.15s,
+    opacity 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+
+#worldLayersPanel button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Tooltip below the button (panel sits at the top of the screen). */
+#worldLayersPanel button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: normal;
+  max-width: 280px;
+  width: max-content;
+  z-index: 100;
+  pointer-events: none;
+}
+
 /* ── Canvases ──────────────────────────────────────────────────── */
 #gameCanvas {
   background: #2a5;

@@ -391,6 +391,8 @@ class TrainingSimulator extends SimulatorShell {
       keyCar: keysCar || bestCar,
       bestCar: keysCar ? bestCar : undefined,
       cars: this.trainingManager.cars,
+      showTrees: this.worldLayers.trees,
+      showBuildings: this.worldLayers.buildings,
       ...opts,
     });
   }
@@ -614,7 +616,11 @@ class TrainingSimulator extends SimulatorShell {
     const viewPoint = scale(this.viewport.getOffset(), -1);
 
     // Draw world without cars (we draw them ourselves to show pool rankings)
-    this.world.draw(this.gameCtx, { viewPoint, showStartMarkings: false });
+    this.world.draw(this.gameCtx, {
+      viewPoint,
+      showStartMarkings: false,
+      layers: this.worldLayers,
+    });
     this.viewport.drawScaleIndicator(this.gameCtx);
 
     // Masks are cached, pre-composited sprites (one drawImage per car), so they

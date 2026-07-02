@@ -2,11 +2,12 @@
  * Procedural world geometry generation, extracted from the World class so the
  * World stays a data + draw + load container. All heavy generation lives here.
  *
- * Split-generation policy: road borders, lane guides and separator borders are
- * always (re)generated because they are cheap and needed for marking placement
- * and collisions even on big maps. Buildings and trees are gated behind the
- * `generateBuildings` flag (the editor's "Generate" checkbox) since they are
- * the expensive part to compute and draw.
+ * Split-generation policy: road geometry (envelopes, road borders, lane guides,
+ * separator borders) is cheap and deterministic, so `generateRoads` runs on
+ * every graph edit. Building and tree placement is expensive, so it lives in
+ * `generateBuildings` / `generateTrees` and runs only on demand (the editor's
+ * "Regenerate items" action). `generate(opts)` is a convenience that runs a
+ * chosen subset of stages.
  */
 
 interface WorldGeneratable {
@@ -17,6 +18,9 @@ interface WorldGeneratable {
   buildingMinLength: number;
   spacing: number;
   treeSize: number;
+  treeSeed: number;
+  treePrototypeCount: number;
+  treePrototypes: TreePrototype[];
   envelopes: Envelope[];
   roadBorders: Segment[];
   separatorBorders: Segment[];
@@ -127,6 +131,8 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
     ...world.roadBorders.map((s) => [s.p1, s.p2]).flat(),
     ...world.buildings.map((b) => b.base.points).flat(),
   ];
+  if (points.length === 0) return [];
+
   const left = Math.min(...points.map((p) => p.x));
   const right = Math.max(...points.map((p) => p.x));
   const top = Math.min(...points.map((p) => p.y));
@@ -136,6 +142,11 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
     ...world.buildings.map((b) => b.base),
     ...world.envelopes.map((e) => e.polygon),
   ];
+
+  // Reproducible prototype set + a seeded RNG so instance variants/scales/types
+  // are deterministic for a given world seed.
+  const prototypes = world.treePrototypes;
+  const rand = mulberry32((world.treeSeed ^ 0x9e3779b9) >>> 0);
 
   const trees: Tree[] = [];
   let tryCount = 0;
@@ -180,7 +191,19 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
     }
 
     if (keep) {
-      trees.push(new Tree(p, world.treeSize));
+      const protoIndex = Math.floor(rand() * prototypes.length);
+      const type = wgPickTreeType(rand());
+      const scale = lerp(0.8, 1.2, rand());
+      trees.push(
+        new Tree(
+          p,
+          world.treeSize,
+          prototypes[protoIndex],
+          protoIndex,
+          type,
+          scale,
+        ),
+      );
       tryCount = 0;
     }
     tryCount++;
@@ -188,23 +211,23 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
   return trees;
 }
 
+/** Weighted tree-type pick: mostly classic, with some conifers and clusters. */
+function wgPickTreeType(r: number): number {
+  if (r < 0.6) return 0;
+  if (r < 0.8) return 1;
+  return 2;
+}
+
 class WorldGenerator {
   /**
-   * (Re)generates world geometry in place. Always rebuilds envelopes, road
-   * borders, lane guides and separator borders; rebuilds buildings and trees
-   * only when `generateBuildings` is true. Markings are re-anchored to the
-   * (possibly edited) graph afterwards.
+   * Cheap, deterministic road geometry: envelopes, road borders, lane guides
+   * and separator borders. Safe to run on every graph edit.
    */
-  static generate(
-    world: WorldGeneratable,
-    generateBuildings: boolean = true,
-  ): void {
+  static generateRoads(world: WorldGeneratable): void {
     world.envelopes.length = 0;
     world.laneGuides.length = 0;
     world.roadBorders.length = 0;
     world.separatorBorders.length = 0;
-    world.buildings = [];
-    world.trees = [];
 
     for (const segment of world.graph.segments) {
       world.envelopes.push(
@@ -212,7 +235,6 @@ class WorldGenerator {
       );
     }
 
-    // Cheap geometry — always generated (needed for markings + collisions).
     const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
     world.roadBorders.push(...Polygon.union(roadPolygons));
     world.laneGuides.push(
@@ -223,16 +245,47 @@ class WorldGenerator {
       ),
     );
     world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
+  }
 
-    // Expensive geometry — gated behind the generation flag.
-    if (generateBuildings) {
-      world.buildings = wgGenerateBuildings(world);
-      world.trees = wgGenerateTrees(world);
+  /** Expensive building placement (O(n²) footprint collision filter). */
+  static generateBuildings(world: WorldGeneratable): void {
+    world.buildings = wgGenerateBuildings(world);
+  }
+
+  /**
+   * Expensive tree placement (rejection sampling). Ensures the world's tree
+   * prototype set exists first, then assigns each instance a prototype/type/scale.
+   */
+  static generateTrees(world: WorldGeneratable): void {
+    if (world.treePrototypes.length !== world.treePrototypeCount) {
+      world.treePrototypes = buildTreePrototypes(
+        world.treeSeed,
+        world.treePrototypeCount,
+      );
     }
+    world.trees = wgGenerateTrees(world);
+  }
 
-    // Keep markings attached to the roads after graph edits.
+  /** Re-anchors markings to the (possibly edited) graph. */
+  static reanchorMarkings(world: WorldGeneratable): void {
     for (const marking of world.markings) {
       marking.reanchor(world.graph);
     }
+  }
+
+  /**
+   * Convenience generator. By default runs every stage; pass `opts` to run only
+   * a subset (e.g. `{ roads: true }` for a cheap refresh). Markings are always
+   * re-anchored afterwards.
+   */
+  static generate(
+    world: WorldGeneratable,
+    opts: { roads?: boolean; buildings?: boolean; trees?: boolean } = {},
+  ): void {
+    const { roads = true, buildings = true, trees = true } = opts;
+    if (roads) this.generateRoads(world);
+    if (buildings) this.generateBuildings(world);
+    if (trees) this.generateTrees(world);
+    this.reanchorMarkings(world);
   }
 }

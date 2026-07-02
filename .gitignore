@@ -1,3 +1,4 @@
 node_modules/
 saves/*.world
 .herenow/
+store/world/_v1_backup/

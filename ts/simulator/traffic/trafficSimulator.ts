@@ -324,7 +324,11 @@ class TrafficSimulator extends SimulatorShell {
 
     // Draw the world without its own cars; we render the placed cars ourselves
     // so we can grey-out wrecks and show the selected car's sensor.
-    this.#world.draw(this.gameCtx, { viewPoint, showStartMarkings: false });
+    this.#world.draw(this.gameCtx, {
+      viewPoint,
+      showStartMarkings: false,
+      layers: this.worldLayers,
+    });
 
     this.viewport.drawScaleIndicator(this.gameCtx);
 
@@ -375,6 +379,8 @@ class TrafficSimulator extends SimulatorShell {
         keyCar,
         cars: this.#cars,
         traffic,
+        showTrees: this.worldLayers.trees,
+        showBuildings: this.worldLayers.buildings,
       });
     }
 

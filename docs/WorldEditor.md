@@ -25,7 +25,12 @@ class World implements IWorld {
   spacing: number; // Gap between buildings and roads
   treeSize: number; // Base tree radius
 
-  // Generated geometry
+  // Tree decoration (reproducible prototype set, referenced by instances)
+  treeSeed: number; // seeds the canopy prototype set
+  treePrototypeCount: number; // number of prototypes generated from the seed
+  treePrototypes: TreePrototype[]; // per-vertex noise profiles (not serialized directly)
+
+  // Generated geometry (rebuilt on load; NOT saved in the lean v2 file)
   envelopes: Envelope[]; // Road surface shapes
   roadBorders: Segment[]; // Outer edges of roads (merged)
   separatorBorders: Segment[]; // Hard-separation center lines (collision)
@@ -48,27 +53,87 @@ class World implements IWorld {
   get corridor(): Corridor | null;
 
   // Methods
-  generate(generateBuildings?: boolean): void; // delegates to WorldGenerator
+  generate(opts?: { roads?; buildings?; trees? }): void; // delegates to WorldGenerator
   generateCorridor(start: Point, end: Point, extendEnd?: boolean): void;
   addCorridor(corridor: Corridor): void;
   getCollisionBorders(): Segment[]; // roadBorders + separators + corridors
   static load(info: any): World;
+  toJSON(): object; // lean v2 serialization (see SaveLoad.md)
   draw(ctx, options: WorldDrawOptions): void;
 }
 ```
 
-### Generation split (`generate(generateBuildings)`)
+### Generation split (staged `WorldGenerator`)
 
-`World.generate()` delegates to `WorldGenerator.generate(world, generateBuildings)`.
-Road geometry that the simulation depends on — `roadBorders`, `laneGuides`, and
-`separatorBorders` — is **always** built. Only the decorative `buildings` and
-`trees` are gated behind the `generateBuildings` flag (the editor's "Generate"
-checkbox). This means lane guides remain available for marking placement even
-when world decoration is turned off.
+`WorldGenerator` exposes independently callable stages so cheap geometry can be
+refreshed continuously while expensive placement runs only on demand:
 
-After regeneration, every marking is re-anchored to the (possibly changed)
-graph via `marking.reanchor(graph)` so markings follow road edits instead of
-being stranded at stale absolute positions.
+- `generateRoads(world)` — **cheap, deterministic**: envelopes, `roadBorders`,
+  `laneGuides`, `separatorBorders`. Safe to run on every graph edit.
+- `generateBuildings(world)` — **expensive**: O(n²) footprint collision filter.
+- `generateTrees(world)` — **expensive**: rejection sampling; ensures the tree
+  prototype set exists, then assigns each instance a prototype/type/scale.
+- `reanchorMarkings(world)` — re-anchors markings to the (possibly edited) graph.
+- `generate(world, opts?)` — convenience that runs a chosen subset of stages
+  (`{ roads?, buildings?, trees? }`, all default `true`) + `reanchorMarkings`.
+
+**Lazy generation in the editor:** graph edits call only
+`generateRoads` + `reanchorMarkings` (fast); the expensive item placement is
+rebuilt exclusively via the **♻️ Regenerate items** action in the World Layers
+panel. When items become outdated after a graph edit, the regenerate button is
+tinted ("stale") until rebuilt.
+
+---
+
+## World Layers panel (`<world-layers-panel>`)
+
+The editor's bottom "Generate" checkbox has been replaced by a floating
+`<world-layers-panel>` (`ts/panels/worldLayersPanel.ts` +
+`templates/worldLayersPanelTemplate.ts`). It gives independent **visibility**
+control over each world layer via emoji toggles, plus the ♻️ Regenerate action:
+
+| Emoji | Layer       | Draws                                                       |
+| ----- | ----------- | ----------------------------------------------------------- |
+| 🛣️    | `roads`     | envelopes, road borders, lane/dash/arrow/separator markings |
+| 🚦    | `markings`  | stop/yield/light/crossing/parking/start/target              |
+| 🛤️    | `corridors` | authored corridors                                          |
+| 📍    | `itemBases` | flat building footprints + tree base circles (placeholders) |
+| 🌳    | `trees`     | rendered pseudo-3D trees                                    |
+| 🏢    | `buildings` | rendered pseudo-3D buildings                                |
+
+- Visibility is a **local editor preference** persisted to `localStorage` under
+  `editor:worldLayers` — it is **not** saved into the world file.
+- Rendering honors the mask via `WorldDrawOptions.layers` (a
+  `Partial<WorldLayerVisibility>` merged over `DEFAULT_LAYER_VISIBILITY` in
+  `World.draw()`). Visibility toggles never trigger generation.
+- The graph editor overlay (nodes + edges) is **not** a togglable layer — it is
+  always drawn in the editor since it is the primary editing surface.
+- `DEFAULT_LAYER_VISIBILITY` is a **runtime** const in `ts/world/types.ts`, so
+  every page that loads `world.js` must also load `js/world/types.js` before it
+  (world/simulator/race/traffic pages).
+- The same `<world-layers-panel>` is reused by the **training** and **traffic**
+  simulators (not race). There, shared handling lives in `SimulatorShell`
+  (persisted under `sim:worldLayers`, the ♻️ Items group hidden via
+  `hideItems()`), and hiding `trees`/`buildings` applies to **both** the
+  top-down 2D view (`world.draw` `layers`) and the 3D camera view
+  (`camera.render` `showTrees`/`showBuildings`).
+
+## Tree types & prototypes (`ts/world/items/tree.ts`)
+
+A `Tree` no longer bakes a canopy polygon. It references a reproducible
+`TreePrototype` (per-vertex noise, built from a seed via `buildTreePrototypes`)
+plus a per-instance render `type`, `scale` and prototype index. Three render
+styles exist:
+
+- **Type 0 — classic**: stacked noisy round canopy (the original look, now
+  driven by the prototype noise rather than `center.x`).
+- **Type 1 — conifer/pine**: a small trunk under stacked narrowing triangular
+  tiers, darker green.
+- **Type 2 — broadleaf cluster**: overlapping lobes forming a bushy olive crown.
+
+All types expose a round `base` polygon for collision, the `itemBases` layer,
+and the camera's `extrudeTreeShapes`. `Tree.toInstance()` serializes to the
+compact `{ x, y, p, s, t }` form (see SaveLoad.md).
 
 ---
 

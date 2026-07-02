@@ -12,6 +12,30 @@ class Building {
     return new Building(basePolygon, info.height);
   }
 
+  /**
+   * Rebuilds a Building from its compact footprint form `{ poly, h }` (footprint
+   * points + height only — no redundant polygon `segments`).
+   */
+  static loadFootprint(info: BuildingFootprint): Building {
+    const points = info.poly.map(([x, y]) => new Point(x, y));
+    return new Building(new Polygon(points), info.h ?? 200);
+  }
+
+  /**
+   * Serializes to the compact footprint form stored in world files: the base
+   * polygon's points plus the height. Drops the redundant `segments` array that
+   * a full `Polygon` serialization would include.
+   */
+  toFootprint(): BuildingFootprint {
+    return {
+      poly: this.base.points.map((p) => [
+        Math.round(p.x * 10) / 10,
+        Math.round(p.y * 10) / 10,
+      ]),
+      h: this.height,
+    };
+  }
+
   draw(ctx: CanvasRenderingContext2D, options: BuildingDrawOptions): void {
     const { viewPoint } = options;
     // Calculate the points for the top of the building (ceiling)

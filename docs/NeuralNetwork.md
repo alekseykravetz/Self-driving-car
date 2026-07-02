@@ -284,23 +284,26 @@ Generation N:
 
 ## Network Visualizer (`ts/neural-network/visualizer.ts`)
 
-Real-time rendering of the neural network's internal state on a dedicated canvas.
+Real-time, **interactive** rendering of the neural network's internal state on a
+dedicated canvas. `NetworkVisualizer` is a stateful instance: it caches the
+geometry it builds each frame (a `NetworkLayout` of neurons and connections) so
+the owning canvas can hit-test the mouse and reveal exact numeric values on
+hover.
 
 ```typescript
-class Visualizer {
-  static drawNetwork(
+class NetworkVisualizer {
+  // Draw the whole network; `time` (ms) drives the signal-flow animation.
+  draw(
     ctx: CanvasRenderingContext2D,
     network: NeuralNetwork,
+    time: number,
   ): void;
-  static drawLevel(
-    ctx,
-    level,
-    left,
-    top,
-    width,
-    height,
-    labels?: string[],
-  ): void;
+
+  // Mouse/keyboard interactivity (wired by the simulator shell).
+  setMouse(x: number, y: number): boolean; // returns true when over an element
+  clearMouse(): void; // call on mouseleave
+  handleClick(x: number, y: number): boolean; // consumes clicks on the toggle
+  toggleDensity(): void; // show every value at once (bound to the `v` key)
 }
 ```
 
@@ -313,34 +316,52 @@ class Visualizer {
 │  Hidden Layer       ○  ○  ○  ○  ○  ○│
 │        ↕ weight connections         │
 │  Input Layer        ○  ○  ○  ○  ○  ○│  (bottom)
+│                    ray1 … rayN speed │
 └─────────────────────────────────────┘
 ```
 
-Levels are drawn bottom-to-top (input at bottom, output at top).
+Rows run bottom-to-top (input at bottom, output at top). The input row is
+labelled `ray1…rayN` plus the trailing `speed` input; the output row shows the
+control arrows.
+
+### Colour palette (diverging amber ↔ cyan)
+
+A visualizer-local palette replaces the shared `getRGBA()` (which stays
+untouched for car/sensor rendering). It reads strongly on the black canvas:
+
+- **Positive** values → amber → yellow (`#FFB000` … `#FFE44D`).
+- **Negative** values → **cyan** (`#00E5FF`) instead of the old hard-to-see dark
+  blue.
+- Magnitude is encoded with lightness **and** line width; alpha has a floor
+  (`0.25 + 0.75·|value|`) so weak weights stay faintly visible instead of
+  disappearing.
+
+An always-on **legend** (cyan −1 → dark 0 → amber +1) sits in the bottom-left
+corner next to the density-toggle button.
 
 ### Visual Elements
 
 **Nodes (Neurons)**:
 
-- Circle with black outline
-- Inner fill colored by value:
-  - Yellow/white = high positive value (active, close to 1)
-  - Black/dark = low/zero value (inactive)
-- Color computed via `getRGBA(value)` utility
+- Dark disc with a glowing radial-gradient core coloured by the activation.
+- Output/hidden neurons carry a **static** dashed **bias ring** (colour = bias
+  sign/magnitude). Input neurons have no bias ring.
 
 **Connections (Weights)**:
 
-- Lines connecting input nodes to output nodes
-- Color: `getRGBA(weight)` — yellow for positive, blue/purple for negative
-- Thickness proportional to |weight| (stronger connections appear bolder)
-- Dashed style for very small weights (near zero)
+- Lines from input nodes (bottom) to output nodes (top).
+- Colour by weight (amber positive / cyan negative); thickness ∝ |weight|.
 
-**Bias Indicators** (output nodes):
+**Signal-flow animation**:
 
-- Dashed circle around each output neuron
-- Color indicates bias magnitude and sign
+- For each connection the live `signal = input × weight` is computed. Connections
+  actually carrying signal show **travelling particles** moving input→output,
+  with speed, size and brightness ∝ |signal|. Idle connections stay calm dim
+  lines. Particle phase is derived from `time` (no per-frame allocation).
+- This replaces the old, meaningless global dashed-line scroll — motion now
+  reflects what the network is really doing for the current inputs.
 
-**Output Labels** (rightmost layer only):
+**Output Labels** (top layer only):
 
 | Symbol | Meaning |
 | ------ | ------- |
@@ -349,13 +370,28 @@ Levels are drawn bottom-to-top (input at bottom, output at top).
 | ↦      | Right   |
 | ↧      | Reverse |
 
+### Hover inspection
+
+- **Hover a neuron** → a white highlight ring appears, its activation `a=` and
+  bias `b=` are shown beside it, **every incoming connection weight** is labelled
+  near its line, and unrelated elements dim to reduce clutter.
+- **Hover a connection** → the line brightens and a cursor tooltip shows the
+  `weight`, the source `input`, the live `contrib = input × weight`, and the
+  `src → dst` neuron indices. The tooltip is clamped to stay on-canvas.
+- **Density toggle** (`v` key or the on-canvas `values (v)` button) shows every
+  neuron/weight value at once — handy for screenshots. Default off.
+
 ### Real-time Updates
 
-The visualizer redraws every frame with the best car's current network state. This shows:
+The visualizer redraws every render frame with the best car's current network
+state. This shows:
 
 - Which sensors are detecting obstacles (input layer lights up)
 - How hidden neurons respond to the pattern (feature extraction visible)
 - Which control outputs are active (output layer shows current decisions)
-- Which weights are strong/weak (connection colors and thickness)
+- Which weights are strong/weak (connection colours and thickness)
+- **Where signal is actually flowing** right now (travelling particles)
 
-This provides immediate visual feedback during training — you can see the network "thinking" as it navigates obstacles.
+This provides immediate visual feedback during training — you can see the
+network "thinking" as it navigates obstacles, and hover any neuron or connection
+to read its exact learned values.
