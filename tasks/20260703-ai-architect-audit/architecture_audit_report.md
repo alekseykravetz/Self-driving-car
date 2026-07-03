@@ -268,3 +268,26 @@ Split the biggest domain responsibilities while preserving the global script loa
 ## Next Step
 
 The report now includes an exact refactor plan with directory layout guidance and file-level actions.
+
+## Prioritized Refactor Checklist
+
+1. `ts/car/car.ts` decomposition
+   - Extract `CarPhysics` and `CarRenderer`.
+   - Move AI-output-to-controls mapping into a dedicated adapter.
+   - Keep the existing `Car` API stable while swapping internal collaborators.
+2. AI serialization hardening
+   - Add `NeuralNetwork.deserialize()` and `NeuralNetwork.clone()`.
+   - Replace all `JSON.parse(JSON.stringify(...))` network copies.
+   - Introduce `Car.fromInfo(info)` or `Car.deserialize(info)`.
+3. Simulator shell decoupling
+   - Define a `SimulatorHost` interface.
+   - Remove direct DOM queries from `SimulatorShell`.
+   - Keep page-specific toolbar setup in `ts/simulator/views/`.
+4. Race view separation
+   - Extract `RacePanel` from `ts/games/race.ts`.
+   - Move DOM and stats wiring into the new view helper.
+5. Toolbar atomic splitting
+   - Break `WorldToolbarElement` into selector, mode, and control subdomains.
+   - Keep the organism as a composition of smaller helpers.
+
+These are the highest-impact changes that preserve behavior while reducing coupling.
