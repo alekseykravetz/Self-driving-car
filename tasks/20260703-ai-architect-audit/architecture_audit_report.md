@@ -291,3 +291,25 @@ The report now includes an exact refactor plan with directory layout guidance an
    - Keep the organism as a composition of smaller helpers.
 
 These are the highest-impact changes that preserve behavior while reducing coupling.
+
+## Execution Task Board
+
+- [ ] `ts/car/car.ts` decomposition
+  - [ ] Extract `CarPhysics` into `ts/car/physics/carPhysics.ts`
+  - [ ] Extract `CarRenderer`/`CarSpriteCache` into `ts/car/rendering/carRenderer.ts`
+  - [ ] Extract `CarBrainAdapter` into `ts/car/brain/carBrainAdapter.ts`
+- [ ] AI serialization hardening
+  - [ ] Add `NeuralNetwork.deserialize()`
+  - [ ] Add `NeuralNetwork.clone()`
+  - [ ] Replace `JSON.parse(JSON.stringify(...))` with explicit helpers
+  - [ ] Add `Car.fromInfo(info)` or `Car.deserialize(info)`
+- [ ] Simulator shell decoupling
+  - [ ] Define a `SimulatorHost` interface
+  - [ ] Remove direct `document.querySelector()` from `SimulatorShell`
+  - [ ] Move toolbar setup into `ts/simulator/views/`
+- [ ] Race view separation
+  - [ ] Extract `RacePanel` into `ts/games/racePanel.ts`
+  - [ ] Move all DOM/stats wiring out of `Race`
+- [ ] Toolbar atomic splitting
+  - [ ] Split `WorldToolbarElement` into selector, mode, and control subdomains
+  - [ ] Keep the organism composed from smaller helpers
