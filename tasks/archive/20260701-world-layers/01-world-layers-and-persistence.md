@@ -1,6 +1,6 @@
 # Task 01 — World Layers panel, lazy generation & lean world persistence
 
-**Effort:** very large · **Priority:** high · **Status:** not-started · **Branch:** `task-world-layers`
+**Effort:** very large · **Priority:** high · **Status:** done · **Branch:** `task-world-layers` · **Archived:** yes
 
 > This task is intentionally exhaustive so a separate agent can implement it end-to-end
 > without further design input. Read it fully before writing code. It has three tightly
