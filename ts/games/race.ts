@@ -86,31 +86,34 @@ class Race {
 
     const cars: Car[] = [];
 
-    const keyCar = new Car({
-      x: startPoint.x,
-      y: startPoint.y,
-      controlType: 'KEYS',
-      angle: startAngle,
-      color: 'blue',
-    });
+    // Create player car from saved params (if available), but without the AI brain
+    const keyCarInfo = keyParams ? { ...keyParams, brain: undefined } : null;
+    const keyCar = Car.fromInfo(
+      {
+        x: startPoint.x,
+        y: startPoint.y,
+        controlType: 'KEYS',
+        angle: startAngle,
+        color: 'blue',
+      },
+      keyCarInfo,
+    );
     keyCar.name = 'Player';
-    if (keyParams) {
-      keyCar.load({ ...keyParams, brain: undefined });
-      keyCar.brain = undefined;
-    }
     cars.push(keyCar);
 
     let i = 1;
     for (const info of aiSources) {
-      const car = new Car({
-        x: startPoint.x,
-        y: startPoint.y,
-        controlType: 'AI',
-        angle: startAngle,
-        color: getRandomColor(),
-      });
+      const car = Car.fromInfo(
+        {
+          x: startPoint.x,
+          y: startPoint.y,
+          controlType: 'AI',
+          angle: startAngle,
+          color: getRandomColor(),
+        },
+        info,
+      );
       car.name = 'AI ' + i;
-      car.load(info);
       cars.push(car);
       i++;
     }

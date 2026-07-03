@@ -156,6 +156,28 @@ class Car {
     this.update();
   }
 
+  /**
+   * Factory method to create a Car instance from initial options and persisted info.
+   * Provides an explicit, deterministic way to rehydrate a car from saved state
+   * without mutation. Prefer this over creating a car and then calling load().
+   *
+   * @param opts Initial car creation options (position, control type, etc.)
+   * @param info Optional persisted car info to apply (brain, config, etc.)
+   * @returns A new Car instance with persisted state applied
+   */
+  static fromInfo(opts: CarOptions, info?: CarInfo | null): Car {
+    const car = new Car(opts);
+    if (info) {
+      car.load(info);
+    }
+    return car;
+  }
+
+  /**
+   * Apply persisted car info to this instance (mutation-based).
+   * For new code, prefer Car.fromInfo() which creates and loads in one step.
+   * This method is kept for backward compatibility.
+   */
   load(info: CarInfo): void {
     if (info.brain) {
       this.brain = NeuralNetwork.deserialize(info.brain);
