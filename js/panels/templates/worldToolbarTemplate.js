@@ -1,5 +1,27 @@
 'use strict';
 const WORLD_TOOLBAR_TEMPLATE = `
+    <div class="controls-group world-editor-action" data-group="storage" style="display: none">
+      <span class="controls-group-label">Storage</span>
+      <div class="border-mode-group">
+        <button
+          id="saveBtn"
+          class="top-controls-btn"
+          title="Save — Save world to file and localStorage"
+        >
+          💾
+        </button>
+        <button
+          id="disposeBtn"
+          class="top-controls-btn"
+          title="Clear — Reset all graph points and segments"
+        >
+          ❌
+        </button>
+      </div>
+    </div>
+
+    <div class="controls-separator world-editor-action" data-group="storage-sep" style="display: none"></div>
+
     <div class="controls-group" data-group="world">
       <span class="controls-group-label">World</span>
       <div class="border-mode-group">
@@ -31,28 +53,6 @@ const WORLD_TOOLBAR_TEMPLATE = `
       </div>
     </div>
 
-    <div class="controls-separator world-editor-action" data-group="storage-sep" style="display: none"></div>
-
-    <div class="controls-group world-editor-action" data-group="storage" style="display: none">
-      <span class="controls-group-label">Storage</span>
-      <div class="border-mode-group">
-        <button
-          id="saveBtn"
-          class="top-controls-btn"
-          title="Save — Save world to file and localStorage"
-        >
-          💾
-        </button>
-        <button
-          id="disposeBtn"
-          class="top-controls-btn"
-          title="Clear — Reset all graph points and segments"
-        >
-          ❌
-        </button>
-      </div>
-    </div>
-
     <div class="controls-group" data-group="car">
       <span class="controls-group-label">Car</span>
       <div class="asset-picker" data-picker="car">
@@ -73,6 +73,8 @@ const WORLD_TOOLBAR_TEMPLATE = `
         </div>
       </div>
     </div>
+
+    <div class="controls-separator" data-group="selected-sep"></div>
 
     <div class="controls-group" data-group="selected" style="display: none">
       <span class="controls-group-label">Selected</span>
