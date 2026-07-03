@@ -57,9 +57,9 @@ abstract class SimulatorShell {
   protected animationLoopToolbar: AnimationLoopToolbarElement;
 
   // Per-layer visibility for the top-down 2D view and the 3D camera view.
-  // Backed by the optional <world-layers-panel> and persisted to localStorage.
+  // Backed by the optional <world-layers-toolbar> and persisted to localStorage.
   protected worldLayers: WorldLayerVisibility = loadSimLayerVisibility();
-  protected worldLayersPanel: WorldLayersPanelElement | null = null;
+  protected worldLayersToolbar: WorldLayersToolbarElement | null = null;
 
   // Render throttle: physics runs every animation frame, the (heavier) render
   // pass only runs once per `renderInterval` frames (read live from the
@@ -94,13 +94,13 @@ abstract class SimulatorShell {
       'animation-loop-toolbar',
     ) as AnimationLoopToolbarElement;
 
-    // Optional world-layers panel: lets the user hide roads/markings/trees/
+    // Optional world-layers toolbar: lets the user hide roads/markings/trees/
     // buildings in both the 2D and 3D views. Absent on pages without it.
-    this.worldLayersPanel = document.querySelector('world-layers-panel');
-    if (this.worldLayersPanel) {
-      this.worldLayersPanel.hideItems(); // no regeneration in simulators
-      this.worldLayersPanel.setVisibility(this.worldLayers);
-      this.worldLayersPanel.setChangeListener((v) => {
+    this.worldLayersToolbar = document.querySelector('world-layers-toolbar');
+    if (this.worldLayersToolbar) {
+      this.worldLayersToolbar.hideItems(); // no regeneration in simulators
+      this.worldLayersToolbar.setVisibility(this.worldLayers);
+      this.worldLayersToolbar.setChangeListener((v) => {
         this.worldLayers = v;
         saveSimLayerVisibility(v);
       });

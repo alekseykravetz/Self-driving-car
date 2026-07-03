@@ -85,11 +85,11 @@ tinted ("stale") until rebuilt.
 
 ---
 
-## World Layers panel (`<world-layers-panel>`)
+## World Layers toolbar (`<world-layers-toolbar>`)
 
 The editor's bottom "Generate" checkbox has been replaced by a floating
-`<world-layers-panel>` (`ts/panels/worldLayersPanel.ts` +
-`templates/worldLayersPanelTemplate.ts`). It gives independent **visibility**
+`<world-layers-toolbar>` (`ts/panels/worldLayersToolbar.ts` +
+`templates/worldLayersToolbarTemplate.ts`). It gives independent **visibility**
 control over each world layer via emoji toggles, plus the ♻️ Regenerate action:
 
 | Emoji | Layer       | Draws                                                       |
@@ -111,7 +111,7 @@ control over each world layer via emoji toggles, plus the ♻️ Regenerate acti
 - `DEFAULT_LAYER_VISIBILITY` is a **runtime** const in `ts/world/types.ts`, so
   every page that loads `world.js` must also load `js/world/types.js` before it
   (world/simulator/race/traffic pages).
-- The same `<world-layers-panel>` is reused by the **training** and **traffic**
+- The same `<world-layers-toolbar>` is reused by the **training** and **traffic**
   simulators (not race). There, shared handling lives in `SimulatorShell`
   (persisted under `sim:worldLayers`, the ♻️ Items group hidden via
   `hideItems()`), and hiding `trees`/`buildings` applies to **both** the

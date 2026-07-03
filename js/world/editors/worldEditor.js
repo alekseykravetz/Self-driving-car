@@ -50,7 +50,7 @@ class WorldEditor {
   corridorBtn;
   worldToolbar;
   shortcutsToolbar;
-  worldLayersPanel;
+  worldLayersToolbar;
   constructor(canvas, miniMapCanvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
@@ -94,7 +94,7 @@ class WorldEditor {
     this.corridorBtn = getElement('corridorBtn');
     this.worldToolbar = document.querySelector('world-toolbar');
     this.shortcutsToolbar = document.querySelector('shortcuts-toolbar');
-    this.worldLayersPanel = document.querySelector('world-layers-panel');
+    this.worldLayersToolbar = document.querySelector('world-layers-toolbar');
   }
 
   /* Adds event listeners to DOM elements. */
@@ -206,13 +206,13 @@ class WorldEditor {
       onWorldSelected: (entry) =>
         this.#initializeWorldEditor(entry?.data ?? null),
     });
-    // World Layers panel: per-layer visibility toggles + Regenerate items action.
-    this.worldLayersPanel.setVisibility(this.layerVisibility);
-    this.worldLayersPanel.setChangeListener((visibility) => {
+    // World Layers toolbar: per-layer visibility toggles + Regenerate items action.
+    this.worldLayersToolbar.setVisibility(this.layerVisibility);
+    this.worldLayersToolbar.setChangeListener((visibility) => {
       this.layerVisibility = visibility;
       saveLayerVisibility(visibility);
     });
-    this.worldLayersPanel.setRegenerateListener(() => this.regenerateItems());
+    this.worldLayersToolbar.setRegenerateListener(() => this.regenerateItems());
   }
 
   /* Initializes or re-initializes the world, viewport, minimap, and tools. */
@@ -237,7 +237,7 @@ class WorldEditor {
     this.miniMapViewport.setMode(this.viewportMode);
     // A freshly loaded/created world already has its items generated in memory.
     this.itemsStale = false;
-    this.worldLayersPanel?.setStale(false);
+    this.worldLayersToolbar?.setStale(false);
   }
 
   /* Creates instances of all editor tools. */
@@ -392,13 +392,13 @@ class WorldEditor {
 
   /* Rebuilds the expensive item placement (buildings + trees) on demand. */
   regenerateItems() {
-    this.worldLayersPanel.setBusy(true);
+    this.worldLayersToolbar.setBusy(true);
     // Yield once so the busy state paints before the heavy synchronous work.
     setTimeout(() => {
       this.world.generate({ roads: false, buildings: true, trees: true });
       this.itemsStale = false;
-      this.worldLayersPanel.setStale(false);
-      this.worldLayersPanel.setBusy(false);
+      this.worldLayersToolbar.setStale(false);
+      this.worldLayersToolbar.setBusy(false);
     }, 0);
   }
 
@@ -415,7 +415,7 @@ class WorldEditor {
       this.oldGraphHash = currentGraphHash;
       if (this.world.buildings.length || this.world.trees.length) {
         this.itemsStale = true;
-        this.worldLayersPanel?.setStale(true);
+        this.worldLayersToolbar?.setStale(true);
       }
     }
     // Get the current viewpoint based on viewport offset

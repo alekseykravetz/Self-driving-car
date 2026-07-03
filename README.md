@@ -227,7 +227,7 @@ Self-driving-car/
 │   ├── panels/                 # Shared floating UI toolbars (custom elements)
 │   │   ├── worldToolbar.ts     # Custom element <world-toolbar>: border/tracking mode, file loading, camera debug
 │   │   ├── shortcutsToolbar.ts # Custom element <shortcuts-toolbar>: keyboard-shortcut indicators
-│   │   ├── worldLayersPanel.ts # Custom element <world-layers-panel>: editor layer visibility + regenerate items
+│   │   ├── worldLayersToolbar.ts # Custom element <world-layers-toolbar>: editor layer visibility + regenerate items
 │   │   └── templates/          # HTML template strings for the toolbars
 │   │
 │   ├── games/

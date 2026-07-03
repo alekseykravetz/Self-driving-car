@@ -291,9 +291,9 @@ input[type='file'] {
   top: calc(100% + 8px);
 }
 
-/* World Layers panel (<world-layers-panel>) — visibility toggles + regenerate
+/* World Layers toolbar (<world-layers-toolbar>) — visibility toggles + regenerate
    action. Shares the floating toolbar box styling. */
-#worldLayersPanel {
+#worldLayersToolbar {
   display: flex;
   align-items: stretch;
   gap: 6px;
@@ -303,13 +303,13 @@ input[type='file'] {
   outline: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-#worldLayersPanel .world-layers-groups {
+#worldLayersToolbar .world-layers-groups {
   display: flex;
   align-items: stretch;
   gap: 6px;
 }
 
-#worldLayersPanel .controls-group {
+#worldLayersToolbar .controls-group {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -318,7 +318,7 @@ input[type='file'] {
   flex: 0 1 auto;
 }
 
-#worldLayersPanel .controls-group-label {
+#worldLayersToolbar .controls-group-label {
   font-size: 9px;
   font-family: Arial, sans-serif;
   font-weight: 700;
@@ -330,14 +330,14 @@ input[type='file'] {
   height: 11px;
 }
 
-#worldLayersPanel .controls-separator {
+#worldLayersToolbar .controls-separator {
   width: 1px;
   align-self: stretch;
   background: rgba(255, 255, 255, 0.2);
   margin: 0 4px;
 }
 
-#worldLayersPanel .world-layers-keys {
+#worldLayersToolbar .world-layers-keys {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -345,7 +345,7 @@ input[type='file'] {
   flex: 0 0 auto;
 }
 
-#worldLayersPanel button {
+#worldLayersToolbar button {
   font-size: 16px;
   padding: 3px 6px;
   transition:
@@ -354,19 +354,19 @@ input[type='file'] {
     box-shadow 0.15s;
 }
 
-/* Tooltip below the button (panel sits at the top of the screen). */
-#worldLayersPanel button[title]:hover::after {
+/* Tooltip below the button (toolbar sits at the top of the screen). */
+#worldLayersToolbar button[title]:hover::after {
   bottom: auto;
   top: calc(100% + 8px);
 }
 
 /* "Items outdated" hint on the Regenerate button after a graph edit. */
-#worldLayersPanel #regenerateItemsBtn.stale {
+#worldLayersToolbar #regenerateItemsBtn.stale {
   box-shadow: 0 0 0 2px #f5a623;
   animation: worldLayersPulse 1.4s ease-in-out infinite;
 }
 
-#worldLayersPanel #regenerateItemsBtn.busy {
+#worldLayersToolbar #regenerateItemsBtn.busy {
   opacity: 0.6;
   cursor: progress;
 }

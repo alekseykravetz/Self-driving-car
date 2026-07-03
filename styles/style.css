@@ -1330,11 +1330,11 @@ input[type='file'] {
   accent-color: #5cb85c;
 }
 
-/* ── World Layers panel (<world-layers-panel>) ─────────────────────
+/* ── World Layers toolbar (<world-layers-toolbar>) ─────────────────────
    Visibility toggles for the top-down 2D view and the 3D camera view.
    Shares the floating toolbar box styling; self-contained button style so it
    does not depend on the page's generic `button` rule. */
-#worldLayersPanel {
+#worldLayersToolbar {
   display: flex;
   align-items: stretch;
   gap: 6px;
@@ -1344,13 +1344,13 @@ input[type='file'] {
   outline: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-#worldLayersPanel .world-layers-groups {
+#worldLayersToolbar .world-layers-groups {
   display: flex;
   align-items: stretch;
   gap: 6px;
 }
 
-#worldLayersPanel .world-layers-keys {
+#worldLayersToolbar .world-layers-keys {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1358,7 +1358,7 @@ input[type='file'] {
   flex: 0 0 auto;
 }
 
-#worldLayersPanel button {
+#worldLayersToolbar button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1379,12 +1379,12 @@ input[type='file'] {
     background 0.15s;
 }
 
-#worldLayersPanel button:hover {
+#worldLayersToolbar button:hover {
   background: rgba(255, 255, 255, 0.22);
 }
 
-/* Tooltip below the button (panel sits at the top of the screen). */
-#worldLayersPanel button[title]:hover::after {
+/* Tooltip below the button (toolbar sits at the top of the screen). */
+#worldLayersToolbar button[title]:hover::after {
   content: attr(title);
   position: absolute;
   top: calc(100% + 8px);

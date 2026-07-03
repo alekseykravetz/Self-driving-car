@@ -1,6 +1,6 @@
 'use strict';
 /**
- * <world-layers-panel> — a floating toolbar for the world editor that gives
+ * <world-layers-toolbar> — a floating toolbar for the world editor that gives
  * independent visibility control over each world layer (roads, markings,
  * corridors, item bases, trees, buildings) via emoji toggle buttons, plus a
  * "Regenerate items" (♻️) action that rebuilds the expensive building/tree
@@ -30,17 +30,17 @@ const WORLD_LAYER_BUTTONS = [
   { id: 'trees', emoji: '🌳', title: 'Trees — rendered 3D trees' },
   { id: 'buildings', emoji: '🏢', title: 'Buildings — rendered 3D buildings' },
 ];
-class WorldLayersPanelElement extends HTMLElement {
+class WorldLayersToolbarElement extends HTMLElement {
   #visibility = { ...DEFAULT_LAYER_VISIBILITY };
   #onChange = null;
   #onRegenerate = null;
   constructor() {
     super();
-    this.id = 'worldLayersPanel';
+    this.id = 'worldLayersToolbar';
   }
 
   connectedCallback() {
-    this.innerHTML = WorldLayersPanelElement.template;
+    this.innerHTML = WorldLayersToolbarElement.template;
     this.#render();
   }
 
@@ -137,6 +137,6 @@ class WorldLayersPanelElement extends HTMLElement {
     });
   }
 
-  static template = WORLD_LAYERS_PANEL_TEMPLATE;
+  static template = WORLD_LAYERS_TOOLBAR_TEMPLATE;
 }
-customElements.define('world-layers-panel', WorldLayersPanelElement);
+customElements.define('world-layers-toolbar', WorldLayersToolbarElement);
