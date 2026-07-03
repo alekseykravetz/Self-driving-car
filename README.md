@@ -290,7 +290,6 @@ Self-driving-car/
     └── Sound.md                # Audio synthesis
 ```
 
-
 ---
 
 ## Build System
@@ -318,15 +317,15 @@ JSON files containing a car configuration with neural network brain, physics par
 
 ### LocalStorage
 
-| Key                | Contents                                                              |
-| ------------------ | --------------------------------------------------------------------- |
-| `bestPool`         | JSON array of top-K car configs with brains (unified format)          |
-| `raceCars`         | JSON array of car configs loaded via race mode's "Load car(s)" button |
-| `editorWorld`      | World saved by the world editor (legacy `world` key migrated on init) |
-| `loadedWorlds`     | User-loaded `.world` files (in-memory after refresh)                  |
-| `loadedCars`       | User-loaded `.car` files (in-memory after refresh)                    |
-| `store:activeWorld`| Id of the active store world (`store:`/`loaded:`/`editor`)            |
-| `store:activeCar`  | JSON array of active store car ids (multi-select)                     |
+| Key                 | Contents                                                              |
+| ------------------- | --------------------------------------------------------------------- |
+| `bestPool`          | JSON array of top-K car configs with brains (unified format)          |
+| `raceCars`          | JSON array of car configs loaded via race mode's "Load car(s)" button |
+| `editorWorld`       | World saved by the world editor (legacy `world` key migrated on init) |
+| `loadedWorlds`      | User-loaded `.world` files (in-memory after refresh)                  |
+| `loadedCars`        | User-loaded `.car` files (in-memory after refresh)                    |
+| `store:activeWorld` | Id of the active store world (`store:`/`loaded:`/`editor`)            |
+| `store:activeCar`   | JSON array of active store car ids (multi-select)                     |
 
 > See [Save & Load](docs/SaveLoad.md) for the full persistence schema, legacy migration, and file formats.
 
@@ -336,23 +335,23 @@ JSON files containing a car configuration with neural network brain, physics par
 
 Detailed technical documentation is maintained in the `docs/` directory:
 
-| Document                                | Description                                               |
-| --------------------------------------- | --------------------------------------------------------- |
-| [Project Goal](docs/ProjectGoal.md)     | Vision, city-scale traffic simulation goals, performance  |
-| [Architecture](docs/Architecture.md)    | System overview, module graph, data flow, design patterns |
-| [Math](docs/Math.md)                    | Geometric primitives, polygon union, graph, OSM import    |
-| [Physics](docs/Physics.md)              | Car dynamics, sensors, collision detection & response     |
-| [Units](docs/Units.md)                  | Unified unit system, conversions, formulas, and examples  |
-| [Neural Network](docs/NeuralNetwork.md) | Network structure, feedforward, mutation, crossover, pool |
-| [World Editor](docs/WorldEditor.md)     | World generation pipeline, editors, markings, traffic     |
-| [Simulators](docs/Simulators.md)        | Training environments, genetic algorithm, panel UI        |
-| [Camera](docs/Camera.md)                | 3D perspective projection, frustum culling, extrusion     |
-| [Controls](docs/Controls.md)            | Keyboard, phone tilt, webcam markers, AI control modes    |
-| [Race](docs/Race.md)                    | Racing mode, corridor progress, countdown, AI opponents   |
-| [Viewport](docs/Viewport.md)            | Pan/zoom system, coordinate transforms, mini-map          |
-| [Save & Load](docs/SaveLoad.md)         | File formats, localStorage, legacy migration, loaders     |
-| [Store](docs/Store.md)                  | Bundled store assets, active selection, landing-page panel|
-| [Sound](docs/Sound.md)                  | Web Audio API synthesis, beep, explosion, victory fanfare |
+| Document                                | Description                                                |
+| --------------------------------------- | ---------------------------------------------------------- |
+| [Project Goal](docs/ProjectGoal.md)     | Vision, city-scale traffic simulation goals, performance   |
+| [Architecture](docs/Architecture.md)    | System overview, module graph, data flow, design patterns  |
+| [Math](docs/Math.md)                    | Geometric primitives, polygon union, graph, OSM import     |
+| [Physics](docs/Physics.md)              | Car dynamics, sensors, collision detection & response      |
+| [Units](docs/Units.md)                  | Unified unit system, conversions, formulas, and examples   |
+| [Neural Network](docs/NeuralNetwork.md) | Network structure, feedforward, mutation, crossover, pool  |
+| [World Editor](docs/WorldEditor.md)     | World generation pipeline, editors, markings, traffic      |
+| [Simulators](docs/Simulators.md)        | Training environments, genetic algorithm, panel UI         |
+| [Camera](docs/Camera.md)                | 3D perspective projection, frustum culling, extrusion      |
+| [Controls](docs/Controls.md)            | Keyboard, phone tilt, webcam markers, AI control modes     |
+| [Race](docs/Race.md)                    | Racing mode, corridor progress, countdown, AI opponents    |
+| [Viewport](docs/Viewport.md)            | Pan/zoom system, coordinate transforms, mini-map           |
+| [Save & Load](docs/SaveLoad.md)         | File formats, localStorage, legacy migration, loaders      |
+| [Store](docs/Store.md)                  | Bundled store assets, active selection, landing-page panel |
+| [Sound](docs/Sound.md)                  | Web Audio API synthesis, beep, explosion, victory fanfare  |
 
 ---
 

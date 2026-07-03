@@ -402,13 +402,13 @@ fitness = distance traveled along corridor/road
 
 ### LocalStorage Keys
 
-| Key                 | Content                                            | Format            |
-| ------------------- | -------------------------------------------------- | ----------------- |
-| `bestPool`          | Array of top-performing car configs with brains    | JSON `CarInfo[]`  |
-| `raceCars`          | Cars loaded via the race "Load car(s)" button      | JSON `CarInfo[]`  |
-| `editorWorld`       | World saved by the world editor                    | JSON world object |
+| Key                 | Content                                             | Format            |
+| ------------------- | --------------------------------------------------- | ----------------- |
+| `bestPool`          | Array of top-performing car configs with brains     | JSON `CarInfo[]`  |
+| `raceCars`          | Cars loaded via the race "Load car(s)" button       | JSON `CarInfo[]`  |
+| `editorWorld`       | World saved by the world editor                     | JSON world object |
 | `store:activeWorld` | Active store world id (`store:`/`loaded:`/`editor`) | string            |
-| `store:activeCar`   | Active store car ids (multi-select)                | JSON `string[]`   |
+| `store:activeCar`   | Active store car ids (multi-select)                 | JSON `string[]`   |
 
 > The legacy `world` key is migrated to `editorWorld` once on init. See
 > [Save & Load](SaveLoad.md) for the full persistence schema.
