@@ -21,6 +21,7 @@ class Car {
   controls;
   image;
   polygon;
+  physics;
   engine;
   /**
    * Shared car sprite image, loaded once for all cars instead of per instance.
@@ -98,8 +99,9 @@ class Car {
       ]);
     }
     this.controls = new Controls(opts.controlType);
+    this.physics = new CarPhysics(this);
     this.image = Car.#getSharedImage();
-    this.polygon = this.#createPolygon();
+    this.polygon = this.physics.createPolygon();
     this.update();
   }
 
@@ -167,17 +169,9 @@ class Car {
   }
 
   update(polygons = []) {
-    if (!this.damaged) {
-      this.#move();
-      this.fitness += this.speed;
-      this.polygon = this.#createPolygon();
-      this.damaged = this.#assessDamage(polygons);
-      if (this.damaged) {
-        this.speed = 0;
-        if (this.type === 'KEYS') {
-          explode();
-        }
-      }
+    const becameDamaged = this.physics.update(polygons);
+    if (becameDamaged && this.type === 'KEYS') {
+      explode();
     }
     if (this.sensor && this.brain) {
       this.sensor.update(polygons);
@@ -201,124 +195,6 @@ class Car {
       this.engine.setVolume(percent);
       this.engine.setPitch(percent);
     }
-  }
-
-  #assessDamage(polygons) {
-    if (polygons.length === 0) return false;
-    // Car bounding box (axis-aligned) — cheap broad-phase reject. The shared
-    // narrow phase feeds every segment within sensor range (far larger than the
-    // car body), so most candidates here cannot possibly touch the car. An AABB
-    // test skips the full edge-edge check for those without changing behaviour:
-    // if the boxes do not overlap the polygons cannot intersect.
-    let carMinX = this.polygon[0].x;
-    let carMaxX = this.polygon[0].x;
-    let carMinY = this.polygon[0].y;
-    let carMaxY = this.polygon[0].y;
-    for (let i = 1; i < this.polygon.length; i++) {
-      const p = this.polygon[i];
-      if (p.x < carMinX) carMinX = p.x;
-      else if (p.x > carMaxX) carMaxX = p.x;
-      if (p.y < carMinY) carMinY = p.y;
-      else if (p.y > carMaxY) carMaxY = p.y;
-    }
-    for (let i = 0; i < polygons.length; i++) {
-      const poly = polygons[i];
-      // Obstacle AABB.
-      let oMinX = poly[0].x;
-      let oMaxX = poly[0].x;
-      let oMinY = poly[0].y;
-      let oMaxY = poly[0].y;
-      for (let j = 1; j < poly.length; j++) {
-        const p = poly[j];
-        if (p.x < oMinX) oMinX = p.x;
-        else if (p.x > oMaxX) oMaxX = p.x;
-        if (p.y < oMinY) oMinY = p.y;
-        else if (p.y > oMaxY) oMaxY = p.y;
-      }
-      // Skip when the bounding boxes are disjoint.
-      if (
-        oMinX > carMaxX ||
-        oMaxX < carMinX ||
-        oMinY > carMaxY ||
-        oMaxY < carMinY
-      ) {
-        continue;
-      }
-      if (polysIntersect(this.polygon, poly)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  #createPolygon() {
-    const points = [];
-    const rad = Math.hypot(this.width, this.height) / 2;
-    const alpha = Math.atan2(this.width, this.height);
-    points.push({
-      x: this.x - Math.sin(this.angle - alpha) * rad,
-      y: this.y - Math.cos(this.angle - alpha) * rad,
-    });
-    points.push({
-      x: this.x - Math.sin(this.angle + alpha) * rad,
-      y: this.y - Math.cos(this.angle + alpha) * rad,
-    });
-    points.push({
-      x: this.x - Math.sin(Math.PI + this.angle - alpha) * rad,
-      y: this.y - Math.cos(Math.PI + this.angle - alpha) * rad,
-    });
-    points.push({
-      x: this.x - Math.sin(Math.PI + this.angle + alpha) * rad,
-      y: this.y - Math.cos(Math.PI + this.angle + alpha) * rad,
-    });
-    return points;
-  }
-
-  #move() {
-    if (this.controls.forward) {
-      this.speed += this.acceleration;
-    }
-    if (this.controls.reverse) {
-      this.speed -= this.acceleration;
-    }
-    if (this.speed > this.maxSpeed) {
-      this.speed = this.maxSpeed;
-    }
-    // Ensure maxSpeed/2 comparison is intended
-    if (this.speed < -this.maxSpeed / 2) {
-      this.speed = -this.maxSpeed / 2;
-    }
-    if (this.speed > 0) {
-      this.speed -= this.friction;
-    }
-    if (this.speed < 0) {
-      this.speed += this.friction;
-    }
-    if (Math.abs(this.speed) < this.friction) {
-      this.speed = 0;
-    }
-    if (this.speed !== 0) {
-      // Check for tilt control specifically if it exists
-      if (
-        (typeof CameraControls !== 'undefined' &&
-          this.controls instanceof CameraControls) ||
-        (typeof PhoneControls !== 'undefined' &&
-          this.controls instanceof PhoneControls &&
-          this.controls.tilt !== 0)
-      ) {
-        this.angle -= this.controls.tilt * 0.03;
-      } else {
-        const flip = this.speed > 0 ? 1 : -1;
-        if (this.controls.left) {
-          this.angle += 0.03 * flip;
-        }
-        if (this.controls.right) {
-          this.angle -= 0.03 * flip;
-        }
-      }
-    }
-    this.x -= Math.sin(this.angle) * this.speed;
-    this.y -= Math.cos(this.angle) * this.speed;
   }
 
   draw(ctx, options = {}) {
