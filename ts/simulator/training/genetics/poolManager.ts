@@ -77,7 +77,7 @@ function applyPoolToCars(
       if (aiIndex < brains.length) {
         // Only apply stored brain if topology matches the freshly-created car.
         if (brainsCompatible(brains[aiIndex], cars[i].brain!)) {
-          cars[i].brain = JSON.parse(JSON.stringify(brains[aiIndex]));
+          cars[i].brain = NeuralNetwork.clone(brains[aiIndex]);
         }
       } else {
         const mutated = NeuralNetwork.toMutatedFromPool(brains, mutationRate);

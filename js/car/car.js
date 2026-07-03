@@ -105,7 +105,7 @@ class Car {
 
   load(info) {
     if (info.brain) {
-      this.brain = JSON.parse(JSON.stringify(info.brain));
+      this.brain = NeuralNetwork.deserialize(info.brain);
     }
     if (info.hiddenLayers) {
       this.hiddenLayers = [...info.hiddenLayers];
@@ -125,7 +125,7 @@ class Car {
 
   toInfo() {
     return {
-      brain: this.brain ? JSON.parse(JSON.stringify(this.brain)) : undefined,
+      brain: this.brain ? NeuralNetwork.clone(this.brain) : undefined,
       maxSpeed: this.maxSpeed,
       friction: this.friction,
       acceleration: this.acceleration,

@@ -99,18 +99,58 @@ class NeuralNetwork {
   }
 
   /**
-   * Safe version of mutateFromPool that deep-copies parents before crossover,
+   * Deserialize a NeuralNetwork from plain JSON-like data.
+   * Reconstructs the network structure from serialized brain data.
+   */
+  static deserialize(data: any): NeuralNetwork {
+    if (!data || !Array.isArray(data.levels)) {
+      throw new Error('Invalid NeuralNetwork data: missing levels');
+    }
+    const network = new NeuralNetwork([]);
+    network.levels = data.levels.map((levelData: any) => {
+      const level = new Level(
+        levelData.inputs.length,
+        levelData.outputs.length,
+      );
+      level.biases = [...levelData.biases];
+      level.weights = levelData.weights.map((w: number[]) => [...w]);
+      level.inputs = [...levelData.inputs];
+      level.outputs = [...levelData.outputs];
+      return level;
+    });
+    return network;
+  }
+
+  /**
+   * Clone an existing NeuralNetwork, creating a deep copy safe for mutation.
+   * Ensures the copy is a proper NeuralNetwork instance, not a plain object.
+   */
+  static clone(network: NeuralNetwork): NeuralNetwork {
+    const cloned = new NeuralNetwork([]);
+    cloned.levels = network.levels.map((level: Level) => {
+      const clonedLevel = new Level(level.inputs.length, level.outputs.length);
+      clonedLevel.biases = [...level.biases];
+      clonedLevel.weights = level.weights.map((w: number[]) => [...w]);
+      clonedLevel.inputs = [...level.inputs];
+      clonedLevel.outputs = [...level.outputs];
+      return clonedLevel;
+    });
+    return cloned;
+  }
+
+  /**
+   * Safe version of mutateFromPool that clones parents before crossover,
    * preventing mutation of the original pool references.
    */
   static toMutatedFromPool(
     networks: NeuralNetwork[],
     amount: number = 0.1,
   ): NeuralNetwork {
-    const parent1: NeuralNetwork = JSON.parse(
-      JSON.stringify(networks[Math.floor(Math.random() * networks.length)]),
+    const parent1 = NeuralNetwork.clone(
+      networks[Math.floor(Math.random() * networks.length)],
     );
-    const parent2: NeuralNetwork = JSON.parse(
-      JSON.stringify(networks[Math.floor(Math.random() * networks.length)]),
+    const parent2 = NeuralNetwork.clone(
+      networks[Math.floor(Math.random() * networks.length)],
     );
 
     const child = NeuralNetwork.crossover(parent1, parent2);
