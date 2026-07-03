@@ -124,32 +124,32 @@ class Tree {
     }
   }
 
-  /** Type 1 — tall conifer/pine: a small trunk under stacked narrowing tiers. */
+  /** Type 1 — tall conifer/pine: a trunk under stacked narrowing tiers. */
   #drawConifer(ctx, viewPoint) {
     // Trunk.
-    const trunkTop = getFake3dPoint(this.center, viewPoint, this.height * 0.25);
-    const trunkWidth = this.size * 0.12;
+    const trunkTop = getFake3dPoint(this.center, viewPoint, this.height * 0.4);
+    const trunkWidth = this.size * 0.22;
     const trunk = new Polygon([
       translate(this.center, Math.PI / 2, trunkWidth),
       translate(this.center, -Math.PI / 2, trunkWidth),
-      translate(trunkTop, -Math.PI / 2, trunkWidth * 0.7),
-      translate(trunkTop, Math.PI / 2, trunkWidth * 0.7),
+      translate(trunkTop, -Math.PI / 2, trunkWidth * 0.6),
+      translate(trunkTop, Math.PI / 2, trunkWidth * 0.6),
     ]);
     trunk.draw(ctx, { fill: 'rgb(90, 60, 30)', stroke: 'rgba(0,0,0,0)' });
     // Stacked triangular tiers, darkest at the bottom.
     const tiers = 4;
     const noise = this.prototype.noise;
     for (let tier = 0; tier < tiers; tier++) {
-      const baseT = 0.2 + (tier / tiers) * 0.7;
-      const tipT = 0.2 + ((tier + 1.4) / tiers) * 0.7;
+      const baseT = 0.15 + (tier / tiers) * 0.75;
+      const tipT = 0.15 + ((tier + 1.4) / tiers) * 0.75;
       const baseCenter = getFake3dPoint(
         this.center,
         viewPoint,
         this.height * baseT,
       );
       const tip = getFake3dPoint(this.center, viewPoint, this.height * tipT);
-      const halfWidth = (this.size / 2) * (1 - tier / (tiers + 1));
-      const jitter = 1 + (noise[tier % noise.length] - 0.75) * 0.3;
+      const halfWidth = (this.size / 2) * (1 - tier / (tiers + 1)) * 1.3;
+      const jitter = 1 + (noise[tier % noise.length] - 0.75) * 0.35;
       const green = Math.round(lerp(70, 130, tier / tiers));
       ctx.fillStyle = `rgb(20, ${green}, 45)`;
       ctx.beginPath();
@@ -161,10 +161,21 @@ class Tree {
     }
   }
 
-  /** Type 2 — broadleaf cluster: overlapping lobes forming a bushy crown. */
+  /** Type 2 — broadleaf cluster: trunk with overlapping lobes forming a bushy crown. */
   #drawCluster(ctx, viewPoint) {
-    const top = getFake3dPoint(this.center, viewPoint, this.height * 0.85);
     const noise = this.prototype.noise;
+    // Trunk.
+    const trunkTop = getFake3dPoint(this.center, viewPoint, this.height * 0.55);
+    const trunkWidth = this.size * 0.2;
+    const trunk = new Polygon([
+      translate(this.center, Math.PI / 2, trunkWidth),
+      translate(this.center, -Math.PI / 2, trunkWidth),
+      translate(trunkTop, -Math.PI / 2, trunkWidth * 0.6),
+      translate(trunkTop, Math.PI / 2, trunkWidth * 0.6),
+    ]);
+    trunk.draw(ctx, { fill: 'rgb(90, 60, 30)', stroke: 'rgba(0,0,0,0)' });
+    // Canopy lobes.
+    const top = getFake3dPoint(this.center, viewPoint, this.height * 0.85);
     const lobeCount = 4;
     const lobeRadius = this.size * 0.32;
     const lobes = [];
