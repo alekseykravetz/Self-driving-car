@@ -406,9 +406,12 @@ fitness = distance traveled along corridor/road
 | ------------------- | -------------------------------------------------- | ----------------- |
 | `bestPool`          | Array of top-performing car configs with brains    | JSON `CarInfo[]`  |
 | `raceCars`          | Cars loaded via the race "Load car(s)" button      | JSON `CarInfo[]`  |
-| `world`             | World state (used as fallback when no file loaded) | JSON world object |
-| `store:activeWorld` | Active store world filename                        | string            |
-| `store:activeCar`   | Active store car filenames (multi-select)          | JSON `string[]`   |
+| `editorWorld`       | World saved by the world editor                    | JSON world object |
+| `store:activeWorld` | Active store world id (`store:`/`loaded:`/`editor`) | string            |
+| `store:activeCar`   | Active store car ids (multi-select)                | JSON `string[]`   |
+
+> The legacy `world` key is migrated to `editorWorld` once on init. See
+> [Save & Load](SaveLoad.md) for the full persistence schema.
 
 > The race composes its grid from `bestPool` (read-only) + active store cars +
 > `raceCars`, applying each car as-is with **no mutation** (mutation is

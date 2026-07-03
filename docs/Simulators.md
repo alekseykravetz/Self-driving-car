@@ -310,7 +310,7 @@ the pool per the chosen source, then runs `newTraining()`.
 | Save Car       | Button     | —          | Download best car as `.car` JSON file                              |
 | Load Car       | File input | .car/.json | Load car config (triggers new training)                            |
 
-> **Render interval** lives in the separate `<layout-toolbar>` (not the
+> **Render interval** lives in the separate `<animation-loop-toolbar>` (not the
 > training panel): a `1 / N frames` number input (1–10, default 2) that throttles
 > the draw rate while physics keeps running every frame. Raise it to push very
 > large populations (the picture jumps but the sim keeps stepping). See

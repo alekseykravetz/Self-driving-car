@@ -134,8 +134,9 @@ Self-driving-car/
 │   │   │   └── envelope.ts     # Rounded rectangle around a segment
 │   │   ├── graph/
 │   │   │   └── graph.ts        # Road network graph with Dijkstra pathfinding
-│   │   └── osm-importer/
-│   │       └── osm.ts          # OpenStreetMap data parser (lat/lon → canvas)
+│   │   ├── osm-importer/
+│   │   │   └── osm.ts          # OpenStreetMap data parser (lat/lon → canvas)
+│   │   └── spatialGrid.ts      # Uniform hash grid for fast range queries (segments)
 │   │
 │   ├── car/
 │   │   ├── car.ts              # Vehicle physics, collision, AI integration
@@ -154,12 +155,16 @@ Self-driving-car/
 │   │   └── visualizer.ts       # Real-time network state renderer
 │   │
 │   ├── world/
-│   │   ├── world.ts            # World generation (roads, buildings, trees)
+│   │   ├── world.ts            # World data + draw + load container
+│   │   ├── corridor.ts         # Standalone race corridor (borders, caps, extend)
 │   │   ├── trafficManager.ts   # Traffic light coordination
 │   │   ├── types.ts            # Shared world/editor types (IWorld, Corridor)
+│   │   ├── generation/
+│   │   │   └── worldGenerator.ts # Procedural geometry (roads on edit, items on demand)
 │   │   ├── editors/            # Interactive editing tools
 │   │   │   ├── worldEditor.ts  # Master editor coordinator
 │   │   │   ├── graphEditor.ts  # Road network point/segment editing
+│   │   │   ├── corridorEditor.ts   # Race corridor authoring
 │   │   │   ├── markingEditor.ts    # Base class for marking placement
 │   │   │   ├── crossingEditor.ts   # Crosswalk placement
 │   │   │   ├── lightEditor.ts      # Traffic light placement
@@ -193,13 +198,13 @@ Self-driving-car/
 │   │   │   ├── trafficPanel.ts     # Custom element <traffic-panel>: per-car stats list
 │   │   │   └── templates/          # HTML template strings for the traffic panel
 │   │   ├── panels/
-│   │   │   ├── worldToolbar.ts     # Custom element <world-toolbar>: border/tracking mode, file loading, camera debug
 │   │   │   ├── layoutToolbar.ts    # Custom element <layout-toolbar>: layout & visibility toggles
 │   │   │   ├── animationLoopToolbar.ts # Custom element <animation-loop-toolbar>: play/pause + render interval
 │   │   │   └── templates/          # HTML template strings for the panels
 │   │   └── training/
 │   │       ├── trainingSimulator.ts # Unified training environment (world + simple modes)
 │   │       ├── trainingPanel.ts     # Custom element <training-panel>: training UI + genetic algorithm
+│   │       ├── trainingInitModal.ts # Custom element <training-init-modal>: brain-source picker
 │   │       ├── genetics/
 │   │       │   ├── poolManager.ts   # Car creation & pool/brain application
 │   │       │   └── storageManager.ts # localStorage persistence & .car file download
@@ -211,7 +216,7 @@ Self-driving-car/
 │   │       ├── rendering/
 │   │       │   ├── carRenderer.ts   # Car drawing utilities (pool highlighting)
 │   │       │   └── layoutManager.ts # Canvas resize/layout logic
-│   │       └── templates/          # HTML template strings for the training panel
+│   │       └── templates/          # HTML template strings for the training panel + init modal
 │   │
 │   ├── store/                  # Bundled store assets (worlds + cars)
 │   │   ├── storeManager.ts     # Singleton: fetches manifest + assets, active selection
@@ -219,11 +224,18 @@ Self-driving-car/
 │   │   ├── types.ts            # Store type definitions
 │   │   └── templates/          # HTML template for the store panel
 │   │
+│   ├── panels/                 # Shared floating UI toolbars (custom elements)
+│   │   ├── worldToolbar.ts     # Custom element <world-toolbar>: border/tracking mode, file loading, camera debug
+│   │   ├── shortcutsToolbar.ts # Custom element <shortcuts-toolbar>: keyboard-shortcut indicators
+│   │   ├── worldLayersPanel.ts # Custom element <world-layers-panel>: editor layer visibility + regenerate items
+│   │   └── templates/          # HTML template strings for the toolbars
+│   │
 │   ├── games/
 │   │   └── race.ts             # Racing mode with countdown & scoring
 │   │
 │   ├── viewport/
-│   │   └── viewport.ts         # Pan/zoom transformation system
+│   │   ├── viewport.ts         # Pan/zoom transformation system
+│   │   └── scaleIndicator.ts   # Distance-scale HUD overlay (meters)
 │   │
 │   ├── mini-map/
 │   │   └── miniMap.ts          # Scaled world overview
@@ -261,9 +273,11 @@ Self-driving-car/
 │   └── *-osm-data.json        # OpenStreetMap import data
 │
 └── docs/                       # Technical documentation
+    ├── ProjectGoal.md          # Vision, city-scale traffic simulation goals
     ├── Architecture.md         # System overview & module graph
     ├── Math.md                 # Geometric primitives & algorithms
     ├── Physics.md              # Car dynamics & sensor system
+    ├── Units.md                # Unified unit system, conversions & formulas
     ├── NeuralNetwork.md        # AI brain & genetic evolution
     ├── WorldEditor.md          # World generation & editing
     ├── Simulators.md           # Training environments & UI
@@ -272,8 +286,10 @@ Self-driving-car/
     ├── Race.md                 # Racing mode & scoring
     ├── Viewport.md             # Pan/zoom & mini-map
     ├── SaveLoad.md             # Persistence & file formats
+    ├── Store.md                # Bundled store assets & active selection
     └── Sound.md                # Audio synthesis
 ```
+
 
 ---
 
@@ -302,11 +318,17 @@ JSON files containing a car configuration with neural network brain, physics par
 
 ### LocalStorage
 
-| Key        | Contents                                                              |
-| ---------- | --------------------------------------------------------------------- |
-| `bestPool` | JSON array of top-K car configs with brains (unified format)          |
-| `raceCars` | JSON array of car configs loaded via race mode's "Load car(s)" button |
-| `world`    | Last-loaded world state (fallback for race mode)                      |
+| Key                | Contents                                                              |
+| ------------------ | --------------------------------------------------------------------- |
+| `bestPool`         | JSON array of top-K car configs with brains (unified format)          |
+| `raceCars`         | JSON array of car configs loaded via race mode's "Load car(s)" button |
+| `editorWorld`      | World saved by the world editor (legacy `world` key migrated on init) |
+| `loadedWorlds`     | User-loaded `.world` files (in-memory after refresh)                  |
+| `loadedCars`       | User-loaded `.car` files (in-memory after refresh)                    |
+| `store:activeWorld`| Id of the active store world (`store:`/`loaded:`/`editor`)            |
+| `store:activeCar`  | JSON array of active store car ids (multi-select)                     |
+
+> See [Save & Load](docs/SaveLoad.md) for the full persistence schema, legacy migration, and file formats.
 
 ---
 
@@ -329,6 +351,7 @@ Detailed technical documentation is maintained in the `docs/` directory:
 | [Race](docs/Race.md)                    | Racing mode, corridor progress, countdown, AI opponents   |
 | [Viewport](docs/Viewport.md)            | Pan/zoom system, coordinate transforms, mini-map          |
 | [Save & Load](docs/SaveLoad.md)         | File formats, localStorage, legacy migration, loaders     |
+| [Store](docs/Store.md)                  | Bundled store assets, active selection, landing-page panel|
 | [Sound](docs/Sound.md)                  | Web Audio API synthesis, beep, explosion, victory fanfare |
 
 ---

@@ -688,6 +688,11 @@ Trees are drawn as layered circles with perspective offset:
 
 ### Save Format (`.world` files)
 
+> The current on-disk format is the **v2 lean format** (decoration block + tree
+> prototypes — see [Save & Load](SaveLoad.md) for full details). The inline
+> shape shown below is the legacy/v1 representation that `World.load()` still
+> accepts and that `World.toJSON()` can produce for programmatic use.
+
 ```javascript
 const world = World.load({"graph":{"points":[{"x":100,"y":200},...],
 "segments":[{"p1":{"x":100,"y":200},"p2":{"x":300,"y":400},"oneWay":false},...]},
