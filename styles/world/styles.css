@@ -235,6 +235,12 @@ input[type='file'] {
   margin: 0;
 }
 
+#shortcutsToolbar .shortcuts-groups {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
 #topControls .controls-group,
 #shortcutsToolbar .controls-group,
 #worldLayersToolbar .controls-group,
