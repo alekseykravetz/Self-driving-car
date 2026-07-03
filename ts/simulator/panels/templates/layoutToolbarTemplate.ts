@@ -4,14 +4,14 @@ const LAYOUT_TOOLBAR_TEMPLATE = `
       <div class="border-mode-group">
         <button
           id="layoutTopBig"
-          class="border-mode-btn active"
+          class="toolbar-btn active"
           title="Top view large, 3D small"
         >
           🗺️
         </button>
         <button
           id="layoutCameraBig"
-          class="border-mode-btn"
+          class="toolbar-btn"
           title="3D view large, Top view small"
         >
           🎥
@@ -27,7 +27,7 @@ const LAYOUT_TOOLBAR_TEMPLATE = `
         <button
           type="button"
           id="showCameraView"
-          class="border-mode-btn view-toggle-btn active"
+          class="toolbar-btn view-toggle-btn active"
           title="Show 3D perspective view"
         >
           🧊
@@ -35,7 +35,7 @@ const LAYOUT_TOOLBAR_TEMPLATE = `
         <button
           type="button"
           id="showVisualizer"
-          class="border-mode-btn view-toggle-btn active"
+          class="toolbar-btn view-toggle-btn active"
           title="Show neural network visualizer"
         >
           🧠
@@ -43,7 +43,7 @@ const LAYOUT_TOOLBAR_TEMPLATE = `
         <button
           type="button"
           id="showMiniMap"
-          class="border-mode-btn view-toggle-btn active"
+          class="toolbar-btn view-toggle-btn active"
           title="Show mini map"
         >
           🧭

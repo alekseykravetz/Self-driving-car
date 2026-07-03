@@ -5,7 +5,7 @@ const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
         <button
           type="button"
           id="loopPauseBtn"
-          class="border-mode-btn active"
+          class="toolbar-btn active"
           title="Pause / resume the simulation"
         >
           ⏸️

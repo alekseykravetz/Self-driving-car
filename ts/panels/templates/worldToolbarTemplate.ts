@@ -4,14 +4,14 @@ const WORLD_TOOLBAR_TEMPLATE = `
       <div class="border-mode-group">
         <button
           id="saveBtn"
-          class="top-controls-btn"
+          class="toolbar-btn"
           title="Save — Save world to file and localStorage"
         >
           💾
         </button>
         <button
           id="disposeBtn"
-          class="top-controls-btn"
+          class="toolbar-btn"
           title="Clear — Reset all graph points and segments"
         >
           ❌
@@ -28,7 +28,7 @@ const WORLD_TOOLBAR_TEMPLATE = `
           <button
             type="button"
             id="loadWorldBtn"
-            class="top-controls-btn"
+            class="toolbar-btn"
             title="Load / select world"
           >
             🌍
@@ -43,7 +43,7 @@ const WORLD_TOOLBAR_TEMPLATE = `
         </div>
         <button
           id="openOsmPanelBtn"
-          class="top-controls-btn world-editor-action"
+          class="toolbar-btn world-editor-action"
           title="Import from OSM — Paste OpenStreetMap data to generate roads"
           style="display: none"
         >
@@ -58,7 +58,7 @@ const WORLD_TOOLBAR_TEMPLATE = `
         <button
           type="button"
           id="loadCarBtn"
-          class="top-controls-btn"
+          class="toolbar-btn"
           title="Load / select car(s)"
         >
           🚗
@@ -96,21 +96,21 @@ const WORLD_TOOLBAR_TEMPLATE = `
       <div class="border-mode-group">
         <button
           id="borderModeNone"
-          class="border-mode-btn"
+          class="toolbar-btn"
           title="No borders"
         >
           🚫
         </button>
         <button
           id="borderModeDamage"
-          class="border-mode-btn active"
+          class="toolbar-btn active"
           title="Damage on collision"
         >
           💀
         </button>
         <button
           id="borderModeCollision"
-          class="border-mode-btn"
+          class="toolbar-btn"
           title="Collision with borders"
         >
           🛡️
@@ -125,21 +125,21 @@ const WORLD_TOOLBAR_TEMPLATE = `
       <div class="border-mode-group">
         <button
           id="trackModeNone"
-          class="border-mode-btn"
+          class="toolbar-btn"
           title="No tracking (free drag)"
         >
           ✋
         </button>
         <button
           id="trackModeBest"
-          class="border-mode-btn active"
+          class="toolbar-btn active"
           title="Track best car"
         >
           🏆
         </button>
         <button
           id="trackModeKeys"
-          class="border-mode-btn"
+          class="toolbar-btn"
           title="Track user-controlled car"
         >
           🎮
@@ -154,14 +154,14 @@ const WORLD_TOOLBAR_TEMPLATE = `
       <div class="border-mode-group">
         <button
           id="viewportModeMouse"
-          class="border-mode-btn active"
+          class="toolbar-btn active"
           title="Mouse mode — scroll wheel zooms"
         >
           🖱️
         </button>
         <button
           id="viewportModeTouchpad"
-          class="border-mode-btn"
+          class="toolbar-btn"
           title="Touchpad mode — two-finger scroll pans, hold Ctrl to zoom"
         >
           ☝️

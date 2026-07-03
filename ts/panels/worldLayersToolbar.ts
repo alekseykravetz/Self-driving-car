@@ -56,7 +56,7 @@ class WorldLayersToolbarElement extends HTMLElement {
 
     const toggles = WORLD_LAYER_BUTTONS.map(
       (b) =>
-        `<button class="layer-toggle" data-layer="${b.id}" title="${b.title}">${b.emoji}</button>`,
+        `<button class="toolbar-btn layer-toggle" data-layer="${b.id}" title="${b.title}">${b.emoji}</button>`,
     ).join('');
 
     container.innerHTML = `
@@ -93,8 +93,6 @@ class WorldLayersToolbarElement extends HTMLElement {
 
   #applyButtonState(btn: HTMLButtonElement, on: boolean): void {
     btn.classList.toggle('active', on);
-    btn.style.filter = on ? '' : 'grayscale(100%)';
-    btn.style.opacity = on ? '1' : '0.5';
   }
 
   #syncButtons(): void {
