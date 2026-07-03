@@ -198,6 +198,73 @@ Split the biggest domain responsibilities while preserving the global script loa
 - The existing pages still load with the same script order.
 - `Car` no longer contains rendering and audio behavior within its core physics update loop.
 
+## Proposed Directory Layout
+
+- `ts/math/`
+  - pure geometry, utility functions, spatial indexing
+- `ts/car/`
+  - core vehicle domain objects and factories
+- `ts/car/physics/`
+  - physics motion, collision checks, and damage state
+- `ts/car/rendering/`
+  - sprite caching, draw helpers, and render options
+- `ts/car/brain/`
+  - brain adapter, controller mapping, and serialization helpers
+- `ts/neural-network/`
+  - abstract network logic and serialization utilities
+- `ts/simulator/`
+  - lifecycle shell, canvas management, and layout wiring
+- `ts/simulator/views/`
+  - simulator-specific DOM/UI assembly for `Race`, `TrainingSimulator`, etc.
+- `ts/panels/`
+  - custom element modules grouped by atomic design intent
+
+## Exact Refactor Task List
+
+1. `ts/car/car.ts`
+
+   - Extract `CarPhysics` into `ts/car/physics/carPhysics.ts`.
+   - Extract sprite caching and `draw(ctx)` behavior into `ts/car/rendering/carRenderer.ts`.
+   - Extract AI output mapping into `ts/car/brain/carBrainAdapter.ts`.
+   - Keep `Car` as a composition root that delegates to physics, sensor, renderer, and brain adapter.
+
+2. `ts/neural-network/network.ts`
+
+   - Add `static deserialize(data: unknown): NeuralNetwork`.
+   - Add `static clone(network: NeuralNetwork): NeuralNetwork`.
+   - Replace every `JSON.parse(JSON.stringify(...))` copy with these helpers.
+
+3. `ts/car/sensors/sensor.ts`
+
+   - Extract ray generation and intersection logic into `ts/car/physics/sensorRaycaster.ts`.
+   - Keep `Sensor` as a thin wrapper around origin/angle state and the pure raycaster API.
+
+4. `ts/simulator/core/simulatorShell.ts`
+
+   - Create a `SimulatorHost` interface containing toolbar/panel references.
+   - Update `SimulatorShell` constructor to accept the host object instead of querying DOM directly.
+   - Move page-specific query logic into `ts/simulator/views/simulatorPageHost.ts` or each page's init code.
+
+5. `ts/games/race.ts`
+
+   - Extract `RacePanel` into `ts/games/racePanel.ts`.
+   - Move DOM creation, stats updates, and toolbar wiring there.
+   - Keep `Race` responsible only for world loading, car generation, race state, and update/draw loops.
+
+6. `ts/panels/worldToolbar.ts`
+
+   - Identify distinct subdomains: mode buttons, selection lists, and file loaders.
+   - Move asset selector rendering and event binding into helper functions or a child element.
+   - Keep `WorldToolbarElement` as an organism that composes smaller UI pieces.
+
+7. `ts/world/world.ts` and `ts/world/generation/worldGenerator.ts`
+
+   - Ensure `World.load(info)` only rehydrates model data.
+   - Move all generation and re-anchoring behavior into `WorldGenerator` helper functions.
+
+8. `tsconfig.json`
+   - Review whether `module: commonjs` should become `none` or `es2022` to align with no bundler script loading.
+
 ## Next Step
 
-If you want, I can also generate a proposed directory layout and exact refactor task list with file-level actions.
+The report now includes an exact refactor plan with directory layout guidance and file-level actions.
