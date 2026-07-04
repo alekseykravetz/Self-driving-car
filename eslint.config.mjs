@@ -154,6 +154,10 @@ const allowedUnusedVars = [
   'discard',
   'restart',
 
+  // toolbar decomposition helpers
+  'ToolbarModeControls',
+  'ToolbarAssetSelectors',
+
   // training / simulator UI
   'TrainingManager',
   'TrainingPanelElement',
@@ -173,6 +177,7 @@ const allowedUnusedVars = [
   'TRAFFIC_PANEL_TEMPLATE',
   'BorderMode',
   'TrackingMode',
+  'ToolbarViewportMode',
   'LayoutMode',
   'drawSimulatorCars',
   'handleCollisionWithRoadBorders',
@@ -503,9 +508,14 @@ const myGlobals = {
     saveRaceCars: 'readonly',
     downloadCarFiles: 'readonly',
 
+    // toolbar decomposition helpers
+    ToolbarModeControls: 'readonly',
+    ToolbarAssetSelectors: 'readonly',
+
     // type aliases
     BorderMode: 'readonly',
     TrackingMode: 'readonly',
+    ToolbarViewportMode: 'readonly',
     LayoutMode: 'readonly',
     LayoutCanvases: 'readonly',
     LayoutPanelState: 'readonly',
