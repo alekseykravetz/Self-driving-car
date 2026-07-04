@@ -137,6 +137,7 @@ const allowedUnusedVars = [
   'PhoneControls',
   'Race',
   'Sensor',
+  'SensorRaycaster',
   'IntersectionPoint',
 
   // sound
@@ -421,6 +422,7 @@ const myGlobals = {
     Race: 'readonly',
 
     Sensor: 'readonly',
+    SensorRaycaster: 'readonly',
     IntersectionPoint: 'readonly',
     // sound.js
     SoundEngine: 'readonly',

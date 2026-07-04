@@ -13,5 +13,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "cSpell.words": ["lerp"]
+  "cSpell.words": ["lerp", "Raycaster"]
 }
