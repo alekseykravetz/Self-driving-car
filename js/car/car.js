@@ -127,15 +127,17 @@ class Car {
     }
     if (this.sensor && this.brain) {
       this.sensor.update(polygons);
-      const offsets = this.sensor.readings
-        .map((s) => (s === null ? 0 : 1 - s.offset))
-        .concat([this.speed / this.maxSpeed]);
-      const outputs = NeuralNetwork.feedForward(offsets, this.brain);
       if (this.useBrain && this.controls instanceof Controls) {
-        this.controls.forward = !!outputs[0];
-        this.controls.left = !!outputs[1];
-        this.controls.right = !!outputs[2];
-        this.controls.reverse = !!outputs[3];
+        const output = CarBrainAdapter.computeControls(
+          this.sensor.readings,
+          this.speed,
+          this.maxSpeed,
+          this.brain,
+        );
+        this.controls.forward = output.forward;
+        this.controls.left = output.left;
+        this.controls.right = output.right;
+        this.controls.reverse = output.reverse;
       }
     } else if (this.sensor) {
       // Keep the rays following the car (and reacting to borders) even when

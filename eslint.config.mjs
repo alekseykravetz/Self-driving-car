@@ -126,6 +126,7 @@ const allowedUnusedVars = [
 
   // car
   'Car',
+  'CarBrainAdapter',
   'CarPhysics',
   'CarRenderer',
   'constants',
@@ -136,6 +137,7 @@ const allowedUnusedVars = [
   'PhoneControls',
   'Race',
   'Sensor',
+  'IntersectionPoint',
 
   // sound
   'SoundEngine',
@@ -407,6 +409,7 @@ const myGlobals = {
     // main folder
     CameraControls: 'readonly',
     Car: 'readonly',
+    CarBrainAdapter: 'readonly',
     CarPhysics: 'readonly',
     CarRenderer: 'readonly',
     constants: 'readonly',
@@ -418,6 +421,7 @@ const myGlobals = {
     Race: 'readonly',
 
     Sensor: 'readonly',
+    IntersectionPoint: 'readonly',
     // sound.js
     SoundEngine: 'readonly',
     taDaa: 'readonly',
