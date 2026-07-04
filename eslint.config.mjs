@@ -127,6 +127,7 @@ const allowedUnusedVars = [
   // car
   'Car',
   'CarPhysics',
+  'CarRenderer',
   'constants',
   'Controls',
   'MarkerDetector',
@@ -407,6 +408,7 @@ const myGlobals = {
     CameraControls: 'readonly',
     Car: 'readonly',
     CarPhysics: 'readonly',
+    CarRenderer: 'readonly',
     constants: 'readonly',
     Controls: 'readonly',
     MarkerDetector: 'readonly',
