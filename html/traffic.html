@@ -111,17 +111,20 @@
     <script src="/js/simulator/traffic/trafficPanel.js"></script>
 
     <!-- Simulator Core -->
+    <script src="/js/simulator/views/simulatorPageHost.js"></script>
     <script src="/js/simulator/core/simulatorShell.js"></script>
     <script src="/js/simulator/traffic/trafficSimulator.js"></script>
 
     <script>
       (async () => {
         await StoreManager.init();
+        const host = new SimulatorPageHost();
         const trafficSimulator = new TrafficSimulator(
           gameCanvas,
           networkCanvas,
           miniMapCanvas,
           cameraCanvas,
+          host,
         );
       })();
     </script>

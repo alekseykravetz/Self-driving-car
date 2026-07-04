@@ -10,8 +10,8 @@ class TrainingSimulator extends SimulatorShell {
   trainingManager;
   // Training-init modal (brain source + settings before training starts).
   initModal = null;
-  constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas) {
-    super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas);
+  constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host) {
+    super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
     this.trainingManager = document.querySelector('training-panel');
     this.initModal = document.querySelector('training-init-modal');
     // Detect mode from URL parameter

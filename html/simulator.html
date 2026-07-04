@@ -123,17 +123,20 @@
     <script src="/js/simulator/training/trainingPanel.js"></script>
 
     <!-- Simulator Core -->
+    <script src="/js/simulator/views/simulatorPageHost.js"></script>
     <script src="/js/simulator/core/simulatorShell.js"></script>
     <script src="/js/simulator/training/trainingSimulator.js"></script>
 
     <script>
       (async () => {
         await StoreManager.init();
+        const host = new SimulatorPageHost();
         const simulator = new TrainingSimulator(
           gameCanvas,
           networkCanvas,
           miniMapCanvas,
           cameraCanvas,
+          host,
         );
       })();
     </script>

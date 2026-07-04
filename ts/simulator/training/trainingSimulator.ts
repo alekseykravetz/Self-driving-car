@@ -19,8 +19,9 @@ class TrainingSimulator extends SimulatorShell {
     networkCanvas: HTMLCanvasElement,
     miniMapCanvas: HTMLCanvasElement,
     cameraCanvas: HTMLCanvasElement,
+    host: SimulatorPageHost,
   ) {
-    super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas);
+    super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
 
     this.trainingManager = document.querySelector(
       'training-panel',

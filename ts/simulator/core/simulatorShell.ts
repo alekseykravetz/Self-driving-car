@@ -74,6 +74,7 @@ abstract class SimulatorShell {
     networkCanvas: HTMLCanvasElement,
     miniMapCanvas: HTMLCanvasElement,
     cameraCanvas: HTMLCanvasElement,
+    host: SimulatorPageHost,
   ) {
     this.gameCanvas = gameCanvas;
     this.gameCtx = gameCanvas.getContext('2d')!;
@@ -83,20 +84,11 @@ abstract class SimulatorShell {
     this.cameraCanvas = cameraCanvas;
     this.cameraCtx = cameraCanvas.getContext('2d')!;
 
-    // Get panel element references
-    this.toolbarPanel = document.querySelector(
-      'world-toolbar',
-    ) as WorldToolbarElement;
-    this.layoutToolbar = document.querySelector(
-      'layout-toolbar',
-    ) as LayoutToolbarElement;
-    this.animationLoopToolbar = document.querySelector(
-      'animation-loop-toolbar',
-    ) as AnimationLoopToolbarElement;
-
-    // Optional world-layers toolbar: lets the user hide roads/markings/trees/
-    // buildings in both the 2D and 3D views. Absent on pages without it.
-    this.worldLayersToolbar = document.querySelector('world-layers-toolbar');
+    // Shared toolbar elements (injected via host to avoid direct DOM queries).
+    this.toolbarPanel = host.toolbarPanel;
+    this.layoutToolbar = host.layoutToolbar;
+    this.animationLoopToolbar = host.animationLoopToolbar;
+    this.worldLayersToolbar = host.worldLayersToolbar;
     if (this.worldLayersToolbar) {
       this.worldLayersToolbar.hideItems(); // no regeneration in simulators
       this.worldLayersToolbar.setVisibility(this.worldLayers);

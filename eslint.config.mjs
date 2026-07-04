@@ -240,6 +240,9 @@ const allowedUnusedVars = [
   'TrainingInitDefaults',
   'TrainingInitResult',
   'TrainingInitOpenOptions',
+
+  // simulator page host
+  'SimulatorPageHost',
 ];
 
 const varsIgnorePattern = `^(_|${allowedUnusedVars.join('|')})$`;
@@ -467,6 +470,7 @@ const myGlobals = {
     ShortcutsToolbarElement: 'readonly',
     TrafficPanelElement: 'readonly',
     TrafficSimulator: 'readonly',
+    SimulatorPageHost: 'readonly',
     WORLD_TOOLBAR_TEMPLATE: 'readonly',
     LAYOUT_TOOLBAR_TEMPLATE: 'readonly',
     ANIMATION_LOOP_TOOLBAR_TEMPLATE: 'readonly',

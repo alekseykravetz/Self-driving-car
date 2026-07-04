@@ -42,8 +42,8 @@ class TrafficSimulator extends SimulatorShell {
   #shortcutsToolbar = null;
   #previewCar = null;
   #previewInfo = null;
-  constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas) {
-    super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas);
+  constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host) {
+    super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
     this.#statsPanel = document.querySelector('traffic-panel');
     this.#initToolbar();
     this.#initStatsPanel();
