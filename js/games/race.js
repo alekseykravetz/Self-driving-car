@@ -6,7 +6,6 @@ class Race {
   cameraCtx;
   miniMapCanvas;
   controls;
-  toolbarPanel;
   racePanel;
   world;
   camera = null;
@@ -18,8 +17,6 @@ class Race {
   frameCount = 0;
   started = false;
   animating = false;
-  statistics;
-  counter;
   constructor(gameCanvas, cameraCanvas, miniMapCanvas, controls = null) {
     this.gameCanvas = gameCanvas;
     this.gameCtx = gameCanvas.getContext('2d');
@@ -27,7 +24,13 @@ class Race {
     this.cameraCtx = cameraCanvas.getContext('2d');
     this.miniMapCanvas = miniMapCanvas;
     this.controls = controls;
-    this.#addEventListeners();
+    this.racePanel = new RacePanel();
+    this.racePanel.configureToolbar({
+      carMode: 'multi',
+      onWorldSelected: (entry) => this.#initializeRace(entry?.data ?? null),
+      onViewportModeChange: (mode) => this.viewport?.setMode(mode),
+    });
+    this.racePanel.createPanel(() => this.#initializeRace(this.world));
     const storeWorld =
       StoreManager.getActiveWorld() ?? StoreManager.getEditorWorld();
     const worldInfo = storeWorld ?? null;
@@ -41,7 +44,7 @@ class Race {
       typeof PhoneControls !== 'undefined' &&
       this.controls instanceof PhoneControls
     ) {
-      this.toolbarPanel.setTrackingMode('keys');
+      this.racePanel.setTrackingMode('keys');
     }
   }
 
@@ -97,49 +100,6 @@ class Race {
     return cars;
   }
 
-  #addEventListeners() {
-    this.toolbarPanel = document.querySelector('world-toolbar');
-    // Keep the active viewport's wheel behavior in sync with the toolbar toggle
-    this.toolbarPanel.setViewportModeListener((mode) =>
-      this.viewport?.setMode(mode),
-    );
-    // World + car selectors. Loading a file adds it to the library without
-    // applying it; the user picks a world to race and the car(s) to add.
-    this.toolbarPanel.configureSelectors({
-      carMode: 'multi',
-      onWorldSelected: (entry) => this.#initializeRace(entry?.data ?? null),
-    });
-    // Camera debug overlay is not implemented in the race game.
-    this.toolbarPanel.hideCameraDebug();
-    this.statistics = document.getElementById('statistics');
-    this.counter = document.getElementById('counter');
-    this.#createRacePanel();
-  }
-
-  #createRacePanel() {
-    this.racePanel = document.createElement('div');
-    this.racePanel.id = 'racePanel';
-    const group = document.createElement('div');
-    group.className = 'controls-group';
-    const label = document.createElement('span');
-    label.className = 'controls-group-label';
-    label.textContent = 'Race';
-    const restartBtn = document.createElement('button');
-    restartBtn.id = 'restartRaceBtn';
-    restartBtn.style.margin = '0';
-    restartBtn.textContent = '🔄 Restart';
-    restartBtn.className = 'race-panel-btn';
-    restartBtn.addEventListener('click', () =>
-      this.#initializeRace(this.world),
-    );
-    group.appendChild(label);
-    group.appendChild(restartBtn);
-    this.racePanel.appendChild(group);
-    const toolbar =
-      document.getElementById('simulatorToolbar') ?? document.body;
-    toolbar.appendChild(this.racePanel);
-  }
-
   #initializeRace(worldInfo) {
     this.world = worldInfo ? World.load(worldInfo) : new World(new Graph());
     this.viewport = new Viewport(
@@ -147,7 +107,7 @@ class Race {
       this.world.zoom,
       this.world.offset,
     );
-    this.viewport.setMode(this.toolbarPanel.viewportMode);
+    this.viewport.setMode(this.racePanel.viewportMode);
     this.cars = this.generateCars();
     this.myCar = this.cars[0];
     if (!this.myCar) throw new Error('Player car not created');
@@ -186,21 +146,26 @@ class Race {
         this.miniMapCanvas.width,
       );
     }
-    this.statistics.innerHTML = ''; // Clear previous stats
-    for (let i = 0; i < this.cars.length; i++) {
-      const div = document.createElement('div');
-      div.id = 'stat_' + i;
-      div.innerText = String(i);
-      div.style.color = this.cars[i].color;
-      div.classList.add('stat');
-      this.statistics.appendChild(div);
-    }
+    this.racePanel.createStatistics(this.cars);
     this.started = false;
     if (!this.animating) {
       this.animating = true;
       this.animate();
     }
-    this.startCounter();
+    this.racePanel.startCounter(() => {
+      this.started = true;
+      this.frameCount = 0;
+      if (this.myCar) {
+        this.myCar.engine = new SoundEngine();
+      }
+      if (
+        this.controls &&
+        typeof CameraControls !== 'undefined' &&
+        this.controls instanceof CameraControls
+      ) {
+        this.controls.saveExpectedSize();
+      }
+    });
   }
 
   updateCarProgress(car) {
@@ -240,44 +205,6 @@ class Race {
     }
   }
 
-  startCounter() {
-    if (!this.counter) return;
-    this.counter.innerText = '3';
-    beep(400);
-    setTimeout(() => {
-      if (!this.counter) return;
-      this.counter.innerText = '2';
-      beep(400);
-      setTimeout(() => {
-        if (!this.counter) return;
-        this.counter.innerText = '1';
-        beep(400);
-        setTimeout(() => {
-          if (!this.counter) return;
-          this.counter.innerText = 'GO!';
-          beep(700);
-          setTimeout(() => {
-            if (!this.counter) return;
-            this.counter.innerText = '';
-            this.started = true;
-            this.frameCount = 0;
-            if (this.myCar) {
-              this.myCar.engine = new SoundEngine();
-            }
-            // Special code part for video camera controls
-            if (
-              this.controls &&
-              typeof CameraControls !== 'undefined' && // Keep runtime check if CameraControls might not exist
-              this.controls instanceof CameraControls
-            ) {
-              this.controls.saveExpectedSize();
-            }
-          }, 1000);
-        }, 1000);
-      }, 1000);
-    }, 1000);
-  }
-
   handleCollisionWithRoadBorders(car) {
     const bordersToCheck = this.world.corridor
       ? this.world.corridor.skeleton
@@ -294,7 +221,7 @@ class Race {
       !this.miniMap
     )
       return;
-    const borderMode = this.toolbarPanel.borderMode;
+    const borderMode = this.racePanel.borderMode;
     if (this.started) {
       for (let i = 0; i < this.cars.length; i++) {
         const car = this.cars[i];
@@ -334,21 +261,7 @@ class Race {
     if (this.world.corridor) {
       this.cars.sort((a, b) => (b.progress ?? 0) - (a.progress ?? 0));
     }
-    // Update statistics display
-    for (let i = 0; i < this.cars.length; i++) {
-      const stat = document.getElementById('stat_' + i);
-      stat.style.color =
-        this.cars[i].type === 'AI' ? 'white' : this.cars[i].color;
-      stat.innerText = `${i + 1}: ${this.cars[i].name} ${this.cars[i].damaged ? '💀' : ''}`;
-      stat.style.backgroundColor =
-        this.cars[i].type === 'AI' ? 'black' : 'white';
-      if (this.cars[i].finishTime) {
-        stat.innerHTML +=
-          '<span style="float: right;">' +
-          (this.cars[i].finishTime / 60).toFixed(1) +
-          's </span>';
-      }
-    }
+    this.racePanel.updateStatistics(this.cars);
     const cameraTarget = trackTarget ?? this.myCar;
     // Only move the camera while actively tracking a car; when tracking is
     // turned off ('none') the camera stays where it is, like the simulator.
@@ -367,7 +280,7 @@ class Race {
   }
 
   #getTrackTarget() {
-    switch (this.toolbarPanel.trackingMode) {
+    switch (this.racePanel.trackingMode) {
       case 'none':
         return null;
       case 'best': {
@@ -386,6 +299,8 @@ class Race {
       }
       case 'keys':
         return this.myCar;
+      default:
+        return null;
     }
   }
 

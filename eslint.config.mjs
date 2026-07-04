@@ -243,6 +243,9 @@ const allowedUnusedVars = [
 
   // simulator page host
   'SimulatorPageHost',
+
+  // race panel
+  'RacePanel',
 ];
 
 const varsIgnorePattern = `^(_|${allowedUnusedVars.join('|')})$`;
@@ -526,6 +529,9 @@ const myGlobals = {
     TrainingInitDefaults: 'readonly',
     TrainingInitResult: 'readonly',
     TrainingInitOpenOptions: 'readonly',
+
+    // race panel
+    RacePanel: 'readonly',
   },
 };
 
