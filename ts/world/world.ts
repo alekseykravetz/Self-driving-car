@@ -213,14 +213,7 @@ class World implements IWorld {
    * constrain cars to a computed path.
    */
   generateCorridor(start: Point, end: Point, extendEnd: boolean = false): void {
-    const path = this.graph.getShortestPath(start, end);
-    const corridor = Corridor.fromPath(
-      path,
-      this.roadWidth,
-      this.roadRoundness,
-      { extendEnd },
-    );
-    this.corridors = [corridor];
+    WorldGenerator.generateCorridor(this, start, end, extendEnd);
   }
 
   /** Adds an authored corridor (e.g. from the corridor editor). */

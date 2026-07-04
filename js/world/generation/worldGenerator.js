@@ -232,6 +232,22 @@ class WorldGenerator {
   }
 
   /**
+   * Builds a single dynamic corridor from `start` to `end` and makes it the
+   * world's only corridor. Used by the race game and training simulator to
+   * constrain cars to a computed path.
+   */
+  static generateCorridor(world, start, end, extendEnd = false) {
+    const path = world.graph.getShortestPath(start, end);
+    const corridor = Corridor.fromPath(
+      path,
+      world.roadWidth,
+      world.roadRoundness,
+      { extendEnd },
+    );
+    world.corridors = [corridor];
+  }
+
+  /**
    * Convenience generator. By default runs every stage; pass `opts` to run only
    * a subset (e.g. `{ roads: true }` for a cheap refresh). Markings are always
    * re-anchored afterwards.

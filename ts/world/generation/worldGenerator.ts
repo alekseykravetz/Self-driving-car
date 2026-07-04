@@ -28,6 +28,7 @@ interface WorldGeneratable {
   buildings: Building[];
   trees: Tree[];
   markings: Marking[];
+  corridors: Corridor[];
 }
 
 /** Center-lane guidance lines (half-width envelope union) for marking placement. */
@@ -271,6 +272,27 @@ class WorldGenerator {
     for (const marking of world.markings) {
       marking.reanchor(world.graph);
     }
+  }
+
+  /**
+   * Builds a single dynamic corridor from `start` to `end` and makes it the
+   * world's only corridor. Used by the race game and training simulator to
+   * constrain cars to a computed path.
+   */
+  static generateCorridor(
+    world: WorldGeneratable,
+    start: Point,
+    end: Point,
+    extendEnd: boolean = false,
+  ): void {
+    const path = world.graph.getShortestPath(start, end);
+    const corridor = Corridor.fromPath(
+      path,
+      world.roadWidth,
+      world.roadRoundness,
+      { extendEnd },
+    );
+    world.corridors = [corridor];
   }
 
   /**
