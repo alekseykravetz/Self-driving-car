@@ -93,11 +93,16 @@ class NeuralNetwork {
    * Reconstructs the network structure from serialized brain data.
    */
   static deserialize(data) {
-    if (!data || !Array.isArray(data.levels)) {
+    if (!data || typeof data !== 'object' || !('levels' in data)) {
       throw new Error('Invalid NeuralNetwork data: missing levels');
     }
+    const dataObj = data;
+    if (!Array.isArray(dataObj.levels)) {
+      throw new Error('Invalid NeuralNetwork data: levels not an array');
+    }
     const network = new NeuralNetwork([]);
-    network.levels = data.levels.map((levelData) => {
+    network.levels = dataObj.levels.map((levelDataRaw) => {
+      const levelData = levelDataRaw;
       const level = new Level(
         levelData.inputs.length,
         levelData.outputs.length,

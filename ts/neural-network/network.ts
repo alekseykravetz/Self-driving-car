@@ -102,18 +102,29 @@ class NeuralNetwork {
    * Deserialize a NeuralNetwork from plain JSON-like data.
    * Reconstructs the network structure from serialized brain data.
    */
-  static deserialize(data: any): NeuralNetwork {
-    if (!data || !Array.isArray(data.levels)) {
+  static deserialize(data: unknown): NeuralNetwork {
+    if (!data || typeof data !== 'object' || !('levels' in data)) {
       throw new Error('Invalid NeuralNetwork data: missing levels');
     }
+    const dataObj = data as { levels?: unknown };
+    if (!Array.isArray(dataObj.levels)) {
+      throw new Error('Invalid NeuralNetwork data: levels not an array');
+    }
+
     const network = new NeuralNetwork([]);
-    network.levels = data.levels.map((levelData: any) => {
+    network.levels = (dataObj.levels as unknown[]).map((levelDataRaw) => {
+      const levelData = levelDataRaw as {
+        inputs: number[];
+        outputs: number[];
+        biases: number[];
+        weights: number[][];
+      };
       const level = new Level(
         levelData.inputs.length,
         levelData.outputs.length,
       );
       level.biases = [...levelData.biases];
-      level.weights = levelData.weights.map((w: number[]) => [...w]);
+      level.weights = levelData.weights.map((w) => [...w]);
       level.inputs = [...levelData.inputs];
       level.outputs = [...levelData.outputs];
       return level;
