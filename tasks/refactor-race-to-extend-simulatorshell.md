@@ -1,22 +1,26 @@
 # Refactor Race to extend SimulatorShell
 
 **Severity:** High
-**Source:** Architectural Violation #1
-**File:** `ts/games/race.ts`
+**Source:** Architectural Violation #1 — **RESOLVED**
+**File:** ~~`ts/games/race.ts`~~ → `ts/simulator/racing/raceSimulator.ts`
 
-## Problem
+## Problem (resolved)
 
-Race manages its own full canvas lifecycle (constructor sets up `gameCanvas`, `cameraCanvas`, `miniMapCanvas`, owns raw `requestAnimationFrame` loop at `ts/games/race.ts:358-361`), completely duplicating the scaffolding already abstracted in `SimulatorShell`. It does not extend `SimulatorShell`.
+Race previously managed its own full canvas lifecycle (constructor set up `gameCanvas`, `cameraCanvas`, `miniMapCanvas`, owned a raw `requestAnimationFrame` loop), completely duplicating the scaffolding already abstracted in `SimulatorShell`. It did not extend `SimulatorShell`.
 
-362 lines of tightly-coupled code that bypasses the architectural template pattern.
+362 lines of tightly-coupled code that bypassed the architectural template pattern.
 
-## Impact
+## Impact (resolved)
 
-Duplicated code for viewport reset, camera management, animation loop, canvas resize wiring. Any improvement to `SimulatorShell`'s render-throttled RAF loop or responsive layout must be manually replicated in `Race`.
+The duplicated canvas/viewport/camera/animation lifecycle was extracted into the shared shell. Improvements to `SimulatorShell`'s render-throttled RAF loop or responsive layout now apply automatically to Race.
 
-## Remediation
+## Changes
 
-- Move `ts/games/race.ts` → `ts/simulator/racing/raceSimulator.ts` (extends `SimulatorShell`)
-- Move `ts/games/racePanel.ts` → `ts/simulator/racing/racePanel.ts`
-- Extract generic canvas/viewport/camera/animation from Race into the shared shell
-- Race-specific logic (corridor progress, car generation, countdown, statistics panel) should live in `update()` and `draw()` overrides
+- **Moved** `ts/games/race.ts` → `ts/simulator/racing/raceSimulator.ts` — extends `SimulatorShell`
+- **Moved** `ts/games/racePanel.ts` → `ts/simulator/racing/racePanel.ts`
+- **Extracted** generic canvas/viewport/camera/animation from Race into the shared shell (inherited via `extends SimulatorShell`)
+- **Race-specific logic** (corridor progress, car generation, countdown, statistics panel) lives in `update()` and `draw(_time)` overrides
+- **Updated** `html/race.html` — added `networkCanvas`, `layout-toolbar`, `animation-loop-toolbar` elements and script imports for `SimulatorPageHost`/`SimulatorShell` core
+- **Deleted** old `ts/games/race.ts` and `ts/games/racePanel.ts`
+- **Deleted** stale output `js/games/race.js` and `js/games/racePanel.js`
+- **Added** `RaceSimulator` to eslint allowed-unused-vars list

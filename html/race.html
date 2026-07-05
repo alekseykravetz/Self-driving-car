@@ -10,12 +10,15 @@
     <canvas id="gameCanvas"></canvas>
     <canvas id="cameraCanvas"></canvas>
     <canvas id="ironManCanvas" style="display: none"></canvas>
+    <canvas id="networkCanvas" style="display: none"></canvas>
     <canvas id="miniMapCanvas" class="miniMap"></canvas>
     <div id="statistics"></div>
     <div id="counter"></div>
 
     <div id="simulatorToolbar">
       <world-toolbar></world-toolbar>
+      <layout-toolbar style="display: none"></layout-toolbar>
+      <animation-loop-toolbar style="display: none"></animation-loop-toolbar>
     </div>
 
     <!-- Core Math & Primitives (Foundation) -->
@@ -94,19 +97,28 @@
 
     <!-- UI Panel Templates (before components) -->
     <script src="/js/panels/templates/worldToolbarTemplate.js"></script>
+    <script src="/js/simulator/panels/templates/layoutToolbarTemplate.js"></script>
+    <script src="/js/simulator/panels/templates/animationLoopToolbarTemplate.js"></script>
 
     <!-- UI Components/Panels -->
     <script src="/js/panels/modeControls.js"></script>
     <script src="/js/panels/assetSelectors.js"></script>
     <script src="/js/panels/worldToolbar.js"></script>
+    <script src="/js/simulator/panels/layoutToolbar.js"></script>
+    <script src="/js/simulator/panels/animationLoopToolbar.js"></script>
 
-    <!-- Games -->
-    <script src="/js/games/racePanel.js"></script>
-    <script src="/js/games/race.js"></script>
+    <!-- Simulator Core -->
+    <script src="/js/simulator/views/simulatorPageHost.js"></script>
+    <script src="/js/simulator/core/simulatorShell.js"></script>
+
+    <!-- Racing Simulator -->
+    <script src="/js/simulator/racing/racePanel.js"></script>
+    <script src="/js/simulator/racing/raceSimulator.js"></script>
 
     <script>
       (async () => {
         await StoreManager.init();
+        const host = new SimulatorPageHost();
         const params = new URLSearchParams(window.location.search);
         const mode = params.get('mode') || 'default';
 
@@ -151,10 +163,12 @@
         statistics.style.width = `${rightPanelWidth}px`;
         statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
 
-        const race = new Race(
+        const race = new RaceSimulator(
           gameCanvas,
-          cameraCanvas,
+          networkCanvas,
           miniMapCanvas,
+          cameraCanvas,
+          host,
           controls,
         );
       })();

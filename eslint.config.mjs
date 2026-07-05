@@ -251,6 +251,9 @@ const allowedUnusedVars = [
 
   // race panel
   'RacePanel',
+
+  // racing simulator
+  'RaceSimulator',
 ];
 
 const varsIgnorePattern = `^(_|${allowedUnusedVars.join('|')})$`;
