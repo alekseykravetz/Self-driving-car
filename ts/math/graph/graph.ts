@@ -208,10 +208,10 @@ class Graph {
 
   draw(ctx: CanvasRenderingContext2D): void {
     for (let segment of this.segments) {
-      segment.draw(ctx);
+      drawSegment(ctx, segment);
     }
     for (let point of this.points) {
-      point.draw(ctx);
+      drawPoint(ctx, point);
     }
   }
 }

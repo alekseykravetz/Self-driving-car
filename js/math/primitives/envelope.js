@@ -35,8 +35,4 @@ class Envelope {
     }
     return new Polygon(points);
   }
-
-  draw(ctx, options) {
-    this.polygon?.draw(ctx, options);
-  }
 }

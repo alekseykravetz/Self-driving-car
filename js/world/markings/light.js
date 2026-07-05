@@ -36,26 +36,26 @@ class Light extends Marking {
     const yellowPoint = lerp2D(line.p1, line.p2, 0.5);
     const redPoint = lerp2D(line.p1, line.p2, 0.8);
     // Draw the background bar (housing) for the lights
-    new Segment(redPoint, greenPoint).draw(ctx, {
+    drawSegment(ctx, new Segment(redPoint, greenPoint), {
       width: this.height, // Uses this.height (which is 18 from super) as the thickness
       cap: 'round',
     });
     // Calculate the size of the light circles based on the housing height
     const lightSize = this.height * 0.6;
     // Draw the "off" state (dark circles) for all lights first
-    greenPoint.draw(ctx, { size: lightSize, color: '#060' }); // Dark green
-    yellowPoint.draw(ctx, { size: lightSize, color: '#660' }); // Dark yellow/brown
-    redPoint.draw(ctx, { size: lightSize, color: '#600' }); // Dark red
+    drawPoint(ctx, greenPoint, { size: lightSize, color: '#060' }); // Dark green
+    drawPoint(ctx, yellowPoint, { size: lightSize, color: '#660' }); // Dark yellow/brown
+    drawPoint(ctx, redPoint, { size: lightSize, color: '#600' }); // Dark red
     // Overlay the bright "on" light based on the current state
     switch (this.state) {
       case 'green':
-        greenPoint.draw(ctx, { size: lightSize, color: '#0F0' }); // Bright green
+        drawPoint(ctx, greenPoint, { size: lightSize, color: '#0F0' }); // Bright green
         break;
       case 'yellow':
-        yellowPoint.draw(ctx, { size: lightSize, color: '#FF0' }); // Bright yellow
+        drawPoint(ctx, yellowPoint, { size: lightSize, color: '#FF0' }); // Bright yellow
         break;
       case 'red':
-        redPoint.draw(ctx, { size: lightSize, color: '#F00' }); // Bright red
+        drawPoint(ctx, redPoint, { size: lightSize, color: '#F00' }); // Bright red
         break;
       // If state is 'off', no bright light is drawn.
       case 'off':

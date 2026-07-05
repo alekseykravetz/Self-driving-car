@@ -232,11 +232,11 @@ class World {
     if (layers.roads) {
       // Draw road envelopes (asphalt style, more wider then road borders itself)
       for (const env of this.envelopes) {
-        env.draw(ctx, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
+        drawEnvelope(ctx, env, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
       }
       // Draw road borders (solid white lines)
       for (const seg of this.roadBorders) {
-        seg.draw(ctx, { color: 'white', width: 4 });
+        drawSegment(ctx, seg, { color: 'white', width: 4 });
       }
       // Draw lane separators or direction arrows
       this.#drawLaneMarkings(ctx);
@@ -265,14 +265,14 @@ class World {
     // Flat item placeholders (cheap outlines) for inspection on big maps.
     if (layers.itemBases) {
       for (const building of this.buildings) {
-        building.base.draw(ctx, {
+        drawPolygon(ctx, building.base, {
           fill: 'rgba(150,150,150,0.25)',
           stroke: 'rgba(0,0,0,0.35)',
           lineWidth: 2,
         });
       }
       for (const tree of this.trees) {
-        tree.base.draw(ctx, {
+        drawPolygon(ctx, tree.base, {
           fill: 'rgba(30,150,70,0.2)',
           stroke: 'rgba(0,90,40,0.5)',
           lineWidth: 2,
@@ -296,7 +296,7 @@ class World {
     }
     // Optional: Draw lane guides for debugging
     // for (const seg of this.laneGuides) {
-    //   seg.draw(ctx, { color: 'cyan', width: 1 });
+    //   drawSegment(ctx, seg, { color: 'cyan', width: 1 });
     // }
   }
 
@@ -349,13 +349,13 @@ class World {
         ctx.lineWidth = originalLineWidth;
       } else if (seg.separated) {
         // Hard separation: solid white center line (also a collision border)
-        seg.draw(ctx, {
+        drawSegment(ctx, seg, {
           color: 'white',
           width: 4,
         });
       } else {
         // Draw dashed lines for two-way roads
-        seg.draw(ctx, {
+        drawSegment(ctx, seg, {
           color: 'white',
           width: 4,
           dash: [15, 25],

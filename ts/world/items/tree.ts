@@ -154,7 +154,7 @@ class Tree {
       const color = `rgb(30, ${greenComponent}, 70)`;
       const levelSize = lerp(this.size, 40, t);
       const polygon = treeLevelPolygon(levelCenter, levelSize, noise);
-      polygon.draw(ctx, { fill: color, stroke: 'rgba(0,0,0,0)' });
+      drawPolygon(ctx, polygon, { fill: color, stroke: 'rgba(0,0,0,0)' });
     }
   }
 
@@ -169,7 +169,10 @@ class Tree {
       translate(trunkTop, -Math.PI / 2, trunkWidth * 0.6),
       translate(trunkTop, Math.PI / 2, trunkWidth * 0.6),
     ]);
-    trunk.draw(ctx, { fill: 'rgb(90, 60, 30)', stroke: 'rgba(0,0,0,0)' });
+    drawPolygon(ctx, trunk, {
+      fill: 'rgb(90, 60, 30)',
+      stroke: 'rgba(0,0,0,0)',
+    });
 
     // Stacked triangular tiers, darkest at the bottom.
     const tiers = 4;
@@ -209,7 +212,10 @@ class Tree {
       translate(trunkTop, -Math.PI / 2, trunkWidth * 0.6),
       translate(trunkTop, Math.PI / 2, trunkWidth * 0.6),
     ]);
-    trunk.draw(ctx, { fill: 'rgb(90, 60, 30)', stroke: 'rgba(0,0,0,0)' });
+    drawPolygon(ctx, trunk, {
+      fill: 'rgb(90, 60, 30)',
+      stroke: 'rgba(0,0,0,0)',
+    });
 
     // Canopy lobes.
     const top = getFake3dPoint(this.center, viewPoint, this.height * 0.85);
@@ -233,7 +239,7 @@ class Tree {
     for (const lobe of lobes) {
       const olive = Math.round(lerp(120, 170, lobe.t));
       const polygon = treeLevelPolygon(lobe.center, lobe.radius * 2, noise);
-      polygon.draw(ctx, {
+      drawPolygon(ctx, polygon, {
         fill: `rgb(70, ${olive}, 40)`,
         stroke: 'rgba(0,0,0,0)',
       });

@@ -43,8 +43,12 @@ class RaceSimulator extends SimulatorShell {
   #started: boolean; // False during countdown
 
   constructor(
-    gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas,
-    host: SimulatorPageHost, controls?,
+    gameCanvas,
+    networkCanvas,
+    miniMapCanvas,
+    cameraCanvas,
+    host: SimulatorPageHost,
+    controls?,
   );
 }
 ```

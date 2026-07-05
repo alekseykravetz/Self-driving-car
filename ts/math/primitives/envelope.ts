@@ -42,8 +42,4 @@ class Envelope {
 
     return new Polygon(points);
   }
-
-  draw(ctx: CanvasRenderingContext2D, options?: PolygonDrawOptions): void {
-    this.polygon?.draw(ctx, options);
-  }
 }

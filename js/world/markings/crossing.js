@@ -18,6 +18,10 @@ class Crossing extends Marking {
       add(this.center, scale(perp, this.width / 2)),
       add(this.center, scale(perp, -this.width / 2)),
     );
-    line.draw(ctx, { width: this.height, color: 'white', dash: [11, 11] });
+    drawSegment(ctx, line, {
+      width: this.height,
+      color: 'white',
+      dash: [11, 11],
+    });
   }
 }

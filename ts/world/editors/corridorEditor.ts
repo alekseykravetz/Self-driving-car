@@ -162,12 +162,12 @@ class CorridorEditor {
 
   public display(): void {
     if (this.hovered) {
-      this.hovered.draw(this.ctx, { fill: true });
+      drawPoint(this.ctx, this.hovered, { fill: true });
     }
     if (this.start) {
-      this.start.draw(this.ctx, { outline: true });
+      drawPoint(this.ctx, this.start, { outline: true });
       if (this.mouse) {
-        new Segment(this.start, this.mouse).draw(this.ctx, {
+        drawSegment(this.ctx, new Segment(this.start, this.mouse), {
           color: 'red',
           width: 2,
           dash: [4, 4],

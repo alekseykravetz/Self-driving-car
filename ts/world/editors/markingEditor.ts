@@ -134,7 +134,7 @@ class MarkingEditor {
   /** Displays the current marking intent (preview) on the canvas. */
   display(): void {
     if (this.intent) {
-      this.intent.draw(this.ctx);
+      drawPolygon(this.ctx, this.intent.polygon);
     }
   }
 }

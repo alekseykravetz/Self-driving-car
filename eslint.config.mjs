@@ -7,6 +7,12 @@ import tsParser from '@typescript-eslint/parser';
 
 /** Names that are allowed to be defined but unused (global script-tag functions/classes). */
 const allowedUnusedVars = [
+  // renderers
+  'drawPoint',
+  'drawSegment',
+  'drawPolygon',
+  'drawEnvelope',
+
   // types
   'PointDrawOptions',
   'SegmentDrawOptions',
@@ -288,6 +294,12 @@ const pluginsAndRules = {
 const myGlobals = {
   globals: {
     ...globals.browser,
+
+    // renderers
+    drawPoint: 'readonly',
+    drawSegment: 'readonly',
+    drawPolygon: 'readonly',
+    drawEnvelope: 'readonly',
 
     // typescript
     // DrawOptions: 'readonly',

@@ -64,7 +64,7 @@ class MiniMap {
     this.ctx.scale(this.scaler, this.scaler);
 
     for (const segment of this.graph.segments) {
-      segment.draw(this.ctx, {
+      drawSegment(this.ctx, segment, {
         width: 3 / this.scaler,
         color: roadColor,
         cap: 'round',
@@ -94,7 +94,7 @@ class MiniMap {
 
     this.ctx.restore();
 
-    new Point(this.size / 2, this.size / 2).draw(this.ctx, {
+    drawPoint(this.ctx, new Point(this.size / 2, this.size / 2), {
       size: 12,
       color: carColor,
       outline: true,

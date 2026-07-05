@@ -47,24 +47,4 @@ class Segment {
       offset: scaler / magnitude(b),
     };
   }
-
-  draw(
-    ctx: CanvasRenderingContext2D,
-    {
-      width = 2,
-      color = 'black',
-      dash = [],
-      cap = 'butt',
-    }: SegmentDrawOptions = {},
-  ): void {
-    ctx.beginPath();
-    ctx.lineWidth = width;
-    ctx.strokeStyle = color;
-    ctx.lineCap = cap;
-    ctx.setLineDash(dash);
-    ctx.moveTo(this.p1.x, this.p1.y);
-    ctx.lineTo(this.p2.x, this.p2.y);
-    ctx.stroke();
-    ctx.setLineDash([]); // Reset line dash to solid
-  }
 }

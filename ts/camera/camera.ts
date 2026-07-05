@@ -279,13 +279,13 @@ class Camera implements ICameraPoint {
       ctx.globalAlpha = Math.max(0, (1 - dist / this.range) ** 2);
 
       const { fill, stroke } = polygons[i] as IColoredPolygon;
-      projectedPolygons[i].draw(ctx, { fill, stroke, join: 'round' });
+      drawPolygon(ctx, projectedPolygons[i], { fill, stroke, join: 'round' });
     }
     ctx.globalAlpha = 1;
 
     if (options.debugCtx) {
       for (const polygon of polygons) {
-        polygon.draw(options.debugCtx);
+        drawPolygon(options.debugCtx, polygon);
       }
     }
   }
@@ -294,6 +294,6 @@ class Camera implements ICameraPoint {
    * Draws the camera's view frustum polygon onto a context (for debugging).
    */
   public draw(ctx: CanvasRenderingContext2D): void {
-    this.polygon.draw(ctx);
+    drawPolygon(ctx, this.polygon);
   }
 }

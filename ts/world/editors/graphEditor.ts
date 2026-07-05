@@ -250,22 +250,22 @@ class GraphEditor {
     this.graph.draw(this.ctx);
 
     if (this.hovered) {
-      this.hovered.draw(this.ctx, { fill: true });
+      drawPoint(this.ctx, this.hovered, { fill: true });
     }
 
     if (this.selected) {
       const intent = this.hovered ?? this.mouse;
       const segment = new Segment(this.selected, intent!);
-      segment.draw(this.ctx, {
+      drawSegment(this.ctx, segment, {
         dash: [3, 3],
       });
       this.#drawIntentMeasurements(segment);
-      this.selected.draw(this.ctx, { outline: true });
+      drawPoint(this.ctx, this.selected, { outline: true });
     }
 
     if (this.shortestPath) {
       this.shortestPath.forEach((seg) => {
-        seg.draw(this.ctx, { color: 'red', width: 4 });
+        drawSegment(this.ctx, seg, { color: 'red', width: 4 });
       });
     }
   }

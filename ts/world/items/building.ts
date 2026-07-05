@@ -109,7 +109,7 @@ class Building {
     // --- Draw all parts ---
 
     // Draw base polygon (ground footprint)
-    this.base.draw(ctx, {
+    drawPolygon(ctx, this.base, {
       fill: 'white',
       stroke: 'rgba(0,0,0,0.2)', // Semi-transparent shadow/outline
       lineWidth: 20,
@@ -117,15 +117,15 @@ class Building {
 
     // Draw sorted sides
     for (const side of sides) {
-      side.draw(ctx, { fill: 'white', stroke: '#AAA' });
+      drawPolygon(ctx, side, { fill: 'white', stroke: '#AAA' });
     }
 
     // Draw ceiling polygon
-    ceiling.draw(ctx, { fill: 'white', stroke: 'white', lineWidth: 6 });
+    drawPolygon(ctx, ceiling, { fill: 'white', stroke: 'white', lineWidth: 6 });
 
     // Draw sorted roof polygons (if generated)
     for (const poly of roofPolys) {
-      poly.draw(ctx, {
+      drawPolygon(ctx, poly, {
         fill: '#D44',
         stroke: '#C44',
         lineWidth: 8,

@@ -193,6 +193,6 @@ class Marking {
    * @param ctx The canvas rendering context.
    */
   draw(ctx: CanvasRenderingContext2D): void {
-    this.polygon.draw(ctx);
+    drawPolygon(ctx, this.polygon);
   }
 }

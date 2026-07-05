@@ -13,7 +13,7 @@ class Stop extends Marking {
   }
 
   draw(ctx) {
-    this.border.draw(ctx, { width: 5, color: 'white' });
+    drawSegment(ctx, this.border, { width: 5, color: 'white' });
     ctx.save();
     ctx.translate(this.center.x, this.center.y);
     ctx.rotate(angle(this.directionVector) - Math.PI / 2);

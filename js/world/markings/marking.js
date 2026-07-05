@@ -155,6 +155,6 @@ class Marking {
    * @param ctx The canvas rendering context.
    */
   draw(ctx) {
-    this.polygon.draw(ctx);
+    drawPolygon(ctx, this.polygon);
   }
 }

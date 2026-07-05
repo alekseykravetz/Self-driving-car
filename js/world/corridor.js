@@ -92,7 +92,7 @@ class Corridor {
   draw(ctx, options = {}) {
     const { color = 'red', width = 4 } = options;
     for (const seg of this.borders) {
-      seg.draw(ctx, { color, width });
+      drawSegment(ctx, seg, { color, width });
     }
   }
 }

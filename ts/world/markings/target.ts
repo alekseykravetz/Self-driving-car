@@ -11,8 +11,8 @@ class Target extends Marking {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    this.center.draw(ctx, { size: 30, color: 'red' });
-    this.center.draw(ctx, { size: 20, color: 'white' });
-    this.center.draw(ctx, { size: 10, color: 'red' });
+    drawPoint(ctx, this.center, { size: 30, color: 'red' });
+    drawPoint(ctx, this.center, { size: 20, color: 'white' });
+    drawPoint(ctx, this.center, { size: 10, color: 'red' });
   }
 }
