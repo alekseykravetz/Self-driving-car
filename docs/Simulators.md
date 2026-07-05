@@ -13,7 +13,19 @@ and a render-throttled animation loop. That scaffolding lives in one reusable
 abstract base class, `SimulatorShell`, so each concrete simulator only writes its
 own behaviour.
 
+Toolbar and panel element references are carried by a lightweight
+`SimulatorPageHost` object (`ts/simulator/views/simulatorPageHost.ts`), created
+once per page and injected into the shell's constructor. This decouples the shell
+from page-specific DOM queries.
+
 ```typescript
+class SimulatorPageHost {
+  readonly toolbarPanel: WorldToolbarElement;
+  readonly layoutToolbar: LayoutToolbarElement;
+  readonly animationLoopToolbar: AnimationLoopToolbarElement;
+  readonly worldLayersToolbar: WorldLayersToolbarElement | null;
+}
+
 abstract class SimulatorShell {
   // Owned scaffolding (protected, available to subclasses)
   protected gameCanvas / gameCtx;
@@ -26,7 +38,7 @@ abstract class SimulatorShell {
   protected toolbarPanel: WorldToolbarElement;
   protected layoutToolbar: LayoutToolbarElement;
 
-  constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas);
+  constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host?: SimulatorPageHost);
 
   // Shared helpers
   protected resizeLayout(): void;                       // responsive multi-panel resize

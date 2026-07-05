@@ -60,6 +60,10 @@ class NeuralNetwork {
     brains: NeuralNetwork[],
     amount: number,
   ): NeuralNetwork;
+
+  // Serialization helpers (replaces ad-hoc JSON clone patterns)
+  static deserialize(data: NeuralNetwork): NeuralNetwork;
+  static clone(network: NeuralNetwork): NeuralNetwork;
 }
 ```
 
@@ -172,7 +176,7 @@ The `lerp` formula: `original + (random - original) * amount` smoothly interpola
 
 ```typescript
 static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork {
-  const child = JSON.parse(JSON.stringify(net1));  // Deep clone parent1
+  const child = NeuralNetwork.clone(net1);
   for (const level of child.levels) {
     for (let i = 0; i < level.biases.length; i++) {
       if (Math.random() > 0.5) level.biases[i] = net2.levels[...].biases[i];
@@ -232,7 +236,7 @@ function applyPoolToCars(cars, pool, mutationRate): void {
   for (let i = 0; i < cars.length; i++) {
     if (i < brains.length) {
       // Elitism: exact copy of pool member
-      cars[i].brain = JSON.parse(JSON.stringify(brains[i]));
+      cars[i].brain = NeuralNetwork.clone(brains[i]);
     } else {
       // Offspring: crossover + mutation from pool
       cars[i].brain = NeuralNetwork.toMutatedFromPool(brains, mutationRate);

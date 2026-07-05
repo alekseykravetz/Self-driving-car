@@ -17,6 +17,11 @@ The `ts/games/race.ts` module implements a competitive racing mode where the pla
 
 ## Class Structure
 
+DOM assembly, stats updates, and toolbar wiring that was previously embedded in
+`Race` have been extracted into a dedicated `RacePanel` helper
+(`ts/games/racePanel.ts`). `Race` focuses on race rules, world setup, car
+generation, and progression.
+
 ```typescript
 class Race {
   // Canvases
@@ -24,11 +29,8 @@ class Race {
   cameraCanvas: HTMLCanvasElement; // 3D perspective view
   miniMapCanvas: HTMLCanvasElement; // Overview
 
-  // UI
-  toolbarPanel: WorldToolbarElement;
-  racePanel: HTMLElement; // Dynamic panel: restart button
-  statistics: HTMLElement; // Per-car progress bars
-  counter: HTMLElement; // Countdown display (3, 2, 1, GO!)
+  // UI (delegated to RacePanel)
+  racePanel: RacePanel;
 
   // World
   world: World;
@@ -131,21 +133,12 @@ generateCars(): Car[] {
 
 ## Countdown System
 
+The countdown is handled by `RacePanel.startCounter(onStarted)`:
+
 ```typescript
-startCounter(): void {
-  counter.innerText = '3';    beep(400);
-  setTimeout(() => {
-    counter.innerText = '2';  beep(400);
-    setTimeout(() => {
-      counter.innerText = '1'; beep(400);
-      setTimeout(() => {
-        counter.innerText = 'GO!'; beep(600);
-        this.started = true;  // Cars can now move
-        setTimeout(() => counter.innerText = '', 500);
-      }, 1000);
-    }, 1000);
-  }, 1000);
-}
+this.racePanel.startCounter(() => {
+  this.started = true; // Cars can now move
+});
 ```
 
 - 3 seconds total countdown
@@ -200,15 +193,11 @@ updateCarProgress(car: Car): void {
 
 ### Statistics Display
 
-Each car gets a progress bar in the statistics panel:
+Each car gets a progress bar in the statistics panel, managed by `RacePanel.updateStatistics()`:
 
 ```typescript
-for (const car of this.cars) {
-  const div = document.getElementById('stat_' + i);
-  div.style.width = car.progress * 100 + '%';
-  div.style.color = car.color;
-  // Shows finish time if car completed the race
-}
+this.racePanel.createStatistics(this.cars);   // setup (on init)
+this.racePanel.updateStatistics(this.cars);   // refresh (each frame)
 ```
 
 ---
@@ -268,7 +257,7 @@ animate(): void {
   this.miniMap.draw(new Point(this.myCar.x, this.myCar.y));
 
   // Update statistics display
-  this.#updateStatistics();
+  this.racePanel.updateStatistics(this.cars);
 
   requestAnimationFrame(() => this.animate());
 }
@@ -276,9 +265,23 @@ animate(): void {
 
 ---
 
-## Race Panel UI
+## Race Panel UI (`ts/games/racePanel.ts`)
 
-Dynamically created at runtime:
+The `RacePanel` class handles all DOM construction and UI wiring for the race
+page. It is created and owned by `Race`:
+
+```typescript
+class RacePanel {
+  constructor();
+  configureToolbar(config): void;    // toolbar selector wiring
+  createPanel(onRestart): void;      // dynamic restart button
+  createStatistics(cars): void;      // per-car stat entries
+  updateStatistics(cars): void;      // refresh values each frame
+  startCounter(onStarted): void;     // 3-2-1-GO! countdown
+}
+```
+
+The panel is built dynamically at runtime:
 
 ```
 ┌─────────────────────────┐
@@ -286,7 +289,6 @@ Dynamically created at runtime:
 └─────────────────────────┘
 ```
 
-- **Cars input**: Number of AI opponents (1-100)
 - **Restart button**: Reinitializes race with current world + car count
 
 ---

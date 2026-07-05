@@ -483,19 +483,28 @@ toInfo(): CarInfo {
       raySpread: this.sensor.raySpread,
       rayOffset: this.sensor.rayOffset,
     },
-    brain: this.brain ? JSON.parse(JSON.stringify(this.brain)) : undefined,
+    brain: this.brain ? NeuralNetwork.clone(this.brain) : undefined,
   };
 }
 ```
 
-### `Car.load(info: CarInfo)`
+### `Car.fromInfo(opts, info?)` (preferred)
 
-Applies a `CarInfo` to the car:
+Factory method that creates a `Car` from initial options and optional persisted
+info — an explicit, deterministic path for car rehydration:
+
+```typescript
+const car = Car.fromInfo({ x: 100, y: 200, controlType: 'AI' }, savedInfo);
+```
+
+### `Car.load(info: CarInfo)` (legacy)
+
+Applies a `CarInfo` to an existing car instance (kept for backward compatibility):
 
 1. Physics params (maxSpeed, acceleration, friction) are applied directly
 2. Size (width, height) override car dimensions if present
 3. Sensor config is applied to the sensor instance
-4. Brain is deep-cloned and assigned (or undefined if no brain in info)
+4. Brain is deserialized via `NeuralNetwork.deserialize(info.brain)` (or undefined if no brain)
 5. If `hiddenLayers` changed or `rayCount` changed, the brain architecture must be rebuilt
 
 ### File Format (`.car` files)

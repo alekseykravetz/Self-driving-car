@@ -81,8 +81,12 @@ All HTML pages follow a strict dependency hierarchy to ensure modules load befor
 
 <!-- Layer 5: Core Utilities & Car System (depends on math + world) -->
 <script src="/js/utils.js"></script>
+<script src="/js/car/physics/sensorRaycaster.js"></script>
 <script src="/js/car/sensors/sensor.js"></script>
 <script src="/js/car/controls/controls.js"></script>
+<script src="/js/car/physics/carPhysics.js"></script>
+<script src="/js/car/rendering/carRenderer.js"></script>
+<script src="/js/car/brain/carBrainAdapter.js"></script>
 <script src="/js/car/car.js"></script>
 <script src="/js/car/loader/carLoader.js"></script>
 
@@ -103,6 +107,8 @@ All HTML pages follow a strict dependency hierarchy to ensure modules load befor
 <script src="/js/simulator/training/templates/trainingInitModalTemplate.js"></script>
 
 <!-- Layer 9: UI Components/Panels (custom elements) -->
+<script src="/js/panels/modeControls.js"></script>
+<script src="/js/panels/assetSelectors.js"></script>
 <script src="/js/panels/worldToolbar.js"></script>
 <script src="/js/simulator/panels/layoutToolbar.js"></script>
 <script src="/js/simulator/panels/animationLoopToolbar.js"></script>
@@ -121,6 +127,7 @@ All HTML pages follow a strict dependency hierarchy to ensure modules load befor
 <script src="/js/simulator/training/trainingPanel.js"></script>
 
 <!-- Layer 11: Simulator Core (final orchestrator) -->
+<script src="/js/simulator/views/simulatorPageHost.js"></script>
 <script src="/js/simulator/core/simulatorShell.js"></script>
 <script src="/js/simulator/training/trainingSimulator.js"></script>
 
@@ -211,16 +218,26 @@ The geometric engine powering all spatial operations.
 
 ### 2. Car System (`ts/car/`)
 
-Vehicle physics, perception, and control abstraction.
+Vehicle physics, perception, and control abstraction. The main `Car` class is an
+orchestrator — motion, collision, rendering, and AI control mapping are delegated
+to focused collaborators.
 
-| Module                       | Responsibility                                        |
-| ---------------------------- | ----------------------------------------------------- |
-| `car.ts`                     | Physics simulation, polygon collision, AI integration |
-| `sensors/sensor.ts`          | Ray-casting, obstacle detection, normalized readings  |
-| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                        |
-| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)               |
-| `controls/cameraControls.ts` | Webcam-based marker steering                          |
-| `controls/markerDetector.ts` | K-means blue pixel clustering for markers             |
+| Module                            | Responsibility                                               |
+| --------------------------------- | ------------------------------------------------------------ |
+| `car.ts`                          | Orchestrator: sensor, brain, physics, renderer, controls     |
+| `physics/carPhysics.ts`           | Motion (speed/angle), polygon creation, damage assessment    |
+| `physics/sensorRaycaster.ts`      | Pure ray generation and intersection logic                   |
+| `rendering/carRenderer.ts`        | Sprite caching, mask compositing, draw (color/name/sensors)  |
+| `brain/carBrainAdapter.ts`        | Translates neural-network outputs into control values        |
+| `sensors/sensor.ts`               | Ray-casting state, obstacle detection, normalized readings   |
+| `controls/controls.ts`            | Keyboard input, AI/DUMMY modes                               |
+| `controls/phoneControls.ts`       | Device orientation (accelerometer tilt)                      |
+| `controls/cameraControls.ts`      | Webcam-based marker steering                                 |
+| `controls/markerDetector.ts`      | K-means blue pixel clustering for markers                    |
+
+**Factory method**: `Car.fromInfo(opts, info?)` provides an explicit, deterministic
+path for car rehydration from persisted `CarInfo`. The existing `load(info)`
+mutation-based path is kept for backward compatibility.
 
 ### 3. Neural Network (`ts/neural-network/`)
 
@@ -275,7 +292,8 @@ simulator built on it.
 
 | Module                        | Responsibility                                                                                                                                                             |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `core/simulatorShell.ts`      | Abstract base class: canvases/contexts, viewport/camera/mini-map, panel refs, responsive layout, network visualizer, and the render-throttled `requestAnimationFrame` loop |
+| `views/simulatorPageHost.ts`  | Lightweight host object carrying toolbar/panel refs, injected into `SimulatorShell` to decouple it from page-specific DOM queries |
+| `core/simulatorShell.ts`      | Abstract base class: canvases/contexts, viewport/camera/mini-map, panel refs (via `SimulatorPageHost`), responsive layout, network visualizer, and the render-throttled `requestAnimationFrame` loop |
 | `traffic/trafficSimulator.ts` | Live Traffic Jam: loads a world, spawns self-driving cars on click, car-vs-car collision with “ghosting” of wrecks                                                         |
 | `traffic/trafficPanel.ts`     | Custom element `<traffic-panel>`: per-car list (swatch, status, speed, distance, read-only config) + select/remove/clear/pause controls                                    |
 | `traffic/templates/`          | HTML template strings for the traffic panel                                                                                                                                |
@@ -303,18 +321,24 @@ simulator only implements its own `update()` / `draw()` behaviour.
 
 ### 7. Games, Audio & Utilities (`ts/games/`, `ts/audio/`, `ts/`)
 
-| Module           | Responsibility                                    |
-| ---------------- | ------------------------------------------------- |
-| `games/race.ts`  | Racing with countdown, progress, AI opponents     |
-| `audio/sound.ts` | Audio synthesis (beep, explosion, ta-daa fanfare) |
-| `utils.ts`       | `polysIntersect`, `getRGBA`, `getRandomColor`     |
-| `types.ts`       | Global type/interface declarations                |
+| Module             | Responsibility                                               |
+| ------------------ | ------------------------------------------------------------ |
+| `games/race.ts`    | Racing logic: countdown, progress tracking, AI opponents     |
+| `games/racePanel.ts` | `RacePanel` — DOM assembly, stats updates, toolbar wiring extracted from `Race` |
+| `audio/sound.ts`   | Audio synthesis (beep, explosion, ta-daa fanfare)            |
+| `utils.ts`         | `polysIntersect`, `getRGBA`, `getRandomColor`                |
+| `types.ts`         | Global type/interface declarations                           |
 
 ### 8. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
 
+The `<world-toolbar>` custom element was decomposed into smaller helper classes
+for clarity — the main element remains as a composition root.
+
 | Module                    | Tag                        | Responsibility                                                                |
 | ------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
-| `worldToolbar.ts`         | `<world-toolbar>`          | File I/O, border/tracking mode, camera debug toggle                           |
+| `worldToolbar.ts`         | `<world-toolbar>`          | Composition root: file I/O, border/tracking mode, camera debug toggle         |
+| `modeControls.ts`         | —                          | `ToolbarModeControls` — border/tracking/viewport mode button wiring           |
+| `assetSelectors.ts`       | —                          | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding      |
 | `layoutToolbar.ts`        | `<layout-toolbar>`         | Layout toggle, camera/network/minimap visibility                              |
 | `animationLoopToolbar.ts` | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control)                         |
 | `shortcutsToolbar.ts`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |
