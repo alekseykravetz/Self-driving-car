@@ -251,7 +251,7 @@ class GraphEditor {
     }
     if (this.shortestPath) {
       this.shortestPath.forEach((seg) => {
-        drawSegment(this.ctx, seg, { color: 'red', width: 4 });
+        drawSegment(this.ctx, seg, { color: 'red', width: 8 });
       });
     }
   }

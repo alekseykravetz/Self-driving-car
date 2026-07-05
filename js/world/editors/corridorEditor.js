@@ -164,7 +164,7 @@ class CorridorEditor {
       if (this.mouse) {
         drawSegment(this.ctx, new Segment(this.start, this.mouse), {
           color: 'red',
-          width: 2,
+          width: 4,
           dash: [4, 4],
         });
       }

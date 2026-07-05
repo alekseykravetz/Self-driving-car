@@ -41,7 +41,13 @@ All HTML pages follow a strict dependency hierarchy to ensure modules load befor
 <script src="/js/math/graph/graph.js"></script>
 <script src="/js/math/spatialGrid.js"></script>
 
-<!-- Layer 2: World System (depends on math primitives) -->
+<!-- Layer 1.5: Math Rendering (extracted draw methods, depends on math primitives) -->
+<script src="/js/rendering/pointRenderer.js"></script>
+<script src="/js/rendering/segmentRenderer.js"></script>
+<script src="/js/rendering/polygonRenderer.js"></script>
+<script src="/js/rendering/envelopeRenderer.js"></script>
+
+<!-- Layer 2: World System (depends on math primitives + renderers) -->
 <script src="/js/world/corridor.js"></script>
 <script src="/js/world/generation/worldGenerator.js"></script>
 <script src="/js/world/items/tree.js"></script>
@@ -209,7 +215,7 @@ The geometric engine powering all spatial operations.
 
 | Module                   | Responsibility                                                |
 | ------------------------ | ------------------------------------------------------------- |
-| `primitives/point.ts`    | 2D/3D position, drawing, equality checks                      |
+| `primitives/point.ts`    | 2D/3D position, equality checks                               |
 | `primitives/segment.ts`  | Line segments, projection, distance, direction vectors        |
 | `primitives/polygon.ts`  | Closed shapes, union, intersection, containment (ray casting) |
 | `primitives/envelope.ts` | Rounded rectangles around segments (road surfaces)            |
@@ -313,7 +319,23 @@ the generic, non-domain scaffolding so each simulator only implements its own
 | `world/loader/worldLoader.ts` | Reusable file-input handler for loading `.world` files       |
 | `car/loader/carLoader.ts`     | Reusable file-input handler for loading `.car`/`.json` files |
 
-### 6. Viewport & Rendering (`ts/viewport/`, `ts/mini-map/`, `ts/camera/`)
+### 6. Math Rendering (`ts/rendering/`)
+
+Pure renderer functions extracted from math primitives to break the cross-cutting
+dependency on Canvas 2D APIs. Each function accepts a primitive as data and an
+options interface for style control.
+
+| Module                | Responsibility                                         |
+| --------------------- | ------------------------------------------------------ |
+| `pointRenderer.ts`    | Draws `Point` as filled/outlined circles               |
+| `segmentRenderer.ts`  | Draws `Segment` as styled lines with optional dash/cap |
+| `polygonRenderer.ts`  | Draws `Polygon` as filled and stroked closed shapes    |
+| `envelopeRenderer.ts` | Draws `Envelope` by delegating to `drawPolygon`        |
+
+These are loaded via `<script>` tags before the World System (Layer 2) so that
+`World.draw()`, editors, and marking types can call them as global functions.
+
+### 7. Viewport & Rendering (`ts/viewport/`, `ts/mini-map/`, `ts/camera/`)
 
 | Module                 | Responsibility                                                   |
 | ---------------------- | ---------------------------------------------------------------- |
@@ -323,7 +345,7 @@ the generic, non-domain scaffolding so each simulator only implements its own
 | `camera/extrusion.ts`  | 3D extrusion helpers (buildings, cars, trees)                    |
 | `camera/camera.ts`     | Frustum-based perspective projection & 3D rendering              |
 
-### 7. Racing, Audio & Utilities (`ts/simulator/racing/`, `ts/audio/`, `ts/`)
+### 8. Racing, Audio & Utilities (`ts/simulator/racing/`, `ts/audio/`, `ts/`)
 
 | Module                              | Responsibility                                                                                         |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -333,7 +355,7 @@ the generic, non-domain scaffolding so each simulator only implements its own
 | `utils.ts`                          | `polysIntersect`, `getRGBA`, `getRandomColor`                                                          |
 | `types.ts`                          | Global type/interface declarations                                                                     |
 
-### 8. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
+### 9. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
 
 The `<world-toolbar>` custom element was decomposed into smaller helper classes
 for clarity — the main element remains as a composition root.
@@ -601,13 +623,13 @@ were rewritten to allocate nothing per car/ray/segment:
 
 ## Code Conventions
 
-| Convention               | Rule                                                                                                                        |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| Formatting               | Prettier with `singleQuote: true`                                                                                           |
-| Class naming             | PascalCase (`NeuralNetwork`, `SimpleWorld`)                                                                                 |
-| Function/variable naming | camelCase (`createCarsForTraining`, `roadBorders`)                                                                          |
-| Private members          | `#` prefix (ES2022 private fields)                                                                                          |
-| Serialization            | `static load(info)` factory + instance `toInfo()` method                                                                    |
-| Drawing                  | Each class owns its `draw(ctx, options?)` method; options are typed interfaces (`CarDrawOptions`, `WorldDrawOptions`, etc.) |
-| Templates                | HTML template strings in `templates/` subdirectories                                                                        |
-| Custom elements          | `connectedCallback()` renders template, `configure()` binds                                                                 |
+| Convention               | Rule                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Formatting               | Prettier with `singleQuote: true`                                                                                                                                                                                                                                                                                                                                                                              |
+| Class naming             | PascalCase (`NeuralNetwork`, `SimpleWorld`)                                                                                                                                                                                                                                                                                                                                                                    |
+| Function/variable naming | camelCase (`createCarsForTraining`, `roadBorders`)                                                                                                                                                                                                                                                                                                                                                             |
+| Private members          | `#` prefix (ES2022 private fields)                                                                                                                                                                                                                                                                                                                                                                             |
+| Serialization            | `static load(info)` factory + instance `toInfo()` method                                                                                                                                                                                                                                                                                                                                                       |
+| Drawing                  | Math primitives (`Point`, `Segment`, `Polygon`, `Envelope`) are pure data — their draw logic lives in `ts/rendering/` as standalone renderer functions (`drawPoint`, `drawSegment`, `drawPolygon`, `drawEnvelope`). Higher-level classes (`World`, `Car`, editors) own their own `draw(ctx, options?)` and call renderers as needed. Options are typed interfaces (`CarDrawOptions`, `WorldDrawOptions`, etc.) |
+| Templates                | HTML template strings in `templates/` subdirectories                                                                                                                                                                                                                                                                                                                                                           |
+| Custom elements          | `connectedCallback()` renders template, `configure()` binds                                                                                                                                                                                                                                                                                                                                                    |

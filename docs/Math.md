@@ -18,16 +18,10 @@ class Point {
   intersection?: boolean; // Flag for polygon union operations
 
   equals(point: Point): boolean;
-  draw(ctx: CanvasRenderingContext2D, options?: PointDrawOptions): void;
-}
-
-interface PointDrawOptions {
-  size?: number; // Circle radius (default: 18)
-  color?: string; // Fill color (default: 'black')
-  outline?: boolean; // Draw border ring
-  fill?: boolean; // Fill the circle
 }
 ```
+
+> Drawing is done via `drawPoint(ctx, point, options?)` from `ts/rendering/pointRenderer.ts`.
 
 **Usage**: Road graph nodes, polygon vertices, car positions, intersection detection results, 3D projected screen coordinates.
 
@@ -49,16 +43,10 @@ class Segment {
   includes(point: Point): boolean;
   distanceToPoint(point: Point): number;
   projectPoint(point: Point): { point: Point; offset: number };
-  draw(ctx, options?: SegmentDrawOptions): void;
-}
-
-interface SegmentDrawOptions {
-  width?: number; // Line width (default: 2)
-  color?: string; // Stroke color (default: 'black')
-  dash?: number[]; // Dash pattern (e.g., [10, 10] for lane markings)
-  cap?: CanvasLineCap; // Line cap style ('round', 'butt', 'square')
 }
 ```
+
+> Drawing is done via `drawSegment(ctx, segment, options?)` from `ts/rendering/segmentRenderer.ts`.
 
 **Key methods:**
 
@@ -114,17 +102,10 @@ class Polygon {
   intersectsPolygon(poly: Polygon): boolean;
   distanceToPoint(p: Point): number;
   distanceToPolygon(poly: Polygon): number;
-  draw(ctx, options?: PolygonDrawOptions): void;
-  drawSegments(ctx): void;
-}
-
-interface PolygonDrawOptions {
-  stroke?: string; // Border color
-  lineWidth?: number; // Border width
-  fill?: string; // Fill color
-  join?: CanvasLineJoin; // Corner join style
 }
 ```
+
+> Drawing is done via `drawPolygon(ctx, polygon, options?)` from `ts/rendering/polygonRenderer.ts`. Envelopes delegate to `drawPolygon` via `drawEnvelope` from `ts/rendering/envelopeRenderer.ts`.
 
 **Critical algorithms:**
 
@@ -579,6 +560,77 @@ width = height * (deltaLon / deltaLat) * cos(avgLatitude)
 4. Save to `saves/` directory (e.g., `ashkelon-osm-data.json`)
 5. In World Editor: load the JSON file → OSM importer creates the graph
 6. World generates roads from the graph automatically
+
+---
+
+## Math Rendering (`ts/rendering/`)
+
+The `draw` methods were extracted from math primitives into standalone renderer
+functions in `ts/rendering/`. This keeps `Point`, `Segment`, `Polygon`, and
+`Envelope` as pure data structures with no dependency on Canvas 2D APIs.
+
+### `drawPoint` (`pointRenderer.ts`)
+
+```typescript
+interface PointDrawOptions {
+  size?: number; // Circle radius (default: 18)
+  color?: string; // Fill color (default: 'black')
+  outline?: boolean; // Draw yellow border ring
+  fill?: boolean; // Fill the circle yellow
+}
+
+function drawPoint(
+  ctx: CanvasRenderingContext2D,
+  point: Point,
+  options?: PointDrawOptions,
+): void;
+```
+
+### `drawSegment` (`segmentRenderer.ts`)
+
+```typescript
+interface SegmentDrawOptions {
+  width?: number; // Line width (default: 2)
+  color?: string; // Stroke color (default: 'black')
+  dash?: number[]; // Dash pattern (e.g., [10, 10] for lane markings)
+  cap?: CanvasLineCap; // Line cap style ('round', 'butt', 'square')
+}
+
+function drawSegment(
+  ctx: CanvasRenderingContext2D,
+  segment: Segment,
+  options?: SegmentDrawOptions,
+): void;
+```
+
+### `drawPolygon` (`polygonRenderer.ts`)
+
+```typescript
+interface PolygonDrawOptions {
+  stroke?: string; // Border color (default: 'blue')
+  lineWidth?: number; // Border width (default: 2)
+  fill?: string; // Fill color (default: 'rgba(0,0,255,0.3)')
+  join?: CanvasLineJoin; // Corner join style (default: 'miter')
+}
+
+function drawPolygon(
+  ctx: CanvasRenderingContext2D,
+  polygon: Polygon,
+  options?: PolygonDrawOptions,
+): void;
+```
+
+### `drawEnvelope` (`envelopeRenderer.ts`)
+
+```typescript
+function drawEnvelope(
+  ctx: CanvasRenderingContext2D,
+  envelope: Envelope,
+  options?: PolygonDrawOptions,
+): void;
+```
+
+Delegates to `drawPolygon(ctx, envelope.polygon, options)`.
 
 ### Saved Examples
 
