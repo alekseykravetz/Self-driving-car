@@ -173,28 +173,29 @@ graph TD
     Envelope --> World
     World -->|IWorld| TrainingSimulator
     SimpleWorld -->|IWorld| TrainingSimulator
-    World --> Race
+    World -->|IWorld| RaceSimulator
     WorldLoader --> TrainingSimulator
-    WorldLoader --> Race
+    WorldLoader --> RaceSimulator
     WorldLoader --> WorldEditor
     Sensor --> Car
     Controls --> Car
     NeuralNetwork --> Car
     Car --> TrainingSimulator
-    Car --> Race
+    Car --> RaceSimulator
     Car --> TrafficSimulator
     TrainingPanel --> TrainingSimulator
     SimulatorShell --> TrainingSimulator
     SimulatorShell --> TrafficSimulator
+    SimulatorShell --> RaceSimulator
     TrafficPanel --> TrafficSimulator
     World -->|IWorld| TrafficSimulator
     WorldLoader --> TrafficSimulator
     Viewport --> TrainingSimulator
-    Viewport --> Race
+    Viewport --> RaceSimulator
     MiniMap --> TrainingSimulator
-    MiniMap --> Race
+    MiniMap --> RaceSimulator
     Camera --> TrainingSimulator
-    Camera --> Race
+    Camera --> RaceSimulator
     TrafficManager --> World
 ```
 
@@ -285,22 +286,25 @@ Training environments and genetic algorithm orchestration.
 | `rendering/carRenderer.ts`    | Simulator-specific car drawing: pool highlighting, name labels, layering       |
 | `templates/`                  | HTML template strings for custom elements                                      |
 
-### 5a. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`)
+### 5a. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
 
-Scaffolding shared by every canvas-based simulator, plus the Live Traffic Jam
-simulator built on it.
+Scaffolding shared by every canvas-based simulator, plus the concrete simulators
+built on it (Live Traffic Jam, Racing).
 
-| Module                        | Responsibility                                                                                                                                                                                       |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `views/simulatorPageHost.ts`  | Lightweight host object carrying toolbar/panel refs, injected into `SimulatorShell` to decouple it from page-specific DOM queries                                                                    |
-| `core/simulatorShell.ts`      | Abstract base class: canvases/contexts, viewport/camera/mini-map, panel refs (via `SimulatorPageHost`), responsive layout, network visualizer, and the render-throttled `requestAnimationFrame` loop |
-| `traffic/trafficSimulator.ts` | Live Traffic Jam: loads a world, spawns self-driving cars on click, car-vs-car collision with “ghosting” of wrecks                                                                                   |
-| `traffic/trafficPanel.ts`     | Custom element `<traffic-panel>`: per-car list (swatch, status, speed, distance, read-only config) + select/remove/clear/pause controls                                                              |
-| `traffic/templates/`          | HTML template strings for the traffic panel                                                                                                                                                          |
+| Module                            | Responsibility                                                                                                                                                                                       |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `views/simulatorPageHost.ts`      | Lightweight host object carrying toolbar/panel refs, injected into `SimulatorShell` to decouple it from page-specific DOM queries                                                                    |
+| `core/simulatorShell.ts`          | Abstract base class: canvases/contexts, viewport/camera/mini-map, panel refs (via `SimulatorPageHost`), responsive layout, network visualizer, and the render-throttled `requestAnimationFrame` loop |
+| `traffic/trafficSimulator.ts`     | Live Traffic Jam: loads a world, spawns self-driving cars on click, car-vs-car collision with “ghosting” of wrecks                                                                                   |
+| `traffic/trafficPanel.ts`         | Custom element `<traffic-panel>`: per-car list (swatch, status, speed, distance, read-only config) + select/remove/clear/pause controls                                                              |
+| `traffic/templates/`              | HTML template strings for the traffic panel                                                                                                                                                          |
+| `racing/raceSimulator.ts`         | Racing mode: competitive race from Start to Target markings with AI opponents, corridor progress tracking, countdown                                                                                 |
+| `racing/racePanel.ts`             | Race-specific DOM construction, statistics panel, restart button, countdown UI                                                                                                                       |
 
-Both `TrainingSimulator` (`ts/simulator/training/trainingSimulator.ts`) and `TrafficSimulator` extend
-`SimulatorShell`, which owns the generic, non-domain scaffolding so each
-simulator only implements its own `update()` / `draw()` behaviour.
+`TrainingSimulator` (`ts/simulator/training/trainingSimulator.ts`),
+`TrafficSimulator`, and `RaceSimulator` all extend `SimulatorShell`, which owns
+the generic, non-domain scaffolding so each simulator only implements its own
+`update()` / `draw()` behaviour.
 
 ### 5b. Reusable Loaders (`ts/world/loader/`, `ts/car/loader/`)
 
@@ -319,15 +323,15 @@ simulator only implements its own `update()` / `draw()` behaviour.
 | `camera/extrusion.ts`  | 3D extrusion helpers (buildings, cars, trees)                    |
 | `camera/camera.ts`     | Frustum-based perspective projection & 3D rendering              |
 
-### 7. Games, Audio & Utilities (`ts/games/`, `ts/audio/`, `ts/`)
+### 7. Racing, Audio & Utilities (`ts/simulator/racing/`, `ts/audio/`, `ts/`)
 
-| Module               | Responsibility                                                                  |
-| -------------------- | ------------------------------------------------------------------------------- |
-| `games/race.ts`      | Racing logic: countdown, progress tracking, AI opponents                        |
-| `games/racePanel.ts` | `RacePanel` — DOM assembly, stats updates, toolbar wiring extracted from `Race` |
-| `audio/sound.ts`     | Audio synthesis (beep, explosion, ta-daa fanfare)                               |
-| `utils.ts`           | `polysIntersect`, `getRGBA`, `getRandomColor`                                   |
-| `types.ts`           | Global type/interface declarations                                              |
+| Module                        | Responsibility                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| `simulator/racing/raceSimulator.ts` | `RaceSimulator` — extends `SimulatorShell`; racing logic, car generation, countdown, corridor progress |
+| `simulator/racing/racePanel.ts`     | `RacePanel` — DOM assembly, stats updates, toolbar wiring for the race page    |
+| `audio/sound.ts`              | Audio synthesis (beep, explosion, ta-daa fanfare)                               |
+| `utils.ts`                    | `polysIntersect`, `getRGBA`, `getRandomColor`                                   |
+| `types.ts`                    | Global type/interface declarations                                              |
 
 ### 8. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
 
@@ -465,7 +469,7 @@ fitness = distance traveled along corridor/road
 | ---------------- | -------------------------------------------------------------- | -------------------------------- |
 | `index.html`     | None (static links only)                                       | Landing page with mode selection |
 | `simulator.html` | Full stack + SimpleWorld + TrafficFactory + SimpleModeBehavior | AI training (both modes)         |
-| `race.html`      | Full stack + Race + Sound + WorldLoader + CarLoader + Controls | All race modes via URL params    |
+| `race.html`      | Full stack + RaceSimulator + SimulatorShell + Sound + WorldLoader + CarLoader + Controls | All race modes via URL params    |
 | `world.html`     | World + Editors + Viewport + WorldLoader + OSM importer        | Map creation & editing           |
 
 ---

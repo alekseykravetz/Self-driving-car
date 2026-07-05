@@ -1,6 +1,6 @@
 # Racing Mode
 
-The `ts/games/race.ts` module implements a competitive racing mode where the player controls a car and races against AI opponents along a corridor path.
+The `ts/simulator/racing/raceSimulator.ts` module implements a competitive racing mode where the player controls a car and races against AI opponents along a corridor path.
 
 ---
 
@@ -17,39 +17,35 @@ The `ts/games/race.ts` module implements a competitive racing mode where the pla
 
 ## Class Structure
 
-DOM assembly, stats updates, and toolbar wiring that was previously embedded in
-`Race` have been extracted into a dedicated `RacePanel` helper
-(`ts/games/racePanel.ts`). `Race` focuses on race rules, world setup, car
-generation, and progression.
+`RaceSimulator` extends `SimulatorShell`, inheriting the four canvases,
+viewport, camera, mini-map, toolbar panel references, and render-throttled RAF
+loop. DOM assembly, stats updates, and toolbar wiring are delegated to a
+dedicated `RacePanel` helper (`ts/simulator/racing/racePanel.ts`).
+`RaceSimulator` focuses on race rules, world setup, car generation, and
+progression.
 
 ```typescript
-class Race {
-  // Canvases
-  gameCanvas: HTMLCanvasElement; // Top-down view
-  cameraCanvas: HTMLCanvasElement; // 3D perspective view
-  miniMapCanvas: HTMLCanvasElement; // Overview
+class RaceSimulator extends SimulatorShell {
+  // Inherited from SimulatorShell:
+  //   gameCanvas / gameCtx, cameraCanvas / cameraCtx,
+  //   miniMapCanvas, networkCanvas / networkCtx
+  //   viewport, camera, miniMap (protected)
 
-  // UI (delegated to RacePanel)
+  controls: Controls | null;
   racePanel: RacePanel;
 
-  // World
-  world: World;
-  camera: Camera | null;
-  viewport: Viewport | null;
-  miniMap: MiniMap | null;
-
-  // Cars
-  cars: Car[] | null; // All cars (player + AI)
-  myCar: Car | null; // Player's car
-  controls: Controls | null; // Keyboard controls (null for phone/camera)
-  roadBorders: [Point, Point][]; // Collision boundaries
-
   // State
-  frameCount: number;
-  started: boolean; // False during countdown
-  animating: boolean; // Animation loop active
+  #world: World;
+  #cars: Car[] | null;
+  #myCar: Car | null;
+  #roadBorders: [Point, Point][];
+  #frameCount: number;
+  #started: boolean; // False during countdown
 
-  constructor(gameCanvas, cameraCanvas, miniMapCanvas, controls?);
+  constructor(
+    gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas,
+    host: SimulatorPageHost, controls?,
+  );
 }
 ```
 
@@ -222,53 +218,61 @@ Cars bounce off corridor walls instead of stopping — this keeps the race going
 
 ## Animation Loop
 
+RaceSimulator inherits the shell's render-throttled `requestAnimationFrame` loop
+(`SimulatorShell.animate(time)`). Physics (car updates, progress tracking,
+viewport offset) happens in `update()`, called every frame. Rendering (world
+draw, camera render, mini-map) happens in `draw(_time)`, called once per
+`renderInterval` frames (default: every frame).
+
 ```typescript
-animate(): void {
-  if (!this.started) {
-    // During countdown: render but don't update car physics
-  }
-
-  // Update all cars
-  for (const car of this.cars) {
-    car.update(this.roadBorders);
-    if (car.damaged) {
-      handleCollisionWithRoadBorders(car, corridorBorders);
+protected update(): void {
+  // 1. Car physics — update all cars against road borders
+  if (this.#started) {
+    for (const car of this.#cars) {
+      car.update(borders);
     }
-    this.updateCarProgress(car);
   }
 
-  // Render game canvas (top-down with viewport)
+  // 2. Viewport tracking — follow the tracked car
+  if (trackTarget) {
+    this.viewport.offset.x = -trackTarget.x;
+    this.viewport.offset.y = -trackTarget.y;
+  }
+
+  // 3. Progress tracking + sort by corridor progress
+  for (const car of this.#cars) this.#updateCarProgress(car);
+  if (this.#world.corridor) this.#cars.sort(...);
+
+  // 4. Refresh statistics panel
+  this.racePanel.updateStatistics(this.#cars);
+
+  // 5. Camera tracking
+  this.camera?.move(trackTarget);
+}
+
+protected draw(_time: number): void {
+  // 1. Reset viewport, render world (top-down with viewport)
   this.viewport.reset();
-  this.world.draw(this.gameCtx, {
-    viewPoint,
-    cars: this.cars,
-    bestCar: trackTarget ?? this.myCar,
-  });
+  this.#world.draw(this.gameCtx, { viewPoint, cars, bestCar, ... });
 
-  // Render 3D camera view (follows player)
-  this.camera.move(this.myCar);
-  this.camera.render(this.cameraCtx, this.world, {
-    keyCar: this.myCar,
-    cars: this.cars,
-    traffic: this.cars.filter(c => c !== this.myCar),
-  });
+  // 2. Render mini-map
+  this.miniMap.draw({ viewPoint, cars });
 
-  // Render mini-map
-  this.miniMap.draw(new Point(this.myCar.x, this.myCar.y));
-
-  // Update statistics display
-  this.racePanel.updateStatistics(this.cars);
-
-  requestAnimationFrame(() => this.animate());
+  // 3. Render 3D camera view
+  this.camera.render(this.cameraCtx, this.#world, { keyCar, cars, traffic });
 }
 ```
 
+The loop is started by calling `this.animate(0)` at the end of the
+RaceSimulator constructor. The countdown timer (3-2-1-GO!) sets `#started =
+true`, after which `update()` begins stepping car physics each frame.
+
 ---
 
-## Race Panel UI (`ts/games/racePanel.ts`)
+## Race Panel UI (`ts/simulator/racing/racePanel.ts`)
 
 The `RacePanel` class handles all DOM construction and UI wiring for the race
-page. It is created and owned by `Race`:
+page. It is created and owned by `RaceSimulator`:
 
 ```typescript
 class RacePanel {

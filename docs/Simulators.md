@@ -130,6 +130,7 @@ class AnimationLoopToolbarElement extends HTMLElement {
 | ------------------- | -------------------------------------------- | ----------------- |
 | `TrainingSimulator` | `ts/simulator/training/trainingSimulator.ts` | `/html/simulator` |
 | `TrafficSimulator`  | `ts/simulator/traffic/trafficSimulator.ts`   | `/html/traffic`   |
+| `RaceSimulator`     | `ts/simulator/racing/raceSimulator.ts`       | `/html/race`      |
 
 ---
 
