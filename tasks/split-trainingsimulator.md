@@ -15,6 +15,7 @@ Reduced maintainability; changes to simple mode risk affecting world mode and vi
 ## Remediation
 
 Either:
+
 - Extract `SimpleTrainingSimulator` and `WorldTrainingSimulator` subclasses
 - Or use strategy pattern: `SimpleModeStrategy` / `WorldModeStrategy` objects injected into a single `TrainingSimulator`
 

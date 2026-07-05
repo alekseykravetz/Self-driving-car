@@ -196,8 +196,8 @@ updateCarProgress(car: Car): void {
 Each car gets a progress bar in the statistics panel, managed by `RacePanel.updateStatistics()`:
 
 ```typescript
-this.racePanel.createStatistics(this.cars);   // setup (on init)
-this.racePanel.updateStatistics(this.cars);   // refresh (each frame)
+this.racePanel.createStatistics(this.cars); // setup (on init)
+this.racePanel.updateStatistics(this.cars); // refresh (each frame)
 ```
 
 ---
@@ -273,11 +273,11 @@ page. It is created and owned by `Race`:
 ```typescript
 class RacePanel {
   constructor();
-  configureToolbar(config): void;    // toolbar selector wiring
-  createPanel(onRestart): void;      // dynamic restart button
-  createStatistics(cars): void;      // per-car stat entries
-  updateStatistics(cars): void;      // refresh values each frame
-  startCounter(onStarted): void;     // 3-2-1-GO! countdown
+  configureToolbar(config): void; // toolbar selector wiring
+  createPanel(onRestart): void; // dynamic restart button
+  createStatistics(cars): void; // per-car stat entries
+  updateStatistics(cars): void; // refresh values each frame
+  startCounter(onStarted): void; // 3-2-1-GO! countdown
 }
 ```
 

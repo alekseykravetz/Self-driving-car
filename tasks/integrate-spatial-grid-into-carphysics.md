@@ -15,6 +15,7 @@ With large city-scale maps (thousands of road border segments) and large car pop
 ## Remediation
 
 Either:
+
 - Expose grid to `Car.update(polygons, grid?)` and pre-filter via spatial query
 - Or: have the caller (`worldModeBehavior`, `trafficSimulator`, `Race`) query the grid and pass only nearby borders to `car.update()`
 

@@ -15,6 +15,7 @@ Fragile ordering that could break if `Car`'s static initialization ever referenc
 ## Remediation
 
 Move all `neural-network` script tags before `car` script tags in every HTML file. Files to update:
+
 - `html/simulator.html`
 - `html/traffic.html`
 - `html/race.html`
