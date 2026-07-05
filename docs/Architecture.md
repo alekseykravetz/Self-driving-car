@@ -222,18 +222,18 @@ Vehicle physics, perception, and control abstraction. The main `Car` class is an
 orchestrator — motion, collision, rendering, and AI control mapping are delegated
 to focused collaborators.
 
-| Module                            | Responsibility                                               |
-| --------------------------------- | ------------------------------------------------------------ |
-| `car.ts`                          | Orchestrator: sensor, brain, physics, renderer, controls     |
-| `physics/carPhysics.ts`           | Motion (speed/angle), polygon creation, damage assessment    |
-| `physics/sensorRaycaster.ts`      | Pure ray generation and intersection logic                   |
-| `rendering/carRenderer.ts`        | Sprite caching, mask compositing, draw (color/name/sensors)  |
-| `brain/carBrainAdapter.ts`        | Translates neural-network outputs into control values        |
-| `sensors/sensor.ts`               | Ray-casting state, obstacle detection, normalized readings   |
-| `controls/controls.ts`            | Keyboard input, AI/DUMMY modes                               |
-| `controls/phoneControls.ts`       | Device orientation (accelerometer tilt)                      |
-| `controls/cameraControls.ts`      | Webcam-based marker steering                                 |
-| `controls/markerDetector.ts`      | K-means blue pixel clustering for markers                    |
+| Module                       | Responsibility                                              |
+| ---------------------------- | ----------------------------------------------------------- |
+| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls    |
+| `physics/carPhysics.ts`      | Motion (speed/angle), polygon creation, damage assessment   |
+| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                  |
+| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors) |
+| `brain/carBrainAdapter.ts`   | Translates neural-network outputs into control values       |
+| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings  |
+| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                              |
+| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                     |
+| `controls/cameraControls.ts` | Webcam-based marker steering                                |
+| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                   |
 
 **Factory method**: `Car.fromInfo(opts, info?)` provides an explicit, deterministic
 path for car rehydration from persisted `CarInfo`. The existing `load(info)`
@@ -290,13 +290,13 @@ Training environments and genetic algorithm orchestration.
 Scaffolding shared by every canvas-based simulator, plus the Live Traffic Jam
 simulator built on it.
 
-| Module                        | Responsibility                                                                                                                                                             |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `views/simulatorPageHost.ts`  | Lightweight host object carrying toolbar/panel refs, injected into `SimulatorShell` to decouple it from page-specific DOM queries |
+| Module                        | Responsibility                                                                                                                                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `views/simulatorPageHost.ts`  | Lightweight host object carrying toolbar/panel refs, injected into `SimulatorShell` to decouple it from page-specific DOM queries                                                                    |
 | `core/simulatorShell.ts`      | Abstract base class: canvases/contexts, viewport/camera/mini-map, panel refs (via `SimulatorPageHost`), responsive layout, network visualizer, and the render-throttled `requestAnimationFrame` loop |
-| `traffic/trafficSimulator.ts` | Live Traffic Jam: loads a world, spawns self-driving cars on click, car-vs-car collision with “ghosting” of wrecks                                                         |
-| `traffic/trafficPanel.ts`     | Custom element `<traffic-panel>`: per-car list (swatch, status, speed, distance, read-only config) + select/remove/clear/pause controls                                    |
-| `traffic/templates/`          | HTML template strings for the traffic panel                                                                                                                                |
+| `traffic/trafficSimulator.ts` | Live Traffic Jam: loads a world, spawns self-driving cars on click, car-vs-car collision with “ghosting” of wrecks                                                                                   |
+| `traffic/trafficPanel.ts`     | Custom element `<traffic-panel>`: per-car list (swatch, status, speed, distance, read-only config) + select/remove/clear/pause controls                                                              |
+| `traffic/templates/`          | HTML template strings for the traffic panel                                                                                                                                                          |
 
 Both `TrainingSimulator` (`ts/simulator/training/trainingSimulator.ts`) and `TrafficSimulator` extend
 `SimulatorShell`, which owns the generic, non-domain scaffolding so each
@@ -321,13 +321,13 @@ simulator only implements its own `update()` / `draw()` behaviour.
 
 ### 7. Games, Audio & Utilities (`ts/games/`, `ts/audio/`, `ts/`)
 
-| Module             | Responsibility                                               |
-| ------------------ | ------------------------------------------------------------ |
-| `games/race.ts`    | Racing logic: countdown, progress tracking, AI opponents     |
+| Module               | Responsibility                                                                  |
+| -------------------- | ------------------------------------------------------------------------------- |
+| `games/race.ts`      | Racing logic: countdown, progress tracking, AI opponents                        |
 | `games/racePanel.ts` | `RacePanel` — DOM assembly, stats updates, toolbar wiring extracted from `Race` |
-| `audio/sound.ts`   | Audio synthesis (beep, explosion, ta-daa fanfare)            |
-| `utils.ts`         | `polysIntersect`, `getRGBA`, `getRandomColor`                |
-| `types.ts`         | Global type/interface declarations                           |
+| `audio/sound.ts`     | Audio synthesis (beep, explosion, ta-daa fanfare)                               |
+| `utils.ts`           | `polysIntersect`, `getRGBA`, `getRandomColor`                                   |
+| `types.ts`           | Global type/interface declarations                                              |
 
 ### 8. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
 
