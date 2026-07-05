@@ -87,6 +87,7 @@ All HTML pages follow a strict dependency hierarchy to ensure modules load befor
 
 <!-- Layer 5: Core Utilities & Car System (depends on math + world) -->
 <script src="/js/utils.js"></script>
+<script src="/js/car/config.js"></script>
 <script src="/js/car/physics/sensorRaycaster.js"></script>
 <script src="/js/car/sensors/sensor.js"></script>
 <script src="/js/car/controls/controls.js"></script>
@@ -229,18 +230,19 @@ Vehicle physics, perception, and control abstraction. The main `Car` class is an
 orchestrator — motion, collision, rendering, and AI control mapping are delegated
 to focused collaborators.
 
-| Module                       | Responsibility                                              |
-| ---------------------------- | ----------------------------------------------------------- |
-| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls    |
-| `physics/carPhysics.ts`      | Motion (speed/angle), polygon creation, damage assessment   |
-| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                  |
-| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors) |
-| `brain/carBrainAdapter.ts`   | Translates neural-network outputs into control values       |
-| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings  |
-| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                              |
-| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                     |
-| `controls/cameraControls.ts` | Webcam-based marker steering                                |
-| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                   |
+| Module                       | Responsibility                                               |
+| ---------------------------- | ------------------------------------------------------------ |
+| `config.ts`                  | Default car configuration (`maxSpeed`, `acceleration`, etc.) |
+| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls     |
+| `physics/carPhysics.ts`      | Motion (speed/angle), polygon creation, damage assessment    |
+| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                   |
+| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors)  |
+| `brain/carBrainAdapter.ts`   | Translates neural-network outputs into control values        |
+| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings   |
+| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                               |
+| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                      |
+| `controls/cameraControls.ts` | Webcam-based marker steering                                 |
+| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                    |
 
 **Factory method**: `Car.fromInfo(opts, info?)` provides an explicit, deterministic
 path for car rehydration from persisted `CarInfo`. The existing `load(info)`

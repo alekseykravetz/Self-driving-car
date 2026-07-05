@@ -38,7 +38,7 @@ Examples:
 
 ## Car Size Scale
 
-Default car values are in world pixels (from `DEFAULT_CAR_CONFIG` in `ts/math/utils.ts`):
+Default car values are in world pixels (from `DEFAULT_CAR_CONFIG` in `ts/car/config.ts`):
 
 - `width = 25 px`
 - `height = 63 px`

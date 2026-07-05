@@ -45,7 +45,6 @@ const allowedUnusedVars = [
   'WORLD_PIXELS_PER_METER',
   'SIMULATION_FPS',
   'METERS_PER_DEGREE_LATITUDE',
-  'DEFAULT_CAR_CONFIG',
   'getNearestPoint',
   'getNearestSegment',
   'distance',
@@ -145,6 +144,7 @@ const allowedUnusedVars = [
   'Sensor',
   'SensorRaycaster',
   'IntersectionPoint',
+  'DEFAULT_CAR_CONFIG',
 
   // sound
   'SoundEngine',
@@ -346,7 +346,6 @@ const myGlobals = {
     WORLD_PIXELS_PER_METER: 'readonly',
     SIMULATION_FPS: 'readonly',
     METERS_PER_DEGREE_LATITUDE: 'readonly',
-    DEFAULT_CAR_CONFIG: 'readonly',
     // world math utils
     getNearestPoint: 'readonly',
     getNearestSegment: 'readonly',
@@ -450,6 +449,7 @@ const myGlobals = {
     Sensor: 'readonly',
     SensorRaycaster: 'readonly',
     IntersectionPoint: 'readonly',
+    DEFAULT_CAR_CONFIG: 'readonly',
     // sound.js
     SoundEngine: 'readonly',
     taDaa: 'readonly',
