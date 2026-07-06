@@ -80,7 +80,7 @@ function applyPoolToCars(
           cars[i].brain = NeuralNetwork.clone(brains[aiIndex]);
         }
       } else {
-        const mutated = NeuralNetwork.toMutatedFromPool(brains, mutationRate);
+        const mutated = NeuralNetwork.mutateFromPool(brains, mutationRate);
         if (brainsCompatible(mutated, cars[i].brain!)) {
           cars[i].brain = mutated;
         }

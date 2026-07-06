@@ -83,22 +83,6 @@ class NeuralNetwork {
   }
 
   /**
-   * Generates a new network by crossing over and mutating from a pool of networks.
-   */
-  static mutateFromPool(
-    networks: NeuralNetwork[],
-    amount: number = 0.1,
-  ): NeuralNetwork {
-    const parent1 = networks[Math.floor(Math.random() * networks.length)];
-    const parent2 = networks[Math.floor(Math.random() * networks.length)];
-
-    const child = NeuralNetwork.crossover(parent1, parent2);
-    NeuralNetwork.mutate(child, amount);
-
-    return child;
-  }
-
-  /**
    * Deserialize a NeuralNetwork from plain JSON-like data.
    * Reconstructs the network structure from serialized brain data.
    */
@@ -150,10 +134,10 @@ class NeuralNetwork {
   }
 
   /**
-   * Safe version of mutateFromPool that clones parents before crossover,
-   * preventing mutation of the original pool references.
+   * Generates a new network by crossing over and mutating from a pool of networks.
+   * Clones parents before crossover to prevent mutation of the original pool.
    */
-  static toMutatedFromPool(
+  static mutateFromPool(
     networks: NeuralNetwork[],
     amount: number = 0.1,
   ): NeuralNetwork {

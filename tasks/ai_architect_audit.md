@@ -60,7 +60,7 @@ Hardcoded values: `-this.car.maxSpeed / 2` (reverse speed cap ratio), `0.03` (st
 
 **Remediation:** Split into `SimpleTrainingSimulator` and `WorldTrainingSimulator` subclasses, or extract mode-specific behavior into strategy objects (the mode files at `ts/simulator/training/modes/` already contain pure functions — promote them to strategies).
 
-## 7. ts/neural-network/network.ts — `mutateFromPool()` Mutates Pool References (Medium Severity)
+## ~~7. ts/neural-network/network.ts — `mutateFromPool()` Mutates Pool References (Medium Severity)~~ **RESOLVED**
 
 **File:** `ts/neural-network/network.ts:88-99`
 
@@ -205,7 +205,7 @@ The world editor page loads `math/primitives/` and `math/graph/` but does not lo
 - Extract `SimpleTrainingSimulator` and `WorldTrainingSimulator` subclasses
 - Or use strategy pattern: `SimpleModeStrategy` / `WorldModeStrategy` objects injected into a single `TrainingSimulator`
 
-### 6. Remove NeuralNetwork.mutateFromPool(), retain only the safe NeuralNetwork.toMutatedFromPool() (renamed)
+### ~~6. Remove NeuralNetwork.mutateFromPool(), retain only the safe NeuralNetwork.toMutatedFromPool() (renamed)~~ **DONE**
 
 ## Tier 3 (Low Priority) — Polish & Consistency
 

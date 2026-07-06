@@ -56,10 +56,7 @@ class NeuralNetwork {
   static feedForward(givenInputs: number[], network: NeuralNetwork): number[];
   static mutate(network: NeuralNetwork, amount: number): void;
   static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork;
-  static toMutatedFromPool(
-    brains: NeuralNetwork[],
-    amount: number,
-  ): NeuralNetwork;
+  static mutateFromPool(brains: NeuralNetwork[], amount: number): NeuralNetwork;
 
   // Serialization helpers (replaces ad-hoc JSON clone patterns)
   static deserialize(data: NeuralNetwork): NeuralNetwork;
@@ -193,10 +190,10 @@ static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork {
 
 Each gene (weight or bias) is randomly selected from one of two parents with 50/50 probability. This produces offspring with traits from both parents.
 
-### Pool-Based Mutation (`NeuralNetwork.toMutatedFromPool`)
+### Pool-Based Mutation (`NeuralNetwork.mutateFromPool`)
 
 ```typescript
-static toMutatedFromPool(brains: NeuralNetwork[], amount: number): NeuralNetwork {
+static mutateFromPool(brains: NeuralNetwork[], amount: number): NeuralNetwork {
   const parent1 = brains[Math.floor(Math.random() * brains.length)];
   const parent2 = brains[Math.floor(Math.random() * brains.length)];
   const child = NeuralNetwork.crossover(parent1, parent2);
@@ -239,7 +236,7 @@ function applyPoolToCars(cars, pool, mutationRate): void {
       cars[i].brain = NeuralNetwork.clone(brains[i]);
     } else {
       // Offspring: crossover + mutation from pool
-      cars[i].brain = NeuralNetwork.toMutatedFromPool(brains, mutationRate);
+      cars[i].brain = NeuralNetwork.mutateFromPool(brains, mutationRate);
     }
   }
 }

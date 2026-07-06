@@ -1,4 +1,4 @@
-# Remove unsafe NeuralNetwork.mutateFromPool()
+# ~~Remove unsafe NeuralNetwork.mutateFromPool()~~ **COMPLETED**
 
 **Severity:** Medium
 **Source:** Architectural Violation #7
@@ -15,3 +15,12 @@ Code smell. The unsafe `mutateFromPool()` is retained alongside the safe `toMuta
 ## Remediation
 
 Remove `mutateFromPool()` entirely and rename `toMutatedFromPool()` to `mutateFromPool()`, or make the former delegate to the latter.
+
+---
+
+## Resolution
+
+- Removed the unsafe `mutateFromPool()` (no-clone version)
+- Renamed `toMutatedFromPool()` → `mutateFromPool()` (safe clone-based version)
+- Updated all callers in `poolManager.ts` and `poolManager.js`
+- Updated documentation in `docs/NeuralNetwork.md` and `docs/Simulators.md`

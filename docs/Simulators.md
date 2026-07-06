@@ -252,7 +252,7 @@ this.trainingManager.initializeCars();
 │ 2. createCarsForTraining(N, 'AI', config, pos)  │
 │ 3. applyPoolToCars(cars, pool, rate):           │
 │    - First K: exact brain copies (elitism)      │
-│    - Rest: toMutatedFromPool(brains, rate)      │
+│    - Rest: mutateFromPool(brains, rate)      │
 │ 4. If rayCount changed: rebuild brain arch      │
 │    → New architecture: [rayCount+1, ...hidden, 4] │
 ├─────────────────────────────────────────────────┤
@@ -1014,7 +1014,7 @@ car's architecture (e.g. user changed hidden layers), the assignment is silently
 skipped and the car keeps its randomly-initialized correct-topology brain:
 
 - First K cars (K = pool.length): exact copy of stored brain, **if compatible**
-- Remaining cars: `NeuralNetwork.toMutatedFromPool(brains, mutationRate)`, **if compatible**
+- Remaining cars: `NeuralNetwork.mutateFromPool(brains, mutationRate)`, **if compatible**
 
 This fixes the bug where changing hidden layers had no visible effect — new cars
 were built with the correct topology but then immediately overwritten with
