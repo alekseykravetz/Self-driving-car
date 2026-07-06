@@ -1,4 +1,15 @@
-class WorldToolbarElement extends HTMLElement {
+import { ToolbarModeControls } from './modeControls.js';
+import type {
+  BorderMode,
+  TrackingMode,
+  ToolbarViewportMode,
+} from './modeControls.js';
+import { ToolbarAssetSelectors } from './assetSelectors.js';
+import type { UnifiedWorldEntry } from '../store/types.js';
+import type { CarInfo } from '../car/car.js';
+import { WORLD_TOOLBAR_TEMPLATE } from './templates/worldToolbarTemplate.js';
+
+export class WorldToolbarElement extends HTMLElement {
   #modeControls: ToolbarModeControls;
   #assetSelectors: ToolbarAssetSelectors;
 

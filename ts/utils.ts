@@ -1,4 +1,7 @@
-function polysIntersect(poly1: Point[], poly2: Point[]): boolean {
+import { Point } from './math/primitives/point.js';
+import { getIntersectionOffset } from './math/utils.js';
+
+export function polysIntersect(poly1: Point[], poly2: Point[]): boolean {
   const n1 = poly1.length;
   const n2 = poly2.length;
   // A 2-point "polygon" is a single segment; its closing edge (p2→p1) is the
@@ -27,7 +30,7 @@ function polysIntersect(poly1: Point[], poly2: Point[]): boolean {
   return false;
 }
 
-function getRGBA(value: number): string {
+export function getRGBA(value: number): string {
   const alpha = Math.abs(value);
   const R = value < 0 ? 0 : 255;
   const G = R;
@@ -35,7 +38,7 @@ function getRGBA(value: number): string {
   return `rgba(${R}, ${G}, ${B}, ${alpha})`;
 }
 
-function getRandomColor(): string {
+export function getRandomColor(): string {
   const hue = 290 + Math.random() * 260; //not blue
   return `hsl(${hue}, 100%, 60%)`;
 }
@@ -45,7 +48,7 @@ function getRandomColor(): string {
  * Failure policy: returns null on a null/undefined input or on invalid JSON
  * instead of throwing, so callers can treat corrupt/missing values as "no data".
  */
-function safeJsonParse<T>(raw: string | null | undefined): T | null {
+export function safeJsonParse<T>(raw: string | null | undefined): T | null {
   if (raw == null) return null;
   try {
     return JSON.parse(raw) as T;
@@ -60,7 +63,7 @@ function safeJsonParse<T>(raw: string | null | undefined): T | null {
  * If there is no dot (or the dot is the first character), the name is returned
  * unchanged.
  */
-function stripFileExtension(name: string): string {
+export function stripFileExtension(name: string): string {
   const dot = name.lastIndexOf('.');
   return dot > 0 ? name.slice(0, dot) : name;
 }

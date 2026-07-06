@@ -1,4 +1,12 @@
-interface TrainingInitDefaults {
+import { TRAINING_INIT_MODAL_TEMPLATE } from './templates/trainingInitModalTemplate.js';
+import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
+import type { CarInfo } from '../../car/car.js';
+import { StoreManager } from '../../store/storeManager.js';
+import { CarLoader } from '../../car/loader/carLoader.js';
+import { safeJsonParse } from '../../utils.js';
+import { inferHiddenLayers } from './genetics/poolManager.js';
+
+export interface TrainingInitDefaults {
   carCount: number;
   poolSize: number;
   mutationRate: number;
@@ -6,7 +14,7 @@ interface TrainingInitDefaults {
   carConfig: CarInfo;
 }
 
-interface TrainingInitResult {
+export interface TrainingInitResult {
   carCount: number;
   poolSize: number;
   mutationRate: number;
@@ -15,7 +23,7 @@ interface TrainingInitResult {
   brainSource: 'fresh' | 'pool' | 'selected';
 }
 
-interface TrainingInitOpenOptions {
+export interface TrainingInitOpenOptions {
   context: 'entry' | 'new';
   defaults: TrainingInitDefaults;
   onStart: (result: TrainingInitResult) => void;
@@ -29,7 +37,7 @@ interface TrainingInitOpenOptions {
  * before training starts. Replaces the previous implicit auto-seeding behavior
  * and the surprise alert()s it produced.
  */
-class TrainingInitModalElement extends HTMLElement {
+export class TrainingInitModalElement extends HTMLElement {
   #options: TrainingInitOpenOptions | null = null;
   #storedPool: CarInfo[] = [];
   #selectedCars: CarInfo[] = [];

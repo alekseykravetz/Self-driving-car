@@ -1,4 +1,3 @@
-'use strict';
 /**
  * Procedural world geometry generation, extracted from the World class so the
  * World stays a data + draw + load container. All heavy generation lives here.
@@ -10,253 +9,212 @@
  * "Regenerate items" action). `generate(opts)` is a convenience that runs a
  * chosen subset of stages.
  */
+import { Envelope } from '../../math/primitives/envelope.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Point } from '../../math/primitives/point.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import { Building } from '../items/building.js';
+import { Tree, buildTreePrototypes } from '../items/tree.js';
+import { Corridor } from '../corridor.js';
+import { add, scale, lerp, distance, mulberry32 } from '../../math/utils.js';
 /** Center-lane guidance lines (half-width envelope union) for marking placement. */
 function wgGenerateLaneGuides(graph, roadWidth, roadRoundness) {
-  const tempEnvelopes = [];
-  for (const segment of graph.segments) {
-    tempEnvelopes.push(new Envelope(segment, roadWidth / 2, roadRoundness));
-  }
-  return Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
+    const tempEnvelopes = [];
+    for (const segment of graph.segments) {
+        tempEnvelopes.push(new Envelope(segment, roadWidth / 2, roadRoundness));
+    }
+    return Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
 }
-
 /**
  * Collision lines for two-way roads flagged as hard-separated. Each separated
  * (non-one-way) segment contributes its center line as a wall so cars cannot
  * cross to the opposing side.
  */
 function wgGenerateSeparatorBorders(graph) {
-  const borders = [];
-  for (const segment of graph.segments) {
-    if (segment.separated && !segment.oneWay) {
-      borders.push(
-        new Segment(
-          new Point(segment.p1.x, segment.p1.y),
-          new Point(segment.p2.x, segment.p2.y),
-        ),
-      );
+    const borders = [];
+    for (const segment of graph.segments) {
+        if (segment.separated && !segment.oneWay) {
+            borders.push(new Segment(new Point(segment.p1.x, segment.p1.y), new Point(segment.p2.x, segment.p2.y)));
+        }
     }
-  }
-  return borders;
+    return borders;
 }
-
 function wgGenerateBuildings(world) {
-  const tempEnvelopes = [];
-  for (const seg of world.graph.segments) {
-    tempEnvelopes.push(
-      new Envelope(
-        seg,
-        world.roadWidth + world.buildingWidth + world.spacing * 2,
-        world.roadRoundness,
-      ),
-    );
-  }
-  const guides = Polygon.union(tempEnvelopes.map((e) => e.polygon));
-  for (let i = 0; i < guides.length; i++) {
-    const seg = guides[i];
-    if (seg.length() < world.buildingMinLength) {
-      guides.splice(i, 1);
-      i--;
+    const tempEnvelopes = [];
+    for (const seg of world.graph.segments) {
+        tempEnvelopes.push(new Envelope(seg, world.roadWidth + world.buildingWidth + world.spacing * 2, world.roadRoundness));
     }
-  }
-  const supports = [];
-  for (const seg of guides) {
-    const length = seg.length() + world.spacing;
-    const buildingCount = Math.floor(
-      length / (world.buildingMinLength + world.spacing),
-    );
-    const buildingLength = length / buildingCount - world.spacing;
-    const direction = seg.directionVector();
-    let q1 = seg.p1;
-    let q2 = add(q1, scale(direction, buildingLength));
-    supports.push(new Segment(q1, q2));
-    for (let i = 2; i <= buildingCount; i++) {
-      q1 = add(q2, scale(direction, world.spacing));
-      q2 = add(q1, scale(direction, buildingLength));
-      supports.push(new Segment(q1, q2));
+    const guides = Polygon.union(tempEnvelopes.map((e) => e.polygon));
+    for (let i = 0; i < guides.length; i++) {
+        const seg = guides[i];
+        if (seg.length() < world.buildingMinLength) {
+            guides.splice(i, 1);
+            i--;
+        }
     }
-  }
-  const bases = [];
-  for (const seg of supports) {
-    bases.push(new Envelope(seg, world.buildingWidth).polygon);
-  }
-  const epsilon = 0.001;
-  for (let i = 0; i < bases.length - 1; i++) {
-    for (let j = i + 1; j < bases.length; j++) {
-      if (
-        bases[i].intersectsPolygon(bases[j]) ||
-        bases[i].distanceToPolygon(bases[j]) < world.spacing - epsilon
-      ) {
-        bases.splice(j, 1);
-        j--;
-      }
+    const supports = [];
+    for (const seg of guides) {
+        const length = seg.length() + world.spacing;
+        const buildingCount = Math.floor(length / (world.buildingMinLength + world.spacing));
+        const buildingLength = length / buildingCount - world.spacing;
+        const direction = seg.directionVector();
+        let q1 = seg.p1;
+        let q2 = add(q1, scale(direction, buildingLength));
+        supports.push(new Segment(q1, q2));
+        for (let i = 2; i <= buildingCount; i++) {
+            q1 = add(q2, scale(direction, world.spacing));
+            q2 = add(q1, scale(direction, buildingLength));
+            supports.push(new Segment(q1, q2));
+        }
     }
-  }
-  return bases.map((b) => new Building(b));
+    const bases = [];
+    for (const seg of supports) {
+        bases.push(new Envelope(seg, world.buildingWidth).polygon);
+    }
+    const epsilon = 0.001;
+    for (let i = 0; i < bases.length - 1; i++) {
+        for (let j = i + 1; j < bases.length; j++) {
+            if (bases[i].intersectsPolygon(bases[j]) ||
+                bases[i].distanceToPolygon(bases[j]) < world.spacing - epsilon) {
+                bases.splice(j, 1);
+                j--;
+            }
+        }
+    }
+    return bases.map((b) => new Building(b));
 }
-
 function wgGenerateTrees(world) {
-  const points = [
-    ...world.roadBorders.map((s) => [s.p1, s.p2]).flat(),
-    ...world.buildings.map((b) => b.base.points).flat(),
-  ];
-  if (points.length === 0) return [];
-  const left = Math.min(...points.map((p) => p.x));
-  const right = Math.max(...points.map((p) => p.x));
-  const top = Math.min(...points.map((p) => p.y));
-  const bottom = Math.max(...points.map((p) => p.y));
-  const illegalPolygons = [
-    ...world.buildings.map((b) => b.base),
-    ...world.envelopes.map((e) => e.polygon),
-  ];
-  // Reproducible prototype set + a seeded RNG so instance variants/scales/types
-  // are deterministic for a given world seed.
-  const prototypes = world.treePrototypes;
-  const rand = mulberry32((world.treeSeed ^ 0x9e3779b9) >>> 0);
-  const trees = [];
-  let tryCount = 0;
-  while (tryCount < 100) {
-    const p = new Point(
-      lerp(left, right, Math.random()),
-      lerp(bottom, top, Math.random()),
-    );
-    // check if tree inside or nearby building / road
-    let keep = true;
-    for (const poly of illegalPolygons) {
-      if (
-        poly.containsPoint(p) ||
-        poly.distanceToPoint(p) < world.treeSize / 2
-      ) {
-        keep = false;
-        break;
-      }
-    }
-    // check if tree too close to other trees
-    if (keep) {
-      for (const tree of trees) {
-        if (distance(tree.center, p) < world.treeSize) {
-          keep = false;
-          break;
+    const points = [
+        ...world.roadBorders.map((s) => [s.p1, s.p2]).flat(),
+        ...world.buildings.map((b) => b.base.points).flat(),
+    ];
+    if (points.length === 0)
+        return [];
+    const left = Math.min(...points.map((p) => p.x));
+    const right = Math.max(...points.map((p) => p.x));
+    const top = Math.min(...points.map((p) => p.y));
+    const bottom = Math.max(...points.map((p) => p.y));
+    const illegalPolygons = [
+        ...world.buildings.map((b) => b.base),
+        ...world.envelopes.map((e) => e.polygon),
+    ];
+    // Reproducible prototype set + a seeded RNG so instance variants/scales/types
+    // are deterministic for a given world seed.
+    const prototypes = world.treePrototypes;
+    const rand = mulberry32((world.treeSeed ^ 0x9e3779b9) >>> 0);
+    const trees = [];
+    let tryCount = 0;
+    while (tryCount < 100) {
+        const p = new Point(lerp(left, right, Math.random()), lerp(bottom, top, Math.random()));
+        // check if tree inside or nearby building / road
+        let keep = true;
+        for (const poly of illegalPolygons) {
+            if (poly.containsPoint(p) ||
+                poly.distanceToPoint(p) < world.treeSize / 2) {
+                keep = false;
+                break;
+            }
         }
-      }
-    }
-    // avoiding trees in the middle of nowhere
-    if (keep) {
-      let closeToSomething = false;
-      for (const poly of illegalPolygons) {
-        if (poly.distanceToPoint(p) < world.treeSize * 2) {
-          closeToSomething = true;
-          break;
+        // check if tree too close to other trees
+        if (keep) {
+            for (const tree of trees) {
+                if (distance(tree.center, p) < world.treeSize) {
+                    keep = false;
+                    break;
+                }
+            }
         }
-      }
-      keep = closeToSomething;
+        // avoiding trees in the middle of nowhere
+        if (keep) {
+            let closeToSomething = false;
+            for (const poly of illegalPolygons) {
+                if (poly.distanceToPoint(p) < world.treeSize * 2) {
+                    closeToSomething = true;
+                    break;
+                }
+            }
+            keep = closeToSomething;
+        }
+        if (keep) {
+            const protoIndex = Math.floor(rand() * prototypes.length);
+            const type = wgPickTreeType(rand());
+            const scale = lerp(0.8, 1.2, rand());
+            trees.push(new Tree(p, world.treeSize, prototypes[protoIndex], protoIndex, type, scale));
+            tryCount = 0;
+        }
+        tryCount++;
     }
-    if (keep) {
-      const protoIndex = Math.floor(rand() * prototypes.length);
-      const type = wgPickTreeType(rand());
-      const scale = lerp(0.8, 1.2, rand());
-      trees.push(
-        new Tree(
-          p,
-          world.treeSize,
-          prototypes[protoIndex],
-          protoIndex,
-          type,
-          scale,
-        ),
-      );
-      tryCount = 0;
-    }
-    tryCount++;
-  }
-  return trees;
+    return trees;
 }
-
 /** Weighted tree-type pick: mostly classic, with some conifers and clusters. */
 function wgPickTreeType(r) {
-  if (r < 0.6) return 0;
-  if (r < 0.8) return 1;
-  return 2;
+    if (r < 0.6)
+        return 0;
+    if (r < 0.8)
+        return 1;
+    return 2;
 }
-
-class WorldGenerator {
-  /**
-   * Cheap, deterministic road geometry: envelopes, road borders, lane guides
-   * and separator borders. Safe to run on every graph edit.
-   */
-  static generateRoads(world) {
-    world.envelopes.length = 0;
-    world.laneGuides.length = 0;
-    world.roadBorders.length = 0;
-    world.separatorBorders.length = 0;
-    for (const segment of world.graph.segments) {
-      world.envelopes.push(
-        new Envelope(segment, world.roadWidth, world.roadRoundness),
-      );
+export class WorldGenerator {
+    /**
+     * Cheap, deterministic road geometry: envelopes, road borders, lane guides
+     * and separator borders. Safe to run on every graph edit.
+     */
+    static generateRoads(world) {
+        world.envelopes.length = 0;
+        world.laneGuides.length = 0;
+        world.roadBorders.length = 0;
+        world.separatorBorders.length = 0;
+        for (const segment of world.graph.segments) {
+            world.envelopes.push(new Envelope(segment, world.roadWidth, world.roadRoundness));
+        }
+        const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
+        world.roadBorders.push(...Polygon.union(roadPolygons));
+        world.laneGuides.push(...wgGenerateLaneGuides(world.graph, world.roadWidth, world.roadRoundness));
+        world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
     }
-    const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
-    world.roadBorders.push(...Polygon.union(roadPolygons));
-    world.laneGuides.push(
-      ...wgGenerateLaneGuides(
-        world.graph,
-        world.roadWidth,
-        world.roadRoundness,
-      ),
-    );
-    world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
-  }
-
-  /** Expensive building placement (O(n²) footprint collision filter). */
-  static generateBuildings(world) {
-    world.buildings = wgGenerateBuildings(world);
-  }
-
-  /**
-   * Expensive tree placement (rejection sampling). Ensures the world's tree
-   * prototype set exists first, then assigns each instance a prototype/type/scale.
-   */
-  static generateTrees(world) {
-    if (world.treePrototypes.length !== world.treePrototypeCount) {
-      world.treePrototypes = buildTreePrototypes(
-        world.treeSeed,
-        world.treePrototypeCount,
-      );
+    /** Expensive building placement (O(n²) footprint collision filter). */
+    static generateBuildings(world) {
+        world.buildings = wgGenerateBuildings(world);
     }
-    world.trees = wgGenerateTrees(world);
-  }
-
-  /** Re-anchors markings to the (possibly edited) graph. */
-  static reanchorMarkings(world) {
-    for (const marking of world.markings) {
-      marking.reanchor(world.graph);
+    /**
+     * Expensive tree placement (rejection sampling). Ensures the world's tree
+     * prototype set exists first, then assigns each instance a prototype/type/scale.
+     */
+    static generateTrees(world) {
+        if (world.treePrototypes.length !== world.treePrototypeCount) {
+            world.treePrototypes = buildTreePrototypes(world.treeSeed, world.treePrototypeCount);
+        }
+        world.trees = wgGenerateTrees(world);
     }
-  }
-
-  /**
-   * Builds a single dynamic corridor from `start` to `end` and makes it the
-   * world's only corridor. Used by the race game and training simulator to
-   * constrain cars to a computed path.
-   */
-  static generateCorridor(world, start, end, extendEnd = false) {
-    const path = world.graph.getShortestPath(start, end);
-    const corridor = Corridor.fromPath(
-      path,
-      world.roadWidth,
-      world.roadRoundness,
-      { extendEnd },
-    );
-    world.corridors = [corridor];
-  }
-
-  /**
-   * Convenience generator. By default runs every stage; pass `opts` to run only
-   * a subset (e.g. `{ roads: true }` for a cheap refresh). Markings are always
-   * re-anchored afterwards.
-   */
-  static generate(world, opts = {}) {
-    const { roads = true, buildings = true, trees = true } = opts;
-    if (roads) this.generateRoads(world);
-    if (buildings) this.generateBuildings(world);
-    if (trees) this.generateTrees(world);
-    this.reanchorMarkings(world);
-  }
+    /** Re-anchors markings to the (possibly edited) graph. */
+    static reanchorMarkings(world) {
+        for (const marking of world.markings) {
+            marking.reanchor(world.graph);
+        }
+    }
+    /**
+     * Builds a single dynamic corridor from `start` to `end` and makes it the
+     * world's only corridor. Used by the race game and training simulator to
+     * constrain cars to a computed path.
+     */
+    static generateCorridor(world, start, end, extendEnd = false) {
+        const path = world.graph.getShortestPath(start, end);
+        const corridor = Corridor.fromPath(path, world.roadWidth, world.roadRoundness, { extendEnd });
+        world.corridors = [corridor];
+    }
+    /**
+     * Convenience generator. By default runs every stage; pass `opts` to run only
+     * a subset (e.g. `{ roads: true }` for a cheap refresh). Markings are always
+     * re-anchored afterwards.
+     */
+    static generate(world, opts = {}) {
+        const { roads = true, buildings = true, trees = true } = opts;
+        if (roads)
+            this.generateRoads(world);
+        if (buildings)
+            this.generateBuildings(world);
+        if (trees)
+            this.generateTrees(world);
+        this.reanchorMarkings(world);
+    }
 }

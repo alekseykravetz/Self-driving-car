@@ -1,11 +1,13 @@
-interface PointDrawOptions {
+import { Point } from '../math/primitives/point.js';
+
+export interface PointDrawOptions {
   size?: number;
   color?: string;
   outline?: boolean;
   fill?: boolean;
 }
 
-function drawPoint(
+export function drawPoint(
   ctx: CanvasRenderingContext2D,
   point: Point,
   options: PointDrawOptions = {},

@@ -4,9 +4,12 @@
  * Allows selecting active world/car for use by simulator, race, and world editor.
  */
 
-// File-scope helpers (kept out of the class so the class name is never
-// referenced inside its own body — that makes tsc emit a global `var _a`
-// alias that collides with other globally-loaded classes' aliases).
+import { CarInfo } from '../car/car.js';
+import { StoreManager } from './storeManager.js';
+import { STORE_PANEL_TEMPLATE } from './templates/storePanelTemplate.js';
+import { stripFileExtension } from '../utils.js';
+
+// File-scope helpers.
 
 /** Format a car's hidden-layer pattern, e.g. "6" or "16,16". */
 function spFormatHiddenLayers(data: CarInfo): string {
@@ -31,7 +34,7 @@ function spFormatSize(chars: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-class StorePanelElement extends HTMLElement {
+export class StorePanelElement extends HTMLElement {
   #storeManager: StoreManager | null = null;
 
   /** Active sort column/direction per tab. `null` means unsorted. */

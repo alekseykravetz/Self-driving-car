@@ -1,10 +1,13 @@
+import { ANIMATION_LOOP_TOOLBAR_TEMPLATE } from './templates/animationLoopToolbarTemplate.js';
+import { formatElapsedTime } from '../../math/utils.js';
+
 /**
  * <animation-loop-toolbar> — floating toolbar that manages the simulator
  * animation loop. It owns the play/pause toggle (shared across every
  * SimulatorShell page) and the render-interval throttle read each frame by
  * `SimulatorShell.animate()`.
  */
-class AnimationLoopToolbarElement extends HTMLElement {
+export class AnimationLoopToolbarElement extends HTMLElement {
   #_paused: boolean = false;
 
   #pauseBtn: HTMLButtonElement | null = null;

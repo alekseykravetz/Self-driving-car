@@ -1,4 +1,10 @@
-class TargetEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { World } from '../world.js';
+import { Point } from '../../math/primitives/point.js';
+import { Target } from '../markings/target.js';
+
+export class TargetEditor extends MarkingEditor {
   /**
    * Editor for creating Target markings.
    * Targets lane guide segments.

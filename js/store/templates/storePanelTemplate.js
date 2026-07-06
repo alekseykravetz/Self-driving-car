@@ -1,5 +1,4 @@
-'use strict';
-const STORE_PANEL_TEMPLATE = `
+export const STORE_PANEL_TEMPLATE = `
 <div class="store-panel">
   <div class="store-panel-header">
     <h3 class="store-panel-title">📦 Store Files</h3>

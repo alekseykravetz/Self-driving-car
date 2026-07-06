@@ -1,3 +1,18 @@
+import { CarInfo } from '../car/car.js';
+import type {
+  StoreManifest,
+  StoreWorldEntry,
+  StoreCarEntry,
+  LocalStorageEntry,
+  LoadedWorldEntry,
+  LoadedCarEntry,
+  UnifiedWorldEntry,
+  UnifiedCarEntry,
+} from './types.js';
+import { safeJsonParse } from '../utils.js';
+import { parseWorldFileContent } from '../world/loader/worldLoader.js';
+import { CarLoader } from '../car/loader/carLoader.js';
+
 /**
  * StoreManager — Singleton that loads preloaded assets from /store/ via manifest.json.
  * Provides active world/car selection persisted to localStorage.
@@ -95,7 +110,7 @@ function smCountItems(key: string, value: string): number | null {
   return Array.isArray(parsed) ? parsed.length : null;
 }
 
-class StoreManager {
+export class StoreManager {
   private static instance: StoreManager | null = null;
   private static initPromise: Promise<StoreManager> | null = null;
 

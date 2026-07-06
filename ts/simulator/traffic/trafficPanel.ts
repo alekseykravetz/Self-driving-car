@@ -1,3 +1,10 @@
+import { TRAFFIC_PANEL_TEMPLATE } from './templates/trafficPanelTemplate.js';
+import type { Car } from '../../car/car.js';
+import {
+  formatKmhFromPxPerFrame,
+  formatMetersFromWorldPixels,
+} from '../../math/utils.js';
+
 /**
  * <traffic-panel> — side panel for the Live Traffic Jam simulator.
  *
@@ -45,7 +52,7 @@ function tpConfigHtml(car: Car): string {
     .join('');
 }
 
-class TrafficPanelElement extends HTMLElement {
+export class TrafficPanelElement extends HTMLElement {
   #cars: Car[] = [];
   #selected: Car | null = null;
 

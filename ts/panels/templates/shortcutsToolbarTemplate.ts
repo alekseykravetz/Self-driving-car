@@ -4,6 +4,6 @@
  * groups container (kept as a named const to mirror the other toolbar panels
  * and stay registered with eslint).
  */
-const SHORTCUTS_TOOLBAR_TEMPLATE = `
+export const SHORTCUTS_TOOLBAR_TEMPLATE = `
     <div class="shortcuts-groups"></div>
 `;

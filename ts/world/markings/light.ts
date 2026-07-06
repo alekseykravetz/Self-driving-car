@@ -1,6 +1,13 @@
-type LightState = 'off' | 'green' | 'yellow' | 'red';
+import { Marking } from './marking.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { perpendicular, scale, add, lerp2D } from '../../math/utils.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
 
-class Light extends Marking {
+export type LightState = 'off' | 'green' | 'yellow' | 'red';
+
+export class Light extends Marking {
   public state: LightState = 'off';
   border: Segment;
   readonly type: string = 'light';

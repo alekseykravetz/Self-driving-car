@@ -1,11 +1,13 @@
-interface SegmentDrawOptions {
+import { Segment } from '../math/primitives/segment.js';
+
+export interface SegmentDrawOptions {
   width?: number;
   color?: string;
   dash?: number[];
   cap?: CanvasLineCap;
 }
 
-function drawSegment(
+export function drawSegment(
   ctx: CanvasRenderingContext2D,
   segment: Segment,
   {

@@ -1,4 +1,10 @@
-class Building {
+import { Point } from '../../math/primitives/point.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import { average, getFake3dPoint } from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+import { BuildingFootprint, BuildingDrawOptions } from '../types.js';
+
+export class Building {
   readonly base: Polygon;
   readonly height: number;
 

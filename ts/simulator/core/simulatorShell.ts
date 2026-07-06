@@ -1,3 +1,18 @@
+import type { WorldLayerVisibility } from '../../world/types.js';
+import { DEFAULT_LAYER_VISIBILITY } from '../../world/types.js';
+import { NetworkVisualizer } from '../../neural-network/visualizer.js';
+import type { Viewport } from '../../viewport/viewport.js';
+import type { MiniMap } from '../../mini-map/miniMap.js';
+import type { Camera } from '../../camera/camera.js';
+import type { WorldToolbarElement } from '../../panels/worldToolbar.js';
+import type { LayoutToolbarElement } from '../panels/layoutToolbar.js';
+import type { AnimationLoopToolbarElement } from '../panels/animationLoopToolbar.js';
+import type { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
+import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
+import { safeJsonParse } from '../../utils.js';
+import { resizeSimulatorLayout } from '../training/rendering/layoutManager.js';
+import type { NeuralNetwork } from '../../neural-network/network.js';
+
 /**
  * SimulatorShell — reusable scaffolding shared by every canvas-based simulator
  * (AI training Simulator, Live Traffic Jam simulator, …).
@@ -37,7 +52,7 @@ function saveSimLayerVisibility(v: WorldLayerVisibility): void {
   localStorage.setItem(SIM_LAYERS_KEY, JSON.stringify(v));
 }
 
-abstract class SimulatorShell {
+export abstract class SimulatorShell {
   gameCanvas: HTMLCanvasElement;
   gameCtx: CanvasRenderingContext2D;
   protected networkCanvas: HTMLCanvasElement;

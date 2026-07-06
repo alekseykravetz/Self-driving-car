@@ -1,4 +1,8 @@
-class Target extends Marking {
+import { Marking } from './marking.js';
+import { Point } from '../../math/primitives/point.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
+
+export class Target extends Marking {
   override type: string = 'target';
 
   constructor(

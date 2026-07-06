@@ -1,8 +1,19 @@
+import { IWorld, WorldDrawOptions } from '../types.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Graph } from '../../math/graph/graph.js';
+import { Corridor } from '../corridor.js';
+import { Building } from '../items/building.js';
+import { Tree } from '../items/tree.js';
+import { Marking } from '../markings/marking.js';
+import { Start } from '../markings/start.js';
+import { lerp } from '../../math/utils.js';
+
 /**
  * A lightweight IWorld implementation for simple straight-road training scenarios.
  * Provides the same interface as World but generates minimal geometry from lane params.
  */
-class SimpleWorld implements IWorld {
+export class SimpleWorld implements IWorld {
   graph: Graph;
   markings: Marking[] = [];
   roadBorders: Segment[];

@@ -20,11 +20,14 @@
  *    an always-on colour legend.
  */
 
+import { NeuralNetwork } from './network.js';
+import { lerp } from '../math/utils.js';
+
 /** Direction of an output-neuron arrow glyph. */
-type ArrowDir = 'up' | 'down' | 'left' | 'right';
+export type ArrowDir = 'up' | 'down' | 'left' | 'right';
 
 /** A single drawn neuron with the geometry needed for hit-testing. */
-interface NeuronNode {
+export interface NeuronNode {
   x: number;
   y: number;
   r: number;
@@ -41,7 +44,7 @@ interface NeuronNode {
 }
 
 /** A single drawn connection (weight) with the geometry needed for hit-testing. */
-interface ConnectionEdge {
+export interface ConnectionEdge {
   /** Source (input-side, lower) endpoint. */
   x1: number;
   y1: number;
@@ -59,19 +62,19 @@ interface ConnectionEdge {
 }
 
 /** Cached per-frame geometry used for both drawing and hit-testing. */
-interface NetworkLayout {
+export interface NetworkLayout {
   neurons: NeuronNode[];
   edges: ConnectionEdge[];
   rows: number;
 }
 
 /** What the mouse is currently over (indices into the cached layout). */
-type Hover =
+export type Hover =
   | { kind: 'neuron'; index: number }
   | { kind: 'connection'; index: number }
   | null;
 
-class NetworkVisualizer {
+export class NetworkVisualizer {
   /** Geometry from the most recent draw, retained for hit-testing. */
   #layout: NetworkLayout | null = null;
   /** Current hover target (neuron/connection) or `null`. */

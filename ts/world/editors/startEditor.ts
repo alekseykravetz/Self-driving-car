@@ -1,4 +1,10 @@
-class StartEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { World } from '../world.js';
+import { Point } from '../../math/primitives/point.js';
+import { Start } from '../markings/start.js';
+
+export class StartEditor extends MarkingEditor {
   /**
    * Editor for creating Start markings.
    * Targets lane guide segments.

@@ -1,4 +1,4 @@
-enum ControlType {
+export enum ControlType {
   KEYS = 'KEYS',
   DUMMY = 'DUMMY',
   AI = 'AI', // Added based on car.js usage
@@ -6,7 +6,7 @@ enum ControlType {
   // PHONE = 'PHONE', // Assuming possibility
 }
 
-class Controls {
+export class Controls {
   public forward: boolean;
   public left: boolean;
   public right: boolean;

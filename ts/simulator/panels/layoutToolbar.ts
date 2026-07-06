@@ -1,6 +1,8 @@
-type LayoutMode = 'topview-big' | 'camera-big';
+import { LAYOUT_TOOLBAR_TEMPLATE } from './templates/layoutToolbarTemplate.js';
 
-class LayoutToolbarElement extends HTMLElement {
+export type LayoutMode = 'topview-big' | 'camera-big';
+
+export class LayoutToolbarElement extends HTMLElement {
   #_layoutMode: LayoutMode = 'topview-big';
 
   #onLayoutModeChange: ((mode: LayoutMode) => void) | null = null;

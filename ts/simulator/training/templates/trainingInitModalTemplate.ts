@@ -1,4 +1,4 @@
-const TRAINING_INIT_MODAL_TEMPLATE = `
+export const TRAINING_INIT_MODAL_TEMPLATE = `
 <div class="ti-overlay">
   <div class="ti-dialog" role="dialog" aria-modal="true" aria-labelledby="tiTitle">
     <div class="ti-header">

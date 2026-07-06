@@ -1,4 +1,12 @@
-class MarkingEditor {
+import { Viewport } from '../../viewport/viewport.js';
+import { World } from '../world.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Marking } from '../markings/marking.js';
+import { getNearestSegment } from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+
+export class MarkingEditor {
   protected viewport: Viewport;
   protected world: World;
   protected targetSegments: Segment[]; // Segments where markings can be placed

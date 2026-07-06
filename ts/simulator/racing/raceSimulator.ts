@@ -1,5 +1,32 @@
-class RaceSimulator extends SimulatorShell {
-  controls: Controls | null;
+import { SimulatorShell } from '../core/simulatorShell.js';
+import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
+import { RacePanel } from './racePanel.js';
+import { SpatialHashGrid } from '../../math/spatialGrid.js';
+import { World } from '../../world/world.js';
+import { Graph } from '../../math/graph/graph.js';
+import type { CarInfo } from '../../car/car.js';
+import { Car } from '../../car/car.js';
+import type { CarControls } from '../../car/car.js';
+import { PhoneControls } from '../../car/controls/phoneControls.js';
+import { CameraControls } from '../../car/controls/cameraControls.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { MiniMap } from '../../mini-map/miniMap.js';
+import { Camera } from '../../camera/camera.js';
+import { StoreManager } from '../../store/storeManager.js';
+import { getRandomColor } from '../../utils.js';
+import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Start } from '../../world/markings/start.js';
+import { Target } from '../../world/markings/target.js';
+import { angle, getNearestSegment, scale } from '../../math/utils.js';
+
+import { loadPoolFromStorage } from '../training/genetics/storageManager.js';
+import { handleCollisionWithRoadBorders } from '../training/modes/borderCollision.js';
+import { SoundEngine, taDaa } from '../../audio/sound.js';
+
+export class RaceSimulator extends SimulatorShell {
+  controls: CarControls | null;
   racePanel: RacePanel;
 
   #world!: World;
@@ -16,7 +43,7 @@ class RaceSimulator extends SimulatorShell {
     miniMapCanvas: HTMLCanvasElement,
     cameraCanvas: HTMLCanvasElement,
     host: SimulatorPageHost,
-    controls: Controls | null = null,
+    controls: CarControls | null = null,
   ) {
     super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
 
@@ -40,10 +67,7 @@ class RaceSimulator extends SimulatorShell {
       this.#myCar.controls = this.controls;
     }
 
-    if (
-      typeof PhoneControls !== 'undefined' &&
-      this.controls instanceof PhoneControls
-    ) {
+    if (this.controls instanceof PhoneControls) {
       this.racePanel.setTrackingMode('keys');
     }
 
@@ -171,11 +195,7 @@ class RaceSimulator extends SimulatorShell {
       if (this.#myCar) {
         this.#myCar.engine = new SoundEngine();
       }
-      if (
-        this.controls &&
-        typeof CameraControls !== 'undefined' &&
-        this.controls instanceof CameraControls
-      ) {
+      if (this.controls instanceof CameraControls) {
         this.controls.saveExpectedSize();
       }
     });

@@ -1,4 +1,9 @@
-class Envelope {
+import { Point } from './point.js';
+import { Segment } from './segment.js';
+import { Polygon } from './polygon.js';
+import { angle, subtract, translate } from '../utils.js';
+
+export class Envelope {
   #skeleton: Segment;
   public polygon: Polygon;
 

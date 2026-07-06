@@ -1,3 +1,43 @@
+import { Graph } from '../math/graph/graph.js';
+import { Envelope } from '../math/primitives/envelope.js';
+import { Segment } from '../math/primitives/segment.js';
+import { Point } from '../math/primitives/point.js';
+import { Building } from './items/building.js';
+import {
+  Tree,
+  TreePrototype,
+  TreeInstance,
+  buildTreePrototypes,
+  DEFAULT_TREE_SEED,
+  DEFAULT_TREE_PROTOTYPE_COUNT,
+} from './items/tree.js';
+import { loadMarking } from './markings/markingLoader.js';
+import type { Marking } from './markings/marking.js';
+import { Start } from './markings/start.js';
+import { Corridor } from './corridor.js';
+import { TrafficManager } from './trafficManager.js';
+import { WorldGenerator } from './generation/worldGenerator.js';
+import {
+  IWorld,
+  WorldDrawOptions,
+  WorldDecoration,
+  WorldLayerVisibility,
+  DEFAULT_LAYER_VISIBILITY,
+} from './types.js';
+import {
+  add,
+  scale,
+  lerp2D,
+  lerp,
+  normalize,
+  magnitude,
+  rotate,
+  mulberry32,
+} from '../math/utils.js';
+import { drawEnvelope } from '../rendering/envelopeRenderer.js';
+import { drawSegment } from '../rendering/segmentRenderer.js';
+import { drawPolygon } from '../rendering/polygonRenderer.js';
+
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field. */
 function loadWorldCorridors(info: World): Corridor[] {
@@ -28,7 +68,7 @@ function loadTreeInstance(inst: TreeInstance, world: World): Tree {
   );
 }
 
-class World implements IWorld {
+export class World implements IWorld {
   graph: Graph;
   roadWidth: number;
   roadRoundness: number;
@@ -104,7 +144,7 @@ class World implements IWorld {
     world.treeSize = info.treeSize;
 
     // Load authored, must-have data.
-    world.markings = (info.markings ?? []).map((m) => Marking.load(m)!);
+    world.markings = (info.markings ?? []).map((m) => loadMarking(m)!);
     world.corridors = loadWorldCorridors(info);
     world.zoom = info.zoom;
     world.offset = info.offset;

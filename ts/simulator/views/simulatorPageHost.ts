@@ -1,3 +1,8 @@
+import type { WorldToolbarElement } from '../../panels/worldToolbar.js';
+import type { LayoutToolbarElement } from '../panels/layoutToolbar.js';
+import type { AnimationLoopToolbarElement } from '../panels/animationLoopToolbar.js';
+import type { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
+
 /**
  * SimulatorPageHost — lightweight configuration object that carries the
  * shared toolbar / panel element references every simulator page needs.
@@ -8,7 +13,7 @@
  * from page-specific DOM structure and makes it easier to reuse the shell
  * on pages with different layouts.
  */
-class SimulatorPageHost {
+export class SimulatorPageHost {
   readonly toolbarPanel: WorldToolbarElement;
   readonly layoutToolbar: LayoutToolbarElement;
   readonly animationLoopToolbar: AnimationLoopToolbarElement;

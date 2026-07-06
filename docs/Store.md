@@ -1,6 +1,6 @@
 # Store System
 
-The Store system provides preloaded assets (worlds, cars) that are bundled with the application and available immediately on all pages. It replaces the old approach of embedding `.world` and `.car` files as `<script>` tags that set global variables.
+The Store system provides preloaded assets (worlds, cars) that are bundled with the application and available immediately on all pages.
 
 ## Architecture
 
@@ -171,5 +171,5 @@ happens in the world toolbar, not here. It displays three tabs:
 
 - **WorldLoader** still parses old `const world = World.load({...})` format when loading files manually via file picker
 - **CarLoader** still parses old `let carInfo = {...}` format when loading files manually
-- The `/saves/` folder is preserved but no longer auto-loaded via HTML script tags
+- The `/saves/` folder is preserved for user-saved files (loaded manually via file picker)
 - The legacy `world` localStorage key is migrated to `editorWorld` on first init

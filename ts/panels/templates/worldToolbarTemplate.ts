@@ -1,4 +1,4 @@
-const WORLD_TOOLBAR_TEMPLATE = `
+export const WORLD_TOOLBAR_TEMPLATE = `
     <div class="controls-group world-editor-action" data-group="storage" style="display: none">
       <span class="controls-group-label">Storage</span>
       <div class="border-mode-group">

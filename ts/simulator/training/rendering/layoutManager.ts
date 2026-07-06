@@ -1,10 +1,14 @@
+import type { LayoutMode } from '../../panels/layoutToolbar.js';
+import type { Viewport } from '../../../viewport/viewport.js';
+import { Point } from '../../../math/primitives/point.js';
+
 /**
  * Layout constants and resize logic for the simulator canvas arrangement.
  */
 
-const LAYOUT_CONTROL_PANEL_WIDTH = 200;
-const LAYOUT_NETWORK_PANEL_WIDTH = 300;
-const LAYOUT_SMALL_VIEW_WIDTH = 300;
+export const LAYOUT_CONTROL_PANEL_WIDTH = 200;
+export const LAYOUT_NETWORK_PANEL_WIDTH = 300;
+export const LAYOUT_SMALL_VIEW_WIDTH = 300;
 
 // Phone breakpoint — kept in sync with the 768px CSS media query. On mobile the
 // training panel is shrunk (CSS) and the secondary 3D view is scaled down so the
@@ -13,21 +17,21 @@ const LAYOUT_MOBILE_MAX_WIDTH = 768;
 const LAYOUT_MOBILE_CONTROL_PANEL_WIDTH = 140;
 const LAYOUT_MOBILE_MIN_SMALL_VIEW_WIDTH = 90;
 
-interface LayoutCanvases {
+export interface LayoutCanvases {
   gameCanvas: HTMLCanvasElement;
   networkCanvas: HTMLCanvasElement;
   miniMapCanvas: HTMLCanvasElement;
   cameraCanvas: HTMLCanvasElement;
 }
 
-interface LayoutPanelState {
+export interface LayoutPanelState {
   showCamera: boolean;
   showNetwork: boolean;
   showMiniMap: boolean;
   layoutMode: LayoutMode;
 }
 
-function resizeSimulatorLayout(
+export function resizeSimulatorLayout(
   canvases: LayoutCanvases,
   panelState: LayoutPanelState,
   viewport: Viewport | null,

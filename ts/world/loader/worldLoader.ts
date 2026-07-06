@@ -7,7 +7,7 @@
  * in-class static self-reference into a shared global `_a` temp, which collides
  * across the classic (non-module) script files this project loads via <script>.
  */
-function parseWorldFileContent(content: string): object | null {
+export function parseWorldFileContent(content: string): object | null {
   try {
     return JSON.parse(content.trim());
   } catch (error) {
@@ -22,7 +22,7 @@ function parseWorldFileContent(content: string): object | null {
  * Binds to an existing `#loadWorldInput` element provided by the page markup
  * (static HTML in world.html, or the shared <world-toolbar> template).
  */
-class WorldLoader {
+export class WorldLoader {
   #input: HTMLInputElement;
   #onLoad: (worldInfo: object) => void;
 

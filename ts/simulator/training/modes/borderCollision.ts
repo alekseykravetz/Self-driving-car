@@ -1,8 +1,19 @@
+import type { Car } from '../../../car/car.js';
+import type { Segment } from '../../../math/primitives/segment.js';
+import { Point } from '../../../math/primitives/point.js';
+import {
+  getNearestSegment,
+  subtract,
+  magnitude,
+  normalize,
+} from '../../../math/utils.js';
+import { COLLISION_ANGLE_CORRECTION } from '../../../car/config.js';
+
 /**
  * Handles collision with road borders by pushing the car back onto the road.
  * Finds the nearest skeleton/border segment and corrects the car's position and angle.
  */
-function handleCollisionWithRoadBorders(
+export function handleCollisionWithRoadBorders(
   car: Car,
   bordersToCheck: Segment[],
 ): void {

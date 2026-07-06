@@ -1,3 +1,7 @@
+import { Point } from './point.js';
+import { Segment } from './segment.js';
+import { average, getIntersection } from '../utils.js';
+
 /** Axis-aligned bounding box, used to skip non-overlapping polygon pairs. */
 interface PolygonBounds {
   minX: number;
@@ -28,7 +32,7 @@ function boundsOverlap(a: PolygonBounds, b: PolygonBounds): boolean {
   );
 }
 
-class Polygon {
+export class Polygon {
   points: Point[];
   segments: Segment[];
 

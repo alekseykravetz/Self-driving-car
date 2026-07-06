@@ -1,31 +1,33 @@
-interface StoreManifest {
+import { CarInfo } from '../car/car.js';
+
+export interface StoreManifest {
   worlds: string[];
   cars: string[];
 }
 
-interface StoreWorldEntry {
+export interface StoreWorldEntry {
   filename: string;
   data: object;
   hasStartMarker: boolean;
   hasEndMarker: boolean;
 }
 
-interface StoreCarEntry {
+export interface StoreCarEntry {
   filename: string;
   data: CarInfo;
 }
 
-interface LocalStorageEntry {
+export interface LocalStorageEntry {
   key: string;
   size: number;
   count: number | null;
 }
 
 /** Origin of a world/car asset shown in the selectors. */
-type AssetSource = 'store' | 'loaded' | 'editor';
+export type AssetSource = 'store' | 'loaded' | 'editor';
 
 /** A world file loaded by the user (persisted to localStorage when it fits). */
-interface LoadedWorldEntry {
+export interface LoadedWorldEntry {
   /** Full asset id, e.g. `loaded:abc123`. */
   id: string;
   name: string;
@@ -33,7 +35,7 @@ interface LoadedWorldEntry {
 }
 
 /** A car file loaded by the user (persisted to localStorage when it fits). */
-interface LoadedCarEntry {
+export interface LoadedCarEntry {
   /** Full asset id, e.g. `loaded:abc123`. */
   id: string;
   name: string;
@@ -41,7 +43,7 @@ interface LoadedCarEntry {
 }
 
 /** A world entry from any source, ready for the selector list. */
-interface UnifiedWorldEntry {
+export interface UnifiedWorldEntry {
   /** Full asset id: `store:<file>` | `loaded:<id>` | `editor`. */
   id: string;
   name: string;
@@ -52,7 +54,7 @@ interface UnifiedWorldEntry {
 }
 
 /** A car entry from any source, ready for the selector list. */
-interface UnifiedCarEntry {
+export interface UnifiedCarEntry {
   /** Full asset id: `store:<file>` | `loaded:<id>`. */
   id: string;
   name: string;

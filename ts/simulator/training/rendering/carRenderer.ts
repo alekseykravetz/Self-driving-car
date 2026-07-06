@@ -1,3 +1,5 @@
+import type { Car } from '../../../car/car.js';
+
 /**
  * Draws the simulator cars (regular AI cars, pool cars, prev pool cars, and KEYS car) on the game canvas.
  *
@@ -13,7 +15,7 @@
  * @param viewportLeft - The left x-boundary of the visible viewport (default: no cull).
  * @param viewportRight - The right x-boundary of the visible viewport (default: no cull).
  */
-function drawSimulatorCars(
+export function drawSimulatorCars(
   ctx: CanvasRenderingContext2D,
   cars: Car[],
   bestPool: Car[],

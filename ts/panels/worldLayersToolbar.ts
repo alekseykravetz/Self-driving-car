@@ -1,3 +1,7 @@
+import type { WorldLayerId, WorldLayerVisibility } from '../world/types.js';
+import { DEFAULT_LAYER_VISIBILITY } from '../world/types.js';
+import { WORLD_LAYERS_TOOLBAR_TEMPLATE } from './templates/worldLayersToolbarTemplate.js';
+
 /**
  * <world-layers-toolbar> — a floating toolbar for the world editor that gives
  * independent visibility control over each world layer (roads, markings,
@@ -35,7 +39,7 @@ const WORLD_LAYER_BUTTONS: {
   { id: 'buildings', emoji: '🏢', title: 'Buildings — rendered 3D buildings' },
 ];
 
-class WorldLayersToolbarElement extends HTMLElement {
+export class WorldLayersToolbarElement extends HTMLElement {
   #visibility: WorldLayerVisibility = { ...DEFAULT_LAYER_VISIBILITY };
   #onChange: ((v: WorldLayerVisibility) => void) | null = null;
   #onRegenerate: (() => void) | null = null;

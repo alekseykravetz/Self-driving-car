@@ -1,3 +1,25 @@
+import { SimulatorShell } from '../core/simulatorShell.js';
+import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
+import { SpatialHashGrid } from '../../math/spatialGrid.js';
+import type { GridSegment } from '../../math/spatialGrid.js';
+import type { TrafficPanelElement } from './trafficPanel.js';
+import type { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+import { World } from '../../world/world.js';
+import { Graph } from '../../math/graph/graph.js';
+import type { CarInfo } from '../../car/car.js';
+import { Car } from '../../car/car.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { Camera } from '../../camera/camera.js';
+import { MiniMap } from '../../mini-map/miniMap.js';
+import { StoreManager } from '../../store/storeManager.js';
+import { getRandomColor } from '../../utils.js';
+import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
+import { getNearestSegment, scale, angle } from '../../math/utils.js';
+import { Point } from '../../math/primitives/point.js';
+import type { BorderMode } from '../../panels/modeControls.js';
+import { BODY_MARGIN_RATIO } from '../../car/config.js';
+import { Start } from '../../world/markings/start.js';
+
 /**
  * TrafficSimulator — the "Live Traffic Jam" simulator.
  *
@@ -22,7 +44,7 @@
 const GRID_CELL_SIZE = 150;
 const SEGMENT_SEARCH_RADIUS = 200;
 
-class TrafficSimulator extends SimulatorShell {
+export class TrafficSimulator extends SimulatorShell {
   #world: World | null = null;
   #roadBorders: GridSegment[] = [];
   #borderGrid!: SpatialHashGrid;

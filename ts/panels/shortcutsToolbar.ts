@@ -1,3 +1,5 @@
+import { SHORTCUTS_TOOLBAR_TEMPLATE } from './templates/shortcutsToolbarTemplate.js';
+
 /**
  * <shortcuts-toolbar> — a reusable, floating toolbar that visualizes the
  * keyboard shortcuts available on the current page. It sits inside the shared
@@ -15,7 +17,7 @@
  * physical keys in `keys` (e.g. Ctrl for zoom, the driving keys). These are
  * informational only and never change page behavior.
  */
-interface ShortcutDef {
+export interface ShortcutDef {
   /** DOM id for the indicator element (e.g. 'keyO', 'keyCtrl'). */
   id: string;
   /** Short text drawn inside the key cap (e.g. 'O', 'Ctrl', '↑'). */
@@ -36,7 +38,7 @@ interface ShortcutDef {
   keys?: string[];
 }
 
-class ShortcutsToolbarElement extends HTMLElement {
+export class ShortcutsToolbarElement extends HTMLElement {
   #onClick: ((id: string) => void) | null = null;
   #displayDefs: ShortcutDef[] = [];
   #boundKeyDown: (e: KeyboardEvent) => void;

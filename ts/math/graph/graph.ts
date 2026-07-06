@@ -1,10 +1,16 @@
+import { Point } from '../primitives/point.js';
+import { Segment } from '../primitives/segment.js';
+import { getNearestSegment } from '../utils.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+
 type ShortestPathPoint = Point & {
   distance: number;
   visited: boolean;
   previous: ShortestPathPoint;
 };
 
-class Graph {
+export class Graph {
   points: Point[];
   segments: Segment[];
 

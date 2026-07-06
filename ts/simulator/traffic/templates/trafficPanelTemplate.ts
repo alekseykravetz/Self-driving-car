@@ -1,4 +1,4 @@
-const TRAFFIC_PANEL_TEMPLATE = `
+export const TRAFFIC_PANEL_TEMPLATE = `
 <!-- ── Controls ────────────────────────────────────── -->
 <div class="panel-section">
   <div class="section-title"><span>Traffic</span></div>

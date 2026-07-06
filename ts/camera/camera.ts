@@ -1,7 +1,26 @@
 /**
  * Represents a camera in a 2D/3D environment, handling projection and rendering.
  */
-class Camera implements ICameraPoint {
+import {
+  ICameraPoint,
+  IColoredPolygon,
+  ICameraRenderOptions,
+} from './types.js';
+import { Point } from '../math/primitives/point.js';
+import { Segment } from '../math/primitives/segment.js';
+import { Polygon } from '../math/primitives/polygon.js';
+
+import { IWorld } from '../world/types.js';
+import { Corridor } from '../world/corridor.js';
+import { lerp, cross, subtract, distance } from '../math/utils.js';
+import { drawPolygon } from '../rendering/polygonRenderer.js';
+import {
+  extrudePolygons,
+  extrudeTreeShapes,
+  extrudeCarShape,
+} from './extrusion.js';
+
+export class Camera implements ICameraPoint {
   public x!: number;
   public y!: number;
   public z!: number;

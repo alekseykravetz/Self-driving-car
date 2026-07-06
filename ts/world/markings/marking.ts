@@ -1,4 +1,22 @@
-type MarkingType =
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Envelope } from '../../math/primitives/envelope.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import { Graph } from '../../math/graph/graph.js';
+import {
+  translate,
+  angle,
+  lerp2D,
+  perpendicular,
+  dot,
+  subtract,
+  scale,
+  add,
+  getNearestSegment,
+} from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+
+export type MarkingType =
   | 'marking'
   | 'crossing'
   | 'parking'
@@ -14,7 +32,7 @@ type MarkingType =
  * segment (`offset`, 0..1) and signed perpendicular distance from it
  * (`lateral`). This lets markings follow the road when the graph is edited.
  */
-interface MarkingAnchor {
+export interface MarkingAnchor {
   p1: Point;
   p2: Point;
   offset: number;
@@ -31,7 +49,7 @@ function findAnchorSegment(
   );
 }
 
-class Marking {
+export class Marking {
   // Core properties defining the marking
   center: Point;
   directionVector: Point;
@@ -131,60 +149,6 @@ class Marking {
       translate(this.center, angle(this.directionVector), -this.height / 2),
     );
     this.polygon = new Envelope(this.support, this.width, 0).polygon!;
-  }
-
-  /**
-   * Static factory method to load a Marking (or appropriate subclass) from saved data.
-   * @param info Object containing the saved state of the marking.
-   * @returns An instance of Marking or one of its subclasses, or null if type is unknown.
-   */
-  static load(info: Marking): Marking | null {
-    const point = new Point(info.center.x, info.center.y);
-    const direction = new Point(info.directionVector.x, info.directionVector.y);
-
-    let marking: Marking | null;
-    switch (info.type) {
-      case 'marking':
-        marking = new Marking(point, direction, info.width, info.height);
-        break;
-      case 'crossing':
-        marking = new Crossing(point, direction, info.width, info.height);
-        break;
-      case 'parking':
-        marking = new Parking(point, direction, info.width, info.height);
-        break;
-      case 'light':
-        marking = new Light(point, direction, info.width);
-        break;
-      case 'start':
-        marking = new Start(point, direction, info.width, info.height);
-        break;
-      case 'stop':
-        marking = new Stop(point, direction, info.width, info.height);
-        break;
-      case 'yield':
-        marking = new Yield(point, direction, info.width, info.height);
-        break;
-      case 'target':
-        marking = new Target(point, direction, info.width, info.height);
-        break;
-      default:
-        console.error(
-          `Unknown marking type encountered during load: ${info.type}`,
-        );
-        return null;
-    }
-
-    // Restore graph-relative anchor when present (newer saves only).
-    if (info.anchor) {
-      marking.anchor = {
-        p1: new Point(info.anchor.p1.x, info.anchor.p1.y),
-        p2: new Point(info.anchor.p2.x, info.anchor.p2.y),
-        offset: info.anchor.offset,
-        lateral: info.anchor.lateral,
-      };
-    }
-    return marking;
   }
 
   /**

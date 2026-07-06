@@ -1,3 +1,15 @@
+import { Point } from '../../math/primitives/point.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import {
+  lerp,
+  lerp2D,
+  mulberry32,
+  translate,
+  getFake3dPoint,
+} from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+import { TreeDrawOptions } from '../types.js';
+
 /**
  * A tree decoration item. Instead of baking a full canopy polygon per tree, a
  * Tree references a small reproducible {@link TreePrototype} (a per-vertex noise
@@ -10,20 +22,20 @@
 const TREE_VERTEX_COUNT = 32;
 
 /** Default seed + prototype count used when a world does not specify its own. */
-const DEFAULT_TREE_SEED = 123456;
-const DEFAULT_TREE_PROTOTYPE_COUNT = 8;
+export const DEFAULT_TREE_SEED = 123456;
+export const DEFAULT_TREE_PROTOTYPE_COUNT = 8;
 
 /**
  * Reproducible canopy shape. `noise` holds one radius multiplier in [0.5, 1]
  * per canopy vertex; the same profile is reused for every instance that
  * references this prototype so their silhouettes match.
  */
-interface TreePrototype {
+export interface TreePrototype {
   noise: number[];
 }
 
 /** A compact, serialized tree instance stored in a world's decoration block. */
-interface TreeInstance {
+export interface TreeInstance {
   x: number;
   y: number;
   /** Prototype/variant index into the world's prototype set. */
@@ -39,7 +51,10 @@ interface TreeInstance {
  * (seed, count) pair always yields the same prototype set, so a world need only
  * persist those two numbers to recreate every canopy shape on load.
  */
-function buildTreePrototypes(seed: number, count: number): TreePrototype[] {
+export function buildTreePrototypes(
+  seed: number,
+  count: number,
+): TreePrototype[] {
   const rand = mulberry32(seed);
   const prototypes: TreePrototype[] = [];
   for (let i = 0; i < count; i++) {
@@ -53,7 +68,7 @@ function buildTreePrototypes(seed: number, count: number): TreePrototype[] {
 }
 
 /** A neutral fallback prototype used when none is supplied. */
-const DEFAULT_TREE_PROTOTYPE: TreePrototype = buildTreePrototypes(
+export const DEFAULT_TREE_PROTOTYPE: TreePrototype = buildTreePrototypes(
   DEFAULT_TREE_SEED,
   1,
 )[0];
@@ -75,7 +90,7 @@ function treeLevelPolygon(
   return new Polygon(points);
 }
 
-class Tree {
+export class Tree {
   readonly center: Point;
   readonly size: number; // Effective base diameter (baseline * scale)
   readonly height: number;

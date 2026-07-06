@@ -10,16 +10,16 @@ This document provides context for AI coding agents working on this project.
 - **Language**: TypeScript (source in `ts/`, compiled output in `js/`)
 - **Runtime**: Browser (Canvas 2D API, no Node.js runtime)
 - **Dependencies**: Zero runtime dependencies. Dev-only: TypeScript, ESLint, Prettier, serve, concurrently, onchange
-- **Bundler**: None. Uses `tsc` to compile TS → JS. HTML files load scripts via `<script>` tags in dependency order.
+- **Bundler**: None. Uses `tsc` to compile TS → JS. Each HTML page loads a single `<script type="module">` entry point.
 
 ---
 
 ## Architecture Rules
 
-1. **No bundlers** — Do not add Webpack, Vite, Rollup, esbuild, or similar. The project intentionally uses direct script loading.
+1. **No bundlers** — Do not add Webpack, Vite, Rollup, esbuild, or similar. The project uses native ES modules via `<script type="module">`.
 2. **No runtime dependencies** — Everything is implemented from scratch. Do not add npm packages for geometry, neural networks, physics, etc.
-3. **Global scope** — All classes are globals. No ES module `import`/`export` at runtime. TypeScript files compile to plain JS that attaches to `window`.
-4. **HTML controls load order** — When adding new modules, you must add `<script>` tags in the correct dependency order to relevant HTML files.
+3. **ES modules** — All files use `import`/`export` with `module: "nodenext"`. Import paths use `.js` extension (even for `.ts` source).
+4. **Single entry point per page** — Each HTML page loads one `<script type="module">`; the browser resolves dependencies via import graph.
 5. **Canvas 2D only** — No WebGL, no Three.js. Rendering uses the standard Canvas 2D API.
 6. **Composition over inheritance** — Cars contain sensors, controls, and networks as separate objects. Markings use subclass hierarchy but most systems prefer composition.
 
@@ -115,11 +115,10 @@ docs/                       # Technical documentation
 ### Adding a new TypeScript module:
 
 1. Create the `.ts` file in the appropriate `ts/` subdirectory
-2. The class/function will be a global (no exports needed)
-3. Add `<script src="/js/path/to/file.js">` to all HTML files that need it
-4. Ensure the script tag comes AFTER its dependencies
-5. Add the class name to `eslint.config.mjs` globals if needed (to suppress lint warnings)
-6. Run `npm start` — tsc will compile it automatically
+2. `export` the class/function/type from the file
+3. Add `import` in the files that need it, using `.js` extension
+4. If the entry point needs it, trace the import chain — the entry module will pull it automatically
+5. Run `npm start` — tsc will compile it automatically
 
 ### Adding a new marking type:
 
@@ -127,16 +126,13 @@ docs/                       # Technical documentation
 2. Create `ts/world/editors/newMarkingEditor.ts` extending `MarkingEditor`
 3. Add to `Marking.load()` switch statement for deserialization
 4. Add editor activation in `worldEditor.ts`
-5. Add script tags to `html/world.html` and simulator HTML files
 
 ### Adding a new simulation mode:
 
 1. Create a new `IWorld` implementation in `ts/` (e.g., `ts/world/simple/simpleWorld.ts`)
 2. Add mode detection to `TrainingSimulator` constructor via URL parameter (e.g., `?mode=mymode`)
 3. Add `#initMyMode()` and `#drawMyMode()` methods to `TrainingSimulator`
-4. Add script tag to `html/simulator.html` in correct dependency order
-5. Add link to `index.html` landing page (use clean URL: `html/simulator?mode=mymode`)
-6. Register new globals in `eslint.config.mjs`
+4. Add link to `index.html` landing page (use clean URL: `html/simulator?mode=mymode`)
 
 ---
 
@@ -146,7 +142,7 @@ docs/                       # Technical documentation
 - **Genetic algorithm only** (no backpropagation) — simpler, produces emergent behaviors
 - **Polygon.union()** for road generation — critical algorithm, handle with care
 - **Painter's algorithm** for 3D rendering — no depth buffer, sort by distance
-- **No module system at runtime** — all globals, HTML controls initialization order
+- **Native ES modules** — single `<script type="module">` per page, imports handle ordering
 - **localStorage for brain persistence** — simple, no server needed
 
 ---
@@ -179,10 +175,10 @@ Update `docs/*.md` when making significant changes:
 
 ## Common Gotchas
 
-1. **Script order matters** — If you get "X is not defined", the script tag is in wrong order
+1. **Import paths use `.js`** — Write `import { X } from './x.js'` even though the source is `x.ts`
 2. **tsc output** — Never edit `js/` files directly; always edit `ts/` source
 3. **Polygon.union()** — Complex algorithm, mutations can break road rendering
-4. **Global namespace** — Class names must be unique across all files
+4. **Import graph** — Circular imports will fail; keep the dependency graph a DAG (math → world → car → NN → simulator)
 5. **Canvas coordinate system** — Y-axis is inverted (positive = down)
 6. **Car angle convention** — 0 = facing up, positive = clockwise
 7. **Sensor offset inversion** — Readings are `1 - offset` before feeding to network

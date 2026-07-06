@@ -1,10 +1,36 @@
-interface TrainingManagerOptions {
+import { TRAINING_PANEL_TEMPLATE } from './templates/trainingPanelTemplate.js';
+import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
+import type { CarInfo } from '../../car/car.js';
+import { Car } from '../../car/car.js';
+import { CarLoader } from '../../car/loader/carLoader.js';
+import { StoreManager } from '../../store/storeManager.js';
+import {
+  createCarsForTraining,
+  getSortedAICars,
+  getTopAICars,
+  getTopCarInfoPool,
+  applyPoolToCars,
+  inferHiddenLayers,
+} from './genetics/poolManager.js';
+import {
+  loadPoolFromStorage,
+  savePoolToStorage,
+  discardStoredPool,
+  downloadCarFiles,
+} from './genetics/storageManager.js';
+import { safeJsonParse } from '../../utils.js';
+import {
+  formatMetersFromWorldPixels,
+  formatKmhFromPxPerFrame,
+} from '../../math/utils.js';
+
+export interface TrainingManagerOptions {
   evaluateFitness: (car: Car) => number;
   getStartInfo: () => { x: number; y: number; angle: number };
   onCarsCreated: (cars: Car[]) => void;
 }
 
-class TrainingPanelElement extends HTMLElement {
+export class TrainingPanelElement extends HTMLElement {
   public iteration: number = 0;
   public maxDistancePassed: number = 0;
   public idleEnabled: boolean = false;

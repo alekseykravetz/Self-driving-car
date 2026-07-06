@@ -1,14 +1,17 @@
-interface PointWithBlueness extends Point {
+import { Point } from '../../math/primitives/point.js';
+import { distance } from '../../math/utils.js';
+
+export interface PointWithBlueness extends Point {
   blueness: number;
 }
 
-interface Marker {
+export interface Marker {
   centroid: Point;
   points: PointWithBlueness[];
   radius: number;
 }
 
-class MarkerDetector {
+export class MarkerDetector {
   threshold: HTMLInputElement;
   thresholdValue: number; // Store numeric value for easier use
 

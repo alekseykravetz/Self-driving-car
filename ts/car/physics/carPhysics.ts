@@ -1,4 +1,12 @@
-class CarPhysics {
+import { Car } from '../car.js';
+import { Controls } from '../controls/controls.js';
+import { CameraControls } from '../controls/cameraControls.js';
+import { PhoneControls } from '../controls/phoneControls.js';
+import { STEERING_SPEED, REVERSE_SPEED_RATIO } from '../config.js';
+import { polysIntersect } from '../../utils.js';
+import { Point } from '../../math/primitives/point.js';
+
+export class CarPhysics {
   car: Car;
 
   constructor(car: Car) {

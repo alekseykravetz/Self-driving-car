@@ -1,8 +1,12 @@
+import { Car } from '../../../car/car.js';
+import type { CarInfo } from '../../../car/car.js';
+import { NeuralNetwork } from '../../../neural-network/network.js';
+
 /**
  * Pure functions for car creation and pool/brain application during training.
  */
 
-function createCarsForTraining(
+export function createCarsForTraining(
   count: number,
   type: string,
   config: CarInfo,
@@ -37,7 +41,7 @@ function createCarsForTraining(
  * overwriting a car brain with an incompatible stored brain (e.g. when the
  * user changes the hidden-layers config and stored brains have old topology).
  */
-function brainsCompatible(a: NeuralNetwork, b: NeuralNetwork): boolean {
+export function brainsCompatible(a: NeuralNetwork, b: NeuralNetwork): boolean {
   if (a.levels.length !== b.levels.length) return false;
   for (let i = 0; i < a.levels.length; i++) {
     if (
@@ -57,12 +61,12 @@ function brainsCompatible(a: NeuralNetwork, b: NeuralNetwork): boolean {
  * the last (the output layer). Returns null when no brain is available.
  * Used to reconstruct config for legacy .car files that omit `hiddenLayers`.
  */
-function inferHiddenLayers(brain?: NeuralNetwork): number[] | null {
+export function inferHiddenLayers(brain?: NeuralNetwork): number[] | null {
   if (!brain || brain.levels.length < 2) return null;
   return brain.levels.slice(0, -1).map((l) => l.outputs.length);
 }
 
-function applyPoolToCars(
+export function applyPoolToCars(
   cars: Car[],
   pool: CarInfo[],
   mutationRate: number,
@@ -90,7 +94,7 @@ function applyPoolToCars(
   }
 }
 
-function getSortedAICars(
+export function getSortedAICars(
   cars: Car[],
   evaluateFitness: (car: Car) => number,
 ): Car[] {
@@ -108,7 +112,7 @@ function getSortedAICars(
  *
  * Equivalent to `getSortedAICars(cars, evaluateFitness).slice(0, k)`.
  */
-function getTopAICars(
+export function getTopAICars(
   cars: Car[],
   evaluateFitness: (car: Car) => number,
   k: number,
@@ -143,7 +147,7 @@ function getTopAICars(
   return top;
 }
 
-function getTopCarInfoPool(
+export function getTopCarInfoPool(
   cars: Car[],
   evaluateFitness: (car: Car) => number,
   poolSize: number,

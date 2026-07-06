@@ -1,4 +1,29 @@
-class TrainingSimulator extends SimulatorShell {
+import { SimulatorShell } from '../core/simulatorShell.js';
+import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
+import { SimpleTrainingStrategy } from './modes/simpleModeBehavior.js';
+import { WorldTrainingStrategy } from './modes/worldModeBehavior.js';
+import type { TrainingPanelElement } from './trainingPanel.js';
+import type {
+  TrainingInitModalElement,
+  TrainingInitResult,
+} from './trainingInitModal.js';
+import type { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+import { StoreManager } from '../../store/storeManager.js';
+import { CarLoader } from '../../car/loader/carLoader.js';
+import {
+  discardStoredPool,
+  savePoolToStorage,
+} from './genetics/storageManager.js';
+import { Start } from '../../world/markings/start.js';
+import { Target } from '../../world/markings/target.js';
+import { Point } from '../../math/primitives/point.js';
+import type { Segment } from '../../math/primitives/segment.js';
+import type { Car } from '../../car/car.js';
+import type { IWorld } from '../../world/types.js';
+import { angle } from '../../math/utils.js';
+import { buildRoadBorders } from '../spatialGridUtils.js';
+
+export class TrainingSimulator extends SimulatorShell {
   #strategy!: SimpleTrainingStrategy | WorldTrainingStrategy;
   world: IWorld | null = null;
   roadBorders: Point[][] | null = null;

@@ -1,6 +1,20 @@
+import type { TrainingSimulator } from '../trainingSimulator.js';
+import { SimpleWorld } from '../../../world/simple/simpleWorld.js';
+import type { Car } from '../../../car/car.js';
+import { Point } from '../../../math/primitives/point.js';
+import { Viewport } from '../../../viewport/viewport.js';
+import { MiniMap } from '../../../mini-map/miniMap.js';
+import { Camera } from '../../../camera/camera.js';
+import {
+  generateInitialTraffic,
+  generateTrafficRow,
+} from './trafficFactory.js';
+import { drawSimulatorCars } from '../rendering/carRenderer.js';
+import { scale } from '../../../math/utils.js';
+
 const INITIAL_TRAFFIC_Y = -700;
 
-class SimpleSimState {
+export class SimpleSimState {
   traffic: Car[] = [];
   lastGeneratedTrafficY: number = INITIAL_TRAFFIC_Y;
   simpleViewY: number = 0;
@@ -11,7 +25,7 @@ class SimpleSimState {
   }
 }
 
-function updateSimpleTraffic(
+export function updateSimpleTraffic(
   state: SimpleSimState,
   bestCar: Car,
   simpleWorld: SimpleWorld,
@@ -49,7 +63,7 @@ function updateSimpleTraffic(
   state.traffic.sort((a, b) => a.y - b.y);
 }
 
-function updateSimpleCars(
+export function updateSimpleCars(
   cars: Car[],
   state: SimpleSimState,
   roadBorders: Point[][],
@@ -106,7 +120,7 @@ function updateSimpleCars(
   return { aliveCount, deadCount, frozenCount };
 }
 
-class SimpleTrainingStrategy {
+export class SimpleTrainingStrategy {
   #parent: TrainingSimulator;
   #simpleState: SimpleSimState = new SimpleSimState();
 

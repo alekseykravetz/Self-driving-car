@@ -1,4 +1,11 @@
-interface CorridorBuildOptions {
+import { Point } from '../math/primitives/point.js';
+import { Segment } from '../math/primitives/segment.js';
+import { Envelope } from '../math/primitives/envelope.js';
+import { Polygon } from '../math/primitives/polygon.js';
+import { distance, add, scale } from '../math/utils.js';
+import { drawSegment } from '../rendering/segmentRenderer.js';
+
+export interface CorridorBuildOptions {
   /** Leave the start edge open (no cap), so cars can pass through it. */
   openStart?: boolean;
   /** Leave the end edge open (no cap), so cars can pass through it. */
@@ -11,7 +18,7 @@ interface CorridorBuildOptions {
   extendEnd?: boolean;
 }
 
-interface CorridorDrawOptions {
+export interface CorridorDrawOptions {
   color?: string;
   width?: number;
 }
@@ -44,7 +51,7 @@ function removeCorridorCap(
  *
  * Open edges let several corridors join into a longer path on big maps.
  */
-class Corridor {
+export class Corridor {
   borders: Segment[];
   skeleton: Segment[];
   openStart: boolean;

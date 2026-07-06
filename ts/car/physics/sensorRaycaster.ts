@@ -1,8 +1,11 @@
-interface IntersectionPoint extends Point {
+import { Point } from '../../math/primitives/point.js';
+import { lerp, getIntersectionOffset } from '../../math/utils.js';
+
+export interface IntersectionPoint extends Point {
   offset: number;
 }
 
-class SensorRaycaster {
+export class SensorRaycaster {
   static castRays(
     carX: number,
     carY: number,

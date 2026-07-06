@@ -1,11 +1,14 @@
-interface BrainControlOutput {
+import { IntersectionPoint } from '../physics/sensorRaycaster.js';
+import { NeuralNetwork } from '../../neural-network/network.js';
+
+export interface BrainControlOutput {
   forward: boolean;
   left: boolean;
   right: boolean;
   reverse: boolean;
 }
 
-class CarBrainAdapter {
+export class CarBrainAdapter {
   static computeControls(
     readings: (IntersectionPoint | null)[],
     speed: number,

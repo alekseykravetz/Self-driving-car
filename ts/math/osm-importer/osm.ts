@@ -1,3 +1,12 @@
+import { Point } from '../primitives/point.js';
+import { Segment } from '../primitives/segment.js';
+import {
+  METERS_PER_DEGREE_LATITUDE,
+  WORLD_PIXELS_PER_METER,
+  invLerp,
+  degToRad,
+} from '../utils.js';
+
 // --- Interfaces for OSM Data Structure ---
 interface OsmNodeElement {
   type: 'node';
@@ -24,7 +33,7 @@ interface OsmWayElement {
 type OsmElement = OsmNodeElement | OsmWayElement;
 
 // Main interface for the input data to parseRoads
-interface OsmData {
+export interface OsmData {
   elements: OsmElement[];
 }
 
@@ -40,7 +49,7 @@ type OsmPoint = Point & {
   id: number;
 };
 
-class Osm {
+export class Osm {
   /**
    * Parses raw OSM data (typically from Overpass API JSON) to extract nodes and ways,
    * converting them into Point and Segment objects scaled to a canvas coordinate system.

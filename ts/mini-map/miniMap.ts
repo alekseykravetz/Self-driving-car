@@ -1,11 +1,29 @@
-interface IMiniMapCar {
+import { Graph } from '../math/graph/graph.js';
+import { Point } from '../math/primitives/point.js';
+import { Viewport } from '../viewport/viewport.js';
+import { ScaleIndicator } from '../viewport/scaleIndicator.js';
+import { scale } from '../math/utils.js';
+import { drawSegment } from '../rendering/segmentRenderer.js';
+import { drawPoint } from '../rendering/pointRenderer.js';
+
+export interface IMiniMapCar {
   x: number;
   y: number;
   damaged: boolean;
   color: string;
 }
 
-class MiniMap {
+export interface MiniMapDrawOptions {
+  viewPoint: Point;
+  cars: IMiniMapCar[];
+  roadColor?: string;
+  carColor?: string;
+  backgroundColor?: string;
+  viewport?: Viewport;
+  compactScaleIndicator?: boolean;
+}
+
+export class MiniMap {
   #canvas: HTMLCanvasElement;
   #graph: Graph;
   #size: number;

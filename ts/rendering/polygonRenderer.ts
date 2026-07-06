@@ -1,11 +1,13 @@
-interface PolygonDrawOptions {
+import { Polygon } from '../math/primitives/polygon.js';
+
+export interface PolygonDrawOptions {
   stroke?: string;
   lineWidth?: number;
   fill?: string;
   join?: CanvasLineJoin;
 }
 
-function drawPolygon(
+export function drawPolygon(
   ctx: CanvasRenderingContext2D,
   polygon: Polygon,
   {
