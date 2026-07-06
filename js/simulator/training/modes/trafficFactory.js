@@ -1,89 +1,33 @@
 import { Car } from '../../../car/car.js';
-import { getRandomColor } from '../../../utils.js';
+import { getRandomColor } from '../../../math/color.js';
+const TRAFFIC_WIDTH = 30;
+const TRAFFIC_HEIGHT = 50;
+const TRAFFIC_MAX_SPEED = 2;
 /**
  * Traffic generation utilities for simple road training scenarios.
  * Designed to work with any IWorld that provides lane info via getLaneCenter/getLaneCount.
  */
+const trafficCarOptions = (x, y, angle) => ({
+    width: TRAFFIC_WIDTH,
+    height: TRAFFIC_HEIGHT,
+    x,
+    y,
+    controlType: 'DUMMY',
+    angle,
+    maxSpeed: TRAFFIC_MAX_SPEED,
+    color: getRandomColor(),
+});
 /**
  * Generates the initial set of hardcoded traffic cars for a 3-lane road.
  */
 export function generateInitialTraffic(getLaneCenter, startAngle) {
-    return [
-        // Row y=-100: lane 1 only
-        new Car({
-            width: 30,
-            height: 50,
-            x: getLaneCenter(1),
-            y: -100,
-            controlType: 'DUMMY',
-            angle: startAngle,
-            maxSpeed: 2,
-            color: getRandomColor(),
-        }),
-        // Row y=-300: lanes 0 and 2
-        new Car({
-            width: 30,
-            height: 50,
-            x: getLaneCenter(0),
-            y: -300,
-            controlType: 'DUMMY',
-            angle: startAngle,
-            maxSpeed: 2,
-            color: getRandomColor(),
-        }),
-        new Car({
-            width: 30,
-            height: 50,
-            x: getLaneCenter(2),
-            y: -300,
-            controlType: 'DUMMY',
-            angle: startAngle,
-            maxSpeed: 2,
-            color: getRandomColor(),
-        }),
-        // Row y=-500: lanes 0 and 1
-        new Car({
-            width: 30,
-            height: 50,
-            x: getLaneCenter(0),
-            y: -500,
-            controlType: 'DUMMY',
-            angle: startAngle,
-            maxSpeed: 2,
-            color: getRandomColor(),
-        }),
-        new Car({
-            width: 30,
-            height: 50,
-            x: getLaneCenter(1),
-            y: -500,
-            controlType: 'DUMMY',
-            angle: startAngle,
-            maxSpeed: 2,
-            color: getRandomColor(),
-        }),
-        // Row y=-700: lanes 1 and 2
-        new Car({
-            width: 30,
-            height: 50,
-            x: getLaneCenter(1),
-            y: -700,
-            controlType: 'DUMMY',
-            angle: startAngle,
-            maxSpeed: 2,
-            color: getRandomColor(),
-        }),
-        new Car({
-            width: 30,
-            height: 50,
-            x: getLaneCenter(2),
-            y: -700,
-            controlType: 'DUMMY',
-            angle: startAngle,
-            maxSpeed: 2,
-            color: getRandomColor(),
-        }),
+    const rows = [
+        [-100, [1]],
+        [-300, [0, 2]],
+        [-500, [0, 1]],
+        [-700, [1, 2]],
     ];
+    return rows.flatMap(([y, lanes]) => lanes.map((lane) => new Car(trafficCarOptions(getLaneCenter(lane), y, startAngle))));
 }
 /**
  * Generates a single dynamic traffic row at the given y coordinate.
@@ -94,14 +38,5 @@ export function generateTrafficRow(y, getLaneCenter, laneCount, startAngle) {
     const lanes = Array.from({ length: laneCount }, (_, i) => i);
     const shuffledLanes = lanes.sort(() => Math.random() - 0.5);
     const activeLanes = shuffledLanes.slice(0, filledCount);
-    return activeLanes.map((lane) => new Car({
-        width: 30,
-        height: 50,
-        x: getLaneCenter(lane),
-        y,
-        controlType: 'DUMMY',
-        angle: startAngle,
-        maxSpeed: 2,
-        color: getRandomColor(),
-    }));
+    return activeLanes.map((lane) => new Car(trafficCarOptions(getLaneCenter(lane), y, startAngle)));
 }

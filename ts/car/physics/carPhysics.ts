@@ -1,114 +1,89 @@
-import { Car } from '../car.js';
-import { Controls } from '../controls/controls.js';
-import { CameraControls } from '../controls/cameraControls.js';
-import { PhoneControls } from '../controls/phoneControls.js';
-import { STEERING_SPEED, REVERSE_SPEED_RATIO } from '../config.js';
-import { polysIntersect } from '../../utils.js';
-import { Point } from '../../math/primitives/point.js';
+import { REVERSE_SPEED_RATIO } from '../config.js';
+import { polysIntersect } from '../../math/collision.js';
+import type { Point } from '../../math/primitives/point.js';
+import type { CarState, ControlsState } from '../carState.js';
 
 export class CarPhysics {
-  car: Car;
+  update(
+    state: CarState,
+    controls: ControlsState,
+    polygons: Point[][] = [],
+  ): boolean {
+    if (state.damaged) return false;
 
-  constructor(car: Car) {
-    this.car = car;
-  }
+    this.move(state, controls);
+    state.fitness += state.speed;
+    state.polygon = this.createPolygon(state);
 
-  update(polygons: Point[][] = []): boolean {
-    if (this.car.damaged) return false;
-
-    this.move();
-    this.car.fitness += this.car.speed;
-    this.car.polygon = this.createPolygon();
-
-    const becameDamaged = this.assessDamage(polygons);
+    const becameDamaged = this.assessDamage(state.polygon, polygons);
     if (becameDamaged) {
-      this.car.speed = 0;
-      this.car.damaged = true;
+      state.speed = 0;
+      state.damaged = true;
     }
     return becameDamaged;
   }
 
-  move(): void {
-    if (this.car.controls.forward) {
-      this.car.speed += this.car.acceleration;
+  private move(state: CarState, controls: ControlsState): void {
+    if (controls.forward) {
+      state.speed += state.acceleration;
     }
-    if (this.car.controls.reverse) {
-      this.car.speed -= this.car.acceleration;
-    }
-
-    if (this.car.speed > this.car.maxSpeed) {
-      this.car.speed = this.car.maxSpeed;
-    }
-    if (this.car.speed < -this.car.maxSpeed * REVERSE_SPEED_RATIO) {
-      this.car.speed = -this.car.maxSpeed * REVERSE_SPEED_RATIO;
+    if (controls.reverse) {
+      state.speed -= state.acceleration;
     }
 
-    if (this.car.speed > 0) {
-      this.car.speed -= this.car.friction;
+    if (state.speed > state.maxSpeed) {
+      state.speed = state.maxSpeed;
     }
-    if (this.car.speed < 0) {
-      this.car.speed += this.car.friction;
-    }
-    if (Math.abs(this.car.speed) < this.car.friction) {
-      this.car.speed = 0;
+    if (state.speed < -state.maxSpeed * REVERSE_SPEED_RATIO) {
+      state.speed = -state.maxSpeed * REVERSE_SPEED_RATIO;
     }
 
-    if (this.car.speed !== 0) {
-      if (
-        (typeof CameraControls !== 'undefined' &&
-          this.car.controls instanceof CameraControls) ||
-        (typeof PhoneControls !== 'undefined' &&
-          this.car.controls instanceof PhoneControls &&
-          this.car.controls.tilt !== 0)
-      ) {
-        this.car.angle -= this.car.controls.tilt * STEERING_SPEED;
-      } else {
-        const flip = this.car.speed > 0 ? 1 : -1;
-        if ((this.car.controls as Controls).left) {
-          this.car.angle += STEERING_SPEED * flip;
-        }
-        if ((this.car.controls as Controls).right) {
-          this.car.angle -= STEERING_SPEED * flip;
-        }
-      }
+    if (state.speed > 0) {
+      state.speed -= state.friction;
+    }
+    if (state.speed < 0) {
+      state.speed += state.friction;
+    }
+    if (Math.abs(state.speed) < state.friction) {
+      state.speed = 0;
     }
 
-    this.car.x -= Math.sin(this.car.angle) * this.car.speed;
-    this.car.y -= Math.cos(this.car.angle) * this.car.speed;
+    state.x -= Math.sin(state.angle) * state.speed;
+    state.y -= Math.cos(state.angle) * state.speed;
   }
 
-  createPolygon(): Point[] {
+  createPolygon(state: CarState): Point[] {
     const points: Point[] = [];
-    const rad = Math.hypot(this.car.width, this.car.height) / 2;
-    const alpha = Math.atan2(this.car.width, this.car.height);
+    const rad = Math.hypot(state.width, state.height) / 2;
+    const alpha = Math.atan2(state.width, state.height);
     points.push({
-      x: this.car.x - Math.sin(this.car.angle - alpha) * rad,
-      y: this.car.y - Math.cos(this.car.angle - alpha) * rad,
+      x: state.x - Math.sin(state.angle - alpha) * rad,
+      y: state.y - Math.cos(state.angle - alpha) * rad,
     } as Point);
     points.push({
-      x: this.car.x - Math.sin(this.car.angle + alpha) * rad,
-      y: this.car.y - Math.cos(this.car.angle + alpha) * rad,
+      x: state.x - Math.sin(state.angle + alpha) * rad,
+      y: state.y - Math.cos(state.angle + alpha) * rad,
     } as Point);
     points.push({
-      x: this.car.x - Math.sin(Math.PI + this.car.angle - alpha) * rad,
-      y: this.car.y - Math.cos(Math.PI + this.car.angle - alpha) * rad,
+      x: state.x - Math.sin(Math.PI + state.angle - alpha) * rad,
+      y: state.y - Math.cos(Math.PI + state.angle - alpha) * rad,
     } as Point);
     points.push({
-      x: this.car.x - Math.sin(Math.PI + this.car.angle + alpha) * rad,
-      y: this.car.y - Math.cos(Math.PI + this.car.angle + alpha) * rad,
+      x: state.x - Math.sin(Math.PI + state.angle + alpha) * rad,
+      y: state.y - Math.cos(Math.PI + state.angle + alpha) * rad,
     } as Point);
     return points;
   }
 
-  assessDamage(polygons: Point[][] = []): boolean {
+  assessDamage(polygon: Point[], polygons: Point[][] = []): boolean {
     if (polygons.length === 0) return false;
 
-    let carMinX = this.car.polygon[0].x;
-    let carMaxX = this.car.polygon[0].x;
-    let carMinY = this.car.polygon[0].y;
-    let carMaxY = this.car.polygon[0].y;
-    for (let i = 1; i < this.car.polygon.length; i++) {
-      const p = this.car.polygon[i];
+    let carMinX = polygon[0].x;
+    let carMaxX = polygon[0].x;
+    let carMinY = polygon[0].y;
+    let carMaxY = polygon[0].y;
+    for (let i = 1; i < polygon.length; i++) {
+      const p = polygon[i];
       if (p.x < carMinX) carMinX = p.x;
       else if (p.x > carMaxX) carMaxX = p.x;
       if (p.y < carMinY) carMinY = p.y;
@@ -138,7 +113,7 @@ export class CarPhysics {
         continue;
       }
 
-      if (polysIntersect(this.car.polygon, poly)) {
+      if (polysIntersect(polygon, poly)) {
         return true;
       }
     }

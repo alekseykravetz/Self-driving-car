@@ -1,6 +1,6 @@
 import { StoreManager } from '../store/storeManager.js';
 import { CarLoader } from '../car/loader/carLoader.js';
-import { stripFileExtension } from '../utils.js';
+import { stripFileExtension } from '../store/serialization.js';
 import { parseWorldFileContent } from '../world/loader/worldLoader.js';
 export class ToolbarAssetSelectors {
     #carSelectMode = 'multi';

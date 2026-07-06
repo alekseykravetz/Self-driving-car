@@ -2,10 +2,6 @@ import { Car } from '../../../car/car.js';
 import type { CarInfo } from '../../../car/car.js';
 import { NeuralNetwork } from '../../../neural-network/network.js';
 
-/**
- * Pure functions for car creation and pool/brain application during training.
- */
-
 export function createCarsForTraining(
   count: number,
   type: string,
@@ -35,18 +31,15 @@ export function createCarsForTraining(
   return cars;
 }
 
-/**
- * Returns true when networks `a` and `b` have the same layer count and each
- * layer has matching input/output sizes. Used to guard against silently
- * overwriting a car brain with an incompatible stored brain (e.g. when the
- * user changes the hidden-layers config and stored brains have old topology).
- */
-export function brainsCompatible(a: NeuralNetwork, b: NeuralNetwork): boolean {
-  if (a.levels.length !== b.levels.length) return false;
-  for (let i = 0; i < a.levels.length; i++) {
+export function brainsCompatible(a: unknown, b: unknown): boolean {
+  const na = a as NeuralNetwork | null;
+  const nb = b as NeuralNetwork | null;
+  if (!na || !nb) return false;
+  if (na.levels.length !== nb.levels.length) return false;
+  for (let i = 0; i < na.levels.length; i++) {
     if (
-      a.levels[i].inputs.length !== b.levels[i].inputs.length ||
-      a.levels[i].outputs.length !== b.levels[i].outputs.length
+      na.levels[i].inputs.length !== nb.levels[i].inputs.length ||
+      na.levels[i].outputs.length !== nb.levels[i].outputs.length
     ) {
       return false;
     }
@@ -54,16 +47,10 @@ export function brainsCompatible(a: NeuralNetwork, b: NeuralNetwork): boolean {
   return true;
 }
 
-/**
- * Derive the hidden-layer sizes encoded in a stored brain's topology.
- * A brain built from neuronCounts `[inputs, ...hidden, outputs]` has one level
- * per adjacent pair, so the hidden sizes are every level's output count except
- * the last (the output layer). Returns null when no brain is available.
- * Used to reconstruct config for legacy .car files that omit `hiddenLayers`.
- */
-export function inferHiddenLayers(brain?: NeuralNetwork): number[] | null {
-  if (!brain || brain.levels.length < 2) return null;
-  return brain.levels.slice(0, -1).map((l) => l.outputs.length);
+export function inferHiddenLayers(brain?: unknown): number[] | null {
+  const nn = brain as NeuralNetwork | undefined;
+  if (!nn || nn.levels.length < 2) return null;
+  return nn.levels.slice(0, -1).map((l) => l.outputs.length);
 }
 
 export function applyPoolToCars(
@@ -79,13 +66,15 @@ export function applyPoolToCars(
     if (cars[i].type === 'KEYS') continue;
     if (brains.length > 0 && cars[i].brain) {
       if (aiIndex < brains.length) {
-        // Only apply stored brain if topology matches the freshly-created car.
-        if (brainsCompatible(brains[aiIndex], cars[i].brain!)) {
-          cars[i].brain = NeuralNetwork.clone(brains[aiIndex]);
+        if (brainsCompatible(brains[aiIndex], cars[i].brain)) {
+          cars[i].brain = NeuralNetwork.clone(brains[aiIndex] as NeuralNetwork);
         }
       } else {
-        const mutated = NeuralNetwork.mutateFromPool(brains, mutationRate);
-        if (brainsCompatible(mutated, cars[i].brain!)) {
+        const mutated = NeuralNetwork.mutateFromPool(
+          brains as NeuralNetwork[],
+          mutationRate,
+        );
+        if (brainsCompatible(mutated, cars[i].brain)) {
           cars[i].brain = mutated;
         }
       }
@@ -103,15 +92,6 @@ export function getSortedAICars(
     .sort((a, b) => evaluateFitness(b) - evaluateFitness(a));
 }
 
-/**
- * Returns the top `k` AI cars by fitness, highest first, without sorting or
- * allocating a filtered copy of the whole population. This runs every frame
- * for the live pool, where `k` (pool size) is tiny (≤20) compared to the car
- * count (thousands), so a single-pass partial selection is far cheaper than a
- * full O(n log n) sort of every car.
- *
- * Equivalent to `getSortedAICars(cars, evaluateFitness).slice(0, k)`.
- */
 export function getTopAICars(
   cars: Car[],
   evaluateFitness: (car: Car) => number,
@@ -119,8 +99,6 @@ export function getTopAICars(
 ): Car[] {
   if (k <= 0) return [];
 
-  // `top` is kept sorted descending by fitness; `topFit` mirrors the fitness so
-  // each car's fitness is evaluated once. Both stay at length ≤ k.
   const top: Car[] = [];
   const topFit: number[] = [];
 
@@ -130,10 +108,8 @@ export function getTopAICars(
 
     const fit = evaluateFitness(car);
 
-    // Skip cars that cannot enter a full pool (worse than the current worst).
     if (top.length === k && fit <= topFit[top.length - 1]) continue;
 
-    // Insertion sort into the small top list.
     let pos = top.length < k ? top.length : k - 1;
     while (pos > 0 && topFit[pos - 1] < fit) {
       top[pos] = top[pos - 1];

@@ -1,33 +1,25 @@
 import type { CarInfo } from '../../../car/car.js';
 import type { Car } from '../../../car/car.js';
-import type { NeuralNetwork } from '../../../neural-network/network.js';
-import { safeJsonParse } from '../../../utils.js';
+import { safeJsonParse } from '../../../store/serialization.js';
 import { DEFAULT_CAR_CONFIG } from '../../../car/config.js';
 
-/**
- * Manages localStorage persistence for the training pool.
- * Provides load/save/discard operations and legacy migration.
- */
-
 export function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
-  // Try unified key first
   const stored = localStorage.getItem('bestPool');
   const storedPool = safeJsonParse<CarInfo[]>(stored);
   if (storedPool) {
     return storedPool;
   }
 
-  // Legacy migration: combine old separate keys into unified pool
   const legacyBrains = localStorage.getItem('bestBrains');
   const legacyBrain = localStorage.getItem('bestBrain');
   const legacyConfig = localStorage.getItem('bestCarInfo');
 
   if (legacyBrains || legacyBrain) {
-    let brains: NeuralNetwork[] = [];
+    let brains: unknown[] = [];
     if (legacyBrains) {
-      brains = safeJsonParse<NeuralNetwork[]>(legacyBrains) ?? [];
+      brains = safeJsonParse<unknown[]>(legacyBrains) ?? [];
     } else if (legacyBrain) {
-      const brain = safeJsonParse<NeuralNetwork>(legacyBrain);
+      const brain = safeJsonParse<unknown>(legacyBrain);
       brains = brain ? [brain] : [];
     }
 
@@ -43,7 +35,6 @@ export function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
       brain,
     }));
 
-    // Migrate: write unified key and remove legacy keys
     localStorage.setItem('bestPool', JSON.stringify(pool));
     localStorage.removeItem('bestBrain');
     localStorage.removeItem('bestBrains');
@@ -66,18 +57,12 @@ export function savePoolToStorage(pool: CarInfo[]): void {
 
 export function discardStoredPool(): void {
   localStorage.removeItem('bestPool');
-  // Remove legacy keys if they exist
   localStorage.removeItem('bestBrain');
   localStorage.removeItem('bestBrains');
   localStorage.removeItem('bestCarInfo');
   console.log('Stored pool discarded from localStorage.');
 }
 
-/**
- * Race-only car list persistence ('raceCars' localStorage key).
- * Separate from the training pool ('bestPool'): cars loaded via the race's
- * "Load car(s)" button are stored here and never overwrite the training pool.
- */
 export function loadRaceCars(): CarInfo[] {
   const stored = localStorage.getItem('raceCars');
   return safeJsonParse<CarInfo[]>(stored) ?? [];

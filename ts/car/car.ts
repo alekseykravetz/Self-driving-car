@@ -1,19 +1,18 @@
-import { NeuralNetwork } from '../neural-network/network.js';
 import { Sensor } from './sensors/sensor.js';
 import { Controls } from './controls/controls.js';
 import { PhoneControls } from './controls/phoneControls.js';
 import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
-import { CarRenderer, CarDrawOptions } from './rendering/carRenderer.js';
-import { CarBrainAdapter } from './brain/carBrainAdapter.js';
-import { SoundEngine, explode } from '../audio/sound.js';
-import { DEFAULT_CAR_CONFIG } from './config.js';
-import { Point } from '../math/primitives/point.js';
+import { CarRenderer, type CarDrawOptions } from './rendering/carRenderer.js';
+import { CarBrainAdapter, type Brain } from './brain/carBrainAdapter.js';
+import { STEERING_SPEED, DEFAULT_CAR_CONFIG } from './config.js';
+import type { Point } from '../math/primitives/point.js';
+import type { ControlsState } from './carState.js';
 
 export type CarControls = Controls | PhoneControls | CameraControls;
 
 export interface CarInfo {
-  brain?: NeuralNetwork;
+  brain?: unknown;
   maxSpeed: number;
   friction: number;
   acceleration: number;
@@ -46,16 +45,25 @@ export interface CarOptions {
     rayLength?: number;
     rayOffset?: number;
   };
+  callbacks?: CarCallbacks;
+}
+
+export interface CarCallbacks {
+  onDamaged?: () => void;
+  onEngineUpdate?: (speed: number, maxSpeed: number) => void;
 }
 
 export class Car {
   name?: string;
+  type: string;
+  color: string;
+  useBrain: boolean;
+  hiddenLayers: number[];
+
   x: number;
   y: number;
   width: number;
   height: number;
-  color: string;
-  type: string; // controlType
   speed: number;
   acceleration: number;
   maxSpeed: number;
@@ -63,19 +71,20 @@ export class Car {
   angle: number;
   damaged: boolean;
   fitness: number;
-  useBrain: boolean;
-  hiddenLayers: number[];
-  sensor?: Sensor;
-  brain?: NeuralNetwork;
-  controls: CarControls;
   polygon: Point[];
-  physics: CarPhysics;
-  renderer: CarRenderer;
-  engine?: SoundEngine;
+
+  sensor?: Sensor;
+  brain?: Brain;
+  controls: CarControls;
 
   //todo: fix this
   finishTime?: number;
   progress?: number;
+
+  physics: CarPhysics;
+  renderer: CarRenderer;
+
+  #callbacks?: CarCallbacks;
 
   constructor(opts: CarOptions) {
     this.x = opts.x;
@@ -98,9 +107,11 @@ export class Car {
 
     this.useBrain = opts.controlType === 'AI';
 
+    this.#callbacks = opts.callbacks;
+
     if (opts.controlType !== 'DUMMY') {
-      this.sensor = new Sensor(this, opts.sensor);
-      this.brain = new NeuralNetwork([
+      this.sensor = new Sensor(opts.sensor);
+      this.brain = CarBrainAdapter.createBrain([
         this.sensor.rayCount + 1,
         ...this.hiddenLayers,
         4,
@@ -108,22 +119,13 @@ export class Car {
     }
     this.controls = new Controls(opts.controlType);
 
-    this.physics = new CarPhysics(this);
+    this.physics = new CarPhysics();
     this.renderer = new CarRenderer(this);
 
-    this.polygon = this.physics.createPolygon();
+    this.polygon = this.physics.createPolygon(this);
     this.update();
   }
 
-  /**
-   * Factory method to create a Car instance from initial options and persisted info.
-   * Provides an explicit, deterministic way to rehydrate a car from saved state
-   * without mutation. Prefer this over creating a car and then calling load().
-   *
-   * @param opts Initial car creation options (position, control type, etc.)
-   * @param info Optional persisted car info to apply (brain, config, etc.)
-   * @returns A new Car instance with persisted state applied
-   */
   static fromInfo(opts: CarOptions, info?: CarInfo | null): Car {
     const car = new Car(opts);
     if (info) {
@@ -132,14 +134,9 @@ export class Car {
     return car;
   }
 
-  /**
-   * Apply persisted car info to this instance (mutation-based).
-   * For new code, prefer Car.fromInfo() which creates and loads in one step.
-   * This method is kept for backward compatibility.
-   */
   load(info: CarInfo): void {
     if (info.brain) {
-      this.brain = NeuralNetwork.deserialize(info.brain);
+      this.brain = CarBrainAdapter.deserialize(info.brain);
     }
     if (info.hiddenLayers) {
       this.hiddenLayers = [...info.hiddenLayers];
@@ -159,7 +156,7 @@ export class Car {
 
   toInfo(): CarInfo {
     return {
-      brain: this.brain ? NeuralNetwork.clone(this.brain) : undefined,
+      brain: this.brain ? CarBrainAdapter.serialize(this.brain) : undefined,
       maxSpeed: this.maxSpeed,
       friction: this.friction,
       acceleration: this.acceleration,
@@ -178,14 +175,46 @@ export class Car {
     };
   }
 
+  #applySteering(): void {
+    if (this.speed === 0) return;
+
+    if (
+      this.controls instanceof CameraControls ||
+      (this.controls instanceof PhoneControls && this.controls.tilt !== 0)
+    ) {
+      this.angle -= this.controls.tilt * STEERING_SPEED;
+    } else {
+      const flip = this.speed > 0 ? 1 : -1;
+      if ((this.controls as Controls).left) {
+        this.angle += STEERING_SPEED * flip;
+      }
+      if ((this.controls as Controls).right) {
+        this.angle -= STEERING_SPEED * flip;
+      }
+    }
+  }
+
+  #computeControlsState(): ControlsState {
+    return {
+      forward: this.controls.forward,
+      reverse: this.controls.reverse,
+    };
+  }
+
   update(polygons: Point[][] = []): void {
-    const becameDamaged = this.physics.update(polygons);
-    if (becameDamaged && this.type === 'KEYS') {
-      explode();
+    this.#applySteering();
+
+    const becameDamaged = this.physics.update(
+      this,
+      this.#computeControlsState(),
+      polygons,
+    );
+    if (becameDamaged) {
+      this.#callbacks?.onDamaged?.();
     }
 
     if (this.sensor && this.brain) {
-      this.sensor.update(polygons);
+      this.sensor.update(this.x, this.y, this.angle, polygons);
       if (this.useBrain && this.controls instanceof Controls) {
         const output = CarBrainAdapter.computeControls(
           this.sensor.readings,
@@ -199,18 +228,22 @@ export class Car {
         this.controls.reverse = output.reverse;
       }
     } else if (this.sensor) {
-      // Keep the rays following the car (and reacting to borders) even when
-      // there is no brain — e.g. the player's manually-driven car.
-      this.sensor.update(polygons);
+      this.sensor.update(this.x, this.y, this.angle, polygons);
     }
-    if (this.engine) {
-      const percent = Math.abs(this.speed / this.maxSpeed);
-      this.engine.setVolume(percent);
-      this.engine.setPitch(percent);
-    }
+
+    this.#syncEngine();
+  }
+
+  #syncEngine(): void {
+    if (!this.#callbacks?.onEngineUpdate) return;
+    this.#callbacks.onEngineUpdate(this.speed, this.maxSpeed);
   }
 
   draw(ctx: CanvasRenderingContext2D, options: CarDrawOptions = {}): void {
     this.renderer.draw(ctx, options);
+  }
+
+  setCallbacks(cb: CarCallbacks): void {
+    this.#callbacks = cb;
   }
 }

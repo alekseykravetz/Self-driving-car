@@ -12,7 +12,7 @@ import { Viewport } from '../../viewport/viewport.js';
 import { Camera } from '../../camera/camera.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { StoreManager } from '../../store/storeManager.js';
-import { getRandomColor } from '../../utils.js';
+import { getRandomColor } from '../../math/color.js';
 import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
 import { getNearestSegment, scale, angle } from '../../math/utils.js';
 import { Point } from '../../math/primitives/point.js';

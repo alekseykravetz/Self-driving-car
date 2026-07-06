@@ -19,7 +19,7 @@ import { StoreManager } from '../../store/storeManager.js';
 import { WorldToolbarElement } from '../../panels/worldToolbar.js';
 import { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
 import { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
-import { safeJsonParse } from '../../utils.js';
+import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
 
 /** localStorage key for the editor's per-layer visibility preference. */

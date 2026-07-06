@@ -18,7 +18,7 @@ import {
   discardStoredPool,
   downloadCarFiles,
 } from './genetics/storageManager.js';
-import { safeJsonParse } from '../../utils.js';
+import { safeJsonParse } from '../../store/serialization.js';
 import {
   formatMetersFromWorldPixels,
   formatKmhFromPxPerFrame,

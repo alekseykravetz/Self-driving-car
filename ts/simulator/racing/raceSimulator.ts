@@ -13,7 +13,7 @@ import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Camera } from '../../camera/camera.js';
 import { StoreManager } from '../../store/storeManager.js';
-import { getRandomColor } from '../../utils.js';
+import { getRandomColor } from '../../math/color.js';
 import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
 import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
@@ -23,7 +23,7 @@ import { angle, getNearestSegment, scale } from '../../math/utils.js';
 
 import { loadPoolFromStorage } from '../training/genetics/storageManager.js';
 import { handleCollisionWithRoadBorders } from '../training/modes/borderCollision.js';
-import { SoundEngine, taDaa } from '../../audio/sound.js';
+import { SoundEngine, taDaa, explode } from '../../audio/sound.js';
 
 export class RaceSimulator extends SimulatorShell {
   controls: CarControls | null;
@@ -193,7 +193,17 @@ export class RaceSimulator extends SimulatorShell {
       this.#started = true;
       this.#frameCount = 0;
       if (this.#myCar) {
-        this.#myCar.engine = new SoundEngine();
+        const engine = new SoundEngine();
+        this.#myCar.setCallbacks({
+          onDamaged: () => {
+            explode();
+          },
+          onEngineUpdate: (speed: number, maxSpeed: number) => {
+            const percent = Math.abs(speed / maxSpeed);
+            engine.setVolume(percent);
+            engine.setPitch(percent);
+          },
+        });
       }
       if (this.controls instanceof CameraControls) {
         this.controls.saveExpectedSize();

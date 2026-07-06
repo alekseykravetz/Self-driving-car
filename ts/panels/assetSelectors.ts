@@ -2,7 +2,7 @@ import type { UnifiedWorldEntry } from '../store/types.js';
 import { StoreManager } from '../store/storeManager.js';
 import type { CarInfo } from '../car/car.js';
 import { CarLoader } from '../car/loader/carLoader.js';
-import { stripFileExtension } from '../utils.js';
+import { stripFileExtension } from '../store/serialization.js';
 import { parseWorldFileContent } from '../world/loader/worldLoader.js';
 
 export class ToolbarAssetSelectors {

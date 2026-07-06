@@ -2,7 +2,7 @@ import { TRAINING_INIT_MODAL_TEMPLATE } from './templates/trainingInitModalTempl
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
-import { safeJsonParse } from '../../utils.js';
+import { safeJsonParse } from '../../store/serialization.js';
 import { inferHiddenLayers } from './genetics/poolManager.js';
 /**
  * <training-init-modal> — A blocking dialog shown on the training page (on entry

@@ -9,7 +9,7 @@ import type { LayoutToolbarElement } from '../panels/layoutToolbar.js';
 import type { AnimationLoopToolbarElement } from '../panels/animationLoopToolbar.js';
 import type { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
-import { safeJsonParse } from '../../utils.js';
+import { safeJsonParse } from '../../store/serialization.js';
 import { resizeSimulatorLayout } from '../training/rendering/layoutManager.js';
 import type { NeuralNetwork } from '../../neural-network/network.js';
 
@@ -198,7 +198,7 @@ export abstract class SimulatorShell {
    * Render the neural-network visualizer for the given brain into the network
    * canvas. No-op when the visualizer toggle is off or no brain is provided.
    */
-  drawNetworkVisualizer(time: number, brain: NeuralNetwork | undefined): void {
+  drawNetworkVisualizer(time: number, brain: unknown): void {
     if (!this.layoutToolbar.showVisualizer) return;
     this.networkCtx.clearRect(
       0,
@@ -207,7 +207,11 @@ export abstract class SimulatorShell {
       this.networkCanvas.height,
     );
     if (brain) {
-      this.networkVisualizer.draw(this.networkCtx, brain, time);
+      this.networkVisualizer.draw(
+        this.networkCtx,
+        brain as NeuralNetwork,
+        time,
+      );
     }
   }
 

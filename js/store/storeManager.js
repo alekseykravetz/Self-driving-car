@@ -1,4 +1,4 @@
-import { safeJsonParse } from '../utils.js';
+import { safeJsonParse } from './serialization.js';
 import { parseWorldFileContent } from '../world/loader/worldLoader.js';
 import { CarLoader } from '../car/loader/carLoader.js';
 /**

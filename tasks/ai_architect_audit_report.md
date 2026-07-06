@@ -62,27 +62,27 @@
 
 ### Immediate Priority
 
-| Action | Files | Rationale |
-|--------|-------|-----------|
-| Extract `CarState` interface | New `ts/car/carState.ts` | Break `car.ts` ↔ `carPhysics.ts` circular dep. `CarPhysics` takes `CarState` + `ControlsState` instead of `Car` instance. |
-| Extract `SensorState` | Modify `ts/car/sensors/sensor.ts` | `Sensor` receives `(x, y, angle)` instead of `Car`, breaking the `car.ts` ↔ `sensor.ts` cycle. |
+| Action                                                     | Files                                                     | Rationale                                                                                                                                       |
+| ---------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Extract `CarState` interface                               | New `ts/car/carState.ts`                                  | Break `car.ts` ↔ `carPhysics.ts` circular dep. `CarPhysics` takes `CarState` + `ControlsState` instead of `Car` instance.                      |
+| Extract `SensorState`                                      | Modify `ts/car/sensors/sensor.ts`                         | `Sensor` receives `(x, y, angle)` instead of `Car`, breaking the `car.ts` ↔ `sensor.ts` cycle.                                                 |
 | Move `NeuralNetwork` import from `car.ts` to adapter layer | Modify `ts/car/car.ts`, `ts/car/brain/carBrainAdapter.ts` | Resolve Layer 2 → Layer 3 upward import. `Car` should reference an opaque `Brain` type; all serialization/feedforward goes through the adapter. |
-| Extract audio out of `Car.update()` | Modify `ts/car/car.ts`, `ts/simulator/` | Fire domain events; let the simulator shell subscribe to car state changes. |
+| Extract audio out of `Car.update()`                        | Modify `ts/car/car.ts`, `ts/simulator/`                   | Fire domain events; let the simulator shell subscribe to car state changes.                                                                     |
 
 ### Medium Priority
 
-| Action | Files | Rationale |
-|--------|-------|-----------|
-| Encapsulate `Car` fields | `ts/car/car.ts` | Mark position, speed, angle, etc. as `#` private with controlled accessors. Prevents untracked mutation from physics/simulator code. |
-| Split `ts/utils.ts` | New `ts/math/collision.ts`, `ts/math/color.ts`, etc. | Remove the misc utility bag. `polysIntersect` belongs in math. |
-| Extract magic numbers in `trafficFactory.ts` | `ts/simulator/training/modes/trafficFactory.ts` | Reference `DEFAULT_CAR_CONFIG` instead of hardcoded width/height/speed. |
-| Deduplicate `greenDuration`/`yellowDuration` | `ts/world/trafficManager.ts` | Extract to module-level constants or a config object; currently duplicated between `#initializeControlCenters` and `update()`. |
-| Encapsulate `trafficManager` frame counting | `ts/world/trafficManager.ts` | `frameCount` is incremented in `update()` → called from `World.draw()`. Frame counting in a draw method is a side-effect violation. Move to a time-delta system. |
+| Action                                       | Files                                                | Rationale                                                                                                                                                        |
+| -------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Encapsulate `Car` fields                     | `ts/car/car.ts`                                      | Mark position, speed, angle, etc. as `#` private with controlled accessors. Prevents untracked mutation from physics/simulator code.                             |
+| Split `ts/utils.ts`                          | New `ts/math/collision.ts`, `ts/math/color.ts`, etc. | Remove the misc utility bag. `polysIntersect` belongs in math.                                                                                                   |
+| Extract magic numbers in `trafficFactory.ts` | `ts/simulator/training/modes/trafficFactory.ts`      | Reference `DEFAULT_CAR_CONFIG` instead of hardcoded width/height/speed.                                                                                          |
+| Deduplicate `greenDuration`/`yellowDuration` | `ts/world/trafficManager.ts`                         | Extract to module-level constants or a config object; currently duplicated between `#initializeControlCenters` and `update()`.                                   |
+| Encapsulate `trafficManager` frame counting  | `ts/world/trafficManager.ts`                         | `frameCount` is incremented in `update()` → called from `World.draw()`. Frame counting in a draw method is a side-effect violation. Move to a time-delta system. |
 
 ### Low Priority / Nice-to-Have
 
-| Action | Files | Rationale |
-|--------|-------|-----------|
-| `RaceSimulator` delegate extraction | `ts/simulator/racing/raceSimulator.ts` | 357-line class with 12 private methods. Extract `RaceProgressTracker` and `RaceCollisionHandler`. |
-| `WorldEditor` delegate extraction | `ts/world/editors/worldEditor.ts` | 543-line class. The editor tool map, OSM parsing, and UI wiring could be split. |
-| Consistent `#` private fields across all classes | Multiple files | Unify on ES2022 `#` convention across the codebase for runtime encapsulation. |
+| Action                                           | Files                                  | Rationale                                                                                         |
+| ------------------------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `RaceSimulator` delegate extraction              | `ts/simulator/racing/raceSimulator.ts` | 357-line class with 12 private methods. Extract `RaceProgressTracker` and `RaceCollisionHandler`. |
+| `WorldEditor` delegate extraction                | `ts/world/editors/worldEditor.ts`      | 543-line class. The editor tool map, OSM parsing, and UI wiring could be split.                   |
+| Consistent `#` private fields across all classes | Multiple files                         | Unify on ES2022 `#` convention across the codebase for runtime encapsulation.                     |

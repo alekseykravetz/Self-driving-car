@@ -1,14 +1,12 @@
 import { SensorRaycaster, } from '../physics/sensorRaycaster.js';
 export class Sensor {
-    car;
     rayCount;
     rayLength;
     raySpread;
     rayOffset;
     rays;
     readings;
-    constructor(car, config) {
-        this.car = car;
+    constructor(config) {
         this.rayCount = config?.rayCount ?? 5;
         this.rayLength = config?.rayLength ?? 150;
         this.raySpread = config?.raySpread ?? Math.PI / 2;
@@ -16,8 +14,8 @@ export class Sensor {
         this.rays = [];
         this.readings = [];
     }
-    update(polygons = []) {
-        this.rays = SensorRaycaster.castRays(this.car.x, this.car.y, this.car.angle, this.rayCount, this.rayLength, this.raySpread, this.rayOffset);
+    update(x, y, angle, polygons = []) {
+        this.rays = SensorRaycaster.castRays(x, y, angle, this.rayCount, this.rayLength, this.raySpread, this.rayOffset);
         this.readings = SensorRaycaster.getReadings(this.rays, polygons);
     }
     draw(ctx) {

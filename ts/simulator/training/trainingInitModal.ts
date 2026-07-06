@@ -3,7 +3,7 @@ import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
-import { safeJsonParse } from '../../utils.js';
+import { safeJsonParse } from '../../store/serialization.js';
 import { inferHiddenLayers } from './genetics/poolManager.js';
 
 export interface TrainingInitDefaults {

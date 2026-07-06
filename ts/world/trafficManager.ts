@@ -10,6 +10,9 @@ type lightControlCenterPoint = Point & {
   ticks: number;
 };
 
+const GREEN_DURATION = 2;
+const YELLOW_DURATION = 1;
+
 export class TrafficManager {
   graph: Graph;
   markings: Marking[];
@@ -86,13 +89,9 @@ export class TrafficManager {
       }
     }
 
-    // Define light cycle durations (consider making these configurable)
-    const greenDuration = 2; // seconds
-    const yellowDuration = 1; // seconds
-
     // Calculate ticks per full cycle for each control center
     for (const center of this.controlCenters) {
-      center.ticks = center.lights.length * (greenDuration + yellowDuration);
+      center.ticks = center.lights.length * (GREEN_DURATION + YELLOW_DURATION);
     }
   }
 
@@ -100,10 +99,6 @@ export class TrafficManager {
   update(): void {
     this.#initializeControlCenters(); // todo: fix not init lights on each update (problem with markings and graph changes outside)
     if (!this.controlCenters.length) return; // Nothing to update
-
-    // Define light cycle durations (same as in initialization)
-    const greenDuration = 2; // seconds
-    const yellowDuration = 1; // seconds
 
     // Determine current state based on frame count (assuming 60 FPS target)
     // Consider using time delta for frame-rate independence if needed
@@ -114,7 +109,7 @@ export class TrafficManager {
       if (!center.ticks || !center.lights.length) continue;
 
       const currentTickInCycle = tick % center.ticks;
-      const cycleSegmentDuration = greenDuration + yellowDuration;
+      const cycleSegmentDuration = GREEN_DURATION + YELLOW_DURATION;
       // Determine which light should be green/yellow based on the cycle progress
       const greenYellowIndex = Math.floor(
         currentTickInCycle / cycleSegmentDuration,
@@ -123,7 +118,7 @@ export class TrafficManager {
       // Determine if the active light is in its green or yellow phase
       const stateWithinSegment = currentTickInCycle % cycleSegmentDuration;
       const currentPhase: 'green' | 'yellow' =
-        stateWithinSegment < greenDuration ? 'green' : 'yellow';
+        stateWithinSegment < GREEN_DURATION ? 'green' : 'yellow';
 
       // Update the state of each light controlled by this center
       for (let i = 0; i < center.lights.length; i++) {

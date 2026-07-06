@@ -1,6 +1,8 @@
 import { Point } from '../math/primitives/point.js';
 import { Light } from './markings/light.js';
 import { getNearestPoint } from '../math/utils.js';
+const GREEN_DURATION = 2;
+const YELLOW_DURATION = 1;
 export class TrafficManager {
     graph;
     markings;
@@ -59,12 +61,9 @@ export class TrafficManager {
                 controlCenter.lights.push(light);
             }
         }
-        // Define light cycle durations (consider making these configurable)
-        const greenDuration = 2; // seconds
-        const yellowDuration = 1; // seconds
         // Calculate ticks per full cycle for each control center
         for (const center of this.controlCenters) {
-            center.ticks = center.lights.length * (greenDuration + yellowDuration);
+            center.ticks = center.lights.length * (GREEN_DURATION + YELLOW_DURATION);
         }
     }
     // Updates the state of all managed traffic lights based on time/frameCount
@@ -72,9 +71,6 @@ export class TrafficManager {
         this.#initializeControlCenters(); // todo: fix not init lights on each update (problem with markings and graph changes outside)
         if (!this.controlCenters.length)
             return; // Nothing to update
-        // Define light cycle durations (same as in initialization)
-        const greenDuration = 2; // seconds
-        const yellowDuration = 1; // seconds
         // Determine current state based on frame count (assuming 60 FPS target)
         // Consider using time delta for frame-rate independence if needed
         const tick = Math.floor(this.frameCount / 60);
@@ -83,12 +79,12 @@ export class TrafficManager {
             if (!center.ticks || !center.lights.length)
                 continue;
             const currentTickInCycle = tick % center.ticks;
-            const cycleSegmentDuration = greenDuration + yellowDuration;
+            const cycleSegmentDuration = GREEN_DURATION + YELLOW_DURATION;
             // Determine which light should be green/yellow based on the cycle progress
             const greenYellowIndex = Math.floor(currentTickInCycle / cycleSegmentDuration);
             // Determine if the active light is in its green or yellow phase
             const stateWithinSegment = currentTickInCycle % cycleSegmentDuration;
-            const currentPhase = stateWithinSegment < greenDuration ? 'green' : 'yellow';
+            const currentPhase = stateWithinSegment < GREEN_DURATION ? 'green' : 'yellow';
             // Update the state of each light controlled by this center
             for (let i = 0; i < center.lights.length; i++) {
                 if (i === greenYellowIndex) {

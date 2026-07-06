@@ -1,17 +1,11 @@
-import { safeJsonParse } from '../../../utils.js';
+import { safeJsonParse } from '../../../store/serialization.js';
 import { DEFAULT_CAR_CONFIG } from '../../../car/config.js';
-/**
- * Manages localStorage persistence for the training pool.
- * Provides load/save/discard operations and legacy migration.
- */
 export function loadPoolFromStorage(fallbackConfig) {
-    // Try unified key first
     const stored = localStorage.getItem('bestPool');
     const storedPool = safeJsonParse(stored);
     if (storedPool) {
         return storedPool;
     }
-    // Legacy migration: combine old separate keys into unified pool
     const legacyBrains = localStorage.getItem('bestBrains');
     const legacyBrain = localStorage.getItem('bestBrain');
     const legacyConfig = localStorage.getItem('bestCarInfo');
@@ -34,7 +28,6 @@ export function loadPoolFromStorage(fallbackConfig) {
             sensor: { ...baseConfig.sensor },
             brain,
         }));
-        // Migrate: write unified key and remove legacy keys
         localStorage.setItem('bestPool', JSON.stringify(pool));
         localStorage.removeItem('bestBrain');
         localStorage.removeItem('bestBrains');
@@ -55,17 +48,11 @@ export function savePoolToStorage(pool) {
 }
 export function discardStoredPool() {
     localStorage.removeItem('bestPool');
-    // Remove legacy keys if they exist
     localStorage.removeItem('bestBrain');
     localStorage.removeItem('bestBrains');
     localStorage.removeItem('bestCarInfo');
     console.log('Stored pool discarded from localStorage.');
 }
-/**
- * Race-only car list persistence ('raceCars' localStorage key).
- * Separate from the training pool ('bestPool'): cars loaded via the race's
- * "Load car(s)" button are stored here and never overwrite the training pool.
- */
 export function loadRaceCars() {
     const stored = localStorage.getItem('raceCars');
     return safeJsonParse(stored) ?? [];

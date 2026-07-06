@@ -1,12 +1,10 @@
-import { Car } from '../car.js';
 import {
   SensorRaycaster,
-  IntersectionPoint,
+  type IntersectionPoint,
 } from '../physics/sensorRaycaster.js';
-import { Point } from '../../math/primitives/point.js';
+import type { Point } from '../../math/primitives/point.js';
 
 export class Sensor {
-  car: Car;
   rayCount: number;
   rayLength: number;
   raySpread: number;
@@ -15,16 +13,12 @@ export class Sensor {
   rays: Point[][];
   readings: (IntersectionPoint | null)[];
 
-  constructor(
-    car: Car,
-    config?: {
-      rayCount?: number;
-      raySpread?: number;
-      rayLength?: number;
-      rayOffset?: number;
-    },
-  ) {
-    this.car = car;
+  constructor(config?: {
+    rayCount?: number;
+    raySpread?: number;
+    rayLength?: number;
+    rayOffset?: number;
+  }) {
     this.rayCount = config?.rayCount ?? 5;
     this.rayLength = config?.rayLength ?? 150;
     this.raySpread = config?.raySpread ?? Math.PI / 2;
@@ -34,11 +28,11 @@ export class Sensor {
     this.readings = [];
   }
 
-  update(polygons: Point[][] = []): void {
+  update(x: number, y: number, angle: number, polygons: Point[][] = []): void {
     this.rays = SensorRaycaster.castRays(
-      this.car.x,
-      this.car.y,
-      this.car.angle,
+      x,
+      y,
+      angle,
       this.rayCount,
       this.rayLength,
       this.raySpread,

@@ -7,7 +7,7 @@
 import { CarInfo } from '../car/car.js';
 import { StoreManager } from './storeManager.js';
 import { STORE_PANEL_TEMPLATE } from './templates/storePanelTemplate.js';
-import { stripFileExtension } from '../utils.js';
+import { stripFileExtension } from './serialization.js';
 
 // File-scope helpers.
 
@@ -16,7 +16,9 @@ function spFormatHiddenLayers(data: CarInfo): string {
   if (data.hiddenLayers && data.hiddenLayers.length > 0) {
     return data.hiddenLayers.join(',');
   }
-  const levels = data.brain?.levels;
+  const levels = (
+    data.brain as { levels?: { outputs: number[] }[] } | undefined
+  )?.levels;
   if (levels && levels.length > 1) {
     return levels
       .slice(0, -1)

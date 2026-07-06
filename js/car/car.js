@@ -1,19 +1,21 @@
-import { NeuralNetwork } from '../neural-network/network.js';
 import { Sensor } from './sensors/sensor.js';
 import { Controls } from './controls/controls.js';
+import { PhoneControls } from './controls/phoneControls.js';
+import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
 import { CarRenderer } from './rendering/carRenderer.js';
 import { CarBrainAdapter } from './brain/carBrainAdapter.js';
-import { explode } from '../audio/sound.js';
-import { DEFAULT_CAR_CONFIG } from './config.js';
+import { STEERING_SPEED, DEFAULT_CAR_CONFIG } from './config.js';
 export class Car {
     name;
+    type;
+    color;
+    useBrain;
+    hiddenLayers;
     x;
     y;
     width;
     height;
-    color;
-    type; // controlType
     speed;
     acceleration;
     maxSpeed;
@@ -21,18 +23,16 @@ export class Car {
     angle;
     damaged;
     fitness;
-    useBrain;
-    hiddenLayers;
+    polygon;
     sensor;
     brain;
     controls;
-    polygon;
-    physics;
-    renderer;
-    engine;
     //todo: fix this
     finishTime;
     progress;
+    physics;
+    renderer;
+    #callbacks;
     constructor(opts) {
         this.x = opts.x;
         this.y = opts.y;
@@ -49,29 +49,21 @@ export class Car {
         this.fitness = 0;
         this.hiddenLayers = opts.hiddenLayers ?? [6];
         this.useBrain = opts.controlType === 'AI';
+        this.#callbacks = opts.callbacks;
         if (opts.controlType !== 'DUMMY') {
-            this.sensor = new Sensor(this, opts.sensor);
-            this.brain = new NeuralNetwork([
+            this.sensor = new Sensor(opts.sensor);
+            this.brain = CarBrainAdapter.createBrain([
                 this.sensor.rayCount + 1,
                 ...this.hiddenLayers,
                 4,
             ]);
         }
         this.controls = new Controls(opts.controlType);
-        this.physics = new CarPhysics(this);
+        this.physics = new CarPhysics();
         this.renderer = new CarRenderer(this);
-        this.polygon = this.physics.createPolygon();
+        this.polygon = this.physics.createPolygon(this);
         this.update();
     }
-    /**
-     * Factory method to create a Car instance from initial options and persisted info.
-     * Provides an explicit, deterministic way to rehydrate a car from saved state
-     * without mutation. Prefer this over creating a car and then calling load().
-     *
-     * @param opts Initial car creation options (position, control type, etc.)
-     * @param info Optional persisted car info to apply (brain, config, etc.)
-     * @returns A new Car instance with persisted state applied
-     */
     static fromInfo(opts, info) {
         const car = new Car(opts);
         if (info) {
@@ -79,14 +71,9 @@ export class Car {
         }
         return car;
     }
-    /**
-     * Apply persisted car info to this instance (mutation-based).
-     * For new code, prefer Car.fromInfo() which creates and loads in one step.
-     * This method is kept for backward compatibility.
-     */
     load(info) {
         if (info.brain) {
-            this.brain = NeuralNetwork.deserialize(info.brain);
+            this.brain = CarBrainAdapter.deserialize(info.brain);
         }
         if (info.hiddenLayers) {
             this.hiddenLayers = [...info.hiddenLayers];
@@ -107,7 +94,7 @@ export class Car {
     }
     toInfo() {
         return {
-            brain: this.brain ? NeuralNetwork.clone(this.brain) : undefined,
+            brain: this.brain ? CarBrainAdapter.serialize(this.brain) : undefined,
             maxSpeed: this.maxSpeed,
             friction: this.friction,
             acceleration: this.acceleration,
@@ -122,13 +109,37 @@ export class Car {
             },
         };
     }
+    #applySteering() {
+        if (this.speed === 0)
+            return;
+        if (this.controls instanceof CameraControls ||
+            (this.controls instanceof PhoneControls && this.controls.tilt !== 0)) {
+            this.angle -= this.controls.tilt * STEERING_SPEED;
+        }
+        else {
+            const flip = this.speed > 0 ? 1 : -1;
+            if (this.controls.left) {
+                this.angle += STEERING_SPEED * flip;
+            }
+            if (this.controls.right) {
+                this.angle -= STEERING_SPEED * flip;
+            }
+        }
+    }
+    #computeControlsState() {
+        return {
+            forward: this.controls.forward,
+            reverse: this.controls.reverse,
+        };
+    }
     update(polygons = []) {
-        const becameDamaged = this.physics.update(polygons);
-        if (becameDamaged && this.type === 'KEYS') {
-            explode();
+        this.#applySteering();
+        const becameDamaged = this.physics.update(this, this.#computeControlsState(), polygons);
+        if (becameDamaged) {
+            this.#callbacks?.onDamaged?.();
         }
         if (this.sensor && this.brain) {
-            this.sensor.update(polygons);
+            this.sensor.update(this.x, this.y, this.angle, polygons);
             if (this.useBrain && this.controls instanceof Controls) {
                 const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain);
                 this.controls.forward = output.forward;
@@ -138,17 +149,19 @@ export class Car {
             }
         }
         else if (this.sensor) {
-            // Keep the rays following the car (and reacting to borders) even when
-            // there is no brain — e.g. the player's manually-driven car.
-            this.sensor.update(polygons);
+            this.sensor.update(this.x, this.y, this.angle, polygons);
         }
-        if (this.engine) {
-            const percent = Math.abs(this.speed / this.maxSpeed);
-            this.engine.setVolume(percent);
-            this.engine.setPitch(percent);
-        }
+        this.#syncEngine();
+    }
+    #syncEngine() {
+        if (!this.#callbacks?.onEngineUpdate)
+            return;
+        this.#callbacks.onEngineUpdate(this.speed, this.maxSpeed);
     }
     draw(ctx, options = {}) {
         this.renderer.draw(ctx, options);
+    }
+    setCallbacks(cb) {
+        this.#callbacks = cb;
     }
 }

@@ -14,6 +14,7 @@ Before evaluating anything else, align with the specific technical constraints o
 
 - **ES modules with `.js` extensions** — All source is in `ts/`, compiled to `js/` (mirrored structure). Every `import`/`export` must use the `.js` extension convention (TypeScript requirement for `nodenext`). Flag bare specifiers or missing extensions.
 - **Layer isolation via imports** — The dependency graph should flow strictly downward. Verify that lower-layer modules never import from higher layers:
+
   1. Layer 1: Math & Primitives (`ts/math/`, `ts/math/primitives/`, `ts/math/utils.ts`) — zero project imports, only DOM or standard TS libs.
   2. Layer 2: Environmental Elements & Physics (`ts/world/`, `ts/car/physics/`, `ts/car/sensors/`, `ts/car/controls/`, `ts/car/car.ts`, `ts/rendering/`) — may import Layer 1 only.
   3. Layer 3: Neural Networks & Evolution Mechanics (`ts/neural-network/`, `ts/simulator/training/genetics/`) — may import Layers 1-2.
