@@ -28,10 +28,11 @@ function injectKeysCarIntoPool(
   keysCar: Car,
   maxPoolSize: number,
   evaluateFitness: (car: Car) => number,
-): CarInfo[]
+): CarInfo[];
 ```
 
 **Logic:**
+
 1. Check brain compatibility: `brainsCompatible(keysCar.brain, pool[0].brain)`. If incompatible (e.g., topology changed between generations), skip and return pool unchanged.
 2. Compute fitness of the KEYS car: call `evaluateFitness(keysCar)` — same formula used for AI cars.
 3. Convert KEYS car to `CarInfo`: `keysCar.toInfo()`.
@@ -39,6 +40,7 @@ function injectKeysCarIntoPool(
 5. If pool exceeds `maxPoolSize` after insertion, remove the lowest-ranked AI car.
 
 **Edge cases:**
+
 - Pool is empty: just return `[keysCarInfo]`
 - KEYS car has zero fitness: still insert (it may still contribute valuable patterns through crossover)
 - `evaluateFitness` throws or returns NaN: skip injection
@@ -48,14 +50,16 @@ function injectKeysCarIntoPool(
 In `ts/simulator/training/trainingPanel.ts` (or the `<training-panel>` template):
 
 Add checkbox:
+
 ```html
 <label class="inject-keys-toggle">
-  <input type="checkbox" id="injectKeys" checked>
+  <input type="checkbox" id="injectKeys" checked />
   Inject KEYS brain into gene pool
 </label>
 ```
 
 Add status display (appears when injection is active):
+
 ```html
 <span class="keys-status" id="keysPoolStatus">KEYS ∈ pool</span>
 ```
@@ -80,10 +84,11 @@ The `#injectKeysEnabled` boolean is wired to the checkbox state.
 ### 4. Update `TrainingManagerOptions`
 
 Add field:
+
 ```ts
 interface TrainingManagerOptions {
   // ... existing fields
-  injectKeys?: boolean;  // defaults to true
+  injectKeys?: boolean; // defaults to true
 }
 ```
 

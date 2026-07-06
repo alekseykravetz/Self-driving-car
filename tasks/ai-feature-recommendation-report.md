@@ -6,13 +6,13 @@ This report analyzes the Self-Driving Car Simulator codebase (4 HTML entry point
 
 ## Recommendation Priority Matrix
 
-| Priority | Feature | Effort | Impact | Risk | Dependencies |
-|----------|---------|--------|--------|------|-------------|
-| 1 | **C1: Spatial Congestion Heatmap** | Small | High | None | None |
-| 2 | **A1: Traffic Light Perception** | Medium | High | Low | Back-compat flag |
-| 3 | **D2: Traffic Control Override** | Small | Low-Medium | None | A1 (light infra) |
-| 4 | **D1: Human-in-the-Loop Training** | Small | Medium | Low | None |
-| 5 | **B1: Multi-Class Sensor Readings** | Large | High | Medium | A1 (shared sensor infra) |
+| Priority | Feature                             | Effort | Impact     | Risk   | Dependencies             |
+| -------- | ----------------------------------- | ------ | ---------- | ------ | ------------------------ |
+| 1        | **C1: Spatial Congestion Heatmap**  | Small  | High       | None   | None                     |
+| 2        | **A1: Traffic Light Perception**    | Medium | High       | Low    | Back-compat flag         |
+| 3        | **D2: Traffic Control Override**    | Small  | Low-Medium | None   | A1 (light infra)         |
+| 4        | **D1: Human-in-the-Loop Training**  | Small  | Medium     | Low    | None                     |
+| 5        | **B1: Multi-Class Sensor Readings** | Large  | High       | Medium | A1 (shared sensor infra) |
 
 ---
 
@@ -33,13 +33,15 @@ The project's stated goal is to discover traffic problems (congestion points, bo
 ### Architectural Implementation Strategy
 
 - **Data Structures & Math:** Create `HeatmapGrid` wrapping the same `cellSize` (150px) as `SpatialHashGrid`. Each cell tracks:
+
   ```ts
   class HeatmapCell {
-    occupancyFrames: number;  // frames where >=1 car was in this cell
-    totalFrames: number;      // frames since recording started
-    idleFrames: number;       // frames where car speed was near zero
+    occupancyFrames: number; // frames where >=1 car was in this cell
+    totalFrames: number; // frames since recording started
+    idleFrames: number; // frames where car speed was near zero
   }
   ```
+
   `HeatmapGrid.record(cars)` maps each car position to a cell (O(1) via `floor(pos / cellSize)`), increments occupancy, and checks car speed against a threshold (<0.5 px/frame) for idle detection.
 
 - **Rendering:** New function `drawHeatmap(ctx, viewPoint)`. Draws each cell as a semi-transparent filled rectangle. Color mapping: occupancy ratio `0→1` maps `blue→cyan→yellow→red` via `lerp` through RGBA values. Viewport culling: only cells intersecting the visible rect are drawn. For a 2000×2000px viewport at 150px cells: ~196 cells drawn per frame. Throttle canvas redraw to ~4 fps by caching to an offscreen canvas.
@@ -105,10 +107,12 @@ Manual traffic control override lets users experiment with traffic flow ("what i
 ### Architectural Implementation Strategy
 
 - **Data Structures & Math:** `TrafficManager` gains:
+
   ```ts
   overrideLight(light: Light, state: LightState): void;
   releaseOverride(): void;
   ```
+
   When an override is active, the automatic update cycle skips that light. `Light` gains `overridden: boolean`. `TrafficManager.update()` checks the flag before cycling each light.
 
 - **World Editor:** In `LightEditor`, add click detection on the light's drawn position. Clicking a placed light cycles its state: `off → green → yellow → red → off`.
@@ -140,14 +144,16 @@ The KEYS car exists in every training session but is thrown away each generation
 ### Architectural Implementation Strategy
 
 - **Data Structures & Math:** Extend `poolManager.ts`:
+
   ```ts
   function injectKeysCarIntoPool(
     pool: CarInfo[],
     keysCar: Car,
     maxPoolSize: number,
     evaluateFitness: (car: Car) => number,
-  ): CarInfo[]
+  ): CarInfo[];
   ```
+
   Converts `keysCar.toInfo()`, computes its fitness (same formula as AI cars), inserts it into the sorted pool by fitness. The lowest-ranked AI car is evicted if the pool exceeds `maxPoolSize`. The KEYS brain must pass `brainsCompatible()` — if not (car config changed), skip injection.
 
 - **UI:** Add a checkbox toggle `<label><input type="checkbox" id="injectKeys"> Inject KEYS brain into gene pool</label>` to the training panel. When enabled, `#createCarsWithPool` calls `injectKeysCarIntoPool` after extracting the top AI pool. A status dot or text "KEYS ∈ pool" indicates active injection.
@@ -177,6 +183,7 @@ All obstacles are currently opaque polygons — a car cannot distinguish a parke
 ### Architectural Implementation Strategy
 
 - **Data Structures & Math:** New reading interface:
+
   ```ts
   interface SensorReading {
     distance: number;
@@ -184,6 +191,7 @@ All obstacles are currently opaque polygons — a car cannot distinguish a parke
     relativeSpeed: number; // 0 for static obstacles
   }
   ```
+
   `SensorRaycaster.getReadings()` accepts tagged polygon groups: `{ borders: Point[][], cars: Car[], controls: Point[][] }`. For each ray, it finds the nearest hit across all groups, records the type, and (for cars) reads the other car's speed to compute relative velocity.
 
 - **Network Input Layer Change:** Each ray's output grows from 1 number to 3 numbers `[distance, type_encoded, relative_speed]`. Input layer grows from `rayCount + 1` to `rayCount * 3 + 1`.
@@ -191,8 +199,9 @@ All obstacles are currently opaque polygons — a car cannot distinguish a parke
   New `CarInfo` field: `sensor.sophistication: 'basic' | 'classified'`. Default `'basic'` preserves legacy. The `CarBrainAdapter` switches input assembly based on this field. Type encoding: continuous tri-valued `1 = border, 0.5 = car, 0 = none`. Relative speed is clamped to `[-1, 1]` as fraction of this car's max speed.
 
 - **Rendering:** Color-code sensor rays by type:
+
   - Red = car
-  - Yellow = border  
+  - Yellow = border
   - Green = traffic control
 
 - **State/Persistence:** `CarInfo.sensor.sophistication` added. `hiddenLayers` must account for larger input layer. Legacy `.car` files default to `'basic'`. Brain compatibility is preserved: `brainsCompatible()` validates level dimensions, so a `basic` brain cannot be loaded into a `classified` car and vice versa.
@@ -207,12 +216,12 @@ All obstacles are currently opaque polygons — a car cannot distinguish a parke
 
 ## Appendix: Feature Delivery Order
 
-| Step | Feature | Milestone |
-|------|---------|-----------|
-| 1 | C1 — Heatmap | "I can see congestion patterns on the canvas" |
-| 2 | A1 — Light Perception | "AI cars stop at red lights on loaded world" |
-| 3 | D2 — Traffic Control Override | "I click a light to change its state" |
-| 4 | D1 — Human-in-the-Loop | "My driving shapes the gene pool" |
-| 5 | B1 — Multi-Class Sensor | "Cars distinguish cars from borders from lights" |
+| Step | Feature                       | Milestone                                        |
+| ---- | ----------------------------- | ------------------------------------------------ |
+| 1    | C1 — Heatmap                  | "I can see congestion patterns on the canvas"    |
+| 2    | A1 — Light Perception         | "AI cars stop at red lights on loaded world"     |
+| 3    | D2 — Traffic Control Override | "I click a light to change its state"            |
+| 4    | D1 — Human-in-the-Loop        | "My driving shapes the gene pool"                |
+| 5    | B1 — Multi-Class Sensor       | "Cars distinguish cars from borders from lights" |
 
 Each step is independently shippable and adds concrete value. Steps 1–4 are all small-to-medium effort; step 5 is the largest and benefits from the foundation built in steps 2–3.

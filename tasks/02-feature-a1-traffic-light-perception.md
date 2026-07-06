@@ -32,7 +32,11 @@ class TrafficControlGrid {
 
   constructor(cellSize?: number);
   rebuild(controls: { polygon: Point[]; state: LightState }[]): void;
-  query(x: number, y: number, range: number): { polygon: Point[]; state: LightState }[];
+  query(
+    x: number,
+    y: number,
+    range: number,
+  ): { polygon: Point[]; state: LightState }[];
 }
 ```
 
@@ -41,11 +45,13 @@ Cell size matches the border grid (150px). Rebuilt only when world markings chan
 ### 2. Extend `Sensor.update()` signature
 
 Current signature:
+
 ```ts
 update(x: number, y: number, angle: number, roadPolygons: Point[][]): void;
 ```
 
 New signature:
+
 ```ts
 update(
   x: number, y: number, angle: number,
@@ -55,11 +61,13 @@ update(
 ```
 
 Add a type for traffic state encoding:
+
 ```ts
 type TrafficState = 'green' | 'yellow' | 'red' | 'off';
 ```
 
 Per-ray logic changes:
+
 - After finding the closest polygon per ray, check if a traffic control polygon exists along the same ray.
 - If a traffic control is found and its distance is less than the road border distance, cache its state.
 - Store `trafficState: TrafficState | null` per ray reading.
@@ -71,10 +79,11 @@ Current output: `number[]` of length `rayCount + 1` (distances + self-reading).
 New output for traffic-aware mode: store both distance and traffic state per ray.
 
 The internal reading type:
+
 ```ts
 interface RayReading {
   distance: number;
-  trafficState: number;  // 1 = green, 0.5 = yellow, 0 = red/off/absent
+  trafficState: number; // 1 = green, 0.5 = yellow, 0 = red/off/absent
 }
 ```
 
@@ -86,7 +95,7 @@ In `ts/car/car.ts`:
 interface SensorConfig {
   rayCount: number;
   // ... existing fields
-  trafficAwareness?: boolean;  // new, defaults to false
+  trafficAwareness?: boolean; // new, defaults to false
 }
 ```
 
@@ -97,10 +106,12 @@ interface SensorConfig {
 In `ts/car/brain/carBrainAdapter.ts`:
 
 When `trafficAwareness` is `true`:
+
 - Input layer size = `rayCount * 2 + 1` (distance + traffic state per ray, plus self-reading)
 - Assemble input array: interleave `[distance0, trafficState0, distance1, trafficState1, ..., selfSpeed]`
 
 When `trafficAwareness` is `false` (legacy):
+
 - Input layer size = `rayCount + 1` (distance only + self-reading)
 - Keep existing behavior
 

@@ -42,6 +42,11 @@ export class LayoutToolbarElement extends HTMLElement {
     return el ? el.classList.contains('active') : true;
   }
 
+  get showHeatmap(): boolean {
+    const el = this.querySelector('#showHeatmap') as HTMLButtonElement | null;
+    return el ? el.classList.contains('active') : false;
+  }
+
   setLayoutModeListener(listener: (mode: LayoutMode) => void): void {
     this.#onLayoutModeChange = listener;
   }

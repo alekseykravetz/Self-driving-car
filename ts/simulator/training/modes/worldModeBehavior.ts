@@ -86,6 +86,7 @@ export class WorldTrainingStrategy {
         this.#rebuildGrid();
         this.#parent.snapCameraToStart();
         this.#parent.animationLoopToolbar.setPaused(false);
+        this.#parent.resetHeatmap();
       },
     });
 
@@ -118,6 +119,7 @@ export class WorldTrainingStrategy {
 
     this.#parent.updateRoadBorders();
     this.#rebuildGrid();
+    this.#parent.resetHeatmap();
   }
 
   #rebuildGrid(): void {
@@ -164,6 +166,8 @@ export class WorldTrainingStrategy {
       deadCount,
       frozenCount,
     );
+
+    this.#parent.recordHeatmap(cars);
 
     const currentBestCar = this.#parent.trainingManager.bestCar || bestCar;
     const trackTarget = this.#parent.getTrackTarget(currentBestCar);
@@ -224,6 +228,8 @@ export class WorldTrainingStrategy {
       viewportLeft,
       viewportRight,
     );
+
+    this.#parent.drawHeatmap(viewPoint);
 
     const floatingMiniMap =
       this.#parent.layoutToolbar.showMiniMap &&

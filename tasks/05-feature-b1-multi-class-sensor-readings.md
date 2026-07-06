@@ -26,7 +26,7 @@ type ObstacleType = 'border' | 'car' | 'trafficControl' | 'none';
 interface SensorReading {
   distance: number;
   type: ObstacleType;
-  relativeSpeed: number;  // 0 for static obstacles
+  relativeSpeed: number; // 0 for static obstacles
 }
 ```
 
@@ -37,6 +37,7 @@ In `ts/car/physics/sensorRaycaster.ts`:
 Current signature (likely accepts `roadPolygons: Point[][]`):
 
 New signature:
+
 ```ts
 interface TaggedPolygons {
   borders: Point[][];
@@ -54,6 +55,7 @@ getReadings(
 ```
 
 **Per-ray algorithm:**
+
 1. For each ray, find the nearest hit across all three groups (borders, cars, controls).
 2. Record the type of the nearest hit.
 3. If nearest hit is a car, read `otherCar.speed` and compute `relativeSpeed = (otherCar.speed - thisCar.speed) / thisCar.maxSpeed`, clamped to `[-1, 1]`.
@@ -70,7 +72,9 @@ class Sensor {
 
   constructor(config: SensorConfig);
   update(
-    x: number, y: number, angle: number,
+    x: number,
+    y: number,
+    angle: number,
     roadPolygons: Point[][],
     trafficControls?: { polygon: Point[]; state: LightState }[],
     otherCars?: Car[],
@@ -80,10 +84,12 @@ class Sensor {
 ```
 
 When `sophistication === 'basic'`:
+
 - Keep existing behavior (returns `number[]` of distances).
 - Do not accept or use traffic controls / other cars.
 
 When `sophistication === 'classified'`:
+
 - Use updated raycaster with all three groups.
 - Return `SensorReading[]` with type and relative speed.
 
@@ -94,6 +100,7 @@ In `ts/car/brain/carBrainAdapter.ts`:
 **Basic mode (existing):** `rayCount + 1` inputs (distance per ray + self-speed).
 
 **Classified mode (new):** `rayCount * 3 + 1` inputs:
+
 - Per ray: `[distance, type_encoded, relative_speed]`
 - Type encoding: `1 = border, 0.5 = car, 0 = none/trafficControl` (continuous tri-valued)
 - Relative speed: clamped to `[-1, 1]` as fraction of this car's max speed
@@ -106,7 +113,7 @@ In `ts/car/car.ts`:
 ```ts
 interface SensorConfig {
   // ... existing fields
-  sophistication?: 'basic' | 'classified';  // defaults to 'basic'
+  sophistication?: 'basic' | 'classified'; // defaults to 'basic'
 }
 ```
 
@@ -119,11 +126,14 @@ interface SensorConfig {
 In `TrainingSimulator`, `TrafficSimulator`, `RaceSimulator`:
 
 Where sensors are updated, pass the appropriate polygon groups:
+
 ```ts
 const groups = {
   borders: world.roadBorders,
-  cars: this.#cars.filter(c => c !== thisCar),
-  controls: world.markings.filter(m => m instanceof Light).map(m => m.polygon),
+  cars: this.#cars.filter((c) => c !== thisCar),
+  controls: world.markings
+    .filter((m) => m instanceof Light)
+    .map((m) => m.polygon),
 };
 sensor.update(car.x, car.y, car.angle, groups);
 ```
@@ -135,6 +145,7 @@ For `basic` sensor cars, pass `undefined` for the extra args (gracefully ignored
 In `ts/car/car.ts` or the car's `draw()` method:
 
 Color-code sensor rays by type when `sophistication === 'classified'`:
+
 - Red = car
 - Yellow = border
 - Green = traffic control

@@ -92,6 +92,7 @@ export class RaceSimulator extends SimulatorShell {
     }
     #initializeRace(worldInfo) {
         this.#world = worldInfo ? World.load(worldInfo) : new World(new Graph());
+        this.resetHeatmap();
         this.viewport = new Viewport(this.gameCanvas, this.#world.zoom, this.#world.offset);
         this.viewport.setMode(this.racePanel.viewportMode);
         this.#cars = this.#generateCars();
@@ -215,6 +216,9 @@ export class RaceSimulator extends SimulatorShell {
             this.#cars.sort((a, b) => (b.progress ?? 0) - (a.progress ?? 0));
         }
         this.racePanel.updateStatistics(this.#cars);
+        if (this.#started) {
+            this.recordHeatmap(this.#cars);
+        }
         const cameraTarget = trackTarget ?? this.#myCar;
         if (trackTarget) {
             this.camera?.move(cameraTarget);
@@ -243,6 +247,7 @@ export class RaceSimulator extends SimulatorShell {
             showCarNames: true,
         });
         this.viewport.drawScaleIndicator(this.gameCtx);
+        this.drawHeatmap(viewPoint);
         this.miniMap.draw({ viewPoint, cars: this.#cars });
         const rotationTarget = trackTarget ?? this.#myCar;
         this.miniMapCanvas.style.transform = `rotate(${rotationTarget.angle}rad)`;

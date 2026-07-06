@@ -156,6 +156,7 @@ export class TrafficSimulator extends SimulatorShell {
         this.#cars = [];
         this.#spawnCount = 0;
         this.#statsPanel.setCars(this.#cars);
+        this.resetHeatmap();
         this.viewport = new Viewport(this.gameCanvas, this.#world.zoom, this.#world.offset);
         this.viewport.setMode(this.toolbarPanel.viewportMode);
         this.miniMap = new MiniMap(this.miniMapCanvas, this.#world.graph, this.miniMapCanvas.width);
@@ -215,6 +216,7 @@ export class TrafficSimulator extends SimulatorShell {
                 continue;
             car.update(this.#collectObstacles(car, borderMode));
         }
+        this.recordHeatmap(this.#cars);
         // Follow the car selected in the stats panel (if any).
         const target = this.#statsPanel.getSelectedCar();
         if (target) {
@@ -291,6 +293,7 @@ export class TrafficSimulator extends SimulatorShell {
         }
         // Ghost preview of the car that would spawn under the cursor.
         this.#drawSpawnPreview();
+        this.drawHeatmap(viewPoint);
         // When the network visualizer is hidden the mini-map floats over the green
         // game canvas, so it mirrors the world editor's palette (grey roads) and
         // paints its own green backdrop into the canvas bitmap. Next to the network

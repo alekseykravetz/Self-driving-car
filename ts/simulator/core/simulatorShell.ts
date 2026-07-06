@@ -12,6 +12,9 @@ import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { resizeSimulatorLayout } from '../rendering/layoutManager.js';
 import type { NeuralNetwork } from '../../neural-network/network.js';
+import { HeatmapGrid } from '../../math/heatmapGrid.js';
+import { HeatmapRenderer } from '../../rendering/heatmapRenderer.js';
+import type { Car } from '../../car/car.js';
 
 /**
  * SimulatorShell — reusable scaffolding shared by every canvas-based simulator
@@ -80,6 +83,14 @@ export abstract class SimulatorShell {
   // pass only runs once per `renderInterval` frames (read live from the
   // animation-loop-toolbar panel).
   protected framesSinceRender: number = 0;
+
+  // Spatial congestion heatmap. Off by default; toggled via the layout
+  // toolbar's 🌡️ button. Recording and rendering are both gated on the toggle
+  // so there is zero overhead when the overlay is hidden.
+  protected heatmapGrid: HeatmapGrid = new HeatmapGrid(150);
+  protected heatmapRenderer: HeatmapRenderer = new HeatmapRenderer(
+    this.heatmapGrid,
+  );
 
   // Loop control
   protected animationFrameId: number = -1;
@@ -192,6 +203,39 @@ export abstract class SimulatorShell {
       },
       this.viewport,
     );
+  }
+
+  /**
+   * Record one frame of vehicle occupancy into the heatmap. No-op when the
+   * heatmap toggle is off (zero overhead when hidden). Call from a subclass
+   * `update()` with the cars currently in the simulation.
+   */
+  recordHeatmap(cars: Car[]): void {
+    if (!this.layoutToolbar.showHeatmap) return;
+    this.heatmapGrid.record(cars);
+  }
+
+  /**
+   * Paint the heatmap overlay on the game canvas. Call from a subclass
+   * `draw()` after the world + cars are drawn, while the viewport transform is
+   * still applied to `gameCtx`. No-op when the toggle is off.
+   */
+  drawHeatmap(viewPoint: { x: number; y: number }): void {
+    if (!this.layoutToolbar.showHeatmap) return;
+    const zoom = this.viewport?.zoom ?? 1;
+    const halfW = (this.gameCanvas.width / 2) * zoom;
+    const halfH = (this.gameCanvas.height / 2) * zoom;
+    this.heatmapRenderer.draw(this.gameCtx, {
+      minX: viewPoint.x - halfW,
+      minY: viewPoint.y - halfH,
+      maxX: viewPoint.x + halfW,
+      maxY: viewPoint.y + halfH,
+    });
+  }
+
+  /** Reset heatmap counters (call on simulation restart / world change). */
+  resetHeatmap(): void {
+    this.heatmapGrid.reset();
   }
 
   /**

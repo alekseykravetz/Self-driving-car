@@ -176,6 +176,7 @@ export class SimpleTrainingStrategy {
         this.#parent.updateRoadBorders();
         this.#parent.snapCameraToStart();
         this.#parent.animationLoopToolbar.setPaused(false);
+        this.#parent.resetHeatmap();
       },
     });
 
@@ -230,6 +231,9 @@ export class SimpleTrainingStrategy {
       deadCount,
       frozenCount,
     );
+
+    this.#parent.recordHeatmap(cars);
+    this.#parent.recordHeatmap(this.#simpleState.traffic);
 
     if (trackTarget) {
       this.#parent.viewport.offset.x = -simpleWorld.getCenter();
@@ -294,6 +298,9 @@ export class SimpleTrainingStrategy {
       'gold',
       this.#parent.trainingManager.prevPoolCars,
     );
+
+    const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
+    this.#parent.drawHeatmap(heatViewPoint);
 
     this.#parent.drawNetworkVisualizer(time, bestCar.brain);
 

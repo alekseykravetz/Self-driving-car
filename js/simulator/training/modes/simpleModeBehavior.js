@@ -103,6 +103,7 @@ export class SimpleTrainingStrategy {
                 this.#parent.updateRoadBorders();
                 this.#parent.snapCameraToStart();
                 this.#parent.animationLoopToolbar.setPaused(false);
+                this.#parent.resetHeatmap();
             },
         });
         this.#simpleState.traffic = generateInitialTraffic((lane) => simpleWorld.getLaneCenter(lane), startInfo.angle);
@@ -126,6 +127,8 @@ export class SimpleTrainingStrategy {
         const startInfo = this.#parent.getStartInfo();
         const currentDist = Math.round(startInfo.y - bestCar.y);
         this.#parent.updateTrainingMetrics(currentDist, aliveCount, deadCount, frozenCount);
+        this.#parent.recordHeatmap(cars);
+        this.#parent.recordHeatmap(this.#simpleState.traffic);
         if (trackTarget) {
             this.#parent.viewport.offset.x = -simpleWorld.getCenter();
             this.#parent.viewport.offset.y = -trackTarget.y;
@@ -164,6 +167,8 @@ export class SimpleTrainingStrategy {
             }
         }
         drawSimulatorCars(this.#parent.gameCtx, cars, this.#parent.trainingManager.bestPool, viewportTop - 100, viewportBottom + 100, drawMasks, 'gold', this.#parent.trainingManager.prevPoolCars);
+        const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
+        this.#parent.drawHeatmap(heatViewPoint);
         this.#parent.drawNetworkVisualizer(time, bestCar.brain);
         if (this.#parent.miniMap) {
             const viewPoint = scale(this.#parent.viewport.getOffset(), -1);

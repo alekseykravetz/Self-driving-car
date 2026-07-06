@@ -26,26 +26,27 @@ ts/math/
 
 ```ts
 class HeatmapCell {
-  occupancyFrames: number = 0;  // frames where >=1 car was in this cell
-  totalFrames: number = 0;      // frames since recording started
-  idleFrames: number = 0;       // frames where car speed was near zero
+  occupancyFrames: number = 0; // frames where >=1 car was in this cell
+  totalFrames: number = 0; // frames since recording started
+  idleFrames: number = 0; // frames where car speed was near zero
 }
 
 class HeatmapGrid {
-  #cellSize: number;         // 150px (match SpatialHashGrid)
+  #cellSize: number; // 150px (match SpatialHashGrid)
   #cells: Map<string, HeatmapCell>;
   #worldWidth: number;
   #worldHeight: number;
 
   constructor(worldWidth: number, worldHeight: number, cellSize?: number);
-  #cellKey(x: number, y: number): string;  // `${col},${row}`
-  record(cars: Car[]): void;                // called every frame
-  getHeatmapData(): HeatmapCell[];          // for rendering
+  #cellKey(x: number, y: number): string; // `${col},${row}`
+  record(cars: Car[]): void; // called every frame
+  getHeatmapData(): HeatmapCell[]; // for rendering
   reset(): void;
 }
 ```
 
 **Key behavior:**
+
 - `record(cars)` maps each car to a cell via `Math.floor(pos / cellSize)`, increments occupancy, and checks car speed against `<0.5 px/frame` threshold for idle detection.
 - O(cars) per frame with O(1) cell lookup.
 - `reset()` clears all counters (used on simulation restart).
@@ -62,13 +63,16 @@ class HeatmapRenderer {
   #heatmapGrid: HeatmapGrid;
   #offscreenCanvas: OffscreenCanvas;
   #lastRedrawFrame: number = 0;
-  #redrawInterval: number = 15;  // ~4 fps at 60fps game loop
+  #redrawInterval: number = 15; // ~4 fps at 60fps game loop
 
   constructor(heatmapGrid: HeatmapGrid, width: number, height: number);
 
-  draw(ctx: CanvasRenderingContext2D, viewPoint: { x: number; y: number }): void;
+  draw(
+    ctx: CanvasRenderingContext2D,
+    viewPoint: { x: number; y: number },
+  ): void;
   #cullAndRender(viewPoint: { x: number; y: number }): void;
-  #occupancyColor(ratio: number): string;  // blue→cyan→yellow→red via RGBA lerp
+  #occupancyColor(ratio: number): string; // blue→cyan→yellow→red via RGBA lerp
   resize(width: number, height: number): void;
 }
 ```
@@ -86,11 +90,12 @@ For each simulator (`TrainingSimulator`, `TrafficSimulator`, `RaceSimulator`):
 - In `constructor`, create `HeatmapGrid(worldWidth, worldHeight)` and `HeatmapRenderer(grid, width, height)`.
 - In `update()` (or a render-hook), call `heatmapGrid.record(cars)`.
 - In `draw()`, after all game objects are drawn, call `heatmapRenderer.draw(ctx, viewPoint)`.
-- Ensure the heatmap overlay is drawn *above* the road/cars but *below* UI overlays.
+- Ensure the heatmap overlay is drawn _above_ the road/cars but _below_ UI overlays.
 
 ### 4. Add toggle UI
 
 Add a button or checkbox in the simulator toolbar:
+
 - Label: "Show Heatmap" or a thermometer icon
 - Toggle `heatmapVisible: boolean` prop in the simulator
 - When off, skip `heatmapRenderer.draw()`

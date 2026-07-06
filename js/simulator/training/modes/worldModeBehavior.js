@@ -57,6 +57,7 @@ export class WorldTrainingStrategy {
                 this.#rebuildGrid();
                 this.#parent.snapCameraToStart();
                 this.#parent.animationLoopToolbar.setPaused(false);
+                this.#parent.resetHeatmap();
             },
         });
         const storeWorld = StoreManager.getActiveWorld() ?? StoreManager.getEditorWorld();
@@ -75,6 +76,7 @@ export class WorldTrainingStrategy {
         this.#parent.camera = new Camera(startInfo);
         this.#parent.updateRoadBorders();
         this.#rebuildGrid();
+        this.#parent.resetHeatmap();
     }
     #rebuildGrid() {
         this.#borderGrid.build((this.#parent.roadBorders ?? []));
@@ -101,6 +103,7 @@ export class WorldTrainingStrategy {
         const { aliveCount, deadCount, frozenCount } = updateWorldCars(cars, this.#borderGrid, this.#parent.toolbarPanel.borderMode, collisionBorders, bestCar, this.#parent.trainingManager.idleEnabled, idleRange);
         const bestFitness = Math.round(bestCar.fitness);
         this.#parent.updateTrainingMetrics(bestFitness, aliveCount, deadCount, frozenCount);
+        this.#parent.recordHeatmap(cars);
         const currentBestCar = this.#parent.trainingManager.bestCar || bestCar;
         const trackTarget = this.#parent.getTrackTarget(currentBestCar);
         if (trackTarget) {
@@ -138,6 +141,7 @@ export class WorldTrainingStrategy {
         const settings = this.#parent.trainingManager.getSettings();
         const drawMasks = settings.carCount <= 5000;
         drawSimulatorCars(this.#parent.gameCtx, cars, this.#parent.trainingManager.bestPool, viewportTop, viewportBottom, drawMasks, 'gold', this.#parent.trainingManager.prevPoolCars, 'deepskyblue', viewportLeft, viewportRight);
+        this.#parent.drawHeatmap(viewPoint);
         const floatingMiniMap = this.#parent.layoutToolbar.showMiniMap &&
             !this.#parent.layoutToolbar.showVisualizer;
         this.#parent.miniMap.draw(floatingMiniMap

@@ -27,6 +27,10 @@ export class LayoutToolbarElement extends HTMLElement {
         const el = this.querySelector('#showMiniMap');
         return el ? el.classList.contains('active') : true;
     }
+    get showHeatmap() {
+        const el = this.querySelector('#showHeatmap');
+        return el ? el.classList.contains('active') : false;
+    }
     setLayoutModeListener(listener) {
         this.#onLayoutModeChange = listener;
     }
