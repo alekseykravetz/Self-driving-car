@@ -4,7 +4,7 @@
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "start": "concurrently \"npm run tsc:watch\" \"npm run serve\" \"npm run fix:all\"",
+    "start": "concurrently \"npm run tsc:watch\" \"npm run serve\" \"npm run watch:fix\"",
     "serve": "serve -p 9090",
     "publish:site": "bash scripts/publish-site.sh",
     "tsc:watch": "tsc --watch",

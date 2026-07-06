@@ -3,7 +3,7 @@
 ## Build & dev
 
 - **No bundler** — `tsc` compiles `ts/` → `js/` (mirrored structure). Each HTML page loads a single `<script type="module">` entry point.
-- **`npm start`** runs three concurrent watchers: `tsc --watch`, `serve -p 9090`, and auto-format+lint.
+- **`npm start`** runs three concurrent watchers: `tsc --watch`, `serve -p 9090`, and `watch:fix` (formats+lints on file change).
 - **Never edit `js/` directly.** Source of truth is `ts/`.
 - **Always run `npm run fix:all` (format + lint) before committing.**
 

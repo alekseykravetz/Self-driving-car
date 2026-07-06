@@ -54,15 +54,6 @@ export default defineConfig([
         'warn',
         { argsIgnorePattern: '^_' },
       ],
-      'padding-line-between-statements': [
-        'error',
-        { blankLine: 'always', prev: 'function', next: '*' },
-      ],
-      'lines-between-class-members': [
-        'error',
-        'always',
-        { exceptAfterSingleLine: true },
-      ],
     },
   },
 ]);

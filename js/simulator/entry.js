@@ -89,13 +89,7 @@ import '../simulator/views/simulatorPageHost.js';
 import '../simulator/core/simulatorShell.js';
 import './training/trainingSimulator.js';
 (async () => {
-  await StoreManager.init();
-  const host = new SimulatorPageHost();
-  new TrainingSimulator(
-    gameCanvas,
-    networkCanvas,
-    miniMapCanvas,
-    cameraCanvas,
-    host,
-  );
+    await StoreManager.init();
+    const host = new SimulatorPageHost();
+    new TrainingSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
 })();

@@ -9,16 +9,14 @@
  * on pages with different layouts.
  */
 export class SimulatorPageHost {
-  toolbarPanel;
-  layoutToolbar;
-  animationLoopToolbar;
-  worldLayersToolbar;
-  constructor() {
-    this.toolbarPanel = document.querySelector('world-toolbar');
-    this.layoutToolbar = document.querySelector('layout-toolbar');
-    this.animationLoopToolbar = document.querySelector(
-      'animation-loop-toolbar',
-    );
-    this.worldLayersToolbar = document.querySelector('world-layers-toolbar');
-  }
+    toolbarPanel;
+    layoutToolbar;
+    animationLoopToolbar;
+    worldLayersToolbar;
+    constructor() {
+        this.toolbarPanel = document.querySelector('world-toolbar');
+        this.layoutToolbar = document.querySelector('layout-toolbar');
+        this.animationLoopToolbar = document.querySelector('animation-loop-toolbar');
+        this.worldLayersToolbar = document.querySelector('world-layers-toolbar');
+    }
 }

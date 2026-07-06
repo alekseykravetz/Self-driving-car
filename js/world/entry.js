@@ -54,18 +54,18 @@ import '../panels/worldToolbar.js';
 import '../panels/shortcutsToolbar.js';
 import '../panels/worldLayersToolbar.js';
 (async () => {
-  await StoreManager.init();
-  function resizeCanvas() {
-    myCanvas.width = window.innerWidth;
-    myCanvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  miniMapCanvas.width = 150;
-  miniMapCanvas.height = 150;
-  const worldEditor = new WorldEditor(myCanvas, miniMapCanvas);
-  window.addEventListener('resize', () => {
+    await StoreManager.init();
+    function resizeCanvas() {
+        myCanvas.width = window.innerWidth;
+        myCanvas.height = window.innerHeight;
+    }
     resizeCanvas();
+    miniMapCanvas.width = 150;
+    miniMapCanvas.height = 150;
+    const worldEditor = new WorldEditor(myCanvas, miniMapCanvas);
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        worldEditor.animate();
+    });
     worldEditor.animate();
-  });
-  worldEditor.animate();
 })();
