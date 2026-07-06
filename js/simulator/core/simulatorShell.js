@@ -61,11 +61,15 @@ export class SimulatorShell {
     // pass only runs once per `renderInterval` frames (read live from the
     // animation-loop-toolbar panel).
     framesSinceRender = 0;
-    // Spatial congestion heatmap. Off by default; toggled via the layout
-    // toolbar's 🌡️ button. Recording and rendering are both gated on the toggle
-    // so there is zero overhead when the overlay is hidden.
+    // Spatial congestion heatmap. Off by default; toggled via the 🌡️ button on
+    // the <world-layers-toolbar> "Overlays" group. Recording and rendering are
+    // both gated on the toggle so there is zero overhead when the overlay is
+    // hidden. The state lives on the shell (not read live from the toolbar) so
+    // `recordHeatmap`/`drawHeatmap` keep working even when the toolbar element is
+    // absent.
     heatmapGrid = new HeatmapGrid(150);
     heatmapRenderer = new HeatmapRenderer(this.heatmapGrid);
+    heatmapVisible = false;
     // Loop control
     animationFrameId = -1;
     constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host) {
@@ -87,6 +91,11 @@ export class SimulatorShell {
             this.worldLayersToolbar.setChangeListener((v) => {
                 this.worldLayers = v;
                 saveSimLayerVisibility(v);
+            });
+            this.worldLayersToolbar.setHeatmapChangeListener((on) => {
+                this.heatmapVisible = on;
+                if (!on)
+                    this.resetHeatmap();
             });
         }
         // Keep the active viewport's wheel behavior in sync with the toolbar toggle
@@ -162,7 +171,7 @@ export class SimulatorShell {
      * `update()` with the cars currently in the simulation.
      */
     recordHeatmap(cars) {
-        if (!this.layoutToolbar.showHeatmap)
+        if (!this.heatmapVisible)
             return;
         this.heatmapGrid.record(cars);
     }
@@ -172,7 +181,7 @@ export class SimulatorShell {
      * still applied to `gameCtx`. No-op when the toggle is off.
      */
     drawHeatmap(viewPoint) {
-        if (!this.layoutToolbar.showHeatmap)
+        if (!this.heatmapVisible)
             return;
         const zoom = this.viewport?.zoom ?? 1;
         const halfW = (this.gameCanvas.width / 2) * zoom;

@@ -48,14 +48,6 @@ export const LAYOUT_TOOLBAR_TEMPLATE = `
         >
           🧭
         </button>
-        <button
-          type="button"
-          id="showHeatmap"
-          class="toolbar-btn view-toggle-btn"
-          title="Show traffic congestion heatmap"
-        >
-          🌡️
-        </button>
       </div>
     </div>
 `;

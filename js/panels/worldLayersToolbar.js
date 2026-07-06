@@ -33,8 +33,10 @@ const WORLD_LAYER_BUTTONS = [
 ];
 export class WorldLayersToolbarElement extends HTMLElement {
     #visibility = { ...DEFAULT_LAYER_VISIBILITY };
+    #showHeatmap = false;
     #onChange = null;
     #onRegenerate = null;
+    #onHeatmapChange = null;
     constructor() {
         super();
         this.id = 'worldLayersToolbar';
@@ -59,6 +61,13 @@ export class WorldLayersToolbarElement extends HTMLElement {
         <div class="world-layers-keys">
           <button id="regenerateItemsBtn" title="Regenerate items — rebuild buildings & trees">♻️</button>
         </div>
+      </div>
+      <div class="controls-separator" data-overlays></div>
+      <div class="controls-group" data-overlays>
+        <span class="controls-group-label">Overlays</span>
+        <div class="world-layers-keys">
+          <button id="showHeatmapBtn" class="toolbar-btn layer-toggle" title="Traffic congestion heatmap — paint vehicle occupancy per grid cell">🌡️</button>
+        </div>
       </div>`;
         this.querySelectorAll('.layer-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -68,6 +77,13 @@ export class WorldLayersToolbarElement extends HTMLElement {
                 if (this.#onChange)
                     this.#onChange({ ...this.#visibility });
             });
+        });
+        const heatmapBtn = this.querySelector('#showHeatmapBtn');
+        heatmapBtn?.addEventListener('click', () => {
+            this.#showHeatmap = !this.#showHeatmap;
+            this.#applyButtonState(heatmapBtn, this.#showHeatmap);
+            if (this.#onHeatmapChange)
+                this.#onHeatmapChange(this.#showHeatmap);
         });
         const regenBtn = this.querySelector('#regenerateItemsBtn');
         regenBtn?.addEventListener('click', () => {
@@ -84,6 +100,9 @@ export class WorldLayersToolbarElement extends HTMLElement {
             const id = btn.dataset.layer;
             this.#applyButtonState(btn, this.#visibility[id]);
         });
+        const heatmapBtn = this.querySelector('#showHeatmapBtn');
+        if (heatmapBtn)
+            this.#applyButtonState(heatmapBtn, this.#showHeatmap);
     }
     /** Replace the visibility state and refresh the buttons. */
     setVisibility(v) {
@@ -101,6 +120,21 @@ export class WorldLayersToolbarElement extends HTMLElement {
     /** Register a handler called when the ♻️ Regenerate items action is clicked. */
     setRegenerateListener(cb) {
         this.#onRegenerate = cb;
+    }
+    /** Current heatmap overlay visibility. */
+    get showHeatmap() {
+        return this.#showHeatmap;
+    }
+    /** Set the heatmap overlay state and refresh the button. */
+    setShowHeatmap(on) {
+        this.#showHeatmap = on;
+        const btn = this.querySelector('#showHeatmapBtn');
+        if (btn)
+            this.#applyButtonState(btn, on);
+    }
+    /** Register a handler called when the 🌡️ heatmap toggle changes. */
+    setHeatmapChangeListener(cb) {
+        this.#onHeatmapChange = cb;
     }
     /** Toggle the "items outdated" indicator on the regenerate button. */
     setStale(stale) {
@@ -122,6 +156,15 @@ export class WorldLayersToolbarElement extends HTMLElement {
      */
     hideItems() {
         this.querySelectorAll('[data-items]').forEach((el) => {
+            el.style.display = 'none';
+        });
+    }
+    /**
+     * Hide the "Overlays" group (the 🌡️ heatmap toggle). Used by the world
+     * editor, which has no live traffic to record; simulators keep it visible.
+     */
+    hideOverlays() {
+        this.querySelectorAll('[data-overlays]').forEach((el) => {
             el.style.display = 'none';
         });
     }

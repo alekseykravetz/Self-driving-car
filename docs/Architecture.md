@@ -144,6 +144,8 @@ The geometric engine powering all spatial operations.
 | `primitives/envelope.ts` | Rounded rectangles around segments (road surfaces)            |
 | `graph/graph.ts`         | Point/segment network, Dijkstra shortest path                 |
 | `osm-importer/osm.ts`    | OpenStreetMap JSON → Point/Segment conversion                 |
+| `spatialGrid.ts`         | Uniform spatial hash grid for fast range queries over segments |
+| `heatmapGrid.ts`         | Lazy grid-based congestion counter for the spatial heatmap overlay |
 | `utils.ts`               | Vector math, lerp, intersections, rotation, distance          |
 
 ### 2. Car System (`ts/car/`)
@@ -271,6 +273,7 @@ options interface for style control.
 | `segmentRenderer.ts`  | Draws `Segment` as styled lines with optional dash/cap |
 | `polygonRenderer.ts`  | Draws `Polygon` as filled and stroked closed shapes    |
 | `envelopeRenderer.ts` | Draws `Envelope` by delegating to `drawPolygon`        |
+| `heatmapRenderer.ts`  | Paints a `HeatmapGrid` as a viewport-culled colour overlay (blue→cyan→yellow→red) |
 
 These are importable by any file that needs them (World, editors, markings) via
 `import { drawPoint } from '../rendering/pointRenderer.js'`.
@@ -307,6 +310,7 @@ for clarity — the main element remains as a composition root.
 | `worldToolbar.ts`         | `<world-toolbar>`          | Composition root: file I/O, border/tracking mode, camera debug toggle         |
 | `modeControls.ts`         | —                          | `ToolbarModeControls` — border/tracking/viewport mode button wiring           |
 | `assetSelectors.ts`       | —                          | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding      |
+| `worldLayersToolbar.ts`   | `<world-layers-toolbar>`   | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle       |
 | `layoutToolbar.ts`        | `<layout-toolbar>`         | Layout toggle, camera/network/minimap visibility                              |
 | `animationLoopToolbar.ts` | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control)                         |
 | `shortcutsToolbar.ts`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |

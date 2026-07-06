@@ -287,6 +287,8 @@ export class WorldEditor {
     this.#worldLayersToolbar.setRegenerateListener(() =>
       this.regenerateItems(),
     );
+    // The editor has no live traffic, so the heatmap overlay toggle is irrelevant.
+    this.#worldLayersToolbar.hideOverlays();
   }
 
   /* Initializes or re-initializes the world, viewport, minimap, and tools. */

@@ -117,6 +117,10 @@ control over each world layer via emoji toggles, plus the ♻️ Regenerate acti
   `hideItems()`), and hiding `trees`/`buildings` applies to **both** the
   top-down 2D view (`world.draw` `layers`) and the 3D camera view
   (`camera.render` `showTrees`/`showBuildings`).
+- The toolbar also hosts an **"Overlays"** group with a 🌡️ **traffic congestion
+  heatmap** toggle, used only by the simulators. The editor calls
+  `hideOverlays()` to hide the group (it has no live traffic to record). See
+  [Simulators → Spatial Congestion Heatmap](Simulators.md#spatial-congestion-heatmap-tsmathheatmapgridts--tsrenderingheatmaprendererts).
 
 ## Tree types & prototypes (`ts/world/items/tree.ts`)
 

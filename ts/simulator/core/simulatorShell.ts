@@ -84,13 +84,17 @@ export abstract class SimulatorShell {
   // animation-loop-toolbar panel).
   protected framesSinceRender: number = 0;
 
-  // Spatial congestion heatmap. Off by default; toggled via the layout
-  // toolbar's 🌡️ button. Recording and rendering are both gated on the toggle
-  // so there is zero overhead when the overlay is hidden.
+  // Spatial congestion heatmap. Off by default; toggled via the 🌡️ button on
+  // the <world-layers-toolbar> "Overlays" group. Recording and rendering are
+  // both gated on the toggle so there is zero overhead when the overlay is
+  // hidden. The state lives on the shell (not read live from the toolbar) so
+  // `recordHeatmap`/`drawHeatmap` keep working even when the toolbar element is
+  // absent.
   protected heatmapGrid: HeatmapGrid = new HeatmapGrid(150);
   protected heatmapRenderer: HeatmapRenderer = new HeatmapRenderer(
     this.heatmapGrid,
   );
+  protected heatmapVisible: boolean = false;
 
   // Loop control
   protected animationFrameId: number = -1;
@@ -121,6 +125,10 @@ export abstract class SimulatorShell {
       this.worldLayersToolbar.setChangeListener((v) => {
         this.worldLayers = v;
         saveSimLayerVisibility(v);
+      });
+      this.worldLayersToolbar.setHeatmapChangeListener((on) => {
+        this.heatmapVisible = on;
+        if (!on) this.resetHeatmap();
       });
     }
 
@@ -211,7 +219,7 @@ export abstract class SimulatorShell {
    * `update()` with the cars currently in the simulation.
    */
   recordHeatmap(cars: Car[]): void {
-    if (!this.layoutToolbar.showHeatmap) return;
+    if (!this.heatmapVisible) return;
     this.heatmapGrid.record(cars);
   }
 
@@ -221,7 +229,7 @@ export abstract class SimulatorShell {
    * still applied to `gameCtx`. No-op when the toggle is off.
    */
   drawHeatmap(viewPoint: { x: number; y: number }): void {
-    if (!this.layoutToolbar.showHeatmap) return;
+    if (!this.heatmapVisible) return;
     const zoom = this.viewport?.zoom ?? 1;
     const halfW = (this.gameCanvas.width / 2) * zoom;
     const halfH = (this.gameCanvas.height / 2) * zoom;

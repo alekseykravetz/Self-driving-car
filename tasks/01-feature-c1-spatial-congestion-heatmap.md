@@ -9,11 +9,16 @@ A grid-based counter that records vehicle occupancy and idle-time per cell over 
 ## Target Files
 
 - `ts/math/spatialGrid.ts` — reference uniform grid cell size (150px)
+- `ts/math/heatmapGrid.ts` — **new file**, occupancy/idle counter grid
 - `ts/rendering/heatmapRenderer.ts` — **new file**, heatmap rendering logic
-- `ts/simulator/core/simulatorShell.ts` — hook into render loop
-- `ts/simulator/training/trainingSimulator.ts` — wire up heatmap
-- `ts/simulator/traffic/trafficSimulator.ts` — wire up heatmap
-- `ts/simulator/race/raceSimulator.ts` — wire up heatmap
+- `ts/panels/worldLayersToolbar.ts` — add "Overlays" group with the 🌡️ toggle
+- `ts/panels/templates/worldLayersToolbarTemplate.ts` — (template renders dynamically; no static change needed)
+- `ts/world/editors/worldEditor.ts` — hide the Overlays group (editor has no live traffic)
+- `ts/simulator/core/simulatorShell.ts` — own `HeatmapGrid`/`HeatmapRenderer` + `recordHeatmap`/`drawHeatmap`/`resetHeatmap` helpers; wire the toolbar's heatmap change callback
+- `ts/simulator/training/modes/simpleModeBehavior.ts` — record (cars + traffic) + draw
+- `ts/simulator/training/modes/worldModeBehavior.ts` — record + draw; reset on world change / new training
+- `ts/simulator/traffic/trafficSimulator.ts` — record + draw; reset on world change
+- `ts/simulator/racing/raceSimulator.ts` — record (while started) + draw; reset on race init
 
 ## Implementation Steps
 
@@ -94,11 +99,22 @@ For each simulator (`TrainingSimulator`, `TrafficSimulator`, `RaceSimulator`):
 
 ### 4. Add toggle UI
 
-Add a button or checkbox in the simulator toolbar:
+The toggle lives on the **`<world-layers-toolbar>`** (the layer/overlay panel),
+not on the `<layout-toolbar>` — it is a per-frame render overlay, grouping
+naturally with the other layer visibility toggles rather than the panel
+layout toggles.
 
-- Label: "Show Heatmap" or a thermometer icon
-- Toggle `heatmapVisible: boolean` prop in the simulator
-- When off, skip `heatmapRenderer.draw()`
+- A new **"Overlays"** group is added to `WorldLayersToolbarElement` with a 🌡️
+  button (`#showHeatmapBtn`).
+- New API on the element: `showHeatmap` getter, `setShowHeatmap(on)`, and
+  `setHeatmapChangeListener(cb)`.
+- `hideOverlays()` mirrors `hideItems()` — called by the **world editor**
+  (which has no live traffic), so the group is only visible on the three
+  simulator pages.
+- `SimulatorShell` stores the visibility as a `heatmapVisible` field (updated
+  via the change listener) so `recordHeatmap`/`drawHeatmap` keep working even
+  when the toolbar element is absent. Toggling off also calls `resetHeatmap()`
+  so re-enabling starts from a clean slate.
 
 ### 5. Persistence
 
@@ -113,12 +129,33 @@ Ephemeral — resets on simulation restart or world change. No schema changes.
 
 ## Acceptance Criteria
 
-- [ ] Heatmap overlay renders on canvas in all three simulators
-- [ ] Cells turn red where traffic is dense/idle
-- [ ] Toggle button hides/shows the overlay
-- [ ] Heatmap resets when simulation restarts or world changes
-- [ ] No measurable FPS drop with heatmap off
-- [ ] Rendering stays smooth (~60fps on car drawing) with heatmap on
+- [x] Heatmap overlay renders on canvas in all three simulators
+- [x] Cells turn red where traffic is dense/idle
+- [x] Toggle button (🌡️ on `<world-layers-toolbar>` → Overlays group) hides/shows the overlay
+- [x] Heatmap resets when simulation restarts or world changes (and when toggled off)
+- [x] No measurable FPS drop with heatmap off (recording + drawing both gated on `heatmapVisible`)
+- [x] Rendering stays smooth (~60fps on car drawing) with heatmap on (viewport-culled, ~200 cells/frame)
+
+## Implementation notes (deviations from the original spec)
+
+- **Toggle location** — moved from the `<layout-toolbar>` (panel layout) to the
+  `<world-layers-toolbar>` (a new "Overlays" group), which is the natural home
+  for a per-frame render overlay. The `<layout-toolbar>` stays limited to
+  panel-visibility (camera / visualizer / mini-map) toggles.
+- **`HeatmapGrid` signature** — the spec proposed
+  `HeatmapGrid(worldWidth, worldHeight, cellSize?)`; the implementation is
+  `HeatmapGrid(cellSize?)` with **lazy cell creation**. There is no need to size
+  the grid to the world up front — cells are created on first write, so memory
+  is proportional to the area that has ever seen traffic, not the full map.
+  This also removes the need to recompute bounds on world change.
+- **`HeatmapRenderer`** — the spec proposed an offscreen-canvas cache redrawn
+  at ~4 fps. The implementation draws directly to the game context each render
+  frame: viewport culling keeps the per-frame cell count to ~200, cheap enough
+  that the extra offscreen canvas + redraw bookkeeping is not worth it.
+- **Shared infrastructure** — `HeatmapGrid`/`HeatmapRenderer` are owned by
+  `SimulatorShell` (not each simulator), exposed via `recordHeatmap` /
+  `drawHeatmap` / `resetHeatmap` helpers. The three concrete simulators only
+  add the record/draw/reset calls in their existing `update()`/`draw()` hooks.
 
 ## References
 

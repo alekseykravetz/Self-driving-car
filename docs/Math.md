@@ -461,6 +461,44 @@ thousands of short-lived `Set` allocations per frame.
 
 ---
 
+## Heatmap Grid (`ts/math/heatmapGrid.ts`)
+
+A lazy grid-based congestion counter backing the [spatial congestion heatmap
+overlay](Simulators.md#spatial-congestion-heatmap-tsmathheatmapgridts--tsrenderingheatmaprendererts).
+It reuses the `SpatialHashGrid` cell size (150px) for visual consistency, but is
+otherwise independent: it counts **car occupancy** per cell, not segments.
+
+```typescript
+class HeatmapCell {
+  col: number;
+  row: number;
+  occupancyFrames: number; // frames where >=1 car was in this cell
+  idleFrames: number;      // frames where a car in the cell was near-stationary
+}
+
+class HeatmapGrid {
+  readonly cellSize: number;            // default 150
+  get totalFrames(): number;            // frames since recording started
+  record(cars: Car[]): void;            // O(cars)/frame, O(1) cell lookup
+  getHeatmapData(): HeatmapCell[];      // live cells (lazily created)
+  reset(): void;                        // clear counters
+}
+```
+
+- **Lazy cells** — a `Map<string, HeatmapCell>` keyed by `"col,row"`. Cells are
+  created on first write, so memory is proportional to the area that has ever
+  seen traffic, not the full map. No `worldWidth`/`worldHeight` is required.
+- **Idle detection** — a car is idle when `|car.speed| < 0.5` px/frame.
+  Damaged cars are skipped entirely.
+- **`reset()`** — clears all counters; called on simulation restart, world
+  change, race init, and when the overlay is toggled off.
+
+The matching renderer (`ts/rendering/heatmapRenderer.ts`) lives in
+`ts/rendering/` and paints the grid as a viewport-culled translucent overlay
+(blue → cyan → yellow → red).
+
+---
+
 ## OSM Importer (`ts/math/osm-importer/osm.ts`)
 
 Converts OpenStreetMap JSON data (from Overpass API) into the project's Point/Segment format for creating real-world road networks.

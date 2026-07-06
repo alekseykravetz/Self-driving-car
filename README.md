@@ -17,6 +17,7 @@ Cars learn to navigate procedurally-generated worlds through evolutionary select
 - **3D Camera Perspective** — Pseudo-3D rendering with buildings, trees, and perspective projection
 - **Racing Mode** — Competitive races between player and AI cars with countdown, progress tracking, and sound effects
 - **Live Traffic Jam** — Click anywhere on a loaded world to drop trained cars that immediately drive themselves, collide with each other, and build an emergent traffic jam
+- **Spatial Congestion Heatmap** — Toggle a 🌡️ colour overlay (blue → red) on any simulator to see where traffic accumulates and idles over time
 - **Traffic Simulation** — Coordinated traffic lights with green/yellow/red cycling at intersections
 - **Mini-Map** — Real-time overview of all cars and the world graph
 - **Save/Load System** — Persist worlds, trained brains, and car configurations to files or localStorage
@@ -139,7 +140,8 @@ Self-driving-car/
 │   │   │   └── graph.ts        # Road network graph with Dijkstra pathfinding
 │   │   ├── osm-importer/
 │   │   │   └── osm.ts          # OpenStreetMap data parser (lat/lon → canvas)
-│   │   └── spatialGrid.ts      # Uniform hash grid for fast range queries (segments)
+│   │   ├── spatialGrid.ts      # Uniform hash grid for fast range queries (segments)
+│   │   └── heatmapGrid.ts      # Lazy grid-based congestion counter for the heatmap overlay
 │   │
 │   ├── car/
 │   │   ├── car.ts              # Vehicle physics, collision, AI integration
@@ -165,7 +167,8 @@ Self-driving-car/
 │   │   ├── pointRenderer.ts
 │   │   ├── segmentRenderer.ts
 │   │   ├── polygonRenderer.ts
-│   │   └── envelopeRenderer.ts
+│   │   ├── envelopeRenderer.ts
+│   │   └── heatmapRenderer.ts  # Viewport-culled congestion heatmap overlay (blue→red)
 │   │
 │   ├── neural-network/
 │   │   ├── network.ts          # Feedforward network, mutation, crossover
@@ -255,7 +258,7 @@ Self-driving-car/
 │   ├── panels/                 # Shared floating UI toolbars (custom elements)
 │   │   ├── worldToolbar.ts     # Custom element <world-toolbar>: border/tracking mode, file loading, camera debug
 │   │   ├── shortcutsToolbar.ts # Custom element <shortcuts-toolbar>: keyboard-shortcut indicators
-│   │   ├── worldLayersToolbar.ts # Custom element <world-layers-toolbar>: editor layer visibility + regenerate items
+│   │   ├── worldLayersToolbar.ts # Custom element <world-layers-toolbar>: editor layer visibility + regenerate items + 🌡️ heatmap overlay toggle
 │   │   ├── assetSelectors.ts   # File-input trigger helpers for worlds & cars
 │   │   ├── modeControls.ts     # Layout & visibility controls shared across simulators
 │   │   └── templates/          # HTML template strings for the toolbars

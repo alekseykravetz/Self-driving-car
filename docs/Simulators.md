@@ -43,6 +43,9 @@ abstract class SimulatorShell {
   // Shared helpers
   protected resizeLayout(): void;                       // responsive multi-panel resize
   protected drawNetworkVisualizer(time, brain): void;   // gated by the visualizer toggle
+  recordHeatmap(cars: Car[]): void;                     // gated by the 🌡️ overlay toggle (no-op when off)
+  drawHeatmap(viewPoint: { x: number; y: number }): void; // viewport-culled colour overlay
+  resetHeatmap(): void;                                 // clear counters (restart / world change / toggle off)
   protected animate(time: number): void;                // render-throttled RAF loop
 
   // Subclass hooks
@@ -62,6 +65,7 @@ abstract class SimulatorShell {
 | Toolbar + layout-toolbar panel wiring         | `SimulatorShell`  |
 | Responsive layout + mobile defaults           | `SimulatorShell`  |
 | Network visualizer rendering                  | `SimulatorShell`  |
+| Spatial heatmap grid + renderer               | `SimulatorShell`  |
 | Render-throttled `requestAnimationFrame` loop | `SimulatorShell`  |
 | World loading, car physics, spawning, fitness | Concrete subclass |
 
@@ -674,6 +678,76 @@ grid-query-and-filter pattern:
 
 Simple mode does **not** use the grid — its two full-length borders are passed
 directly via `roadBorders`.
+
+### Spatial Congestion Heatmap (`ts/math/heatmapGrid.ts` + `ts/rendering/heatmapRenderer.ts`)
+
+A grid-based counter that records vehicle occupancy per cell over time and
+renders it as a translucent colour overlay (blue → cyan → yellow → red) on top
+of the game canvas. It gives live visual analytics of traffic bottlenecks with
+zero external tooling, and is shared by all three simulators.
+
+**Data — `HeatmapGrid`:**
+
+```typescript
+class HeatmapCell {
+  col: number;
+  row: number;
+  occupancyFrames: number; // frames where >=1 car was in this cell
+  idleFrames: number;      // frames where a car in the cell was near-stationary
+}
+
+class HeatmapGrid {
+  readonly cellSize: number;            // 150 (matches SpatialHashGrid)
+  get totalFrames(): number;            // frames since recording started
+  record(cars: Car[]): void;            // O(cars)/frame, O(1) cell lookup
+  getHeatmapData(): HeatmapCell[];      // live cells (lazily created)
+  reset(): void;                        // clear counters
+}
+```
+
+- Cells are created lazily on first write, so memory is proportional to the
+  area that has ever seen traffic, not the full map.
+- A car is idle when `|speed| < 0.5 px/frame`. Damaged cars are skipped.
+- `reset()` is called on simulation restart / world change / race init, and
+  when the overlay is toggled off (so re-enabling starts from a clean slate).
+
+**Rendering — `HeatmapRenderer`:**
+
+- Draws directly onto the game context (the viewport transform is already
+  applied), so world-space `fillRect` calls land in the right place.
+- **Viewport-culled**: only cells intersecting the visible rect are drawn —
+  ~200 cells per frame for a 2000×2000px viewport at 150px cells, cheap enough
+  to run every render pass without an offscreen cache.
+- Translucent (`globalAlpha = 0.35`) so cars stay visible through the overlay.
+- `occupancyColor(ratio)` lerps `occupancyFrames / totalFrames` through the
+  four-stop gradient and returns an `rgb(...)` string.
+
+**Shell integration (`SimulatorShell`):**
+
+The grid + renderer are owned by `SimulatorShell` and exposed via three
+helpers, all gated on `heatmapVisible` (zero overhead when the overlay is off):
+
+```typescript
+recordHeatmap(cars: Car[]): void;                       // call from subclass update()
+drawHeatmap(viewPoint: { x: number; y: number }): void; // call from subclass draw()
+resetHeatmap(): void;                                   // call on restart / world change
+```
+
+`heatmapVisible` is a shell field kept in sync with the 🌡️ toggle on the
+`<world-layers-toolbar>` "Overlays" group via
+`setHeatmapChangeListener`. Toggling off also calls `resetHeatmap()`.
+
+**Per-simulator wiring:**
+
+| Simulator          | Records                              | Resets on                          |
+| ------------------ | ------------------------------------ | ---------------------------------- |
+| `TrainingSimulator` (simple) | cars + traffic cars         | new training / world change        |
+| `TrainingSimulator` (world)  | cars                       | new training / world change        |
+| `TrafficSimulator` | placed cars (alive)                  | world reload                       |
+| `RaceSimulator`    | cars (only while the race is started) | race init                         |
+
+The overlay is drawn after the world + cars but before the mini-map / network
+visualizer / 3D camera, so it sits on the top-down view only.
 
 ### World Mode Update Loop (`ts/simulator/training/modes/worldModeBehavior.ts`)
 
