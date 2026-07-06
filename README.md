@@ -297,9 +297,9 @@ Self-driving-car/
 This project intentionally uses **no bundler** (no Webpack, Vite, Rollup, etc.).
 
 - **TypeScript Compiler** (`tsc`) transpiles `.ts` files to `.js` files maintaining the same directory structure
-- **HTML `<script>` tags** load compiled JS files in dependency order (base utilities first, then domain modules)
+- **Native ES modules** — each HTML page loads a single `<script type="module">` entry point; the browser resolves the import graph at runtime
 - **Static file server** (`serve`) hosts the project as-is
-- All classes are exposed as **global variables** — no ES module imports/exports at runtime
+- Import paths use `.js` extension in source TypeScript (convention for `module: "nodenext"`)
 
 This keeps the development loop instant: save a `.ts` file → `tsc` compiles → browser refresh picks up changes.
 
@@ -357,9 +357,9 @@ Detailed technical documentation is maintained in the `docs/` directory:
 
 ## Key Design Decisions
 
-- **No bundler** — Direct script loading keeps the project simple and debuggable
+- **No bundler** — Native ES modules via `<script type="module">` keep the project simple and debuggable
 - **No runtime dependencies** — Everything is implemented from scratch (neural network, physics, geometry, rendering)
-- **Global scope** — Classes are globals for simplicity; HTML files control load order
+- **ES modules** — All files use proper `import`/`export` with `module: "nodenext"`
 - **Genetic algorithms over backpropagation** — Binary step activation + evolutionary selection is simpler and produces interesting emergent behaviors
 - **Polygon-based collision** — Accurate rotated rectangle intersection testing for all objects
 - **Canvas 2D rendering** — No WebGL; uses standard Canvas API with custom 3D projection for camera views

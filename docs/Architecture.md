@@ -7,8 +7,8 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 **Key architectural principles:**
 
 - Zero runtime dependencies — everything implemented from scratch
-- No bundler — TypeScript compiles to JS, HTML loads scripts via `<script>` tags
-- Global scope — all classes exist as window globals; HTML controls dependency order
+- No bundler — native ES modules via `<script type="module">`
+- ES module imports/exports — all files use `module: "nodenext"` with `.js` import extensions
 - Canvas 2D rendering with custom 3D projection for camera views
 
 ---
@@ -16,158 +16,74 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 ## Build Pipeline
 
 ```
-┌──────────────┐     ┌─────────┐     ┌──────────────┐     ┌─────────┐
-│  ts/*.ts     │────▶│  tsc    │────▶│  js/*.js     │────▶│ Browser │
-│  (source)    │     │ compiler│     │  (output)    │     │ <script>│
-└──────────────┘     └─────────┘     └──────────────┘     └─────────┘
+┌──────────────┐     ┌─────────┐     ┌──────────────┐     ┌─────────────────┐
+│  ts/*.ts     │────▶│  tsc    │────▶│  js/*.js     │────▶│ Browser         │
+│  (source)    │     │ compiler│     │  (output)    │     │ <script type=   │
+│  import/export│    │         │     │  import/export│    │  "module">      │
+└──────────────┘     └─────────┘     └──────────────┘     └─────────────────┘
 ```
 
 - `tsc --watch` recompiles on save
 - `serve -p 9090` serves the root directory as static files
-- HTML files reference `/js/...` paths directly in ordered `<script>` tags
-- No import/export at runtime — all code attaches to global scope
+- Each HTML page loads exactly one `<script type="module" src="/js/path/to/entry.js">`
+- The browser resolves the import graph at runtime — no manual dependency ordering needed
 
-### Script Load Order (Dependency Hierarchy)
+### Import Path Convention
 
-All HTML pages follow a strict dependency hierarchy to ensure modules load before their dependencies reference them. The order is organized by layer:
+TypeScript `module: "nodenext"` requires `.js` extensions in import paths, even though the source file is `.ts`:
 
-```html
-<!-- Layer 1: Core Math & Primitives (Foundation — no dependencies) -->
-<script src="/js/math/primitives/point.js"></script>
-<script src="/js/math/primitives/segment.js"></script>
-<script src="/js/math/primitives/polygon.js"></script>
-<script src="/js/math/primitives/envelope.js"></script>
-<script src="/js/math/utils.js"></script>
-<script src="/js/math/graph/graph.js"></script>
-<script src="/js/math/spatialGrid.js"></script>
+```typescript
+// In ts/world/world.ts:
+import { Point } from '../math/primitives/point.js';     // resolves to point.ts
+import { Segment } from '../math/primitives/segment.js';  // resolves to segment.ts
+import { Graph } from '../math/graph/graph.js';
+import { Envelope } from '../math/primitives/envelope.js';
+```
 
-<!-- Layer 1.5: Math Rendering (extracted draw methods, depends on math primitives) -->
-<script src="/js/rendering/pointRenderer.js"></script>
-<script src="/js/rendering/segmentRenderer.js"></script>
-<script src="/js/rendering/polygonRenderer.js"></script>
-<script src="/js/rendering/envelopeRenderer.js"></script>
+### Entry Points
 
-<!-- Layer 2: World System (depends on math primitives + renderers) -->
-<script src="/js/world/corridor.js"></script>
-<script src="/js/world/generation/worldGenerator.js"></script>
-<script src="/js/world/items/tree.js"></script>
-<script src="/js/world/items/building.js"></script>
-<script src="/js/world/markings/marking.js"></script>
-<script src="/js/world/markings/stop.js"></script>
-<script src="/js/world/markings/start.js"></script>
-<script src="/js/world/markings/crossing.js"></script>
-<script src="/js/world/markings/parking.js"></script>
-<script src="/js/world/markings/light.js"></script>
-<script src="/js/world/markings/target.js"></script>
-<script src="/js/world/markings/yield.js"></script>
-<script src="/js/world/editors/markingEditor.js"></script>
-<script src="/js/world/editors/graphEditor.js"></script>
-<script src="/js/world/editors/stopEditor.js"></script>
-<script src="/js/world/editors/startEditor.js"></script>
-<script src="/js/world/editors/crossingEditor.js"></script>
-<script src="/js/world/editors/parkingEditor.js"></script>
-<script src="/js/world/editors/lightEditor.js"></script>
-<script src="/js/world/editors/targetEditor.js"></script>
-<script src="/js/world/editors/yieldEditor.js"></script>
-<script src="/js/world/trafficManager.js"></script>
-<script src="/js/world/world.js"></script>
-<script src="/js/world/simple/simpleWorld.js"></script>
-<script src="/js/world/loader/worldLoader.js"></script>
+| Page                     | Entry module                          |
+|--------------------------|---------------------------------------|
+| `html/simulator.html`    | `ts/simulator/entry.ts`               |
+| `html/traffic.html`      | `ts/traffic/entry.ts`                 |
+| `html/race.html`         | `ts/race/entry.ts`                    |
+| `html/world.html`        | `ts/world/entry.ts`                   |
+| `index.html`             | `ts/store/entry.ts`                   |
 
-<!-- Layer 3: Rendering & Viewport (depends on math) -->
-<script src="/js/camera/types.js"></script>
-<script src="/js/camera/extrusion.js"></script>
-<script src="/js/camera/camera.js"></script>
-<script src="/js/viewport/scaleIndicator.js"></script>
-<script src="/js/viewport/viewport.js"></script>
-<script src="/js/mini-map/miniMap.js"></script>
+### Dependency Graph (Import Order)
 
-<!-- Layer 4: Audio (standalone) -->
-<script src="/js/audio/sound.js"></script>
+The module dependency graph is a DAG. Each file `import`s only from lower layers:
 
-<!-- Layer 5: Core Utilities & Car System (depends on math + world) -->
-<script src="/js/utils.js"></script>
-<script src="/js/car/config.js"></script>
-<script src="/js/car/physics/sensorRaycaster.js"></script>
-<script src="/js/car/sensors/sensor.js"></script>
-<script src="/js/car/controls/controls.js"></script>
-<script src="/js/car/physics/carPhysics.js"></script>
-<script src="/js/car/rendering/carRenderer.js"></script>
-<script src="/js/car/brain/carBrainAdapter.js"></script>
-<script src="/js/car/car.js"></script>
-<script src="/js/car/loader/carLoader.js"></script>
-
-<!-- Layer 6: Neural Network (depends on core utilities) -->
-<script src="/js/neural-network/visualizer.js"></script>
-<script src="/js/neural-network/network.js"></script>
-
-<!-- Layer 7: Storage & Data Management (before simulators) -->
-<script src="/js/store/types.js"></script>
-<script src="/js/store/storeManager.js"></script>
-
-<!-- Layer 8: UI Panel Templates (before custom elements) -->
-<script src="/js/panels/templates/worldToolbarTemplate.js"></script>
-<script src="/js/simulator/panels/templates/layoutToolbarTemplate.js"></script>
-<script src="/js/simulator/panels/templates/animationLoopToolbarTemplate.js"></script>
-<script src="/js/panels/templates/shortcutsToolbarTemplate.js"></script>
-<script src="/js/simulator/training/templates/trainingPanelTemplate.js"></script>
-<script src="/js/simulator/training/templates/trainingInitModalTemplate.js"></script>
-
-<!-- Layer 9: UI Components/Panels (custom elements) -->
-<script src="/js/panels/modeControls.js"></script>
-<script src="/js/panels/assetSelectors.js"></script>
-<script src="/js/panels/worldToolbar.js"></script>
-<script src="/js/simulator/panels/layoutToolbar.js"></script>
-<script src="/js/simulator/panels/animationLoopToolbar.js"></script>
-<script src="/js/panels/shortcutsToolbar.js"></script>
-
-<!-- Layer 10: Shared Simulator Utilities (depends on math + car types) -->
-<script src="/js/simulator/spatialGridUtils.js"></script>
-
-<!-- Layer 11: Training & Simulator-Specific Modules (depends on everything) -->
-<script src="/js/simulator/training/modes/trafficFactory.js"></script>
-<script src="/js/simulator/training/modes/borderCollision.js"></script>
-<script src="/js/simulator/training/rendering/carRenderer.js"></script>
-<script src="/js/simulator/training/rendering/layoutManager.js"></script>
-<script src="/js/simulator/training/modes/simpleModeBehavior.js"></script>
-<script src="/js/simulator/training/modes/worldModeBehavior.js"></script>
-<script src="/js/simulator/training/genetics/storageManager.js"></script>
-<script src="/js/simulator/training/genetics/poolManager.js"></script>
-<script src="/js/simulator/training/trainingInitModal.js"></script>
-<script src="/js/simulator/training/trainingPanel.js"></script>
-
-<!-- Layer 12: Simulator Core (final orchestrator) -->
-<script src="/js/simulator/views/simulatorPageHost.js"></script>
-<script src="/js/simulator/core/simulatorShell.js"></script>
-<script src="/js/simulator/training/trainingSimulator.js"></script>
-
-<!-- Layer 13: Inline Initialization (after all modules loaded) -->
-<script>
-  (async () => {
-    await StoreManager.init();
-    const simulator = new TrainingSimulator(
-      canvas,
-      networkCanvas,
-      miniMapCanvas,
-    );
-  })();
-</script>
+```
+math/primitives (Point, Segment, Polygon, Envelope)
+  → math/utils (lerp, distance, etc.)
+  → math/graph (Graph)
+  → math/spatialGrid, math/osm-importer
+  → rendering (drawPoint, drawSegment, drawPolygon, drawEnvelope)
+  → world: items, markings, editors, corridor, trafficManager
+  → world/world, world/simple/simpleWorld, world/loader
+  → camera, viewport, mini-map
+  → audio
+  → utils (polysIntersect, getRGBA)
+  → car: config, sensorRaycaster, sensors, controls, physics, brain
+  → car/car, car/loader
+  → neural-network
+  → store
+  → panels: templates, custom elements (world-toolbar, layout-toolbar, etc.)
+  → simulator: spatialGridUtils, training modes, genetics, panels
+  → simulator/core (SimulatorShell)
+  → simulator/training/trainingSimulator
+  → simulator/traffic/trafficSimulator
+  → simulator/racing/raceSimulator
+  → entry points (import everything needed and bootstrap)
 ```
 
 **Critical Rules:**
 
-1. **Core features first**: Math, World, and Rendering layers must load before any modules that use them
-2. **Templates before components**: UI templates must load before custom elements that reference them
-3. **Storage initialized early**: `StoreManager` must be available before simulators start
-4. **Global scope only**: No import/export at runtime; all classes attach to `window`
-5. **Add to all HTML files**: When adding new modules, update all relevant HTML files (`simulator.html`, `traffic.html`, `race.html`, `world.html`) with consistent ordering
-
-**HTML files affected:**
-
-- `html/simulator.html` — Training simulator
-- `html/traffic.html` — Live traffic simulation
-- `html/race.html` — Racing game
-- `html/world.html` — World editor
+1. **No circular imports** — The graph must remain acyclic. If a cycle appears, extract shared types into a new file.
+2. **Import from `.js` files** — TypeScript for `nodenext` needs the `.js` extension in import paths.
+3. **Single entry per page** — All dependencies are reachable via the import graph from one entry point.
+4. **`StoreManager.init()`** is called at the top of each entry module — it fetches bundled assets before the app boots.
 
 ---
 
@@ -354,8 +270,8 @@ options interface for style control.
 | `polygonRenderer.ts`  | Draws `Polygon` as filled and stroked closed shapes    |
 | `envelopeRenderer.ts` | Draws `Envelope` by delegating to `drawPolygon`        |
 
-These are loaded via `<script>` tags before the World System (Layer 2) so that
-`World.draw()`, editors, and marking types can call them as global functions.
+These are importable by any file that needs them (World, editors, markings) via
+`import { drawPoint } from '../rendering/pointRenderer.js'`.
 
 ### 7. Viewport & Rendering (`ts/viewport/`, `ts/mini-map/`, `ts/camera/`)
 
