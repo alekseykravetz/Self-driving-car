@@ -76,15 +76,8 @@ import '../simulator/training/rendering/layoutManager.js';
 import '../simulator/traffic/trafficPanel.js';
 import '../simulator/views/simulatorPageHost.js';
 import '../simulator/core/simulatorShell.js';
-import './trafficSimulator.js';
 (async () => {
-  await StoreManager.init();
-  const host = new SimulatorPageHost();
-  new TrafficSimulator(
-    gameCanvas,
-    networkCanvas,
-    miniMapCanvas,
-    cameraCanvas,
-    host,
-  );
+    await StoreManager.init();
+    const host = new SimulatorPageHost();
+    new TrafficSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
 })();

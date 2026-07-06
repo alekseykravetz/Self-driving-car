@@ -78,7 +78,6 @@ import '../simulator/views/simulatorPageHost.js';
 import '../simulator/core/simulatorShell.js';
 import '../simulator/spatialGridUtils.js';
 import '../simulator/racing/racePanel.js';
-import './raceSimulator.js';
 (async () => {
     await StoreManager.init();
     const host = new SimulatorPageHost();

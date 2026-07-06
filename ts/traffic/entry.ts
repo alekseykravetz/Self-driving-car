@@ -82,7 +82,6 @@ import '../simulator/training/rendering/layoutManager.js';
 import '../simulator/traffic/trafficPanel.js';
 import '../simulator/views/simulatorPageHost.js';
 import '../simulator/core/simulatorShell.js';
-import './trafficSimulator.js';
 
 (async () => {
   await StoreManager.init();
