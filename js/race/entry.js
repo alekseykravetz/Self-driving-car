@@ -79,43 +79,47 @@ import '../simulator/core/simulatorShell.js';
 import '../simulator/spatialGridUtils.js';
 import '../simulator/racing/racePanel.js';
 (async () => {
-    await StoreManager.init();
-    const host = new SimulatorPageHost();
-    const params = new URLSearchParams(window.location.search);
-    const mode = params.get('mode') || 'default';
-    gameCanvas.width = window.innerWidth;
-    cameraCanvas.width = window.innerWidth;
-    document.body.style.flexDirection = 'column';
-    const rightPanelWidth = 250;
-    miniMapCanvas.width = rightPanelWidth;
-    miniMapCanvas.height = rightPanelWidth;
-    let controls = null;
-    if (mode === 'camera') {
-        gameCanvas.height = 0;
-        cameraCanvas.height = window.innerHeight;
-        ironManCanvas.style.display = '';
-        controls = new CameraControls(ironManCanvas);
-    }
-    else if (mode === 'phone') {
-        gameCanvas.height = 0;
-        cameraCanvas.height = window.innerHeight;
-        cameraCanvas.style.cssText =
-            'top:50%;left:50%;position:absolute;transform:translate(-50%,-50%)';
-        miniMapCanvas.style.display = 'none';
-        statistics.style.display = 'none';
-        document.querySelector('world-toolbar').style.display =
-            'none';
-        controls = new PhoneControls(cameraCanvas);
-        document.addEventListener('click', () => {
-            const el = document.body;
-            el.requestFullscreen?.();
-        });
-    }
-    else {
-        gameCanvas.height = window.innerHeight / 2;
-        cameraCanvas.height = window.innerHeight / 2;
-    }
-    statistics.style.width = `${rightPanelWidth}px`;
-    statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
-    new RaceSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host, controls);
+  await StoreManager.init();
+  const host = new SimulatorPageHost();
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get('mode') || 'default';
+  gameCanvas.width = window.innerWidth;
+  cameraCanvas.width = window.innerWidth;
+  document.body.style.flexDirection = 'column';
+  const rightPanelWidth = 250;
+  miniMapCanvas.width = rightPanelWidth;
+  miniMapCanvas.height = rightPanelWidth;
+  let controls = null;
+  if (mode === 'camera') {
+    gameCanvas.height = 0;
+    cameraCanvas.height = window.innerHeight;
+    ironManCanvas.style.display = '';
+    controls = new CameraControls(ironManCanvas);
+  } else if (mode === 'phone') {
+    gameCanvas.height = 0;
+    cameraCanvas.height = window.innerHeight;
+    cameraCanvas.style.cssText =
+      'top:50%;left:50%;position:absolute;transform:translate(-50%,-50%)';
+    miniMapCanvas.style.display = 'none';
+    statistics.style.display = 'none';
+    document.querySelector('world-toolbar').style.display = 'none';
+    controls = new PhoneControls(cameraCanvas);
+    document.addEventListener('click', () => {
+      const el = document.body;
+      el.requestFullscreen?.();
+    });
+  } else {
+    gameCanvas.height = window.innerHeight / 2;
+    cameraCanvas.height = window.innerHeight / 2;
+  }
+  statistics.style.width = `${rightPanelWidth}px`;
+  statistics.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
+  new RaceSimulator(
+    gameCanvas,
+    networkCanvas,
+    miniMapCanvas,
+    cameraCanvas,
+    host,
+    controls,
+  );
 })();

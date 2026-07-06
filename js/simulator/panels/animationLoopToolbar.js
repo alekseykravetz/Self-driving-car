@@ -7,102 +7,101 @@ import { formatElapsedTime } from '../../math/utils.js';
  * `SimulatorShell.animate()`.
  */
 export class AnimationLoopToolbarElement extends HTMLElement {
-    #_paused = false;
-    #pauseBtn = null;
-    #timeDisplay = null;
-    #resetTimeBtn = null;
-    #fpsDisplay = null;
-    #elapsedFrames = 0;
-    #renderedFrames = 0;
-    #lastFpsUpdate = 0;
-    #currentFps = 0;
-    constructor() {
-        super();
-        this.id = 'animationLoopToolbar';
+  #_paused = false;
+  #pauseBtn = null;
+  #timeDisplay = null;
+  #resetTimeBtn = null;
+  #fpsDisplay = null;
+  #elapsedFrames = 0;
+  #renderedFrames = 0;
+  #lastFpsUpdate = 0;
+  #currentFps = 0;
+  constructor() {
+    super();
+    this.id = 'animationLoopToolbar';
+  }
+  connectedCallback() {
+    this.innerHTML = AnimationLoopToolbarElement.template;
+    this.#pauseBtn = this.querySelector('#loopPauseBtn');
+    this.#pauseBtn?.addEventListener('click', () => this.togglePause());
+    this.#timeDisplay = this.querySelector('#elapsedTimeDisplay');
+    this.#resetTimeBtn = this.querySelector('#resetTimeBtn');
+    this.#resetTimeBtn?.addEventListener('click', () => this.resetTime());
+    this.#fpsDisplay = this.querySelector('#fpsDisplay');
+    this.#lastFpsUpdate = performance.now();
+    this.#updateTimeDisplay();
+    this.#updateFpsDisplay();
+  }
+  /** Whether the simulation step is currently paused. */
+  get paused() {
+    return this.#_paused;
+  }
+  /**
+   * How many animation frames pass per rendered frame. Physics always runs at
+   * full rate; only the (heavier) draw pass is throttled by this value.
+   * Clamped to [1, 10]; 1 = draw every frame.
+   */
+  get renderInterval() {
+    const el = this.querySelector('#renderInterval');
+    const value = el ? Math.round(Number(el.value)) : 1;
+    if (!Number.isFinite(value)) return 1;
+    return Math.min(10, Math.max(1, value));
+  }
+  /** Record one animation frame. Called by SimulatorShell.animate(). */
+  recordFrame(isRenderFrame = false) {
+    if (!this.#_paused) {
+      this.#elapsedFrames++;
+      this.#updateTimeDisplay();
     }
-    connectedCallback() {
-        this.innerHTML = AnimationLoopToolbarElement.template;
-        this.#pauseBtn = this.querySelector('#loopPauseBtn');
-        this.#pauseBtn?.addEventListener('click', () => this.togglePause());
-        this.#timeDisplay = this.querySelector('#elapsedTimeDisplay');
-        this.#resetTimeBtn = this.querySelector('#resetTimeBtn');
-        this.#resetTimeBtn?.addEventListener('click', () => this.resetTime());
-        this.#fpsDisplay = this.querySelector('#fpsDisplay');
-        this.#lastFpsUpdate = performance.now();
-        this.#updateTimeDisplay();
-        this.#updateFpsDisplay();
+    if (isRenderFrame) {
+      this.#renderedFrames++;
+      this.#updateFpsCounter();
     }
-    /** Whether the simulation step is currently paused. */
-    get paused() {
-        return this.#_paused;
+  }
+  /** Get the total elapsed simulation frames. */
+  get elapsedTime() {
+    return this.#elapsedFrames;
+  }
+  /** Reset the elapsed time counter to zero. */
+  resetTime() {
+    this.#elapsedFrames = 0;
+    this.#updateTimeDisplay();
+  }
+  /** Update the time display element with the current elapsed time. */
+  #updateTimeDisplay() {
+    if (this.#timeDisplay) {
+      this.#timeDisplay.textContent = formatElapsedTime(this.#elapsedFrames);
     }
-    /**
-     * How many animation frames pass per rendered frame. Physics always runs at
-     * full rate; only the (heavier) draw pass is throttled by this value.
-     * Clamped to [1, 10]; 1 = draw every frame.
-     */
-    get renderInterval() {
-        const el = this.querySelector('#renderInterval');
-        const value = el ? Math.round(Number(el.value)) : 1;
-        if (!Number.isFinite(value))
-            return 1;
-        return Math.min(10, Math.max(1, value));
+  }
+  /** Update FPS counter once per second. */
+  #updateFpsCounter() {
+    const now = performance.now();
+    const elapsed = now - this.#lastFpsUpdate;
+    if (elapsed >= 1000) {
+      this.#currentFps = Math.round((this.#renderedFrames * 1000) / elapsed);
+      this.#renderedFrames = 0;
+      this.#lastFpsUpdate = now;
+      this.#updateFpsDisplay();
     }
-    /** Record one animation frame. Called by SimulatorShell.animate(). */
-    recordFrame(isRenderFrame = false) {
-        if (!this.#_paused) {
-            this.#elapsedFrames++;
-            this.#updateTimeDisplay();
-        }
-        if (isRenderFrame) {
-            this.#renderedFrames++;
-            this.#updateFpsCounter();
-        }
+  }
+  /** Update the FPS display element. */
+  #updateFpsDisplay() {
+    if (this.#fpsDisplay) {
+      this.#fpsDisplay.textContent = `${this.#currentFps} fps`;
     }
-    /** Get the total elapsed simulation frames. */
-    get elapsedTime() {
-        return this.#elapsedFrames;
+  }
+  /** Toggle (or force) the paused state, syncing the button glyph. */
+  togglePause(forceState) {
+    this.#_paused = forceState !== undefined ? forceState : !this.#_paused;
+    if (this.#pauseBtn) {
+      this.#pauseBtn.textContent = this.#_paused ? '▶️' : '⏸️';
+      this.#pauseBtn.classList.toggle('active', !this.#_paused);
     }
-    /** Reset the elapsed time counter to zero. */
-    resetTime() {
-        this.#elapsedFrames = 0;
-        this.#updateTimeDisplay();
-    }
-    /** Update the time display element with the current elapsed time. */
-    #updateTimeDisplay() {
-        if (this.#timeDisplay) {
-            this.#timeDisplay.textContent = formatElapsedTime(this.#elapsedFrames);
-        }
-    }
-    /** Update FPS counter once per second. */
-    #updateFpsCounter() {
-        const now = performance.now();
-        const elapsed = now - this.#lastFpsUpdate;
-        if (elapsed >= 1000) {
-            this.#currentFps = Math.round((this.#renderedFrames * 1000) / elapsed);
-            this.#renderedFrames = 0;
-            this.#lastFpsUpdate = now;
-            this.#updateFpsDisplay();
-        }
-    }
-    /** Update the FPS display element. */
-    #updateFpsDisplay() {
-        if (this.#fpsDisplay) {
-            this.#fpsDisplay.textContent = `${this.#currentFps} fps`;
-        }
-    }
-    /** Toggle (or force) the paused state, syncing the button glyph. */
-    togglePause(forceState) {
-        this.#_paused = forceState !== undefined ? forceState : !this.#_paused;
-        if (this.#pauseBtn) {
-            this.#pauseBtn.textContent = this.#_paused ? '▶️' : '⏸️';
-            this.#pauseBtn.classList.toggle('active', !this.#_paused);
-        }
-    }
-    /** Programmatically set the paused state. */
-    setPaused(paused) {
-        this.togglePause(paused);
-    }
-    static template = ANIMATION_LOOP_TOOLBAR_TEMPLATE;
+  }
+  /** Programmatically set the paused state. */
+  setPaused(paused) {
+    this.togglePause(paused);
+  }
+  static template = ANIMATION_LOOP_TOOLBAR_TEMPLATE;
 }
 customElements.define('animation-loop-toolbar', AnimationLoopToolbarElement);
