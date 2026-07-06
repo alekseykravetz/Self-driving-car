@@ -457,13 +457,23 @@ export class TrafficSimulator extends SimulatorShell {
     ctx.lineTo(tipX, tipY);
     // Arrowhead: two barbs rotated ±150° off the forward direction.
     ctx.lineTo(
-      tipX + (Math.cos(2.618) * fx - Math.sin(2.618) * fy) * head,
-      tipY + (Math.sin(2.618) * fx + Math.cos(2.618) * fy) * head,
+      tipX +
+        (Math.cos((5 * Math.PI) / 6) * fx - Math.sin((5 * Math.PI) / 6) * fy) *
+          head,
+      tipY +
+        (Math.sin((5 * Math.PI) / 6) * fx + Math.cos((5 * Math.PI) / 6) * fy) *
+          head,
     );
     ctx.moveTo(tipX, tipY);
     ctx.lineTo(
-      tipX + (Math.cos(-2.618) * fx - Math.sin(-2.618) * fy) * head,
-      tipY + (Math.sin(-2.618) * fx + Math.cos(-2.618) * fy) * head,
+      tipX +
+        (Math.cos((-5 * Math.PI) / 6) * fx -
+          Math.sin((-5 * Math.PI) / 6) * fy) *
+          head,
+      tipY +
+        (Math.sin((-5 * Math.PI) / 6) * fx +
+          Math.cos((-5 * Math.PI) / 6) * fy) *
+          head,
     );
     ctx.stroke();
     ctx.restore();

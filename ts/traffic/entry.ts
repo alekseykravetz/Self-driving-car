@@ -78,7 +78,7 @@ import '../simulator/panels/animationLoopToolbar.js';
 import '../panels/shortcutsToolbar.js';
 import '../panels/worldLayersToolbar.js';
 import '../simulator/spatialGridUtils.js';
-import '../simulator/training/rendering/layoutManager.js';
+import '../simulator/rendering/layoutManager.js';
 import '../simulator/traffic/trafficPanel.js';
 import '../simulator/views/simulatorPageHost.js';
 import '../simulator/core/simulatorShell.js';

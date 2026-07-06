@@ -3,6 +3,7 @@ import type { GridSegment, SpatialHashGrid } from '../math/spatialGrid.js';
 import type { Segment } from '../math/primitives/segment.js';
 import type { Point } from '../math/primitives/point.js';
 import type { Car } from '../car/car.js';
+import { BODY_MARGIN_RATIO } from '../car/config.js';
 
 /**
  * Shared spatial-grid utilities used by TrainingSimulator, TrafficSimulator,
@@ -46,7 +47,7 @@ export function queryBordersNearCar(
   const MIN_RANGE = 100;
   const rayLength = car.sensor?.rayLength ?? MIN_RANGE;
   const reach = Math.max(rayLength, MIN_RANGE);
-  const bodyMargin = Math.hypot(car.width, car.height) * 0.5;
+  const bodyMargin = Math.hypot(car.width, car.height) * BODY_MARGIN_RATIO;
 
   const broadRadius = reach + bodyMargin + grid.cellSize;
   const candidates = grid.query(car.x, car.y, broadRadius);

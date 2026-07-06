@@ -1,8 +1,9 @@
 import { Car } from '../../../car/car.js';
 import { getRandomColor } from '../../../math/color.js';
+import { DEFAULT_CAR_CONFIG } from '../../../car/config.js';
 
-const TRAFFIC_WIDTH = 30;
-const TRAFFIC_HEIGHT = 50;
+const TRAFFIC_WIDTH = DEFAULT_CAR_CONFIG.width + 5;
+const TRAFFIC_HEIGHT = DEFAULT_CAR_CONFIG.height - 13;
 const TRAFFIC_MAX_SPEED = 2;
 
 /**

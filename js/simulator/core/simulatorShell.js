@@ -1,7 +1,7 @@
 import { DEFAULT_LAYER_VISIBILITY } from '../../world/types.js';
 import { NetworkVisualizer } from '../../neural-network/visualizer.js';
 import { safeJsonParse } from '../../store/serialization.js';
-import { resizeSimulatorLayout } from '../training/rendering/layoutManager.js';
+import { resizeSimulatorLayout } from '../rendering/layoutManager.js';
 /**
  * SimulatorShell — reusable scaffolding shared by every canvas-based simulator
  * (AI training Simulator, Live Traffic Jam simulator, …).

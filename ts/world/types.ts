@@ -1,13 +1,13 @@
-import { Point } from '../math/primitives/point.js';
-import { Segment } from '../math/primitives/segment.js';
-import { Graph } from '../math/graph/graph.js';
-import { Car } from '../car/car.js';
-import { Marking } from './markings/marking.js';
-import { Corridor } from './corridor.js';
-import { Building } from './items/building.js';
-import { Tree, TreeInstance } from './items/tree.js';
-import { Viewport } from '../viewport/viewport.js';
-import { IMiniMapCar } from '../mini-map/miniMap.js';
+import type { Point } from '../math/primitives/point.js';
+import type { Segment } from '../math/primitives/segment.js';
+import type { Graph } from '../math/graph/graph.js';
+import type { Car } from '../car/car.js';
+import type { Marking } from './markings/marking.js';
+import type { Corridor } from './corridor.js';
+import type { Building } from './items/building.js';
+import type { Tree, TreeInstance } from './items/tree.js';
+import type { Viewport } from '../viewport/viewport.js';
+import type { IMiniMapCar } from '../mini-map/miniMap.js';
 
 export interface CarDrawOptions {
   showSensor?: boolean;

@@ -10,7 +10,7 @@ import type { AnimationLoopToolbarElement } from '../panels/animationLoopToolbar
 import type { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { safeJsonParse } from '../../store/serialization.js';
-import { resizeSimulatorLayout } from '../training/rendering/layoutManager.js';
+import { resizeSimulatorLayout } from '../rendering/layoutManager.js';
 import type { NeuralNetwork } from '../../neural-network/network.js';
 
 /**

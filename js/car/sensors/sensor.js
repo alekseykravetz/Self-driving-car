@@ -1,4 +1,5 @@
 import { SensorRaycaster, } from '../physics/sensorRaycaster.js';
+import { DEFAULT_CAR_CONFIG } from '../config.js';
 export class Sensor {
     rayCount;
     rayLength;
@@ -7,10 +8,10 @@ export class Sensor {
     rays;
     readings;
     constructor(config) {
-        this.rayCount = config?.rayCount ?? 5;
-        this.rayLength = config?.rayLength ?? 150;
-        this.raySpread = config?.raySpread ?? Math.PI / 2;
-        this.rayOffset = config?.rayOffset ?? 0;
+        this.rayCount = config?.rayCount ?? DEFAULT_CAR_CONFIG.sensor.rayCount;
+        this.rayLength = config?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength;
+        this.raySpread = config?.raySpread ?? DEFAULT_CAR_CONFIG.sensor.raySpread;
+        this.rayOffset = config?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset;
         this.rays = [];
         this.readings = [];
     }

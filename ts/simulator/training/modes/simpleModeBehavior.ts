@@ -12,7 +12,17 @@ import {
 import { drawSimulatorCars } from '../rendering/carRenderer.js';
 import { scale } from '../../../math/utils.js';
 
-const INITIAL_TRAFFIC_Y = -700;
+export const SIMPLE_MODE_CONFIG = {
+  initialTrafficY: -700,
+  trafficLookahead: 1500,
+  trafficRowGap: 200,
+  trafficSpeed: 2,
+  trafficCullMargin: 600,
+  proximityThreshold: 400,
+  simpleRoadWidth: 180,
+} as const;
+
+const { initialTrafficY: INITIAL_TRAFFIC_Y } = SIMPLE_MODE_CONFIG;
 
 export class SimpleSimState {
   traffic: Car[] = [];
@@ -32,14 +42,13 @@ export function updateSimpleTraffic(
   roadBorders: Point[][],
   startInfo: { x: number; y: number; angle: number },
 ): void {
-  const TRAFFIC_LOOKAHEAD = 1500;
-  const TRAFFIC_ROW_GAP = 200;
-  const TRAFFIC_SPEED = 2;
+  state.lastGeneratedTrafficY -= SIMPLE_MODE_CONFIG.trafficSpeed;
 
-  state.lastGeneratedTrafficY -= TRAFFIC_SPEED;
-
-  while (state.lastGeneratedTrafficY > bestCar.y - TRAFFIC_LOOKAHEAD) {
-    state.lastGeneratedTrafficY -= TRAFFIC_ROW_GAP;
+  while (
+    state.lastGeneratedTrafficY >
+    bestCar.y - SIMPLE_MODE_CONFIG.trafficLookahead
+  ) {
+    state.lastGeneratedTrafficY -= SIMPLE_MODE_CONFIG.trafficRowGap;
     state.traffic.push(
       ...generateTrafficRow(
         state.lastGeneratedTrafficY,
@@ -50,10 +59,9 @@ export function updateSimpleTraffic(
     );
   }
 
-  const TRAFFIC_CULL_MARGIN = 600;
   const startY = startInfo.y;
   state.traffic = state.traffic.filter(
-    (c) => c.y < startY + TRAFFIC_CULL_MARGIN,
+    (c) => c.y < startY + SIMPLE_MODE_CONFIG.trafficCullMargin,
   );
 
   for (let i = 0; i < state.traffic.length; i++) {
@@ -71,7 +79,7 @@ export function updateSimpleCars(
   bestCar: Car,
   idleRange: number,
 ): { aliveCount: number; deadCount: number; frozenCount: number } {
-  const PROXIMITY_THRESHOLD = 400;
+  const PROXIMITY_THRESHOLD = SIMPLE_MODE_CONFIG.proximityThreshold;
   let aliveCount = 0;
   let deadCount = 0;
   let frozenCount = 0;
@@ -134,10 +142,9 @@ export class SimpleTrainingStrategy {
     this.#parent.toolbarPanel.hideCameraDebug();
     this.#parent.layoutToolbar.setDefaultLayoutMode('camera-big');
 
-    const SIMPLE_ROAD_WIDTH = 180;
     const simpleWorld = new SimpleWorld(
       this.#parent.gameCanvas.width / 2,
-      SIMPLE_ROAD_WIDTH,
+      SIMPLE_MODE_CONFIG.simpleRoadWidth,
     );
     this.#parent.world = simpleWorld;
 

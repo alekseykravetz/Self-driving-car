@@ -78,7 +78,7 @@ import '../simulator/spatialGridUtils.js';
 import '../simulator/training/modes/trafficFactory.js';
 import '../simulator/training/modes/borderCollision.js';
 import '../simulator/training/rendering/carRenderer.js';
-import '../simulator/training/rendering/layoutManager.js';
+import '../simulator/rendering/layoutManager.js';
 import '../simulator/training/modes/simpleModeBehavior.js';
 import '../simulator/training/modes/worldModeBehavior.js';
 import '../simulator/training/genetics/storageManager.js';

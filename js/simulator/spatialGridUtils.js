@@ -1,3 +1,4 @@
+import { BODY_MARGIN_RATIO } from '../car/config.js';
 /**
  * Shared spatial-grid utilities used by TrainingSimulator, TrafficSimulator,
  * and RaceSimulator.
@@ -35,7 +36,7 @@ export function queryBordersNearCar(grid, car) {
     const MIN_RANGE = 100;
     const rayLength = car.sensor?.rayLength ?? MIN_RANGE;
     const reach = Math.max(rayLength, MIN_RANGE);
-    const bodyMargin = Math.hypot(car.width, car.height) * 0.5;
+    const bodyMargin = Math.hypot(car.width, car.height) * BODY_MARGIN_RATIO;
     const broadRadius = reach + bodyMargin + grid.cellSize;
     const candidates = grid.query(car.x, car.y, broadRadius);
     const narrowRadiusSq = (reach + bodyMargin) * (reach + bodyMargin);
