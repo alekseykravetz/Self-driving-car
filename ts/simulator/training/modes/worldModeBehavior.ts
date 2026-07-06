@@ -21,10 +21,6 @@ function updateWorldCars(
   idleEnabled: boolean,
   idleRange: number,
 ): { aliveCount: number; deadCount: number; frozenCount: number } {
-  // Minimum border lookup range, independent of sensor length, so damage
-  // detection and collision correction always have nearby borders to test.
-  const MIN_BORDER_RANGE = 100;
-
   let aliveCount = 0;
   let deadCount = 0;
   let frozenCount = 0;
