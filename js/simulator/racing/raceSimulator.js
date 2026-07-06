@@ -6,6 +6,7 @@ class RaceSimulator extends SimulatorShell {
   #cars = null;
   #myCar = null;
   #roadBorders = null;
+  #borderGrid = new SpatialHashGrid(150);
   #frameCount = 0;
   #started = false;
   constructor(
@@ -114,11 +115,10 @@ class RaceSimulator extends SimulatorShell {
       if (!this.#world.corridor) throw new Error('Corridor generation failed');
       this.#roadBorders = this.#world.corridor.borders.map((s) => [s.p1, s.p2]);
     } else {
-      this.#roadBorders = [
-        ...this.#world.roadBorders,
-        ...this.#world.separatorBorders,
-        ...this.#world.corridors.flatMap((c) => c.borders),
-      ].map((s) => [s.p1, s.p2]);
+      this.#roadBorders = buildRoadBorders(this.#world);
+    }
+    if (this.#roadBorders) {
+      this.#borderGrid.build(this.#roadBorders);
     }
     if (this.#world.corridor) {
       const miniMapGraph = new Graph([], this.#world.corridor.skeleton);
@@ -207,8 +207,11 @@ class RaceSimulator extends SimulatorShell {
         if (car.damaged && borderMode === 'collision') {
           this.#handleCollisionWithRoadBorders(car);
         }
-        const borders = borderMode === 'none' ? [] : (this.#roadBorders ?? []);
-        car.update(borders);
+        let obstacles = [];
+        if (borderMode !== 'none' && this.#roadBorders) {
+          obstacles = queryBordersNearCar(this.#borderGrid, car);
+        }
+        car.update(obstacles);
       }
     }
     const trackTarget = this.#getTrackTarget();

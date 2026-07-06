@@ -409,6 +409,13 @@ road-border segments and large car populations: each car's border lookup becomes
 proportional to the segments near it instead of scanning the whole map (`O(n)` →
 roughly `O(1)`).
 
+**Ownership:** The grid is owned and queried by the simulators
+(`TrainingSimulator`, `TrafficSimulator`, `RaceSimulator`), not by `CarPhysics`.
+Each simulator calls `queryBordersNearCar()` from the shared
+`spatialGridUtils.ts` to get nearby borders, then passes those pre-filtered
+polygons to `car.update()`. `CarPhysics.assessDamage()` works solely with the
+`polygons` array it receives — no grid dependency.
+
 ```typescript
 type GridSegment = [Point, Point];
 
@@ -447,10 +454,10 @@ stamp slot; a numeric compare (`stamp !== queryId`) replaces `Set.has`/`add`.
 previous build can never be mistaken for a current-query hit. This removed
 thousands of short-lived `Set` allocations per frame.
 
-> ⚠️ The grid assumes many **short** segments (real road borders). It is not used
-> for `SimpleWorld`, whose two borders span the entire road (`±1,000,000`) and
-> would rasterize into millions of cells — simple mode passes its 2 borders
-> directly instead.
+> ⚠️ The grid assumes many **short** segments (real road borders). It is **not**
+> used for simple mode, whose two borders span the entire road (`±1,000,000`) and
+> would rasterize into millions of cells. Simple mode passes its 2 borders
+> directly via `roadBorders` — no grid created or queried.
 
 ---
 

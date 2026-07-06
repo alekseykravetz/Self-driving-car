@@ -661,6 +661,20 @@ in the [animation-loop-toolbar panel](#control-panel-ui) and applies to both
 world and simple modes. Training throughput and outcomes are unaffected — only
 visual smoothness.
 
+### Shared Spatial Grid Utilities (`ts/simulator/spatialGridUtils.ts`)
+
+Three functions shared by all canvas-based simulators to avoid duplicating the
+grid-query-and-filter pattern:
+
+| Function                                           | Purpose                                                                                                                       |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `buildRoadBorders(world)`                          | Extracts all road-border segments (`roadBorders` + `separatorBorders` + corridor borders) from an `IWorld`                    |
+| `queryBordersNearCar(grid, car)`                   | Broad-phase grid query + narrow-phase distance filter, returning only segments within the car's sensor range plus body margin |
+| `pointToSegmentDistanceSq(px, py, ax, ay, bx, by)` | Sqrt-free squared-distance from point to line segment (allocation-free)                                                       |
+
+Simple mode does **not** use the grid — its two full-length borders are passed
+directly via `roadBorders`.
+
 ### World Mode Update Loop (`ts/simulator/training/modes/worldModeBehavior.ts`)
 
 The per-frame car-update phase is extracted out of `TrainingSimulator` into a free function,
@@ -680,8 +694,7 @@ function updateWorldCars(
   // - 'collision' mode: push damaged cars back onto road (handleCollisionWithRoadBorders)
   // - idle: freeze cars whose fitness is lower than the best car's fitness by more than idleRange (frozenCount++)
   // - 'none' mode: cars receive no borders
-  // - otherwise: query the SpatialHashGrid for nearby borders (broad phase),
-  //   then keep only the segments actually within the car's reach (narrow phase)
+  // - otherwise: use queryBordersNearCar(grid, car) for broad+narrow-phase filtering
 }
 ```
 
@@ -705,22 +718,25 @@ can actually reach. World mode uses a two-phase scheme on top of the
 | Traffic (simple mode) | Sort by Y, binary-search for nearby range (±400 px)              |
 | Road borders (world)  | Grid query (broad phase) + exact per-car distance (narrow phase) |
 
-**World-mode two-phase border filtering:**
+The broad+narrow phase is encapsulated in `queryBordersNearCar(grid, car)` in
+`spatialGridUtils.ts` and shared by world mode, traffic, and race simulators:
 
-1. **Broad phase** — `borderGrid.query(car.x, car.y, reach + cellSize)` returns
-   every segment in the surrounding grid cells. `reach = max(sensor.rayLength, MIN)`,
-   so the query radius scales with the car's actual ray length (this fixed the
-   old bug where rays longer than a fixed threshold missed borders).
+1. **Broad phase** — `grid.query(car.x, car.y, reach + bodyMargin + cellSize)`
+   returns every segment in the surrounding grid cells. The radius scales with
+   the car's actual sensor ray length (fixed the old bug where long rays missed
+   borders at a fixed threshold).
 2. **Narrow phase** — each candidate is kept only if its exact point-to-segment
-   distance is within `reach + halfCarDiagonal`, using a `sqrt`-free squared
-   distance (`pointToSegmentDistanceSq`). Cell neighbours that are technically
-   nearby but actually out of range are discarded.
+   squared distance is within `(reach + bodyMargin)²`, using the sqrt-free
+   `pointToSegmentDistanceSq`. Cell neighbours that are out of range are discarded.
 
 This reduces each car's per-frame polygon count from the full map down to the
-handful of borders it can really hit, while never dropping a reachable one.
+handful of borders it can really hit.
 
 > Simple mode does **not** use the grid: it has only 2 (full-length) borders,
-> passed directly, plus the binary-searched traffic above.
+> passed directly via `roadBorders`, plus the binary-searched traffic above.
+
+**CarPhysics** has no grid dependency at all — it receives the pre-filtered
+`polygons` array and uses those for both sensor raycasting and damage detection.
 
 ---
 
@@ -747,8 +763,7 @@ the traffic-specific `update()` / `draw()` behaviour plus click-to-spawn.
 class TrafficSimulator extends SimulatorShell {
   #world: World | null;
   #roadBorders: GridSegment[];
-  #borderGrid: SpatialHashGrid; // broad-phase border lookups
-  #statsPanel: TrafficPanelElement;
+  #borderGrid: SpatialHashGrid; // broad-phase border lookups (via queryBordersNearCar)
   #cars: Car[]; // single source of truth (panel is a view)
   #spawnCount: number; // names cars "Car 1", "Car 2", …
 
@@ -805,7 +820,8 @@ if nothing is selected the user is prompted to pick a car first. The old
 
 Car physics treats every nearby obstacle polygon the same — road borders and
 other cars alike. The traffic simulator builds each alive car's obstacle set per
-frame and feeds it to `car.update(obstacles)`:
+frame via `queryBordersNearCar(this.#borderGrid, car)` (shared utility) and
+feeds it to `car.update(obstacles)`:
 
 | Obstacle source | Filtering                                                               |
 | --------------- | ----------------------------------------------------------------------- |

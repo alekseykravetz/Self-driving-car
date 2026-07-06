@@ -337,16 +337,14 @@ class TrainingSimulator extends SimulatorShell {
         ? corridor.borders.map((s: Segment): [Point, Point] => [s.p1, s.p2])
         : null;
     } else {
-      this.roadBorders = [
-        ...this.world.roadBorders,
-        ...this.world.separatorBorders,
-        ...this.world.corridors.flatMap((c) => c.borders),
-      ].map((s) => [s.p1, s.p2]);
+      this.roadBorders = buildRoadBorders(this.world);
     }
 
-    // Rebuild the spatial index so per-car border lookups stay O(1)-ish even
-    // with city-scale maps and large populations.
-    this.borderGrid.build((this.roadBorders ?? []) as GridSegment[]);
+    // Rebuild the spatial index for world mode (simple mode has only 2
+    // borders and passes them directly — no grid needed).
+    if (this.mode === 'world') {
+      this.borderGrid.build((this.roadBorders ?? []) as GridSegment[]);
+    }
   }
 
   protected update(): void {

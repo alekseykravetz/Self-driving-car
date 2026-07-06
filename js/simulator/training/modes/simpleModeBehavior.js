@@ -72,6 +72,7 @@ function updateSimpleCars(
       frozenCount++;
       continue;
     }
+    // Simple mode has only 2 road borders — pass them directly (no grid).
     const nearbyPolygons = [...roadBorders];
     const minY = car.y - PROXIMITY_THRESHOLD;
     const maxY = car.y + PROXIMITY_THRESHOLD;

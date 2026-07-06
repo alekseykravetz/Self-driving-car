@@ -121,7 +121,10 @@ All HTML pages follow a strict dependency hierarchy to ensure modules load befor
 <script src="/js/simulator/panels/animationLoopToolbar.js"></script>
 <script src="/js/panels/shortcutsToolbar.js"></script>
 
-<!-- Layer 10: Training & Simulator-Specific Modules (depends on everything) -->
+<!-- Layer 10: Shared Simulator Utilities (depends on math + car types) -->
+<script src="/js/simulator/spatialGridUtils.js"></script>
+
+<!-- Layer 11: Training & Simulator-Specific Modules (depends on everything) -->
 <script src="/js/simulator/training/modes/trafficFactory.js"></script>
 <script src="/js/simulator/training/modes/borderCollision.js"></script>
 <script src="/js/simulator/training/rendering/carRenderer.js"></script>
@@ -133,12 +136,12 @@ All HTML pages follow a strict dependency hierarchy to ensure modules load befor
 <script src="/js/simulator/training/trainingInitModal.js"></script>
 <script src="/js/simulator/training/trainingPanel.js"></script>
 
-<!-- Layer 11: Simulator Core (final orchestrator) -->
+<!-- Layer 12: Simulator Core (final orchestrator) -->
 <script src="/js/simulator/views/simulatorPageHost.js"></script>
 <script src="/js/simulator/core/simulatorShell.js"></script>
 <script src="/js/simulator/training/trainingSimulator.js"></script>
 
-<!-- Layer 12: Inline Initialization (after all modules loaded) -->
+<!-- Layer 13: Inline Initialization (after all modules loaded) -->
 <script>
   (async () => {
     await StoreManager.init();
@@ -294,7 +297,17 @@ Training environments and genetic algorithm orchestration.
 | `rendering/carRenderer.ts`    | Simulator-specific car drawing: pool highlighting, name labels, layering       |
 | `templates/`                  | HTML template strings for custom elements                                      |
 
-### 5a. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
+### 5b. Shared Simulator Utilities (`ts/simulator/`)
+
+Functions shared by all canvas-based simulators (TrainingSimulator, TrafficSimulator, RaceSimulator).
+
+| Module                | Responsibility                                                              |
+| --------------------- | --------------------------------------------------------------------------- |
+| `spatialGridUtils.ts` | `buildRoadBorders()`, `queryBordersNearCar()`, `pointToSegmentDistanceSq()` |
+
+### 5c. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
+
+### 5c. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
 
 Scaffolding shared by every canvas-based simulator, plus the concrete simulators
 built on it (Live Traffic Jam, Racing).
@@ -595,7 +608,9 @@ were rewritten to allocate nothing per car/ray/segment:
   with a bounding-box test before any edge math, and the 2-point border duplicate
   edge is skipped.
 - **`SpatialHashGrid.query`** — index buckets + an `Int32Array` stamp for dedup,
-  eliminating a per-query `Set`.
+  eliminating a per-query `Set`. Used by simulators (world mode, traffic, race)
+  to pre-filter borders before passing them to `car.update()` — `CarPhysics`
+  itself has no grid dependency.
 - **Top-K pool selection** — `getTopAICars` picks the best `poolSize` cars in one
   partial-selection pass instead of `filter` + full `sort` of the whole
   population every frame.

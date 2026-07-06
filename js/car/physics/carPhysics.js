@@ -86,7 +86,7 @@ class CarPhysics {
     return points;
   }
 
-  assessDamage(polygons) {
+  assessDamage(polygons = []) {
     if (polygons.length === 0) return false;
     let carMinX = this.car.polygon[0].x;
     let carMaxX = this.car.polygon[0].x;
