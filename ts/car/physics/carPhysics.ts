@@ -5,14 +5,14 @@ class CarPhysics {
     this.car = car;
   }
 
-  update(polygons: Point[][] = []): boolean {
+  update(polygons: Point[][] = [], grid?: SpatialHashGrid): boolean {
     if (this.car.damaged) return false;
 
     this.move();
     this.car.fitness += this.car.speed;
     this.car.polygon = this.createPolygon();
 
-    const becameDamaged = this.assessDamage(polygons);
+    const becameDamaged = this.assessDamage(polygons, grid);
     if (becameDamaged) {
       this.car.speed = 0;
       this.car.damaged = true;
@@ -92,8 +92,8 @@ class CarPhysics {
     return points;
   }
 
-  assessDamage(polygons: Point[][]): boolean {
-    if (polygons.length === 0) return false;
+  assessDamage(polygons: Point[][] = [], grid?: SpatialHashGrid): boolean {
+    if (polygons.length === 0 && !grid) return false;
 
     let carMinX = this.car.polygon[0].x;
     let carMaxX = this.car.polygon[0].x;
@@ -105,6 +105,32 @@ class CarPhysics {
       else if (p.x > carMaxX) carMaxX = p.x;
       if (p.y < carMinY) carMinY = p.y;
       else if (p.y > carMaxY) carMaxY = p.y;
+    }
+
+    if (grid) {
+      const bodyRadius = Math.hypot(this.car.width, this.car.height) * 0.5;
+      const queryRadius = bodyRadius + grid.cellSize;
+      const nearby = grid.query(this.car.x, this.car.y, queryRadius);
+      for (let i = 0; i < nearby.length; i++) {
+        const seg = nearby[i];
+        const oMinX = Math.min(seg[0].x, seg[1].x);
+        const oMaxX = Math.max(seg[0].x, seg[1].x);
+        const oMinY = Math.min(seg[0].y, seg[1].y);
+        const oMaxY = Math.max(seg[0].y, seg[1].y);
+
+        if (
+          oMinX > carMaxX ||
+          oMaxX < carMinX ||
+          oMinY > carMaxY ||
+          oMaxY < carMinY
+        ) {
+          continue;
+        }
+
+        if (polysIntersect(this.car.polygon, seg)) {
+          return true;
+        }
+      }
     }
 
     for (let i = 0; i < polygons.length; i++) {

@@ -52,6 +52,7 @@ function updateSimpleCars(
   idleEnabled,
   bestCar,
   idleRange,
+  borderGrid,
 ) {
   const PROXIMITY_THRESHOLD = 400;
   let aliveCount = 0;
@@ -72,7 +73,32 @@ function updateSimpleCars(
       frozenCount++;
       continue;
     }
-    const nearbyPolygons = [...roadBorders];
+    // Broad-phase grid query for road borders near this car.
+    let nearbyPolygons = [];
+    if (borderGrid) {
+      const bodyMargin = Math.hypot(car.width, car.height) * 0.5;
+      const reach = Math.max(car.sensor?.rayLength ?? 100, 100);
+      const broadRadius = reach + bodyMargin + borderGrid.cellSize;
+      const candidates = borderGrid.query(car.x, car.y, broadRadius);
+      const narrowRadius = reach + bodyMargin;
+      const narrowRadiusSq = narrowRadius * narrowRadius;
+      for (let j = 0; j < candidates.length; j++) {
+        const seg = candidates[j];
+        const distSq = pointToSegmentDistanceSq(
+          car.x,
+          car.y,
+          seg[0].x,
+          seg[0].y,
+          seg[1].x,
+          seg[1].y,
+        );
+        if (distSq <= narrowRadiusSq) {
+          nearbyPolygons.push(seg);
+        }
+      }
+    } else {
+      nearbyPolygons = [...roadBorders];
+    }
     const minY = car.y - PROXIMITY_THRESHOLD;
     const maxY = car.y + PROXIMITY_THRESHOLD;
     // Binary search for first traffic car with y >= minY
@@ -90,8 +116,23 @@ function updateSimpleCars(
     ) {
       nearbyPolygons.push(state.traffic[j].polygon);
     }
-    car.update(nearbyPolygons);
+    car.update(nearbyPolygons, borderGrid);
     aliveCount++;
   }
   return { aliveCount, deadCount, frozenCount };
+}
+
+function pointToSegmentDistanceSq(px, py, ax, ay, bx, by) {
+  const abx = bx - ax;
+  const aby = by - ay;
+  const apx = px - ax;
+  const apy = py - ay;
+  const lenSq = abx * abx + aby * aby;
+  let t = lenSq > 0 ? (apx * abx + apy * aby) / lenSq : 0;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  const cx = ax + t * abx;
+  const cy = ay + t * aby;
+  const dx = px - cx;
+  const dy = py - cy;
+  return dx * dx + dy * dy;
 }

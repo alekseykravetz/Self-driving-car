@@ -6,6 +6,7 @@ class RaceSimulator extends SimulatorShell {
   #cars: Car[] | null = null;
   #myCar: Car | null = null;
   #roadBorders: [Point, Point][] | null = null;
+  #borderGrid: SpatialHashGrid = new SpatialHashGrid(150);
   #frameCount: number = 0;
   #started: boolean = false;
 
@@ -143,6 +144,10 @@ class RaceSimulator extends SimulatorShell {
       ].map((s: Segment): [Point, Point] => [s.p1, s.p2]);
     }
 
+    if (this.#roadBorders) {
+      this.#borderGrid.build(this.#roadBorders);
+    }
+
     if (this.#world.corridor) {
       const miniMapGraph = new Graph([], this.#world.corridor.skeleton);
       this.miniMap = new MiniMap(
@@ -240,9 +245,30 @@ class RaceSimulator extends SimulatorShell {
         if (car.damaged && borderMode === 'collision') {
           this.#handleCollisionWithRoadBorders(car);
         }
-        const borders: [Point, Point][] =
-          borderMode === 'none' ? [] : (this.#roadBorders ?? []);
-        car.update(borders);
+        let obstacles: Point[][] = [];
+        if (borderMode !== 'none' && this.#roadBorders) {
+          const bodyMargin = Math.hypot(car.width, car.height) * 0.5;
+          const reach = Math.max(car.sensor?.rayLength ?? 100, 100);
+          const reachWithBody = reach + bodyMargin;
+          const broadRadius = reachWithBody + this.#borderGrid.cellSize;
+          const candidates = this.#borderGrid.query(car.x, car.y, broadRadius);
+          const reachWithBodySq = reachWithBody * reachWithBody;
+          for (let j = 0; j < candidates.length; j++) {
+            const seg = candidates[j];
+            const distSq = pointToSegmentDistanceSq(
+              car.x,
+              car.y,
+              seg[0].x,
+              seg[0].y,
+              seg[1].x,
+              seg[1].y,
+            );
+            if (distSq <= reachWithBodySq) {
+              obstacles.push(seg);
+            }
+          }
+        }
+        car.update(obstacles, this.#borderGrid);
       }
     }
 
@@ -331,4 +357,26 @@ class RaceSimulator extends SimulatorShell {
         return null;
     }
   }
+}
+
+function pointToSegmentDistanceSq(
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+): number {
+  const abx = bx - ax;
+  const aby = by - ay;
+  const apx = px - ax;
+  const apy = py - ay;
+  const lenSq = abx * abx + aby * aby;
+  let t = lenSq > 0 ? (apx * abx + apy * aby) / lenSq : 0;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  const cx = ax + t * abx;
+  const cy = ay + t * aby;
+  const dx = px - cx;
+  const dy = py - cy;
+  return dx * dx + dy * dy;
 }

@@ -120,8 +120,8 @@ class Car {
     };
   }
 
-  update(polygons = []) {
-    const becameDamaged = this.physics.update(polygons);
+  update(polygons = [], grid) {
+    const becameDamaged = this.physics.update(polygons, grid);
     if (becameDamaged && this.type === 'KEYS') {
       explode();
     }

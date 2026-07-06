@@ -434,6 +434,7 @@ class TrainingSimulator extends SimulatorShell {
       this.trainingManager.idleEnabled,
       bestCar,
       idleRange,
+      this.borderGrid,
     );
 
     // Distance metric
