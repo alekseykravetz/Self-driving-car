@@ -1,17 +1,18 @@
-'use strict';
-class Building {
+import { Point } from '../../math/primitives/point.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import { average, getFake3dPoint } from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+export class Building {
   base;
   height;
   constructor(polygon, height = 200) {
     this.base = polygon;
     this.height = height;
   }
-
   static load(info) {
     const basePolygon = Polygon.load(info.base);
     return new Building(basePolygon, info.height);
   }
-
   /**
    * Rebuilds a Building from its compact footprint form `{ poly, h }` (footprint
    * points + height only — no redundant polygon `segments`).
@@ -20,7 +21,6 @@ class Building {
     const points = info.poly.map(([x, y]) => new Point(x, y));
     return new Building(new Polygon(points), info.h ?? 200);
   }
-
   /**
    * Serializes to the compact footprint form stored in world files: the base
    * polygon's points plus the height. Drops the redundant `segments` array that
@@ -35,7 +35,6 @@ class Building {
       h: this.height,
     };
   }
-
   draw(ctx, options) {
     const { viewPoint } = options;
     // Calculate the points for the top of the building (ceiling)

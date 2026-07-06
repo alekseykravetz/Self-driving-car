@@ -1,5 +1,4 @@
-'use strict';
-const TRAINING_PANEL_TEMPLATE = `
+export const TRAINING_PANEL_TEMPLATE = `
 <!-- ── Storage ─────────────────────────────────────── -->
 <div class="panel-section">
   <div class="section-title">

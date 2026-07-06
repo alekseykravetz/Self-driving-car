@@ -1,5 +1,4 @@
-'use strict';
-class ScaleIndicator {
+export class ScaleIndicator {
   #canvasHeight;
   #viewport;
   #options;
@@ -26,7 +25,6 @@ class ScaleIndicator {
     this.scaleInMeters = this.#options.scaleInMeters;
     this.update(canvasWidth, canvasHeight);
   }
-
   update(viewportWidth, viewportHeight) {
     if (viewportHeight !== undefined) {
       this.#canvasHeight = viewportHeight;
@@ -38,7 +36,6 @@ class ScaleIndicator {
     this.position.x = this.#options.paddingX;
     this.position.y = this.#canvasHeight - this.#options.paddingY;
   }
-
   draw(ctx, viewportWidth, viewportHeight) {
     this.update(viewportWidth, viewportHeight);
     const x1 = this.position.x;

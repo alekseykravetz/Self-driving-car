@@ -1,4 +1,4 @@
-class PhoneControls {
+export class PhoneControls {
   canvas: HTMLCanvasElement;
   tilt: number;
   forward: boolean;

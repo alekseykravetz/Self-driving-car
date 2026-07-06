@@ -1,5 +1,7 @@
-'use strict';
-class Viewport {
+import { Point } from '../math/primitives/point.js';
+import { ScaleIndicator } from './scaleIndicator.js';
+import { scale, subtract, add, WORLD_PIXELS_PER_METER } from '../math/utils.js';
+export class Viewport {
   canvas;
   #ctx;
   #scaleIndicator;
@@ -14,7 +16,6 @@ class Viewport {
     offset: new Point(0, 0), // Vector difference (end - start)
     active: false, // Is a drag currently in progress?
   };
-
   // Timer used to commit a touchpad pan once two-finger scrolling stops,
   // mirroring the way a mouse drag commits on mouseup.
   #wheelPanCommitTimer = null;
@@ -48,7 +49,6 @@ class Viewport {
     this.#boundHandleMouseUp = this.#handleMouseUp.bind(this);
     this.#addEventListeners();
   }
-
   /**
    * Applies the current viewport transform (pan and zoom) to the canvas context.
    * Should be called at the beginning of each render loop.
@@ -65,7 +65,6 @@ class Viewport {
     const totalOffset = this.getOffset(); // Includes permanent offset and active drag
     this.#ctx.translate(totalOffset.x, totalOffset.y);
   }
-
   /**
    * Calculates the mouse position in world coordinates based on a MouseEvent.
    * @param e - The MouseEvent object.
@@ -81,7 +80,6 @@ class Viewport {
     // If dragging and flag is set, counteract the temporary drag offset
     return subtractDragOffset ? subtract(p, this.#drag.offset) : p;
   }
-
   /**
    * Gets the current total offset, including the base offset and any active drag offset.
    * This is the offset used when applying transformations in reset().
@@ -91,15 +89,12 @@ class Viewport {
     // Total offset is the permanent offset plus the current drag offset
     return add(this.offset, this.#drag.offset);
   }
-
   getZoom() {
     return this.zoom;
   }
-
   getPixelsPerMeter() {
     return WORLD_PIXELS_PER_METER / this.zoom;
   }
-
   drawScaleIndicator(
     ctx = this.#ctx,
     viewportWidth = this.canvas.width,
@@ -107,7 +102,6 @@ class Viewport {
   ) {
     this.#scaleIndicator.draw(ctx, viewportWidth, viewportHeight);
   }
-
   /**
    * Sets the wheel-input mode.
    * @param mode - 'mouse' (wheel zooms) or 'touchpad' (wheel pans, Ctrl/pinch zooms).
@@ -115,7 +109,6 @@ class Viewport {
   setMode(mode) {
     this.mode = mode;
   }
-
   #addEventListeners() {
     this.canvas.addEventListener('wheel', this.#boundHandleMouseWheel, {
       passive: false,
@@ -125,7 +118,6 @@ class Viewport {
     // Listen to mouseup on the window/document to catch cases where mouse is released outside canvas
     window.addEventListener('mouseup', this.#boundHandleMouseUp);
   }
-
   // public removeEventListeners(): void {
   //   this.canvas.removeEventListener('wheel', this.#boundHandleMouseWheel);
   //   this.canvas.removeEventListener('mousedown', this.#boundHandleMouseDown);
@@ -140,7 +132,6 @@ class Viewport {
       active: false, // Is a drag currently in progress?
     };
   }
-
   /**
    * Handles the mousedown event to initiate panning (drag).
    * @param e - The MouseEvent object.
@@ -152,7 +143,6 @@ class Viewport {
       this.#drag.active = true;
     }
   }
-
   /**
    * Handles the mousemove event to update the drag offset during panning.
    * @param e - The MouseEvent object.
@@ -164,7 +154,6 @@ class Viewport {
       this.#drag.offset = subtract(this.#drag.end, this.#drag.start);
     }
   }
-
   /**
    * Handles the mouseup event to finalize the panning operation.
    * @param e - The MouseEvent object.
@@ -178,7 +167,6 @@ class Viewport {
       this.#resetDrag();
     }
   }
-
   /**
    * Handles the mousewheel event to adjust zoom or pan.
    * - 'mouse' mode: wheel scroll zooms directly (Ctrl/pinch also zooms).
@@ -209,7 +197,6 @@ class Viewport {
       this.#scheduleWheelPanCommit();
     }
   }
-
   /**
    * Commits the accumulated touchpad pan from the temporary drag offset into
    * the permanent offset after two-finger scrolling stops. This mirrors the

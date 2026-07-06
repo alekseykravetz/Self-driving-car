@@ -1,4 +1,9 @@
-'use strict';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Corridor } from '../corridor.js';
+import { getNearestPoint } from '../../math/utils.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
 /**
  * Authoring tool for {@link Corridor} world objects.
  *
@@ -9,7 +14,7 @@
  * Right-click removes the corridor nearest the cursor (or cancels an in-progress
  * pick).
  */
-class CorridorEditor {
+export class CorridorEditor {
   #viewport;
   #world;
   #canvas;
@@ -39,7 +44,6 @@ class CorridorEditor {
     this.#boundKeyDown = this.#handleKeyDown.bind(this);
     this.#boundKeyUp = this.#handleKeyUp.bind(this);
   }
-
   /**
    * Connect the shared <shortcuts-toolbar> so the tunnel toggle ('t') can be
    * latched by clicking its indicator.
@@ -54,7 +58,6 @@ class CorridorEditor {
     });
     this.#updateOpen();
   }
-
   enable() {
     this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
@@ -62,7 +65,6 @@ class CorridorEditor {
     window.addEventListener('keydown', this.#boundKeyDown);
     window.addEventListener('keyup', this.#boundKeyUp);
   }
-
   disable() {
     this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
@@ -72,26 +74,22 @@ class CorridorEditor {
     this.#start = null;
     this.#hovered = null;
   }
-
   #handleKeyDown(e) {
     if (e.key === 't') {
       this.#openHeld = true;
       this.#updateOpen();
     }
   }
-
   #handleKeyUp(e) {
     if (e.key === 't') {
       this.#openHeld = false;
       this.#updateOpen();
     }
   }
-
   #updateOpen() {
     this.#isOpen = this.#openHeld || this.#openLatched;
     this.#toolbar?.setActive('keyT', this.#isOpen);
   }
-
   #handleMouseMove(e) {
     this.#mouse = this.#viewport.getMouse(e, true);
     this.#hovered = getNearestPoint(
@@ -100,7 +98,6 @@ class CorridorEditor {
       10 * this.#viewport.zoom,
     );
   }
-
   #handleMouseDown(e) {
     // Right-click: cancel in-progress pick, or remove nearest corridor.
     if (e.button === 2) {
@@ -124,7 +121,6 @@ class CorridorEditor {
       }
     }
   }
-
   #buildCorridor(start, end) {
     const path = this.#world.graph.getShortestPath(start, end);
     if (path.length === 0) return;
@@ -136,7 +132,6 @@ class CorridorEditor {
     );
     this.#world.addCorridor(corridor);
   }
-
   #removeNearestCorridor(point) {
     const threshold = this.#world.roadWidth;
     let bestIndex = -1;
@@ -154,7 +149,6 @@ class CorridorEditor {
       this.#world.corridors.splice(bestIndex, 1);
     }
   }
-
   display() {
     if (this.#hovered) {
       drawPoint(this.#ctx, this.#hovered, { fill: true });

@@ -1,4 +1,22 @@
-class GraphEditor {
+import { Viewport } from '../../viewport/viewport.js';
+import { Graph } from '../../math/graph/graph.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import {
+  getNearestPoint,
+  subtract,
+  normalize,
+  perpendicular,
+  scale,
+  add,
+  formatMetersFromWorldPixels,
+  formatDegrees,
+} from '../../math/utils.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+
+export class GraphEditor {
   #viewport: Viewport;
   #canvas: HTMLCanvasElement;
   #graph: Graph;

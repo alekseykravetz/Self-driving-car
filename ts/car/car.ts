@@ -1,6 +1,18 @@
-type CarControls = Controls | PhoneControls | CameraControls;
+import { NeuralNetwork } from '../neural-network/network.js';
+import { Sensor } from './sensors/sensor.js';
+import { Controls } from './controls/controls.js';
+import { PhoneControls } from './controls/phoneControls.js';
+import { CameraControls } from './controls/cameraControls.js';
+import { CarPhysics } from './physics/carPhysics.js';
+import { CarRenderer, CarDrawOptions } from './rendering/carRenderer.js';
+import { CarBrainAdapter } from './brain/carBrainAdapter.js';
+import { SoundEngine, explode } from '../audio/sound.js';
+import { DEFAULT_CAR_CONFIG } from './config.js';
+import { Point } from '../math/primitives/point.js';
 
-interface CarInfo {
+export type CarControls = Controls | PhoneControls | CameraControls;
+
+export interface CarInfo {
   brain?: NeuralNetwork;
   maxSpeed: number;
   friction: number;
@@ -16,7 +28,7 @@ interface CarInfo {
   };
 }
 
-interface CarOptions {
+export interface CarOptions {
   x: number;
   y: number;
   controlType: string;
@@ -36,7 +48,7 @@ interface CarOptions {
   };
 }
 
-class Car {
+export class Car {
   name?: string;
   x: number;
   y: number;

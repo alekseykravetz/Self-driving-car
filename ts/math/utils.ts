@@ -1,8 +1,11 @@
-const WORLD_PIXELS_PER_METER = 14;
-const SIMULATION_FPS = 60;
-const METERS_PER_DEGREE_LATITUDE = 111000;
+import { Point } from './primitives/point.js';
+import { Segment } from './primitives/segment.js';
 
-function getNearestPoint(
+export const WORLD_PIXELS_PER_METER = 14;
+export const SIMULATION_FPS = 60;
+export const METERS_PER_DEGREE_LATITUDE = 111000;
+
+export function getNearestPoint(
   location: Point,
   points: Point[],
   threshold: number = Number.MAX_SAFE_INTEGER,
@@ -19,7 +22,7 @@ function getNearestPoint(
   return nearestPoint;
 }
 
-function getNearestSegment(
+export function getNearestSegment(
   location: Point,
   segments: Segment[],
   threshold: number = Number.MAX_SAFE_INTEGER,
@@ -36,39 +39,39 @@ function getNearestSegment(
   return nearestSegment;
 }
 
-function distance(p1: Point, p2: Point): number {
+export function distance(p1: Point, p2: Point): number {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
-function worldPixelsToMeters(px: number): number {
+export function worldPixelsToMeters(px: number): number {
   return px / WORLD_PIXELS_PER_METER;
 }
 
-function metersToWorldPixels(meters: number): number {
+export function metersToWorldPixels(meters: number): number {
   return meters * WORLD_PIXELS_PER_METER;
 }
 
-function pxPerFrameToKmh(pxPerFrame: number): number {
+export function pxPerFrameToKmh(pxPerFrame: number): number {
   return (pxPerFrame * SIMULATION_FPS * 3.6) / WORLD_PIXELS_PER_METER;
 }
 
-function kmhToPxPerFrame(kmh: number): number {
+export function kmhToPxPerFrame(kmh: number): number {
   return ((kmh / 3.6) * WORLD_PIXELS_PER_METER) / SIMULATION_FPS;
 }
 
-function radiansToDegrees(radians: number): number {
+export function radiansToDegrees(radians: number): number {
   return (radians * 180) / Math.PI;
 }
 
-function formatMetersFromWorldPixels(px: number): string {
+export function formatMetersFromWorldPixels(px: number): string {
   return `${worldPixelsToMeters(px).toFixed(1)} m`;
 }
 
-function formatKmhFromPxPerFrame(pxPerFrame: number): string {
+export function formatKmhFromPxPerFrame(pxPerFrame: number): string {
   return `${pxPerFrameToKmh(pxPerFrame).toFixed(1)} km/h`;
 }
 
-function formatDegrees(radians: number): string {
+export function formatDegrees(radians: number): string {
   return `${radiansToDegrees(radians).toFixed(0)}°`;
 }
 
@@ -76,7 +79,7 @@ function formatDegrees(radians: number): string {
  * Convert simulation frames to real-world seconds based on SIMULATION_FPS.
  * At 60 FPS: 60 frames = 1 second
  */
-function framesToSeconds(frames: number): number {
+export function framesToSeconds(frames: number): number {
   return frames / SIMULATION_FPS;
 }
 
@@ -85,7 +88,7 @@ function framesToSeconds(frames: number): number {
  * @param frames Total elapsed simulation frames
  * @returns Formatted time string like "00:05:30" for 5 minutes 30 seconds
  */
-function formatElapsedTime(frames: number): string {
+export function formatElapsedTime(frames: number): string {
   const totalSeconds = Math.floor(framesToSeconds(frames));
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -95,54 +98,58 @@ function formatElapsedTime(frames: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-function average(p1: Point, p2: Point): Point {
+export function average(p1: Point, p2: Point): Point {
   return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
 }
 
-function dot(p1: Point, p2: Point): number {
+export function dot(p1: Point, p2: Point): number {
   return p1.x * p2.x + p1.y * p2.y;
 }
 
-function cross(p1: Point, p2: Point): number {
+export function cross(p1: Point, p2: Point): number {
   return p1.x * p2.y - p1.y * p2.x;
 }
 
-function add(p1: Point, p2: Point): Point {
+export function add(p1: Point, p2: Point): Point {
   return new Point(p1.x + p2.x, p1.y + p2.y);
 }
 
-function subtract(p1: Point, p2: Point): Point {
+export function subtract(p1: Point, p2: Point): Point {
   return new Point(p1.x - p2.x, p1.y - p2.y);
 }
 
-function scale(p: Point, scaler: number): Point {
+export function scale(p: Point, scaler: number): Point {
   return new Point(p.x * scaler, p.y * scaler);
 }
 
-function normalize(p: Point): Point {
+export function normalize(p: Point): Point {
   return scale(p, 1 / magnitude(p));
 }
 
-function magnitude(p: Point): number {
+export function magnitude(p: Point): number {
   return Math.hypot(p.x, p.y);
 }
 
-function perpendicular(p: Point): Point {
+export function perpendicular(p: Point): Point {
   return new Point(-p.y, p.x);
 }
 
-function translate(location: Point, angle: number, offset: number): Point {
+export function translate(
+  location: Point,
+  angle: number,
+  offset: number,
+): Point {
   return new Point(
     location.x + Math.cos(angle) * offset,
     location.y + Math.sin(angle) * offset,
   );
 }
 
-function angle(p: Point): number {
+export function angle(p: Point): number {
   return Math.atan2(p.y, p.x);
 }
 
-function getIntersection(
+export function getIntersection(
   a: Point,
   b: Point,
   c: Point,
@@ -176,7 +183,12 @@ function getIntersection(
  * so it is used in the sensor's per-ray/per-segment hot loop where only the
  * closest offset matters; the actual point is computed once for the winner.
  */
-function getIntersectionOffset(a: Point, b: Point, c: Point, d: Point): number {
+export function getIntersectionOffset(
+  a: Point,
+  b: Point,
+  c: Point,
+  d: Point,
+): number {
   const tTop = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
   const uTop = (c.y - a.y) * (a.x - b.x) - (c.x - a.x) * (a.y - b.y);
   const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
@@ -194,7 +206,7 @@ function getIntersectionOffset(a: Point, b: Point, c: Point, d: Point): number {
   return -1;
 }
 
-function lerp(a: number, b: number, t: number): number {
+export function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
@@ -204,7 +216,7 @@ function lerp(a: number, b: number, t: number): number {
  * prototype shapes from a small integer seed so worlds can store a seed instead
  * of baking full geometry.
  */
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return function () {
     a |= 0;
@@ -215,25 +227,29 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-function lerp2D(a: Point, b: Point, t: number): Point {
+export function lerp2D(a: Point, b: Point, t: number): Point {
   return new Point(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
 }
 
-function invLerp(a: number, b: number, v: number): number {
+export function invLerp(a: number, b: number, v: number): number {
   return (v - a) / (b - a);
 }
 
-function rotate(p: Point, angle: number): Point {
+export function rotate(p: Point, angle: number): Point {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
   return new Point(p.x * cos - p.y * sin, p.x * sin + p.y * cos);
 }
 
-function degToRad(degree: number): number {
+export function degToRad(degree: number): number {
   return (degree * Math.PI) / 180;
 }
 
-function getFake3dPoint(point: Point, viewPoint: Point, height: number): Point {
+export function getFake3dPoint(
+  point: Point,
+  viewPoint: Point,
+  height: number,
+): Point {
   const dir = normalize(subtract(point, viewPoint));
   const dist = distance(point, viewPoint);
   const scaler = Math.atan(dist / 300) / (Math.PI / 2);

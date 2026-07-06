@@ -1,4 +1,10 @@
-class CrossingEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { World } from '../world.js';
+import { Point } from '../../math/primitives/point.js';
+import { Crossing } from '../markings/crossing.js';
+
+export class CrossingEditor extends MarkingEditor {
   /**
    * Editor for creating Crossing markings.
    * Targets graph segments by default.

@@ -1,5 +1,6 @@
-'use strict';
-class TargetEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Target } from '../markings/target.js';
+export class TargetEditor extends MarkingEditor {
   /**
    * Editor for creating Target markings.
    * Targets lane guide segments.
@@ -8,7 +9,6 @@ class TargetEditor extends MarkingEditor {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
-
   /**
    * Creates a new Target marking instance.
    * @param center The center point of the target marking.

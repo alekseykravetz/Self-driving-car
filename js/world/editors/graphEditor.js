@@ -1,5 +1,17 @@
-'use strict';
-class GraphEditor {
+import { Segment } from '../../math/primitives/segment.js';
+import {
+  getNearestPoint,
+  subtract,
+  normalize,
+  perpendicular,
+  scale,
+  add,
+  formatMetersFromWorldPixels,
+  formatDegrees,
+} from '../../math/utils.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+export class GraphEditor {
   #viewport;
   #canvas;
   #graph;
@@ -42,7 +54,6 @@ class GraphEditor {
     this.#boundKeyDown = this.#handleKeyDown.bind(this);
     this.#boundKeyUp = this.#handleKeyUp.bind(this);
   }
-
   #addEventListeners() {
     this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
@@ -51,7 +62,6 @@ class GraphEditor {
     window.addEventListener('keydown', this.#boundKeyDown);
     window.addEventListener('keyup', this.#boundKeyUp);
   }
-
   #removeEventListeners() {
     this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
@@ -59,12 +69,10 @@ class GraphEditor {
     this.#canvas.removeEventListener('contextmenu', this.#boundContextMenu);
     window.removeEventListener('keydown', this.#boundKeyDown);
   }
-
   // Activates the graph editor by adding event listeners.
   enable() {
     this.#addEventListeners();
   }
-
   /**
    * Connect the shared <shortcuts-toolbar> so key actions light their
    * indicators and the one-way toggle can be latched by clicking it.
@@ -84,7 +92,6 @@ class GraphEditor {
     this.#updateOneWay();
     this.#updateSeparated();
   }
-
   // Deactivates the graph editor by removing event listeners and resetting state.
   disable() {
     this.#removeEventListeners();
@@ -94,7 +101,6 @@ class GraphEditor {
     this.#startPoint = null;
     this.#endPoint = null;
   }
-
   // Handles keyboard events for specific editor actions like finding shortest path or creating one way segments.
   #handleKeyDown(e) {
     if (this.#mouse) {
@@ -128,7 +134,6 @@ class GraphEditor {
       );
     }
   }
-
   #handleKeyUp(e) {
     if (e.key === 'o') {
       this.#oneWayHeld = false;
@@ -139,21 +144,18 @@ class GraphEditor {
       this.#updateSeparated();
     }
   }
-
   // Recompute the effective one-way state (held OR latched) and sync the
   // toolbar indicator.
   #updateOneWay() {
     this.#isOneWay = this.#oneWayHeld || this.#oneWayLatched;
     this.#toolbar?.setActive('keyO', this.#isOneWay);
   }
-
   // Recompute the effective hard-separation state (held OR latched) and sync
   // the toolbar indicator.
   #updateSeparated() {
     this.#isSeparated = this.#separatedHeld || this.#separatedLatched;
     this.#toolbar?.setActive('keyH', this.#isSeparated);
   }
-
   // Handles mouse movement over the canvas. Updates hovered state and drags selected points.
   #handleMouseMove(e) {
     this.#mouse = this.#viewport.getMouse(e, true);
@@ -168,7 +170,6 @@ class GraphEditor {
       this.#selected.y = this.#mouse.y;
     }
   }
-
   // Handles mouse button presses on the canvas. Manages point selection, creation, and removal.
   #handleMouseDown(e) {
     // Right-click (button === 2)
@@ -199,7 +200,6 @@ class GraphEditor {
       }
     }
   }
-
   /**
    * Selects a point. If another point was previously selected, attempts to add a segment between them.
    * @param point - The point to select.
@@ -213,7 +213,6 @@ class GraphEditor {
     }
     this.#selected = point;
   }
-
   #removePoint(point) {
     this.#graph.removePoint(point);
     this.#hovered = null;
@@ -221,7 +220,6 @@ class GraphEditor {
       this.#selected = null;
     }
   }
-
   dispose() {
     this.#graph.dispose();
     this.#selected = null;
@@ -232,7 +230,6 @@ class GraphEditor {
     this.#startPoint = null;
     this.#endPoint = null;
   }
-
   // todo: change name to draw in all editors
   // Renders the graph and editor-specific visuals (hovered, selected points, intent line) onto the canvas.
   display() {
@@ -255,7 +252,6 @@ class GraphEditor {
       });
     }
   }
-
   #drawIntentMeasurements(segment) {
     const lengthPx = segment.length();
     if (lengthPx < 1) return;

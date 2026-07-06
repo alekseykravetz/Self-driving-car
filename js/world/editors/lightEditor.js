@@ -1,5 +1,6 @@
-'use strict';
-class LightEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Light } from '../markings/light.js';
+export class LightEditor extends MarkingEditor {
   /**
    * Editor for creating Light markings.
    * Targets lane guide segments.
@@ -8,7 +9,6 @@ class LightEditor extends MarkingEditor {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
-
   /**
    * Creates a new Light marking instance.
    * @param center The center point of the light.

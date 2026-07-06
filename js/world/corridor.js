@@ -1,4 +1,9 @@
-'use strict';
+import { Point } from '../math/primitives/point.js';
+import { Segment } from '../math/primitives/segment.js';
+import { Envelope } from '../math/primitives/envelope.js';
+import { Polygon } from '../math/primitives/polygon.js';
+import { distance, add, scale } from '../math/utils.js';
+import { drawSegment } from '../rendering/segmentRenderer.js';
 /**
  * Removes the rounded end-cap border segments around `point`. The cap of a
  * corridor envelope is an arc whose points all sit at `radius` from the
@@ -14,7 +19,6 @@ function removeCorridorCap(borders, point, radius) {
     return !(d1 <= threshold && d2 <= threshold);
   });
 }
-
 /**
  * A drivable path through the road network. Holds the collision `borders`
  * (outer walls) and the `skeleton` (center-line used for progress tracking and
@@ -23,7 +27,7 @@ function removeCorridorCap(borders, point, radius) {
  *
  * Open edges let several corridors join into a longer path on big maps.
  */
-class Corridor {
+export class Corridor {
   borders;
   skeleton;
   openStart;
@@ -34,7 +38,6 @@ class Corridor {
     this.openStart = openStart;
     this.openEnd = openEnd;
   }
-
   /**
    * Builds a corridor's borders from a center-line `skeleton` by unioning road
    * envelopes along it, then optionally opening the start/end caps.
@@ -71,7 +74,6 @@ class Corridor {
     }
     return new Corridor([...skeleton], borders, openStart, openEnd);
   }
-
   /** Reconstructs a corridor from its saved (plain-object) form. */
   static load(info) {
     const skeleton = info.skeleton.map(
@@ -87,7 +89,6 @@ class Corridor {
       info.openEnd ?? false,
     );
   }
-
   /** Draws the corridor walls. Single source of truth for corridor styling. */
   draw(ctx, options = {}) {
     const { color = 'red', width = 4 } = options;

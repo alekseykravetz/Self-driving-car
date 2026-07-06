@@ -1,10 +1,16 @@
+import { Point } from '../math/primitives/point.js';
+import { Graph } from '../math/graph/graph.js';
+import { Marking } from './markings/marking.js';
+import { Light } from './markings/light.js';
+import { getNearestPoint } from '../math/utils.js';
+
 // Type definition for the points used internally
 type lightControlCenterPoint = Point & {
   lights: Light[];
   ticks: number;
 };
 
-class TrafficManager {
+export class TrafficManager {
   graph: Graph;
   markings: Marking[];
   controlCenters!: lightControlCenterPoint[];

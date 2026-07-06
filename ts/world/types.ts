@@ -1,4 +1,15 @@
-interface CarDrawOptions {
+import { Point } from '../math/primitives/point.js';
+import { Segment } from '../math/primitives/segment.js';
+import { Graph } from '../math/graph/graph.js';
+import { Car } from '../car/car.js';
+import { Marking } from './markings/marking.js';
+import { Corridor } from './corridor.js';
+import { Building } from './items/building.js';
+import { Tree, TreeInstance } from './items/tree.js';
+import { Viewport } from '../viewport/viewport.js';
+import { IMiniMapCar } from '../mini-map/miniMap.js';
+
+export interface CarDrawOptions {
   showSensor?: boolean;
   showMask?: boolean;
   colorOverride?: string;
@@ -6,29 +17,29 @@ interface CarDrawOptions {
   showName?: boolean;
 }
 
-interface BuildingDrawOptions {
+export interface BuildingDrawOptions {
   viewPoint: Point;
 }
 
 /** Compact serialized building: footprint points + height (no `segments`). */
-interface BuildingFootprint {
+export interface BuildingFootprint {
   poly: number[][];
   h: number;
 }
 
 /** The compact decoration block stored in a v2 world file. */
-interface WorldDecoration {
+export interface WorldDecoration {
   treeSeed: number;
   treePrototypeCount: number;
   trees: TreeInstance[];
   buildings: BuildingFootprint[];
 }
 
-interface TreeDrawOptions {
+export interface TreeDrawOptions {
   viewPoint: Point;
 }
 
-interface MiniMapDrawOptions {
+export interface MiniMapDrawOptions {
   viewPoint: Point;
   cars: IMiniMapCar[];
   roadColor?: string;
@@ -38,7 +49,7 @@ interface MiniMapDrawOptions {
   compactScaleIndicator?: boolean;
 }
 
-interface IWorld {
+export interface IWorld {
   graph: Graph;
   markings: Marking[];
   roadBorders: Segment[];
@@ -58,7 +69,7 @@ interface IWorld {
  * cached, expensive, on demand). The panel toggles visibility; the generator
  * owns generation.
  */
-type WorldLayerId =
+export type WorldLayerId =
   | 'roads' // envelopes + road borders + lane/dash/arrow markings + separators
   | 'markings' // stop/yield/light/crossing/parking/start/target markings
   | 'corridors' // authored corridors
@@ -66,9 +77,9 @@ type WorldLayerId =
   | 'trees' // fully rendered pseudo-3D trees
   | 'buildings'; // fully rendered pseudo-3D buildings
 
-type WorldLayerVisibility = Record<WorldLayerId, boolean>;
+export type WorldLayerVisibility = Record<WorldLayerId, boolean>;
 
-const DEFAULT_LAYER_VISIBILITY: WorldLayerVisibility = {
+export const DEFAULT_LAYER_VISIBILITY: WorldLayerVisibility = {
   roads: true,
   markings: true,
   corridors: true,
@@ -77,7 +88,7 @@ const DEFAULT_LAYER_VISIBILITY: WorldLayerVisibility = {
   buildings: true,
 };
 
-interface WorldDrawOptions {
+export interface WorldDrawOptions {
   viewPoint: Point;
   /** Cars to render on top of the world (draw-time input, not world state). */
   cars?: Car[];

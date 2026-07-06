@@ -1,5 +1,6 @@
-'use strict';
-class ParkingEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Parking } from '../markings/parking.js';
+export class ParkingEditor extends MarkingEditor {
   /**
    * Editor for creating Parking markings.
    * Targets lane guide segments.
@@ -8,7 +9,6 @@ class ParkingEditor extends MarkingEditor {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
-
   /**
    * Creates a new Parking marking instance.
    * @param center The center point of the parking spot marking.

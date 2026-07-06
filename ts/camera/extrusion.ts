@@ -2,7 +2,16 @@
  * Moves two points towards each other by a percentage of the distance between them.
  * Modifies the points in place.
  */
-function movePointsInward(p1: Point, p2: Point, percent: number = 0.3): void {
+import { Point } from '../math/primitives/point.js';
+import { Polygon } from '../math/primitives/polygon.js';
+import { lerp, lerp2D, average } from '../math/utils.js';
+import { IColoredPolygon } from './types.js';
+
+export function movePointsInward(
+  p1: Point,
+  p2: Point,
+  percent: number = 0.3,
+): void {
   const new_p1: Point = lerp2D(p1, p2, percent);
   const new_p2: Point = lerp2D(p2, p1, percent);
   p1.x = new_p1.x;
@@ -14,7 +23,7 @@ function movePointsInward(p1: Point, p2: Point, percent: number = 0.3): void {
 /**
  * Calculates the centroid (average position) of a set of points.
  */
-function getCentroid(points: Point[]): Point {
+export function getCentroid(points: Point[]): Point {
   let xSum: number = 0;
   let ySum: number = 0;
   const n: number = points.length;
@@ -31,7 +40,10 @@ function getCentroid(points: Point[]): Point {
  * @param polygons - An array of 2D Polygons (bases).
  * @param height - The extrusion height. Defaults to 10.
  */
-function extrudePolygons(polygons: Polygon[], height: number = 10): Polygon[] {
+export function extrudePolygons(
+  polygons: Polygon[],
+  height: number = 10,
+): Polygon[] {
   const extrudedPolygons: Polygon[] = [];
   for (const polygon of polygons) {
     const ceiling: Polygon = new Polygon(
@@ -63,7 +75,7 @@ function extrudePolygons(polygons: Polygon[], height: number = 10): Polygon[] {
  * @param height - The main height of the car body. Defaults to 15.
  * @param wheelRadius - Used to offset the base height. Defaults to 5.
  */
-function extrudeCarShape(
+export function extrudeCarShape(
   polygon: Polygon,
   height: number = 15,
   wheelRadius: number = 5,
@@ -218,7 +230,7 @@ function extrudeCarShape(
  * @param polygons - An array of 2D Polygons representing tree bases.
  * @param height - The total height of the tree. Defaults to 200.
  */
-function extrudeTreeShapes(
+export function extrudeTreeShapes(
   polygons: Polygon[],
   height: number = 200,
 ): Polygon[] {

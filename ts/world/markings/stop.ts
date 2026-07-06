@@ -1,4 +1,10 @@
-class Stop extends Marking {
+import { Marking } from './marking.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { angle } from '../../math/utils.js';
+
+export class Stop extends Marking {
   override type: string = 'stop';
   border: Segment;
 

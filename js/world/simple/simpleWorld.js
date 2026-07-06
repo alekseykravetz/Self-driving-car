@@ -1,9 +1,13 @@
-'use strict';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Graph } from '../../math/graph/graph.js';
+import { Start } from '../markings/start.js';
+import { lerp } from '../../math/utils.js';
 /**
  * A lightweight IWorld implementation for simple straight-road training scenarios.
  * Provides the same interface as World but generates minimal geometry from lane params.
  */
-class SimpleWorld {
+export class SimpleWorld {
   graph;
   markings = [];
   roadBorders;
@@ -53,7 +57,6 @@ class SimpleWorld {
     const startDirection = new Point(0, 1);
     this.markings = [new Start(startCenter, startDirection, this.#width, 20)];
   }
-
   /**
    * Returns the center x-coordinate of a specific lane.
    */
@@ -62,28 +65,24 @@ class SimpleWorld {
     const clampedIndex = Math.min(laneIndex, this.#laneCount - 1);
     return this.#left + laneWidth / 2 + clampedIndex * laneWidth;
   }
-
   /**
    * Returns the number of lanes.
    */
   getLaneCount() {
     return this.#laneCount;
   }
-
   /**
    * Returns the center x-coordinate of the road.
    */
   getCenter() {
     return this.#x;
   }
-
   /**
    * No-op: simple straight road doesn't support corridor pathfinding.
    */
   generateCorridor(_start, _end) {
     // No-op for simple road
   }
-
   /**
    * Draws the simple road (borders and lane dividers) on a canvas context.
    */

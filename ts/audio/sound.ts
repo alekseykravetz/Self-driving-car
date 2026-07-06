@@ -1,7 +1,7 @@
 /**
  * Plays a short "ta-daa" sound effect.
  */
-function taDaa(): void {
+export function taDaa(): void {
   beep(400, 'sawtooth');
   setTimeout(() => beep(600, 'sawtooth'), 200);
 }
@@ -9,7 +9,7 @@ function taDaa(): void {
 /**
  * Creates a multi-oscillator explosion sound effect.
  */
-function explode(): void {
+export function explode(): void {
   const audioContext: AudioContext = new (window.AudioContext ||
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).webkitAudioContext)();
@@ -40,7 +40,10 @@ function explode(): void {
  * @param frequency - The frequency of the beep in Hz.
  * @param waveType - The oscillator waveform type. Defaults to 'sine'.
  */
-function beep(frequency: number, waveType: OscillatorType = 'sine'): void {
+export function beep(
+  frequency: number,
+  waveType: OscillatorType = 'sine',
+): void {
   const audioContext: AudioContext = new (window.AudioContext ||
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).webkitAudioContext)();
@@ -63,7 +66,7 @@ function beep(frequency: number, waveType: OscillatorType = 'sine'): void {
   envelope.connect(audioContext.destination);
 }
 
-class SoundEngine {
+export class SoundEngine {
   #audioContext: AudioContext;
   #osc: OscillatorNode;
   #masterGain: GainNode;

@@ -1,3 +1,9 @@
+import type { IWorld } from '../world/types.js';
+import type { GridSegment, SpatialHashGrid } from '../math/spatialGrid.js';
+import type { Segment } from '../math/primitives/segment.js';
+import type { Point } from '../math/primitives/point.js';
+import type { Car } from '../car/car.js';
+
 /**
  * Shared spatial-grid utilities used by TrainingSimulator, TrafficSimulator,
  * and RaceSimulator.
@@ -15,7 +21,7 @@
  * Extracts all road-border segments from an IWorld as GridSegment pairs.
  * Aggregates roadBorders, separatorBorders, and corridor borders.
  */
-function buildRoadBorders(world: IWorld): GridSegment[] {
+export function buildRoadBorders(world: IWorld): GridSegment[] {
   return [
     ...world.roadBorders,
     ...world.separatorBorders,
@@ -33,7 +39,10 @@ function buildRoadBorders(world: IWorld): GridSegment[] {
  * @returns      An array of segment polygons (Point[][]) close enough that
  *               the car could collide with them or sense them.
  */
-function queryBordersNearCar(grid: SpatialHashGrid, car: Car): Point[][] {
+export function queryBordersNearCar(
+  grid: SpatialHashGrid,
+  car: Car,
+): Point[][] {
   const MIN_RANGE = 100;
   const rayLength = car.sensor?.rayLength ?? MIN_RANGE;
   const reach = Math.max(rayLength, MIN_RANGE);
@@ -65,7 +74,7 @@ function queryBordersNearCar(grid: SpatialHashGrid, car: Car): Point[][] {
  * Squared distance from point (px, py) to the line segment (ax, ay)-(bx, by).
  * Allocation-free and sqrt-free, for hot per-car/per-segment filtering.
  */
-function pointToSegmentDistanceSq(
+export function pointToSegmentDistanceSq(
   px: number,
   py: number,
   ax: number,

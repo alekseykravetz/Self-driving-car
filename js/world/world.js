@@ -1,4 +1,31 @@
-'use strict';
+import { Graph } from '../math/graph/graph.js';
+import { Point } from '../math/primitives/point.js';
+import { Building } from './items/building.js';
+import {
+  Tree,
+  buildTreePrototypes,
+  DEFAULT_TREE_SEED,
+  DEFAULT_TREE_PROTOTYPE_COUNT,
+} from './items/tree.js';
+import { Marking } from './markings/marking.js';
+import { Start } from './markings/start.js';
+import { Corridor } from './corridor.js';
+import { TrafficManager } from './trafficManager.js';
+import { WorldGenerator } from './generation/worldGenerator.js';
+import { DEFAULT_LAYER_VISIBILITY } from './types.js';
+import {
+  add,
+  scale,
+  lerp2D,
+  lerp,
+  normalize,
+  magnitude,
+  rotate,
+  mulberry32,
+} from '../math/utils.js';
+import { drawEnvelope } from '../rendering/envelopeRenderer.js';
+import { drawSegment } from '../rendering/segmentRenderer.js';
+import { drawPolygon } from '../rendering/polygonRenderer.js';
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field. */
 function loadWorldCorridors(info) {
@@ -11,7 +38,6 @@ function loadWorldCorridors(info) {
   }
   return [];
 }
-
 /** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes. */
 function loadTreeInstance(inst, world) {
   const p = inst.p ?? 0;
@@ -25,8 +51,7 @@ function loadTreeInstance(inst, world) {
     inst.s ?? 1,
   );
 }
-
-class World {
+export class World {
   graph;
   roadWidth;
   roadRoundness;
@@ -78,7 +103,6 @@ class World {
     this.trafficManager = new TrafficManager(this.graph, this.markings);
     this.generate();
   }
-
   static load(info) {
     // Create a world with default graph, properties will be overwritten
     const world = new World(new Graph());
@@ -146,7 +170,6 @@ class World {
     world.trafficManager = new TrafficManager(world.graph, world.markings);
     return world;
   }
-
   /**
    * Serializes to the lean v2 world schema: must-have data (graph, params,
    * markings, corridors, viewport) plus a compact `decoration` block (tree seed
@@ -176,16 +199,13 @@ class World {
       },
     };
   }
-
   generate(opts) {
     WorldGenerator.generate(this, opts);
   }
-
   /** Back-compat accessor: the primary (first) corridor, or null. */
   get corridor() {
     return this.corridors[0] ?? null;
   }
-
   /**
    * Builds a single dynamic corridor from `start` to `end` and makes it the
    * world's only corridor. Used by the race game and training simulator to
@@ -194,12 +214,10 @@ class World {
   generateCorridor(start, end, extendEnd = false) {
     WorldGenerator.generateCorridor(this, start, end, extendEnd);
   }
-
   /** Adds an authored corridor (e.g. from the corridor editor). */
   addCorridor(corridor) {
     this.corridors.push(corridor);
   }
-
   /**
    * All collision boundaries cars must respect: road borders, hard-separation
    * center lines, and every corridor's walls.
@@ -211,7 +229,6 @@ class World {
     }
     return borders;
   }
-
   draw(ctx, options) {
     const {
       viewPoint,
@@ -299,7 +316,6 @@ class World {
     //   drawSegment(ctx, seg, { color: 'cyan', width: 1 });
     // }
   }
-
   /** Draws one-way arrows, hard-separation center lines, and dashed dividers. */
   #drawLaneMarkings(ctx) {
     for (const seg of this.graph.segments) {

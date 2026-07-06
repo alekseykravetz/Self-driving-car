@@ -1,4 +1,15 @@
-class Segment {
+import { Point } from './point.js';
+import {
+  distance,
+  normalize,
+  subtract,
+  dot,
+  add,
+  scale,
+  magnitude,
+} from '../utils.js';
+
+export class Segment {
   p1: Point;
   p2: Point;
   oneWay: boolean;

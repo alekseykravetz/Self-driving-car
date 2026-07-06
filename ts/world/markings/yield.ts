@@ -1,4 +1,10 @@
-class Yield extends Marking {
+import { Marking } from './marking.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { angle } from '../../math/utils.js';
+
+export class Yield extends Marking {
   override type: string = 'yield';
   border: Segment;
   constructor(

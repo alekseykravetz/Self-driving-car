@@ -10,9 +10,11 @@
  * segments and cars, the per-car border lookup drops from O(n) to roughly O(1)
  * (proportional to the segments near the car, not the whole map).
  */
-type GridSegment = [Point, Point];
+import { Point } from './primitives/point.js';
 
-class SpatialHashGrid {
+export type GridSegment = [Point, Point];
+
+export class SpatialHashGrid {
   readonly cellSize: number;
   #cells: Map<string, number[]>;
   #segments: GridSegment[];

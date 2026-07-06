@@ -1,4 +1,6 @@
-class NeuralNetwork {
+import { lerp } from '../math/utils.js';
+
+export class NeuralNetwork {
   public levels: Level[];
 
   constructor(neuronCounts: number[]) {
@@ -155,7 +157,7 @@ class NeuralNetwork {
   }
 }
 
-class Level {
+export class Level {
   public inputs: number[];
   public outputs: number[];
   public biases: number[];

@@ -1,5 +1,7 @@
-'use strict';
-class MarkingEditor {
+import { Marking } from '../markings/marking.js';
+import { getNearestSegment } from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+export class MarkingEditor {
   viewport;
   world;
   targetSegments; // Segments where markings can be placed
@@ -24,7 +26,6 @@ class MarkingEditor {
     this.#boundMouseMove = this.#handleMouseMove.bind(this);
     this.#boundContextMenu = (e) => e.preventDefault();
   }
-
   /**
    * Creates a new marking instance. To be overridden by subclasses
    * for specific marking types.
@@ -41,18 +42,15 @@ class MarkingEditor {
       this.world.roadWidth,
     );
   }
-
   /** Enables the editor by adding event listeners. */
   enable() {
     this.#addEventListeners();
   }
-
   /** Disables the editor by removing event listeners and clearing intent. */
   disable() {
     this.#removeEventListeners();
     this.intent = null; // Clear preview when disabled
   }
-
   /** Adds necessary event listeners to the canvas. */
   #addEventListeners() {
     this.canvas.addEventListener('mousedown', this.#boundMouseDown);
@@ -60,14 +58,12 @@ class MarkingEditor {
     // Prevent default right-click menu
     this.canvas.addEventListener('contextmenu', this.#boundContextMenu);
   }
-
   /** Removes event listeners from the canvas. */
   #removeEventListeners() {
     this.canvas.removeEventListener('mousedown', this.#boundMouseDown);
     this.canvas.removeEventListener('mousemove', this.#boundMouseMove);
     this.canvas.removeEventListener('contextmenu', this.#boundContextMenu);
   }
-
   /** Handles mouse movement to update the marking intent (preview). */
   #handleMouseMove(e) {
     this.mouse = this.viewport.getMouse(e, true);
@@ -91,7 +87,6 @@ class MarkingEditor {
       this.intent = null; // No segment nearby
     }
   }
-
   /** Handles mouse down events to place or remove markings. */
   #handleMouseDown(e) {
     if (!this.mouse) return; // Make sure mouse position is available
@@ -120,7 +115,6 @@ class MarkingEditor {
       }
     }
   }
-
   /** Displays the current marking intent (preview) on the canvas. */
   display() {
     if (this.intent) {

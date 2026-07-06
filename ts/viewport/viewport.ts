@@ -1,4 +1,8 @@
-interface DragState {
+import { Point } from '../math/primitives/point.js';
+import { ScaleIndicator } from './scaleIndicator.js';
+import { scale, subtract, add, WORLD_PIXELS_PER_METER } from '../math/utils.js';
+
+export interface DragState {
   start: Point;
   end: Point;
   offset: Point; // The difference between end and start during a drag
@@ -10,9 +14,9 @@ interface DragState {
  * - 'mouse': wheel scroll zooms directly (no modifier needed).
  * - 'touchpad': two-finger scroll pans; pinch / Ctrl+scroll zooms.
  */
-type ViewportMode = 'mouse' | 'touchpad';
+export type ViewportMode = 'mouse' | 'touchpad';
 
-class Viewport {
+export class Viewport {
   public canvas: HTMLCanvasElement;
   #ctx: CanvasRenderingContext2D;
   #scaleIndicator: ScaleIndicator;

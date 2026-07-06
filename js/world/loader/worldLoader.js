@@ -1,4 +1,3 @@
-'use strict';
 /**
  * Parse a .world file content string into a plain world info object.
  * Expects pure JSON `{...}`. Returns null if the content cannot be parsed.
@@ -8,7 +7,7 @@
  * in-class static self-reference into a shared global `_a` temp, which collides
  * across the classic (non-module) script files this project loads via <script>.
  */
-function parseWorldFileContent(content) {
+export function parseWorldFileContent(content) {
   try {
     return JSON.parse(content.trim());
   } catch (error) {
@@ -16,14 +15,13 @@ function parseWorldFileContent(content) {
     return null;
   }
 }
-
 /**
  * Reusable world loader utility.
  * Handles file input, reading, and JSON extraction from .world files.
  * Binds to an existing `#loadWorldInput` element provided by the page markup
  * (static HTML in world.html, or the shared <world-toolbar> template).
  */
-class WorldLoader {
+export class WorldLoader {
   #input;
   #onLoad;
   /**
@@ -42,7 +40,6 @@ class WorldLoader {
     this.#input = input;
     this.#input.addEventListener('change', this.#handleFileChange.bind(this));
   }
-
   #handleFileChange(e) {
     const input = e.target;
     const worldFile = input.files?.[0];
@@ -59,7 +56,6 @@ class WorldLoader {
       input.value = '';
     };
   }
-
   #onFileRead(e) {
     if (!e.target?.result) {
       alert('Could not read file content');
@@ -77,7 +73,6 @@ class WorldLoader {
     this.#onLoad(worldInfo);
     this.#input.value = '';
   }
-
   /**
    * Parse a .world file content string into a plain world info object.
    * Delegates to the shared {@link parseWorldFileContent} helper.

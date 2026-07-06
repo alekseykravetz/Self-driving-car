@@ -1,5 +1,9 @@
-'use strict';
-class Light extends Marking {
+import { Marking } from './marking.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { perpendicular, scale, add, lerp2D } from '../../math/utils.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
+export class Light extends Marking {
   state = 'off';
   border;
   type = 'light';
@@ -13,12 +17,10 @@ class Light extends Marking {
     super(center, directionVector, width, 18);
     this.border = this.polygon.segments[0];
   }
-
   rebuildGeometry() {
     super.rebuildGeometry();
     this.border = this.polygon.segments[0];
   }
-
   /**
    * Draws the traffic light onto the canvas.
    * @param ctx The CanvasRenderingContext2D to draw on.

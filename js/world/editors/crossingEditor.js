@@ -1,5 +1,6 @@
-'use strict';
-class CrossingEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Crossing } from '../markings/crossing.js';
+export class CrossingEditor extends MarkingEditor {
   /**
    * Editor for creating Crossing markings.
    * Targets graph segments by default.
@@ -8,7 +9,6 @@ class CrossingEditor extends MarkingEditor {
     // Call base constructor, passing graph segments as targets
     super(viewport, world, world.graph.segments);
   }
-
   /**
    * Creates a new Crossing marking instance.
    * @param center The center point of the crossing.

@@ -1,4 +1,8 @@
-class CameraControls {
+import { MarkerDetector, Marker } from './markerDetector.js';
+import { Point } from '../../math/primitives/point.js';
+import { average, distance } from '../../math/utils.js';
+
+export class CameraControls {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   tempCanvas: HTMLCanvasElement;

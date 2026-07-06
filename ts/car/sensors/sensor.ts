@@ -1,4 +1,11 @@
-class Sensor {
+import { Car } from '../car.js';
+import {
+  SensorRaycaster,
+  IntersectionPoint,
+} from '../physics/sensorRaycaster.js';
+import { Point } from '../../math/primitives/point.js';
+
+export class Sensor {
   car: Car;
   rayCount: number;
   rayLength: number;

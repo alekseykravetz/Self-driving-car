@@ -1,3 +1,6 @@
+import { Car } from '../../../car/car.js';
+import { getRandomColor } from '../../../utils.js';
+
 /**
  * Traffic generation utilities for simple road training scenarios.
  * Designed to work with any IWorld that provides lane info via getLaneCenter/getLaneCount.
@@ -6,7 +9,7 @@
 /**
  * Generates the initial set of hardcoded traffic cars for a 3-lane road.
  */
-function generateInitialTraffic(
+export function generateInitialTraffic(
   getLaneCenter: (lane: number) => number,
   startAngle: number,
 ): Car[] {
@@ -92,7 +95,7 @@ function generateInitialTraffic(
  * Generates a single dynamic traffic row at the given y coordinate.
  * Randomly fills 1 or more lanes, always leaving at least one empty.
  */
-function generateTrafficRow(
+export function generateTrafficRow(
   y: number,
   getLaneCenter: (lane: number) => number,
   laneCount: number,

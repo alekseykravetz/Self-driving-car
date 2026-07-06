@@ -1,12 +1,32 @@
-'use strict';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Envelope } from '../../math/primitives/envelope.js';
+import {
+  translate,
+  angle,
+  lerp2D,
+  perpendicular,
+  dot,
+  subtract,
+  scale,
+  add,
+  getNearestSegment,
+} from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+import { Crossing } from './crossing.js';
+import { Parking } from './parking.js';
+import { Light } from './light.js';
+import { Start } from './start.js';
+import { Stop } from './stop.js';
+import { Yield } from './yield.js';
+import { Target } from './target.js';
 /** Finds the graph segment matching a saved anchor (same endpoint order). */
 function findAnchorSegment(graph, anchor) {
   return graph.segments.find(
     (s) => s.p1.equals(anchor.p1) && s.p2.equals(anchor.p2),
   );
 }
-
-class Marking {
+export class Marking {
   // Core properties defining the marking
   center;
   directionVector;
@@ -39,7 +59,6 @@ class Marking {
     );
     this.polygon = new Envelope(this.support, this.width, 0).polygon;
   }
-
   /**
    * Computes and stores a graph-relative anchor from the marking's current
    * position, binding it to the nearest graph segment. Called when a marking is
@@ -61,7 +80,6 @@ class Marking {
       lateral,
     };
   }
-
   /**
    * Recomputes the marking's absolute position from its anchor against the
    * current graph. No-op when there is no anchor (legacy markings keep their
@@ -83,7 +101,6 @@ class Marking {
     this.anchor.p2 = new Point(seg.p2.x, seg.p2.y);
     this.rebuildGeometry();
   }
-
   /**
    * Rebuilds the support segment and bounding polygon from the current
    * center/direction. Subclasses override to also refresh their derived
@@ -96,7 +113,6 @@ class Marking {
     );
     this.polygon = new Envelope(this.support, this.width, 0).polygon;
   }
-
   /**
    * Static factory method to load a Marking (or appropriate subclass) from saved data.
    * @param info Object containing the saved state of the marking.
@@ -148,7 +164,6 @@ class Marking {
     }
     return marking;
   }
-
   /**
    * Draws the base representation of the marking (its bounding polygon).
    * Subclasses should override this method to draw their specific visuals.

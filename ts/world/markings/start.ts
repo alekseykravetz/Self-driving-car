@@ -1,4 +1,8 @@
-class Start extends Marking {
+import { Marking } from './marking.js';
+import { Point } from '../../math/primitives/point.js';
+import { angle } from '../../math/utils.js';
+
+export class Start extends Marking {
   // Property to hold the car image element
   image: HTMLImageElement;
   // Override the type from the base Marking class

@@ -1,8 +1,8 @@
-type BorderMode = 'none' | 'damage' | 'collision';
-type TrackingMode = 'none' | 'best' | 'keys';
-type ToolbarViewportMode = 'mouse' | 'touchpad';
+export type BorderMode = 'none' | 'damage' | 'collision';
+export type TrackingMode = 'none' | 'best' | 'keys';
+export type ToolbarViewportMode = 'mouse' | 'touchpad';
 
-class ToolbarModeControls {
+export class ToolbarModeControls {
   #_borderMode: BorderMode = 'damage';
   #_trackingMode: TrackingMode = 'best';
   #_viewportMode: ToolbarViewportMode = 'mouse';

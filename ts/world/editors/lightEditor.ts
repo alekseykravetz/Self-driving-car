@@ -1,4 +1,10 @@
-class LightEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { World } from '../world.js';
+import { Point } from '../../math/primitives/point.js';
+import { Light } from '../markings/light.js';
+
+export class LightEditor extends MarkingEditor {
   /**
    * Editor for creating Light markings.
    * Targets lane guide segments.

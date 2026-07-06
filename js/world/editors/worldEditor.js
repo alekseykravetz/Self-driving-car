@@ -1,4 +1,23 @@
-'use strict';
+import { DEFAULT_LAYER_VISIBILITY } from '../types.js';
+import { World } from '../world.js';
+import { WorldGenerator } from '../generation/worldGenerator.js';
+import { GraphEditor } from './graphEditor.js';
+import { MarkingEditor } from './markingEditor.js';
+import { CorridorEditor } from './corridorEditor.js';
+import { StopEditor } from './stopEditor.js';
+import { CrossingEditor } from './crossingEditor.js';
+import { StartEditor } from './startEditor.js';
+import { ParkingEditor } from './parkingEditor.js';
+import { LightEditor } from './lightEditor.js';
+import { TargetEditor } from './targetEditor.js';
+import { YieldEditor } from './yieldEditor.js';
+import { Graph } from '../../math/graph/graph.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { MiniMap } from '../../mini-map/miniMap.js';
+import { Osm } from '../../math/osm-importer/osm.js';
+import { StoreManager } from '../../store/storeManager.js';
+import { safeJsonParse } from '../../utils.js';
+import { scale } from '../../math/utils.js';
 /** localStorage key for the editor's per-layer visibility preference. */
 const EDITOR_LAYERS_KEY = 'editor:worldLayers';
 /** Reads the persisted layer visibility, falling back to the defaults. */
@@ -6,13 +25,11 @@ function loadLayerVisibility() {
   const stored = safeJsonParse(localStorage.getItem(EDITOR_LAYERS_KEY));
   return { ...DEFAULT_LAYER_VISIBILITY, ...(stored ?? {}) };
 }
-
 /** Persists the layer visibility preference. */
 function saveLayerVisibility(visibility) {
   localStorage.setItem(EDITOR_LAYERS_KEY, JSON.stringify(visibility));
 }
-
-class WorldEditor {
+export class WorldEditor {
   #canvas;
   #ctx;
   #miniMapCanvas;
@@ -65,7 +82,6 @@ class WorldEditor {
       this.#initializeWorldEditor(storeWorld);
     }
   }
-
   /* Assigns DOM elements to class properties. */
   #assignElementReferences() {
     // Helper function to get elements and type cast
@@ -95,7 +111,6 @@ class WorldEditor {
     this.#shortcutsToolbar = document.querySelector('shortcuts-toolbar');
     this.#worldLayersToolbar = document.querySelector('world-layers-toolbar');
   }
-
   /* Adds event listeners to DOM elements. */
   #addEventListeners() {
     this.#saveBtn.addEventListener('click', this.save.bind(this));
@@ -215,7 +230,6 @@ class WorldEditor {
       this.regenerateItems(),
     );
   }
-
   /* Initializes or re-initializes the world, viewport, minimap, and tools. */
   #initializeWorldEditor(worldInfo) {
     this.#world = worldInfo ? World.load(worldInfo) : new World(new Graph());
@@ -239,7 +253,6 @@ class WorldEditor {
     // A freshly loaded/created world already has its items generated in memory.
     this.#worldLayersToolbar?.setStale(false);
   }
-
   /* Creates instances of all editor tools. */
   initializeEditors(viewport, world) {
     const graphEditor = new GraphEditor(viewport, world.graph);
@@ -287,7 +300,6 @@ class WorldEditor {
     }; // Assert final type
     return tools;
   }
-
   /* Sets the active editor mode. */
   setMode(mode) {
     this.#mode = mode;
@@ -296,7 +308,6 @@ class WorldEditor {
     this.#editors[mode].button.style.filter = '';
     this.#editors[mode].editor.enable(); // Enable the selected editor
   }
-
   /* Disables all editor tools and resets button styles. */
   disableEditors() {
     for (const tool of Object.values(this.#editors)) {
@@ -305,14 +316,12 @@ class WorldEditor {
       tool.editor.disable();
     }
   }
-
   /* Sets the viewport wheel-input mode (mouse vs. touchpad) on both viewports. */
   setViewportMode(mode) {
     this.#viewportMode = mode;
     this.#viewport?.setMode(mode);
     this.#miniMapViewport?.setMode(mode);
   }
-
   save() {
     // Update world state with current viewport settings
     this.#world.zoom = this.#viewport.zoom;
@@ -343,24 +352,20 @@ class WorldEditor {
     element.click();
     document.body.removeChild(element); // Clean up
   }
-
   /* Disposes the graph editor and clears world markings. */
   dispose() {
     // this.#editors.graph.editor.dispose?.();
     // this.#world.markings.length = 0;
     this.#initializeWorldEditor(null);
   }
-
   /* Displays the OSM data input panel. */
   openOsmPanel() {
     this.#osmPanel.style.display = 'block';
   }
-
   /* Hides the OSM data input panel. */
   closeOsmPanel() {
     this.#osmPanel.style.display = 'none';
   }
-
   /* Parses OSM data from the text area and updates the world graph. */
   parseOsmData() {
     const osmData = this.#osmDataContainer.value;
@@ -389,7 +394,6 @@ class WorldEditor {
       console.error('Error processing OSM data:', error);
     }
   }
-
   /* Rebuilds the expensive item placement (buildings + trees) on demand. */
   regenerateItems() {
     this.#worldLayersToolbar.setBusy(true);
@@ -400,7 +404,6 @@ class WorldEditor {
       this.#worldLayersToolbar.setBusy(false);
     }, 0);
   }
-
   /* Main draw loop called by animate. */
   draw() {
     // Reset viewport transforms
@@ -439,7 +442,6 @@ class WorldEditor {
       compactScaleIndicator: true,
     }); // Update minimap based on main viewpoint
   }
-
   /* Animation loop using requestAnimationFrame. */
   animate() {
     this.draw();

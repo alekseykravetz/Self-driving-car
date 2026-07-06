@@ -1,17 +1,17 @@
-'use strict';
-class Parking extends Marking {
+import { Marking } from './marking.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { angle } from '../../math/utils.js';
+export class Parking extends Marking {
   type = 'parking';
   borders;
   constructor(center, directionVector, width, height) {
     super(center, directionVector, width, height);
     this.borders = [this.polygon.segments[0], this.polygon.segments[2]];
   }
-
   rebuildGeometry() {
     super.rebuildGeometry();
     this.borders = [this.polygon.segments[0], this.polygon.segments[2]];
   }
-
   draw(ctx) {
     for (const border of this.borders) {
       drawSegment(ctx, border, { width: 5, color: 'white' });

@@ -1,4 +1,4 @@
-const LAYOUT_TOOLBAR_TEMPLATE = `
+export const LAYOUT_TOOLBAR_TEMPLATE = `
     <div class="controls-group">
       <span class="controls-group-label">Layout</span>
       <div class="border-mode-group">

@@ -1,3 +1,27 @@
+import { WorldLayerVisibility, DEFAULT_LAYER_VISIBILITY } from '../types.js';
+import { World } from '../world.js';
+import { WorldGenerator } from '../generation/worldGenerator.js';
+import { GraphEditor } from './graphEditor.js';
+import { MarkingEditor } from './markingEditor.js';
+import { CorridorEditor } from './corridorEditor.js';
+import { StopEditor } from './stopEditor.js';
+import { CrossingEditor } from './crossingEditor.js';
+import { StartEditor } from './startEditor.js';
+import { ParkingEditor } from './parkingEditor.js';
+import { LightEditor } from './lightEditor.js';
+import { TargetEditor } from './targetEditor.js';
+import { YieldEditor } from './yieldEditor.js';
+import { Graph } from '../../math/graph/graph.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { MiniMap } from '../../mini-map/miniMap.js';
+import { Osm, OsmData } from '../../math/osm-importer/osm.js';
+import { StoreManager } from '../../store/storeManager.js';
+import { WorldToolbarElement } from '../../panels/worldToolbar.js';
+import { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
+import { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+import { safeJsonParse } from '../../utils.js';
+import { scale } from '../../math/utils.js';
+
 /** localStorage key for the editor's per-layer visibility preference. */
 const EDITOR_LAYERS_KEY = 'editor:worldLayers';
 
@@ -14,14 +38,14 @@ function saveLayerVisibility(visibility: WorldLayerVisibility): void {
   localStorage.setItem(EDITOR_LAYERS_KEY, JSON.stringify(visibility));
 }
 
-interface Editor {
+export interface Editor {
   enable(): void;
   disable(): void;
   display(): void;
   dispose?(): void; // Optional dispose method (GraphEditor has it)
 }
 
-type EditorType =
+export type EditorType =
   | 'graph'
   | 'marking'
   | 'stop'
@@ -40,7 +64,7 @@ type Editors = {
   };
 };
 
-class WorldEditor {
+export class WorldEditor {
   #canvas: HTMLCanvasElement;
   #ctx: CanvasRenderingContext2D;
   #miniMapCanvas: HTMLCanvasElement;

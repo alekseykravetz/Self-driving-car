@@ -1,4 +1,12 @@
-'use strict';
+import { Polygon } from '../../math/primitives/polygon.js';
+import {
+  lerp,
+  lerp2D,
+  mulberry32,
+  translate,
+  getFake3dPoint,
+} from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
 /**
  * A tree decoration item. Instead of baking a full canopy polygon per tree, a
  * Tree references a small reproducible {@link TreePrototype} (a per-vertex noise
@@ -9,14 +17,14 @@
 /** Number of vertices in a canopy level / footprint polygon. */
 const TREE_VERTEX_COUNT = 32;
 /** Default seed + prototype count used when a world does not specify its own. */
-const DEFAULT_TREE_SEED = 123456;
-const DEFAULT_TREE_PROTOTYPE_COUNT = 8;
+export const DEFAULT_TREE_SEED = 123456;
+export const DEFAULT_TREE_PROTOTYPE_COUNT = 8;
 /**
  * Builds `count` reproducible canopy prototypes from `seed`. The same
  * (seed, count) pair always yields the same prototype set, so a world need only
  * persist those two numbers to recreate every canopy shape on load.
  */
-function buildTreePrototypes(seed, count) {
+export function buildTreePrototypes(seed, count) {
   const rand = mulberry32(seed);
   const prototypes = [];
   for (let i = 0; i < count; i++) {
@@ -28,9 +36,11 @@ function buildTreePrototypes(seed, count) {
   }
   return prototypes;
 }
-
 /** A neutral fallback prototype used when none is supplied. */
-const DEFAULT_TREE_PROTOTYPE = buildTreePrototypes(DEFAULT_TREE_SEED, 1)[0];
+export const DEFAULT_TREE_PROTOTYPE = buildTreePrototypes(
+  DEFAULT_TREE_SEED,
+  1,
+)[0];
 /** Builds one noisy canopy level polygon from a prototype's noise profile. */
 function treeLevelPolygon(center, size, noise) {
   const points = [];
@@ -43,8 +53,7 @@ function treeLevelPolygon(center, size, noise) {
   }
   return new Polygon(points);
 }
-
-class Tree {
+export class Tree {
   center;
   size; // Effective base diameter (baseline * scale)
   height;
@@ -81,7 +90,6 @@ class Tree {
     this.prototype = prototype;
     this.base = treeLevelPolygon(this.center, this.size, this.prototype.noise);
   }
-
   /** Serializes to the compact instance form stored in world files. */
   toInstance() {
     return {
@@ -92,7 +100,6 @@ class Tree {
       t: this.type,
     };
   }
-
   draw(ctx, options) {
     const { viewPoint } = options;
     switch (this.type) {
@@ -107,7 +114,6 @@ class Tree {
         break;
     }
   }
-
   /** Type 0 — classic stacked noisy round canopy. */
   #drawClassic(ctx, viewPoint) {
     const top = getFake3dPoint(this.center, viewPoint, this.height);
@@ -123,7 +129,6 @@ class Tree {
       drawPolygon(ctx, polygon, { fill: color, stroke: 'rgba(0,0,0,0)' });
     }
   }
-
   /** Type 1 — tall conifer/pine: a trunk under stacked narrowing tiers. */
   #drawConifer(ctx, viewPoint) {
     // Trunk.
@@ -163,7 +168,6 @@ class Tree {
       ctx.fill();
     }
   }
-
   /** Type 2 — broadleaf cluster: trunk with overlapping lobes forming a bushy crown. */
   #drawCluster(ctx, viewPoint) {
     const noise = this.prototype.noise;

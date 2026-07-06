@@ -1,5 +1,7 @@
-'use strict';
-class TrafficManager {
+import { Point } from '../math/primitives/point.js';
+import { Light } from './markings/light.js';
+import { getNearestPoint } from '../math/utils.js';
+export class TrafficManager {
   graph;
   markings;
   controlCenters;
@@ -10,7 +12,6 @@ class TrafficManager {
     this.frameCount = 0;
     this.#initializeControlCenters();
   }
-
   // Crossroads, an intersection of two or more roads. Finds graph points where more than 2 segments meet
   #getCrossroads() {
     const subset = [];
@@ -27,7 +28,6 @@ class TrafficManager {
     }
     return subset;
   }
-
   #initializeControlCenters() {
     this.controlCenters = []; // Reset
     // Filter only Light instances from all markings
@@ -76,7 +76,6 @@ class TrafficManager {
       center.ticks = center.lights.length * (greenDuration + yellowDuration);
     }
   }
-
   // Updates the state of all managed traffic lights based on time/frameCount
   update() {
     this.#initializeControlCenters(); // todo: fix not init lights on each update (problem with markings and graph changes outside)

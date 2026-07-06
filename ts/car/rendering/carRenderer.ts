@@ -1,4 +1,14 @@
-class CarRenderer {
+import { Car } from '../car.js';
+
+export interface CarDrawOptions {
+  showSensor?: boolean;
+  showMask?: boolean;
+  colorOverride?: string;
+  alpha?: number;
+  showName?: boolean;
+}
+
+export class CarRenderer {
   car: Car;
   image: HTMLImageElement;
 

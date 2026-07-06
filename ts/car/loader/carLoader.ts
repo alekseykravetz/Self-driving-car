@@ -1,3 +1,5 @@
+import { CarInfo } from '../car.js';
+
 /**
  * Parse a .car file content string into a CarInfo object.
  * Expects pure JSON `{...}`. Returns null if the content cannot be parsed.
@@ -7,7 +9,7 @@
  * in-class static self-reference into a shared global `_a` temp, which collides
  * across the classic (non-module) script files this project loads via <script>.
  */
-function parseCarFileContent(content: string): CarInfo | null {
+export function parseCarFileContent(content: string): CarInfo | null {
   try {
     return JSON.parse(content.trim());
   } catch (err) {
@@ -22,7 +24,7 @@ function parseCarFileContent(content: string): CarInfo | null {
  *
  * Top-level (global) function — see {@link parseCarFileContent} for the rationale.
  */
-function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
+export function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
   const aHidden = a.hiddenLayers ?? [6];
   const bHidden = b.hiddenLayers ?? [6];
   // raySpread is a radian float (e.g. Math.PI / 2 = 1.5707963…). Different save
@@ -48,7 +50,7 @@ function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
  * Reusable car loader utility.
  * Handles file input, reading, and parsing of one or multiple pure-JSON .car files.
  */
-class CarLoader {
+export class CarLoader {
   #input: HTMLInputElement;
   #onLoad: (cars: CarInfo[]) => void;
 

@@ -1,17 +1,17 @@
-'use strict';
-class Yield extends Marking {
+import { Marking } from './marking.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { angle } from '../../math/utils.js';
+export class Yield extends Marking {
   type = 'yield';
   border;
   constructor(center, directionVector, width, height) {
     super(center, directionVector, width, height);
     this.border = this.polygon.segments[2];
   }
-
   rebuildGeometry() {
     super.rebuildGeometry();
     this.border = this.polygon.segments[2];
   }
-
   draw(ctx) {
     drawSegment(ctx, this.border, { width: 5, color: 'white' });
     ctx.save();

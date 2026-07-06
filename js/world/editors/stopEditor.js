@@ -1,5 +1,6 @@
-'use strict';
-class StopEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Stop } from '../markings/stop.js';
+export class StopEditor extends MarkingEditor {
   /**
    * Editor for creating Stop markings.
    * Targets lane guide segments.
@@ -8,7 +9,6 @@ class StopEditor extends MarkingEditor {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
-
   /**
    * Creates a new Stop marking instance.
    * @param center The center point of the stop line.

@@ -1,15 +1,18 @@
-interface ICameraPoint {
+import { Polygon } from '../math/primitives/polygon.js';
+import { Car } from '../car/car.js';
+
+export interface ICameraPoint {
   x: number;
   y: number;
   angle: number;
 }
 
-interface IColoredPolygon extends Polygon {
+export interface IColoredPolygon extends Polygon {
   fill: string;
   stroke: string;
 }
 
-interface ICameraRenderOptions {
+export interface ICameraRenderOptions {
   /** The key car to always extrude as 3D (the car the camera follows). */
   keyCar?: Car;
   /** The best AI car to extrude (highlighted). */

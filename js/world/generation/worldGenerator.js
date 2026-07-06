@@ -1,4 +1,3 @@
-'use strict';
 /**
  * Procedural world geometry generation, extracted from the World class so the
  * World stays a data + draw + load container. All heavy generation lives here.
@@ -10,6 +9,14 @@
  * "Regenerate items" action). `generate(opts)` is a convenience that runs a
  * chosen subset of stages.
  */
+import { Envelope } from '../../math/primitives/envelope.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Point } from '../../math/primitives/point.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import { Building } from '../items/building.js';
+import { Tree, buildTreePrototypes } from '../items/tree.js';
+import { Corridor } from '../corridor.js';
+import { add, scale, lerp, distance, mulberry32 } from '../../math/utils.js';
 /** Center-lane guidance lines (half-width envelope union) for marking placement. */
 function wgGenerateLaneGuides(graph, roadWidth, roadRoundness) {
   const tempEnvelopes = [];
@@ -18,7 +25,6 @@ function wgGenerateLaneGuides(graph, roadWidth, roadRoundness) {
   }
   return Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
 }
-
 /**
  * Collision lines for two-way roads flagged as hard-separated. Each separated
  * (non-one-way) segment contributes its center line as a wall so cars cannot
@@ -38,7 +44,6 @@ function wgGenerateSeparatorBorders(graph) {
   }
   return borders;
 }
-
 function wgGenerateBuildings(world) {
   const tempEnvelopes = [];
   for (const seg of world.graph.segments) {
@@ -93,7 +98,6 @@ function wgGenerateBuildings(world) {
   }
   return bases.map((b) => new Building(b));
 }
-
 function wgGenerateTrees(world) {
   const points = [
     ...world.roadBorders.map((s) => [s.p1, s.p2]).flat(),
@@ -170,15 +174,13 @@ function wgGenerateTrees(world) {
   }
   return trees;
 }
-
 /** Weighted tree-type pick: mostly classic, with some conifers and clusters. */
 function wgPickTreeType(r) {
   if (r < 0.6) return 0;
   if (r < 0.8) return 1;
   return 2;
 }
-
-class WorldGenerator {
+export class WorldGenerator {
   /**
    * Cheap, deterministic road geometry: envelopes, road borders, lane guides
    * and separator borders. Safe to run on every graph edit.
@@ -204,12 +206,10 @@ class WorldGenerator {
     );
     world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
   }
-
   /** Expensive building placement (O(n²) footprint collision filter). */
   static generateBuildings(world) {
     world.buildings = wgGenerateBuildings(world);
   }
-
   /**
    * Expensive tree placement (rejection sampling). Ensures the world's tree
    * prototype set exists first, then assigns each instance a prototype/type/scale.
@@ -223,14 +223,12 @@ class WorldGenerator {
     }
     world.trees = wgGenerateTrees(world);
   }
-
   /** Re-anchors markings to the (possibly edited) graph. */
   static reanchorMarkings(world) {
     for (const marking of world.markings) {
       marking.reanchor(world.graph);
     }
   }
-
   /**
    * Builds a single dynamic corridor from `start` to `end` and makes it the
    * world's only corridor. Used by the race game and training simulator to
@@ -246,7 +244,6 @@ class WorldGenerator {
     );
     world.corridors = [corridor];
   }
-
   /**
    * Convenience generator. By default runs every stage; pass `opts` to run only
    * a subset (e.g. `{ roads: true }` for a cheap refresh). Markings are always

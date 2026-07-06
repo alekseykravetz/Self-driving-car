@@ -1,5 +1,5 @@
-'use strict';
-function polysIntersect(poly1, poly2) {
+import { getIntersectionOffset } from './math/utils.js';
+export function polysIntersect(poly1, poly2) {
   const n1 = poly1.length;
   const n2 = poly2.length;
   // A 2-point "polygon" is a single segment; its closing edge (p2→p1) is the
@@ -25,26 +25,23 @@ function polysIntersect(poly1, poly2) {
   }
   return false;
 }
-
-function getRGBA(value) {
+export function getRGBA(value) {
   const alpha = Math.abs(value);
   const R = value < 0 ? 0 : 255;
   const G = R;
   const B = value > 0 ? 0 : 255;
   return `rgba(${R}, ${G}, ${B}, ${alpha})`;
 }
-
-function getRandomColor() {
+export function getRandomColor() {
   const hue = 290 + Math.random() * 260; //not blue
   return `hsl(${hue}, 100%, 60%)`;
 }
-
 /**
  * Safely parses a JSON string, typically from localStorage.
  * Failure policy: returns null on a null/undefined input or on invalid JSON
  * instead of throwing, so callers can treat corrupt/missing values as "no data".
  */
-function safeJsonParse(raw) {
+export function safeJsonParse(raw) {
   if (raw == null) return null;
   try {
     return JSON.parse(raw);
@@ -52,14 +49,13 @@ function safeJsonParse(raw) {
     return null;
   }
 }
-
 /**
  * Strip the final file extension from a display name.
  * e.g. "circle.world" → "circle", "best_brain.car" → "best_brain".
  * If there is no dot (or the dot is the first character), the name is returned
  * unchanged.
  */
-function stripFileExtension(name) {
+export function stripFileExtension(name) {
   const dot = name.lastIndexOf('.');
   return dot > 0 ? name.slice(0, dot) : name;
 }

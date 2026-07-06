@@ -1,4 +1,29 @@
-type MarkingType =
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Envelope } from '../../math/primitives/envelope.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import { Graph } from '../../math/graph/graph.js';
+import {
+  translate,
+  angle,
+  lerp2D,
+  perpendicular,
+  dot,
+  subtract,
+  scale,
+  add,
+  getNearestSegment,
+} from '../../math/utils.js';
+import { drawPolygon } from '../../rendering/polygonRenderer.js';
+import { Crossing } from './crossing.js';
+import { Parking } from './parking.js';
+import { Light } from './light.js';
+import { Start } from './start.js';
+import { Stop } from './stop.js';
+import { Yield } from './yield.js';
+import { Target } from './target.js';
+
+export type MarkingType =
   | 'marking'
   | 'crossing'
   | 'parking'
@@ -14,7 +39,7 @@ type MarkingType =
  * segment (`offset`, 0..1) and signed perpendicular distance from it
  * (`lateral`). This lets markings follow the road when the graph is edited.
  */
-interface MarkingAnchor {
+export interface MarkingAnchor {
   p1: Point;
   p2: Point;
   offset: number;
@@ -31,7 +56,7 @@ function findAnchorSegment(
   );
 }
 
-class Marking {
+export class Marking {
   // Core properties defining the marking
   center: Point;
   directionVector: Point;

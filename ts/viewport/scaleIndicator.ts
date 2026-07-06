@@ -1,4 +1,6 @@
-interface ScaleIndicatorOptions {
+import { Viewport } from './viewport.js';
+
+export interface ScaleIndicatorOptions {
   paddingX?: number;
   paddingY?: number;
   lineColor?: string;
@@ -12,7 +14,7 @@ interface ScaleIndicatorOptions {
   statSeparator?: string;
 }
 
-class ScaleIndicator {
+export class ScaleIndicator {
   #canvasHeight: number;
   #viewport: Viewport;
   #options: Required<ScaleIndicatorOptions>;

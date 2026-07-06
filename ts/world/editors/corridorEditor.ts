@@ -1,3 +1,13 @@
+import { Viewport } from '../../viewport/viewport.js';
+import { World } from '../world.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Corridor } from '../corridor.js';
+import { getNearestPoint } from '../../math/utils.js';
+import { drawPoint } from '../../rendering/pointRenderer.js';
+import { drawSegment } from '../../rendering/segmentRenderer.js';
+import { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+
 /**
  * Authoring tool for {@link Corridor} world objects.
  *
@@ -8,7 +18,7 @@
  * Right-click removes the corridor nearest the cursor (or cancels an in-progress
  * pick).
  */
-class CorridorEditor {
+export class CorridorEditor {
   #viewport: Viewport;
   #world: World;
   #canvas: HTMLCanvasElement;

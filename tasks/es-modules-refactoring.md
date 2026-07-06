@@ -16,7 +16,7 @@ Eliminate the global-scope pattern. Every `.ts` file gets proper `import`/`expor
 {
   "compilerOptions": {
     "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "nodenext"
     // remove "module": "none"
     // keep everything else: target ES2022, outDir ./js, rootDir ./ts, strict
   }
@@ -52,21 +52,21 @@ This is the bulk of the work (99 files). Strategy:
 
 Each file references globals defined elsewhere. These become `import` statements. The dependency graph is largely known (see `docs/Architecture.md` load-order layers). Key mapping:
 
-| Declares → | Consumed by |
-|---|---|
-| `ts/math/primitives/point.ts`: `class Point` | ~All files |
-| `ts/math/primitives/segment.ts`: `class Segment` | polygon, envelope, graph, world/* |
-| `ts/math/primitives/polygon.ts`: `class Polygon` | envelope, corridor, markings |
-| `ts/math/primitives/envelope.ts`: `class Envelope` | world, corridor, markings |
-| `ts/math/utils.ts`: `lerp`, `distance`, `add`, `angle`, etc. | segment, polygon, envelope, geometry, world, car |
-| `ts/math/graph/graph.ts`: `class Graph` | world, miniMap, editors, simulators |
-| `ts/math/spatialGrid.ts`: `class SpatialHashGrid` | simulators (racing, traffic, worldMode) |
-| `ts/car/car.ts`: `class Car`, `type CarInfo` | poolManager, trainingPanel, race, traffic |
-| `ts/neural-network/network.ts`: `class NeuralNetwork`, `class Level` | car, brainAdapter, poolManager, storageManager, visualizer |
-| `ts/world/world.ts`: `class World` | all simulators, editor |
-| `ts/simulator/core/simulatorShell.ts`: `class SimulatorShell` | trainingSimulator, trafficSimulator, raceSimulator |
-| `ts/store/storeManager.ts`: `class StoreManager` (with `static init()`) | All entry pages |
-| rendering functions (`drawPoint`, `drawPolygon`, etc.) | World, editors, car renderers |
+| Declares →                                                              | Consumed by                                                |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `ts/math/primitives/point.ts`: `class Point`                            | ~All files                                                 |
+| `ts/math/primitives/segment.ts`: `class Segment`                        | polygon, envelope, graph, world/\*                         |
+| `ts/math/primitives/polygon.ts`: `class Polygon`                        | envelope, corridor, markings                               |
+| `ts/math/primitives/envelope.ts`: `class Envelope`                      | world, corridor, markings                                  |
+| `ts/math/utils.ts`: `lerp`, `distance`, `add`, `angle`, etc.            | segment, polygon, envelope, geometry, world, car           |
+| `ts/math/graph/graph.ts`: `class Graph`                                 | world, miniMap, editors, simulators                        |
+| `ts/math/spatialGrid.ts`: `class SpatialHashGrid`                       | simulators (racing, traffic, worldMode)                    |
+| `ts/car/car.ts`: `class Car`, `type CarInfo`                            | poolManager, trainingPanel, race, traffic                  |
+| `ts/neural-network/network.ts`: `class NeuralNetwork`, `class Level`    | car, brainAdapter, poolManager, storageManager, visualizer |
+| `ts/world/world.ts`: `class World`                                      | all simulators, editor                                     |
+| `ts/simulator/core/simulatorShell.ts`: `class SimulatorShell`           | trainingSimulator, trafficSimulator, raceSimulator         |
+| `ts/store/storeManager.ts`: `class StoreManager` (with `static init()`) | All entry pages                                            |
+| rendering functions (`drawPoint`, `drawPolygon`, etc.)                  | World, editors, car renderers                              |
 
 ### 2.2 Rule for import paths
 
@@ -131,6 +131,7 @@ Create one entry module per HTML page. These import everything needed and bootst
 ### Entry: `ts/simulator/entry.ts`
 
 Imports everything needed by `html/simulator.html`:
+
 - All math, world, rendering, car, NN, store, panels, simulator modules
 - Bootstrap: `StoreManager.init()` → `new TrainingSimulator(...)`
 
@@ -167,6 +168,7 @@ Each HTML page replaces its ~50-140 `<script src="...">` tags with a single modu
 ```
 
 **Key differences with type="module":**
+
 1. Scripts are **deferred by default** — no need to place at bottom of `<body>`.
 2. ES modules are **strict** by default — `"use strict"` implicit.
 3. Top-level declarations are **scoped to the module** — no global leak without explicit `window.X = X`.
@@ -247,6 +249,7 @@ For `race.html`, move the inline initialization logic (mode detection, controls 
 ## Rollback plan
 
 Keep the current commit as a safety branch (`git tag pre-esm`). Each phase produces a working commit:
+
 - After Phase 1: site still works (no behavioral change, TS may complain about missing imports but JS output is unchanged)
 - After each file batch in Phase 2: verify `npx tsc --noEmit` on that batch
 - After Phase 4: verify all HTML pages load and work

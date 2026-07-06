@@ -1,9 +1,15 @@
+import type { CarInfo } from '../../../car/car.js';
+import type { Car } from '../../../car/car.js';
+import type { NeuralNetwork } from '../../../neural-network/network.js';
+import { safeJsonParse } from '../../../utils.js';
+import { DEFAULT_CAR_CONFIG } from '../../../car/config.js';
+
 /**
  * Manages localStorage persistence for the training pool.
  * Provides load/save/discard operations and legacy migration.
  */
 
-function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
+export function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
   // Try unified key first
   const stored = localStorage.getItem('bestPool');
   const storedPool = safeJsonParse<CarInfo[]>(stored);
@@ -49,7 +55,7 @@ function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
   return [];
 }
 
-function savePoolToStorage(pool: CarInfo[]): void {
+export function savePoolToStorage(pool: CarInfo[]): void {
   if (pool.length > 0) {
     localStorage.setItem('bestPool', JSON.stringify(pool));
     console.log(`Saved top ${pool.length} car(s) to localStorage.`);
@@ -58,7 +64,7 @@ function savePoolToStorage(pool: CarInfo[]): void {
   }
 }
 
-function discardStoredPool(): void {
+export function discardStoredPool(): void {
   localStorage.removeItem('bestPool');
   // Remove legacy keys if they exist
   localStorage.removeItem('bestBrain');
@@ -72,12 +78,12 @@ function discardStoredPool(): void {
  * Separate from the training pool ('bestPool'): cars loaded via the race's
  * "Load car(s)" button are stored here and never overwrite the training pool.
  */
-function loadRaceCars(): CarInfo[] {
+export function loadRaceCars(): CarInfo[] {
   const stored = localStorage.getItem('raceCars');
   return safeJsonParse<CarInfo[]>(stored) ?? [];
 }
 
-function saveRaceCars(cars: CarInfo[]): void {
+export function saveRaceCars(cars: CarInfo[]): void {
   if (cars.length > 0) {
     localStorage.setItem('raceCars', JSON.stringify(cars));
     console.log(`Saved ${cars.length} race car(s) to localStorage.`);
@@ -86,7 +92,7 @@ function saveRaceCars(cars: CarInfo[]): void {
   }
 }
 
-function downloadCarFiles(
+export function downloadCarFiles(
   selectedCars: { car: Car; poolPosition: number }[],
 ): void {
   if (selectedCars.length === 0) return;

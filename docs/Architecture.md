@@ -34,21 +34,21 @@ TypeScript `module: "nodenext"` requires `.js` extensions in import paths, even 
 
 ```typescript
 // In ts/world/world.ts:
-import { Point } from '../math/primitives/point.js';     // resolves to point.ts
-import { Segment } from '../math/primitives/segment.js';  // resolves to segment.ts
+import { Point } from '../math/primitives/point.js'; // resolves to point.ts
+import { Segment } from '../math/primitives/segment.js'; // resolves to segment.ts
 import { Graph } from '../math/graph/graph.js';
 import { Envelope } from '../math/primitives/envelope.js';
 ```
 
 ### Entry Points
 
-| Page                     | Entry module                          |
-|--------------------------|---------------------------------------|
-| `html/simulator.html`    | `ts/simulator/entry.ts`               |
-| `html/traffic.html`      | `ts/traffic/entry.ts`                 |
-| `html/race.html`         | `ts/race/entry.ts`                    |
-| `html/world.html`        | `ts/world/entry.ts`                   |
-| `index.html`             | `ts/store/entry.ts`                   |
+| Page                  | Entry module            |
+| --------------------- | ----------------------- |
+| `html/simulator.html` | `ts/simulator/entry.ts` |
+| `html/traffic.html`   | `ts/traffic/entry.ts`   |
+| `html/race.html`      | `ts/race/entry.ts`      |
+| `html/world.html`     | `ts/world/entry.ts`     |
+| `index.html`          | `ts/store/entry.ts`     |
 
 ### Dependency Graph (Import Order)
 

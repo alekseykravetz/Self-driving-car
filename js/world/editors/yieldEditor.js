@@ -1,5 +1,6 @@
-'use strict';
-class YieldEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Yield } from '../markings/yield.js';
+export class YieldEditor extends MarkingEditor {
   /**
    * Editor for creating Yield markings.
    * Targets lane guide segments.
@@ -8,7 +9,6 @@ class YieldEditor extends MarkingEditor {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
   }
-
   /**
    * Creates a new Yield marking instance.
    * @param center The center point of the yield marking.

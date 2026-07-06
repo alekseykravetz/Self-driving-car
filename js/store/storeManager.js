@@ -1,4 +1,6 @@
-'use strict';
+import { safeJsonParse } from '../utils.js';
+import { parseWorldFileContent } from '../world/loader/worldLoader.js';
+import { CarLoader } from '../car/loader/carLoader.js';
 /**
  * StoreManager — Singleton that loads preloaded assets from /store/ via manifest.json.
  * Provides active world/car selection persisted to localStorage.
@@ -29,7 +31,6 @@ const SM_ARRAY_LS_KEYS = ['bestPool', 'raceCars', 'loadedWorlds', 'loadedCars'];
 function smGenId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
-
 /** Detect start/target markers in a world data object. */
 function smWorldMarkers(data) {
   const markings = data.markings || [];
@@ -38,7 +39,6 @@ function smWorldMarkers(data) {
     hasEndMarker: markings.some((m) => m.type === 'target'),
   };
 }
-
 /**
  * Persist a value to localStorage. On QuotaExceededError, warn and keep the
  * in-memory copy so oversized files still work for the current session.
@@ -54,7 +54,6 @@ function smPersist(key, value, name) {
     );
   }
 }
-
 /** Normalize a stored world id, mapping legacy bare filenames to `store:`. */
 function smNormalizeWorldId(raw) {
   if (
@@ -66,7 +65,6 @@ function smNormalizeWorldId(raw) {
   }
   return `store:${raw}`; // legacy bare filename
 }
-
 /** Read & normalize the active-car ids from localStorage. */
 function smReadActiveCarIds() {
   const raw = localStorage.getItem(SM_ACTIVE_CAR_KEY);
@@ -79,7 +77,6 @@ function smReadActiveCarIds() {
     id.startsWith('store:') || id.startsWith('loaded:') ? id : `store:${id}`,
   );
 }
-
 /**
  * Item count for array-backed tracked keys (bestPool, raceCars, loadedWorlds,
  * loadedCars). Returns null for non-array keys (e.g. 'editorWorld') or
@@ -90,8 +87,7 @@ function smCountItems(key, value) {
   const parsed = safeJsonParse(value);
   return Array.isArray(parsed) ? parsed.length : null;
 }
-
-class StoreManager {
+export class StoreManager {
   static instance = null;
   static initPromise = null;
   #worlds = [];
@@ -110,7 +106,6 @@ class StoreManager {
     this.initPromise = this.load();
     return this.initPromise;
   }
-
   static async load() {
     const mgr = new StoreManager();
     // Migrate legacy keys and load user assets before touching the network so
@@ -179,7 +174,6 @@ class StoreManager {
     this.instance = mgr;
     return mgr;
   }
-
   /**
    * Migrate legacy localStorage keys and hydrate user-loaded assets + editor
    * world into memory. Runs once during init().
@@ -201,31 +195,25 @@ class StoreManager {
     this.#loadedCars =
       safeJsonParse(localStorage.getItem(SM_LOADED_CARS_KEY)) ?? [];
   }
-
   // --- Getters ---
   getWorlds() {
     return this.#worlds;
   }
-
   getCars() {
     return this.#cars;
   }
-
   /** User-loaded worlds (insertion order). */
   getLoadedWorlds() {
     return this.#loadedWorlds;
   }
-
   /** User-loaded cars (insertion order). */
   getLoadedCars() {
     return this.#loadedCars;
   }
-
   /** The world saved by the world editor, or null. */
   getEditorWorld() {
     return this.#editorWorld;
   }
-
   /**
    * Persist the world editor's current world (in memory + localStorage).
    * Returns false if it could not be persisted (e.g. quota exceeded); the
@@ -244,7 +232,6 @@ class StoreManager {
       return false;
     }
   }
-
   /**
    * All selectable worlds across sources, ordered loaded → editor → store so the
    * user's own files surface first.
@@ -281,7 +268,6 @@ class StoreManager {
     }
     return out;
   }
-
   /** All selectable cars across sources, ordered loaded → store. */
   getAllCars() {
     const out = [];
@@ -298,42 +284,35 @@ class StoreManager {
     }
     return out;
   }
-
   // --- Active world selection (id-based) ---
   /** Active world id, e.g. `store:circle.world` | `loaded:x` | `editor`. */
   getActiveWorldId() {
     const raw = localStorage.getItem(SM_ACTIVE_WORLD_KEY);
     return raw ? smNormalizeWorldId(raw) : null;
   }
-
   setActiveWorldId(id) {
     localStorage.setItem(SM_ACTIVE_WORLD_KEY, id);
   }
-
   /** Get the currently active world data (parsed JSON object), or null. */
   getActiveWorld() {
     const id = this.getActiveWorldId();
     if (!id) return null;
     return this.getAllWorlds().find((w) => w.id === id)?.data ?? null;
   }
-
   /** Name of the active world for display, or null. */
   getActiveWorldName() {
     const id = this.getActiveWorldId();
     if (!id) return null;
     return this.getAllWorlds().find((w) => w.id === id)?.name ?? null;
   }
-
   // --- Active car selection (id-based, multi) ---
   /** Active car ids in selection order. */
   getActiveCarIds() {
     return smReadActiveCarIds();
   }
-
   setActiveCarIds(ids) {
     localStorage.setItem(SM_ACTIVE_CAR_KEY, JSON.stringify(ids));
   }
-
   /** Toggle a car id in the active set (multi-select). */
   toggleActiveCarId(id) {
     const current = this.getActiveCarIds();
@@ -342,7 +321,6 @@ class StoreManager {
       : [...current, id];
     this.setActiveCarIds(next);
   }
-
   /** Get all active cars' data (in selection order). */
   getActiveCars() {
     const all = this.getAllCars();
@@ -350,12 +328,10 @@ class StoreManager {
       .map((id) => all.find((c) => c.id === id)?.data)
       .filter((d) => Boolean(d));
   }
-
   /** Get the first active car's data, or null. */
   getActiveCar() {
     return this.getActiveCars()[0] ?? null;
   }
-
   /** Names of the active cars for display (in selection order). */
   getActiveCarNames() {
     const all = this.getAllCars();
@@ -363,7 +339,6 @@ class StoreManager {
       .map((id) => all.find((c) => c.id === id)?.name)
       .filter((n) => Boolean(n));
   }
-
   // --- Loaded asset management ---
   /**
    * Add a user-loaded world. Persists to localStorage when it fits; on quota
@@ -385,7 +360,6 @@ class StoreManager {
       ...smWorldMarkers(entry.data),
     };
   }
-
   /**
    * Add a user-loaded car. Persists to localStorage when it fits; on quota
    * overflow keeps it in memory only (lost on refresh). Returns the new entry.
@@ -405,7 +379,6 @@ class StoreManager {
       data: entry.data,
     };
   }
-
   // --- localStorage state management ---
   getLocalStorageStates() {
     const entries = [];
@@ -421,12 +394,10 @@ class StoreManager {
     }
     return entries;
   }
-
   /** Number of tracked localStorage keys. */
   static getTrackedKeyCount() {
     return SM_TRACKED_LS_KEYS.length;
   }
-
   /**
    * Item count for array-backed tracked keys (bestPool, raceCars, loadedWorlds,
    * loadedCars). Returns null for non-array keys (e.g. 'editorWorld') or
@@ -437,7 +408,6 @@ class StoreManager {
       localStorage.removeItem(key);
     }
   }
-
   exportLocalStorageKey(key) {
     const value = localStorage.getItem(key);
     if (value === null) return;
@@ -449,63 +419,51 @@ class StoreManager {
     a.click();
     URL.revokeObjectURL(url);
   }
-
   // --- Static convenience methods (require init() to have been called) ---
   /** The initialized singleton instance, or null if init() has not run. */
   static getInstance() {
     return this.instance;
   }
-
   /** Get the active world (static convenience). Returns null if not initialized or no active world. */
   static getActiveWorld() {
     return this.instance?.getActiveWorld() ?? null;
   }
-
   /** Get the world saved by the world editor (static convenience). */
   static getEditorWorld() {
     return this.instance?.getEditorWorld() ?? null;
   }
-
   /** Get the active world's display name (static convenience). */
   static getActiveWorldName() {
     return this.instance?.getActiveWorldName() ?? null;
   }
-
   /** Get the active cars' display names (static convenience). */
   static getActiveCarNames() {
     return this.instance?.getActiveCarNames() ?? [];
   }
-
   /** Get all stored cars (static convenience). Returns [] if not initialized. */
   static getCars() {
     return this.instance?.getCars() ?? [];
   }
-
   /** Get the active car (static convenience). Returns null if not initialized or no active car. */
   static getActiveCar() {
     return this.instance?.getActiveCar() ?? null;
   }
-
   /** Get all active cars (static convenience). Returns [] if not initialized. */
   static getActiveCars() {
     return this.instance?.getActiveCars() ?? [];
   }
-
   /** Get all selectable worlds across sources (static convenience). */
   static getAllWorlds() {
     return this.instance?.getAllWorlds() ?? [];
   }
-
   /** Get all selectable cars across sources (static convenience). */
   static getAllCars() {
     return this.instance?.getAllCars() ?? [];
   }
-
   /** Get the active world id (static convenience). */
   static getActiveWorldId() {
     return this.instance?.getActiveWorldId() ?? null;
   }
-
   /** Get the active car ids (static convenience). */
   static getActiveCarIds() {
     return this.instance?.getActiveCarIds() ?? [];

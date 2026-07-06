@@ -1,4 +1,10 @@
-class StopEditor extends MarkingEditor {
+import { MarkingEditor } from './markingEditor.js';
+import { Viewport } from '../../viewport/viewport.js';
+import { World } from '../world.js';
+import { Point } from '../../math/primitives/point.js';
+import { Stop } from '../markings/stop.js';
+
+export class StopEditor extends MarkingEditor {
   /**
    * Editor for creating Stop markings.
    * Targets lane guide segments.

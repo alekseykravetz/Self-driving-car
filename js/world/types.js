@@ -1,5 +1,4 @@
-'use strict';
-const DEFAULT_LAYER_VISIBILITY = {
+export const DEFAULT_LAYER_VISIBILITY = {
   roads: true,
   markings: true,
   corridors: true,

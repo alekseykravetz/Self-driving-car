@@ -1,5 +1,6 @@
-'use strict';
-class Start extends Marking {
+import { Marking } from './marking.js';
+import { angle } from '../../math/utils.js';
+export class Start extends Marking {
   // Property to hold the car image element
   image;
   // Override the type from the base Marking class
@@ -19,7 +20,6 @@ class Start extends Marking {
       console.error(`Failed to load start marking image: ${this.image.src}`);
     };
   }
-
   /**
    * Draws the start marking (the car image) on the canvas.
    * @param ctx The canvas rendering context.

@@ -10,7 +10,18 @@
  * chosen subset of stages.
  */
 
-interface WorldGeneratable {
+import { Graph } from '../../math/graph/graph.js';
+import { Envelope } from '../../math/primitives/envelope.js';
+import { Segment } from '../../math/primitives/segment.js';
+import { Point } from '../../math/primitives/point.js';
+import { Polygon } from '../../math/primitives/polygon.js';
+import { Building } from '../items/building.js';
+import { Tree, TreePrototype, buildTreePrototypes } from '../items/tree.js';
+import { Marking } from '../markings/marking.js';
+import { Corridor } from '../corridor.js';
+import { add, scale, lerp, distance, mulberry32 } from '../../math/utils.js';
+
+export interface WorldGeneratable {
   graph: Graph;
   roadWidth: number;
   roadRoundness: number;
@@ -219,7 +230,7 @@ function wgPickTreeType(r: number): number {
   return 2;
 }
 
-class WorldGenerator {
+export class WorldGenerator {
   /**
    * Cheap, deterministic road geometry: envelopes, road borders, lane guides
    * and separator borders. Safe to run on every graph edit.

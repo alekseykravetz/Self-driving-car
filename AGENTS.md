@@ -25,14 +25,14 @@
 
 ## Key commands
 
-| Command | Purpose |
-|---|---|
-| `npm start` | Full dev: tsc watch + server + lint/format |
-| `npm run tsc:watch` | Compile TS on save only |
-| `npm run serve` | Static server on :9090 |
-| `npm run lint` | ESLint auto-fix |
-| `npm run format` | Prettier (singleQuote: true) |
-| `npm run fix:all` | format + lint |
+| Command                | Purpose                                       |
+| ---------------------- | --------------------------------------------- |
+| `npm start`            | Full dev: tsc watch + server + lint/format    |
+| `npm run tsc:watch`    | Compile TS on save only                       |
+| `npm run serve`        | Static server on :9090                        |
+| `npm run lint`         | ESLint auto-fix                               |
+| `npm run format`       | Prettier (singleQuote: true)                  |
+| `npm run fix:all`      | format + lint                                 |
 | `npm run publish:site` | Deploy via here.now (scripts/publish-site.sh) |
 
 ## Entry points
@@ -49,9 +49,9 @@
 
 ## Persistence
 
-| localStorage key | Content |
-|---|---|
-| `bestPool` | Top-K car configs with brains |
-| `raceCars` | Cars loaded via race "Load car(s)" |
-| `editorWorld` | World saved by editor |
-| `store:activeWorld` / `store:activeCar` | Active store selection |
+| localStorage key                        | Content                            |
+| --------------------------------------- | ---------------------------------- |
+| `bestPool`                              | Top-K car configs with brains      |
+| `raceCars`                              | Cars loaded via race "Load car(s)" |
+| `editorWorld`                           | World saved by editor              |
+| `store:activeWorld` / `store:activeCar` | Active store selection             |

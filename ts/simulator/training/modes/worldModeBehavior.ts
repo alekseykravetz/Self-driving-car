@@ -1,4 +1,22 @@
-function updateWorldCars(
+import type { TrainingSimulator } from '../trainingSimulator.js';
+import { SpatialHashGrid } from '../../../math/spatialGrid.js';
+import type { GridSegment } from '../../../math/spatialGrid.js';
+import type { BorderMode } from '../../../panels/modeControls.js';
+import type { Car } from '../../../car/car.js';
+import type { Segment } from '../../../math/primitives/segment.js';
+import { Point } from '../../../math/primitives/point.js';
+import { World } from '../../../world/world.js';
+import { Graph } from '../../../math/graph/graph.js';
+import { Viewport } from '../../../viewport/viewport.js';
+import { MiniMap } from '../../../mini-map/miniMap.js';
+import { Camera } from '../../../camera/camera.js';
+import { StoreManager } from '../../../store/storeManager.js';
+import { queryBordersNearCar } from '../../spatialGridUtils.js';
+import { handleCollisionWithRoadBorders } from './borderCollision.js';
+import { drawSimulatorCars } from '../rendering/carRenderer.js';
+import { scale } from '../../../math/utils.js';
+
+export function updateWorldCars(
   cars: Car[],
   borderGrid: SpatialHashGrid,
   borderMode: BorderMode,
@@ -45,7 +63,7 @@ function updateWorldCars(
   return { aliveCount, deadCount, frozenCount };
 }
 
-class WorldTrainingStrategy {
+export class WorldTrainingStrategy {
   #parent: TrainingSimulator;
   #borderGrid: SpatialHashGrid = new SpatialHashGrid(150);
 

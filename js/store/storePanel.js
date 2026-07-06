@@ -1,12 +1,12 @@
-'use strict';
 /**
  * <store-panel> — Custom element for the main landing page.
  * Shows preloaded store assets (worlds, cars) and localStorage state.
  * Allows selecting active world/car for use by simulator, race, and world editor.
  */
-// File-scope helpers (kept out of the class so the class name is never
-// referenced inside its own body — that makes tsc emit a global `var _a`
-// alias that collides with other globally-loaded classes' aliases).
+import { StoreManager } from './storeManager.js';
+import { STORE_PANEL_TEMPLATE } from './templates/storePanelTemplate.js';
+import { stripFileExtension } from '../utils.js';
+// File-scope helpers.
 /** Format a car's hidden-layer pattern, e.g. "6" or "16,16". */
 function spFormatHiddenLayers(data) {
   if (data.hiddenLayers && data.hiddenLayers.length > 0) {
@@ -21,7 +21,6 @@ function spFormatHiddenLayers(data) {
   }
   return '-';
 }
-
 /** Format a byte size from a JS string length (UTF-16). */
 function spFormatSize(chars) {
   const bytes = chars * 2; // JS strings are UTF-16
@@ -29,8 +28,7 @@ function spFormatSize(chars) {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
-
-class StorePanelElement extends HTMLElement {
+export class StorePanelElement extends HTMLElement {
   #storeManager = null;
   /** Active sort column/direction per tab. `null` means unsorted. */
   #sortState = {
@@ -38,11 +36,9 @@ class StorePanelElement extends HTMLElement {
     cars: null,
     localStorage: null,
   };
-
   constructor() {
     super();
   }
-
   connectedCallback() {
     this.innerHTML = STORE_PANEL_TEMPLATE;
     this.#initTabs();
@@ -63,7 +59,6 @@ class StorePanelElement extends HTMLElement {
       }
     });
   }
-
   async #loadData() {
     this.#storeManager = await StoreManager.init();
     this.#renderWorlds();
@@ -71,7 +66,6 @@ class StorePanelElement extends HTMLElement {
     this.#renderLocalStorage();
     this.#updateTabCounts();
   }
-
   #initTabs() {
     const tabs = this.querySelectorAll('.store-tab');
     tabs.forEach((tab) => {
@@ -87,7 +81,6 @@ class StorePanelElement extends HTMLElement {
       });
     });
   }
-
   /** Wire click-to-sort on sortable column headers (one active column per tab). */
   #initSorting() {
     this.querySelectorAll('th.sortable').forEach((th) => {
@@ -107,7 +100,6 @@ class StorePanelElement extends HTMLElement {
       });
     });
   }
-
   /** Update the asc/desc indicator classes on a tab's sortable headers. */
   #updateSortIndicators(tab) {
     const content = this.querySelector(
@@ -122,7 +114,6 @@ class StorePanelElement extends HTMLElement {
       }
     });
   }
-
   /**
    * Return a sorted copy of `rows` according to the tab's sort state.
    * Numeric values compare numerically; everything else as strings.
@@ -146,7 +137,6 @@ class StorePanelElement extends HTMLElement {
     });
     return sorted;
   }
-
   #renderWorlds() {
     const mgr = this.#storeManager;
     const worlds = mgr.getAllWorlds();
@@ -190,7 +180,6 @@ class StorePanelElement extends HTMLElement {
       .join('');
     this.#updateSortIndicators('worlds');
   }
-
   #renderCars() {
     const mgr = this.#storeManager;
     const cars = mgr.getAllCars();
@@ -249,7 +238,6 @@ class StorePanelElement extends HTMLElement {
       .join('');
     this.#updateSortIndicators('cars');
   }
-
   #renderLocalStorage() {
     const mgr = this.#storeManager;
     const entries = mgr.getLocalStorageStates();
@@ -305,7 +293,6 @@ class StorePanelElement extends HTMLElement {
     });
     this.#updateSortIndicators('localStorage');
   }
-
   /** Update the count badges in the tab buttons (selected/total, present/tracked). */
   #updateTabCounts() {
     const mgr = this.#storeManager;
@@ -324,7 +311,6 @@ class StorePanelElement extends HTMLElement {
       `${lsEntries.length}/${StoreManager.getTrackedKeyCount()}`,
     );
   }
-
   #setTabCount(tab, text) {
     const span = this.querySelector(`.store-tab-count[data-count="${tab}"]`);
     if (span) span.textContent = `(${text})`;

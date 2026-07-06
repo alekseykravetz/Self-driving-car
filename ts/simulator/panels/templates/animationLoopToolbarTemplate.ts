@@ -1,4 +1,4 @@
-const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
+export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
     <div class="controls-group">
       <span class="controls-group-label">Loop</span>
       <div class="border-mode-group">
