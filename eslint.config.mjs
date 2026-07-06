@@ -268,6 +268,10 @@ const allowedUnusedVars = [
   // shared spatial grid utilities
   'queryBordersNearCar',
   'pointToSegmentDistanceSq',
+
+  // training strategies
+  'SimpleTrainingStrategy',
+  'WorldTrainingStrategy',
 ];
 
 const varsIgnorePattern = `^(_|${allowedUnusedVars.join('|')})$`;
@@ -574,6 +578,10 @@ const myGlobals = {
     buildRoadBorders: 'readonly',
     queryBordersNearCar: 'readonly',
     pointToSegmentDistanceSq: 'readonly',
+
+    // training strategies
+    SimpleTrainingStrategy: 'readonly',
+    WorldTrainingStrategy: 'readonly',
   },
 };
 

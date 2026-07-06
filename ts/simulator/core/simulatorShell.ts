@@ -38,27 +38,27 @@ function saveSimLayerVisibility(v: WorldLayerVisibility): void {
 }
 
 abstract class SimulatorShell {
-  protected gameCanvas: HTMLCanvasElement;
-  protected gameCtx: CanvasRenderingContext2D;
+  gameCanvas: HTMLCanvasElement;
+  gameCtx: CanvasRenderingContext2D;
   protected networkCanvas: HTMLCanvasElement;
   protected networkCtx: CanvasRenderingContext2D;
   protected networkVisualizer: NetworkVisualizer = new NetworkVisualizer();
-  protected miniMapCanvas: HTMLCanvasElement;
+  miniMapCanvas: HTMLCanvasElement;
   protected cameraCanvas: HTMLCanvasElement;
-  protected cameraCtx: CanvasRenderingContext2D;
+  cameraCtx: CanvasRenderingContext2D;
 
-  protected viewport: Viewport | null = null;
-  protected miniMap: MiniMap | null = null;
-  protected camera: Camera | null = null;
+  viewport: Viewport | null = null;
+  miniMap: MiniMap | null = null;
+  camera: Camera | null = null;
 
   // Shared UI panels (custom elements present on every simulator page).
-  protected toolbarPanel: WorldToolbarElement;
-  protected layoutToolbar: LayoutToolbarElement;
-  protected animationLoopToolbar: AnimationLoopToolbarElement;
+  toolbarPanel: WorldToolbarElement;
+  layoutToolbar: LayoutToolbarElement;
+  animationLoopToolbar: AnimationLoopToolbarElement;
 
   // Per-layer visibility for the top-down 2D view and the 3D camera view.
   // Backed by the optional <world-layers-toolbar> and persisted to localStorage.
-  protected worldLayers: WorldLayerVisibility = loadSimLayerVisibility();
+  worldLayers: WorldLayerVisibility = loadSimLayerVisibility();
   protected worldLayersToolbar: WorldLayersToolbarElement | null = null;
 
   // Render throttle: physics runs every animation frame, the (heavier) render
@@ -161,7 +161,7 @@ abstract class SimulatorShell {
    * Resize the multi-panel canvas layout to the current window/panel state.
    * Called from the subclass draw pass (before the viewport reset).
    */
-  protected resizeLayout(): void {
+  resizeLayout(): void {
     resizeSimulatorLayout(
       {
         gameCanvas: this.gameCanvas,
@@ -183,10 +183,7 @@ abstract class SimulatorShell {
    * Render the neural-network visualizer for the given brain into the network
    * canvas. No-op when the visualizer toggle is off or no brain is provided.
    */
-  protected drawNetworkVisualizer(
-    time: number,
-    brain: NeuralNetwork | undefined,
-  ): void {
+  drawNetworkVisualizer(time: number, brain: NeuralNetwork | undefined): void {
     if (!this.layoutToolbar.showVisualizer) return;
     this.networkCtx.clearRect(
       0,

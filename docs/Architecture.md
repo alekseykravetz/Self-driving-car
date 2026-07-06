@@ -195,6 +195,8 @@ graph TD
     Car --> TrafficSimulator
     TrainingPanel --> TrainingSimulator
     SimulatorShell --> TrainingSimulator
+    SimpleTrainingStrategy --> TrainingSimulator
+    WorldTrainingStrategy --> TrainingSimulator
     SimulatorShell --> TrafficSimulator
     SimulatorShell --> RaceSimulator
     TrafficPanel --> TrafficSimulator
@@ -284,18 +286,19 @@ Environment generation and interactive editing.
 
 Training environments and genetic algorithm orchestration.
 
-| Module                        | Responsibility                                                                 |
-| ----------------------------- | ------------------------------------------------------------------------------ |
-| `trainingPanel.ts`            | Custom element: training UI + genetic algorithm orchestration + car generation |
-| `trainingSimulator.ts`        | Unified simulator: world mode (default) + simple mode (`?mode=simple`)         |
-| `genetics/poolManager.ts`     | Pure functions for car creation, brain application, pool sorting               |
-| `genetics/storageManager.ts`  | localStorage persistence: load/save/discard/legacy migration                   |
-| `modes/trafficFactory.ts`     | Traffic row generation for simple mode                                         |
-| `modes/simpleModeBehavior.ts` | Simple-mode update loop: traffic spawning, car updates, idle detection         |
-| `modes/borderCollision.ts`    | Collision response: push cars back onto road instead of stopping               |
-| `rendering/layoutManager.ts`  | Canvas resize logic for multi-panel layout                                     |
-| `rendering/carRenderer.ts`    | Simulator-specific car drawing: pool highlighting, name labels, layering       |
-| `templates/`                  | HTML template strings for custom elements                                      |
+| Module                        | Responsibility                                                                          |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| `trainingPanel.ts`            | Custom element: training UI + genetic algorithm orchestration + car generation          |
+| `trainingSimulator.ts`        | Strategy host: shared state + helpers, delegates per-mode behavior to a strategy object |
+| `genetics/poolManager.ts`     | Pure functions for car creation, brain application, pool sorting                        |
+| `genetics/storageManager.ts`  | localStorage persistence: load/save/discard/legacy migration                            |
+| `modes/trafficFactory.ts`     | Traffic row generation for simple mode                                                  |
+| `modes/simpleModeBehavior.ts` | `SimpleSimState` + pure update functions + `SimpleTrainingStrategy` class               |
+| `modes/worldModeBehavior.ts`  | Pure `updateWorldCars()` function + `WorldTrainingStrategy` class                       |
+| `modes/borderCollision.ts`    | Collision response: push cars back onto road instead of stopping                        |
+| `rendering/layoutManager.ts`  | Canvas resize logic for multi-panel layout                                              |
+| `rendering/carRenderer.ts`    | Simulator-specific car drawing: pool highlighting, name labels, layering                |
+| `templates/`                  | HTML template strings for custom elements                                               |
 
 ### 5b. Shared Simulator Utilities (`ts/simulator/`)
 
@@ -305,9 +308,7 @@ Functions shared by all canvas-based simulators (TrainingSimulator, TrafficSimul
 | --------------------- | --------------------------------------------------------------------------- |
 | `spatialGridUtils.ts` | `buildRoadBorders()`, `queryBordersNearCar()`, `pointToSegmentDistanceSq()` |
 
-### 5c. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
-
-### 5c. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
+### 5d. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
 
 Scaffolding shared by every canvas-based simulator, plus the concrete simulators
 built on it (Live Traffic Jam, Racing).
@@ -322,12 +323,18 @@ built on it (Live Traffic Jam, Racing).
 | `racing/raceSimulator.ts`     | Racing mode: competitive race from Start to Target markings with AI opponents, corridor progress tracking, countdown                                                                                 |
 | `racing/racePanel.ts`         | Race-specific DOM construction, statistics panel, restart button, countdown UI                                                                                                                       |
 
-`TrainingSimulator` (`ts/simulator/training/trainingSimulator.ts`),
-`TrafficSimulator`, and `RaceSimulator` all extend `SimulatorShell`, which owns
-the generic, non-domain scaffolding so each simulator only implements its own
-`update()` / `draw()` behaviour.
+`TrainingSimulator` (`ts/simulator/training/trainingSimulator.ts`) extends
+`SimulatorShell` and uses the **strategy pattern** — it detects the mode from the
+URL parameter (`?mode=simple`) and delegates per-frame `update()` / `draw()` calls
+to either a `SimpleTrainingStrategy` or `WorldTrainingStrategy` instance
+(in `modes/simpleModeBehavior.ts` / `modes/worldModeBehavior.ts`). Mode-specific
+state (`SimpleSimState`, `SpatialHashGrid`) lives in the strategies while shared
+helpers (`getStartInfo`, `updateRoadBorders`, `openInitModal`, …) stay on
+`TrainingSimulator`.
 
-### 5b. Reusable Loaders (`ts/world/loader/`, `ts/car/loader/`)
+`TrafficSimulator` and `RaceSimulator` extend `SimulatorShell` directly.
+
+### 5e. Reusable Loaders (`ts/world/loader/`, `ts/car/loader/`)
 
 | Module                        | Responsibility                                               |
 | ----------------------------- | ------------------------------------------------------------ |
@@ -559,18 +566,19 @@ class Corridor {
 
 ## Design Patterns
 
-| Pattern                    | Usage                                                                                |
-| -------------------------- | ------------------------------------------------------------------------------------ |
-| **Custom HTML Elements**   | UI panels self-contain template, DOM queries, event listeners, and public state      |
-| **Composition**            | Cars contain Sensors, Controls, and NeuralNetworks as separate objects               |
-| **Static factory methods** | `World.load()`, `Graph.load()`, `Marking.load()` for deserialization                 |
-| **Painter's algorithm**    | 3D objects sorted by distance and drawn back-to-front                                |
-| **Genetic pool breeding**  | Top K parents produce offspring via random crossover + mutation                      |
-| **Ray casting**            | Sensor perception and point-in-polygon containment testing                           |
-| **Envelope wrapping**      | Roads generated by wrapping graph segments in rounded polygons, then unioning        |
-| **Interface polymorphism** | `IWorld` lets TrainingSimulator/Camera work with both `World` and `SimpleWorld`      |
-| **Spatial filtering**      | Binary-search or Manhattan-distance to reduce per-car collision checks               |
-| **Pure functions**         | `poolManager.ts`, `trafficFactory.ts` — stateless logic extracted from UI components |
+| Pattern                    | Usage                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Custom HTML Elements**   | UI panels self-contain template, DOM queries, event listeners, and public state                          |
+| **Composition**            | Cars contain Sensors, Controls, and NeuralNetworks as separate objects                                   |
+| **Static factory methods** | `World.load()`, `Graph.load()`, `Marking.load()` for deserialization                                     |
+| **Painter's algorithm**    | 3D objects sorted by distance and drawn back-to-front                                                    |
+| **Genetic pool breeding**  | Top K parents produce offspring via random crossover + mutation                                          |
+| **Ray casting**            | Sensor perception and point-in-polygon containment testing                                               |
+| **Envelope wrapping**      | Roads generated by wrapping graph segments in rounded polygons, then unioning                            |
+| **Interface polymorphism** | `IWorld` lets TrainingSimulator/Camera work with both `World` and `SimpleWorld`                          |
+| **Spatial filtering**      | Binary-search or Manhattan-distance to reduce per-car collision checks                                   |
+| **Strategy pattern**       | `TrainingSimulator` delegates `update()`/`draw()` to `SimpleTrainingStrategy` or `WorldTrainingStrategy` |
+| **Pure functions**         | `poolManager.ts`, `trafficFactory.ts` — stateless logic extracted from UI components                     |
 
 ---
 

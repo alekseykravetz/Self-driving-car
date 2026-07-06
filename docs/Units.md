@@ -66,12 +66,12 @@ Examples:
 
 Defined in `ts/car/config.ts`:
 
-| Constant                     | Value | Unit          | Description                                                   |
-| ---------------------------- | ----- | ------------- | ------------------------------------------------------------- |
-| `STEERING_SPEED`             | 0.03  | rad/frame     | Steering angle delta per frame                                |
-| `REVERSE_SPEED_RATIO`        | 0.5   | (ratio)       | Reverse speed cap as a fraction of `maxSpeed`                 |
-| `COLLISION_ANGLE_CORRECTION` | 0.1   | rad           | Angle correction applied when a car collides with road borders |
-| `BODY_MARGIN_RATIO`          | 0.5   | (ratio)       | Car body diagonal multiplier for obstacle proximity checks    |
+| Constant                     | Value | Unit      | Description                                                    |
+| ---------------------------- | ----- | --------- | -------------------------------------------------------------- |
+| `STEERING_SPEED`             | 0.03  | rad/frame | Steering angle delta per frame                                 |
+| `REVERSE_SPEED_RATIO`        | 0.5   | (ratio)   | Reverse speed cap as a fraction of `maxSpeed`                  |
+| `COLLISION_ANGLE_CORRECTION` | 0.1   | rad       | Angle correction applied when a car collides with road borders |
+| `BODY_MARGIN_RATIO`          | 0.5   | (ratio)   | Car body diagonal multiplier for obstacle proximity checks     |
 
 ---
 
