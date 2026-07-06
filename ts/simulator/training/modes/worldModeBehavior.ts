@@ -55,33 +55,7 @@ function updateWorldCars(
     // Query only the border segments within the car's sensor/collision range.
     let bordersForUpdate: Point[][] = [];
     if (borderMode !== 'none') {
-      const rayLength = car.sensor?.rayLength ?? MIN_BORDER_RANGE;
-      const reach = Math.max(rayLength, MIN_BORDER_RANGE);
-
-      // Broad phase: grab every segment in the grid cells around the car.
-      const broadRadius = reach + borderGrid.cellSize;
-      const candidates = borderGrid.query(car.x, car.y, broadRadius);
-
-      // Narrow phase: keep only the segments this specific car can actually
-      // reach (sensor length + half the car body), discarding cell neighbours
-      // that are still too far. Squared distances avoid a sqrt per segment.
-      const bodyMargin = Math.hypot(car.width, car.height) * 0.5;
-      const narrowRadius = reach + bodyMargin;
-      const narrowRadiusSq = narrowRadius * narrowRadius;
-      for (let j = 0; j < candidates.length; j++) {
-        const seg = candidates[j];
-        const distSq = pointToSegmentDistanceSq(
-          car.x,
-          car.y,
-          seg[0].x,
-          seg[0].y,
-          seg[1].x,
-          seg[1].y,
-        );
-        if (distSq <= narrowRadiusSq) {
-          bordersForUpdate.push(seg);
-        }
-      }
+      bordersForUpdate = queryBordersNearCar(borderGrid, car);
     }
 
     car.update(bordersForUpdate);
@@ -89,30 +63,4 @@ function updateWorldCars(
   }
 
   return { aliveCount, deadCount, frozenCount };
-}
-
-/**
- * Squared distance from point (px, py) to the line segment (ax, ay)-(bx, by).
- * Allocation-free and sqrt-free, for hot per-car/per-segment filtering.
- */
-function pointToSegmentDistanceSq(
-  px: number,
-  py: number,
-  ax: number,
-  ay: number,
-  bx: number,
-  by: number,
-): number {
-  const abx = bx - ax;
-  const aby = by - ay;
-  const apx = px - ax;
-  const apy = py - ay;
-  const lenSq = abx * abx + aby * aby;
-  let t = lenSq > 0 ? (apx * abx + apy * aby) / lenSq : 0;
-  t = t < 0 ? 0 : t > 1 ? 1 : t;
-  const cx = ax + t * abx;
-  const cy = ay + t * aby;
-  const dx = px - cx;
-  const dy = py - cy;
-  return dx * dx + dy * dy;
 }

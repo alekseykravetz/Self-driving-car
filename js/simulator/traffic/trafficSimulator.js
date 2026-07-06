@@ -167,11 +167,7 @@ class TrafficSimulator extends SimulatorShell {
     // Snap the viewport to the start so the first click lands on visible road.
     this.viewport.offset.x = -startInfo.x;
     this.viewport.offset.y = -startInfo.y;
-    this.#roadBorders = [
-      ...this.#world.roadBorders,
-      ...this.#world.separatorBorders,
-      ...this.#world.corridors.flatMap((c) => c.borders),
-    ].map((s) => [s.p1, s.p2]);
+    this.#roadBorders = buildRoadBorders(this.#world);
     this.#borderGrid.build(this.#roadBorders);
   }
 
@@ -247,16 +243,9 @@ class TrafficSimulator extends SimulatorShell {
     const reachWithBodySq = reachWithBody * reachWithBody;
     const obstacles = [];
     // Road borders (broad-phase grid query + narrow-phase distance filter).
-    const broadRadius = reach + this.#borderGrid.cellSize;
-    const candidates = this.#borderGrid.query(car.x, car.y, broadRadius);
-    for (let j = 0; j < candidates.length; j++) {
-      const seg = candidates[j];
-      if (
-        pointSegDistSq(car.x, car.y, seg[0].x, seg[0].y, seg[1].x, seg[1].y) <=
-        reachWithBodySq
-      ) {
-        obstacles.push(seg);
-      }
+    const nearby = queryBordersNearCar(this.#borderGrid, car);
+    for (let j = 0; j < nearby.length; j++) {
+      obstacles.push(nearby[j]);
     }
     // Car-vs-car: small populations, so a distance-filtered O(n²) scan is fine.
     for (let j = 0; j < this.#cars.length; j++) {
@@ -416,27 +405,4 @@ class TrafficSimulator extends SimulatorShell {
       angle: -angle(direction) + Math.PI / 2,
     };
   }
-}
-/**
- * Squared distance from point (px, py) to segment (ax, ay)-(bx, by).
- * Allocation- and sqrt-free, for the hot per-car/per-segment border filter.
- *
- * Top-level (global) free function rather than a static/class method so it is
- * never referenced through a class name (which TypeScript would compile into a
- * shared global `_a` temp that collides across the classic <script> files this
- * project loads). The name is unique to this file to avoid global redeclaration.
- */
-function pointSegDistSq(px, py, ax, ay, bx, by) {
-  const abx = bx - ax;
-  const aby = by - ay;
-  const apx = px - ax;
-  const apy = py - ay;
-  const lenSq = abx * abx + aby * aby;
-  let t = lenSq > 0 ? (apx * abx + apy * aby) / lenSq : 0;
-  t = t < 0 ? 0 : t > 1 ? 1 : t;
-  const cx = ax + t * abx;
-  const cy = ay + t * aby;
-  const dx = px - cx;
-  const dy = py - cy;
-  return dx * dx + dy * dy;
 }

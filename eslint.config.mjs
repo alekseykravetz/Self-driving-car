@@ -260,6 +260,10 @@ const allowedUnusedVars = [
 
   // racing simulator
   'RaceSimulator',
+
+  // shared spatial grid utilities
+  'queryBordersNearCar',
+  'pointToSegmentDistanceSq',
 ];
 
 const varsIgnorePattern = `^(_|${allowedUnusedVars.join('|')})$`;
@@ -557,6 +561,11 @@ const myGlobals = {
 
     // race panel
     RacePanel: 'readonly',
+
+    // shared spatial grid utilities
+    buildRoadBorders: 'readonly',
+    queryBordersNearCar: 'readonly',
+    pointToSegmentDistanceSq: 'readonly',
   },
 };
 

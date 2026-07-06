@@ -166,8 +166,8 @@ class Car {
     };
   }
 
-  update(polygons: Point[][] = [], grid?: SpatialHashGrid): void {
-    const becameDamaged = this.physics.update(polygons, grid);
+  update(polygons: Point[][] = []): void {
+    const becameDamaged = this.physics.update(polygons);
     if (becameDamaged && this.type === 'KEYS') {
       explode();
     }
