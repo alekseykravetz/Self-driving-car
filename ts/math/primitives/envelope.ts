@@ -1,5 +1,5 @@
 class Envelope {
-  private skeleton: Segment;
+  #skeleton: Segment;
   public polygon: Polygon;
 
   constructor(
@@ -8,7 +8,7 @@ class Envelope {
     roundness: number = 1,
     generatedPolygon?: Polygon,
   ) {
-    this.skeleton = skeleton;
+    this.#skeleton = skeleton;
     if (generatedPolygon) {
       this.polygon = generatedPolygon;
     } else {
@@ -17,14 +17,15 @@ class Envelope {
   }
 
   static load(info: Envelope, width: number = 10, roundness: number = 1) {
-    const skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
-    const polygon = Polygon.load(info.polygon);
+    const d = info as unknown as { skeleton: Segment; polygon: Polygon };
+    const skeleton = new Segment(d.skeleton.p1, d.skeleton.p2);
+    const polygon = Polygon.load(d.polygon);
     const env = new Envelope(skeleton, width, roundness, polygon);
     return env;
   }
 
   #generatePolygon(width: number, roundness: number): Polygon {
-    const { p1, p2 } = this.skeleton!;
+    const { p1, p2 } = this.#skeleton!;
     const radius = width / 2;
     const alpha = angle(subtract(p1, p2));
     const alpha_cw = alpha + Math.PI / 2;

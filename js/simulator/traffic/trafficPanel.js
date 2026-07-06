@@ -49,10 +49,10 @@ class TrafficPanelElement extends HTMLElement {
   #selected = null;
   // Per-car row references, parallel to `#cars`, used for in-place refresh.
   #rows = [];
-  onSelect = null;
-  onRemove = null;
-  onClear = null;
-  onDeleteDamaged = null;
+  #onSelect = null;
+  #onRemove = null;
+  #onClear = null;
+  #onDeleteDamaged = null;
   constructor() {
     super();
     this.id = 'trafficStatsPanel';
@@ -62,11 +62,11 @@ class TrafficPanelElement extends HTMLElement {
     this.innerHTML = TRAFFIC_PANEL_TEMPLATE;
     const clearBtn = this.querySelector('#trafficClearBtn');
     clearBtn?.addEventListener('click', () => {
-      if (this.onClear) this.onClear();
+      if (this.#onClear) this.#onClear();
     });
     const deleteDamagedBtn = this.querySelector('#trafficDeleteDamagedBtn');
     deleteDamagedBtn?.addEventListener('click', () => {
-      if (this.onDeleteDamaged) this.onDeleteDamaged();
+      if (this.#onDeleteDamaged) this.#onDeleteDamaged();
     });
   }
 
@@ -79,19 +79,19 @@ class TrafficPanelElement extends HTMLElement {
   }
 
   setSelectListener(listener) {
-    this.onSelect = listener;
+    this.#onSelect = listener;
   }
 
   setRemoveListener(listener) {
-    this.onRemove = listener;
+    this.#onRemove = listener;
   }
 
   setClearListener(listener) {
-    this.onClear = listener;
+    this.#onClear = listener;
   }
 
   setDeleteDamagedListener(listener) {
-    this.onDeleteDamaged = listener;
+    this.#onDeleteDamaged = listener;
   }
 
   /** Rebuild the car list. Call when cars are added or removed. */
@@ -196,7 +196,7 @@ class TrafficPanelElement extends HTMLElement {
     row.addEventListener('click', () => this.#select(car));
     remove.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (this.onRemove) this.onRemove(car);
+      if (this.#onRemove) this.#onRemove(car);
     });
     return { car, row, status, speed, dist, swatch };
   }
@@ -204,7 +204,7 @@ class TrafficPanelElement extends HTMLElement {
   #select(car) {
     this.#selected = car;
     this.refresh();
-    if (this.onSelect) this.onSelect(car);
+    if (this.#onSelect) this.#onSelect(car);
   }
 }
 customElements.define('traffic-panel', TrafficPanelElement);

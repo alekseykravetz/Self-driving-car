@@ -32,7 +32,7 @@ function spFormatSize(chars: number): string {
 }
 
 class StorePanelElement extends HTMLElement {
-  private storeManager: StoreManager | null = null;
+  #storeManager: StoreManager | null = null;
 
   /** Active sort column/direction per tab. `null` means unsorted. */
   #sortState: Record<string, { key: string; dir: 1 | -1 } | null> = {
@@ -53,14 +53,14 @@ class StorePanelElement extends HTMLElement {
 
     // Re-render localStorage tab when storage changes in another tab
     window.addEventListener('storage', () => {
-      if (this.storeManager) {
+      if (this.#storeManager) {
         this.#renderLocalStorage();
         this.#updateTabCounts();
       }
     });
     // Re-render when user returns to this tab (same-tab navigation)
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.storeManager) {
+      if (!document.hidden && this.#storeManager) {
         this.#renderLocalStorage();
         this.#updateTabCounts();
       }
@@ -68,7 +68,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   async #loadData(): Promise<void> {
-    this.storeManager = await StoreManager.init();
+    this.#storeManager = await StoreManager.init();
     this.#renderWorlds();
     this.#renderCars();
     this.#renderLocalStorage();
@@ -162,7 +162,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   #renderWorlds(): void {
-    const mgr = this.storeManager!;
+    const mgr = this.#storeManager!;
     const worlds = mgr.getAllWorlds();
     const tbody =
       this.querySelector<HTMLTableSectionElement>('#storeWorldsBody')!;
@@ -210,7 +210,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   #renderCars(): void {
-    const mgr = this.storeManager!;
+    const mgr = this.#storeManager!;
     const cars = mgr.getAllCars();
     const tbody =
       this.querySelector<HTMLTableSectionElement>('#storeCarsBody')!;
@@ -273,7 +273,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   #renderLocalStorage(): void {
-    const mgr = this.storeManager!;
+    const mgr = this.#storeManager!;
     const entries = mgr.getLocalStorageStates();
     const tbody = this.querySelector<HTMLTableSectionElement>(
       '#storeLocalStorageBody',
@@ -341,7 +341,7 @@ class StorePanelElement extends HTMLElement {
 
   /** Update the count badges in the tab buttons (selected/total, present/tracked). */
   #updateTabCounts(): void {
-    const mgr = this.storeManager;
+    const mgr = this.#storeManager;
     if (!mgr) return;
 
     const worlds = mgr.getAllWorlds();

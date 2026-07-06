@@ -18,17 +18,17 @@ class TrainingPanelElement extends HTMLElement {
   // Per-frame counter used to throttle the pool-table + status-dot DOM refresh.
   // The pool/best-car selection itself runs every frame (needed for camera
   // tracking and metrics); only the UI rendering is rate-limited.
-  private domRefreshCounter: number = 0;
-  private static readonly DOM_REFRESH_INTERVAL = 15;
+  #domRefreshCounter: number = 0;
+  static readonly DOM_REFRESH_INTERVAL = 15;
 
-  private evaluateFitness: (car: Car) => number = () => 0;
-  private getStartInfo: () => { x: number; y: number; angle: number } = () => ({
+  #evaluateFitness: (car: Car) => number = () => 0;
+  #getStartInfo: () => { x: number; y: number; angle: number } = () => ({
     x: 0,
     y: 0,
     angle: 0,
   });
 
-  private onCarsCreatedCallback: (cars: Car[]) => void = () => {};
+  #onCarsCreatedCallback: (cars: Car[]) => void = () => {};
 
   // Optional override for the "New Training" button. When set (by the training
   // simulator), the button opens the training-init modal instead of restarting
@@ -36,46 +36,46 @@ class TrainingPanelElement extends HTMLElement {
   #newTrainingHandler: (() => void) | null = null;
 
   // DOM Elements
-  private carCountInput: HTMLInputElement | null = null;
-  private thresholdInput: HTMLInputElement | null = null;
-  private poolCountInput: HTMLInputElement | null = null;
-  private idleRangeInput: HTMLInputElement | null = null;
-  private nextGenBtn: HTMLButtonElement | null = null;
-  private newTrainingBtn: HTMLButtonElement | null = null;
-  private saveBtn: HTMLButtonElement | null = null;
-  private discardBtn: HTMLButtonElement | null = null;
+  #carCountInput: HTMLInputElement | null = null;
+  #thresholdInput: HTMLInputElement | null = null;
+  #poolCountInput: HTMLInputElement | null = null;
+  #idleRangeInput: HTMLInputElement | null = null;
+  #nextGenBtn: HTMLButtonElement | null = null;
+  #newTrainingBtn: HTMLButtonElement | null = null;
+  #saveBtn: HTMLButtonElement | null = null;
+  #discardBtn: HTMLButtonElement | null = null;
 
   // Car config DOM elements
-  private carMaxSpeedInput: HTMLInputElement | null = null;
-  private carAccelerationInput: HTMLInputElement | null = null;
-  private carFrictionInput: HTMLInputElement | null = null;
-  private carWidthInput: HTMLInputElement | null = null;
-  private carHeightInput: HTMLInputElement | null = null;
-  private carRayCountInput: HTMLInputElement | null = null;
-  private carRayLengthInput: HTMLInputElement | null = null;
-  private carRaySpreadInput: HTMLInputElement | null = null;
-  private carRayOffsetInput: HTMLInputElement | null = null;
-  private carHiddenLayersInput: HTMLInputElement | null = null;
+  #carMaxSpeedInput: HTMLInputElement | null = null;
+  #carAccelerationInput: HTMLInputElement | null = null;
+  #carFrictionInput: HTMLInputElement | null = null;
+  #carWidthInput: HTMLInputElement | null = null;
+  #carHeightInput: HTMLInputElement | null = null;
+  #carRayCountInput: HTMLInputElement | null = null;
+  #carRayLengthInput: HTMLInputElement | null = null;
+  #carRaySpreadInput: HTMLInputElement | null = null;
+  #carRayOffsetInput: HTMLInputElement | null = null;
+  #carHiddenLayersInput: HTMLInputElement | null = null;
 
-  private statGenEl: HTMLElement | null = null;
-  private statAliveEl: HTMLElement | null = null;
-  private statDeadEl: HTMLElement | null = null;
-  private statFrozenEl: HTMLElement | null = null;
-  private statFrozenRow: HTMLElement | null = null;
-  private statDistEl: HTMLElement | null = null;
-  private statSpeedEl: HTMLElement | null = null;
+  #statGenEl: HTMLElement | null = null;
+  #statAliveEl: HTMLElement | null = null;
+  #statDeadEl: HTMLElement | null = null;
+  #statFrozenEl: HTMLElement | null = null;
+  #statFrozenRow: HTMLElement | null = null;
+  #statDistEl: HTMLElement | null = null;
+  #statSpeedEl: HTMLElement | null = null;
 
   // Pool table and status dots
-  private poolTableBody: HTMLElement | null = null;
-  private dotPool: HTMLElement | null = null;
-  private dotStorage: HTMLElement | null = null;
-  private dotCarConfig: HTMLElement | null = null;
+  #poolTableBody: HTMLElement | null = null;
+  #dotPool: HTMLElement | null = null;
+  #dotStorage: HTMLElement | null = null;
+  #dotCarConfig: HTMLElement | null = null;
 
   // Idle range wrapper + collapsible car config
-  private idleRangeWrap: HTMLElement | null = null;
-  private carConfigSection: HTMLElement | null = null;
-  private carConfigToggle: HTMLElement | null = null;
-  private carConfigSummary: HTMLElement | null = null;
+  #idleRangeWrap: HTMLElement | null = null;
+  #carConfigSection: HTMLElement | null = null;
+  #carConfigToggle: HTMLElement | null = null;
+  #carConfigSummary: HTMLElement | null = null;
 
   constructor() {
     super();
@@ -87,9 +87,9 @@ class TrainingPanelElement extends HTMLElement {
   }
 
   configure(options: TrainingManagerOptions): void {
-    this.evaluateFitness = options.evaluateFitness;
-    this.getStartInfo = options.getStartInfo;
-    this.onCarsCreatedCallback = options.onCarsCreated;
+    this.#evaluateFitness = options.evaluateFitness;
+    this.#getStartInfo = options.getStartInfo;
+    this.#onCarsCreatedCallback = options.onCarsCreated;
 
     this.#initDOMElements();
     this.#addEventListeners();
@@ -107,13 +107,14 @@ class TrainingPanelElement extends HTMLElement {
     mutationRate: number;
     idleRange: number;
   }): void {
-    if (this.carCountInput) this.carCountInput.value = String(params.carCount);
-    if (this.poolCountInput)
-      this.poolCountInput.value = String(params.poolSize);
-    if (this.thresholdInput)
-      this.thresholdInput.value = String(params.mutationRate);
-    if (this.idleRangeInput)
-      this.idleRangeInput.value = String(params.idleRange);
+    if (this.#carCountInput)
+      this.#carCountInput.value = String(params.carCount);
+    if (this.#poolCountInput)
+      this.#poolCountInput.value = String(params.poolSize);
+    if (this.#thresholdInput)
+      this.#thresholdInput.value = String(params.mutationRate);
+    if (this.#idleRangeInput)
+      this.#idleRangeInput.value = String(params.idleRange);
   }
 
   // ── Helpers ──────────────────────────────────────────
@@ -129,12 +130,12 @@ class TrainingPanelElement extends HTMLElement {
   }
 
   #getSortedAICars(): Car[] {
-    return getSortedAICars(this.cars, this.evaluateFitness);
+    return getSortedAICars(this.cars, this.#evaluateFitness);
   }
 
   #getTopCarInfoPool(): CarInfo[] {
     const { poolSize } = this.getSettings();
-    return getTopCarInfoPool(this.cars, this.evaluateFitness, poolSize);
+    return getTopCarInfoPool(this.cars, this.#evaluateFitness, poolSize);
   }
 
   #applyPoolToCars(cars: Car[], pool: CarInfo[]): void {
@@ -145,46 +146,46 @@ class TrainingPanelElement extends HTMLElement {
   // ── Initialization ───────────────────────────────────
 
   #initDOMElements(): void {
-    this.carCountInput = this.querySelector('#carCount');
-    this.thresholdInput = this.querySelector('#threshold');
-    this.poolCountInput = this.querySelector('#poolCount');
-    this.idleRangeInput = this.querySelector('#idleRange');
-    this.nextGenBtn = this.querySelector('#nextGenBtn');
-    this.newTrainingBtn = this.querySelector('#newTrainingBtn');
-    this.saveBtn = this.querySelector('#saveBtn');
-    this.discardBtn = this.querySelector('#discardBtn');
+    this.#carCountInput = this.querySelector('#carCount');
+    this.#thresholdInput = this.querySelector('#threshold');
+    this.#poolCountInput = this.querySelector('#poolCount');
+    this.#idleRangeInput = this.querySelector('#idleRange');
+    this.#nextGenBtn = this.querySelector('#nextGenBtn');
+    this.#newTrainingBtn = this.querySelector('#newTrainingBtn');
+    this.#saveBtn = this.querySelector('#saveBtn');
+    this.#discardBtn = this.querySelector('#discardBtn');
 
     // Car config inputs
-    this.carMaxSpeedInput = this.querySelector('#carMaxSpeed');
-    this.carAccelerationInput = this.querySelector('#carAcceleration');
-    this.carFrictionInput = this.querySelector('#carFriction');
-    this.carWidthInput = this.querySelector('#carWidth');
-    this.carHeightInput = this.querySelector('#carHeight');
-    this.carRayCountInput = this.querySelector('#carRayCount');
-    this.carRayLengthInput = this.querySelector('#carRayLength');
-    this.carRaySpreadInput = this.querySelector('#carRaySpread');
-    this.carRayOffsetInput = this.querySelector('#carRayOffset');
-    this.carHiddenLayersInput = this.querySelector('#carHiddenLayers');
+    this.#carMaxSpeedInput = this.querySelector('#carMaxSpeed');
+    this.#carAccelerationInput = this.querySelector('#carAcceleration');
+    this.#carFrictionInput = this.querySelector('#carFriction');
+    this.#carWidthInput = this.querySelector('#carWidth');
+    this.#carHeightInput = this.querySelector('#carHeight');
+    this.#carRayCountInput = this.querySelector('#carRayCount');
+    this.#carRayLengthInput = this.querySelector('#carRayLength');
+    this.#carRaySpreadInput = this.querySelector('#carRaySpread');
+    this.#carRayOffsetInput = this.querySelector('#carRayOffset');
+    this.#carHiddenLayersInput = this.querySelector('#carHiddenLayers');
 
-    this.statGenEl = this.querySelector('#stat-gen');
-    this.statAliveEl = this.querySelector('#stat-alive');
-    this.statDeadEl = this.querySelector('#stat-dead');
-    this.statFrozenEl = this.querySelector('#stat-frozen');
-    this.statFrozenRow = this.querySelector('#stat-frozen-row');
-    this.statDistEl = this.querySelector('#stat-dist');
-    this.statSpeedEl = this.querySelector('#stat-speed');
+    this.#statGenEl = this.querySelector('#stat-gen');
+    this.#statAliveEl = this.querySelector('#stat-alive');
+    this.#statDeadEl = this.querySelector('#stat-dead');
+    this.#statFrozenEl = this.querySelector('#stat-frozen');
+    this.#statFrozenRow = this.querySelector('#stat-frozen-row');
+    this.#statDistEl = this.querySelector('#stat-dist');
+    this.#statSpeedEl = this.querySelector('#stat-speed');
 
     // Pool table and status dots
-    this.poolTableBody = this.querySelector('#poolTableBody');
-    this.dotPool = this.querySelector('#dot-pool');
-    this.dotStorage = this.querySelector('#dot-storage');
-    this.dotCarConfig = this.querySelector('#dot-car-config');
+    this.#poolTableBody = this.querySelector('#poolTableBody');
+    this.#dotPool = this.querySelector('#dot-pool');
+    this.#dotStorage = this.querySelector('#dot-storage');
+    this.#dotCarConfig = this.querySelector('#dot-car-config');
 
     // Idle range wrapper + collapsible car config
-    this.idleRangeWrap = this.querySelector('#idleRangeWrap');
-    this.carConfigSection = this.querySelector('#carConfigSection');
-    this.carConfigToggle = this.querySelector('#carConfigToggle');
-    this.carConfigSummary = this.querySelector('#carConfigSummary');
+    this.#idleRangeWrap = this.querySelector('#idleRangeWrap');
+    this.#carConfigSection = this.querySelector('#carConfigSection');
+    this.#carConfigToggle = this.querySelector('#carConfigToggle');
+    this.#carConfigSummary = this.querySelector('#carConfigSummary');
 
     // Initialize car config from localStorage or global carInfo
     this.#loadInitialCarConfig();
@@ -195,11 +196,11 @@ class TrainingPanelElement extends HTMLElement {
   }
 
   #addEventListeners(): void {
-    if (this.nextGenBtn) {
-      this.nextGenBtn.addEventListener('click', () => this.nextGeneration());
+    if (this.#nextGenBtn) {
+      this.#nextGenBtn.addEventListener('click', () => this.nextGeneration());
     }
-    if (this.newTrainingBtn) {
-      this.newTrainingBtn.addEventListener('click', () => {
+    if (this.#newTrainingBtn) {
+      this.#newTrainingBtn.addEventListener('click', () => {
         if (this.#newTrainingHandler) {
           this.#newTrainingHandler();
         } else {
@@ -207,21 +208,21 @@ class TrainingPanelElement extends HTMLElement {
         }
       });
     }
-    if (this.saveBtn) {
-      this.saveBtn.addEventListener('click', () => this.save());
+    if (this.#saveBtn) {
+      this.#saveBtn.addEventListener('click', () => this.save());
     }
-    if (this.discardBtn) {
-      this.discardBtn.addEventListener('click', () => this.discard());
+    if (this.#discardBtn) {
+      this.#discardBtn.addEventListener('click', () => this.discard());
     }
 
     // Pool selection via a single delegated listener attached once. The pool
     // table rows are reconciled in place (never re-created), so this handler
     // stays valid and clicks are not lost when the table refreshes.
-    if (this.poolTableBody) {
-      this.poolTableBody.addEventListener('click', (e) => {
+    if (this.#poolTableBody) {
+      this.#poolTableBody.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
         const row = target.closest('tr');
-        if (!row || !this.poolTableBody!.contains(row)) return;
+        if (!row || !this.#poolTableBody!.contains(row)) return;
         const idx = parseInt(row.dataset.poolIdx ?? '', 10);
         if (Number.isNaN(idx)) return;
         if (this.selectedPoolIndices.has(idx)) {
@@ -235,17 +236,17 @@ class TrainingPanelElement extends HTMLElement {
     }
 
     // Toggle idle (freeze far cars) by clicking the idle stats row
-    if (this.statFrozenRow) {
-      this.statFrozenRow.addEventListener('click', () => {
+    if (this.#statFrozenRow) {
+      this.#statFrozenRow.addEventListener('click', () => {
         this.idleEnabled = !this.idleEnabled;
         this.#updateIdleUI();
       });
     }
 
     // Collapse / expand the Car Config section
-    if (this.carConfigToggle) {
-      this.carConfigToggle.addEventListener('click', () => {
-        this.carConfigSection?.classList.toggle('collapsed');
+    if (this.#carConfigToggle) {
+      this.#carConfigToggle.addEventListener('click', () => {
+        this.#carConfigSection?.classList.toggle('collapsed');
       });
     }
 
@@ -274,16 +275,16 @@ class TrainingPanelElement extends HTMLElement {
 
     // Auto-restart training when car params change
     const carParamInputs = [
-      this.carMaxSpeedInput,
-      this.carAccelerationInput,
-      this.carFrictionInput,
-      this.carWidthInput,
-      this.carHeightInput,
-      this.carRayCountInput,
-      this.carRayLengthInput,
-      this.carRaySpreadInput,
-      this.carRayOffsetInput,
-      this.carHiddenLayersInput,
+      this.#carMaxSpeedInput,
+      this.#carAccelerationInput,
+      this.#carFrictionInput,
+      this.#carWidthInput,
+      this.#carHeightInput,
+      this.#carRayCountInput,
+      this.#carRayLengthInput,
+      this.#carRaySpreadInput,
+      this.#carRayOffsetInput,
+      this.#carHiddenLayersInput,
     ];
     for (const input of carParamInputs) {
       if (input) {
@@ -297,15 +298,15 @@ class TrainingPanelElement extends HTMLElement {
 
   /** Dim the idle stats row + show/hide the idle range input. */
   #updateIdleUI(): void {
-    this.statFrozenRow?.classList.toggle('disabled', !this.idleEnabled);
-    if (this.idleRangeWrap) {
-      this.idleRangeWrap.style.display = this.idleEnabled ? '' : 'none';
+    this.#statFrozenRow?.classList.toggle('disabled', !this.idleEnabled);
+    if (this.#idleRangeWrap) {
+      this.#idleRangeWrap.style.display = this.idleEnabled ? '' : 'none';
     }
   }
 
   /** Rebuild the collapsed car-config summary (emoji icon + readonly value). */
   #updateCarConfigSummary(): void {
-    if (!this.carConfigSummary) return;
+    if (!this.#carConfigSummary) return;
     const v = (input: HTMLInputElement | null, fallback = ''): string => {
       const value = input ? input.value.trim() : '';
       return value !== '' ? value : fallback;
@@ -314,19 +315,19 @@ class TrainingPanelElement extends HTMLElement {
       [
         '↕️',
         'Height',
-        v(this.carHeightInput, String(DEFAULT_CAR_CONFIG.height)),
+        v(this.#carHeightInput, String(DEFAULT_CAR_CONFIG.height)),
       ],
-      ['↔️', 'Width', v(this.carWidthInput, String(DEFAULT_CAR_CONFIG.width))],
-      ['🧠', 'Hidden Layers', v(this.carHiddenLayersInput)],
-      ['🚀', 'Max Speed', v(this.carMaxSpeedInput)],
-      ['⚡', 'Accel', v(this.carAccelerationInput)],
-      ['🛞', 'Friction', v(this.carFrictionInput)],
-      ['📡', 'Rays', v(this.carRayCountInput)],
-      ['📐', 'Ray Len', v(this.carRayLengthInput)],
-      ['🔦', 'Ray Spread', v(this.carRaySpreadInput)],
-      ['🎯', 'Ray Offset', v(this.carRayOffsetInput)],
+      ['↔️', 'Width', v(this.#carWidthInput, String(DEFAULT_CAR_CONFIG.width))],
+      ['🧠', 'Hidden Layers', v(this.#carHiddenLayersInput)],
+      ['🚀', 'Max Speed', v(this.#carMaxSpeedInput)],
+      ['⚡', 'Accel', v(this.#carAccelerationInput)],
+      ['🛞', 'Friction', v(this.#carFrictionInput)],
+      ['📡', 'Rays', v(this.#carRayCountInput)],
+      ['📐', 'Ray Len', v(this.#carRayLengthInput)],
+      ['🔦', 'Ray Spread', v(this.#carRaySpreadInput)],
+      ['🎯', 'Ray Offset', v(this.#carRayOffsetInput)],
     ];
-    this.carConfigSummary.innerHTML = items
+    this.#carConfigSummary.innerHTML = items
       .map(
         ([emoji, label, value]) =>
           `<span class="cfg-chip" title="${label}"><span class="cfg-chip-emoji">${emoji}</span><span class="cfg-chip-value">${value}</span></span>`,
@@ -343,46 +344,46 @@ class TrainingPanelElement extends HTMLElement {
     idleRange: number;
   } {
     return {
-      carCount: this.#readNumericInput(this.carCountInput, 100, true),
-      poolSize: this.#readNumericInput(this.poolCountInput, 5, true),
-      mutationRate: this.#readNumericInput(this.thresholdInput, 0.1),
-      idleRange: this.#readNumericInput(this.idleRangeInput, 1000, true),
+      carCount: this.#readNumericInput(this.#carCountInput, 100, true),
+      poolSize: this.#readNumericInput(this.#poolCountInput, 5, true),
+      mutationRate: this.#readNumericInput(this.#thresholdInput, 0.1),
+      idleRange: this.#readNumericInput(this.#idleRangeInput, 1000, true),
     };
   }
 
   public getCarSettings(): CarInfo {
-    const hiddenLayers = this.carHiddenLayersInput
-      ? this.#parseHiddenLayers(this.carHiddenLayersInput.value)
+    const hiddenLayers = this.#carHiddenLayersInput
+      ? this.#parseHiddenLayers(this.#carHiddenLayersInput.value)
       : [...this.hiddenLayers];
     return {
       maxSpeed: this.#readNumericInput(
-        this.carMaxSpeedInput,
+        this.#carMaxSpeedInput,
         DEFAULT_CAR_CONFIG.maxSpeed,
       ),
       acceleration: this.#readNumericInput(
-        this.carAccelerationInput,
+        this.#carAccelerationInput,
         DEFAULT_CAR_CONFIG.acceleration,
       ),
       friction: this.#readNumericInput(
-        this.carFrictionInput,
+        this.#carFrictionInput,
         DEFAULT_CAR_CONFIG.friction,
       ),
       width: this.#readNumericInput(
-        this.carWidthInput,
+        this.#carWidthInput,
         DEFAULT_CAR_CONFIG.width,
         true,
       ),
       height: this.#readNumericInput(
-        this.carHeightInput,
+        this.#carHeightInput,
         DEFAULT_CAR_CONFIG.height,
         true,
       ),
       hiddenLayers,
       sensor: {
-        rayCount: this.#readNumericInput(this.carRayCountInput, 5, true),
-        rayLength: this.#readNumericInput(this.carRayLengthInput, 150, true),
-        raySpread: this.#readNumericInput(this.carRaySpreadInput, Math.PI / 2),
-        rayOffset: this.#readNumericInput(this.carRayOffsetInput, 0),
+        rayCount: this.#readNumericInput(this.#carRayCountInput, 5, true),
+        rayLength: this.#readNumericInput(this.#carRayLengthInput, 150, true),
+        raySpread: this.#readNumericInput(this.#carRaySpreadInput, Math.PI / 2),
+        rayOffset: this.#readNumericInput(this.#carRayOffsetInput, 0),
       },
     };
   }
@@ -396,14 +397,14 @@ class TrainingPanelElement extends HTMLElement {
   }
 
   public setCarSettings(info: CarInfo): void {
-    if (this.carMaxSpeedInput)
-      this.carMaxSpeedInput.value = String(info.maxSpeed);
-    if (this.carAccelerationInput)
-      this.carAccelerationInput.value = String(info.acceleration);
-    if (this.carFrictionInput)
-      this.carFrictionInput.value = String(info.friction);
-    if (this.carWidthInput) this.carWidthInput.value = String(info.width);
-    if (this.carHeightInput) this.carHeightInput.value = String(info.height);
+    if (this.#carMaxSpeedInput)
+      this.#carMaxSpeedInput.value = String(info.maxSpeed);
+    if (this.#carAccelerationInput)
+      this.#carAccelerationInput.value = String(info.acceleration);
+    if (this.#carFrictionInput)
+      this.#carFrictionInput.value = String(info.friction);
+    if (this.#carWidthInput) this.#carWidthInput.value = String(info.width);
+    if (this.#carHeightInput) this.#carHeightInput.value = String(info.height);
     // Prefer the explicit hiddenLayers field; otherwise infer the topology from
     // the stored brain. Legacy .car files omit hiddenLayers, so without this the
     // hidden-layers config keeps a stale/default value and the freshly-created
@@ -412,18 +413,18 @@ class TrainingPanelElement extends HTMLElement {
     const hiddenLayers = info.hiddenLayers ?? inferHiddenLayers(info.brain);
     if (hiddenLayers) {
       this.hiddenLayers = [...hiddenLayers];
-      if (this.carHiddenLayersInput) {
-        this.carHiddenLayersInput.value = hiddenLayers.join(', ');
+      if (this.#carHiddenLayersInput) {
+        this.#carHiddenLayersInput.value = hiddenLayers.join(', ');
       }
     }
-    if (this.carRayCountInput)
-      this.carRayCountInput.value = String(info.sensor.rayCount);
-    if (this.carRayLengthInput)
-      this.carRayLengthInput.value = String(info.sensor.rayLength);
-    if (this.carRaySpreadInput)
-      this.carRaySpreadInput.value = String(info.sensor.raySpread);
-    if (this.carRayOffsetInput)
-      this.carRayOffsetInput.value = String(info.sensor.rayOffset);
+    if (this.#carRayCountInput)
+      this.#carRayCountInput.value = String(info.sensor.rayCount);
+    if (this.#carRayLengthInput)
+      this.#carRayLengthInput.value = String(info.sensor.rayLength);
+    if (this.#carRaySpreadInput)
+      this.#carRaySpreadInput.value = String(info.sensor.raySpread);
+    if (this.#carRayOffsetInput)
+      this.#carRayOffsetInput.value = String(info.sensor.rayOffset);
     this.#updateCarConfigSummary();
   }
 
@@ -473,7 +474,7 @@ class TrainingPanelElement extends HTMLElement {
       this.prevPoolCars[i].name = String(i + 1);
     }
 
-    this.onCarsCreatedCallback(this.cars);
+    this.#onCarsCreatedCallback(this.cars);
 
     console.log(
       `Generation ${this.iteration} started with ${settings.carCount} cars.`,
@@ -481,7 +482,7 @@ class TrainingPanelElement extends HTMLElement {
   }
 
   #generateCars(n: number, type: string, config: CarInfo): Car[] {
-    const start = this.getStartInfo();
+    const start = this.#getStartInfo();
     return createCarsForTraining(n, type, config, start);
   }
 
@@ -527,8 +528,8 @@ class TrainingPanelElement extends HTMLElement {
     const pool = this.#loadPoolFromStorage();
     if (pool.length > 0) {
       this.setCarSettings(pool[0]);
-      if (this.poolCountInput) {
-        this.poolCountInput.value = String(pool.length);
+      if (this.#poolCountInput) {
+        this.#poolCountInput.value = String(pool.length);
       }
       return;
     }
@@ -554,15 +555,15 @@ class TrainingPanelElement extends HTMLElement {
     maxDist: number,
     bestCarSpeed: number = 0,
   ): void {
-    if (this.statGenEl) this.statGenEl.textContent = String(this.iteration);
-    if (this.statAliveEl) this.statAliveEl.textContent = String(alive);
-    if (this.statDeadEl) this.statDeadEl.textContent = String(dead);
-    if (this.statFrozenEl) this.statFrozenEl.textContent = String(frozen);
-    if (this.statDistEl) {
-      this.statDistEl.textContent = formatMetersFromWorldPixels(maxDist);
+    if (this.#statGenEl) this.#statGenEl.textContent = String(this.iteration);
+    if (this.#statAliveEl) this.#statAliveEl.textContent = String(alive);
+    if (this.#statDeadEl) this.#statDeadEl.textContent = String(dead);
+    if (this.#statFrozenEl) this.#statFrozenEl.textContent = String(frozen);
+    if (this.#statDistEl) {
+      this.#statDistEl.textContent = formatMetersFromWorldPixels(maxDist);
     }
-    if (this.statSpeedEl) {
-      this.statSpeedEl.textContent = formatKmhFromPxPerFrame(
+    if (this.#statSpeedEl) {
+      this.#statSpeedEl.textContent = formatKmhFromPxPerFrame(
         Math.abs(bestCarSpeed),
       );
     }
@@ -572,27 +573,29 @@ class TrainingPanelElement extends HTMLElement {
     const { poolSize } = this.getSettings();
     // Per-frame: select just the top `poolSize` cars instead of sorting the
     // entire population (thousands) every frame.
-    this.bestPool = getTopAICars(this.cars, this.evaluateFitness, poolSize);
+    this.bestPool = getTopAICars(this.cars, this.#evaluateFitness, poolSize);
     this.bestCar = this.bestPool.length > 0 ? this.bestPool[0] : null;
 
     // Throttle the DOM-heavy UI refresh (pool table innerHTML rebuild + a
     // localStorage read in the status dots). At ~4 refreshes/sec the panel
     // still feels live but stops dominating the frame at large populations.
-    if (++this.domRefreshCounter >= TrainingPanelElement.DOM_REFRESH_INTERVAL) {
-      this.domRefreshCounter = 0;
+    if (
+      ++this.#domRefreshCounter >= TrainingPanelElement.DOM_REFRESH_INTERVAL
+    ) {
+      this.#domRefreshCounter = 0;
       this.refreshPoolUI();
     }
   }
 
   /** Immediately re-renders the pool table and status dots (bypasses throttle). */
   public refreshPoolUI(): void {
-    this.domRefreshCounter = 0;
+    this.#domRefreshCounter = 0;
     this.#updatePoolTable();
     this.#updateStatusDots();
   }
 
   #updatePoolTable(): void {
-    const body = this.poolTableBody;
+    const body = this.#poolTableBody;
     if (!body) return;
 
     // Reconcile rows in place instead of rebuilding innerHTML. Re-creating the
@@ -602,7 +605,7 @@ class TrainingPanelElement extends HTMLElement {
     // single delegated listener attached in #addEventListeners.
     for (let i = 0; i < this.bestPool.length; i++) {
       const car = this.bestPool[i];
-      const fitness = this.evaluateFitness(car);
+      const fitness = this.#evaluateFitness(car);
       const name = car.name || '-';
 
       let row = body.children[i] as HTMLTableRowElement | undefined;
@@ -646,41 +649,41 @@ class TrainingPanelElement extends HTMLElement {
     const stored = localStorage.getItem('bestPool');
     const storedPool: CarInfo[] | null = safeJsonParse<CarInfo[]>(stored);
 
-    if (this.dotStorage) {
+    if (this.#dotStorage) {
       const hasStorage = !!storedPool;
-      this.dotStorage.className =
+      this.#dotStorage.className =
         'status-dot ' + (hasStorage ? 'green' : 'red');
-      this.dotStorage.title = hasStorage
+      this.#dotStorage.title = hasStorage
         ? `${storedPool!.length} car(s) in localStorage`
         : 'No saved cars';
     }
 
-    if (this.dotPool) {
+    if (this.#dotPool) {
       if (!storedPool) {
-        this.dotPool.className = 'status-dot red';
-        this.dotPool.title = 'No pool (no storage)';
+        this.#dotPool.className = 'status-dot red';
+        this.#dotPool.title = 'No pool (no storage)';
       } else {
         const settings = this.getSettings();
         const match = storedPool.length === settings.poolSize;
-        this.dotPool.className = 'status-dot ' + (match ? 'green' : 'orange');
-        this.dotPool.title = match
+        this.#dotPool.className = 'status-dot ' + (match ? 'green' : 'orange');
+        this.#dotPool.title = match
           ? `Pool: ${storedPool.length}/${settings.poolSize}`
           : `Pool size mismatch: stored ${storedPool.length}, expected ${settings.poolSize}`;
       }
     }
 
-    if (this.dotCarConfig) {
+    if (this.#dotCarConfig) {
       if (!storedPool || storedPool.length === 0) {
-        this.dotCarConfig.className = 'status-dot red';
-        this.dotCarConfig.title = 'No stored config to compare';
+        this.#dotCarConfig.className = 'status-dot red';
+        this.#dotCarConfig.title = 'No stored config to compare';
       } else {
         const storedInfo = storedPool[0];
         const current = this.getCarSettings();
         const matches = CarLoader.compareCarParams(storedInfo, current);
-        this.dotCarConfig.className =
+        this.#dotCarConfig.className =
           'status-dot ' + (matches ? 'green' : 'orange');
         if (matches) {
-          this.dotCarConfig.title = 'Config matches storage';
+          this.#dotCarConfig.title = 'Config matches storage';
         } else {
           const diffs: string[] = [];
           if (storedInfo.maxSpeed !== current.maxSpeed)
@@ -717,7 +720,7 @@ class TrainingPanelElement extends HTMLElement {
           const sHL = (storedInfo.hiddenLayers ?? [6]).join(',');
           const cHL = (current.hiddenLayers ?? [6]).join(',');
           if (sHL !== cHL) diffs.push(`hl:[${sHL}]→[${cHL}]`);
-          this.dotCarConfig.title = `Mismatch: ${diffs.join(', ')}`;
+          this.#dotCarConfig.title = `Mismatch: ${diffs.join(', ')}`;
         }
       }
     }

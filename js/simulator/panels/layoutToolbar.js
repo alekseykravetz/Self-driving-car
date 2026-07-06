@@ -1,8 +1,8 @@
 'use strict';
 class LayoutToolbarElement extends HTMLElement {
-  _layoutMode = 'topview-big';
-  onLayoutModeChange = null;
-  onPanelToggle = null;
+  #_layoutMode = 'topview-big';
+  #onLayoutModeChange = null;
+  #onPanelToggle = null;
   constructor() {
     super();
     this.id = 'layoutToolbar';
@@ -15,7 +15,7 @@ class LayoutToolbarElement extends HTMLElement {
   }
 
   get layoutMode() {
-    return this._layoutMode;
+    return this.#_layoutMode;
   }
 
   get showCameraView() {
@@ -34,11 +34,11 @@ class LayoutToolbarElement extends HTMLElement {
   }
 
   setLayoutModeListener(listener) {
-    this.onLayoutModeChange = listener;
+    this.#onLayoutModeChange = listener;
   }
 
   setPanelToggleListener(listener) {
-    this.onPanelToggle = listener;
+    this.#onPanelToggle = listener;
   }
 
   /**
@@ -57,7 +57,7 @@ class LayoutToolbarElement extends HTMLElement {
   }
 
   setDefaultLayoutMode(mode) {
-    this._layoutMode = mode;
+    this.#_layoutMode = mode;
     const layoutTopBig = this.querySelector('#layoutTopBig');
     const layoutCameraBig = this.querySelector('#layoutCameraBig');
     if (layoutTopBig)
@@ -70,12 +70,12 @@ class LayoutToolbarElement extends HTMLElement {
     const layoutTopBig = this.querySelector('#layoutTopBig');
     const layoutCameraBig = this.querySelector('#layoutCameraBig');
     const setLayout = (mode) => {
-      this._layoutMode = mode;
+      this.#_layoutMode = mode;
       if (layoutTopBig)
         layoutTopBig.classList.toggle('active', mode === 'topview-big');
       if (layoutCameraBig)
         layoutCameraBig.classList.toggle('active', mode === 'camera-big');
-      if (this.onLayoutModeChange) this.onLayoutModeChange(mode);
+      if (this.#onLayoutModeChange) this.#onLayoutModeChange(mode);
     };
     layoutTopBig?.addEventListener('click', () => setLayout('topview-big'));
     layoutCameraBig?.addEventListener('click', () => setLayout('camera-big'));
@@ -89,14 +89,14 @@ class LayoutToolbarElement extends HTMLElement {
       btn.addEventListener('click', () => {
         if (btn.disabled) return;
         btn.classList.toggle('active');
-        if (this.onPanelToggle) this.onPanelToggle();
+        if (this.#onPanelToggle) this.#onPanelToggle();
       });
     });
     // Remaining checkbox toggles (e.g. camera debug overlay).
     const checkboxes = this.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach((cb) => {
       cb.addEventListener('change', () => {
-        if (this.onPanelToggle) this.onPanelToggle();
+        if (this.#onPanelToggle) this.#onPanelToggle();
       });
     });
   }

@@ -5,7 +5,11 @@ class ToolbarAssetSelectors {
   #onWorldSelected: ((entry: UnifiedWorldEntry | null) => void) | null = null;
   #onCarsSelected: ((cars: CarInfo[]) => void) | null = null;
 
-  constructor(private host: HTMLElement) {}
+  #host: HTMLElement;
+
+  constructor(host: HTMLElement) {
+    this.#host = host;
+  }
 
   configureSelectors(opts: {
     carMode?: 'multi' | 'single';
@@ -19,7 +23,7 @@ class ToolbarAssetSelectors {
     this.#onCarsSelected = opts.onCarsSelected ?? null;
     this.#selectorsReady = true;
 
-    const selected = this.host.querySelector('[data-group="selected"]');
+    const selected = this.#host.querySelector('[data-group="selected"]');
     if (selected) (selected as HTMLElement).style.display = '';
 
     this.#bindPicker('loadWorldBtn', 'worldPicker');
@@ -42,7 +46,7 @@ class ToolbarAssetSelectors {
   }
 
   refreshWorldList(): void {
-    const list = this.host.querySelector('#worldPickerList');
+    const list = this.#host.querySelector('#worldPickerList');
     if (!list) return;
     const worlds = StoreManager.getAllWorlds();
     const activeId = StoreManager.getActiveWorldId();
@@ -75,7 +79,7 @@ class ToolbarAssetSelectors {
   }
 
   refreshCarList(): void {
-    const list = this.host.querySelector('#carPickerList');
+    const list = this.#host.querySelector('#carPickerList');
     if (!list) return;
     const cars = StoreManager.getAllCars();
     const activeIds = new Set(StoreManager.getActiveCarIds());
@@ -126,12 +130,12 @@ class ToolbarAssetSelectors {
   }
 
   #updateSelectedDisplay(): void {
-    const worldEl = this.host.querySelector('#selectedWorldName');
+    const worldEl = this.#host.querySelector('#selectedWorldName');
     if (worldEl) {
       const rawName = StoreManager.getActiveWorldName() ?? null;
       worldEl.textContent = rawName ? stripFileExtension(rawName) : '\u2014';
     }
-    const carEl = this.host.querySelector<HTMLElement>('#selectedCarNames');
+    const carEl = this.#host.querySelector<HTMLElement>('#selectedCarNames');
     if (carEl) {
       const names = StoreManager.getActiveCarNames();
       if (names.length === 0) {
@@ -148,8 +152,8 @@ class ToolbarAssetSelectors {
   }
 
   #bindPicker(buttonId: string, popoverId: string): void {
-    const btn = this.host.querySelector(`#${buttonId}`) as HTMLElement | null;
-    const popover = this.host.querySelector(
+    const btn = this.#host.querySelector(`#${buttonId}`) as HTMLElement | null;
+    const popover = this.#host.querySelector(
       `#${popoverId}`,
     ) as HTMLElement | null;
     if (!btn || !popover) return;
@@ -157,9 +161,11 @@ class ToolbarAssetSelectors {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isOpen = !popover.hidden;
-      this.host.querySelectorAll<HTMLElement>('.asset-popover').forEach((p) => {
-        p.hidden = true;
-      });
+      this.#host
+        .querySelectorAll<HTMLElement>('.asset-popover')
+        .forEach((p) => {
+          p.hidden = true;
+        });
       popover.hidden = isOpen;
     });
 
@@ -170,7 +176,7 @@ class ToolbarAssetSelectors {
   }
 
   #bindWorldFileInput(): void {
-    const input = this.host.querySelector(
+    const input = this.#host.querySelector(
       '#loadWorldInput',
     ) as HTMLInputElement | null;
     if (!input) return;
@@ -199,7 +205,7 @@ class ToolbarAssetSelectors {
   }
 
   #bindCarFileInput(): void {
-    const input = this.host.querySelector(
+    const input = this.#host.querySelector(
       '#loadCarInput',
     ) as HTMLInputElement | null;
     if (!input) return;

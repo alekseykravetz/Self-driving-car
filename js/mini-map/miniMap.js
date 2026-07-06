@@ -1,19 +1,19 @@
 'use strict';
 class MiniMap {
-  canvas;
-  graph;
-  size;
-  scaler;
-  ctx;
-  scaleIndicator = null;
+  #canvas;
+  #graph;
+  #size;
+  #scaler;
+  #ctx;
+  #scaleIndicator = null;
   constructor(canvas, graph, size, scaler = 0.05) {
-    this.canvas = canvas;
-    this.graph = graph;
-    this.size = size;
-    this.scaler = scaler;
-    this.canvas.width = size;
-    this.canvas.height = size;
-    this.ctx = canvas.getContext('2d');
+    this.#canvas = canvas;
+    this.#graph = graph;
+    this.#size = size;
+    this.#scaler = scaler;
+    this.#canvas.width = size;
+    this.#canvas.height = size;
+    this.#ctx = canvas.getContext('2d');
   }
 
   draw(options) {
@@ -33,55 +33,55 @@ class MiniMap {
     // class toggles. Filling the bitmap (which repaints every frame) sidesteps
     // that bug entirely.
     if (backgroundColor) {
-      this.ctx.fillStyle = backgroundColor;
-      this.ctx.fillRect(0, 0, this.size, this.size);
+      this.#ctx.fillStyle = backgroundColor;
+      this.#ctx.fillRect(0, 0, this.#size, this.#size);
     } else {
-      this.ctx.clearRect(0, 0, this.size, this.size);
+      this.#ctx.clearRect(0, 0, this.#size, this.#size);
     }
-    const scaledViewPoint = scale(viewPoint, -this.scaler);
-    this.ctx.save();
-    this.ctx.translate(
-      scaledViewPoint.x + this.size / 2,
-      scaledViewPoint.y + this.size / 2,
+    const scaledViewPoint = scale(viewPoint, -this.#scaler);
+    this.#ctx.save();
+    this.#ctx.translate(
+      scaledViewPoint.x + this.#size / 2,
+      scaledViewPoint.y + this.#size / 2,
     );
-    this.ctx.scale(this.scaler, this.scaler);
-    for (const segment of this.graph.segments) {
-      drawSegment(this.ctx, segment, {
-        width: 3 / this.scaler,
+    this.#ctx.scale(this.#scaler, this.#scaler);
+    for (const segment of this.#graph.segments) {
+      drawSegment(this.#ctx, segment, {
+        width: 3 / this.#scaler,
         color: roadColor,
         cap: 'round',
       });
     }
     for (const car of cars) {
-      this.ctx.beginPath();
-      this.ctx.fillStyle = car.damaged ? 'gray' : car.color || 'red';
-      this.ctx.strokeStyle = 'white';
-      this.ctx.lineWidth = (car.damaged ? 1 : 2) / this.scaler;
-      this.ctx.arc(
+      this.#ctx.beginPath();
+      this.#ctx.fillStyle = car.damaged ? 'gray' : car.color || 'red';
+      this.#ctx.strokeStyle = 'white';
+      this.#ctx.lineWidth = (car.damaged ? 1 : 2) / this.#scaler;
+      this.#ctx.arc(
         car.x,
         car.y,
-        (car.damaged ? 2 : 3) / this.scaler,
+        (car.damaged ? 2 : 3) / this.#scaler,
         0,
         Math.PI * 2,
       );
-      this.ctx.fill();
-      this.ctx.stroke();
-      // new Point(car.x, car.y).draw(this.ctx, {
+      this.#ctx.fill();
+      this.#ctx.stroke();
+      // new Point(car.x, car.y).draw(this.#ctx, {
       //   color: car.damaged ? 'gray' : 'red',
-      //   size: 5 / this.scaler,
+      //   size: 5 / this.#scaler,
       // });
     }
-    this.ctx.restore();
-    drawPoint(this.ctx, new Point(this.size / 2, this.size / 2), {
+    this.#ctx.restore();
+    drawPoint(this.#ctx, new Point(this.#size / 2, this.#size / 2), {
       size: 12,
       color: carColor,
       outline: true,
     });
     if (viewport) {
-      if (!this.scaleIndicator) {
-        this.scaleIndicator = new ScaleIndicator(
-          this.size,
-          this.size,
+      if (!this.#scaleIndicator) {
+        this.#scaleIndicator = new ScaleIndicator(
+          this.#size,
+          this.#size,
           viewport,
           {
             paddingX: compactScaleIndicator ? 6 : 20,
@@ -89,14 +89,18 @@ class MiniMap {
             fontSize: compactScaleIndicator ? 9 : 12,
             lineWidth: compactScaleIndicator ? 1 : 2,
             scaleInMeters: 10,
-            pixelsPerMeterMultiplier: this.scaler,
-            zoomMultiplier: this.scaler,
+            pixelsPerMeterMultiplier: this.#scaler,
+            zoomMultiplier: this.#scaler,
             inlineStats: compactScaleIndicator,
             statSeparator: ' • ',
           },
         );
       }
-      this.scaleIndicator.draw(this.ctx, this.canvas.width, this.canvas.height);
+      this.#scaleIndicator.draw(
+        this.#ctx,
+        this.#canvas.width,
+        this.#canvas.height,
+      );
     }
   }
 }

@@ -31,7 +31,7 @@ function spFormatSize(chars) {
 }
 
 class StorePanelElement extends HTMLElement {
-  storeManager = null;
+  #storeManager = null;
   /** Active sort column/direction per tab. `null` means unsorted. */
   #sortState = {
     worlds: null,
@@ -50,14 +50,14 @@ class StorePanelElement extends HTMLElement {
     this.#loadData();
     // Re-render localStorage tab when storage changes in another tab
     window.addEventListener('storage', () => {
-      if (this.storeManager) {
+      if (this.#storeManager) {
         this.#renderLocalStorage();
         this.#updateTabCounts();
       }
     });
     // Re-render when user returns to this tab (same-tab navigation)
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.storeManager) {
+      if (!document.hidden && this.#storeManager) {
         this.#renderLocalStorage();
         this.#updateTabCounts();
       }
@@ -65,7 +65,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   async #loadData() {
-    this.storeManager = await StoreManager.init();
+    this.#storeManager = await StoreManager.init();
     this.#renderWorlds();
     this.#renderCars();
     this.#renderLocalStorage();
@@ -148,7 +148,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   #renderWorlds() {
-    const mgr = this.storeManager;
+    const mgr = this.#storeManager;
     const worlds = mgr.getAllWorlds();
     const tbody = this.querySelector('#storeWorldsBody');
     const empty = this.querySelector('#storeWorldsEmpty');
@@ -192,7 +192,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   #renderCars() {
-    const mgr = this.storeManager;
+    const mgr = this.#storeManager;
     const cars = mgr.getAllCars();
     const tbody = this.querySelector('#storeCarsBody');
     const empty = this.querySelector('#storeCarsEmpty');
@@ -251,7 +251,7 @@ class StorePanelElement extends HTMLElement {
   }
 
   #renderLocalStorage() {
-    const mgr = this.storeManager;
+    const mgr = this.#storeManager;
     const entries = mgr.getLocalStorageStates();
     const tbody = this.querySelector('#storeLocalStorageBody');
     const empty = this.querySelector('#storeLocalStorageEmpty');
@@ -308,7 +308,7 @@ class StorePanelElement extends HTMLElement {
 
   /** Update the count badges in the tab buttons (selected/total, present/tracked). */
   #updateTabCounts() {
-    const mgr = this.storeManager;
+    const mgr = this.#storeManager;
     if (!mgr) return;
     const worlds = mgr.getAllWorlds();
     const cars = mgr.getAllCars();

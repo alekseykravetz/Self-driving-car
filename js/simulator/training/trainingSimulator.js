@@ -1,6 +1,6 @@
 'use strict';
 class TrainingSimulator extends SimulatorShell {
-  strategy;
+  #strategy;
   world = null;
   roadBorders = null;
   trainingManager;
@@ -11,11 +11,11 @@ class TrainingSimulator extends SimulatorShell {
     this.initModal = document.querySelector('training-init-modal');
     const params = new URLSearchParams(window.location.search);
     if (params.get('mode') === 'simple') {
-      this.strategy = new SimpleTrainingStrategy(this);
-      this.strategy.init();
+      this.#strategy = new SimpleTrainingStrategy(this);
+      this.#strategy.init();
     } else {
-      this.strategy = new WorldTrainingStrategy(this);
-      this.strategy.init(null);
+      this.#strategy = new WorldTrainingStrategy(this);
+      this.#strategy.init(null);
     }
     this.trainingManager.setNewTrainingHandler(() => this.openInitModal('new'));
     this.#initPauseToggleClicks();
@@ -220,11 +220,11 @@ class TrainingSimulator extends SimulatorShell {
   }
 
   update() {
-    this.strategy.update();
+    this.#strategy.update();
   }
 
   draw(time) {
-    this.strategy.draw(time);
+    this.#strategy.draw(time);
   }
 
   onPausedRender() {

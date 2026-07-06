@@ -1,10 +1,10 @@
 type LayoutMode = 'topview-big' | 'camera-big';
 
 class LayoutToolbarElement extends HTMLElement {
-  private _layoutMode: LayoutMode = 'topview-big';
+  #_layoutMode: LayoutMode = 'topview-big';
 
-  private onLayoutModeChange: ((mode: LayoutMode) => void) | null = null;
-  private onPanelToggle: (() => void) | null = null;
+  #onLayoutModeChange: ((mode: LayoutMode) => void) | null = null;
+  #onPanelToggle: (() => void) | null = null;
 
   constructor() {
     super();
@@ -18,7 +18,7 @@ class LayoutToolbarElement extends HTMLElement {
   }
 
   get layoutMode(): LayoutMode {
-    return this._layoutMode;
+    return this.#_layoutMode;
   }
 
   get showCameraView(): boolean {
@@ -41,11 +41,11 @@ class LayoutToolbarElement extends HTMLElement {
   }
 
   setLayoutModeListener(listener: (mode: LayoutMode) => void): void {
-    this.onLayoutModeChange = listener;
+    this.#onLayoutModeChange = listener;
   }
 
   setPanelToggleListener(listener: () => void): void {
-    this.onPanelToggle = listener;
+    this.#onPanelToggle = listener;
   }
 
   /**
@@ -70,7 +70,7 @@ class LayoutToolbarElement extends HTMLElement {
   }
 
   setDefaultLayoutMode(mode: LayoutMode): void {
-    this._layoutMode = mode;
+    this.#_layoutMode = mode;
     const layoutTopBig = this.querySelector(
       '#layoutTopBig',
     ) as HTMLButtonElement | null;
@@ -92,12 +92,12 @@ class LayoutToolbarElement extends HTMLElement {
     ) as HTMLButtonElement | null;
 
     const setLayout = (mode: LayoutMode) => {
-      this._layoutMode = mode;
+      this.#_layoutMode = mode;
       if (layoutTopBig)
         layoutTopBig.classList.toggle('active', mode === 'topview-big');
       if (layoutCameraBig)
         layoutCameraBig.classList.toggle('active', mode === 'camera-big');
-      if (this.onLayoutModeChange) this.onLayoutModeChange(mode);
+      if (this.#onLayoutModeChange) this.#onLayoutModeChange(mode);
     };
 
     layoutTopBig?.addEventListener('click', () => setLayout('topview-big'));
@@ -113,7 +113,7 @@ class LayoutToolbarElement extends HTMLElement {
       btn.addEventListener('click', () => {
         if (btn.disabled) return;
         btn.classList.toggle('active');
-        if (this.onPanelToggle) this.onPanelToggle();
+        if (this.#onPanelToggle) this.#onPanelToggle();
       });
     });
 
@@ -121,7 +121,7 @@ class LayoutToolbarElement extends HTMLElement {
     const checkboxes = this.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach((cb) => {
       cb.addEventListener('change', () => {
-        if (this.onPanelToggle) this.onPanelToggle();
+        if (this.#onPanelToggle) this.#onPanelToggle();
       });
     });
   }

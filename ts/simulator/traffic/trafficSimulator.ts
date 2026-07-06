@@ -25,7 +25,7 @@ const SEGMENT_SEARCH_RADIUS = 200;
 class TrafficSimulator extends SimulatorShell {
   #world: World | null = null;
   #roadBorders: GridSegment[] = [];
-  #borderGrid: SpatialHashGrid;
+  #borderGrid!: SpatialHashGrid;
 
   #statsPanel: TrafficPanelElement;
 

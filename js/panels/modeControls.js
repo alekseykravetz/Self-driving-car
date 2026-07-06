@@ -1,51 +1,51 @@
 'use strict';
 class ToolbarModeControls {
-  host;
-  _borderMode = 'damage';
-  _trackingMode = 'best';
-  _viewportMode = 'mouse';
-  onBorderModeChange = null;
-  onTrackingModeChange = null;
-  onViewportModeChange = null;
+  #_borderMode = 'damage';
+  #_trackingMode = 'best';
+  #_viewportMode = 'mouse';
+  #onBorderModeChange = null;
+  #onTrackingModeChange = null;
+  #onViewportModeChange = null;
+  #host;
   constructor(host) {
-    this.host = host;
+    this.#host = host;
   }
 
   get borderMode() {
-    return this._borderMode;
+    return this.#_borderMode;
   }
 
   get trackingMode() {
-    return this._trackingMode;
+    return this.#_trackingMode;
   }
 
   get viewportMode() {
-    return this._viewportMode;
+    return this.#_viewportMode;
   }
 
   setBorderModeListener(listener) {
-    this.onBorderModeChange = listener;
+    this.#onBorderModeChange = listener;
   }
 
   setTrackingModeListener(listener) {
-    this.onTrackingModeChange = listener;
+    this.#onTrackingModeChange = listener;
   }
 
   setViewportModeListener(listener) {
-    this.onViewportModeChange = listener;
+    this.#onViewportModeChange = listener;
   }
 
   setTrackingMode(mode) {
-    this._trackingMode = mode;
+    this.#_trackingMode = mode;
     const buttons = {
-      none: this.host.querySelector('#trackModeNone'),
-      best: this.host.querySelector('#trackModeBest'),
-      keys: this.host.querySelector('#trackModeKeys'),
+      none: this.#host.querySelector('#trackModeNone'),
+      best: this.#host.querySelector('#trackModeBest'),
+      keys: this.#host.querySelector('#trackModeKeys'),
     };
     Object.entries(buttons).forEach(([key, btn]) => {
       if (btn) btn.classList.toggle('active', key === mode);
     });
-    if (this.onTrackingModeChange) this.onTrackingModeChange(mode);
+    if (this.#onTrackingModeChange) this.#onTrackingModeChange(mode);
   }
 
   init() {
@@ -56,16 +56,16 @@ class ToolbarModeControls {
 
   #initBorderModeButtons() {
     const buttons = {
-      none: this.host.querySelector('#borderModeNone'),
-      damage: this.host.querySelector('#borderModeDamage'),
-      collision: this.host.querySelector('#borderModeCollision'),
+      none: this.#host.querySelector('#borderModeNone'),
+      damage: this.#host.querySelector('#borderModeDamage'),
+      collision: this.#host.querySelector('#borderModeCollision'),
     };
     const setActive = (mode) => {
-      this._borderMode = mode;
+      this.#_borderMode = mode;
       Object.entries(buttons).forEach(([key, btn]) => {
         if (btn) btn.classList.toggle('active', key === mode);
       });
-      if (this.onBorderModeChange) this.onBorderModeChange(mode);
+      if (this.#onBorderModeChange) this.#onBorderModeChange(mode);
     };
     buttons.none?.addEventListener('click', () => setActive('none'));
     buttons.damage?.addEventListener('click', () => setActive('damage'));
@@ -74,9 +74,9 @@ class ToolbarModeControls {
 
   #initTrackingModeButtons() {
     const buttons = {
-      none: this.host.querySelector('#trackModeNone'),
-      best: this.host.querySelector('#trackModeBest'),
-      keys: this.host.querySelector('#trackModeKeys'),
+      none: this.#host.querySelector('#trackModeNone'),
+      best: this.#host.querySelector('#trackModeBest'),
+      keys: this.#host.querySelector('#trackModeKeys'),
     };
     buttons.none?.addEventListener('click', () => this.setTrackingMode('none'));
     buttons.best?.addEventListener('click', () => this.setTrackingMode('best'));
@@ -85,15 +85,15 @@ class ToolbarModeControls {
 
   #initViewportModeButtons() {
     const buttons = {
-      mouse: this.host.querySelector('#viewportModeMouse'),
-      touchpad: this.host.querySelector('#viewportModeTouchpad'),
+      mouse: this.#host.querySelector('#viewportModeMouse'),
+      touchpad: this.#host.querySelector('#viewportModeTouchpad'),
     };
     const setActive = (mode) => {
-      this._viewportMode = mode;
+      this.#_viewportMode = mode;
       Object.entries(buttons).forEach(([key, btn]) => {
         if (btn) btn.classList.toggle('active', key === mode);
       });
-      if (this.onViewportModeChange) this.onViewportModeChange(mode);
+      if (this.#onViewportModeChange) this.#onViewportModeChange(mode);
     };
     buttons.mouse?.addEventListener('click', () => setActive('mouse'));
     buttons.touchpad?.addEventListener('click', () => setActive('touchpad'));

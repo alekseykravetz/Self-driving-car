@@ -59,10 +59,10 @@ class TrafficPanelElement extends HTMLElement {
     swatch: HTMLElement;
   }[] = [];
 
-  private onSelect: ((car: Car | null) => void) | null = null;
-  private onRemove: ((car: Car) => void) | null = null;
-  private onClear: (() => void) | null = null;
-  private onDeleteDamaged: (() => void) | null = null;
+  #onSelect: ((car: Car | null) => void) | null = null;
+  #onRemove: ((car: Car) => void) | null = null;
+  #onClear: (() => void) | null = null;
+  #onDeleteDamaged: (() => void) | null = null;
 
   constructor() {
     super();
@@ -76,14 +76,14 @@ class TrafficPanelElement extends HTMLElement {
       '#trafficClearBtn',
     ) as HTMLButtonElement | null;
     clearBtn?.addEventListener('click', () => {
-      if (this.onClear) this.onClear();
+      if (this.#onClear) this.#onClear();
     });
 
     const deleteDamagedBtn = this.querySelector(
       '#trafficDeleteDamagedBtn',
     ) as HTMLButtonElement | null;
     deleteDamagedBtn?.addEventListener('click', () => {
-      if (this.onDeleteDamaged) this.onDeleteDamaged();
+      if (this.#onDeleteDamaged) this.#onDeleteDamaged();
     });
   }
 
@@ -96,19 +96,19 @@ class TrafficPanelElement extends HTMLElement {
   }
 
   setSelectListener(listener: (car: Car | null) => void): void {
-    this.onSelect = listener;
+    this.#onSelect = listener;
   }
 
   setRemoveListener(listener: (car: Car) => void): void {
-    this.onRemove = listener;
+    this.#onRemove = listener;
   }
 
   setClearListener(listener: () => void): void {
-    this.onClear = listener;
+    this.#onClear = listener;
   }
 
   setDeleteDamagedListener(listener: () => void): void {
-    this.onDeleteDamaged = listener;
+    this.#onDeleteDamaged = listener;
   }
 
   /** Rebuild the car list. Call when cars are added or removed. */
@@ -230,7 +230,7 @@ class TrafficPanelElement extends HTMLElement {
 
     remove.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (this.onRemove) this.onRemove(car);
+      if (this.#onRemove) this.#onRemove(car);
     });
 
     return { car, row, status, speed, dist, swatch };
@@ -239,7 +239,7 @@ class TrafficPanelElement extends HTMLElement {
   #select(car: Car): void {
     this.#selected = car;
     this.refresh();
-    if (this.onSelect) this.onSelect(car);
+    if (this.#onSelect) this.#onSelect(car);
   }
 }
 

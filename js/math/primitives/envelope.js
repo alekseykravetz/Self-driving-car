@@ -1,9 +1,9 @@
 'use strict';
 class Envelope {
-  skeleton;
+  #skeleton;
   polygon;
   constructor(skeleton, width = 10, roundness = 1, generatedPolygon) {
-    this.skeleton = skeleton;
+    this.#skeleton = skeleton;
     if (generatedPolygon) {
       this.polygon = generatedPolygon;
     } else {
@@ -12,14 +12,15 @@ class Envelope {
   }
 
   static load(info, width = 10, roundness = 1) {
-    const skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
-    const polygon = Polygon.load(info.polygon);
+    const d = info;
+    const skeleton = new Segment(d.skeleton.p1, d.skeleton.p2);
+    const polygon = Polygon.load(d.polygon);
     const env = new Envelope(skeleton, width, roundness, polygon);
     return env;
   }
 
   #generatePolygon(width, roundness) {
-    const { p1, p2 } = this.skeleton;
+    const { p1, p2 } = this.#skeleton;
     const radius = width / 2;
     const alpha = angle(subtract(p1, p2));
     const alpha_cw = alpha + Math.PI / 2;

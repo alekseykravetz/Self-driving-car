@@ -1,5 +1,5 @@
 class TrainingSimulator extends SimulatorShell {
-  private strategy!: SimpleTrainingStrategy | WorldTrainingStrategy;
+  #strategy!: SimpleTrainingStrategy | WorldTrainingStrategy;
   world: IWorld | null = null;
   roadBorders: Point[][] | null = null;
   trainingManager!: TrainingPanelElement;
@@ -24,11 +24,11 @@ class TrainingSimulator extends SimulatorShell {
 
     const params = new URLSearchParams(window.location.search);
     if (params.get('mode') === 'simple') {
-      this.strategy = new SimpleTrainingStrategy(this);
-      this.strategy.init();
+      this.#strategy = new SimpleTrainingStrategy(this);
+      this.#strategy.init();
     } else {
-      this.strategy = new WorldTrainingStrategy(this);
-      this.strategy.init(null);
+      this.#strategy = new WorldTrainingStrategy(this);
+      this.#strategy.init(null);
     }
 
     this.trainingManager.setNewTrainingHandler(() => this.openInitModal('new'));
@@ -259,11 +259,11 @@ class TrainingSimulator extends SimulatorShell {
   }
 
   protected update(): void {
-    this.strategy.update();
+    this.#strategy.update();
   }
 
   protected draw(time: number): void {
-    this.strategy.draw(time);
+    this.#strategy.draw(time);
   }
 
   protected onPausedRender(): void {

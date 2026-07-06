@@ -6,15 +6,15 @@
  * `SimulatorShell.animate()`.
  */
 class AnimationLoopToolbarElement extends HTMLElement {
-  _paused = false;
-  pauseBtn = null;
-  timeDisplay = null;
-  resetTimeBtn = null;
-  fpsDisplay = null;
-  elapsedFrames = 0;
-  renderedFrames = 0;
-  lastFpsUpdate = 0;
-  currentFps = 0;
+  #_paused = false;
+  #pauseBtn = null;
+  #timeDisplay = null;
+  #resetTimeBtn = null;
+  #fpsDisplay = null;
+  #elapsedFrames = 0;
+  #renderedFrames = 0;
+  #lastFpsUpdate = 0;
+  #currentFps = 0;
   constructor() {
     super();
     this.id = 'animationLoopToolbar';
@@ -22,20 +22,20 @@ class AnimationLoopToolbarElement extends HTMLElement {
 
   connectedCallback() {
     this.innerHTML = AnimationLoopToolbarElement.template;
-    this.pauseBtn = this.querySelector('#loopPauseBtn');
-    this.pauseBtn?.addEventListener('click', () => this.togglePause());
-    this.timeDisplay = this.querySelector('#elapsedTimeDisplay');
-    this.resetTimeBtn = this.querySelector('#resetTimeBtn');
-    this.resetTimeBtn?.addEventListener('click', () => this.resetTime());
-    this.fpsDisplay = this.querySelector('#fpsDisplay');
-    this.lastFpsUpdate = performance.now();
-    this.updateTimeDisplay();
-    this.updateFpsDisplay();
+    this.#pauseBtn = this.querySelector('#loopPauseBtn');
+    this.#pauseBtn?.addEventListener('click', () => this.togglePause());
+    this.#timeDisplay = this.querySelector('#elapsedTimeDisplay');
+    this.#resetTimeBtn = this.querySelector('#resetTimeBtn');
+    this.#resetTimeBtn?.addEventListener('click', () => this.resetTime());
+    this.#fpsDisplay = this.querySelector('#fpsDisplay');
+    this.#lastFpsUpdate = performance.now();
+    this.#updateTimeDisplay();
+    this.#updateFpsDisplay();
   }
 
   /** Whether the simulation step is currently paused. */
   get paused() {
-    return this._paused;
+    return this.#_paused;
   }
 
   /**
@@ -52,59 +52,59 @@ class AnimationLoopToolbarElement extends HTMLElement {
 
   /** Record one animation frame. Called by SimulatorShell.animate(). */
   recordFrame(isRenderFrame = false) {
-    if (!this._paused) {
-      this.elapsedFrames++;
-      this.updateTimeDisplay();
+    if (!this.#_paused) {
+      this.#elapsedFrames++;
+      this.#updateTimeDisplay();
     }
     if (isRenderFrame) {
-      this.renderedFrames++;
-      this.updateFpsCounter();
+      this.#renderedFrames++;
+      this.#updateFpsCounter();
     }
   }
 
   /** Get the total elapsed simulation frames. */
   get elapsedTime() {
-    return this.elapsedFrames;
+    return this.#elapsedFrames;
   }
 
   /** Reset the elapsed time counter to zero. */
   resetTime() {
-    this.elapsedFrames = 0;
-    this.updateTimeDisplay();
+    this.#elapsedFrames = 0;
+    this.#updateTimeDisplay();
   }
 
   /** Update the time display element with the current elapsed time. */
-  updateTimeDisplay() {
-    if (this.timeDisplay) {
-      this.timeDisplay.textContent = formatElapsedTime(this.elapsedFrames);
+  #updateTimeDisplay() {
+    if (this.#timeDisplay) {
+      this.#timeDisplay.textContent = formatElapsedTime(this.#elapsedFrames);
     }
   }
 
   /** Update FPS counter once per second. */
-  updateFpsCounter() {
+  #updateFpsCounter() {
     const now = performance.now();
-    const elapsed = now - this.lastFpsUpdate;
+    const elapsed = now - this.#lastFpsUpdate;
     if (elapsed >= 1000) {
-      this.currentFps = Math.round((this.renderedFrames * 1000) / elapsed);
-      this.renderedFrames = 0;
-      this.lastFpsUpdate = now;
-      this.updateFpsDisplay();
+      this.#currentFps = Math.round((this.#renderedFrames * 1000) / elapsed);
+      this.#renderedFrames = 0;
+      this.#lastFpsUpdate = now;
+      this.#updateFpsDisplay();
     }
   }
 
   /** Update the FPS display element. */
-  updateFpsDisplay() {
-    if (this.fpsDisplay) {
-      this.fpsDisplay.textContent = `${this.currentFps} fps`;
+  #updateFpsDisplay() {
+    if (this.#fpsDisplay) {
+      this.#fpsDisplay.textContent = `${this.#currentFps} fps`;
     }
   }
 
   /** Toggle (or force) the paused state, syncing the button glyph. */
   togglePause(forceState) {
-    this._paused = forceState !== undefined ? forceState : !this._paused;
-    if (this.pauseBtn) {
-      this.pauseBtn.textContent = this._paused ? '▶️' : '⏸️';
-      this.pauseBtn.classList.toggle('active', !this._paused);
+    this.#_paused = forceState !== undefined ? forceState : !this.#_paused;
+    if (this.#pauseBtn) {
+      this.#pauseBtn.textContent = this.#_paused ? '▶️' : '⏸️';
+      this.#pauseBtn.classList.toggle('active', !this.#_paused);
     }
   }
 

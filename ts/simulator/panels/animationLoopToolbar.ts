@@ -5,17 +5,17 @@
  * `SimulatorShell.animate()`.
  */
 class AnimationLoopToolbarElement extends HTMLElement {
-  private _paused: boolean = false;
+  #_paused: boolean = false;
 
-  private pauseBtn: HTMLButtonElement | null = null;
-  private timeDisplay: HTMLElement | null = null;
-  private resetTimeBtn: HTMLButtonElement | null = null;
-  private fpsDisplay: HTMLElement | null = null;
+  #pauseBtn: HTMLButtonElement | null = null;
+  #timeDisplay: HTMLElement | null = null;
+  #resetTimeBtn: HTMLButtonElement | null = null;
+  #fpsDisplay: HTMLElement | null = null;
 
-  private elapsedFrames: number = 0;
-  private renderedFrames: number = 0;
-  private lastFpsUpdate: number = 0;
-  private currentFps: number = 0;
+  #elapsedFrames: number = 0;
+  #renderedFrames: number = 0;
+  #lastFpsUpdate: number = 0;
+  #currentFps: number = 0;
 
   constructor() {
     super();
@@ -24,23 +24,23 @@ class AnimationLoopToolbarElement extends HTMLElement {
 
   connectedCallback(): void {
     this.innerHTML = AnimationLoopToolbarElement.template;
-    this.pauseBtn = this.querySelector('#loopPauseBtn');
-    this.pauseBtn?.addEventListener('click', () => this.togglePause());
+    this.#pauseBtn = this.querySelector('#loopPauseBtn');
+    this.#pauseBtn?.addEventListener('click', () => this.togglePause());
 
-    this.timeDisplay = this.querySelector('#elapsedTimeDisplay');
-    this.resetTimeBtn = this.querySelector('#resetTimeBtn');
-    this.resetTimeBtn?.addEventListener('click', () => this.resetTime());
+    this.#timeDisplay = this.querySelector('#elapsedTimeDisplay');
+    this.#resetTimeBtn = this.querySelector('#resetTimeBtn');
+    this.#resetTimeBtn?.addEventListener('click', () => this.resetTime());
 
-    this.fpsDisplay = this.querySelector('#fpsDisplay');
-    this.lastFpsUpdate = performance.now();
+    this.#fpsDisplay = this.querySelector('#fpsDisplay');
+    this.#lastFpsUpdate = performance.now();
 
-    this.updateTimeDisplay();
-    this.updateFpsDisplay();
+    this.#updateTimeDisplay();
+    this.#updateFpsDisplay();
   }
 
   /** Whether the simulation step is currently paused. */
   get paused(): boolean {
-    return this._paused;
+    return this.#_paused;
   }
 
   /**
@@ -57,60 +57,60 @@ class AnimationLoopToolbarElement extends HTMLElement {
 
   /** Record one animation frame. Called by SimulatorShell.animate(). */
   recordFrame(isRenderFrame: boolean = false): void {
-    if (!this._paused) {
-      this.elapsedFrames++;
-      this.updateTimeDisplay();
+    if (!this.#_paused) {
+      this.#elapsedFrames++;
+      this.#updateTimeDisplay();
     }
     if (isRenderFrame) {
-      this.renderedFrames++;
-      this.updateFpsCounter();
+      this.#renderedFrames++;
+      this.#updateFpsCounter();
     }
   }
 
   /** Get the total elapsed simulation frames. */
   get elapsedTime(): number {
-    return this.elapsedFrames;
+    return this.#elapsedFrames;
   }
 
   /** Reset the elapsed time counter to zero. */
   resetTime(): void {
-    this.elapsedFrames = 0;
-    this.updateTimeDisplay();
+    this.#elapsedFrames = 0;
+    this.#updateTimeDisplay();
   }
 
   /** Update the time display element with the current elapsed time. */
-  private updateTimeDisplay(): void {
-    if (this.timeDisplay) {
-      this.timeDisplay.textContent = formatElapsedTime(this.elapsedFrames);
+  #updateTimeDisplay(): void {
+    if (this.#timeDisplay) {
+      this.#timeDisplay.textContent = formatElapsedTime(this.#elapsedFrames);
     }
   }
 
   /** Update FPS counter once per second. */
-  private updateFpsCounter(): void {
+  #updateFpsCounter(): void {
     const now = performance.now();
-    const elapsed = now - this.lastFpsUpdate;
+    const elapsed = now - this.#lastFpsUpdate;
 
     if (elapsed >= 1000) {
-      this.currentFps = Math.round((this.renderedFrames * 1000) / elapsed);
-      this.renderedFrames = 0;
-      this.lastFpsUpdate = now;
-      this.updateFpsDisplay();
+      this.#currentFps = Math.round((this.#renderedFrames * 1000) / elapsed);
+      this.#renderedFrames = 0;
+      this.#lastFpsUpdate = now;
+      this.#updateFpsDisplay();
     }
   }
 
   /** Update the FPS display element. */
-  private updateFpsDisplay(): void {
-    if (this.fpsDisplay) {
-      this.fpsDisplay.textContent = `${this.currentFps} fps`;
+  #updateFpsDisplay(): void {
+    if (this.#fpsDisplay) {
+      this.#fpsDisplay.textContent = `${this.#currentFps} fps`;
     }
   }
 
   /** Toggle (or force) the paused state, syncing the button glyph. */
   togglePause(forceState?: boolean): void {
-    this._paused = forceState !== undefined ? forceState : !this._paused;
-    if (this.pauseBtn) {
-      this.pauseBtn.textContent = this._paused ? '▶️' : '⏸️';
-      this.pauseBtn.classList.toggle('active', !this._paused);
+    this.#_paused = forceState !== undefined ? forceState : !this.#_paused;
+    if (this.#pauseBtn) {
+      this.#pauseBtn.textContent = this.#_paused ? '▶️' : '⏸️';
+      this.#pauseBtn.classList.toggle('active', !this.#_paused);
     }
   }
 

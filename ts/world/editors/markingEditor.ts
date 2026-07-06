@@ -9,9 +9,9 @@ class MarkingEditor {
   protected markings: Marking[]; // Reference to world.markings
 
   // Bound event listeners for correct 'this' context and removal
-  private boundMouseDown: (event: MouseEvent) => void;
-  private boundMouseMove: (event: MouseEvent) => void;
-  private boundContextMenu: (event: MouseEvent) => void;
+  #boundMouseDown: (event: MouseEvent) => void;
+  #boundMouseMove: (event: MouseEvent) => void;
+  #boundContextMenu: (event: MouseEvent) => void;
 
   constructor(
     viewport: Viewport,
@@ -28,9 +28,9 @@ class MarkingEditor {
     this.markings = world.markings; // Store reference
 
     // Initialize bound functions here to ensure 'this' is correct
-    this.boundMouseDown = this.#handleMouseDown.bind(this);
-    this.boundMouseMove = this.#handleMouseMove.bind(this);
-    this.boundContextMenu = (e: MouseEvent) => e.preventDefault();
+    this.#boundMouseDown = this.#handleMouseDown.bind(this);
+    this.#boundMouseMove = this.#handleMouseMove.bind(this);
+    this.#boundContextMenu = (e: MouseEvent) => e.preventDefault();
   }
 
   /**
@@ -63,17 +63,17 @@ class MarkingEditor {
 
   /** Adds necessary event listeners to the canvas. */
   #addEventListeners(): void {
-    this.canvas.addEventListener('mousedown', this.boundMouseDown);
-    this.canvas.addEventListener('mousemove', this.boundMouseMove);
+    this.canvas.addEventListener('mousedown', this.#boundMouseDown);
+    this.canvas.addEventListener('mousemove', this.#boundMouseMove);
     // Prevent default right-click menu
-    this.canvas.addEventListener('contextmenu', this.boundContextMenu);
+    this.canvas.addEventListener('contextmenu', this.#boundContextMenu);
   }
 
   /** Removes event listeners from the canvas. */
   #removeEventListeners(): void {
-    this.canvas.removeEventListener('mousedown', this.boundMouseDown);
-    this.canvas.removeEventListener('mousemove', this.boundMouseMove);
-    this.canvas.removeEventListener('contextmenu', this.boundContextMenu);
+    this.canvas.removeEventListener('mousedown', this.#boundMouseDown);
+    this.canvas.removeEventListener('mousemove', this.#boundMouseMove);
+    this.canvas.removeEventListener('contextmenu', this.#boundContextMenu);
   }
 
   /** Handles mouse movement to update the marking intent (preview). */

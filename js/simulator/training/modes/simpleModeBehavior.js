@@ -92,156 +92,156 @@ function updateSimpleCars(
 }
 
 class SimpleTrainingStrategy {
-  parent;
-  simpleState = new SimpleSimState();
+  #parent;
+  #simpleState = new SimpleSimState();
   constructor(parent) {
-    this.parent = parent;
+    this.#parent = parent;
   }
 
   init() {
-    this.parent.toolbarPanel.hideGroups('world', 'borders', 'borders-sep');
-    this.parent.toolbarPanel.configureSelectors({ carMode: 'multi' });
-    this.parent.toolbarPanel.hideCameraDebug();
-    this.parent.layoutToolbar.setDefaultLayoutMode('camera-big');
+    this.#parent.toolbarPanel.hideGroups('world', 'borders', 'borders-sep');
+    this.#parent.toolbarPanel.configureSelectors({ carMode: 'multi' });
+    this.#parent.toolbarPanel.hideCameraDebug();
+    this.#parent.layoutToolbar.setDefaultLayoutMode('camera-big');
     const SIMPLE_ROAD_WIDTH = 180;
     const simpleWorld = new SimpleWorld(
-      this.parent.gameCanvas.width / 2,
+      this.#parent.gameCanvas.width / 2,
       SIMPLE_ROAD_WIDTH,
     );
-    this.parent.world = simpleWorld;
-    this.parent.viewport = new Viewport(
-      this.parent.gameCanvas,
+    this.#parent.world = simpleWorld;
+    this.#parent.viewport = new Viewport(
+      this.#parent.gameCanvas,
       1,
       new Point(-simpleWorld.getCenter(), -100),
     );
-    this.parent.viewport.setMode(this.parent.toolbarPanel.viewportMode);
-    this.parent.miniMap = new MiniMap(
-      this.parent.miniMapCanvas,
+    this.#parent.viewport.setMode(this.#parent.toolbarPanel.viewportMode);
+    this.#parent.miniMap = new MiniMap(
+      this.#parent.miniMapCanvas,
       simpleWorld.graph,
-      this.parent.miniMapCanvas.width,
+      this.#parent.miniMapCanvas.width,
     );
-    const startInfo = this.parent.getStartInfo();
-    this.parent.camera = new Camera(startInfo);
-    this.parent.trainingManager.configure({
+    const startInfo = this.#parent.getStartInfo();
+    this.#parent.camera = new Camera(startInfo);
+    this.#parent.trainingManager.configure({
       evaluateFitness: (car) => startInfo.y - car.y,
-      getStartInfo: () => this.parent.getStartInfo(),
+      getStartInfo: () => this.#parent.getStartInfo(),
       onCarsCreated: () => {
-        this.simpleState.traffic = generateInitialTraffic(
-          (lane) => this.parent.world.getLaneCenter(lane),
+        this.#simpleState.traffic = generateInitialTraffic(
+          (lane) => this.#parent.world.getLaneCenter(lane),
           startInfo.angle,
         );
-        this.simpleState.lastGeneratedTrafficY = -700;
-        this.parent.updateRoadBorders();
-        this.parent.snapCameraToStart();
-        this.parent.animationLoopToolbar.setPaused(false);
+        this.#simpleState.lastGeneratedTrafficY = -700;
+        this.#parent.updateRoadBorders();
+        this.#parent.snapCameraToStart();
+        this.#parent.animationLoopToolbar.setPaused(false);
       },
     });
-    this.simpleState.traffic = generateInitialTraffic(
+    this.#simpleState.traffic = generateInitialTraffic(
       (lane) => simpleWorld.getLaneCenter(lane),
       startInfo.angle,
     );
-    this.parent.updateRoadBorders();
-    this.parent.openInitModal('entry');
+    this.#parent.updateRoadBorders();
+    this.#parent.openInitModal('entry');
   }
 
   update() {
-    const cars = this.parent.trainingManager.cars;
-    const { bestCar, trackTarget } = this.parent.resolveTrackTarget();
+    const cars = this.#parent.trainingManager.cars;
+    const { bestCar, trackTarget } = this.#parent.resolveTrackTarget();
     if (
       !cars.length ||
-      !this.parent.world ||
-      !this.parent.viewport ||
-      !this.parent.roadBorders ||
+      !this.#parent.world ||
+      !this.#parent.viewport ||
+      !this.#parent.roadBorders ||
       !bestCar
     ) {
       return;
     }
-    const simpleWorld = this.parent.world;
+    const simpleWorld = this.#parent.world;
     updateSimpleTraffic(
-      this.simpleState,
+      this.#simpleState,
       bestCar,
       simpleWorld,
-      this.parent.roadBorders,
-      this.parent.getStartInfo(),
+      this.#parent.roadBorders,
+      this.#parent.getStartInfo(),
     );
-    const { idleRange } = this.parent.trainingManager.getSettings();
+    const { idleRange } = this.#parent.trainingManager.getSettings();
     const { aliveCount, deadCount, frozenCount } = updateSimpleCars(
       cars,
-      this.simpleState,
-      this.parent.roadBorders,
-      this.parent.trainingManager.idleEnabled,
+      this.#simpleState,
+      this.#parent.roadBorders,
+      this.#parent.trainingManager.idleEnabled,
       bestCar,
       idleRange,
     );
-    const startInfo = this.parent.getStartInfo();
+    const startInfo = this.#parent.getStartInfo();
     const currentDist = Math.round(startInfo.y - bestCar.y);
-    this.parent.updateTrainingMetrics(
+    this.#parent.updateTrainingMetrics(
       currentDist,
       aliveCount,
       deadCount,
       frozenCount,
     );
     if (trackTarget) {
-      this.parent.viewport.offset.x = -simpleWorld.getCenter();
-      this.parent.viewport.offset.y = -trackTarget.y;
+      this.#parent.viewport.offset.x = -simpleWorld.getCenter();
+      this.#parent.viewport.offset.y = -trackTarget.y;
     }
-    const totalOffset = this.parent.viewport.getOffset();
-    this.simpleState.simpleViewY = -totalOffset.y;
-    if (trackTarget && this.parent.camera) {
-      this.parent.camera.move(trackTarget);
+    const totalOffset = this.#parent.viewport.getOffset();
+    this.#simpleState.simpleViewY = -totalOffset.y;
+    if (trackTarget && this.#parent.camera) {
+      this.#parent.camera.move(trackTarget);
     }
   }
 
   draw(time) {
-    const cars = this.parent.trainingManager.cars;
-    const bestCar = this.parent.trainingManager.bestCar;
+    const cars = this.#parent.trainingManager.cars;
+    const bestCar = this.#parent.trainingManager.bestCar;
     if (
       !cars.length ||
-      !this.parent.world ||
-      !this.parent.viewport ||
-      !this.parent.roadBorders ||
+      !this.#parent.world ||
+      !this.#parent.viewport ||
+      !this.#parent.roadBorders ||
       !bestCar
     ) {
       return;
     }
-    const simpleWorld = this.parent.world;
-    this.parent.resizeLayout();
+    const simpleWorld = this.#parent.world;
+    this.#parent.resizeLayout();
     const viewportTop =
-      this.simpleState.simpleViewY -
-      this.parent.gameCanvas.height * 0.5 * this.parent.viewport.zoom;
+      this.#simpleState.simpleViewY -
+      this.#parent.gameCanvas.height * 0.5 * this.#parent.viewport.zoom;
     const viewportBottom =
-      this.simpleState.simpleViewY +
-      this.parent.gameCanvas.height * 0.5 * this.parent.viewport.zoom;
-    const settings = this.parent.trainingManager.getSettings();
+      this.#simpleState.simpleViewY +
+      this.#parent.gameCanvas.height * 0.5 * this.#parent.viewport.zoom;
+    const settings = this.#parent.trainingManager.getSettings();
     const drawMasks = settings.carCount <= 5000;
-    this.parent.viewport.reset();
-    simpleWorld.draw(this.parent.gameCtx, { viewPoint: new Point(0, 0) });
-    this.parent.viewport.drawScaleIndicator(this.parent.gameCtx);
-    for (let i = 0; i < this.simpleState.traffic.length; i++) {
+    this.#parent.viewport.reset();
+    simpleWorld.draw(this.#parent.gameCtx, { viewPoint: new Point(0, 0) });
+    this.#parent.viewport.drawScaleIndicator(this.#parent.gameCtx);
+    for (let i = 0; i < this.#simpleState.traffic.length; i++) {
       if (
-        this.simpleState.traffic[i].y > viewportTop - 100 &&
-        this.simpleState.traffic[i].y < viewportBottom + 100
+        this.#simpleState.traffic[i].y > viewportTop - 100 &&
+        this.#simpleState.traffic[i].y < viewportBottom + 100
       ) {
-        this.simpleState.traffic[i].draw(this.parent.gameCtx, {});
+        this.#simpleState.traffic[i].draw(this.#parent.gameCtx, {});
       }
     }
     drawSimulatorCars(
-      this.parent.gameCtx,
+      this.#parent.gameCtx,
       cars,
-      this.parent.trainingManager.bestPool,
+      this.#parent.trainingManager.bestPool,
       viewportTop - 100,
       viewportBottom + 100,
       drawMasks,
       'gold',
-      this.parent.trainingManager.prevPoolCars,
+      this.#parent.trainingManager.prevPoolCars,
     );
-    this.parent.drawNetworkVisualizer(time, bestCar.brain);
-    if (this.parent.miniMap) {
-      const viewPoint = scale(this.parent.viewport.getOffset(), -1);
+    this.#parent.drawNetworkVisualizer(time, bestCar.brain);
+    if (this.#parent.miniMap) {
+      const viewPoint = scale(this.#parent.viewport.getOffset(), -1);
       const floatingMiniMap =
-        this.parent.layoutToolbar.showMiniMap &&
-        !this.parent.layoutToolbar.showVisualizer;
-      this.parent.miniMap.draw(
+        this.#parent.layoutToolbar.showMiniMap &&
+        !this.#parent.layoutToolbar.showVisualizer;
+      this.#parent.miniMap.draw(
         floatingMiniMap
           ? {
               viewPoint,
@@ -253,8 +253,8 @@ class SimpleTrainingStrategy {
           : { viewPoint, cars },
       );
     }
-    this.parent.renderCameraView(bestCar, {
-      traffic: this.simpleState.traffic,
+    this.#parent.renderCameraView(bestCar, {
+      traffic: this.#simpleState.traffic,
     });
   }
 }

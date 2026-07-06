@@ -50,22 +50,22 @@ function compareCarInfoParams(a, b) {
  * Handles file input, reading, and parsing of one or multiple pure-JSON .car files.
  */
 class CarLoader {
-  input;
-  onLoad;
+  #input;
+  #onLoad;
   /**
    * @param onLoad - Callback invoked with an array of parsed CarInfo objects.
    * @param inputId - ID of an existing file input element (default: "loadCarInput").
    *                  If the element doesn't exist, one will be created.
    */
   constructor(onLoad, inputId = 'loadCarInput') {
-    this.onLoad = onLoad;
+    this.#onLoad = onLoad;
     let input = document.getElementById(inputId);
     if (!input) {
       input = this.#createInput(inputId);
     }
-    this.input = input;
-    this.input.multiple = true;
-    this.input.addEventListener('change', this.#handleFilesChange.bind(this));
+    this.#input = input;
+    this.#input.multiple = true;
+    this.#input.addEventListener('change', this.#handleFilesChange.bind(this));
   }
 
   #createInput(inputId) {
@@ -105,7 +105,7 @@ class CarLoader {
         if (completed === fileArray.length) {
           input.value = '';
           if (results.length > 0) {
-            this.onLoad(results);
+            this.#onLoad(results);
           } else {
             alert('No valid car files could be parsed.');
           }
@@ -117,7 +117,7 @@ class CarLoader {
         if (completed === fileArray.length) {
           input.value = '';
           if (results.length > 0) {
-            this.onLoad(results);
+            this.#onLoad(results);
           }
         }
       };

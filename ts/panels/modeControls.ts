@@ -3,52 +3,55 @@ type TrackingMode = 'none' | 'best' | 'keys';
 type ToolbarViewportMode = 'mouse' | 'touchpad';
 
 class ToolbarModeControls {
-  private _borderMode: BorderMode = 'damage';
-  private _trackingMode: TrackingMode = 'best';
-  private _viewportMode: ToolbarViewportMode = 'mouse';
+  #_borderMode: BorderMode = 'damage';
+  #_trackingMode: TrackingMode = 'best';
+  #_viewportMode: ToolbarViewportMode = 'mouse';
 
-  private onBorderModeChange: ((mode: BorderMode) => void) | null = null;
-  private onTrackingModeChange: ((mode: TrackingMode) => void) | null = null;
-  private onViewportModeChange: ((mode: ToolbarViewportMode) => void) | null =
-    null;
+  #onBorderModeChange: ((mode: BorderMode) => void) | null = null;
+  #onTrackingModeChange: ((mode: TrackingMode) => void) | null = null;
+  #onViewportModeChange: ((mode: ToolbarViewportMode) => void) | null = null;
 
-  constructor(private host: HTMLElement) {}
+  #host: HTMLElement;
+
+  constructor(host: HTMLElement) {
+    this.#host = host;
+  }
 
   get borderMode(): BorderMode {
-    return this._borderMode;
+    return this.#_borderMode;
   }
 
   get trackingMode(): TrackingMode {
-    return this._trackingMode;
+    return this.#_trackingMode;
   }
 
   get viewportMode(): ToolbarViewportMode {
-    return this._viewportMode;
+    return this.#_viewportMode;
   }
 
   setBorderModeListener(listener: (mode: BorderMode) => void): void {
-    this.onBorderModeChange = listener;
+    this.#onBorderModeChange = listener;
   }
 
   setTrackingModeListener(listener: (mode: TrackingMode) => void): void {
-    this.onTrackingModeChange = listener;
+    this.#onTrackingModeChange = listener;
   }
 
   setViewportModeListener(listener: (mode: ToolbarViewportMode) => void): void {
-    this.onViewportModeChange = listener;
+    this.#onViewportModeChange = listener;
   }
 
   setTrackingMode(mode: TrackingMode): void {
-    this._trackingMode = mode;
+    this.#_trackingMode = mode;
     const buttons: Record<TrackingMode, HTMLButtonElement | null> = {
-      none: this.host.querySelector('#trackModeNone'),
-      best: this.host.querySelector('#trackModeBest'),
-      keys: this.host.querySelector('#trackModeKeys'),
+      none: this.#host.querySelector('#trackModeNone'),
+      best: this.#host.querySelector('#trackModeBest'),
+      keys: this.#host.querySelector('#trackModeKeys'),
     };
     Object.entries(buttons).forEach(([key, btn]) => {
       if (btn) btn.classList.toggle('active', key === mode);
     });
-    if (this.onTrackingModeChange) this.onTrackingModeChange(mode);
+    if (this.#onTrackingModeChange) this.#onTrackingModeChange(mode);
   }
 
   init(): void {
@@ -59,23 +62,23 @@ class ToolbarModeControls {
 
   #initBorderModeButtons(): void {
     const buttons = {
-      none: this.host.querySelector(
+      none: this.#host.querySelector(
         '#borderModeNone',
       ) as HTMLButtonElement | null,
-      damage: this.host.querySelector(
+      damage: this.#host.querySelector(
         '#borderModeDamage',
       ) as HTMLButtonElement | null,
-      collision: this.host.querySelector(
+      collision: this.#host.querySelector(
         '#borderModeCollision',
       ) as HTMLButtonElement | null,
     };
 
     const setActive = (mode: BorderMode) => {
-      this._borderMode = mode;
+      this.#_borderMode = mode;
       Object.entries(buttons).forEach(([key, btn]) => {
         if (btn) btn.classList.toggle('active', key === mode);
       });
-      if (this.onBorderModeChange) this.onBorderModeChange(mode);
+      if (this.#onBorderModeChange) this.#onBorderModeChange(mode);
     };
 
     buttons.none?.addEventListener('click', () => setActive('none'));
@@ -85,13 +88,13 @@ class ToolbarModeControls {
 
   #initTrackingModeButtons(): void {
     const buttons = {
-      none: this.host.querySelector(
+      none: this.#host.querySelector(
         '#trackModeNone',
       ) as HTMLButtonElement | null,
-      best: this.host.querySelector(
+      best: this.#host.querySelector(
         '#trackModeBest',
       ) as HTMLButtonElement | null,
-      keys: this.host.querySelector(
+      keys: this.#host.querySelector(
         '#trackModeKeys',
       ) as HTMLButtonElement | null,
     };
@@ -103,20 +106,20 @@ class ToolbarModeControls {
 
   #initViewportModeButtons(): void {
     const buttons = {
-      mouse: this.host.querySelector(
+      mouse: this.#host.querySelector(
         '#viewportModeMouse',
       ) as HTMLButtonElement | null,
-      touchpad: this.host.querySelector(
+      touchpad: this.#host.querySelector(
         '#viewportModeTouchpad',
       ) as HTMLButtonElement | null,
     };
 
     const setActive = (mode: ToolbarViewportMode) => {
-      this._viewportMode = mode;
+      this.#_viewportMode = mode;
       Object.entries(buttons).forEach(([key, btn]) => {
         if (btn) btn.classList.toggle('active', key === mode);
       });
-      if (this.onViewportModeChange) this.onViewportModeChange(mode);
+      if (this.#onViewportModeChange) this.#onViewportModeChange(mode);
     };
 
     buttons.mouse?.addEventListener('click', () => setActive('mouse'));

@@ -64,46 +64,46 @@ function beep(frequency: number, waveType: OscillatorType = 'sine'): void {
 }
 
 class SoundEngine {
-  private audioContext: AudioContext;
-  private osc: OscillatorNode;
-  private masterGain: GainNode;
-  private lfo: OscillatorNode;
-  private mod: GainNode;
+  #audioContext: AudioContext;
+  #osc: OscillatorNode;
+  #masterGain: GainNode;
+  #lfo: OscillatorNode;
+  #mod: GainNode;
 
   // Public accessors for controlling parameters
   public volume: AudioParam;
   public frequency: AudioParam;
 
   constructor() {
-    this.audioContext = new (window.AudioContext ||
+    this.#audioContext = new (window.AudioContext ||
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).webkitAudioContext)();
-    const currentTime = this.audioContext.currentTime;
+    const currentTime = this.#audioContext.currentTime;
 
-    this.osc = this.audioContext.createOscillator();
-    this.masterGain = this.audioContext.createGain();
+    this.#osc = this.#audioContext.createOscillator();
+    this.#masterGain = this.#audioContext.createGain();
 
     // Base engine tone frequency
-    this.osc.frequency.setValueAtTime(200, currentTime);
-    this.osc.connect(this.masterGain);
-    this.osc.start(currentTime);
+    this.#osc.frequency.setValueAtTime(200, currentTime);
+    this.#osc.connect(this.#masterGain);
+    this.#osc.start(currentTime);
 
     // Master volume control
-    this.masterGain.gain.setValueAtTime(0.2, currentTime); // Default volume
-    this.masterGain.connect(this.audioContext.destination);
+    this.#masterGain.gain.setValueAtTime(0.2, currentTime); // Default volume
+    this.#masterGain.connect(this.#audioContext.destination);
 
     // Low-Frequency Oscillator (LFO) for frequency modulation ("rumble")
-    this.lfo = this.audioContext.createOscillator();
-    this.lfo.frequency.setValueAtTime(30, currentTime); // LFO speed
-    this.mod = this.audioContext.createGain();
-    this.mod.gain.setValueAtTime(60, currentTime); // LFO intensity (modulation depth)
-    this.lfo.connect(this.mod);
-    this.mod.connect(this.osc.frequency); // Modulate the main oscillator's frequency
-    this.lfo.start(currentTime);
+    this.#lfo = this.#audioContext.createOscillator();
+    this.#lfo.frequency.setValueAtTime(30, currentTime); // LFO speed
+    this.#mod = this.#audioContext.createGain();
+    this.#mod.gain.setValueAtTime(60, currentTime); // LFO intensity (modulation depth)
+    this.#lfo.connect(this.#mod);
+    this.#mod.connect(this.#osc.frequency); // Modulate the main oscillator's frequency
+    this.#lfo.start(currentTime);
 
     // Expose control parameters
-    this.volume = this.masterGain.gain;
-    this.frequency = this.osc.frequency;
+    this.volume = this.#masterGain.gain;
+    this.frequency = this.#osc.frequency;
   }
 
   /**
@@ -112,7 +112,7 @@ class SoundEngine {
    */
   setVolume(percent: number): void {
     // Use setValueAtTime for sample-accurate changes if needed, though direct value assignment is often fine for gain.
-    // this.volume.setValueAtTime(percent, this.audioContext.currentTime);
+    // this.volume.setValueAtTime(percent, this.#audioContext.currentTime);
     // Ensure value is clamped if necessary
     this.volume.value = Math.max(0, Math.min(1, percent));
   }
@@ -127,22 +127,22 @@ class SoundEngine {
     // Use setValueAtTime for smooth transitions if required, or target approaches
     this.frequency.setValueAtTime(
       targetFrequency,
-      this.audioContext.currentTime,
+      this.#audioContext.currentTime,
     );
     // For smoother changes:
-    // this.frequency.linearRampToValueAtTime(targetFrequency, this.audioContext.currentTime + 0.05); // 50ms ramp
+    // this.frequency.linearRampToValueAtTime(targetFrequency, this.#audioContext.currentTime + 0.05); // 50ms ramp
   }
 
   /**
    * Stops the engine sound and releases audio resources.
    */
   stop(): void {
-    const currentTime = this.audioContext.currentTime;
-    this.masterGain.gain.cancelScheduledValues(currentTime);
-    this.masterGain.gain.linearRampToValueAtTime(0, currentTime + 0.1); // Fade out
-    this.osc.stop(currentTime + 0.1);
-    this.lfo.stop(currentTime + 0.1);
+    const currentTime = this.#audioContext.currentTime;
+    this.#masterGain.gain.cancelScheduledValues(currentTime);
+    this.#masterGain.gain.linearRampToValueAtTime(0, currentTime + 0.1); // Fade out
+    this.#osc.stop(currentTime + 0.1);
+    this.#lfo.stop(currentTime + 0.1);
     // Consider closing the context after a delay if no other sounds are playing
-    // setTimeout(() => this.audioContext.close(), 500);
+    // setTimeout(() => this.#audioContext.close(), 500);
   }
 }

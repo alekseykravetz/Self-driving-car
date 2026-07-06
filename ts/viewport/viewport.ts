@@ -14,15 +14,15 @@ type ViewportMode = 'mouse' | 'touchpad';
 
 class Viewport {
   public canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
-  private scaleIndicator: ScaleIndicator;
+  #ctx: CanvasRenderingContext2D;
+  #scaleIndicator: ScaleIndicator;
 
   public zoom: number;
   public center: Point; // Center of the canvas element itself
   public offset: Point; // Offset of the world origin relative to the scaled canvas center
   public mode: ViewportMode = 'mouse'; // Wheel behavior (mouse vs. touchpad)
   // Internal state for handling panning/dragging
-  private drag: DragState = {
+  #drag: DragState = {
     start: new Point(0, 0), // Position where drag started
     end: new Point(0, 0), // Current position during drag
     offset: new Point(0, 0), // Vector difference (end - start)
@@ -31,12 +31,12 @@ class Viewport {
 
   // Timer used to commit a touchpad pan once two-finger scrolling stops,
   // mirroring the way a mouse drag commits on mouseup.
-  private wheelPanCommitTimer: ReturnType<typeof setTimeout> | null = null;
+  #wheelPanCommitTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private boundHandleMouseWheel: (e: WheelEvent) => void;
-  private boundHandleMouseDown: (e: MouseEvent) => void;
-  private boundHandleMouseMove: (e: MouseEvent) => void;
-  private boundHandleMouseUp: (e: MouseEvent) => void;
+  #boundHandleMouseWheel: (e: WheelEvent) => void;
+  #boundHandleMouseDown: (e: MouseEvent) => void;
+  #boundHandleMouseMove: (e: MouseEvent) => void;
+  #boundHandleMouseUp: (e: MouseEvent) => void;
 
   /**
    * Creates a Viewport instance.
@@ -50,20 +50,24 @@ class Viewport {
     offset: Point | null = null,
   ) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d')!;
+    this.#ctx = canvas.getContext('2d')!;
 
     this.zoom = zoom;
     // Canvas center remains fixed relative to the canvas element
     this.center = new Point(canvas.width / 2, canvas.height / 2);
     // Initial offset: use provided one or default to negative center (world origin at top-left)
     this.offset = offset ?? scale(this.center, -1); // Nullish coalescing for default
-    this.scaleIndicator = new ScaleIndicator(canvas.width, canvas.height, this);
+    this.#scaleIndicator = new ScaleIndicator(
+      canvas.width,
+      canvas.height,
+      this,
+    );
 
     // Bind event handlers
-    this.boundHandleMouseWheel = this.#handleMouseWheel.bind(this);
-    this.boundHandleMouseDown = this.#handleMouseDown.bind(this);
-    this.boundHandleMouseMove = this.#handleMouseMove.bind(this);
-    this.boundHandleMouseUp = this.#handleMouseUp.bind(this);
+    this.#boundHandleMouseWheel = this.#handleMouseWheel.bind(this);
+    this.#boundHandleMouseDown = this.#handleMouseDown.bind(this);
+    this.#boundHandleMouseMove = this.#handleMouseMove.bind(this);
+    this.#boundHandleMouseUp = this.#handleMouseUp.bind(this);
 
     this.#addEventListeners();
   }
@@ -76,15 +80,15 @@ class Viewport {
     // Keep viewport center in sync with responsive canvas resizes.
     this.center = new Point(this.canvas.width / 2, this.canvas.height / 2);
 
-    this.ctx.restore(); // Restore to default state (clears previous transforms)
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Clear the canvas
-    this.ctx.save(); // Save the clean state before applying new transforms
+    this.#ctx.restore(); // Restore to default state (clears previous transforms)
+    this.#ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Clear the canvas
+    this.#ctx.save(); // Save the clean state before applying new transforms
 
     // Move canvas origin to the center, apply zoom, then apply offset
-    this.ctx.translate(this.center.x, this.center.y);
-    this.ctx.scale(1 / this.zoom, 1 / this.zoom);
+    this.#ctx.translate(this.center.x, this.center.y);
+    this.#ctx.scale(1 / this.zoom, 1 / this.zoom);
     const totalOffset = this.getOffset(); // Includes permanent offset and active drag
-    this.ctx.translate(totalOffset.x, totalOffset.y);
+    this.#ctx.translate(totalOffset.x, totalOffset.y);
   }
 
   /**
@@ -101,7 +105,7 @@ class Viewport {
     );
 
     // If dragging and flag is set, counteract the temporary drag offset
-    return subtractDragOffset ? subtract(p, this.drag.offset) : p;
+    return subtractDragOffset ? subtract(p, this.#drag.offset) : p;
   }
 
   /**
@@ -111,7 +115,7 @@ class Viewport {
    */
   public getOffset(): Point {
     // Total offset is the permanent offset plus the current drag offset
-    return add(this.offset, this.drag.offset);
+    return add(this.offset, this.#drag.offset);
   }
 
   public getZoom(): number {
@@ -123,11 +127,11 @@ class Viewport {
   }
 
   public drawScaleIndicator(
-    ctx: CanvasRenderingContext2D = this.ctx,
+    ctx: CanvasRenderingContext2D = this.#ctx,
     viewportWidth: number = this.canvas.width,
     viewportHeight: number = this.canvas.height,
   ): void {
-    this.scaleIndicator.draw(ctx, viewportWidth, viewportHeight);
+    this.#scaleIndicator.draw(ctx, viewportWidth, viewportHeight);
   }
 
   /**
@@ -139,24 +143,24 @@ class Viewport {
   }
 
   #addEventListeners(): void {
-    this.canvas.addEventListener('wheel', this.boundHandleMouseWheel, {
+    this.canvas.addEventListener('wheel', this.#boundHandleMouseWheel, {
       passive: false,
     }); // Use WheelEvent, prevent default scroll
-    this.canvas.addEventListener('mousedown', this.boundHandleMouseDown);
-    this.canvas.addEventListener('mousemove', this.boundHandleMouseMove);
+    this.canvas.addEventListener('mousedown', this.#boundHandleMouseDown);
+    this.canvas.addEventListener('mousemove', this.#boundHandleMouseMove);
     // Listen to mouseup on the window/document to catch cases where mouse is released outside canvas
-    window.addEventListener('mouseup', this.boundHandleMouseUp);
+    window.addEventListener('mouseup', this.#boundHandleMouseUp);
   }
 
   // public removeEventListeners(): void {
-  //   this.canvas.removeEventListener('wheel', this.boundHandleMouseWheel);
-  //   this.canvas.removeEventListener('mousedown', this.boundHandleMouseDown);
-  //   this.canvas.removeEventListener('mousemove', this.boundHandleMouseMove); // May need removal from window instead if move continues outside
-  //   window.removeEventListener('mouseup', this.boundHandleMouseUp);
+  //   this.canvas.removeEventListener('wheel', this.#boundHandleMouseWheel);
+  //   this.canvas.removeEventListener('mousedown', this.#boundHandleMouseDown);
+  //   this.canvas.removeEventListener('mousemove', this.#boundHandleMouseMove); // May need removal from window instead if move continues outside
+  //   window.removeEventListener('mouseup', this.#boundHandleMouseUp);
   // }
 
   #resetDrag(): void {
-    this.drag = {
+    this.#drag = {
       start: new Point(0, 0), // Position where drag started
       end: new Point(0, 0), // Current position during drag
       offset: new Point(0, 0), // Vector difference (end - start)
@@ -171,8 +175,8 @@ class Viewport {
   #handleMouseDown(e: MouseEvent): void {
     // Typically, middle mouse button (button === 1) is used for panning
     if (e.button === 1) {
-      this.drag.start = this.getMouse(e); // Record start position in world coordinates
-      this.drag.active = true;
+      this.#drag.start = this.getMouse(e); // Record start position in world coordinates
+      this.#drag.active = true;
     }
   }
 
@@ -181,10 +185,10 @@ class Viewport {
    * @param e - The MouseEvent object.
    */
   #handleMouseMove(e: MouseEvent): void {
-    if (this.drag.active) {
-      this.drag.end = this.getMouse(e); // Update current position
+    if (this.#drag.active) {
+      this.#drag.end = this.getMouse(e); // Update current position
       // Calculate the vector difference from start to end
-      this.drag.offset = subtract(this.drag.end, this.drag.start);
+      this.#drag.offset = subtract(this.#drag.end, this.#drag.start);
     }
   }
 
@@ -194,9 +198,9 @@ class Viewport {
    */
   #handleMouseUp(e: MouseEvent): void {
     // Only finalize if a drag was active with the middle button
-    if (this.drag.active && e.button === 1) {
+    if (this.#drag.active && e.button === 1) {
       // Add the accumulated drag offset to the permanent viewport offset
-      this.offset = add(this.offset, this.drag.offset);
+      this.offset = add(this.offset, this.#drag.offset);
       // Reset the drag state for the next interaction
       this.#resetDrag();
     }
@@ -224,9 +228,9 @@ class Viewport {
       // Accumulate the pan into the temporary drag offset (the same layer the
       // mouse middle-drag uses) so it stays visible even while an external
       // owner — e.g. car tracking — keeps overwriting the permanent offset.
-      this.drag.active = true;
-      this.drag.offset = add(
-        this.drag.offset,
+      this.#drag.active = true;
+      this.#drag.offset = add(
+        this.#drag.offset,
         new Point(-e.deltaX * this.zoom, -e.deltaY * this.zoom),
       );
       // Commit the accumulated pan once scrolling pauses, like a mouseup.
@@ -242,13 +246,13 @@ class Viewport {
    * snaps back to the tracked target.
    */
   #scheduleWheelPanCommit(): void {
-    if (this.wheelPanCommitTimer !== null) {
-      clearTimeout(this.wheelPanCommitTimer);
+    if (this.#wheelPanCommitTimer !== null) {
+      clearTimeout(this.#wheelPanCommitTimer);
     }
-    this.wheelPanCommitTimer = setTimeout(() => {
-      this.offset = add(this.offset, this.drag.offset);
+    this.#wheelPanCommitTimer = setTimeout(() => {
+      this.offset = add(this.offset, this.#drag.offset);
       this.#resetDrag();
-      this.wheelPanCommitTimer = null;
+      this.#wheelPanCommitTimer = null;
     }, 150);
   }
 }

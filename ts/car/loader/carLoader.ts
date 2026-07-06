@@ -49,8 +49,8 @@ function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
  * Handles file input, reading, and parsing of one or multiple pure-JSON .car files.
  */
 class CarLoader {
-  private input: HTMLInputElement;
-  private onLoad: (cars: CarInfo[]) => void;
+  #input: HTMLInputElement;
+  #onLoad: (cars: CarInfo[]) => void;
 
   /**
    * @param onLoad - Callback invoked with an array of parsed CarInfo objects.
@@ -58,15 +58,15 @@ class CarLoader {
    *                  If the element doesn't exist, one will be created.
    */
   constructor(onLoad: (cars: CarInfo[]) => void, inputId = 'loadCarInput') {
-    this.onLoad = onLoad;
+    this.#onLoad = onLoad;
 
     let input = document.getElementById(inputId) as HTMLInputElement | null;
     if (!input) {
       input = this.#createInput(inputId);
     }
-    this.input = input;
-    this.input.multiple = true;
-    this.input.addEventListener('change', this.#handleFilesChange.bind(this));
+    this.#input = input;
+    this.#input.multiple = true;
+    this.#input.addEventListener('change', this.#handleFilesChange.bind(this));
   }
 
   #createInput(inputId: string): HTMLInputElement {
@@ -109,7 +109,7 @@ class CarLoader {
         if (completed === fileArray.length) {
           input.value = '';
           if (results.length > 0) {
-            this.onLoad(results);
+            this.#onLoad(results);
           } else {
             alert('No valid car files could be parsed.');
           }
@@ -121,7 +121,7 @@ class CarLoader {
         if (completed === fileArray.length) {
           input.value = '';
           if (results.length > 0) {
-            this.onLoad(results);
+            this.#onLoad(results);
           }
         }
       };

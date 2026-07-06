@@ -23,15 +23,15 @@ function parseWorldFileContent(content: string): object | null {
  * (static HTML in world.html, or the shared <world-toolbar> template).
  */
 class WorldLoader {
-  private input: HTMLInputElement;
-  private onLoad: (worldInfo: object) => void;
+  #input: HTMLInputElement;
+  #onLoad: (worldInfo: object) => void;
 
   /**
    * @param onLoad - Callback invoked with the parsed world JSON object.
    * @param inputId - ID of the existing file input element (default: "loadWorldInput").
    */
   constructor(onLoad: (worldInfo: object) => void, inputId = 'loadWorldInput') {
-    this.onLoad = onLoad;
+    this.#onLoad = onLoad;
 
     const input = document.getElementById(inputId) as HTMLInputElement | null;
     if (!input) {
@@ -40,8 +40,8 @@ class WorldLoader {
           'Ensure the page provides the file input before constructing WorldLoader.',
       );
     }
-    this.input = input;
-    this.input.addEventListener('change', this.#handleFileChange.bind(this));
+    this.#input = input;
+    this.#input.addEventListener('change', this.#handleFileChange.bind(this));
   }
 
   #handleFileChange(e: Event): void {
@@ -75,12 +75,12 @@ class WorldLoader {
       alert(
         'Could not parse world data from the file. Ensure it contains a valid JSON object.',
       );
-      this.input.value = '';
+      this.#input.value = '';
       return;
     }
 
-    this.onLoad(worldInfo);
-    this.input.value = '';
+    this.#onLoad(worldInfo);
+    this.#input.value = '';
   }
 
   /**

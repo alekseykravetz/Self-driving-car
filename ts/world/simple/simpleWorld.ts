@@ -13,31 +13,31 @@ class SimpleWorld implements IWorld {
   zoom?: number;
   offset?: Point;
 
-  private x: number;
-  private width: number;
-  private laneCount: number;
-  private left: number;
-  private right: number;
-  private top: number;
-  private bottom: number;
+  #x: number;
+  #width: number;
+  #laneCount: number;
+  #left: number;
+  #right: number;
+  #top: number;
+  #bottom: number;
 
   constructor(x: number, width: number, laneCount: number = 3) {
-    this.x = x;
-    this.width = width;
-    this.laneCount = laneCount;
+    this.#x = x;
+    this.#width = width;
+    this.#laneCount = laneCount;
 
-    this.left = x - width / 2;
-    this.right = x + width / 2;
+    this.#left = x - width / 2;
+    this.#right = x + width / 2;
 
     const infinity = 1000000;
-    this.top = -infinity;
-    this.bottom = infinity;
+    this.#top = -infinity;
+    this.#bottom = infinity;
 
     // Create road border segments (left and right edges)
-    const topLeft = new Point(this.left, this.top);
-    const bottomLeft = new Point(this.left, this.bottom);
-    const topRight = new Point(this.right, this.top);
-    const bottomRight = new Point(this.right, this.bottom);
+    const topLeft = new Point(this.#left, this.#top);
+    const bottomLeft = new Point(this.#left, this.#bottom);
+    const topRight = new Point(this.#right, this.#top);
+    const bottomRight = new Point(this.#right, this.#bottom);
 
     this.roadBorders = [
       new Segment(topLeft, bottomLeft),
@@ -45,8 +45,8 @@ class SimpleWorld implements IWorld {
     ];
 
     // Minimal graph: two nodes connected by one segment
-    const graphTop = new Point(this.x, this.top);
-    const graphBottom = new Point(this.x, this.bottom);
+    const graphTop = new Point(this.#x, this.#top);
+    const graphBottom = new Point(this.#x, this.#bottom);
     this.graph = new Graph(
       [graphTop, graphBottom],
       [new Segment(graphTop, graphBottom)],
@@ -58,30 +58,30 @@ class SimpleWorld implements IWorld {
     const startCenter = new Point(startX, startY);
     // Direction (0, 1) produces startAngle=0 via formula: -angle(dir) + π/2
     const startDirection = new Point(0, 1);
-    this.markings = [new Start(startCenter, startDirection, this.width, 20)];
+    this.markings = [new Start(startCenter, startDirection, this.#width, 20)];
   }
 
   /**
    * Returns the center x-coordinate of a specific lane.
    */
   getLaneCenter(laneIndex: number): number {
-    const laneWidth = this.width / this.laneCount;
-    const clampedIndex = Math.min(laneIndex, this.laneCount - 1);
-    return this.left + laneWidth / 2 + clampedIndex * laneWidth;
+    const laneWidth = this.#width / this.#laneCount;
+    const clampedIndex = Math.min(laneIndex, this.#laneCount - 1);
+    return this.#left + laneWidth / 2 + clampedIndex * laneWidth;
   }
 
   /**
    * Returns the number of lanes.
    */
   getLaneCount(): number {
-    return this.laneCount;
+    return this.#laneCount;
   }
 
   /**
    * Returns the center x-coordinate of the road.
    */
   getCenter(): number {
-    return this.x;
+    return this.#x;
   }
 
   /**
@@ -97,18 +97,18 @@ class SimpleWorld implements IWorld {
   draw(ctx: CanvasRenderingContext2D, _options: WorldDrawOptions): void {
     // Draw road surface
     ctx.fillStyle = '#BBB';
-    ctx.fillRect(this.left, this.top, this.width, this.bottom - this.top);
+    ctx.fillRect(this.#left, this.#top, this.#width, this.#bottom - this.#top);
 
     ctx.lineWidth = 5;
     ctx.strokeStyle = 'white';
 
     // Draw lane dividers (dashed lines)
-    for (let i = 1; i < this.laneCount; i++) {
-      const laneX = lerp(this.left, this.right, i / this.laneCount);
+    for (let i = 1; i < this.#laneCount; i++) {
+      const laneX = lerp(this.#left, this.#right, i / this.#laneCount);
       ctx.setLineDash([20, 20]);
       ctx.beginPath();
-      ctx.moveTo(laneX, this.top);
-      ctx.lineTo(laneX, this.bottom);
+      ctx.moveTo(laneX, this.#top);
+      ctx.lineTo(laneX, this.#bottom);
       ctx.stroke();
     }
 
