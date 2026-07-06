@@ -214,7 +214,6 @@ Training environments and genetic algorithm orchestration.
 | `modes/simpleModeBehavior.ts` | `SimpleSimState` + pure update functions + `SimpleTrainingStrategy` class               |
 | `modes/worldModeBehavior.ts`  | Pure `updateWorldCars()` function + `WorldTrainingStrategy` class                       |
 | `modes/borderCollision.ts`    | Collision response: push cars back onto road instead of stopping                        |
-| `rendering/layoutManager.ts`  | Canvas resize logic for multi-panel layout                                              |
 | `rendering/carRenderer.ts`    | Simulator-specific car drawing: pool highlighting, name labels, layering                |
 | `templates/`                  | HTML template strings for custom elements                                               |
 
@@ -222,9 +221,10 @@ Training environments and genetic algorithm orchestration.
 
 Functions shared by all canvas-based simulators (TrainingSimulator, TrafficSimulator, RaceSimulator).
 
-| Module                | Responsibility                                                              |
-| --------------------- | --------------------------------------------------------------------------- |
-| `spatialGridUtils.ts` | `buildRoadBorders()`, `queryBordersNearCar()`, `pointToSegmentDistanceSq()` |
+| Module                       | Responsibility                                                              |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `spatialGridUtils.ts`        | `buildRoadBorders()`, `queryBordersNearCar()`, `pointToSegmentDistanceSq()` |
+| `rendering/layoutManager.ts` | Canvas resize logic for multi-panel layout                                  |
 
 ### 5d. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
 

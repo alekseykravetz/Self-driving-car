@@ -222,6 +222,8 @@ Self-driving-car/
 │   │   │   ├── layoutToolbar.ts    # Custom element <layout-toolbar>: layout & visibility toggles
 │   │   │   ├── animationLoopToolbar.ts # Custom element <animation-loop-toolbar>: play/pause + render interval
 │   │   │   └── templates/          # HTML template strings for the panels
+│   │   ├── rendering/
+│   │   │   └── layoutManager.ts   # Canvas resize/layout logic
 │   │   ├── training/
 │   │   │   ├── trainingSimulator.ts # Unified training environment (world + simple modes)
 │   │   │   ├── trainingPanel.ts     # Custom element <training-panel>: training UI + genetic algorithm
@@ -235,8 +237,7 @@ Self-driving-car/
 │   │   │   │   ├── borderCollision.ts    # Collision correction with road borders
 │   │   │   │   └── trafficFactory.ts     # Dynamic traffic generation for simple mode
 │   │   │   ├── rendering/
-│   │   │   │   ├── carRenderer.ts   # Car drawing utilities (pool highlighting)
-│   │   │   │   └── layoutManager.ts # Canvas resize/layout logic
+│   │   │   │   └── carRenderer.ts   # Car drawing utilities (pool highlighting)
 │   │   │   └── templates/          # HTML template strings for the training panel + init modal
 │   │   ├── racing/
 │   │   │   ├── raceSimulator.ts # Racing mode with countdown, progress, AI opponents

@@ -878,7 +878,7 @@ destroying expand state.
 
 ---
 
-## Layout Management (`ts/simulator/training/rendering/layoutManager.ts`)
+## Layout Management (`ts/simulator/rendering/layoutManager.ts`)
 
 ### Constants
 
