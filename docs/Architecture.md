@@ -64,8 +64,8 @@ math/primitives (Point, Segment, Polygon, Envelope)
   → world/world, world/simple/simpleWorld, world/loader
   → camera, viewport, mini-map
   → audio
-  → utils (polysIntersect, getRGBA)
-  → car: config, sensorRaycaster, sensors, controls, physics, brain
+  → car: config, carState, sensorRaycaster, sensors, controls, physics
+  → car/brain (CarBrainAdapter — sole bridge to NeuralNetwork)
   → car/car, car/loader
   → neural-network
   → store
@@ -103,9 +103,10 @@ graph TD
     WorldLoader --> TrainingSimulator
     WorldLoader --> RaceSimulator
     WorldLoader --> WorldEditor
-    Sensor --> Car
+    CarState --> CarPhysics
+    CarState --> Car
     Controls --> Car
-    NeuralNetwork --> Car
+    CarBrainAdapter --> Car
     Car --> TrainingSimulator
     Car --> RaceSimulator
     Car --> TrafficSimulator
@@ -151,19 +152,20 @@ Vehicle physics, perception, and control abstraction. The main `Car` class is an
 orchestrator — motion, collision, rendering, and AI control mapping are delegated
 to focused collaborators.
 
-| Module                       | Responsibility                                               |
-| ---------------------------- | ------------------------------------------------------------ |
-| `config.ts`                  | Default car configuration (`maxSpeed`, `acceleration`, etc.) |
-| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls     |
-| `physics/carPhysics.ts`      | Motion (speed/angle), polygon creation, damage assessment    |
-| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                   |
-| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors)  |
-| `brain/carBrainAdapter.ts`   | Translates neural-network outputs into control values        |
-| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings   |
-| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                               |
-| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                      |
-| `controls/cameraControls.ts` | Webcam-based marker steering                                 |
-| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                    |
+| Module                       | Responsibility                                                                                              |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `config.ts`                  | Default car configuration (`maxSpeed`, `acceleration`, etc.)                                                |
+| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls, audio callbacks                                   |
+| `physics/carPhysics.ts`      | Motion (speed + translation), polygon creation, damage assessment. Steering (angle) handled by Car directly |
+| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                                                                  |
+| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors)                                                 |
+| `carState.ts`                | `CarState` + `ControlsState` interfaces (breaks circular deps)                                              |
+| `brain/carBrainAdapter.ts`   | Sole bridge to NeuralNetwork: create, serialize, deserialize, feedforward                                   |
+| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings                                                  |
+| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                                                                              |
+| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                                                                     |
+| `controls/cameraControls.ts` | Webcam-based marker steering                                                                                |
+| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                                                                   |
 
 **Factory method**: `Car.fromInfo(opts, info?)` provides an explicit, deterministic
 path for car rehydration from persisted `CarInfo`. The existing `load(info)`
@@ -290,7 +292,9 @@ These are importable by any file that needs them (World, editors, markings) via
 | `simulator/racing/raceSimulator.ts` | `RaceSimulator` — extends `SimulatorShell`; racing logic, car generation, countdown, corridor progress |
 | `simulator/racing/racePanel.ts`     | `RacePanel` — DOM assembly, stats updates, toolbar wiring for the race page                            |
 | `audio/sound.ts`                    | Audio synthesis (beep, explosion, ta-daa fanfare)                                                      |
-| `utils.ts`                          | `polysIntersect`, `getRGBA`, `getRandomColor`                                                          |
+| `math/collision.ts`                 | `polysIntersect` — edge intersection detection (moved from utils.ts)                                   |
+| `math/color.ts`                     | `getRGBA`, `getRandomColor` (moved from utils.ts)                                                      |
+| `store/serialization.ts`            | `safeJsonParse`, `stripFileExtension` (moved from utils.ts)                                            |
 | `types.ts`                          | Global type/interface declarations                                                                     |
 
 ### 9. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
@@ -351,10 +355,11 @@ NeuralNetwork.feedForward(readings + speed)
 outputs[4] (binary: forward, left, right, reverse)
     │
     ▼
-Car.#move() ── physics update ──▶ new position/angle
+CarPhysics.update() ── physics update ──▶ new position/speed
+                                           (angle set by Car.#applySteering() beforehand)
     │
     ▼
-Car.#assessDamage() ── polygon intersection ──▶ damaged?
+CarPhysics.assessDamage() ── polygon intersection ──▶ damaged?
     │                                            │
     ▼ (if borderMode === 'collision')            │
 handleCollisionWithRoadBorders() ── push back    │
@@ -525,9 +530,9 @@ were rewritten to allocate nothing per car/ray/segment:
 
 - **Sensor `#getReading`** — single pass tracking the closest offset (no per-ray
   array/`map`/spread/`find`), builds the hit point once for the winner.
-- **`getIntersectionOffset`** — number-returning intersection used by the sensor
-  and `polysIntersect`, replacing the `{x,y,offset}` object in boolean/offset-only
-  contexts.
+- **`getIntersectionOffset`** (`ts/math/utils.js`) — number-returning intersection
+  used by the sensor and `polysIntersect` (`ts/math/collision.ts`), replacing the
+  `{x,y,offset}` object in boolean/offset-only contexts.
 - **`polysIntersect` + AABB pre-filter** — `#assessDamage` rejects far obstacles
   with a bounding-box test before any edge math, and the 2-point border duplicate
   edge is skipped.

@@ -14,6 +14,11 @@
 - **Canvas 2D API only** — no WebGL or Three.js.
 - **Private members use `#` prefix** (ES2022 private fields).
 - **Serialization pattern:** `static load(info)` factory + instance method.
+- **Layer isolation:** Car must never import NeuralNetwork, audio, or explode. Bridge through `CarBrainAdapter` and `CarCallbacks`.
+- **Sensor decoupled:** Sensor holds no Car reference — receives `(x, y, angle, polygons)` via `update()`.
+- **Physics stateless:** `CarPhysics.update(carState, controlsState)` mutates state but knows nothing of Car or control subtypes.
+- **Audio via callbacks:** RaceSimulator injects `SoundEngine`/`explode` through `car.setCallbacks({onDamaged, onEngineUpdate})` instead of Car owning a sound engine.
+- **`Brain = unknown` opaque type:** Car stores brain as opaque type. Consumers cast `as NeuralNetwork` when they need network API.
 
 ## Key gotchas
 
@@ -22,6 +27,7 @@
 - **`Polygon.union()`** is complex — mutations can break road rendering.
 - **3D uses Painter's algorithm** (sort by distance, draw back-to-front).
 - **Neural network uses binary step activation** (not sigmoid/ReLU).
+- **`utils.ts` split** — functions moved to `math/collision.ts` (`polysIntersect`), `math/color.ts` (`getRGBA`, `getRandomColor`), `store/serialization.ts` (`safeJsonParse`, `stripFileExtension`). Old file kept as re-export barrel.
 
 ## Key commands
 

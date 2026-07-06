@@ -226,21 +226,27 @@ function createCarsForTraining(count, type, config, startInfo): Car[] {
 
 ### Brain Application (`applyPoolToCars`)
 
+Brain data flows through `CarBrainAdapter` — the Car class never imports
+`NeuralNetwork` directly. PoolManager uses `as NeuralNetwork` casts internally:
+
 ```typescript
 function applyPoolToCars(cars, pool, mutationRate): void {
   const brains = pool.filter((c) => c.brain).map((c) => c.brain);
 
   for (let i = 0; i < cars.length; i++) {
     if (i < brains.length) {
-      // Elitism: exact copy of pool member
-      cars[i].brain = NeuralNetwork.clone(brains[i]);
+      // Elitism: exact copy of pool member (via CarBrainAdapter.clone)
+      cars[i].brain = CarBrainAdapter.clone(brains[i]);
     } else {
       // Offspring: crossover + mutation from pool
-      cars[i].brain = NeuralNetwork.mutateFromPool(brains, mutationRate);
+      cars[i].brain = CarBrainAdapter.mutateFromPool(brains, mutationRate);
     }
   }
 }
 ```
+
+The adapter's `clone` and `mutateFromPool` internally cast to `NeuralNetwork`
+and delegate to `NeuralNetwork.clone` / `NeuralNetwork.mutateFromPool`.
 
 ### Full Generation Cycle
 

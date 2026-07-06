@@ -25,7 +25,7 @@ interface CarConstructorOptions {
 }
 
 interface CarInfo {
-  brain?: NeuralNetwork;
+  brain?: unknown; // Opaque brain data (serialized via CarBrainAdapter)
   maxSpeed: number;
   friction: number;
   acceleration: number;
@@ -151,14 +151,21 @@ if (|speed| < friction) speed = 0    // Prevent oscillation around zero
 
 ### 4. Steering
 
-```
+Steering is handled by `Car.#applySteering()` (not by CarPhysics), because the
+tilt behavior differs by control type:
+
+- **Keyboard controls**: simple left/right angle modification
+- **CameraControls / PhoneControls**: tilt offset read from sensor/device
+
+```typescript
+// Car.#applySteering() — simplified
 if (speed != 0):
   flip = (speed > 0) ? 1 : -1       // Reverse flips steering direction
   if (controls.left)  angle += 0.03 * flip
   if (controls.right) angle -= 0.03 * flip
 ```
 
-### 5. Position Update
+### 5. Position Update (CarPhysics.update / CarPhysics.move)
 
 ```
 x -= sin(angle) * speed    // Heading-based movement
@@ -348,7 +355,6 @@ interface IntersectionPoint extends Point {
 }
 
 class Sensor {
-  car: Car; // Reference to parent car
   rayCount: number; // Number of sensor rays (default: 5)
   rayLength: number; // Maximum detection distance (default: 150)
   raySpread: number; // Angular spread of rays (default: π/2 = 90°)
@@ -361,32 +367,36 @@ class Sensor {
 
 ### Ray Casting (`#castRays`)
 
-Generates `rayCount` rays spread evenly across the `raySpread` angle:
+Generates `rayCount` rays spread evenly across the `raySpread` angle.
+Takes the car's current center position and heading angle:
 
 ```typescript
-for (let i = 0; i < this.rayCount; i++) {
-  const rayAngle =
-    lerp(
-      this.raySpread / 2,
-      -this.raySpread / 2,
-      this.rayCount === 1 ? 0.5 : i / (this.rayCount - 1),
-    ) +
-    this.car.angle +
-    this.rayOffset;
+this.#castRays(x: number, y: number, angle: number): void {
+  for (let i = 0; i < this.rayCount; i++) {
+    const rayAngle =
+      lerp(
+        this.raySpread / 2,
+        -this.raySpread / 2,
+        this.rayCount === 1 ? 0.5 : i / (this.rayCount - 1),
+      ) +
+      angle +
+      this.rayOffset;
 
-  const start = new Point(this.car.x, this.car.y);
-  const end = new Point(
-    this.car.x - Math.sin(rayAngle) * this.rayLength,
-    this.car.y - Math.cos(rayAngle) * this.rayLength,
-  );
-  this.rays[i] = [start, end];
+    const start = new Point(x, y);
+    const end = new Point(
+      x - Math.sin(rayAngle) * this.rayLength,
+      y - Math.cos(rayAngle) * this.rayLength,
+    );
+    this.rays[i] = [start, end];
+  }
 }
 ```
 
-- Rays emanate from the car's center position
-- Spread evenly from `+raySpread/2` to `-raySpread/2` relative to car heading
+- Rays emanate from the provided center position
+- Spread evenly from `+raySpread/2` to `-raySpread/2` relative to heading
 - `rayOffset` rotates the entire sensor array (useful for asymmetric sensing)
 - Default config: 5 rays spanning 90° ahead of the car
+- Sensor no longer holds a reference to its parent Car — position data is passed in each frame
 
 ### Reading Detection (`#getReading`)
 
@@ -434,21 +444,22 @@ When `drawSensor` is true, rays are rendered on the canvas:
 
 ## AI Integration
 
-When the car has `type === 'AI'` and a brain:
+Brain evaluation is handled through `CarBrainAdapter`, the sole bridge between
+the Car layer and the NeuralNetwork layer:
 
 ```typescript
-// In update(), after sensor.update():
-const offsets = this.sensor.readings.map((r) => (r == null ? 0 : 1 - r.offset));
-// Add normalized speed as extra input
-offsets.push(this.speed / this.maxSpeed);
-
-const outputs = NeuralNetwork.feedForward(offsets, this.brain);
-
-this.controls.forward = outputs[0]; // 1 or 0
-this.controls.left = outputs[1]; // 1 or 0
-this.controls.right = outputs[2]; // 1 or 0
-this.controls.reverse = outputs[3]; // 1 or 0
+// In Car.update(), after sensor.update():
+const reading = CarBrainAdapter.getReading(this); // builds input array
+CarBrainAdapter.feedForward(this, reading);
+// Car's internal controls are updated by the adapter
 ```
+
+**What the adapter does**:
+
+1. Reads `sensor.readings`, inverts offsets (`1 - offset`)
+2. Appends normalized speed (`speed / maxSpeed`)
+3. Calls `NeuralNetwork.feedForward(offsets, brain)`
+4. Maps binary outputs to `controls.forward/left/right/reverse`
 
 **Input normalization**: Sensor readings are inverted (`1 - offset`) so that:
 
@@ -459,6 +470,8 @@ this.controls.reverse = outputs[3]; // 1 or 0
 **Speed input**: Normalized to `[0, 1]` range using `speed / maxSpeed`.
 
 **Network topology**: With default 5 rays + 1 speed input → 6 input neurons. Outputs are 4 binary decisions. Default architecture: `[6, 6, 4]` (6 inputs → 6 hidden → 4 outputs).
+
+**Opaque brain type**: `Car.brain` is typed as `unknown` (aliased `Brain`). No layer-2 code imports `NeuralNetwork` directly. Consumers that need the network API (e.g., pool manager, visualizer) use `as NeuralNetwork` casts internally.
 
 ---
 
@@ -483,7 +496,7 @@ toInfo(): CarInfo {
       raySpread: this.sensor.raySpread,
       rayOffset: this.sensor.rayOffset,
     },
-    brain: this.brain ? NeuralNetwork.clone(this.brain) : undefined,
+    brain: this.brain ? CarBrainAdapter.serialize(this.brain) : undefined,
   };
 }
 ```
@@ -504,7 +517,7 @@ Applies a `CarInfo` to an existing car instance (kept for backward compatibility
 1. Physics params (maxSpeed, acceleration, friction) are applied directly
 2. Size (width, height) override car dimensions if present
 3. Sensor config is applied to the sensor instance
-4. Brain is deserialized via `NeuralNetwork.deserialize(info.brain)` (or undefined if no brain)
+4. Brain is deserialized via `CarBrainAdapter.deserialize(info.brain, this)` (or undefined if no brain)
 5. If `hiddenLayers` changed or `rayCount` changed, the brain architecture must be rebuilt
 
 ### File Format (`.car` files)
