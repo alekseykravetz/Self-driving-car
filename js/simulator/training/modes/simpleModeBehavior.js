@@ -3,11 +3,12 @@
  * Simple-mode update logic for the simulator.
  * Manages dynamic traffic generation and car updates in the simple road environment.
  */
+const INITIAL_TRAFFIC_Y = -700;
 class SimpleSimState {
   traffic = [];
-  lastGeneratedTrafficY = -700;
+  lastGeneratedTrafficY = INITIAL_TRAFFIC_Y;
   simpleViewY = 0;
-  reset(startTrafficY = -700) {
+  reset(startTrafficY = INITIAL_TRAFFIC_Y) {
     this.traffic = [];
     this.lastGeneratedTrafficY = startTrafficY;
   }
@@ -35,8 +36,11 @@ function updateSimpleTraffic(
     );
   }
   // Cull traffic far behind start (don't cull based on bestCar to preserve road for stuck cars)
+  const TRAFFIC_CULL_MARGIN = 600;
   const startY = startInfo.y;
-  state.traffic = state.traffic.filter((c) => c.y < startY + 600);
+  state.traffic = state.traffic.filter(
+    (c) => c.y < startY + TRAFFIC_CULL_MARGIN,
+  );
   // Update traffic
   for (let i = 0; i < state.traffic.length; i++) {
     state.traffic[i].update(roadBorders);

@@ -3,12 +3,14 @@
  * Manages dynamic traffic generation and car updates in the simple road environment.
  */
 
+const INITIAL_TRAFFIC_Y = -700;
+
 class SimpleSimState {
   traffic: Car[] = [];
-  lastGeneratedTrafficY: number = -700;
+  lastGeneratedTrafficY: number = INITIAL_TRAFFIC_Y;
   simpleViewY: number = 0;
 
-  reset(startTrafficY: number = -700): void {
+  reset(startTrafficY: number = INITIAL_TRAFFIC_Y): void {
     this.traffic = [];
     this.lastGeneratedTrafficY = startTrafficY;
   }
@@ -40,8 +42,11 @@ function updateSimpleTraffic(
   }
 
   // Cull traffic far behind start (don't cull based on bestCar to preserve road for stuck cars)
+  const TRAFFIC_CULL_MARGIN = 600;
   const startY = startInfo.y;
-  state.traffic = state.traffic.filter((c) => c.y < startY + 600);
+  state.traffic = state.traffic.filter(
+    (c) => c.y < startY + TRAFFIC_CULL_MARGIN,
+  );
 
   // Update traffic
   for (let i = 0; i < state.traffic.length; i++) {

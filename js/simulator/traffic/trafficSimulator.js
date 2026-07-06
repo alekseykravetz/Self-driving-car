@@ -20,10 +20,12 @@
  * render-throttled RAF loop) lives in {@link SimulatorShell}; this class only
  * adds the traffic-specific domain behaviour.
  */
+const GRID_CELL_SIZE = 150;
+const SEGMENT_SEARCH_RADIUS = 200;
 class TrafficSimulator extends SimulatorShell {
   #world = null;
   #roadBorders = [];
-  #borderGrid = new SpatialHashGrid(150);
+  #borderGrid;
   #statsPanel;
   // Cars the user has placed on the road (the single source of truth; the
   // stats panel is a pure view over this array).
@@ -168,6 +170,7 @@ class TrafficSimulator extends SimulatorShell {
     this.viewport.offset.x = -startInfo.x;
     this.viewport.offset.y = -startInfo.y;
     this.#roadBorders = buildRoadBorders(this.#world);
+    this.#borderGrid = new SpatialHashGrid(GRID_CELL_SIZE);
     this.#borderGrid.build(this.#roadBorders);
   }
 
@@ -196,7 +199,11 @@ class TrafficSimulator extends SimulatorShell {
   /** Angle that faces the nearest road segment to `point` (start convention). */
   #headingAt(point) {
     if (!this.#world) return 0;
-    const segment = getNearestSegment(point, this.#world.graph.segments, 200);
+    const segment = getNearestSegment(
+      point,
+      this.#world.graph.segments,
+      SEGMENT_SEARCH_RADIUS,
+    );
     if (!segment) return 0;
     return -angle(segment.directionVector()) + Math.PI / 2;
   }
@@ -238,7 +245,7 @@ class TrafficSimulator extends SimulatorShell {
     const MIN_RANGE = 100;
     const rayLength = car.sensor?.rayLength ?? MIN_RANGE;
     const reach = Math.max(rayLength, MIN_RANGE);
-    const bodyMargin = Math.hypot(car.width, car.height) * 0.5;
+    const bodyMargin = Math.hypot(car.width, car.height) * BODY_MARGIN_RATIO;
     const reachWithBody = reach + bodyMargin;
     const reachWithBodySq = reachWithBody * reachWithBody;
     const obstacles = [];

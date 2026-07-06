@@ -28,8 +28,8 @@ class CarPhysics {
     if (this.car.speed > this.car.maxSpeed) {
       this.car.speed = this.car.maxSpeed;
     }
-    if (this.car.speed < -this.car.maxSpeed / 2) {
-      this.car.speed = -this.car.maxSpeed / 2;
+    if (this.car.speed < -this.car.maxSpeed * REVERSE_SPEED_RATIO) {
+      this.car.speed = -this.car.maxSpeed * REVERSE_SPEED_RATIO;
     }
     if (this.car.speed > 0) {
       this.car.speed -= this.car.friction;
@@ -48,14 +48,14 @@ class CarPhysics {
           this.car.controls instanceof PhoneControls &&
           this.car.controls.tilt !== 0)
       ) {
-        this.car.angle -= this.car.controls.tilt * 0.03;
+        this.car.angle -= this.car.controls.tilt * STEERING_SPEED;
       } else {
         const flip = this.car.speed > 0 ? 1 : -1;
         if (this.car.controls.left) {
-          this.car.angle += 0.03 * flip;
+          this.car.angle += STEERING_SPEED * flip;
         }
         if (this.car.controls.right) {
-          this.car.angle -= 0.03 * flip;
+          this.car.angle -= STEERING_SPEED * flip;
         }
       }
     }

@@ -20,9 +20,9 @@ function handleCollisionWithRoadBorders(car, bordersToCheck) {
   const corrector = correctors[correctorIndex];
   const normalizedCorrector = normalize(corrector);
   if (correctorIndex === 0 || correctorIndex === 3) {
-    car.angle += 0.1;
+    car.angle += COLLISION_ANGLE_CORRECTION;
   } else {
-    car.angle -= 0.1;
+    car.angle -= COLLISION_ANGLE_CORRECTION;
   }
   car.x += normalizedCorrector.x;
   car.y += normalizedCorrector.y;

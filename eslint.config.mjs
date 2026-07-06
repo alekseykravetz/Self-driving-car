@@ -145,6 +145,10 @@ const allowedUnusedVars = [
   'SensorRaycaster',
   'IntersectionPoint',
   'DEFAULT_CAR_CONFIG',
+  'STEERING_SPEED',
+  'REVERSE_SPEED_RATIO',
+  'COLLISION_ANGLE_CORRECTION',
+  'BODY_MARGIN_RATIO',
 
   // sound
   'SoundEngine',
@@ -454,6 +458,10 @@ const myGlobals = {
     SensorRaycaster: 'readonly',
     IntersectionPoint: 'readonly',
     DEFAULT_CAR_CONFIG: 'readonly',
+    STEERING_SPEED: 'readonly',
+    REVERSE_SPEED_RATIO: 'readonly',
+    COLLISION_ANGLE_CORRECTION: 'readonly',
+    BODY_MARGIN_RATIO: 'readonly',
     // sound.js
     SoundEngine: 'readonly',
     taDaa: 'readonly',
