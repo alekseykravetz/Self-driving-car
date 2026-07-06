@@ -11,7 +11,8 @@ import {
   DEFAULT_TREE_SEED,
   DEFAULT_TREE_PROTOTYPE_COUNT,
 } from './items/tree.js';
-import { Marking } from './markings/marking.js';
+import { loadMarking } from './markings/markingLoader.js';
+import type { Marking } from './markings/marking.js';
 import { Start } from './markings/start.js';
 import { Corridor } from './corridor.js';
 import { TrafficManager } from './trafficManager.js';
@@ -143,7 +144,7 @@ export class World implements IWorld {
     world.treeSize = info.treeSize;
 
     // Load authored, must-have data.
-    world.markings = (info.markings ?? []).map((m) => Marking.load(m)!);
+    world.markings = (info.markings ?? []).map((m) => loadMarking(m)!);
     world.corridors = loadWorldCorridors(info);
     world.zoom = info.zoom;
     world.offset = info.offset;
