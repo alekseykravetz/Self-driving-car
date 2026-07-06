@@ -3,6 +3,7 @@
 **Severity:** Low
 **Source:** Architectural Violation #9
 **Files:** `html/simulator.html:86-91`, `html/traffic.html:83-88`, `html/race.html:79-84`
+**Status:** ✅ Fixed
 
 ## Problem
 
