@@ -55,14 +55,17 @@ Open [http://localhost:9090](http://localhost:9090) in your browser to see the l
 
 ## Available Commands
 
-| Command             | Description                                                |
-| ------------------- | ---------------------------------------------------------- |
-| `npm start`         | Full dev environment (compile + serve + lint/format watch) |
-| `npm run tsc:watch` | TypeScript compiler in watch mode only                     |
-| `npm run serve`     | Static file server on port 9090                            |
-| `npm run format`    | Format all files with Prettier                             |
-| `npm run lint`      | Lint and auto-fix with ESLint                              |
-| `npm run fix:all`   | Format + lint combined                                     |
+| Command                | Description                                                |
+| ---------------------- | ---------------------------------------------------------- |
+| `npm start`            | Full dev environment (compile + serve + lint/format watch) |
+| `npm run tsc:watch`    | TypeScript compiler in watch mode only                     |
+| `npm run serve`        | Static file server on port 9090                            |
+| `npm run watch:fix`    | Auto-format + lint on file change                          |
+| `npm run format`       | Format all files with Prettier                             |
+| `npm run lint`         | Lint and auto-fix with ESLint                              |
+| `npm run fix:all`      | Format + lint combined                                     |
+| `npm run lint:watch`   | Watch mode linter (on changed files only)                  |
+| `npm run publish:site` | Deploy via here.now (`scripts/publish-site.sh`)            |
 
 ---
 
@@ -140,8 +143,16 @@ Self-driving-car/
 │   │
 │   ├── car/
 │   │   ├── car.ts              # Vehicle physics, collision, AI integration
+│   │   ├── config.ts           # Car configuration & defaults
+│   │   ├── brain/
+│   │   │   └── carBrainAdapter.ts  # Neural network ↔ car brain bridge
 │   │   ├── sensors/
 │   │   │   └── sensor.ts       # Ray-casting perception system
+│   │   ├── physics/
+│   │   │   ├── carPhysics.ts       # Acceleration, friction, steering dynamics
+│   │   │   └── sensorRaycaster.ts  # Optimized ray-segment intersection
+│   │   ├── rendering/
+│   │   │   └── carRenderer.ts  # Car drawing (hull, wheels, damage overlays)
 │   │   ├── controls/
 │   │   │   ├── controls.ts     # Keyboard & AI control modes
 │   │   │   ├── phoneControls.ts    # Device orientation (tilt) steering
@@ -150,6 +161,12 @@ Self-driving-car/
 │   │   └── loader/
 │   │       └── carLoader.ts    # .car/.json file-input loader
 │   │
+│   ├── rendering/              # Shared canvas-drawing helpers
+│   │   ├── pointRenderer.ts
+│   │   ├── segmentRenderer.ts
+│   │   ├── polygonRenderer.ts
+│   │   └── envelopeRenderer.ts
+│   │
 │   ├── neural-network/
 │   │   ├── network.ts          # Feedforward network, mutation, crossover
 │   │   └── visualizer.ts       # Real-time network state renderer
@@ -157,6 +174,7 @@ Self-driving-car/
 │   ├── world/
 │   │   ├── world.ts            # World data + draw + load container
 │   │   ├── corridor.ts         # Standalone race corridor (borders, caps, extend)
+│   │   ├── entry.ts            # World editor page entry point
 │   │   ├── trafficManager.ts   # Traffic light coordination
 │   │   ├── types.ts            # Shared world/editor types (IWorld, Corridor)
 │   │   ├── generation/
@@ -178,6 +196,7 @@ Self-driving-car/
 │   │   │   └── tree.ts         # Procedural tree with layered canopy
 │   │   ├── markings/           # Traffic marking types
 │   │   │   ├── marking.ts      # Base marking class
+│   │   │   ├── markingLoader.ts    # Marking de/serialization
 │   │   │   ├── crossing.ts     # Pedestrian crossing
 │   │   │   ├── light.ts        # Traffic light
 │   │   │   ├── parking.ts      # Parking spot
@@ -191,6 +210,8 @@ Self-driving-car/
 │   │       └── worldLoader.ts  # .world file-input loader
 │   │
 │   ├── simulator/              # Simulator domain (training, traffic, panels, core)
+│   │   ├── entry.ts            # Simulator page entry point
+│   │   ├── spatialGridUtils.ts # Spatial-grid helpers for collision queries
 │   │   ├── core/
 │   │   │   └── simulatorShell.ts   # Abstract base: canvases, viewport, camera, RAF loop
 │   │   ├── traffic/
@@ -201,24 +222,30 @@ Self-driving-car/
 │   │   │   ├── layoutToolbar.ts    # Custom element <layout-toolbar>: layout & visibility toggles
 │   │   │   ├── animationLoopToolbar.ts # Custom element <animation-loop-toolbar>: play/pause + render interval
 │   │   │   └── templates/          # HTML template strings for the panels
-│   │   └── training/
-│   │       ├── trainingSimulator.ts # Unified training environment (world + simple modes)
-│   │       ├── trainingPanel.ts     # Custom element <training-panel>: training UI + genetic algorithm
-│   │       ├── trainingInitModal.ts # Custom element <training-init-modal>: brain-source picker
-│   │       ├── genetics/
-│   │       │   ├── poolManager.ts   # Car creation & pool/brain application
-│   │       │   └── storageManager.ts # localStorage persistence & .car file download
-│   │       ├── modes/
-│   │       │   ├── simpleModeBehavior.ts # Simple-mode traffic & car update loops
-│   │       │   ├── worldModeBehavior.ts  # World-mode car update loop
-│   │       │   ├── borderCollision.ts    # Collision correction with road borders
-│   │       │   └── trafficFactory.ts     # Dynamic traffic generation for simple mode
-│   │       ├── rendering/
-│   │       │   ├── carRenderer.ts   # Car drawing utilities (pool highlighting)
-│   │       │   └── layoutManager.ts # Canvas resize/layout logic
-│   │       └── templates/          # HTML template strings for the training panel + init modal
+│   │   ├── training/
+│   │   │   ├── trainingSimulator.ts # Unified training environment (world + simple modes)
+│   │   │   ├── trainingPanel.ts     # Custom element <training-panel>: training UI + genetic algorithm
+│   │   │   ├── trainingInitModal.ts # Custom element <training-init-modal>: brain-source picker
+│   │   │   ├── genetics/
+│   │   │   │   ├── poolManager.ts   # Car creation & pool/brain application
+│   │   │   │   └── storageManager.ts # localStorage persistence & .car file download
+│   │   │   ├── modes/
+│   │   │   │   ├── simpleModeBehavior.ts # Simple-mode traffic & car update loops
+│   │   │   │   ├── worldModeBehavior.ts  # World-mode car update loop
+│   │   │   │   ├── borderCollision.ts    # Collision correction with road borders
+│   │   │   │   └── trafficFactory.ts     # Dynamic traffic generation for simple mode
+│   │   │   ├── rendering/
+│   │   │   │   ├── carRenderer.ts   # Car drawing utilities (pool highlighting)
+│   │   │   │   └── layoutManager.ts # Canvas resize/layout logic
+│   │   │   └── templates/          # HTML template strings for the training panel + init modal
+│   │   ├── racing/
+│   │   │   ├── raceSimulator.ts # Racing mode with countdown, progress, AI opponents
+│   │   │   └── racePanel.ts     # Custom element <race-panel>: race HUD
+│   │   └── views/
+│   │       └── simulatorPageHost.ts # Shared page host wiring (entry → simulator)
 │   │
 │   ├── store/                  # Bundled store assets (worlds + cars)
+│   │   ├── entry.ts            # Store page entry point
 │   │   ├── storeManager.ts     # Singleton: fetches manifest + assets, active selection
 │   │   ├── storePanel.ts       # Custom element <store-panel>: landing-page browser
 │   │   ├── types.ts            # Store type definitions
@@ -228,10 +255,12 @@ Self-driving-car/
 │   │   ├── worldToolbar.ts     # Custom element <world-toolbar>: border/tracking mode, file loading, camera debug
 │   │   ├── shortcutsToolbar.ts # Custom element <shortcuts-toolbar>: keyboard-shortcut indicators
 │   │   ├── worldLayersToolbar.ts # Custom element <world-layers-toolbar>: editor layer visibility + regenerate items
+│   │   ├── assetSelectors.ts   # File-input trigger helpers for worlds & cars
+│   │   ├── modeControls.ts     # Layout & visibility controls shared across simulators
 │   │   └── templates/          # HTML template strings for the toolbars
 │   │
-│   ├── games/
-│   │   └── race.ts             # Racing mode with countdown & scoring
+│   ├── race/
+│   │   └── entry.ts            # Racing page entry point
 │   │
 │   ├── viewport/
 │   │   ├── viewport.ts         # Pan/zoom transformation system
@@ -247,7 +276,6 @@ Self-driving-car/
 │   │
 │   ├── audio/
 │   │   └── sound.ts            # Audio effects (engine, beep, explosion)
-│   ├── types.ts                # Global type declarations
 │   └── utils.ts                # Collision helpers, color utilities
 │
 ├── js/                         # COMPILED OUTPUT (generated by tsc)
@@ -264,11 +292,18 @@ Self-driving-car/
 │   └── world/styles.css        # World editor styles
 │
 ├── assets/
-│   └── world/                  # Textures and sprites
+│   ├── favicon.svg             # Browser tab icon
+│   ├── logo.svg                # Project logo
+│   ├── car.png                 # Car sprite (store/landing page)
+│   ├── car_old.png             # Legacy car sprite
+│   └── world/                  # World textures and sprites
 │
-├── saves/                      # Saved worlds and trained brains
-│   ├── *.world                 # World definition files
-│   ├── *.car                   # Car brain/config files
+├── store/                      # Bundled asset packages
+│   ├── manifest.json           # Asset manifest (id → name/description)
+│   ├── world/                  # Pre-built world files (*.world)
+│   └── car/                    # Pre-trained car brains (*.car)
+│
+├── saves/                      # Exported brains and OSM data
 │   ├── bestBrain*.txt          # Exported neural networks
 │   └── *-osm-data.json        # OpenStreetMap import data
 │
@@ -317,15 +352,18 @@ JSON files containing a car configuration with neural network brain, physics par
 
 ### LocalStorage
 
-| Key                 | Contents                                                              |
-| ------------------- | --------------------------------------------------------------------- |
-| `bestPool`          | JSON array of top-K car configs with brains (unified format)          |
-| `raceCars`          | JSON array of car configs loaded via race mode's "Load car(s)" button |
-| `editorWorld`       | World saved by the world editor (legacy `world` key migrated on init) |
-| `loadedWorlds`      | User-loaded `.world` files (in-memory after refresh)                  |
-| `loadedCars`        | User-loaded `.car` files (in-memory after refresh)                    |
-| `store:activeWorld` | Id of the active store world (`store:`/`loaded:`/`editor`)            |
-| `store:activeCar`   | JSON array of active store car ids (multi-select)                     |
+| Key                  | Contents                                                              |
+| -------------------- | --------------------------------------------------------------------- |
+| `bestPool`           | JSON array of top-K car configs with brains (unified format)          |
+| `raceCars`           | JSON array of car configs loaded via race mode's "Load car(s)" button |
+| `editorWorld`        | World saved by the world editor (legacy `world` key migrated on init) |
+| `loadedWorlds`       | User-loaded `.world` files (in-memory after refresh)                  |
+| `loadedCars`         | User-loaded `.car` files (in-memory after refresh)                    |
+| `store:activeWorld`  | Id of the active store world (`store:`/`loaded:`/`editor`)            |
+| `store:activeCar`    | JSON array of active store car ids (multi-select)                     |
+| `sim:worldLayers`    | Simulator world-layer visibility toggles                              |
+| `editor:worldLayers` | Editor world-layer visibility toggles                                 |
+| `markerThreshold`    | Webcam marker detection threshold (camera controls)                   |
 
 > See [Save & Load](docs/SaveLoad.md) for the full persistence schema, legacy migration, and file formats.
 
