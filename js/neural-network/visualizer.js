@@ -370,7 +370,8 @@ export class NetworkVisualizer {
     }
     /** Draw a neuron's activation (and bias, if any) as a small label chip. */
     #drawNeuronValue(ctx, node) {
-        const lines = [`a=${node.value.toFixed(2)}`];
+        const v = Number.isFinite(node.value) ? node.value : 0;
+        const lines = [`a=${v.toFixed(2)}`];
         if (node.bias !== null)
             lines.push(`b=${node.bias.toFixed(2)}`);
         // Estimate the chip width so it can flip to the left of the node when it
@@ -509,7 +510,13 @@ export class NetworkVisualizer {
      * strongly on the black canvas (unlike the old dark blue).
      */
     static #color(value, alpha) {
-        const t = Math.max(-1, Math.min(1, value));
+        // Brains that have never been fed (e.g. the KEYS car's brain, which is
+        // built but never driven by feedForward) have undefined/NaN neuron
+        // values. Treat those as 0 so the visualizer renders a neutral net
+        // instead of crashing on `rgba(NaN, NaN, 255, NaN)`.
+        const v = Number.isFinite(value) ? value : 0;
+        const a = Number.isFinite(alpha) ? alpha : 0;
+        const t = Math.max(-1, Math.min(1, v));
         let r;
         let g;
         let b;
@@ -526,11 +533,12 @@ export class NetworkVisualizer {
             g = Math.round(lerp(210, 229, m));
             b = 255;
         }
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
     }
     /** Alpha with a floor so weak values stay faintly visible instead of vanishing. */
     static #alpha(value) {
-        return 0.25 + 0.75 * Math.min(1, Math.abs(value));
+        const v = Number.isFinite(value) ? value : 0;
+        return 0.25 + 0.75 * Math.min(1, Math.abs(v));
     }
     /** Shortest distance from a point to a line segment. */
     static #pointSegmentDistance(px, py, x1, y1, x2, y2) {

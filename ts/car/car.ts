@@ -252,6 +252,19 @@ export class Car {
         this.controls.left = output.left;
         this.controls.right = output.right;
         this.controls.reverse = output.reverse;
+      } else {
+        // Not brain-driven (e.g. the KEYS car), but a brain exists for the
+        // visualizer. Feed it with the live sensor readings so the network
+        // panel shows real activations instead of stale/undefined values.
+        CarBrainAdapter.computeControls(
+          this.sensor.readings,
+          this.speed,
+          this.maxSpeed,
+          this.brain,
+          this.sensor.trafficAwareness
+            ? this.sensor.trafficReadings
+            : undefined,
+        );
       }
     } else if (this.sensor) {
       this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls);
