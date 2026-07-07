@@ -1,6 +1,6 @@
 import { SensorRaycaster, } from '../physics/sensorRaycaster.js';
 import { DEFAULT_CAR_CONFIG } from '../config.js';
-import { getIntersectionOffset } from '../../math/utils.js';
+import { getIntersectionOffset, lerp } from '../../math/utils.js';
 /**
  * Encodes a traffic light state into the numeric input the neural network
  * consumes: `1` for green (go), `0.5` for yellow (caution), `0` for red/off
@@ -25,10 +25,10 @@ export class Sensor {
     rays;
     readings;
     /**
-     * Per-ray traffic-light state. `null` means no traffic control was seen
-     * along that ray (or the sensor is not traffic-aware). Populated only when
-     * `trafficAwareness` is true and traffic controls were supplied to
-     * {@link update}.
+     * Per-ray traffic-light detection result. `null` means no traffic control
+     * was seen along that ray (or the sensor is not traffic-aware). Populated
+     * only when `trafficAwareness` is true and traffic controls were supplied
+     * to {@link update}.
      */
     trafficReadings;
     constructor(config) {
@@ -80,7 +80,12 @@ export class Sensor {
                 }
             }
             if (minState !== null) {
-                result[i] = minState;
+                result[i] = {
+                    state: minState,
+                    offset: minOffset,
+                    x: lerp(ray[0].x, ray[1].x, minOffset),
+                    y: lerp(ray[0].y, ray[1].y, minOffset),
+                };
             }
         }
         return result;
@@ -88,7 +93,57 @@ export class Sensor {
     draw(ctx) {
         for (let i = 0; i < this.rays.length; i++) {
             const reading = this.readings[i];
-            if (!reading) {
+            const traffic = this.trafficReadings[i];
+            if (traffic) {
+                const color = traffic.state === 'green'
+                    ? '#0F0'
+                    : traffic.state === 'yellow'
+                        ? '#FF0'
+                        : '#F00';
+                // Colored ray from car to traffic light
+                ctx.beginPath();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = color;
+                ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+                ctx.lineTo(traffic.x, traffic.y);
+                ctx.stroke();
+                // Continue ray from light to wall (yellow) if wall exists
+                if (reading) {
+                    ctx.beginPath();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'yellow';
+                    ctx.moveTo(traffic.x, traffic.y);
+                    ctx.lineTo(reading.x, reading.y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.fillStyle = 'yellow';
+                    ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                // Traffic dot with white border at the light intersection point
+                ctx.beginPath();
+                ctx.arc(traffic.x, traffic.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+            else if (reading) {
+                // Standard wall-only ray (no traffic)
+                ctx.beginPath();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'yellow';
+                ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+                ctx.lineTo(reading.x, reading.y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.fillStyle = 'yellow';
+                ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            else {
+                // Nothing hit — faint full-length ray
                 ctx.save();
                 ctx.globalAlpha = 0.2;
                 ctx.beginPath();
@@ -98,26 +153,6 @@ export class Sensor {
                 ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
                 ctx.stroke();
                 ctx.restore();
-                continue;
-            }
-            ctx.beginPath();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'yellow';
-            ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
-            ctx.lineTo(reading.x, reading.y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.fillStyle = 'yellow';
-            ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
-            ctx.fill();
-            // Traffic-light indicator on the best car's sensor display.
-            const traffic = this.trafficReadings[i];
-            if (traffic) {
-                ctx.beginPath();
-                ctx.fillStyle =
-                    traffic === 'green' ? '#0F0' : traffic === 'yellow' ? '#FF0' : '#F00';
-                ctx.arc(reading.x, reading.y - 8, 3, 0, Math.PI * 2);
-                ctx.fill();
             }
         }
     }

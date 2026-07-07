@@ -1,5 +1,5 @@
 import { NeuralNetwork } from '../../neural-network/network.js';
-import { encodeTrafficState, } from '../sensors/sensor.js';
+import { encodeTrafficState } from '../sensors/sensor.js';
 export class CarBrainAdapter {
     static createBrain(layerCounts) {
         return new NeuralNetwork(layerCounts);
@@ -21,13 +21,13 @@ export class CarBrainAdapter {
     static inputLayerSize(rayCount, trafficAwareness) {
         return trafficAwareness ? rayCount * 2 + 1 : rayCount + 1;
     }
-    static computeControls(readings, speed, maxSpeed, brain, trafficStates) {
+    static computeControls(readings, speed, maxSpeed, brain, trafficReadings) {
         let offsets;
-        if (trafficStates && trafficStates.length) {
+        if (trafficReadings && trafficReadings.length) {
             offsets = new Array(readings.length * 2 + 1);
             for (let i = 0; i < readings.length; i++) {
                 offsets[i * 2] = readings[i] === null ? 0 : 1 - readings[i].offset;
-                offsets[i * 2 + 1] = encodeTrafficState(trafficStates[i] ?? null);
+                offsets[i * 2 + 1] = encodeTrafficState(trafficReadings[i]?.state ?? null);
             }
             offsets[offsets.length - 1] = speed / maxSpeed;
         }
