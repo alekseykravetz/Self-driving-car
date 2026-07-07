@@ -92,6 +92,12 @@ export class TrainingPanelElement extends HTMLElement {
   #statDistEl: HTMLElement | null = null;
   #statSpeedEl: HTMLElement | null = null;
 
+  // Human-in-the-loop (D1): toggle + status. When on, the KEYS car's brain is
+  // trained online to imitate the human's keypresses (see Car.setLearningFromHuman)
+  // and included as a candidate when building the next generation's gene pool.
+  #injectKeysInput: HTMLInputElement | null = null;
+  #keysPoolStatus: HTMLElement | null = null;
+
   // Pool table and status dots
   #poolTableBody: HTMLElement | null = null;
   #dotPool: HTMLElement | null = null;
@@ -160,9 +166,14 @@ export class TrainingPanelElement extends HTMLElement {
     return getSortedAICars(this.cars, this.#evaluateFitness);
   }
 
-  #getTopCarInfoPool(): CarInfo[] {
+  #getTopCarInfoPool(includeKeys: boolean = false): CarInfo[] {
     const { poolSize } = this.getSettings();
-    return getTopCarInfoPool(this.cars, this.#evaluateFitness, poolSize);
+    return getTopCarInfoPool(
+      this.cars,
+      this.#evaluateFitness,
+      poolSize,
+      includeKeys,
+    );
   }
 
   #applyPoolToCars(cars: Car[], pool: CarInfo[]): void {
@@ -202,6 +213,11 @@ export class TrainingPanelElement extends HTMLElement {
     this.#statFrozenRow = this.querySelector('#stat-frozen-row');
     this.#statDistEl = this.querySelector('#stat-dist');
     this.#statSpeedEl = this.querySelector('#stat-speed');
+
+    // Human-in-the-loop toggle + status
+    this.#injectKeysInput = this.querySelector('#injectKeys');
+    this.#keysPoolStatus = this.querySelector('#keysPoolStatus');
+    this.#updateKeysPoolStatus();
 
     // Pool table and status dots
     this.#poolTableBody = this.querySelector('#poolTableBody');
@@ -323,6 +339,36 @@ export class TrainingPanelElement extends HTMLElement {
         });
       }
     }
+
+    // Human-in-the-loop toggle: propagate to the live KEYS car immediately so
+    // online imitation learning starts/stops mid-generation, and refresh the
+    // status badge.
+    if (this.#injectKeysInput) {
+      this.#injectKeysInput.addEventListener('change', () => {
+        this.#applyLearningFromHumanToKeysCar();
+        this.#updateKeysPoolStatus();
+      });
+    }
+  }
+
+  /** Reflect the toggle state on the live KEYS car (if any). */
+  #applyLearningFromHumanToKeysCar(): void {
+    const enabled = this.#injectKeysInput?.checked ?? false;
+    const keysCar = this.cars.find((c) => c.type === 'KEYS');
+    keysCar?.setLearningFromHuman(enabled);
+  }
+
+  /** Badge shown next to the toggle: "∈ pool" when injection is enabled. */
+  #updateKeysPoolStatus(): void {
+    if (!this.#keysPoolStatus) return;
+    const enabled = this.#injectKeysInput?.checked ?? false;
+    this.#keysPoolStatus.textContent = enabled ? '∈ pool' : '';
+    this.#keysPoolStatus.style.opacity = enabled ? '1' : '0';
+  }
+
+  /** Public read of the toggle (used by nextGeneration). */
+  get injectKeysEnabled(): boolean {
+    return this.#injectKeysInput?.checked ?? false;
   }
 
   /** Dim the idle stats row + show/hide the idle range input. */
@@ -469,7 +515,12 @@ export class TrainingPanelElement extends HTMLElement {
     this.iteration++;
     this.maxDistancePassed = 0;
     this.selectedPoolIndices.clear();
-    this.#createCarsWithPool(this.#getTopCarInfoPool());
+    // When human-in-the-loop is on, the KEYS car's imitation-learned brain
+    // competes alongside AI cars for a slot in the next generation's gene pool.
+    // Topology compatibility is later enforced by brainsCompatible() inside
+    // applyPoolToCars, so an incompatible KEYS brain is silently dropped.
+    const pool = this.#getTopCarInfoPool(this.injectKeysEnabled);
+    this.#createCarsWithPool(pool);
   }
 
   public newTraining(): void {
@@ -490,6 +541,11 @@ export class TrainingPanelElement extends HTMLElement {
     const config = this.getCarSettings();
     const aiCars = this.#generateCars(settings.carCount, 'AI', config);
     const keysCar = this.#generateCars(1, 'KEYS', config);
+    // Each generation starts with a fresh random KEYS brain (per the D1 plan);
+    // online imitation learning then shapes it over the generation as the
+    // human drives. Apply the toggle state so a freshly-restarted session
+    // respects the checkbox immediately.
+    keysCar[0].setLearningFromHuman(this.injectKeysEnabled);
     this.cars = [...keysCar, ...aiCars];
     this.bestCar = this.cars[0];
     this.bestPool = [];

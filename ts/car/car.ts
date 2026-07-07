@@ -5,7 +5,14 @@ import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
 import { CarRenderer, type CarDrawOptions } from './rendering/carRenderer.js';
 import { CarBrainAdapter, type Brain } from './brain/carBrainAdapter.js';
+import { NeuralNetwork } from '../neural-network/network.js';
 import { STEERING_SPEED, DEFAULT_CAR_CONFIG } from './config.js';
+
+// Online imitation-learning rate for the KEYS car (human-in-the-loop training).
+// Per-frame perceptron-style update via the straight-through estimator; see
+// NeuralNetwork.trainStep. Tuned for a typical generation length — raise to
+// converge faster (risk of oscillation), lower for smoother learning.
+const KEYS_LEARNING_RATE = 0.1;
 import type { Point } from '../math/primitives/point.js';
 import type { ControlsState } from './carState.js';
 
@@ -87,6 +94,12 @@ export class Car {
   renderer: CarRenderer;
 
   #callbacks?: CarCallbacks;
+
+  // When true (KEYS car only), the brain is trained online each frame to
+  // imitate the human's keypresses via NeuralNetwork.trainStep. The forward
+  // pass already runs in the KEYS branch to drive the network visualizer, so
+  // training piggybacks on the freshly-populated level state at no extra cost.
+  #learningFromHuman: boolean = false;
 
   constructor(opts: CarOptions) {
     this.x = opts.x;
@@ -265,6 +278,28 @@ export class Car {
             ? this.sensor.trafficReadings
             : undefined,
         );
+        // Online imitation learning: nudge the KEYS brain toward the human's
+        // actual keypresses so its weights encode demonstrated driving. The
+        // forward pass above already populated each level's inputs/outputs,
+        // so trainStep can read them directly. Skip when damaged or stationary
+        // to avoid learning crashes / "sit still" as good behavior.
+        if (
+          this.#learningFromHuman &&
+          !this.damaged &&
+          this.speed !== 0 &&
+          this.controls instanceof Controls
+        ) {
+          NeuralNetwork.trainStep(
+            this.brain as NeuralNetwork,
+            [
+              this.controls.forward ? 1 : 0,
+              this.controls.left ? 1 : 0,
+              this.controls.right ? 1 : 0,
+              this.controls.reverse ? 1 : 0,
+            ],
+            KEYS_LEARNING_RATE,
+          );
+        }
       }
     } else if (this.sensor) {
       this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls);
@@ -284,5 +319,14 @@ export class Car {
 
   setCallbacks(cb: CarCallbacks): void {
     this.#callbacks = cb;
+  }
+
+  /** Enable/disable online imitation learning (KEYS car only). */
+  setLearningFromHuman(enabled: boolean): void {
+    this.#learningFromHuman = enabled;
+  }
+
+  get learningFromHuman(): boolean {
+    return this.#learningFromHuman;
   }
 }

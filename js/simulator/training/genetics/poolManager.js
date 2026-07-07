@@ -68,19 +68,21 @@ export function applyPoolToCars(cars, pool, mutationRate) {
         aiIndex++;
     }
 }
-export function getSortedAICars(cars, evaluateFitness) {
+export function getSortedAICars(cars, evaluateFitness, includeKeys = false) {
     return cars
-        .filter((c) => c.brain && c.type !== 'KEYS')
+        .filter((c) => c.brain && (includeKeys || c.type !== 'KEYS'))
         .sort((a, b) => evaluateFitness(b) - evaluateFitness(a));
 }
-export function getTopAICars(cars, evaluateFitness, k) {
+export function getTopAICars(cars, evaluateFitness, k, includeKeys = false) {
     if (k <= 0)
         return [];
     const top = [];
     const topFit = [];
     for (let i = 0; i < cars.length; i++) {
         const car = cars[i];
-        if (!car.brain || car.type === 'KEYS')
+        if (!car.brain)
+            continue;
+        if (!includeKeys && car.type === 'KEYS')
             continue;
         const fit = evaluateFitness(car);
         if (top.length === k && fit <= topFit[top.length - 1])
@@ -96,8 +98,8 @@ export function getTopAICars(cars, evaluateFitness, k) {
     }
     return top;
 }
-export function getTopCarInfoPool(cars, evaluateFitness, poolSize) {
-    return getSortedAICars(cars, evaluateFitness)
+export function getTopCarInfoPool(cars, evaluateFitness, poolSize, includeKeys = false) {
+    return getSortedAICars(cars, evaluateFitness, includeKeys)
         .slice(0, poolSize)
         .map((c) => c.toInfo());
 }

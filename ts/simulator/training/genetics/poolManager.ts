@@ -86,9 +86,10 @@ export function applyPoolToCars(
 export function getSortedAICars(
   cars: Car[],
   evaluateFitness: (car: Car) => number,
+  includeKeys: boolean = false,
 ): Car[] {
   return cars
-    .filter((c: Car) => c.brain && c.type !== 'KEYS')
+    .filter((c: Car) => c.brain && (includeKeys || c.type !== 'KEYS'))
     .sort((a, b) => evaluateFitness(b) - evaluateFitness(a));
 }
 
@@ -96,6 +97,7 @@ export function getTopAICars(
   cars: Car[],
   evaluateFitness: (car: Car) => number,
   k: number,
+  includeKeys: boolean = false,
 ): Car[] {
   if (k <= 0) return [];
 
@@ -104,7 +106,8 @@ export function getTopAICars(
 
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
-    if (!car.brain || car.type === 'KEYS') continue;
+    if (!car.brain) continue;
+    if (!includeKeys && car.type === 'KEYS') continue;
 
     const fit = evaluateFitness(car);
 
@@ -127,8 +130,9 @@ export function getTopCarInfoPool(
   cars: Car[],
   evaluateFitness: (car: Car) => number,
   poolSize: number,
+  includeKeys: boolean = false,
 ): CarInfo[] {
-  return getSortedAICars(cars, evaluateFitness)
+  return getSortedAICars(cars, evaluateFitness, includeKeys)
     .slice(0, poolSize)
-    .map((c: Car) => c.toInfo());
+    .map((c) => c.toInfo());
 }

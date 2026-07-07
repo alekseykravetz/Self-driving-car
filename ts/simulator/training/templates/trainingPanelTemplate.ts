@@ -294,6 +294,14 @@ export const TRAINING_PANEL_TEMPLATE = `
       🔄 New Training
     </button>
   </div>
+  <label
+    class="inject-keys-toggle"
+    title="Learn from your driving: train the KEYS car's brain each frame to imitate your keypresses, then include it as a parent candidate for the next generation."
+  >
+    <input type="checkbox" id="injectKeys" checked />
+    <span>Learn from KEYS car</span>
+    <span class="keys-status" id="keysPoolStatus"></span>
+  </label>
 </div>
 
 <!-- ── Pool Statistics ──────────────────────────────── -->

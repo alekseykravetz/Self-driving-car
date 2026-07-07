@@ -108,6 +108,64 @@ export class NeuralNetwork {
         return cloned;
     }
     /**
+     * Online imitation-learning step for the KEYS car (human-in-the-loop).
+     * Assumes `feedForward(inputVector, network)` was just called on the current
+     * frame's input, so each `level.inputs[]` and `level.outputs[]` already holds
+     * fresh values. Trains every layer via the straight-through estimator
+     * (treats the binary-step derivative as 1), so inference keeps using step
+     * activation and pool/crossover compatibility is unaffected.
+     *
+     * Note on the bias sign: this codebase uses `z = Σ w·x − bias` with
+     * `step(z > 0)`, so to raise `z` when the error is positive we *decrease*
+     * the bias (opposite of the usual `b += lr·err` convention).
+     */
+    static trainStep(network, targets, lr = 0.1) {
+        const levels = network.levels;
+        const L = levels.length;
+        if (L === 0)
+            return;
+        const outLevel = levels[L - 1];
+        if (targets.length !== outLevel.outputs.length)
+            return;
+        // deltas[i][j] = error signal for output j of level i.
+        const deltas = new Array(L);
+        // Output level: perceptron error (STE: step' = 1, so delta = target - output).
+        const outDelta = new Array(outLevel.outputs.length);
+        for (let j = 0; j < outLevel.outputs.length; j++) {
+            outDelta[j] = (targets[j] ?? 0) - outLevel.outputs[j];
+        }
+        deltas[L - 1] = outDelta;
+        // Hidden levels: backprop through the next level's weights. step' = 1
+        // contributes no extra factor, so delta_hidden[k] = Σ_j w_next[k][j] * delta_next[j].
+        for (let i = L - 2; i >= 0; i--) {
+            const level = levels[i];
+            const next = levels[i + 1];
+            const delta = new Array(level.outputs.length).fill(0);
+            for (let k = 0; k < level.outputs.length; k++) {
+                let sum = 0;
+                for (let j = 0; j < next.outputs.length; j++) {
+                    sum += next.weights[k][j] * deltas[i + 1][j];
+                }
+                delta[k] = sum;
+            }
+            deltas[i] = delta;
+        }
+        // Apply updates: w[input][output] += lr * delta_out * input; bias -= lr * delta.
+        for (let i = 0; i < L; i++) {
+            const level = levels[i];
+            const delta = deltas[i];
+            for (let j = 0; j < level.outputs.length; j++) {
+                const d = delta[j];
+                if (d === 0)
+                    continue;
+                for (let k = 0; k < level.inputs.length; k++) {
+                    level.weights[k][j] += lr * d * level.inputs[k];
+                }
+                level.biases[j] -= lr * d;
+            }
+        }
+    }
+    /**
      * Generates a new network by crossing over and mutating from a pool of networks.
      * Clones parents before crossover to prevent mutation of the original pool.
      */
