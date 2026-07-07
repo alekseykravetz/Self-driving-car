@@ -210,6 +210,13 @@ export const TRAINING_PANEL_TEMPLATE = `
         title="Sensor ray offset (radians)"
       />
     </div>
+
+    <div class="ctrl ctrl-checkbox">
+      <label title="Let the sensor detect traffic lights (doubles the brain input layer)">
+        <input type="checkbox" id="carTrafficAwareness" />
+        <span class="ctrl-label">Traffic Lights</span>
+      </label>
+    </div>
   </div>
 </div>
 

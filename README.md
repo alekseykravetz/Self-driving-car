@@ -13,12 +13,13 @@ Cars learn to navigate procedurally-generated worlds through evolutionary select
 - **OpenStreetMap Import** — Load real-world road networks from OSM Overpass API data
 - **Interactive World Editor** — Visual tools for designing road networks, placing traffic lights, stop signs, crosswalks, and destinations
 - **Multiple Control Modes** — Keyboard, phone tilt (device orientation), camera-based marker tracking, and AI neural network control
-- **Real-time Neural Network Visualizer** — Live display of neuron activations, weights, and biases as cars drive
+- **Real-time Neural Network Visualizer** — Live display of neuron activations, weights, and biases as cars drive; follows the best AI car by default, or the user-controlled KEYS car when the toolbar tracking mode is set to "keys" (which also reveals the KEYS car's sensor rays)
 - **3D Camera Perspective** — Pseudo-3D rendering with buildings, trees, and perspective projection
 - **Racing Mode** — Competitive races between player and AI cars with countdown, progress tracking, and sound effects
 - **Live Traffic Jam** — Click anywhere on a loaded world to drop trained cars that immediately drive themselves, collide with each other, and build an emergent traffic jam
 - **Spatial Congestion Heatmap** — Toggle a 🌡️ colour overlay (blue → red) on any simulator to see where traffic accumulates and idles over time
 - **Traffic Simulation** — Coordinated traffic lights with green/yellow/red cycling at intersections
+- **Traffic-Light Perception** — AI cars with `sensor.trafficAwareness: true` detect traffic lights via their ray network and feed the light state (green=1, yellow=0.5, red/off=0) as an extra input per ray; enabled per car via the "Traffic Lights" checkbox in the training car-config (init modal and live panel), defaults to off so legacy cars keep the original input layer and drive unchanged
 - **Mini-Map** — Real-time overview of all cars and the world graph
 - **Save/Load System** — Persist worlds, trained brains, and car configurations to files or localStorage
 
@@ -104,7 +105,7 @@ Open [http://localhost:9090](http://localhost:9090) in your browser to see the l
 
 ### Neural Network Architecture
 
-- **Input Layer**: Sensor ray offsets (normalized 0–1) + current speed
+- **Input Layer**: Sensor ray offsets (normalized 0–1) + current speed. Traffic-aware cars add one light-state input per ray (input size `rayCount*2 + 1` vs legacy `rayCount + 1`)
 - **Hidden Layer(s)**: Configurable neuron count (default: 6)
 - **Output Layer**: 4 neurons → Forward, Left, Right, Reverse
 - **Activation**: Binary step function (fires if weighted sum > bias)
@@ -141,6 +142,7 @@ Self-driving-car/
 │   │   ├── osm-importer/
 │   │   │   └── osm.ts          # OpenStreetMap data parser (lat/lon → canvas)
 │   │   ├── spatialGrid.ts      # Uniform hash grid for fast range queries (segments)
+│   │   ├── trafficControlGrid.ts # Spatial hash grid indexing traffic-light polygons for AI perception
 │   │   └── heatmapGrid.ts      # Lazy grid-based congestion counter for the heatmap overlay
 │   │
 │   ├── car/
@@ -215,6 +217,7 @@ Self-driving-car/
 │   ├── simulator/              # Simulator domain (training, traffic, panels, core)
 │   │   ├── entry.ts            # Simulator page entry point
 │   │   ├── spatialGridUtils.ts # Spatial-grid helpers for collision queries
+│   │   ├── trafficControlUtils.ts # Traffic-light grid build/query helpers for AI perception
 │   │   ├── core/
 │   │   │   └── simulatorShell.ts   # Abstract base: canvases, viewport, camera, RAF loop
 │   │   ├── traffic/

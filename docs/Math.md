@@ -461,6 +461,42 @@ thousands of short-lived `Set` allocations per frame.
 
 ---
 
+## Traffic Control Grid (`ts/math/trafficControlGrid.ts`)
+
+A sibling spatial hash grid (same 150px cell size, same allocation-free
+`Int32Array`-stamp dedup) that indexes **traffic-light polygons** instead of
+road-border segments, for AI traffic-light perception. Each entry stores a
+`{ polygon, getState }` pair so the grid is rebuilt only when world **markings**
+change while the light **state** is read live at query time via the `getState`
+closure — no rebuild is needed when lights cycle.
+
+```typescript
+type TrafficControlState = 'green' | 'yellow' | 'red';
+interface TrafficControlEntry {
+  polygon: Polygon;
+  getState: () => TrafficControlState;
+}
+interface SensorTrafficControl {
+  polygon: Polygon;
+  state: TrafficControlState;
+}
+
+class TrafficControlGrid {
+  readonly cellSize: number; // 150
+  build(entries: TrafficControlEntry[]): void; // rebuilt on world-markings change
+  query(x: number, y: number, radius: number): SensorTrafficControl[]; // live state read
+}
+```
+
+`ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)`
+(extract `Light` markings → entries) and `queryTrafficControlsNearCar(grid, car)`
+(broad phase + reach filter, mirroring `queryBordersNearCar`). World mode, Live
+Traffic Jam, and Racing own one grid each and forward the queried controls into
+`car.update(obstacles, trafficControls)` for cars with
+`sensor.trafficAwareness === true`. See [Simulators](Simulators.md#traffic-control-grid-tssimulatortrafficcontrolutilsts--tsmathtrafficcontrolgridts).
+
+---
+
 ## Heatmap Grid (`ts/math/heatmapGrid.ts`)
 
 A lazy grid-based congestion counter backing the [spatial congestion heatmap
@@ -473,15 +509,15 @@ class HeatmapCell {
   col: number;
   row: number;
   occupancyFrames: number; // frames where >=1 car was in this cell
-  idleFrames: number;      // frames where a car in the cell was near-stationary
+  idleFrames: number; // frames where a car in the cell was near-stationary
 }
 
 class HeatmapGrid {
-  readonly cellSize: number;            // default 150
-  get totalFrames(): number;            // frames since recording started
-  record(cars: Car[]): void;            // O(cars)/frame, O(1) cell lookup
-  getHeatmapData(): HeatmapCell[];      // live cells (lazily created)
-  reset(): void;                        // clear counters
+  readonly cellSize: number; // default 150
+  get totalFrames(): number; // frames since recording started
+  record(cars: Car[]): void; // O(cars)/frame, O(1) cell lookup
+  getHeatmapData(): HeatmapCell[]; // live cells (lazily created)
+  reset(): void; // clear counters
 }
 ```
 

@@ -27,6 +27,7 @@ export function drawSimulatorCars(
   prevPoolColor: string = 'deepskyblue',
   viewportLeft: number = -Infinity,
   viewportRight: number = Infinity,
+  keysShowSensor: boolean = false,
 ): void {
   const poolSet = new Set<Car>(bestPool);
   const prevPoolSet = new Set<Car>(prevPoolCars);
@@ -77,9 +78,13 @@ export function drawSimulatorCars(
     }
   }
 
-  // 4. KEYS (user-controlled) car — full opacity
+  // 4. KEYS (user-controlled) car — full opacity; sensor rays shown when the
+  // user is tracking it (so they can debug driving with the sensor visible).
   const keysCar = cars.find((c) => c.type === 'KEYS');
   if (keysCar && keysCar.y > viewportTop && keysCar.y < viewportBottom) {
-    keysCar.draw(ctx, { showMask: drawMasks });
+    keysCar.draw(ctx, {
+      showMask: drawMasks,
+      showSensor: keysShowSensor,
+    });
   }
 }

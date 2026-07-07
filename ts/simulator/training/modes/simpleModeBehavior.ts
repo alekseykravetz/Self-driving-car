@@ -288,6 +288,11 @@ export class SimpleTrainingStrategy {
       }
     }
 
+    const trackingKeys = this.#parent.toolbarPanel.trackingMode === 'keys';
+    const keysCar = trackingKeys
+      ? cars.find((c) => c.type === 'KEYS')
+      : undefined;
+
     drawSimulatorCars(
       this.#parent.gameCtx,
       cars,
@@ -297,12 +302,16 @@ export class SimpleTrainingStrategy {
       drawMasks,
       'gold',
       this.#parent.trainingManager.prevPoolCars,
+      'deepskyblue',
+      -Infinity,
+      Infinity,
+      trackingKeys,
     );
 
     const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
     this.#parent.drawHeatmap(heatViewPoint);
 
-    this.#parent.drawNetworkVisualizer(time, bestCar.brain);
+    this.#parent.drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain);
 
     if (this.#parent.miniMap) {
       const viewPoint = scale(this.#parent.viewport.getOffset(), -1);

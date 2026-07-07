@@ -19,6 +19,8 @@
 - **Physics stateless:** `CarPhysics.update(carState, controlsState)` mutates state but knows nothing of Car or control subtypes.
 - **Audio via callbacks:** RaceSimulator injects `SoundEngine`/`explode` through `car.setCallbacks({onDamaged, onEngineUpdate})` instead of Car owning a sound engine.
 - **`Brain = unknown` opaque type:** Car stores brain as opaque type. Consumers cast `as NeuralNetwork` when they need network API.
+- **Traffic-light perception:** `TrafficControlGrid` (`ts/math/trafficControlGrid.ts`) indexes `Light` polygons (150px cells, mirrors `SpatialHashGrid`); rebuilt only when world markings change, light _state_ read live at query time via a `getState` closure. `ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)`.
+- **Dual brain input layer:** `CarBrainAdapter.inputLayerSize(rayCount, trafficAwareness)` returns `rayCount*2 + 1` when traffic-aware (distance + light state per ray + self-speed), else legacy `rayCount + 1`. Sensor `trafficAwareness` flag (defaults `false`) is serialized on `CarInfo.sensor` — old `.car` files stay backward compatible. `brainsCompatible()` rejects cross-awareness brain swaps automatically.
 
 ## Key gotchas
 
@@ -28,6 +30,9 @@
 - **3D uses Painter's algorithm** (sort by distance, draw back-to-front).
 - **Neural network uses binary step activation** (not sigmoid/ReLU).
 - **`utils.ts` split** — functions moved to `math/collision.ts` (`polysIntersect`), `math/color.ts` (`getRGBA`, `getRandomColor`), `store/serialization.ts` (`safeJsonParse`, `stripFileExtension`). Old file kept as re-export barrel.
+- **Traffic-aware sensors** — `Sensor.update()` and `Car.update()` take an optional `trafficControls` second param; only cars with `sensor.trafficAwareness === true` consume it. Traffic-state encoding: green=1, yellow=0.5, red/off/absent=0. Lights update via `TrafficManager` inside `World.draw()`, so perception reads the previous frame's state (one-frame lag, acceptable). The flag is exposed in the UI via the "Traffic Lights" checkbox in the training init modal (`#tiCarTrafficAwareness`) and the live training panel (`#carTrafficAwareness`); both default to off (legacy behavior).
+- **Keys tracking drives rendering** — when the toolbar tracking mode is `keys`, the world/simple mode `draw()` passes `trackingKeys=true` to `drawSimulatorCars(..., keysShowSensor)` so the KEYS car is drawn with `showSensor: true`, and `drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain)` shows the KEYS car's brain instead of the best AI car's.
+- **Traffic-state ray rendering** — `Sensor.draw()` renders traffic detection as a colored ray (green/yellow/red) from car to the light intersection point plus a colored dot (r=4, white 1.5px border) at the light position. When a wall sits behind the light, the yellow wall ray continues beyond the dot. The intersection point is stored in a `TrafficReading` (`{ state, offset, x, y }`) rather than offset from the wall hit point. See `docs/Physics.md#sensor-visualization`.
 
 ## Key commands
 

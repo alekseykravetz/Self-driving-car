@@ -231,9 +231,10 @@ draw, camera render, mini-map) happens in `draw(_time)`, called once per
 ```typescript
 protected update(): void {
   // 1. Car physics — update all cars against road borders
+  //    (traffic-aware cars also receive queryTrafficControlsNearCar(trafficControlGrid, car))
   if (this.#started) {
     for (const car of this.#cars) {
-      car.update(borders);
+      car.update(borders, trafficControls);
     }
   }
 

@@ -125,11 +125,33 @@ Backward compatible: all existing `.car` files continue to work.
 
 **Brain compatibility:** `brainsCompatible()` checks level dimensions — a non-traffic-aware brain cannot be loaded into a traffic-aware car and vice versa (since input layer sizes differ).
 
-### 7. Rendering
+### 7. Sensor-Ray Rendering
 
-No changes needed — `Light.draw()` already renders the current state.
+`Sensor.draw()` draws the per-ray visualization on the canvas when `showSensor` is true (best pool car #1 or KEYS car in `keys` tracking mode).
 
-Optional polish: draw a colored indicator on the best car's sensor display when a traffic light is detected (green/yellow/red dot).
+**`TrafficReading` type** stores both the light state and the exact intersection point on the light polygon:
+
+```typescript
+interface TrafficReading {
+  state: TrafficControlState; // 'green' | 'yellow' | 'red' | 'off'
+  offset: number; // parametric t along the ray
+  x: number; // intersection point x
+  y: number; // intersection point y
+}
+```
+
+`trafficReadings: (TrafficReading | null)[]` replaces the earlier `(TrafficControlState | null)[]` — the extra `x`/`y`/`offset` fields enable precise dot positioning at the light polygon rather than at the road-border hit point.
+
+**Per-ray visual rules:**
+
+| Scenario             | Ray line                                                                   | Endpoint dot                                                                           |
+| -------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Wall hit, no traffic | Yellow from car → wall                                                     | Yellow dot (r=3) at wall                                                               |
+| Wall hit + traffic   | Colored (green/yellow/red) from car → light, then yellow from light → wall | Yellow dot (r=3) at wall + colored dot (r=4, white 1.5px border) at light intersection |
+| No wall, no traffic  | Faint yellow full-length (alpha 0.2)                                       | None                                                                                   |
+| No wall + traffic    | Colored from car → light (no faint background)                             | Colored dot (r=4, white 1.5px border) at light intersection                            |
+
+The colored dot is **always** drawn at the actual traffic-light polygon intersection point (computed via `lerp` in `#getTrafficReadings`), never offset from a wall.
 
 ## Performance Safeguards
 

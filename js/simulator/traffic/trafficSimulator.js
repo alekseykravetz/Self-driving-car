@@ -1,5 +1,6 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import { SpatialHashGrid } from '../../math/spatialGrid.js';
+import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
 import { Car } from '../../car/car.js';
@@ -9,6 +10,7 @@ import { MiniMap } from '../../mini-map/miniMap.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { getRandomColor } from '../../math/color.js';
 import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
+import { buildTrafficControls, queryTrafficControlsNearCar, } from '../trafficControlUtils.js';
 import { getNearestSegment, scale, angle } from '../../math/utils.js';
 import { Point } from '../../math/primitives/point.js';
 import { BODY_MARGIN_RATIO } from '../../car/config.js';
@@ -40,6 +42,7 @@ export class TrafficSimulator extends SimulatorShell {
     #world = null;
     #roadBorders = [];
     #borderGrid;
+    #trafficGrid = new TrafficControlGrid(GRID_CELL_SIZE);
     #statsPanel;
     // Cars the user has placed on the road (the single source of truth; the
     // stats panel is a pure view over this array).
@@ -168,6 +171,7 @@ export class TrafficSimulator extends SimulatorShell {
         this.#roadBorders = buildRoadBorders(this.#world);
         this.#borderGrid = new SpatialHashGrid(GRID_CELL_SIZE);
         this.#borderGrid.build(this.#roadBorders);
+        this.#trafficGrid.rebuild(buildTrafficControls(this.#world));
     }
     // ── Spawning ─────────────────────────────────────────
     #handleSpawnClick(e) {
@@ -214,7 +218,12 @@ export class TrafficSimulator extends SimulatorShell {
             // Ghost wrecks: crashed cars stay frozen and invisible to everyone else.
             if (car.damaged)
                 continue;
-            car.update(this.#collectObstacles(car, borderMode));
+            const obstacles = this.#collectObstacles(car, borderMode);
+            const trafficControls = car.sensor
+                ?.trafficAwareness
+                ? queryTrafficControlsNearCar(this.#trafficGrid, car)
+                : [];
+            car.update(obstacles, trafficControls);
         }
         this.recordHeatmap(this.#cars);
         // Follow the car selected in the stats panel (if any).

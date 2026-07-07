@@ -1,8 +1,10 @@
 import type { TrainingSimulator } from '../trainingSimulator.js';
 import { SpatialHashGrid } from '../../../math/spatialGrid.js';
 import type { GridSegment } from '../../../math/spatialGrid.js';
+import { TrafficControlGrid } from '../../../math/trafficControlGrid.js';
 import type { BorderMode } from '../../../panels/modeControls.js';
 import type { Car } from '../../../car/car.js';
+import type { SensorTrafficControl } from '../../../car/sensors/sensor.js';
 import type { Segment } from '../../../math/primitives/segment.js';
 import { Point } from '../../../math/primitives/point.js';
 import { World } from '../../../world/world.js';
@@ -12,6 +14,10 @@ import { MiniMap } from '../../../mini-map/miniMap.js';
 import { Camera } from '../../../camera/camera.js';
 import { StoreManager } from '../../../store/storeManager.js';
 import { queryBordersNearCar } from '../../spatialGridUtils.js';
+import {
+  buildTrafficControls,
+  queryTrafficControlsNearCar,
+} from '../../trafficControlUtils.js';
 import { handleCollisionWithRoadBorders } from './borderCollision.js';
 import { drawSimulatorCars } from '../rendering/carRenderer.js';
 import { scale } from '../../../math/utils.js';
@@ -19,6 +25,7 @@ import { scale } from '../../../math/utils.js';
 export function updateWorldCars(
   cars: Car[],
   borderGrid: SpatialHashGrid,
+  trafficGrid: TrafficControlGrid,
   borderMode: BorderMode,
   collisionBorders: Segment[],
   bestCar: Car,
@@ -56,7 +63,11 @@ export function updateWorldCars(
       bordersForUpdate = queryBordersNearCar(borderGrid, car);
     }
 
-    car.update(bordersForUpdate);
+    const trafficControls: SensorTrafficControl[] = car.sensor?.trafficAwareness
+      ? queryTrafficControlsNearCar(trafficGrid, car)
+      : [];
+
+    car.update(bordersForUpdate, trafficControls);
     aliveCount++;
   }
 
@@ -66,6 +77,7 @@ export function updateWorldCars(
 export class WorldTrainingStrategy {
   #parent: TrainingSimulator;
   #borderGrid: SpatialHashGrid = new SpatialHashGrid(150);
+  #trafficGrid: TrafficControlGrid = new TrafficControlGrid(150);
 
   constructor(parent: TrainingSimulator) {
     this.#parent = parent;
@@ -124,6 +136,11 @@ export class WorldTrainingStrategy {
 
   #rebuildGrid(): void {
     this.#borderGrid.build((this.#parent.roadBorders ?? []) as GridSegment[]);
+    if (this.#parent.world) {
+      this.#trafficGrid.rebuild(buildTrafficControls(this.#parent.world));
+    } else {
+      this.#trafficGrid.rebuild([]);
+    }
   }
 
   update(): void {
@@ -152,6 +169,7 @@ export class WorldTrainingStrategy {
     const { aliveCount, deadCount, frozenCount } = updateWorldCars(
       cars,
       this.#borderGrid,
+      this.#trafficGrid,
       this.#parent.toolbarPanel.borderMode,
       collisionBorders,
       bestCar,
@@ -215,6 +233,11 @@ export class WorldTrainingStrategy {
     const settings = this.#parent.trainingManager.getSettings();
     const drawMasks = settings.carCount <= 5000;
 
+    const trackingKeys = this.#parent.toolbarPanel.trackingMode === 'keys';
+    const keysCar = trackingKeys
+      ? cars.find((c) => c.type === 'KEYS')
+      : undefined;
+
     drawSimulatorCars(
       this.#parent.gameCtx,
       cars,
@@ -227,6 +250,7 @@ export class WorldTrainingStrategy {
       'deepskyblue',
       viewportLeft,
       viewportRight,
+      trackingKeys,
     );
 
     this.#parent.drawHeatmap(viewPoint);
@@ -246,7 +270,7 @@ export class WorldTrainingStrategy {
         : { viewPoint, cars },
     );
 
-    this.#parent.drawNetworkVisualizer(time, bestCar.brain);
+    this.#parent.drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain);
     const debugCtx = this.#parent.toolbarPanel.showCameraDebug
       ? this.#parent.gameCtx
       : undefined;

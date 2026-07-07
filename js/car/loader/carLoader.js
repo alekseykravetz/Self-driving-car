@@ -39,7 +39,9 @@ export function compareCarInfoParams(a, b) {
         a.sensor.rayCount === b.sensor.rayCount &&
         a.sensor.rayLength === b.sensor.rayLength &&
         Math.abs(a.sensor.raySpread - b.sensor.raySpread) <= RAY_SPREAD_EPSILON &&
-        a.sensor.rayOffset === b.sensor.rayOffset);
+        a.sensor.rayOffset === b.sensor.rayOffset &&
+        (a.sensor.trafficAwareness ?? false) ===
+            (b.sensor.trafficAwareness ?? false));
 }
 /**
  * Reusable car loader utility.
