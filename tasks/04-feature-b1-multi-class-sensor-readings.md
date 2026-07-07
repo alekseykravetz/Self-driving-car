@@ -16,24 +16,24 @@ Sensor rays report not just distance but also the **type** of obstacle (road bor
 
 ## Target Files
 
-| File | Change |
-|---|---|
-| `ts/car/sensors/sensorReading.ts` | **NEW** — `SensorReading` interface, `ObstacleType` union, `Sophistication` type, one-hot encoder helpers |
-| `ts/car/sensors/sensor.ts` | Replace `trafficAwareness: boolean` with `sophistication: Sophistication`; merge traffic + border + car raycasting into one tagged pass for `classified`; new `#relativeSpeed()` helper |
-| `ts/car/physics/sensorRaycaster.ts` | New `getTaggedReadings(rays, borders, cars, controls)` returning `(TaggedHit \| null)[]`; share edge-intersection via `#nearestEdgeOffset()` |
-| `ts/car/brain/carBrainAdapter.ts` | `inputLayerSize(rayCount, sophistication)`; `computeControls` assembles per-mode input arrays; add `Sophistication` import |
-| `ts/car/car.ts` | `CarInfo.sensor.sophistication` field; migrate `trafficAwareness` on `load()`; thread `otherCars?: { polygon: Point[]; speed: number }[]` through `update()` + forward `this.speed, this.maxSpeed` to `Sensor.update()` |
-| `ts/car/carState.ts` | **Possibly** — if `OtherCarInfo` type is needed; otherwise inline `{ polygon, speed }` |
-| `ts/car/loader/carLoader.ts` | `compareCarInfoParams` normalizes `sophistication` for comparison (migrate inline) |
-| `ts/simulator/training/genetics/poolManager.ts` | Add doc comment to `brainsCompatible()` noting it validates input-layer dimension mismatches — no code change needed |
-| `ts/simulator/traffic/trafficSimulator.ts` | Split `#collectObstacles` into borders + cars; pass both to `car.update()` |
-| `ts/simulator/training/modes/simpleModeBehavior.ts` | Split `nearbyPolygons` into borders + traffic cars (`{ polygon, speed }[]`); pass both |
-| `ts/simulator/training/modes/worldModeBehavior.ts` | Pass `otherCars: []` for new `car.update()` arg (no car-vs-car) |
-| `ts/simulator/racing/raceSimulator.ts` | Pass `otherCars: []` (no car-vs-car) |
-| `ts/simulator/training/templates/trainingInitModalTemplate.ts` | Replace `#tiCarTrafficAwareness` checkbox with `#tiCarSophistication` `<select>` |
-| `ts/simulator/training/templates/trainingPanelTemplate.ts` | Same replacement, `#carSophistication` selector |
-| `ts/simulator/training/trainingInitModal.ts` | Read/write `sophistication`; migration on `#fillCarConfig` |
-| `ts/simulator/training/trainingPanel.ts` | Read/write `sophistication`; status row shows current mode |
+| File                                                           | Change                                                                                                                                                                                                                  |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ts/car/sensors/sensorReading.ts`                              | **NEW** — `SensorReading` interface, `ObstacleType` union, `Sophistication` type, one-hot encoder helpers                                                                                                               |
+| `ts/car/sensors/sensor.ts`                                     | Replace `trafficAwareness: boolean` with `sophistication: Sophistication`; merge traffic + border + car raycasting into one tagged pass for `classified`; new `#relativeSpeed()` helper                                 |
+| `ts/car/physics/sensorRaycaster.ts`                            | New `getTaggedReadings(rays, borders, cars, controls)` returning `(TaggedHit \| null)[]`; share edge-intersection via `#nearestEdgeOffset()`                                                                            |
+| `ts/car/brain/carBrainAdapter.ts`                              | `inputLayerSize(rayCount, sophistication)`; `computeControls` assembles per-mode input arrays; add `Sophistication` import                                                                                              |
+| `ts/car/car.ts`                                                | `CarInfo.sensor.sophistication` field; migrate `trafficAwareness` on `load()`; thread `otherCars?: { polygon: Point[]; speed: number }[]` through `update()` + forward `this.speed, this.maxSpeed` to `Sensor.update()` |
+| `ts/car/carState.ts`                                           | **Possibly** — if `OtherCarInfo` type is needed; otherwise inline `{ polygon, speed }`                                                                                                                                  |
+| `ts/car/loader/carLoader.ts`                                   | `compareCarInfoParams` normalizes `sophistication` for comparison (migrate inline)                                                                                                                                      |
+| `ts/simulator/training/genetics/poolManager.ts`                | Add doc comment to `brainsCompatible()` noting it validates input-layer dimension mismatches — no code change needed                                                                                                    |
+| `ts/simulator/traffic/trafficSimulator.ts`                     | Split `#collectObstacles` into borders + cars; pass both to `car.update()`                                                                                                                                              |
+| `ts/simulator/training/modes/simpleModeBehavior.ts`            | Split `nearbyPolygons` into borders + traffic cars (`{ polygon, speed }[]`); pass both                                                                                                                                  |
+| `ts/simulator/training/modes/worldModeBehavior.ts`             | Pass `otherCars: []` for new `car.update()` arg (no car-vs-car)                                                                                                                                                         |
+| `ts/simulator/racing/raceSimulator.ts`                         | Pass `otherCars: []` (no car-vs-car)                                                                                                                                                                                    |
+| `ts/simulator/training/templates/trainingInitModalTemplate.ts` | Replace `#tiCarTrafficAwareness` checkbox with `#tiCarSophistication` `<select>`                                                                                                                                        |
+| `ts/simulator/training/templates/trainingPanelTemplate.ts`     | Same replacement, `#carSophistication` selector                                                                                                                                                                         |
+| `ts/simulator/training/trainingInitModal.ts`                   | Read/write `sophistication`; migration on `#fillCarConfig`                                                                                                                                                              |
+| `ts/simulator/training/trainingPanel.ts`                       | Read/write `sophistication`; status row shows current mode                                                                                                                                                              |
 
 ## Implementation Steps
 
@@ -46,12 +46,12 @@ export type ObstacleType = 'border' | 'car' | 'trafficControl' | 'none';
 export type Sophistication = 'basic' | 'traffic' | 'classified';
 
 export interface SensorReading {
-  distance: number;        // 0..1 parametric offset along the ray; 1 if no hit
+  distance: number; // 0..1 parametric offset along the ray; 1 if no hit
   type: ObstacleType;
-  relativeSpeed: number;   // clamped [-1, 1] as fraction of this car's maxSpeed; 0 for static
-  controlState: number;    // 1=green, 0.5=yellow, 0=red/off/none (reuses encodeTrafficState encodings)
-  x: number;               // hit point x
-  y: number;               // hit point y
+  relativeSpeed: number; // clamped [-1, 1] as fraction of this car's maxSpeed; 0 for static
+  controlState: number; // 1=red, 0.5=yellow, 0=green/off/none (reversed encodeTrafficState — danger = higher)
+  x: number; // hit point x
+  y: number; // hit point y
 }
 ```
 
@@ -125,15 +125,16 @@ update(
 
 **Per-mode branch:**
 
-| `sophistication` | Reads `otherCars` | Reads `trafficControls` | Raycaster call | Stored in | Input layer |
-|---|---|---|---|---|---|
-| `basic` | Ignored | Ignored | `getReadings(rays, borders)` | `readings` | `rayCount + 1` |
-| `traffic` | Ignored | Used | `getReadings(rays, borders)` + `#getTrafficReadings` | `readings` + `trafficReadings` | `rayCount * 2 + 1` |
-| `classified` | Used | Used | `getTaggedReadings(rays, borders, otherCars, controls)` | `classifiedReadings` | `rayCount * 5 + 1` |
+| `sophistication` | Reads `otherCars` | Reads `trafficControls` | Raycaster call                                          | Stored in                      | Input layer        |
+| ---------------- | ----------------- | ----------------------- | ------------------------------------------------------- | ------------------------------ | ------------------ |
+| `basic`          | Ignored           | Ignored                 | `getReadings(rays, borders)`                            | `readings`                     | `rayCount + 1`     |
+| `traffic`        | Ignored           | Used                    | `getReadings(rays, borders)` + `#getTrafficReadings`    | `readings` + `trafficReadings` | `rayCount * 2 + 1` |
+| `classified`     | Used              | Used                    | `getTaggedReadings(rays, borders, otherCars, controls)` | `classifiedReadings`           | `rayCount * 5 + 1` |
 
 When `classified` and `selfSpeed` / `selfMaxSpeed` are provided, `relativeSpeed` for car hits is `(otherCarSpeed - thisSpeed) / thisMaxSpeed`, clamped to `[-1, 1]`.
 
 **`#relativeSpeed(otherSpeed, selfSpeed, selfMaxSpeed)`** helper:
+
 ```ts
 #relativeSpeed(other: number, self: number, max: number): number {
   return Math.max(-1, Math.min(1, (other - self) / max));
@@ -142,11 +143,11 @@ When `classified` and `selfSpeed` / `selfMaxSpeed` are provided, `relativeSpeed`
 
 **`Sensor.draw()`** — new branch for `classified` rendering:
 
-| Type | Ray color | Dot |
-|---|---|---|
-| `none` | Faint yellow (alpha 0.2), full-length | None |
-| `border` | Yellow, car → hit | Yellow r=3 at hit |
-| `car` | Red, car → hit | Red r=3 at hit |
+| Type             | Ray color                                      | Dot                                        |
+| ---------------- | ---------------------------------------------- | ------------------------------------------ |
+| `none`           | Faint yellow (alpha 0.2), full-length          | None                                       |
+| `border`         | Yellow, car → hit                              | Yellow r=3 at hit                          |
+| `car`            | Red, car → hit                                 | Red r=3 at hit                             |
 | `trafficControl` | Colored by state (green/yellow/red), car → hit | Colored r=4 with white 1.5px border at hit |
 
 Keep the existing `trafficReadings` rendering for `traffic` mode unchanged. The `classified` branch reads `classifiedReadings[i]` instead.
@@ -172,7 +173,7 @@ static inputLayerSize(rayCount: number, sophistication: Sophistication): number 
   - `isBorder = reading?.type === 'border' ? 1 : 0`
   - `isCar = reading?.type === 'car' ? 1 : 0`
   - `isControl = reading?.type === 'trafficControl' ? 1 : 0`
-  - `controlState = reading?.controlState ?? 0` (reuses `encodeTrafficState` — 1/0.5/0)
+  - `controlState = reading?.controlState ?? 0` (reuses `encodeTrafficState` — reversed: 1=red/0.5=yellow/0=green; danger = higher)
   - `relativeSpeed = reading?.relativeSpeed ?? 0`
 
 ### 5. Update `Car` + `CarInfo`
@@ -183,13 +184,14 @@ interface SensorConfig {
   raySpread: number;
   rayLength: number;
   rayOffset: number;
-  sophistication?: Sophistication;  // new, defaults 'basic'
+  sophistication?: Sophistication; // new, defaults 'basic'
   /** @deprecated use sophistication instead */
   trafficAwareness?: boolean;
 }
 ```
 
 **`Car.load(info)` — migration:**
+
 ```ts
 if (info.sensor.trafficAwareness === true && !info.sensor.sophistication) {
   info.sensor.sophistication = 'traffic';
@@ -200,6 +202,7 @@ this.sensor.sophistication = info.sensor.sophistication ?? 'basic';
 Then rebuild brain if no supplied brain (existing pattern at `car.ts:163-172`), now keyed off the new `sophistication`-sensitive `inputLayerSize`.
 
 **`Car.toInfo()`:**
+
 ```ts
 sensor: {
   rayCount: ...,
@@ -212,6 +215,7 @@ sensor: {
 ```
 
 **`Car.update()` — new third param:**
+
 ```ts
 update(
   borders: Point[][] = [],
@@ -224,9 +228,14 @@ When calling `this.sensor.update()`, also pass `this.speed` and `this.maxSpeed` 
 
 ```ts
 this.sensor.update(
-  this.x, this.y, this.angle,
-  borders, trafficControls, otherCars,
-  this.speed, this.maxSpeed,
+  this.x,
+  this.y,
+  this.angle,
+  borders,
+  trafficControls,
+  otherCars,
+  this.speed,
+  this.maxSpeed,
 );
 ```
 
@@ -246,20 +255,25 @@ Drop the `trafficAwareness` comparison line; use `normalizeSoph(a) === normalize
 ### 7. Wire simulators
 
 **`trafficSimulator.ts`** — split `#collectObstacles` into two helpers:
+
 - `#collectBorders(car, borderMode): Point[][]` (grid query, existing)
 - `#collectCarObstacles(car): { polygon: Point[]; speed: number }[]` (existing O(n²) scan returning speed-augmented results)
 
 ```ts
 const borders = this.#collectBorders(car, borderMode);
-const otherCars = car.sensor?.sophistication === 'classified'
-  ? this.#collectCarObstacles(car) : [];
-const trafficControls = car.sensor?.sophistication !== 'basic'
-  ? queryTrafficControlsNearCar(this.#trafficGrid, car)
-  : [];
+const otherCars =
+  car.sensor?.sophistication === 'classified'
+    ? this.#collectCarObstacles(car)
+    : [];
+const trafficControls =
+  car.sensor?.sophistication !== 'basic'
+    ? queryTrafficControlsNearCar(this.#trafficGrid, car)
+    : [];
 car.update(borders, trafficControls, otherCars);
 ```
 
 **`simpleModeBehavior.ts`** — in `updateSimpleCars`, split the `nearbyPolygons` approach:
+
 - `roadBorders` stays as borders.
 - The binary-search window (`lo`..`hi`) collects `{ polygon: state.traffic[j].polygon, speed: state.traffic[j].speed }` into an `otherCars` array instead of pushing to `nearbyPolygons`.
 - Pass `otherCars` to `car.update()` when `car.sensor?.sophistication === 'classified'`, else pass `[]`.
@@ -275,6 +289,7 @@ car.update(borders, trafficControls, otherCars);
 **Training init modal template** (`trainingInitModalTemplate.ts:109-114`):
 
 Replace:
+
 ```html
 <div class="ctrl ctrl-checkbox">
   <label>
@@ -283,7 +298,9 @@ Replace:
   </label>
 </div>
 ```
+
 With:
+
 ```html
 <div class="ctrl">
   <span class="ctrl-label">Sophistication</span>
@@ -298,11 +315,13 @@ With:
 **Training panel template** (`trainingPanelTemplate.ts:214-219`) — same replacement, `#carSophistication` instead of `#carTrafficAwareness`.
 
 **`trainingInitModal.ts`:**
+
 - `#fillCarConfig`: `select.value = normalizeSoph(info)`.
 - `#buildCarInfo`: `sophistication: (this.querySelector('#tiCarSophistication') as HTMLSelectElement).value as Sophistication`.
 - Drop all `#tiCarTrafficAwareness` references.
 
 **`trainingPanel.ts`:**
+
 - Grab `#carSophistication` in constructor (replace `#carTrafficAwarenessInput`).
 - `#getCarInfo`: read `.value`.
 - `setCarSettings`: set `.value = info.sensor.sophistication ?? 'basic'`.
@@ -310,12 +329,12 @@ With:
 
 ### 9. Serialization & compatibility
 
-| Scenario | Load behavior |
-|---|---|
-| Pre-A1 `.car` (no `trafficAwareness`, no `sophistication`) | `sophistication = 'basic'` — identical to original |
-| A1-era `.car` (`trafficAwareness:true`, no `sophistication`) | Migration → `sophistication = 'traffic'` — identical to A1 |
-| A1-era `.car` (`trafficAwareness:false`, no `sophistication`) | `sophistication = 'basic'` — identical to original |
-| New B1 `.car` (`sophistication:'classified'`) | Loads directly, no migration needed |
+| Scenario                                                      | Load behavior                                              |
+| ------------------------------------------------------------- | ---------------------------------------------------------- |
+| Pre-A1 `.car` (no `trafficAwareness`, no `sophistication`)    | `sophistication = 'basic'` — identical to original         |
+| A1-era `.car` (`trafficAwareness:true`, no `sophistication`)  | Migration → `sophistication = 'traffic'` — identical to A1 |
+| A1-era `.car` (`trafficAwareness:false`, no `sophistication`) | `sophistication = 'basic'` — identical to original         |
+| New B1 `.car` (`sophistication:'classified'`)                 | Loads directly, no migration needed                        |
 
 `brainsCompatible()` in `poolManager.ts:34` already validates level dimensions — cross-sophistication swaps are automatically rejected because input layer sizes differ. Add a doc comment noting this.
 

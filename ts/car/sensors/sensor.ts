@@ -30,12 +30,13 @@ export interface TrafficReading {
 
 /**
  * Encodes a traffic light state into the numeric input the neural network
- * consumes: `1` for green (go), `0.5` for yellow (caution), `0` for red/off
- * or "no light seen along this ray".
+ * consumes: `1` for red (stop/danger), `0.5` for yellow (caution), `0` for
+ * green/off or "no light seen along this ray". Reversed encoding matches
+ * the distance convention where higher = more urgent.
  */
 export function encodeTrafficState(state: TrafficControlState | null): number {
   switch (state) {
-    case 'green':
+    case 'red':
       return 1;
     case 'yellow':
       return 0.5;
