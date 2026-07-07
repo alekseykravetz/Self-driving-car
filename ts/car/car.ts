@@ -281,13 +281,18 @@ export class Car {
         // Online imitation learning: nudge the KEYS brain toward the human's
         // actual keypresses so its weights encode demonstrated driving. The
         // forward pass above already populated each level's inputs/outputs,
-        // so trainStep can read them directly. Skip when damaged or stationary
-        // to avoid learning crashes / "sit still" as good behavior.
+        // so trainStep can read them directly. Skip when damaged (don't learn
+        // crashes) or when no keys are pressed (no lesson to teach — and
+        // critically, this prevents the "release keys to click Next Gen"
+        // frames from overwriting everything you taught via recency bias).
         if (
           this.#learningFromHuman &&
           !this.damaged &&
-          this.speed !== 0 &&
-          this.controls instanceof Controls
+          this.controls instanceof Controls &&
+          (this.controls.forward ||
+            this.controls.left ||
+            this.controls.right ||
+            this.controls.reverse)
         ) {
           NeuralNetwork.trainStep(
             this.brain as NeuralNetwork,
