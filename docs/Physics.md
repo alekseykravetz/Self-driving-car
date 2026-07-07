@@ -40,6 +40,7 @@ interface SensorConfig {
   raySpread: number;
   rayLength: number;
   rayOffset: number;
+  trafficAwareness?: boolean; // Defaults to false; omitted on legacy .car files
 }
 
 class Car {
@@ -359,6 +360,8 @@ class Sensor {
   rayLength: number; // Maximum detection distance (default: 150)
   raySpread: number; // Angular spread of rays (default: π/2 = 90°)
   rayOffset: number; // Rotational offset of sensor array (default: 0)
+  trafficAwareness: boolean; // Whether the sensor detects traffic lights (default: false)
+  trafficReadings: (TrafficControlState | null)[]; // Per-ray light state, traffic-aware only
 
   rays: Point[][]; // Array of [startPoint, endPoint] pairs
   readings: (IntersectionPoint | null)[]; // Closest hit per ray, or null
@@ -425,12 +428,27 @@ allocated per ray per car per frame.
 
 ### Default Sensor Configuration
 
-| Parameter   | Default   | Description                                   |
-| ----------- | --------- | --------------------------------------------- |
-| `rayCount`  | 5         | Number of rays in the sensor array            |
-| `rayLength` | 150       | Maximum detection distance (pixels)           |
-| `raySpread` | π/2 (90°) | Total angular coverage of the sensor array    |
-| `rayOffset` | 0         | Rotation offset (0 = centered on car heading) |
+| Parameter          | Default   | Description                                                                                                   |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------------------------- |
+| `rayCount`         | 5         | Number of rays in the sensor array                                                                            |
+| `rayLength`        | 150       | Maximum detection distance (pixels)                                                                           |
+| `raySpread`        | π/2 (90°) | Total angular coverage of the sensor array                                                                    |
+| `rayOffset`        | 0         | Rotation offset (0 = centered on car heading)                                                                 |
+| `trafficAwareness` | false     | When true, the sensor also detects traffic lights (see [Traffic-Light Perception](#traffic-light-perception)) |
+
+### Traffic-Light Perception
+
+When `trafficAwareness` is `true`, `Sensor.update(x, y, angle, polygons, trafficControls?)` performs an extra per-ray pass over the supplied `SensorTrafficControl[]` (polygons + live light state). For each ray:
+
+1. Find the closest traffic-control polygon intersection.
+2. If that intersection's offset is **less** than the road-border hit offset (i.e. the light sits in front of the wall), the ray "sees" that light's state.
+3. The state is written to `trafficReadings[i]`; `encodeTrafficState()` maps green→1, yellow→0.5, red/off/absent→0.
+
+The traffic-control set is built per frame by the simulator via `buildTrafficControls(world)` (into a `TrafficControlGrid`) and `queryTrafficControlsNearCar(grid, car)` — mirroring `queryBordersNearCar` (sensor reach + body margin). The grid uses 150px cells and is rebuilt only when world markings change; light state is read live at query time through a `getState` closure, so a state change takes effect on the next query without a rebuild.
+
+`Sensor.draw()` additionally renders a small colored dot (green/yellow/red) above the hit point when a light is detected on that ray.
+
+> Lights still update via `TrafficManager` inside `World.draw()`, so perception reads the previous frame's light state — a one-frame lag, which is acceptable.
 
 ### Sensor Visualization
 
@@ -457,8 +475,8 @@ CarBrainAdapter.feedForward(this, reading);
 **What the adapter does**:
 
 1. Reads `sensor.readings`, inverts offsets (`1 - offset`)
-2. Appends normalized speed (`speed / maxSpeed`)
-3. Calls `NeuralNetwork.feedForward(offsets, brain)`
+2. If `sensor.trafficAwareness`, interleaves `sensor.trafficReadings` (encoded green=1 / yellow=0.5 / red=0) between each distance and appends normalized speed; otherwise appends speed only
+3. Calls `NeuralNetwork.feedForward(inputs, brain)`
 4. Maps binary outputs to `controls.forward/left/right/reverse`
 
 **Input normalization**: Sensor readings are inverted (`1 - offset`) so that:
@@ -469,7 +487,7 @@ CarBrainAdapter.feedForward(this, reading);
 
 **Speed input**: Normalized to `[0, 1]` range using `speed / maxSpeed`.
 
-**Network topology**: With default 5 rays + 1 speed input → 6 input neurons. Outputs are 4 binary decisions. Default architecture: `[6, 6, 4]` (6 inputs → 6 hidden → 4 outputs).
+**Network topology**: Input layer size is `CarBrainAdapter.inputLayerSize(rayCount, trafficAwareness)` — `rayCount*2 + 1` for traffic-aware cars (distance + light state per ray, plus speed), else the legacy `rayCount + 1`. With default 5 rays that yields 6 inputs (legacy) or 11 inputs (traffic-aware) → 4 outputs. Default architecture: `[6, 6, 4]` (legacy) / `[11, 6, 4]` (traffic-aware). `brainsCompatible()` in `poolManager.ts` rejects brain swaps across the two input sizes automatically.
 
 **Opaque brain type**: `Car.brain` is typed as `unknown` (aliased `Brain`). No layer-2 code imports `NeuralNetwork` directly. Consumers that need the network API (e.g., pool manager, visualizer) use `as NeuralNetwork` casts internally.
 
@@ -495,6 +513,7 @@ toInfo(): CarInfo {
       rayLength: this.sensor.rayLength,
       raySpread: this.sensor.raySpread,
       rayOffset: this.sensor.rayOffset,
+      trafficAwareness: this.sensor.trafficAwareness,
     },
     brain: this.brain ? CarBrainAdapter.serialize(this.brain) : undefined,
   };
@@ -536,7 +555,8 @@ Plain JSON matching the `CarInfo` interface:
     "rayCount": 5,
     "rayLength": 150,
     "raySpread": 1.5707963267948966,
-    "rayOffset": 0
+    "rayOffset": 0,
+    "trafficAwareness": false
   },
   "brain": {
     "levels": [

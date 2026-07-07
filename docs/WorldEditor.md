@@ -493,6 +493,8 @@ class Light extends Marking {
 
 The `state` property is updated externally by `TrafficManager.update()` each frame. The light itself just renders its current state.
 
+AI cars with `sensor.trafficAwareness: true` additionally perceive `Light` markings through their sensor rays — a `TrafficControlGrid` (see [Simulators](Simulators.md#traffic-control-grid-tssimulatortrafficcontrolutilsts--tsmathtrafficcontrolgridts)) indexes light polygons and feeds each ray the live state (green=1, yellow=0.5, red/off=0) when the light sits in front of the road-border hit. Lights update inside `World.draw()`, so perception reads the previous frame's state (one-frame lag).
+
 ### Marking Serialization
 
 `Marking.load(info)` is a factory method that dispatches based on `info.type`:

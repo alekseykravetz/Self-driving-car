@@ -2,11 +2,13 @@ import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { RacePanel } from './racePanel.js';
 import { SpatialHashGrid } from '../../math/spatialGrid.js';
+import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
 import type { CarInfo } from '../../car/car.js';
 import { Car } from '../../car/car.js';
 import type { CarControls } from '../../car/car.js';
+import type { SensorTrafficControl } from '../../car/sensors/sensor.js';
 import { PhoneControls } from '../../car/controls/phoneControls.js';
 import { CameraControls } from '../../car/controls/cameraControls.js';
 import { Viewport } from '../../viewport/viewport.js';
@@ -15,6 +17,10 @@ import { Camera } from '../../camera/camera.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { getRandomColor } from '../../math/color.js';
 import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
+import {
+  buildTrafficControls,
+  queryTrafficControlsNearCar,
+} from '../trafficControlUtils.js';
 import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
 import { Start } from '../../world/markings/start.js';
@@ -34,6 +40,7 @@ export class RaceSimulator extends SimulatorShell {
   #myCar: Car | null = null;
   #roadBorders: [Point, Point][] | null = null;
   #borderGrid: SpatialHashGrid = new SpatialHashGrid(150);
+  #trafficGrid: TrafficControlGrid = new TrafficControlGrid(150);
   #frameCount: number = 0;
   #started: boolean = false;
 
@@ -169,6 +176,7 @@ export class RaceSimulator extends SimulatorShell {
     if (this.#roadBorders) {
       this.#borderGrid.build(this.#roadBorders);
     }
+    this.#trafficGrid.rebuild(buildTrafficControls(this.#world));
 
     if (this.#world.corridor) {
       const miniMapGraph = new Graph([], this.#world.corridor.skeleton);
@@ -277,7 +285,11 @@ export class RaceSimulator extends SimulatorShell {
         if (borderMode !== 'none' && this.#roadBorders) {
           obstacles = queryBordersNearCar(this.#borderGrid, car);
         }
-        car.update(obstacles);
+        const trafficControls: SensorTrafficControl[] = car.sensor
+          ?.trafficAwareness
+          ? queryTrafficControlsNearCar(this.#trafficGrid, car)
+          : [];
+        car.update(obstacles, trafficControls);
       }
     }
 

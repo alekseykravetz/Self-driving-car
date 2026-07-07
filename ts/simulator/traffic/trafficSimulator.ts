@@ -2,18 +2,24 @@ import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { SpatialHashGrid } from '../../math/spatialGrid.js';
 import type { GridSegment } from '../../math/spatialGrid.js';
+import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import type { TrafficPanelElement } from './trafficPanel.js';
 import type { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
 import type { CarInfo } from '../../car/car.js';
 import { Car } from '../../car/car.js';
+import type { SensorTrafficControl } from '../../car/sensors/sensor.js';
 import { Viewport } from '../../viewport/viewport.js';
 import { Camera } from '../../camera/camera.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { getRandomColor } from '../../math/color.js';
 import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
+import {
+  buildTrafficControls,
+  queryTrafficControlsNearCar,
+} from '../trafficControlUtils.js';
 import { getNearestSegment, scale, angle } from '../../math/utils.js';
 import { Point } from '../../math/primitives/point.js';
 import type { BorderMode } from '../../panels/modeControls.js';
@@ -48,6 +54,7 @@ export class TrafficSimulator extends SimulatorShell {
   #world: World | null = null;
   #roadBorders: GridSegment[] = [];
   #borderGrid!: SpatialHashGrid;
+  #trafficGrid: TrafficControlGrid = new TrafficControlGrid(GRID_CELL_SIZE);
 
   #statsPanel: TrafficPanelElement;
 
@@ -226,6 +233,7 @@ export class TrafficSimulator extends SimulatorShell {
     this.#roadBorders = buildRoadBorders(this.#world);
     this.#borderGrid = new SpatialHashGrid(GRID_CELL_SIZE);
     this.#borderGrid.build(this.#roadBorders);
+    this.#trafficGrid.rebuild(buildTrafficControls(this.#world));
   }
 
   // ── Spawning ─────────────────────────────────────────
@@ -282,7 +290,12 @@ export class TrafficSimulator extends SimulatorShell {
       const car = this.#cars[i];
       // Ghost wrecks: crashed cars stay frozen and invisible to everyone else.
       if (car.damaged) continue;
-      car.update(this.#collectObstacles(car, borderMode));
+      const obstacles = this.#collectObstacles(car, borderMode);
+      const trafficControls: SensorTrafficControl[] = car.sensor
+        ?.trafficAwareness
+        ? queryTrafficControlsNearCar(this.#trafficGrid, car)
+        : [];
+      car.update(obstacles, trafficControls);
     }
 
     this.recordHeatmap(this.#cars);

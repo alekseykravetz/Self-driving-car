@@ -19,6 +19,8 @@
 - **Physics stateless:** `CarPhysics.update(carState, controlsState)` mutates state but knows nothing of Car or control subtypes.
 - **Audio via callbacks:** RaceSimulator injects `SoundEngine`/`explode` through `car.setCallbacks({onDamaged, onEngineUpdate})` instead of Car owning a sound engine.
 - **`Brain = unknown` opaque type:** Car stores brain as opaque type. Consumers cast `as NeuralNetwork` when they need network API.
+- **Traffic-light perception:** `TrafficControlGrid` (`ts/math/trafficControlGrid.ts`) indexes `Light` polygons (150px cells, mirrors `SpatialHashGrid`); rebuilt only when world markings change, light _state_ read live at query time via a `getState` closure. `ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)`.
+- **Dual brain input layer:** `CarBrainAdapter.inputLayerSize(rayCount, trafficAwareness)` returns `rayCount*2 + 1` when traffic-aware (distance + light state per ray + self-speed), else legacy `rayCount + 1`. Sensor `trafficAwareness` flag (defaults `false`) is serialized on `CarInfo.sensor` — old `.car` files stay backward compatible. `brainsCompatible()` rejects cross-awareness brain swaps automatically.
 
 ## Key gotchas
 
@@ -28,6 +30,7 @@
 - **3D uses Painter's algorithm** (sort by distance, draw back-to-front).
 - **Neural network uses binary step activation** (not sigmoid/ReLU).
 - **`utils.ts` split** — functions moved to `math/collision.ts` (`polysIntersect`), `math/color.ts` (`getRGBA`, `getRandomColor`), `store/serialization.ts` (`safeJsonParse`, `stripFileExtension`). Old file kept as re-export barrel.
+- **Traffic-aware sensors** — `Sensor.update()` and `Car.update()` take an optional `trafficControls` second param; only cars with `sensor.trafficAwareness === true` consume it. Traffic-state encoding: green=1, yellow=0.5, red/off/absent=0. Lights update via `TrafficManager` inside `World.draw()`, so perception reads the previous frame's state (one-frame lag, acceptable).
 
 ## Key commands
 

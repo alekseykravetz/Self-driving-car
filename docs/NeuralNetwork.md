@@ -113,10 +113,25 @@ Total parameters: 36 + 24 + 6 + 4 = 70 (weights + biases)
 
 ### Input Encoding
 
+Legacy (non-traffic-aware) cars:
+
 | Input  | Source              | Range  | Meaning                           |
 | ------ | ------------------- | ------ | --------------------------------- |
-| ray1-5 | `1 - sensor.offset` | [0, 1] | 0 = clear path, 1 = touching wall |
+| ray1-N | `1 - sensor.offset` | [0, 1] | 0 = clear path, 1 = touching wall |
 | speed  | `speed / maxSpeed`  | [0, 1] | 0 = stopped, 1 = max speed        |
+
+Traffic-aware cars (`sensor.trafficAwareness: true`) interleave one light-state
+input per ray between the distance inputs, so the input layer is
+`rayCount*2 + 1` instead of `rayCount + 1`:
+
+| Input       | Source                      | Range  | Meaning                               |
+| ----------- | --------------------------- | ------ | ------------------------------------- |
+| rayDist1-N  | `1 - sensor.offset`         | [0, 1] | 0 = clear path, 1 = touching wall     |
+| rayLight1-N | `encodeTrafficState(state)` | [0, 1] | green=1, yellow=0.5, red/off/absent=0 |
+| speed       | `speed / maxSpeed`          | [0, 1] | 0 = stopped, 1 = max speed            |
+
+A light-state input is only non-zero for a ray whose closest hit is a traffic
+light in front of the road-border hit; otherwise it is 0 (treated as absent).
 
 ### Output Decoding
 
@@ -131,10 +146,10 @@ Total parameters: 36 + 24 + 6 + 4 = 70 (weights + biases)
 
 The `hiddenLayers` parameter in `CarInfo` allows customizing the network depth:
 
-- Default: `[6]` → architecture `[rayCount+1, 6, 4]`
-- Custom: `[8, 6]` → architecture `[rayCount+1, 8, 6, 4]`
+- Default: `[6]` → architecture `[rayCount+1, 6, 4]` (legacy) or `[rayCount*2+1, 6, 4]` (traffic-aware)
+- Custom: `[8, 6]` → architecture `[inputSize, 8, 6, 4]`
 
-When `rayCount` changes, the entire network must be rebuilt (input layer size changes).
+Input layer size is chosen by `CarBrainAdapter.inputLayerSize(rayCount, trafficAwareness)`. When `rayCount` or `trafficAwareness` changes, the entire network must be rebuilt (input layer size changes). `brainsCompatible()` rejects any brain swap whose input layer size does not match the target car, so traffic-aware and legacy brains never get cross-applied.
 
 ---
 

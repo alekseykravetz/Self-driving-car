@@ -1,6 +1,7 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import { RacePanel } from './racePanel.js';
 import { SpatialHashGrid } from '../../math/spatialGrid.js';
+import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
 import { Car } from '../../car/car.js';
@@ -12,6 +13,7 @@ import { Camera } from '../../camera/camera.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { getRandomColor } from '../../math/color.js';
 import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
+import { buildTrafficControls, queryTrafficControlsNearCar, } from '../trafficControlUtils.js';
 import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
 import { Start } from '../../world/markings/start.js';
@@ -28,6 +30,7 @@ export class RaceSimulator extends SimulatorShell {
     #myCar = null;
     #roadBorders = null;
     #borderGrid = new SpatialHashGrid(150);
+    #trafficGrid = new TrafficControlGrid(150);
     #frameCount = 0;
     #started = false;
     constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host, controls = null) {
@@ -116,6 +119,7 @@ export class RaceSimulator extends SimulatorShell {
         if (this.#roadBorders) {
             this.#borderGrid.build(this.#roadBorders);
         }
+        this.#trafficGrid.rebuild(buildTrafficControls(this.#world));
         if (this.#world.corridor) {
             const miniMapGraph = new Graph([], this.#world.corridor.skeleton);
             this.miniMap = new MiniMap(this.miniMapCanvas, miniMapGraph, this.miniMapCanvas.width, 0.1);
@@ -201,7 +205,11 @@ export class RaceSimulator extends SimulatorShell {
                 if (borderMode !== 'none' && this.#roadBorders) {
                     obstacles = queryBordersNearCar(this.#borderGrid, car);
                 }
-                car.update(obstacles);
+                const trafficControls = car.sensor
+                    ?.trafficAwareness
+                    ? queryTrafficControlsNearCar(this.#trafficGrid, car)
+                    : [];
+                car.update(obstacles, trafficControls);
             }
         }
         const trackTarget = this.#getTrackTarget();

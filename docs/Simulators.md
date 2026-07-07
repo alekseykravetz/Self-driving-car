@@ -679,6 +679,26 @@ grid-query-and-filter pattern:
 Simple mode does **not** use the grid — its two full-length borders are passed
 directly via `roadBorders`.
 
+### Traffic-Control Grid (`ts/simulator/trafficControlUtils.ts` + `ts/math/trafficControlGrid.ts`)
+
+A second spatial hash grid (also 150px cells) dedicated to indexing `Light`
+marking polygons for AI traffic-light perception. It mirrors the border grid's
+build/query pattern but is consumed only by cars with
+`sensor.trafficAwareness === true`:
+
+| Function                                 | Purpose                                                                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `buildTrafficControls(world)`            | Extracts `Light` markings into `TrafficControlEntry[]` (`{ polygon, getState }`) and builds a `TrafficControlGrid`                          |
+| `queryTrafficControlsNearCar(grid, car)` | Broad-phase grid query + reach filter, returning `SensorTrafficControl[]` within sensor range + body margin (mirrors `queryBordersNearCar`) |
+
+The grid is rebuilt only when world markings change (world load / editor save),
+never per frame. Light **state** is read live at query time via the `getState`
+closure on each entry, so a state cycle takes effect on the next query without a
+rebuild. World mode, Live Traffic Jam, and Racing each own a
+`TrafficControlGrid` and forward the queried controls into
+`car.update(obstacles, trafficControls)` for traffic-aware cars. Simple mode has
+no lights and is unchanged.
+
 ### Spatial Congestion Heatmap (`ts/math/heatmapGrid.ts` + `ts/rendering/heatmapRenderer.ts`)
 
 A grid-based counter that records vehicle occupancy per cell over time and
@@ -693,15 +713,15 @@ class HeatmapCell {
   col: number;
   row: number;
   occupancyFrames: number; // frames where >=1 car was in this cell
-  idleFrames: number;      // frames where a car in the cell was near-stationary
+  idleFrames: number; // frames where a car in the cell was near-stationary
 }
 
 class HeatmapGrid {
-  readonly cellSize: number;            // 150 (matches SpatialHashGrid)
-  get totalFrames(): number;            // frames since recording started
-  record(cars: Car[]): void;            // O(cars)/frame, O(1) cell lookup
-  getHeatmapData(): HeatmapCell[];      // live cells (lazily created)
-  reset(): void;                        // clear counters
+  readonly cellSize: number; // 150 (matches SpatialHashGrid)
+  get totalFrames(): number; // frames since recording started
+  record(cars: Car[]): void; // O(cars)/frame, O(1) cell lookup
+  getHeatmapData(): HeatmapCell[]; // live cells (lazily created)
+  reset(): void; // clear counters
 }
 ```
 
@@ -739,12 +759,12 @@ resetHeatmap(): void;                                   // call on restart / wor
 
 **Per-simulator wiring:**
 
-| Simulator          | Records                              | Resets on                          |
-| ------------------ | ------------------------------------ | ---------------------------------- |
-| `TrainingSimulator` (simple) | cars + traffic cars         | new training / world change        |
-| `TrainingSimulator` (world)  | cars                       | new training / world change        |
-| `TrafficSimulator` | placed cars (alive)                  | world reload                       |
-| `RaceSimulator`    | cars (only while the race is started) | race init                         |
+| Simulator                    | Records                               | Resets on                   |
+| ---------------------------- | ------------------------------------- | --------------------------- |
+| `TrainingSimulator` (simple) | cars + traffic cars                   | new training / world change |
+| `TrainingSimulator` (world)  | cars                                  | new training / world change |
+| `TrafficSimulator`           | placed cars (alive)                   | world reload                |
+| `RaceSimulator`              | cars (only while the race is started) | race init                   |
 
 The overlay is drawn after the world + cars but before the mini-map / network
 visualizer / 3D camera, so it sits on the top-down view only.
@@ -769,8 +789,16 @@ function updateWorldCars(
   // - idle: freeze cars whose fitness is lower than the best car's fitness by more than idleRange (frozenCount++)
   // - 'none' mode: cars receive no borders
   // - otherwise: use queryBordersNearCar(grid, car) for broad+narrow-phase filtering
+  // - traffic-aware cars additionally receive queryTrafficControlsNearCar(trafficControlGrid, car)
+  //   forwarded as the second arg to car.update(obstacles, trafficControls)
 }
 ```
+
+The simulator owns a `TrafficControlGrid` (built from the loaded world's `Light`
+markings via `buildTrafficControls(world)` and rebuilt on world change). Per
+frame, cars with `sensor.trafficAwareness === true` are passed the
+`SensorTrafficControl[]` near them; non-traffic-aware cars receive nothing and
+keep the legacy input layer. Simple mode is unchanged (no lights).
 
 ### Fitness (World Mode)
 
@@ -895,12 +923,18 @@ if nothing is selected the user is prompted to pick a car first. The old
 Car physics treats every nearby obstacle polygon the same — road borders and
 other cars alike. The traffic simulator builds each alive car's obstacle set per
 frame via `queryBordersNearCar(this.#borderGrid, car)` (shared utility) and
-feeds it to `car.update(obstacles)`:
+feeds it to `car.update(obstacles, trafficControls)`:
 
-| Obstacle source | Filtering                                                               |
-| --------------- | ----------------------------------------------------------------------- |
-| Road borders    | `SpatialHashGrid` broad phase + exact narrow-phase distance (sqrt-free) |
-| Other cars      | Distance-filtered O(n²) scan (small populations) over **alive** cars    |
+| Obstacle source | Filtering                                                                     |
+| --------------- | ----------------------------------------------------------------------------- |
+| Road borders    | `SpatialHashGrid` broad phase + exact narrow-phase distance (sqrt-free)       |
+| Other cars      | Distance-filtered O(n²) scan (small populations) over **alive** cars          |
+| Traffic lights  | `TrafficControlGrid` broad phase + reach filter (only for traffic-aware cars) |
+
+The simulator owns a `TrafficControlGrid` rebuilt on world load (via
+`buildTrafficControls(world)`). Per frame, traffic-aware cars receive
+`queryTrafficControlsNearCar(grid, car)` as the second `car.update()` argument;
+non-traffic-aware cars are passed nothing and drive with the legacy input layer.
 
 Both follow the toolbar **border mode**: when it is `none` there is no collision
 at all (free driving). When a car crashes it becomes **ghosted**:

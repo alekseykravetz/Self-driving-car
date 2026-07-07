@@ -136,17 +136,18 @@ graph TD
 
 The geometric engine powering all spatial operations.
 
-| Module                   | Responsibility                                                |
-| ------------------------ | ------------------------------------------------------------- |
-| `primitives/point.ts`    | 2D/3D position, equality checks                               |
-| `primitives/segment.ts`  | Line segments, projection, distance, direction vectors        |
-| `primitives/polygon.ts`  | Closed shapes, union, intersection, containment (ray casting) |
-| `primitives/envelope.ts` | Rounded rectangles around segments (road surfaces)            |
-| `graph/graph.ts`         | Point/segment network, Dijkstra shortest path                 |
-| `osm-importer/osm.ts`    | OpenStreetMap JSON → Point/Segment conversion                 |
-| `spatialGrid.ts`         | Uniform spatial hash grid for fast range queries over segments |
-| `heatmapGrid.ts`         | Lazy grid-based congestion counter for the spatial heatmap overlay |
-| `utils.ts`               | Vector math, lerp, intersections, rotation, distance          |
+| Module                   | Responsibility                                                                                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `primitives/point.ts`    | 2D/3D position, equality checks                                                                                                                               |
+| `primitives/segment.ts`  | Line segments, projection, distance, direction vectors                                                                                                        |
+| `primitives/polygon.ts`  | Closed shapes, union, intersection, containment (ray casting)                                                                                                 |
+| `primitives/envelope.ts` | Rounded rectangles around segments (road surfaces)                                                                                                            |
+| `graph/graph.ts`         | Point/segment network, Dijkstra shortest path                                                                                                                 |
+| `osm-importer/osm.ts`    | OpenStreetMap JSON → Point/Segment conversion                                                                                                                 |
+| `spatialGrid.ts`         | Uniform spatial hash grid for fast range queries over segments                                                                                                |
+| `trafficControlGrid.ts`  | Spatial hash grid (150px cells) indexing `Light` polygons for AI traffic-light perception; rebuilt on markings change, state read live via `getState` closure |
+| `heatmapGrid.ts`         | Lazy grid-based congestion counter for the spatial heatmap overlay                                                                                            |
+| `utils.ts`               | Vector math, lerp, intersections, rotation, distance                                                                                                          |
 
 ### 2. Car System (`ts/car/`)
 
@@ -154,20 +155,20 @@ Vehicle physics, perception, and control abstraction. The main `Car` class is an
 orchestrator — motion, collision, rendering, and AI control mapping are delegated
 to focused collaborators.
 
-| Module                       | Responsibility                                                                                              |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `config.ts`                  | Default car configuration (`maxSpeed`, `acceleration`, etc.)                                                |
-| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls, audio callbacks                                   |
-| `physics/carPhysics.ts`      | Motion (speed + translation), polygon creation, damage assessment. Steering (angle) handled by Car directly |
-| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                                                                  |
-| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors)                                                 |
-| `carState.ts`                | `CarState` + `ControlsState` interfaces (breaks circular deps)                                              |
-| `brain/carBrainAdapter.ts`   | Sole bridge to NeuralNetwork: create, serialize, deserialize, feedforward                                   |
-| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings                                                  |
-| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                                                                              |
-| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                                                                     |
-| `controls/cameraControls.ts` | Webcam-based marker steering                                                                                |
-| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                                                                   |
+| Module                       | Responsibility                                                                                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config.ts`                  | Default car configuration (`maxSpeed`, `acceleration`, etc.)                                                                                                                          |
+| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls, audio callbacks                                                                                                             |
+| `physics/carPhysics.ts`      | Motion (speed + translation), polygon creation, damage assessment. Steering (angle) handled by Car directly                                                                           |
+| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                                                                                                                                            |
+| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors)                                                                                                                           |
+| `carState.ts`                | `CarState` + `ControlsState` interfaces (breaks circular deps)                                                                                                                        |
+| `brain/carBrainAdapter.ts`   | Sole bridge to NeuralNetwork: create, serialize, deserialize, feedforward; `inputLayerSize(rayCount, trafficAwareness)` picks `rayCount*2+1` (traffic-aware) vs `rayCount+1` (legacy) |
+| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings; optional `trafficControls` param + `trafficAwareness` flag for traffic-light perception                                   |
+| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                                                                                                                                                        |
+| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                                                                                                                                               |
+| `controls/cameraControls.ts` | Webcam-based marker steering                                                                                                                                                          |
+| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                                                                                                                                             |
 
 **Factory method**: `Car.fromInfo(opts, info?)` provides an explicit, deterministic
 path for car rehydration from persisted `CarInfo`. The existing `load(info)`
@@ -223,10 +224,11 @@ Training environments and genetic algorithm orchestration.
 
 Functions shared by all canvas-based simulators (TrainingSimulator, TrafficSimulator, RaceSimulator).
 
-| Module                       | Responsibility                                                              |
-| ---------------------------- | --------------------------------------------------------------------------- |
-| `spatialGridUtils.ts`        | `buildRoadBorders()`, `queryBordersNearCar()`, `pointToSegmentDistanceSq()` |
-| `rendering/layoutManager.ts` | Canvas resize logic for multi-panel layout                                  |
+| Module                       | Responsibility                                                                                           |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `spatialGridUtils.ts`        | `buildRoadBorders()`, `queryBordersNearCar()`, `pointToSegmentDistanceSq()`                              |
+| `trafficControlUtils.ts`     | `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)` for AI traffic-light perception |
+| `rendering/layoutManager.ts` | Canvas resize logic for multi-panel layout                                                               |
 
 ### 5d. Reusable Simulator Core (`ts/simulator/core/`, `ts/simulator/traffic/`, `ts/simulator/racing/`)
 
@@ -267,12 +269,12 @@ Pure renderer functions extracted from math primitives to break the cross-cuttin
 dependency on Canvas 2D APIs. Each function accepts a primitive as data and an
 options interface for style control.
 
-| Module                | Responsibility                                         |
-| --------------------- | ------------------------------------------------------ |
-| `pointRenderer.ts`    | Draws `Point` as filled/outlined circles               |
-| `segmentRenderer.ts`  | Draws `Segment` as styled lines with optional dash/cap |
-| `polygonRenderer.ts`  | Draws `Polygon` as filled and stroked closed shapes    |
-| `envelopeRenderer.ts` | Draws `Envelope` by delegating to `drawPolygon`        |
+| Module                | Responsibility                                                                    |
+| --------------------- | --------------------------------------------------------------------------------- |
+| `pointRenderer.ts`    | Draws `Point` as filled/outlined circles                                          |
+| `segmentRenderer.ts`  | Draws `Segment` as styled lines with optional dash/cap                            |
+| `polygonRenderer.ts`  | Draws `Polygon` as filled and stroked closed shapes                               |
+| `envelopeRenderer.ts` | Draws `Envelope` by delegating to `drawPolygon`                                   |
 | `heatmapRenderer.ts`  | Paints a `HeatmapGrid` as a viewport-culled colour overlay (blue→cyan→yellow→red) |
 
 These are importable by any file that needs them (World, editors, markings) via
@@ -310,7 +312,7 @@ for clarity — the main element remains as a composition root.
 | `worldToolbar.ts`         | `<world-toolbar>`          | Composition root: file I/O, border/tracking mode, camera debug toggle         |
 | `modeControls.ts`         | —                          | `ToolbarModeControls` — border/tracking/viewport mode button wiring           |
 | `assetSelectors.ts`       | —                          | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding      |
-| `worldLayersToolbar.ts`   | `<world-layers-toolbar>`   | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle       |
+| `worldLayersToolbar.ts`   | `<world-layers-toolbar>`   | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle      |
 | `layoutToolbar.ts`        | `<layout-toolbar>`         | Layout toggle, camera/network/minimap visibility                              |
 | `animationLoopToolbar.ts` | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control)                         |
 | `shortcutsToolbar.ts`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |
@@ -348,12 +350,14 @@ Sensor.update()
     │
     ▼
 rays[] ──intersect──▶ roadBorders, buildings, traffic cars
+    │                  (+ trafficControls for cars with sensor.trafficAwareness)
     │
     ▼
 readings[] (normalized 0-1 offsets, closer = higher value)
+    │   (+ trafficReadings[]: green=1, yellow=0.5, red/off=0 per ray, traffic-aware only)
     │
     ▼
-NeuralNetwork.feedForward(readings + speed)
+NeuralNetwork.feedForward(readings [+ trafficStates] + speed)
     │
     ▼
 outputs[4] (binary: forward, left, right, reverse)

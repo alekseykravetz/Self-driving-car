@@ -1,4 +1,4 @@
-import { Sensor } from './sensors/sensor.js';
+import { Sensor, type SensorTrafficControl } from './sensors/sensor.js';
 import { Controls } from './controls/controls.js';
 import { PhoneControls } from './controls/phoneControls.js';
 import { CameraControls } from './controls/cameraControls.js';
@@ -24,6 +24,7 @@ export interface CarInfo {
     raySpread: number;
     rayLength: number;
     rayOffset: number;
+    trafficAwareness?: boolean;
   };
 }
 
@@ -44,6 +45,7 @@ export interface CarOptions {
     raySpread?: number;
     rayLength?: number;
     rayOffset?: number;
+    trafficAwareness?: boolean;
   };
   callbacks?: CarCallbacks;
 }
@@ -112,7 +114,10 @@ export class Car {
     if (opts.controlType !== 'DUMMY') {
       this.sensor = new Sensor(opts.sensor);
       this.brain = CarBrainAdapter.createBrain([
-        this.sensor.rayCount + 1,
+        CarBrainAdapter.inputLayerSize(
+          this.sensor.rayCount,
+          this.sensor.trafficAwareness,
+        ),
         ...this.hiddenLayers,
         4,
       ]);
@@ -151,6 +156,7 @@ export class Car {
       this.sensor.raySpread = info.sensor.raySpread;
       this.sensor.rayLength = info.sensor.rayLength;
       this.sensor.rayOffset = info.sensor.rayOffset;
+      this.sensor.trafficAwareness = info.sensor.trafficAwareness ?? false;
     }
   }
 
@@ -171,6 +177,7 @@ export class Car {
           this.sensor?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength,
         rayOffset:
           this.sensor?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset,
+        trafficAwareness: this.sensor?.trafficAwareness ?? false,
       },
     };
   }
@@ -201,7 +208,10 @@ export class Car {
     };
   }
 
-  update(polygons: Point[][] = []): void {
+  update(
+    polygons: Point[][] = [],
+    trafficControls?: SensorTrafficControl[],
+  ): void {
     this.#applySteering();
 
     const becameDamaged = this.physics.update(
@@ -214,13 +224,16 @@ export class Car {
     }
 
     if (this.sensor && this.brain) {
-      this.sensor.update(this.x, this.y, this.angle, polygons);
+      this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls);
       if (this.useBrain && this.controls instanceof Controls) {
         const output = CarBrainAdapter.computeControls(
           this.sensor.readings,
           this.speed,
           this.maxSpeed,
           this.brain,
+          this.sensor.trafficAwareness
+            ? this.sensor.trafficReadings
+            : undefined,
         );
         this.controls.forward = output.forward;
         this.controls.left = output.left;
@@ -228,7 +241,7 @@ export class Car {
         this.controls.reverse = output.reverse;
       }
     } else if (this.sensor) {
-      this.sensor.update(this.x, this.y, this.angle, polygons);
+      this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls);
     }
 
     this.#syncEngine();

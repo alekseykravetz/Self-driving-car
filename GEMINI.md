@@ -22,6 +22,7 @@ This document provides context for AI coding agents working on this project.
 4. **Single entry point per page** — Each HTML page loads one `<script type="module">`; the browser resolves dependencies via import graph.
 5. **Canvas 2D only** — No WebGL, no Three.js. Rendering uses the standard Canvas 2D API.
 6. **Composition over inheritance** — Cars contain sensors, controls, and networks as separate objects. Markings use subclass hierarchy but most systems prefer composition.
+7. **Traffic-light perception** — `TrafficControlGrid` (`ts/math/trafficControlGrid.ts`) indexes `Light` polygons in 150px cells (mirrors `SpatialHashGrid`); rebuilt only on world-markings change, light state read live at query time via a `getState` closure. `ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)`. `Sensor.update()` / `Car.update()` take an optional `trafficControls` param consumed only when `sensor.trafficAwareness === true`. Traffic-state encoding: green=1, yellow=0.5, red/off/absent=0. The flag is serialized on `CarInfo.sensor` (defaults `false` → old `.car` files keep the legacy `rayCount + 1` input layer and drive unchanged). `CarBrainAdapter.inputLayerSize(rayCount, trafficAwareness)` returns `rayCount*2 + 1` when traffic-aware, else `rayCount + 1`; `brainsCompatible()` rejects cross-awareness brain swaps automatically.
 
 ---
 
@@ -68,6 +69,7 @@ ts/                         # TypeScript source (THE source of truth)
 │   ├── primitives/         # Point, Segment, Polygon, Envelope
 │   ├── graph/              # Graph with Dijkstra pathfinding
 │   ├── osm-importer/       # OpenStreetMap data parser
+│   ├── trafficControlGrid.ts # Spatial hash grid indexing Light polygons for AI perception
 │   └── utils.ts            # Vector math, lerp, intersections
 ├── car/                    # Vehicle system
 │   ├── car.ts              # Physics, collision, AI integration
@@ -86,6 +88,7 @@ ts/                         # TypeScript source (THE source of truth)
 ├── simulator/              # Simulator domain
 │   ├── core/               # SimulatorShell: shared canvas/RAF scaffolding
 │   ├── traffic/            # Live Traffic Jam + <traffic-panel>
+│   ├── trafficControlUtils.ts # Traffic-light grid build/query helpers for AI perception
 │   ├── panels/             # <world-toolbar>, <layout-toolbar>, <animation-loop-toolbar>
 │   └── training/           # Training sim + <training-panel>
 │       ├── genetics/       # Pool + storage managers
@@ -183,3 +186,4 @@ Update `docs/*.md` when making significant changes:
 6. **Car angle convention** — 0 = facing up, positive = clockwise
 7. **Sensor offset inversion** — Readings are `1 - offset` before feeding to network
 8. **World files** — Use JS variable assignment syntax, not pure JSON
+9. **Traffic-aware sensors** — Lights update via `TrafficManager` inside `World.draw()`, so AI perception reads the previous frame's state (one-frame lag, acceptable).

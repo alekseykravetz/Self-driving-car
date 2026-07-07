@@ -1,4 +1,5 @@
 import { SpatialHashGrid } from '../../../math/spatialGrid.js';
+import { TrafficControlGrid } from '../../../math/trafficControlGrid.js';
 import { World } from '../../../world/world.js';
 import { Graph } from '../../../math/graph/graph.js';
 import { Viewport } from '../../../viewport/viewport.js';
@@ -6,10 +7,11 @@ import { MiniMap } from '../../../mini-map/miniMap.js';
 import { Camera } from '../../../camera/camera.js';
 import { StoreManager } from '../../../store/storeManager.js';
 import { queryBordersNearCar } from '../../spatialGridUtils.js';
+import { buildTrafficControls, queryTrafficControlsNearCar, } from '../../trafficControlUtils.js';
 import { handleCollisionWithRoadBorders } from './borderCollision.js';
 import { drawSimulatorCars } from '../rendering/carRenderer.js';
 import { scale } from '../../../math/utils.js';
-export function updateWorldCars(cars, borderGrid, borderMode, collisionBorders, bestCar, idleEnabled, idleRange) {
+export function updateWorldCars(cars, borderGrid, trafficGrid, borderMode, collisionBorders, bestCar, idleEnabled, idleRange) {
     let aliveCount = 0;
     let deadCount = 0;
     let frozenCount = 0;
@@ -33,7 +35,10 @@ export function updateWorldCars(cars, borderGrid, borderMode, collisionBorders, 
         if (borderMode !== 'none') {
             bordersForUpdate = queryBordersNearCar(borderGrid, car);
         }
-        car.update(bordersForUpdate);
+        const trafficControls = car.sensor?.trafficAwareness
+            ? queryTrafficControlsNearCar(trafficGrid, car)
+            : [];
+        car.update(bordersForUpdate, trafficControls);
         aliveCount++;
     }
     return { aliveCount, deadCount, frozenCount };
@@ -41,6 +46,7 @@ export function updateWorldCars(cars, borderGrid, borderMode, collisionBorders, 
 export class WorldTrainingStrategy {
     #parent;
     #borderGrid = new SpatialHashGrid(150);
+    #trafficGrid = new TrafficControlGrid(150);
     constructor(parent) {
         this.#parent = parent;
     }
@@ -80,6 +86,12 @@ export class WorldTrainingStrategy {
     }
     #rebuildGrid() {
         this.#borderGrid.build((this.#parent.roadBorders ?? []));
+        if (this.#parent.world) {
+            this.#trafficGrid.rebuild(buildTrafficControls(this.#parent.world));
+        }
+        else {
+            this.#trafficGrid.rebuild([]);
+        }
     }
     update() {
         const cars = this.#parent.trainingManager.cars;
@@ -100,7 +112,7 @@ export class WorldTrainingStrategy {
                 ...this.#parent.world.separatorBorders,
             ];
         const { idleRange } = this.#parent.trainingManager.getSettings();
-        const { aliveCount, deadCount, frozenCount } = updateWorldCars(cars, this.#borderGrid, this.#parent.toolbarPanel.borderMode, collisionBorders, bestCar, this.#parent.trainingManager.idleEnabled, idleRange);
+        const { aliveCount, deadCount, frozenCount } = updateWorldCars(cars, this.#borderGrid, this.#trafficGrid, this.#parent.toolbarPanel.borderMode, collisionBorders, bestCar, this.#parent.trainingManager.idleEnabled, idleRange);
         const bestFitness = Math.round(bestCar.fitness);
         this.#parent.updateTrainingMetrics(bestFitness, aliveCount, deadCount, frozenCount);
         this.#parent.recordHeatmap(cars);
