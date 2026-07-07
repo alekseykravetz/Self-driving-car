@@ -36,9 +36,16 @@ The project supports multiple input methods for controlling cars. All control sy
 
 ### Live Traffic Jam (Traffic page)
 
-| Key        | Action                                                        |
-| ---------- | ------------------------------------------------------------- |
-| `R` (hold) | Flip the spawn heading 180° while held (preview + next spawn) |
+| Key        | Action                                                                                           |
+| ---------- | ------------------------------------------------------------------------------------------------ |
+| `R` (hold) | Flip the spawn heading 180° while held (preview + next spawn)                                    |
+| `G`        | Toggle global green wave — force all traffic lights green, press again to restore normal cycling |
+
+### Training Simulator (world mode)
+
+| Key | Action                                                                                           |
+| --- | ------------------------------------------------------------------------------------------------ |
+| `G` | Toggle global green wave — force all traffic lights green, press again to restore normal cycling |
 
 ---
 

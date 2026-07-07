@@ -1,6 +1,7 @@
 import { Point } from '../math/primitives/point.js';
 import { Graph } from '../math/graph/graph.js';
 import { Marking } from './markings/marking.js';
+import type { LightState } from './markings/light.js';
 import { Light } from './markings/light.js';
 import { getNearestPoint } from '../math/utils.js';
 
@@ -95,6 +96,22 @@ export class TrafficManager {
     }
   }
 
+  overrideLight(light: Light, state: LightState): void {
+    light.override(state);
+  }
+
+  releaseOverride(light: Light): void {
+    light.releaseOverride();
+  }
+
+  releaseAllOverrides(): void {
+    for (const light of this.markings) {
+      if (light instanceof Light && light.overridden) {
+        light.releaseOverride();
+      }
+    }
+  }
+
   // Updates the state of all managed traffic lights based on time/frameCount
   update(): void {
     this.#initializeControlCenters(); // todo: fix not init lights on each update (problem with markings and graph changes outside)
@@ -121,7 +138,9 @@ export class TrafficManager {
         stateWithinSegment < GREEN_DURATION ? 'green' : 'yellow';
 
       // Update the state of each light controlled by this center
+      // Skip lights that have been manually overridden (paused cycling)
       for (let i = 0; i < center.lights.length; i++) {
+        if (center.lights[i].overridden) continue;
         if (i === greenYellowIndex) {
           center.lights[i].state = currentPhase;
         } else {

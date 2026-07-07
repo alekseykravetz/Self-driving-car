@@ -20,11 +20,14 @@ import { Point } from '../../math/primitives/point.js';
 import type { Segment } from '../../math/primitives/segment.js';
 import type { Car } from '../../car/car.js';
 import type { IWorld } from '../../world/types.js';
+import { World } from '../../world/world.js';
+import { Light } from '../../world/markings/light.js';
 import { angle } from '../../math/utils.js';
 import { buildRoadBorders } from '../spatialGridUtils.js';
 
 export class TrainingSimulator extends SimulatorShell {
   #strategy!: SimpleTrainingStrategy | WorldTrainingStrategy;
+  #globalGreenWave: boolean = false;
   world: IWorld | null = null;
   roadBorders: Point[][] | null = null;
   trainingManager!: TrainingPanelElement;
@@ -59,6 +62,7 @@ export class TrainingSimulator extends SimulatorShell {
     this.trainingManager.setNewTrainingHandler(() => this.openInitModal('new'));
 
     this.#initPauseToggleClicks();
+    this.#initGreenWaveHandler();
     this.#initShortcutsToolbar();
     this.animate(0);
   }
@@ -105,6 +109,14 @@ export class TrainingSimulator extends SimulatorShell {
         keys: ['ArrowRight', 'd'],
       },
       {
+        id: 'keyG',
+        label: 'G',
+        title:
+          'G \u2014 Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
+        group: 'Traffic',
+        kind: 'toggle',
+      },
+      {
         id: 'keyCtrl',
         label: 'Ctrl',
         title: 'Ctrl + scroll wheel \u2014 Zoom in/out (touchpad mode)',
@@ -123,6 +135,34 @@ export class TrainingSimulator extends SimulatorShell {
     };
     this.gameCanvas.addEventListener('click', toggle);
     this.cameraCanvas.addEventListener('click', toggle);
+  }
+
+  #initGreenWaveHandler(): void {
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'g' || e.key === 'G') {
+        this.#toggleGreenWave();
+      }
+    });
+  }
+
+  /** Toggle global green wave: force all lights green or restore normal cycling. */
+  #toggleGreenWave(): void {
+    if (!this.world || !(this.world instanceof World)) return;
+    const toolbar = document.querySelector(
+      'shortcuts-toolbar',
+    ) as ShortcutsToolbarElement | null;
+    if (this.#globalGreenWave) {
+      this.world.trafficManager.releaseAllOverrides();
+      this.#globalGreenWave = false;
+    } else {
+      for (const marking of this.world.markings) {
+        if (marking instanceof Light) {
+          this.world.trafficManager.overrideLight(marking, 'green');
+        }
+      }
+      this.#globalGreenWave = true;
+    }
+    toolbar?.setActive('keyG', this.#globalGreenWave);
   }
 
   openInitModal(context: 'entry' | 'new'): void {

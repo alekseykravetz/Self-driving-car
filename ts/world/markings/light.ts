@@ -9,8 +9,22 @@ export type LightState = 'off' | 'green' | 'yellow' | 'red';
 
 export class Light extends Marking {
   public state: LightState = 'off';
+  #overridden: boolean = false;
   border: Segment;
   readonly type: string = 'light';
+
+  get overridden(): boolean {
+    return this.#overridden;
+  }
+
+  override(state: LightState): void {
+    this.#overridden = true;
+    this.state = state;
+  }
+
+  releaseOverride(): void {
+    this.#overridden = false;
+  }
 
   /**
    * Constructs a Traffic Light marking.
@@ -49,9 +63,20 @@ export class Light extends Marking {
 
     // Draw the background bar (housing) for the lights
     drawSegment(ctx, new Segment(redPoint, greenPoint), {
-      width: this.height, // Uses this.height (which is 18 from super) as the thickness
+      width: this.height,
       cap: 'round',
     });
+
+    // Visual indicator for overridden lights: a cyan "M" badge above the housing
+    if (this.#overridden) {
+      ctx.save();
+      ctx.fillStyle = '#0FF';
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('M', this.center.x, greenPoint.y - this.height / 2 - 2);
+      ctx.restore();
+    }
 
     // Calculate the size of the light circles based on the housing height
     const lightSize = this.height * 0.6;
