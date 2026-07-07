@@ -361,7 +361,7 @@ class Sensor {
   raySpread: number; // Angular spread of rays (default: π/2 = 90°)
   rayOffset: number; // Rotational offset of sensor array (default: 0)
   trafficAwareness: boolean; // Whether the sensor detects traffic lights (default: false)
-  trafficReadings: (TrafficControlState | null)[]; // Per-ray light state, traffic-aware only
+  trafficReadings: (TrafficReading | null)[]; // Per-ray detection result (state + intersection point), traffic-aware only
 
   rays: Point[][]; // Array of [startPoint, endPoint] pairs
   readings: (IntersectionPoint | null)[]; // Closest hit per ray, or null
@@ -446,17 +446,24 @@ When `trafficAwareness` is `true`, `Sensor.update(x, y, angle, polygons, traffic
 
 The traffic-control set is built per frame by the simulator via `buildTrafficControls(world)` (into a `TrafficControlGrid`) and `queryTrafficControlsNearCar(grid, car)` — mirroring `queryBordersNearCar` (sensor reach + body margin). The grid uses 150px cells and is rebuilt only when world markings change; light state is read live at query time through a `getState` closure, so a state change takes effect on the next query without a rebuild.
 
-`Sensor.draw()` additionally renders a small colored dot (green/yellow/red) above the hit point when a light is detected on that ray.
+`Sensor.draw()` renders the traffic detection with a colored ray from the car to the light intersection point (instead of offsetting a dot above the wall hit), plus a colored dot (r=4) with a white 1.5px border at the light position. When a wall exists behind the light, the yellow wall ray continues from the light point to the wall. See [Sensor Visualization](#sensor-visualization) for the full per-ray rules.
 
 > Lights still update via `TrafficManager` inside `World.draw()`, so perception reads the previous frame's light state — a one-frame lag, which is acceptable.
 
 ### Sensor Visualization
 
-When `drawSensor` is true, rays are rendered on the canvas:
+When `drawSensor` is true, rays are rendered on the canvas. The per-ray rules depend on whether a road-border hit and/or a traffic-light detection exists:
 
-- **Clear ray** (no hit): drawn full-length in yellow with green endpoint
-- **Hit ray**: drawn in yellow up to the hit point, then red to the max endpoint
-- Hit point drawn as a black circle
+| Scenario             | Ray line                                                  | Endpoint dot                                                                           |
+| -------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Wall hit, no traffic | Yellow from car → wall                                    | Yellow dot (r=3) at wall                                                               |
+| Wall hit + traffic   | Colored\* from car → light, then yellow from light → wall | Yellow dot (r=3) at wall + colored dot (r=4, white 1.5px border) at light intersection |
+| No wall, no traffic  | Faint yellow full-length (α0.2)                           | None                                                                                   |
+| No wall + traffic    | Colored\* from car → light                                | Colored dot (r=4, white 1.5px border) at light intersection                            |
+
+\* Color matches the traffic-light state: `#0F0` (green), `#FF0` (yellow), `#F00` (red).
+
+The traffic intersection point is computed inside `#getTrafficReadings()` via `lerp()` and stored in a `TrafficReading` (`{ state, offset, x, y }`), so the dot lands exactly on the light polygon — never offset from a wall.
 
 ---
 
