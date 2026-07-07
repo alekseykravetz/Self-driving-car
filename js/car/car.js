@@ -153,7 +153,11 @@ export class Car {
     }
     update(polygons = [], trafficControls, otherCars) {
         this.#applySteering();
-        const becameDamaged = this.physics.update(this, this.#computeControlsState(), polygons);
+        // Physics needs all polygons (road borders + other cars for collision).
+        const collisionPolygons = otherCars && otherCars.length > 0
+            ? polygons.concat(otherCars.map((c) => c.polygon))
+            : polygons;
+        const becameDamaged = this.physics.update(this, this.#computeControlsState(), collisionPolygons);
         if (becameDamaged) {
             this.#callbacks?.onDamaged?.();
         }

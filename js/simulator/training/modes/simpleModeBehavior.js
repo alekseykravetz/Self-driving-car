@@ -68,23 +68,20 @@ export function updateSimpleCars(cars, state, roadBorders, idleEnabled, bestCar,
                 hi = mid;
         }
         const isClassified = car.sensor?.sophistication === 'classified';
-        if (isClassified) {
-            const otherCars = [];
-            for (let j = lo; j < state.traffic.length && state.traffic[j].y <= maxY; j++) {
-                otherCars.push({
-                    polygon: state.traffic[j].polygon,
-                    speed: state.traffic[j].speed,
-                });
+        const otherCars = [];
+        const nearbyPolygons = isClassified
+            ? [...roadBorders]
+            : [...roadBorders];
+        for (let j = lo; j < state.traffic.length && state.traffic[j].y <= maxY; j++) {
+            const t = state.traffic[j];
+            if (isClassified) {
+                otherCars.push({ polygon: t.polygon, speed: t.speed });
             }
-            car.update(roadBorders, undefined, otherCars);
-        }
-        else {
-            const nearbyPolygons = [...roadBorders];
-            for (let j = lo; j < state.traffic.length && state.traffic[j].y <= maxY; j++) {
-                nearbyPolygons.push(state.traffic[j].polygon);
+            else {
+                nearbyPolygons.push(t.polygon);
             }
-            car.update(nearbyPolygons);
         }
+        car.update(nearbyPolygons, undefined, isClassified ? otherCars : undefined);
         aliveCount++;
     }
     return { aliveCount, deadCount, frozenCount };
