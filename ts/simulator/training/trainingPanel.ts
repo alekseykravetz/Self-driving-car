@@ -358,12 +358,20 @@ export class TrainingPanelElement extends HTMLElement {
     keysCar?.setLearningFromHuman(enabled);
   }
 
-  /** Badge shown next to the toggle: "∈ pool" when injection is enabled. */
+  /** Badge shown next to the toggle: reflects *actual* pool membership.
+   *  States: "off" (toggle off, badge hidden), "in" (∈ pool, KEYS ranks in top
+   *  poolSize), "out" (toggle on but KEYS isn't ranking high enough yet). */
   #updateKeysPoolStatus(): void {
     if (!this.#keysPoolStatus) return;
     const enabled = this.#injectKeysInput?.checked ?? false;
-    this.#keysPoolStatus.textContent = enabled ? '∈ pool' : '';
-    this.#keysPoolStatus.style.opacity = enabled ? '1' : '0';
+    if (!enabled) {
+      this.#keysPoolStatus.dataset.state = 'off';
+      this.#keysPoolStatus.textContent = '';
+      return;
+    }
+    const keysInPool = this.bestPool.some((c) => c.type === 'KEYS');
+    this.#keysPoolStatus.dataset.state = keysInPool ? 'in' : 'out';
+    this.#keysPoolStatus.textContent = keysInPool ? '∈ pool' : '— pool';
   }
 
   /** Public read of the toggle (used by nextGeneration). */
@@ -519,8 +527,19 @@ export class TrainingPanelElement extends HTMLElement {
     // competes alongside AI cars for a slot in the next generation's gene pool.
     // Topology compatibility is later enforced by brainsCompatible() inside
     // applyPoolToCars, so an incompatible KEYS brain is silently dropped.
-    const pool = this.#getTopCarInfoPool(this.injectKeysEnabled);
-    this.#createCarsWithPool(pool);
+    const includeKeys = this.injectKeysEnabled;
+    const pool = this.#getTopCarInfoPool(includeKeys);
+    // Find which pool slot (if any) came from the KEYS car so we can label it
+    // "K" in the next generation's prevPoolCars — otherwise the user can't tell
+    // which preserved elite inherited their human-driven brain.
+    let keysPoolIndex = -1;
+    if (includeKeys) {
+      const { poolSize } = this.getSettings();
+      const sorted = getSortedAICars(this.cars, this.#evaluateFitness, true);
+      const top = sorted.slice(0, poolSize);
+      keysPoolIndex = top.findIndex((c) => c.type === 'KEYS');
+    }
+    this.#createCarsWithPool(pool, keysPoolIndex);
   }
 
   public newTraining(): void {
@@ -536,7 +555,7 @@ export class TrainingPanelElement extends HTMLElement {
 
   // ── Car Creation ─────────────────────────────────────
 
-  #createCarsWithPool(pool: CarInfo[]): void {
+  #createCarsWithPool(pool: CarInfo[], keysPoolIndex: number = -1): void {
     const settings = this.getSettings();
     const config = this.getCarSettings();
     const aiCars = this.#generateCars(settings.carCount, 'AI', config);
@@ -560,9 +579,11 @@ export class TrainingPanelElement extends HTMLElement {
       poolCount > 0
         ? this.cars.filter((c) => c.type !== 'KEYS').slice(0, poolCount)
         : [];
-    // Label prev pool cars with their inherited rank
+    // Label prev pool cars with their inherited rank. The slot that came from
+    // the KEYS car is labeled "K" so the user can identify which elite car
+    // carries their human-trained brain.
     for (let i = 0; i < this.prevPoolCars.length; i++) {
-      this.prevPoolCars[i].name = String(i + 1);
+      this.prevPoolCars[i].name = i === keysPoolIndex ? 'K' : String(i + 1);
     }
 
     this.#onCarsCreatedCallback(this.cars);
@@ -663,8 +684,15 @@ export class TrainingPanelElement extends HTMLElement {
   public updateBestCarAndPool(): void {
     const { poolSize } = this.getSettings();
     // Per-frame: select just the top `poolSize` cars instead of sorting the
-    // entire population (thousands) every frame.
-    this.bestPool = getTopAICars(this.cars, this.#evaluateFitness, poolSize);
+    // entire population (thousands) every frame. When human-in-the-loop is
+    // enabled, the KEYS car competes for a slot so the user can see it ranked
+    // in the live pool table (named "K", highlighted row).
+    this.bestPool = getTopAICars(
+      this.cars,
+      this.#evaluateFitness,
+      poolSize,
+      this.injectKeysEnabled,
+    );
     this.bestCar = this.bestPool.length > 0 ? this.bestPool[0] : null;
 
     // Throttle the DOM-heavy UI refresh (pool table innerHTML rebuild + a
@@ -678,11 +706,12 @@ export class TrainingPanelElement extends HTMLElement {
     }
   }
 
-  /** Immediately re-renders the pool table and status dots (bypasses throttle). */
+  /** Immediately re-renders the pool table, status dots, and KEYS badge. */
   public refreshPoolUI(): void {
     this.#domRefreshCounter = 0;
     this.#updatePoolTable();
     this.#updateStatusDots();
+    this.#updateKeysPoolStatus();
   }
 
   #updatePoolTable(): void {
@@ -728,6 +757,12 @@ export class TrainingPanelElement extends HTMLElement {
       const selected = this.selectedPoolIndices.has(i);
       if (row.classList.contains('selected') !== selected)
         row.classList.toggle('selected', selected);
+
+      // Highlight the KEYS car's row so the user can spot their human-driven
+      // entry among the AI cars in the pool table.
+      const isKeys = car.type === 'KEYS';
+      if (row.classList.contains('keys-row') !== isKeys)
+        row.classList.toggle('keys-row', isKeys);
     }
 
     // Drop any rows left over from a previously larger pool.

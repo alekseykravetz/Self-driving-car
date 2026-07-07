@@ -94,13 +94,18 @@ Transient training parameter — not persisted to localStorage or world files. R
 - [x] Incompatible brains (e.g. sensor topology changed mid-session) are gracefully skipped via `brainsCompatible()` inside `applyPoolToCars` — no errors
 - [x] Pool size never exceeds `poolSize` (the KEYS car is a candidate, not an addition)
 - [x] Toggle state persists across generations within a session; resets to default on page reload (acceptable)
+- [x] **Visibility:** KEYS car appears in the live pool table (name "K", yellow-highlighted row) when it ranks in the top `poolSize`
+- [x] **Visibility:** Status badge shows `∈ pool` / `— pool` dynamically based on actual pool membership (not just toggle state)
+- [x] **Visibility:** After Next Gen, the prev pool car that inherited the KEYS brain is labeled "K" instead of a number
 
 ## Visual validation
 
 1. Start training, drive the KEYS car for a full generation. The network visualizer should show output activations increasingly matching your keypresses.
-2. Click **Next Gen** with the toggle on → some AI children should inherit your behavior via crossover (look for cars that steer where you steered).
-3. Toggle off mid-session → learning stops immediately, KEYS brain is excluded from the next pool.
-4. Change sensor topology (e.g. toggle Traffic Lights) → `brainsCompatible` rejects the KEYS brain silently; no errors in console.
+2. Watch the **pool table** while driving — when your KEYS car (row "K", yellow highlight) enters the top `poolSize`, the badge switches to `∈ pool`. If you're not ranking high enough, it shows `— pool`.
+3. Click **Next Gen** with the toggle on → the prev pool car carrying your brain is labeled "K" in the new generation. Other AI children inherit your behavior via crossover (look for cars that steer where you steered).
+4. Toggle off mid-session → learning stops immediately, KEYS brain is excluded from the next pool, badge hides.
+5. Change sensor topology (e.g. toggle Traffic Lights) → `brainsCompatible` rejects the KEYS brain silently; no errors in console.
+6. **Save** only persists AI brains (KEYS brain is transient — never written to localStorage).
 
 ## References
 
