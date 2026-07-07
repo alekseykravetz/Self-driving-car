@@ -2,9 +2,13 @@ import { MarkingEditor } from './markingEditor.js';
 import { Viewport } from '../../viewport/viewport.js';
 import { World } from '../world.js';
 import { Point } from '../../math/primitives/point.js';
-import { Light } from '../markings/light.js';
+import { Light, type LightState } from '../markings/light.js';
+
+const CYCLE_ORDER: LightState[] = ['off', 'green', 'yellow', 'red'];
 
 export class LightEditor extends MarkingEditor {
+  #boundLightClick: (e: MouseEvent) => void;
+
   /**
    * Editor for creating Light markings.
    * Targets lane guide segments.
@@ -12,6 +16,42 @@ export class LightEditor extends MarkingEditor {
   constructor(viewport: Viewport, world: World) {
     // Call base constructor, passing lane guides as targets
     super(viewport, world, world.laneGuides);
+    this.#boundLightClick = this.#handleLightClick.bind(this);
+  }
+
+  override enable(): void {
+    this.canvas.addEventListener('mousedown', this.#boundLightClick);
+    super.enable();
+  }
+
+  override disable(): void {
+    this.canvas.removeEventListener('mousedown', this.#boundLightClick);
+    super.disable();
+  }
+
+  #handleLightClick(e: MouseEvent): void {
+    if (e.button !== 0 || !this.mouse) return;
+
+    const light = this.#findLightAt(this.mouse);
+    if (!light) return;
+
+    e.stopImmediatePropagation();
+    this.#cycleLight(light);
+  }
+
+  #findLightAt(point: Point): Light | null {
+    for (const marking of this.markings) {
+      if (marking instanceof Light && marking.polygon.containsPoint(point)) {
+        return marking;
+      }
+    }
+    return null;
+  }
+
+  #cycleLight(light: Light): void {
+    const currentIndex = CYCLE_ORDER.indexOf(light.state);
+    const nextState = CYCLE_ORDER[(currentIndex + 1) % CYCLE_ORDER.length];
+    this.world.trafficManager.overrideLight(light, nextState);
   }
 
   /**
@@ -21,12 +61,6 @@ export class LightEditor extends MarkingEditor {
    * @returns A new Light instance.
    */
   createMarking(center: Point, directionVector: Point): Light {
-    // Use the Light constructor (no height parameter)
-    return new Light(
-      center,
-      directionVector,
-      this.world.roadWidth / 2, // Width for the light placement
-      // Height is fixed internally by Light constructor/super call (e.g., 18)
-    );
+    return new Light(center, directionVector, this.world.roadWidth / 2);
   }
 }

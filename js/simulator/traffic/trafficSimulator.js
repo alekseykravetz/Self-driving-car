@@ -14,6 +14,7 @@ import { buildTrafficControls, queryTrafficControlsNearCar, } from '../trafficCo
 import { getNearestSegment, scale, angle } from '../../math/utils.js';
 import { Point } from '../../math/primitives/point.js';
 import { BODY_MARGIN_RATIO } from '../../car/config.js';
+import { Light } from '../../world/markings/light.js';
 import { Start } from '../../world/markings/start.js';
 /**
  * TrafficSimulator — the "Live Traffic Jam" simulator.
@@ -58,6 +59,7 @@ export class TrafficSimulator extends SimulatorShell {
     // the shortcuts toolbar; the effective `#reverseHeading` is `held || latched`.
     #reverseHeld = false;
     #reverseLatched = false;
+    #globalGreenWave = false;
     #shortcutsToolbar = null;
     #previewCar = null;
     #previewInfo = null;
@@ -86,6 +88,12 @@ export class TrafficSimulator extends SimulatorShell {
                 this.#updateReverse();
             }
         });
+        // 'G' toggles global green wave over all traffic lights.
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'g' || e.key === 'G') {
+                this.#toggleGreenWave();
+            }
+        });
         // Load the active world (store/loaded selection, then the editor's copy).
         const storeWorld = StoreManager.getActiveWorld() ?? StoreManager.getEditorWorld();
         this.#loadWorld(storeWorld ?? null);
@@ -104,6 +112,13 @@ export class TrafficSimulator extends SimulatorShell {
                 id: 'keyR',
                 label: 'R',
                 title: 'R — Flip spawn heading 180°. Hold while placing a car, or click to latch it on permanently.',
+                group: 'Spawn',
+                kind: 'toggle',
+            },
+            {
+                id: 'keyG',
+                label: 'G',
+                title: 'G — Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
                 group: 'Spawn',
                 kind: 'toggle',
             },
@@ -136,6 +151,24 @@ export class TrafficSimulator extends SimulatorShell {
     #updateReverse() {
         this.#reverseHeading = this.#reverseHeld || this.#reverseLatched;
         this.#shortcutsToolbar?.setActive('keyR', this.#reverseHeading);
+    }
+    /** Toggle global green wave: force all lights green or restore normal cycling. */
+    #toggleGreenWave() {
+        if (!this.#world)
+            return;
+        if (this.#globalGreenWave) {
+            this.#world.trafficManager.releaseAllOverrides();
+            this.#globalGreenWave = false;
+        }
+        else {
+            for (const marking of this.#world.markings) {
+                if (marking instanceof Light) {
+                    this.#world.trafficManager.overrideLight(marking, 'green');
+                }
+            }
+            this.#globalGreenWave = true;
+        }
+        this.#shortcutsToolbar?.setActive('keyG', this.#globalGreenWave);
     }
     #initStatsPanel() {
         this.#statsPanel.setSelectListener((car) => this.#snapTo(car));

@@ -66,6 +66,19 @@ export class TrafficManager {
             center.ticks = center.lights.length * (GREEN_DURATION + YELLOW_DURATION);
         }
     }
+    overrideLight(light, state) {
+        light.override(state);
+    }
+    releaseOverride(light) {
+        light.releaseOverride();
+    }
+    releaseAllOverrides() {
+        for (const light of this.markings) {
+            if (light instanceof Light && light.overridden) {
+                light.releaseOverride();
+            }
+        }
+    }
     // Updates the state of all managed traffic lights based on time/frameCount
     update() {
         this.#initializeControlCenters(); // todo: fix not init lights on each update (problem with markings and graph changes outside)
@@ -86,7 +99,10 @@ export class TrafficManager {
             const stateWithinSegment = currentTickInCycle % cycleSegmentDuration;
             const currentPhase = stateWithinSegment < GREEN_DURATION ? 'green' : 'yellow';
             // Update the state of each light controlled by this center
+            // Skip lights that have been manually overridden (paused cycling)
             for (let i = 0; i < center.lights.length; i++) {
+                if (center.lights[i].overridden)
+                    continue;
                 if (i === greenYellowIndex) {
                     center.lights[i].state = currentPhase;
                 }
