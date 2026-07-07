@@ -13,7 +13,7 @@
  * @param viewportLeft - The left x-boundary of the visible viewport (default: no cull).
  * @param viewportRight - The right x-boundary of the visible viewport (default: no cull).
  */
-export function drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor = 'gold', prevPoolCars = [], prevPoolColor = 'deepskyblue', viewportLeft = -Infinity, viewportRight = Infinity) {
+export function drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor = 'gold', prevPoolCars = [], prevPoolColor = 'deepskyblue', viewportLeft = -Infinity, viewportRight = Infinity, keysShowSensor = false) {
     const poolSet = new Set(bestPool);
     const prevPoolSet = new Set(prevPoolCars);
     const highlightedSet = new Set([...poolSet, ...prevPoolSet]);
@@ -59,9 +59,13 @@ export function drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBott
             });
         }
     }
-    // 4. KEYS (user-controlled) car — full opacity
+    // 4. KEYS (user-controlled) car — full opacity; sensor rays shown when the
+    // user is tracking it (so they can debug driving with the sensor visible).
     const keysCar = cars.find((c) => c.type === 'KEYS');
     if (keysCar && keysCar.y > viewportTop && keysCar.y < viewportBottom) {
-        keysCar.draw(ctx, { showMask: drawMasks });
+        keysCar.draw(ctx, {
+            showMask: drawMasks,
+            showSensor: keysShowSensor,
+        });
     }
 }

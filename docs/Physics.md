@@ -428,13 +428,13 @@ allocated per ray per car per frame.
 
 ### Default Sensor Configuration
 
-| Parameter          | Default   | Description                                                                                                   |
-| ------------------ | --------- | ------------------------------------------------------------------------------------------------------------- |
-| `rayCount`         | 5         | Number of rays in the sensor array                                                                            |
-| `rayLength`        | 150       | Maximum detection distance (pixels)                                                                           |
-| `raySpread`        | π/2 (90°) | Total angular coverage of the sensor array                                                                    |
-| `rayOffset`        | 0         | Rotation offset (0 = centered on car heading)                                                                 |
-| `trafficAwareness` | false     | When true, the sensor also detects traffic lights (see [Traffic-Light Perception](#traffic-light-perception)) |
+| Parameter          | Default   | Description                                                                                                                                                                                                                                 |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rayCount`         | 5         | Number of rays in the sensor array                                                                                                                                                                                                          |
+| `rayLength`        | 150       | Maximum detection distance (pixels)                                                                                                                                                                                                         |
+| `raySpread`        | π/2 (90°) | Total angular coverage of the sensor array                                                                                                                                                                                                  |
+| `rayOffset`        | 0         | Rotation offset (0 = centered on car heading)                                                                                                                                                                                               |
+| `trafficAwareness` | false     | When true, the sensor also detects traffic lights (see [Traffic-Light Perception](#traffic-light-perception)). Settable from the training UI via the "Traffic Lights" checkbox (init modal + live panel); defaults to off (legacy behavior) |
 
 ### Traffic-Light Perception
 

@@ -152,7 +152,11 @@ export class WorldTrainingStrategy {
         const viewportRight = bestCar.x + this.#parent.gameCanvas.width * 2;
         const settings = this.#parent.trainingManager.getSettings();
         const drawMasks = settings.carCount <= 5000;
-        drawSimulatorCars(this.#parent.gameCtx, cars, this.#parent.trainingManager.bestPool, viewportTop, viewportBottom, drawMasks, 'gold', this.#parent.trainingManager.prevPoolCars, 'deepskyblue', viewportLeft, viewportRight);
+        const trackingKeys = this.#parent.toolbarPanel.trackingMode === 'keys';
+        const keysCar = trackingKeys
+            ? cars.find((c) => c.type === 'KEYS')
+            : undefined;
+        drawSimulatorCars(this.#parent.gameCtx, cars, this.#parent.trainingManager.bestPool, viewportTop, viewportBottom, drawMasks, 'gold', this.#parent.trainingManager.prevPoolCars, 'deepskyblue', viewportLeft, viewportRight, trackingKeys);
         this.#parent.drawHeatmap(viewPoint);
         const floatingMiniMap = this.#parent.layoutToolbar.showMiniMap &&
             !this.#parent.layoutToolbar.showVisualizer;
@@ -165,7 +169,7 @@ export class WorldTrainingStrategy {
                 backgroundColor: '#2a5',
             }
             : { viewPoint, cars });
-        this.#parent.drawNetworkVisualizer(time, bestCar.brain);
+        this.#parent.drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain);
         const debugCtx = this.#parent.toolbarPanel.showCameraDebug
             ? this.#parent.gameCtx
             : undefined;

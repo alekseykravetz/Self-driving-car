@@ -22,7 +22,7 @@ This document provides context for AI coding agents working on this project.
 4. **Single entry point per page** — Each HTML page loads one `<script type="module">`; the browser resolves dependencies via import graph.
 5. **Canvas 2D only** — No WebGL, no Three.js. Rendering uses the standard Canvas 2D API.
 6. **Composition over inheritance** — Cars contain sensors, controls, and networks as separate objects. Markings use subclass hierarchy but most systems prefer composition.
-7. **Traffic-light perception** — `TrafficControlGrid` (`ts/math/trafficControlGrid.ts`) indexes `Light` polygons in 150px cells (mirrors `SpatialHashGrid`); rebuilt only on world-markings change, light state read live at query time via a `getState` closure. `ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)`. `Sensor.update()` / `Car.update()` take an optional `trafficControls` param consumed only when `sensor.trafficAwareness === true`. Traffic-state encoding: green=1, yellow=0.5, red/off/absent=0. The flag is serialized on `CarInfo.sensor` (defaults `false` → old `.car` files keep the legacy `rayCount + 1` input layer and drive unchanged). `CarBrainAdapter.inputLayerSize(rayCount, trafficAwareness)` returns `rayCount*2 + 1` when traffic-aware, else `rayCount + 1`; `brainsCompatible()` rejects cross-awareness brain swaps automatically.
+7. **Traffic-light perception** — `TrafficControlGrid` (`ts/math/trafficControlGrid.ts`) indexes `Light` polygons in 150px cells (mirrors `SpatialHashGrid`); rebuilt only on world-markings change, light state read live at query time via a `getState` closure. `ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)`. `Sensor.update()` / `Car.update()` take an optional `trafficControls` param consumed only when `sensor.trafficAwareness === true`. Traffic-state encoding: green=1, yellow=0.5, red/off/absent=0. The flag is serialized on `CarInfo.sensor` (defaults `false` → old `.car` files keep the legacy `rayCount + 1` input layer and drive unchanged) and is settable from the training UI via the "Traffic Lights" checkbox in the init modal (`#tiCarTrafficAwareness`) and the live training panel (`#carTrafficAwareness`); both default to off. `CarBrainAdapter.inputLayerSize(rayCount, trafficAwareness)` returns `rayCount*2 + 1` when traffic-aware, else `rayCount + 1`; `brainsCompatible()` rejects cross-awareness brain swaps automatically.
 
 ---
 
@@ -145,6 +145,7 @@ docs/                       # Technical documentation
 - **Genetic algorithm only** (no backpropagation) — simpler, produces emergent behaviors
 - **Polygon.union()** for road generation — critical algorithm, handle with care
 - **Painter's algorithm** for 3D rendering — no depth buffer, sort by distance
+- **Keys tracking drives rendering** — when the toolbar tracking mode is `keys`, world/simple mode draws the KEYS car with `showSensor: true` (sensor rays visible) and the network visualizer shows the KEYS car's brain instead of the best AI car's
 - **Native ES modules** — single `<script type="module">` per page, imports handle ordering
 - **localStorage for brain persistence** — simple, no server needed
 

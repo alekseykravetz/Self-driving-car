@@ -166,10 +166,14 @@ export class SimpleTrainingStrategy {
                 this.#simpleState.traffic[i].draw(this.#parent.gameCtx, {});
             }
         }
-        drawSimulatorCars(this.#parent.gameCtx, cars, this.#parent.trainingManager.bestPool, viewportTop - 100, viewportBottom + 100, drawMasks, 'gold', this.#parent.trainingManager.prevPoolCars);
+        const trackingKeys = this.#parent.toolbarPanel.trackingMode === 'keys';
+        const keysCar = trackingKeys
+            ? cars.find((c) => c.type === 'KEYS')
+            : undefined;
+        drawSimulatorCars(this.#parent.gameCtx, cars, this.#parent.trainingManager.bestPool, viewportTop - 100, viewportBottom + 100, drawMasks, 'gold', this.#parent.trainingManager.prevPoolCars, 'deepskyblue', -Infinity, Infinity, trackingKeys);
         const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
         this.#parent.drawHeatmap(heatViewPoint);
-        this.#parent.drawNetworkVisualizer(time, bestCar.brain);
+        this.#parent.drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain);
         if (this.#parent.miniMap) {
             const viewPoint = scale(this.#parent.viewport.getOffset(), -1);
             const floatingMiniMap = this.#parent.layoutToolbar.showMiniMap &&

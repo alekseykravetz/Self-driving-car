@@ -76,7 +76,7 @@ The project uses two persistence mechanisms: browser localStorage for training s
 
 Each entry is a complete `CarInfo` — physics config + sensor config + trained brain. This allows reproducing the exact car behavior.
 
-> The optional `sensor.trafficAwareness` field (defaults to `false` when absent) toggles AI traffic-light perception and changes the brain's input-layer size (`rayCount*2 + 1` when true, else `rayCount + 1`). Existing `.car` files without the field remain valid and drive identically; `brainsCompatible()` rejects brain swaps across the two input sizes. See [Physics](Physics.md#traffic-light-perception).
+> The optional `sensor.trafficAwareness` field (defaults to `false` when absent) toggles AI traffic-light perception and changes the brain's input-layer size (`rayCount*2 + 1` when true, else `rayCount + 1`). It is settable from the training UI via the "Traffic Lights" checkbox in the init modal and the live training panel. Existing `.car` files without the field remain valid and drive identically; `brainsCompatible()` rejects brain swaps across the two input sizes. See [Physics](Physics.md#traffic-light-perception).
 
 ---
 

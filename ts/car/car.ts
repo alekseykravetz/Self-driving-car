@@ -157,6 +157,19 @@ export class Car {
       this.sensor.rayLength = info.sensor.rayLength;
       this.sensor.rayOffset = info.sensor.rayOffset;
       this.sensor.trafficAwareness = info.sensor.trafficAwareness ?? false;
+      // If no brain was supplied but the sensor topology changed (e.g. a
+      // .car file with trafficAwareness:true and no brain), rebuild the
+      // brain so its input layer matches the sensor.
+      if (!info.brain && this.useBrain) {
+        this.brain = CarBrainAdapter.createBrain([
+          CarBrainAdapter.inputLayerSize(
+            this.sensor.rayCount,
+            this.sensor.trafficAwareness,
+          ),
+          ...this.hiddenLayers,
+          4,
+        ]);
+      }
     }
   }
 

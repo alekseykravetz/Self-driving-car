@@ -581,11 +581,11 @@ Three radio-button options in `<world-toolbar>`:
 
 Radio-button group in `<world-toolbar>`:
 
-| Mode     | Icon | Behavior                                            |
-| -------- | ---- | --------------------------------------------------- |
-| No track | ✋   | Viewport stays in place; user pans freely           |
-| Best car | 🏆   | Viewport + camera follow best-fitness car (default) |
-| Keys car | 🎮   | Viewport + camera follow user-controlled KEYS car   |
+| Mode     | Icon | Behavior                                                                                                                                                                 |
+| -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| No track | ✋   | Viewport stays in place; user pans freely                                                                                                                                |
+| Best car | 🏆   | Viewport + camera follow best-fitness car (default)                                                                                                                      |
+| Keys car | 🎮   | Viewport + camera follow user-controlled KEYS car; the KEYS car is drawn with `showSensor: true` and the network visualizer shows its brain instead of the best AI car's |
 
 ### Animation Loop (Pseudocode)
 
@@ -684,7 +684,9 @@ directly via `roadBorders`.
 A second spatial hash grid (also 150px cells) dedicated to indexing `Light`
 marking polygons for AI traffic-light perception. It mirrors the border grid's
 build/query pattern but is consumed only by cars with
-`sensor.trafficAwareness === true`:
+`sensor.trafficAwareness === true` (a per-car flag toggled in the training UI
+via the "Traffic Lights" checkbox in the init modal and live training panel;
+defaults to off → legacy input layer):
 
 | Function                                 | Purpose                                                                                                                                     |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1052,7 +1054,7 @@ floating mini-map style).
 
 ## Car Renderer (`ts/simulator/training/rendering/carRenderer.ts`)
 
-### `drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor, prevPoolCars, prevPoolColor, viewportLeft, viewportRight)`
+### `drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor, prevPoolCars, prevPoolColor, viewportLeft, viewportRight, keysShowSensor)`
 
 Draws cars in layered order for visual clarity. Each car's `draw()` method is called with `CarDrawOptions` — no external state mutation:
 
@@ -1083,8 +1085,9 @@ Layer 3: Current pool cars
   - Drawn lowest-rank first so best is on top
 
 Layer 4: KEYS car (if present)
-  - car.draw(ctx, { showMask: drawMasks })
-  - Always visible
+  - car.draw(ctx, { showMask: drawMasks, showSensor: keysShowSensor })
+  - Always visible; sensor rays render only when the toolbar tracking mode is
+    "keys" (so the user can debug driving with the sensor visible)
 ```
 
 ### Rendering performance: cached mask sprites

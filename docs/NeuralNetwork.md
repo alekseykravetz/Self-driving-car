@@ -405,8 +405,10 @@ corner next to the density-toggle button.
 
 ### Real-time Updates
 
-The visualizer redraws every render frame with the best car's current network
-state. This shows:
+The visualizer redraws every render frame with the current network state of the
+car selected by the toolbar tracking mode — the best AI car by default, or the
+user-controlled KEYS car when tracking is set to "keys" (which also reveals the
+KEYS car's sensor rays on the main canvas). This shows:
 
 - Which sensors are detecting obstacles (input layer lights up)
 - How hidden neurons respond to the pattern (feature extraction visible)
