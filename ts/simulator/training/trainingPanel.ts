@@ -81,6 +81,7 @@ export class TrainingPanelElement extends HTMLElement {
   #carRayLengthInput: HTMLInputElement | null = null;
   #carRaySpreadInput: HTMLInputElement | null = null;
   #carRayOffsetInput: HTMLInputElement | null = null;
+  #carTrafficAwarenessInput: HTMLInputElement | null = null;
   #carHiddenLayersInput: HTMLInputElement | null = null;
 
   #statGenEl: HTMLElement | null = null;
@@ -191,6 +192,7 @@ export class TrainingPanelElement extends HTMLElement {
     this.#carRayLengthInput = this.querySelector('#carRayLength');
     this.#carRaySpreadInput = this.querySelector('#carRaySpread');
     this.#carRayOffsetInput = this.querySelector('#carRayOffset');
+    this.#carTrafficAwarenessInput = this.querySelector('#carTrafficAwareness');
     this.#carHiddenLayersInput = this.querySelector('#carHiddenLayers');
 
     this.#statGenEl = this.querySelector('#stat-gen');
@@ -311,6 +313,7 @@ export class TrainingPanelElement extends HTMLElement {
       this.#carRaySpreadInput,
       this.#carRayOffsetInput,
       this.#carHiddenLayersInput,
+      this.#carTrafficAwarenessInput,
     ];
     for (const input of carParamInputs) {
       if (input) {
@@ -352,6 +355,7 @@ export class TrainingPanelElement extends HTMLElement {
       ['📐', 'Ray Len', v(this.#carRayLengthInput)],
       ['🔦', 'Ray Spread', v(this.#carRaySpreadInput)],
       ['🎯', 'Ray Offset', v(this.#carRayOffsetInput)],
+      ['🚦', 'Traffic', this.#carTrafficAwarenessInput?.checked ? 'on' : 'off'],
     ];
     this.#carConfigSummary.innerHTML = items
       .map(
@@ -410,6 +414,7 @@ export class TrainingPanelElement extends HTMLElement {
         rayLength: this.#readNumericInput(this.#carRayLengthInput, 150, true),
         raySpread: this.#readNumericInput(this.#carRaySpreadInput, Math.PI / 2),
         rayOffset: this.#readNumericInput(this.#carRayOffsetInput, 0),
+        trafficAwareness: this.#carTrafficAwarenessInput?.checked ?? false,
       },
     };
   }
@@ -451,6 +456,10 @@ export class TrainingPanelElement extends HTMLElement {
       this.#carRaySpreadInput.value = String(info.sensor.raySpread);
     if (this.#carRayOffsetInput)
       this.#carRayOffsetInput.value = String(info.sensor.rayOffset);
+    if (this.#carTrafficAwarenessInput) {
+      this.#carTrafficAwarenessInput.checked =
+        info.sensor.trafficAwareness ?? false;
+    }
     this.#updateCarConfigSummary();
   }
 

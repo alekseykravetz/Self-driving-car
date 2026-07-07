@@ -687,6 +687,24 @@ body.main-page {
   padding: 4px 4px;
 }
 
+/* ── Checkbox control inside a param grid ──────────────────────── */
+.ctrl-checkbox {
+  justify-content: center;
+}
+.ctrl-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+.ctrl-checkbox input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #4caf50;
+}
+
 /* ── Car Config 2-column grid ──────────────────────────────────── */
 .car-config-grid {
   display: grid;

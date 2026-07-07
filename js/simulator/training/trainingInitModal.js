@@ -83,6 +83,10 @@ export class TrainingInitModalElement extends HTMLElement {
         this.#setValue('#tiCarRayLength', c.sensor.rayLength);
         this.#setValue('#tiCarRaySpread', c.sensor.raySpread);
         this.#setValue('#tiCarRayOffset', c.sensor.rayOffset);
+        const trafficCheckbox = this.querySelector('#tiCarTrafficAwareness');
+        if (trafficCheckbox) {
+            trafficCheckbox.checked = c.sensor.trafficAwareness ?? false;
+        }
     }
     /** Re-read the available brain sources and enable/disable the radios. */
     #refreshSources() {
@@ -218,6 +222,8 @@ export class TrainingInitModalElement extends HTMLElement {
                 rayLength: this.#num('#tiCarRayLength', 150, true),
                 raySpread: this.#num('#tiCarRaySpread', Math.PI / 2),
                 rayOffset: this.#num('#tiCarRayOffset', 0),
+                trafficAwareness: this.querySelector('#tiCarTrafficAwareness')
+                    ?.checked ?? false,
             },
         };
     }
