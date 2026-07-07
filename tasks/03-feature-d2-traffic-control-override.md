@@ -11,6 +11,7 @@ Users click a traffic light to toggle its state manually in the world editor and
 - `ts/world/trafficManager.ts` — add override methods
 - `ts/world/editors/lightEditor.ts` — click detection on lights
 - `ts/simulator/traffic/trafficSimulator.ts` — 'G' hotkey
+- `ts/simulator/training/trainingSimulator.ts` — 'G' hotkey (world mode only)
 - `ts/world/markings/light.ts` — add `overridden` field
 - `ts/panels/shortcutsToolbar.ts` — document hotkey
 
@@ -71,24 +72,30 @@ update(): void {
 In `ts/world/editors/lightEditor.ts` (or the relevant editor file):
 
 - Add click detection: when user clicks on the canvas, check if click position falls within any placed light's polygon.
-- Clicking a placed light cycles its state: `off → green → yellow → red → off`.
-- On each click, call `trafficManager.overrideLight(light, newState)`.
+- Clicking a non-overridden light first pauses automatic cycling and sets the light to 'off'.
+- Subsequent clicks cycle the overridden state: `off → green → yellow → red → release (regular cycle)`.
+- On each click, call `trafficManager.overrideLight(light, state)` or `trafficManager.releaseOverride(light)` after 'red'.
 - Show a visual indicator when a light is overridden (e.g., a slightly brighter glow or a "MANUAL" badge).
 
 ### 4. Global green wave hotkey
 
-In `ts/simulator/traffic/trafficSimulator.ts`:
+In `ts/simulator/traffic/trafficSimulator.ts` and `ts/simulator/training/trainingSimulator.ts`:
 
 - Add keyboard handler for 'G' key.
 - First press: iterate all `world.markings` that are `Light` instances and call `trafficManager.overrideLight(light, 'green')`.
 - Second press: call `trafficManager.releaseAllOverrides()` to restore normal cycling.
 - Toggle state tracked in a `#globalGreenWave: boolean` field.
+- In the training simulator, guard with `instanceof World` check since it also supports `SimpleWorld` (which has no traffic lights).
 
 ### 5. Shortcuts toolbar
 
-In `ts/panels/shortcutsToolbar.ts` (or the relevant shortcuts display):
+In both `ts/simulator/traffic/trafficSimulator.ts` and `ts/simulator/training/trainingSimulator.ts`:
 
-Add entry: `G — Toggle global green wave for all traffic lights`
+Add shortcut def with id `keyG`, label `G`, group `Spawn` (traffic) / `Traffic` (training), kind `toggle`:
+
+```
+G — Toggle global green wave for all traffic lights
+```
 
 ### 6. Rendering
 
@@ -106,12 +113,14 @@ Ephemeral — override states are not saved with the world. This simplifies the 
 
 ## Acceptance Criteria
 
-- [ ] Clicking a placed light in world editor cycles its state
+- [ ] Clicking a non-overridden light in world editor pauses cycling and sets it to 'off'
+- [ ] Subsequent clicks cycle: off → green → yellow → red → release (regular cycling resumes)
 - [ ] Overridden lights stay at their set state (automatic cycling pauses)
-- [ ] Pressing 'G' forces all lights green
-- [ ] Pressing 'G' again restores normal cycling for all lights
-- [ ] Shortcut shown in the shortcuts toolbar
-- [ ] World editor tooltip or visual cue indicates overridden lights
+- [ ] Pressing 'G' in traffic simulator forces all lights green
+- [ ] Pressing 'G' in training simulator (world mode) forces all lights green
+- [ ] Pressing 'G' again (either simulator) restores normal cycling for all lights
+- [ ] 'G' shortcut shown in the shortcuts toolbar on both traffic and training pages
+- [ ] World editor visual cue (cyan "M" badge) indicates overridden lights
 - [ ] No performance impact when no lights are overridden
 
 ## References

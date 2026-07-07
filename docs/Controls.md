@@ -41,6 +41,12 @@ The project supports multiple input methods for controlling cars. All control sy
 | `R` (hold) | Flip the spawn heading 180° while held (preview + next spawn)                                    |
 | `G`        | Toggle global green wave — force all traffic lights green, press again to restore normal cycling |
 
+### Training Simulator (world mode)
+
+| Key | Action                                                                                           |
+| --- | ------------------------------------------------------------------------------------------------ |
+| `G` | Toggle global green wave — force all traffic lights green, press again to restore normal cycling |
+
 ---
 
 ## Shortcuts Toolbar (`<shortcuts-toolbar>`)

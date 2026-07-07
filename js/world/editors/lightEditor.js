@@ -1,5 +1,6 @@
 import { MarkingEditor } from './markingEditor.js';
 import { Light } from '../markings/light.js';
+/** Override states cycled on left-click. After 'red', the light releases back to regular cycling. */
 const CYCLE_ORDER = ['off', 'green', 'yellow', 'red'];
 export class LightEditor extends MarkingEditor {
     #boundLightClick;
@@ -38,9 +39,20 @@ export class LightEditor extends MarkingEditor {
         return null;
     }
     #cycleLight(light) {
+        if (!light.overridden) {
+            // First click on a non-overridden light: pause automatic cycling at 'off'
+            this.world.trafficManager.overrideLight(light, 'off');
+            return;
+        }
         const currentIndex = CYCLE_ORDER.indexOf(light.state);
-        const nextState = CYCLE_ORDER[(currentIndex + 1) % CYCLE_ORDER.length];
-        this.world.trafficManager.overrideLight(light, nextState);
+        if (currentIndex === CYCLE_ORDER.length - 1) {
+            // Last state ('red') → release back to regular automatic cycling
+            this.world.trafficManager.releaseOverride(light);
+        }
+        else {
+            const nextState = CYCLE_ORDER[(currentIndex + 1) % CYCLE_ORDER.length];
+            this.world.trafficManager.overrideLight(light, nextState);
+        }
     }
     /**
      * Creates a new Light marking instance.

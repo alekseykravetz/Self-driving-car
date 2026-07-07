@@ -416,11 +416,16 @@ Individual lights can be **overridden** to pause automatic cycling and hold a sp
 - `releaseOverride(light)` — releases the override and lets `update()` resume normal cycling.
 - `releaseAllOverrides()` — releases all overridden lights at once.
 
-In the **World Editor**, left-clicking a placed light when the Light editor is active cycles its state (off → green → yellow → red → off) and calls `overrideLight()` internally. A cyan "M" badge is drawn above overridden lights.
+In the **World Editor**, left-clicking a placed light when the Light editor is active:
 
-In the **Live Traffic Jam** page, pressing `G` toggles a global green wave — all lights are forced green on the first press, and `releaseAllOverrides()` restores normal cycling on the second press.
+1. First click pauses automatic cycling and sets the light to 'off'
+2. Subsequent clicks cycle: off → green → yellow → red → release (back to regular cycling)
 
-Override state is **ephemeral** and not saved with the world file. See [Simulators → Traffic Control Override](Simulators.md) for the Traffic Simulator hotkey.
+A cyan "M" badge is drawn above overridden lights.
+
+In the **Live Traffic Jam** page and **Training Simulator** (world mode), pressing `G` toggles a global green wave — all lights are forced green on the first press, and `releaseAllOverrides()` restores normal cycling on the second press. The 'G' shortcut is shown in the shortcuts toolbar on both pages.
+
+Override state is **ephemeral** and not saved with the world file. See [Simulators → Traffic Control Override](Simulators.md) for the simulator hotkey.
 
 **Timing:**
 
@@ -519,7 +524,13 @@ class Light extends Marking {
 
 The `state` property is normally updated by `TrafficManager.update()` each frame, cycling through green → yellow → red. When a light is **overridden**, automatic cycling pauses and the light keeps its manually set state. A cyan "M" badge is drawn above overridden lights. Override state is ephemeral — it is not saved with the world.
 
-**In the World Editor**, left-clicking a placed light cycles its state (off → green → yellow → red → off) via `TrafficManager.overrideLight()`. Right-clicking removes it as with other markings.
+**In the World Editor**, left-clicking a placed light cycles through states via `TrafficManager.overrideLight()` / `releaseOverride()`:
+
+1. First click (not overridden) → pauses automatic cycling, sets state to 'off'
+2. Next clicks → cycles through off → green → yellow → red
+3. After 'red' → releases override, light resumes normal automatic cycling
+
+Right-clicking removes the light as with other markings.
 
 AI cars with `sensor.trafficAwareness: true` additionally perceive `Light` markings through their sensor rays — a `TrafficControlGrid` (see [Simulators](Simulators.md#traffic-control-grid-tssimulatortrafficcontrolutilsts--tsmathtrafficcontrolgridts)) indexes light polygons and feeds each ray the live state (green=1, yellow=0.5, red/off=0) when the light sits in front of the road-border hit. Lights update inside `World.draw()`, so perception reads the previous frame's state (one-frame lag).
 
