@@ -6,21 +6,15 @@ import type { Point } from '../../math/primitives/point.js';
 import { DEFAULT_CAR_CONFIG } from '../config.js';
 import type { TrafficControlState } from '../../math/trafficControlGrid.js';
 import { getIntersectionOffset, lerp } from '../../math/utils.js';
+import type { SensorReading, Sophistication } from './sensorReading.js';
 
-/**
- * A traffic control polygon paired with its current state, passed to the
- * sensor each frame so rays can detect lights ahead of the car.
- */
+export type { Sophistication } from './sensorReading.js';
+
 export interface SensorTrafficControl {
   polygon: Point[];
   state: TrafficControlState;
 }
 
-/**
- * Per-ray traffic-light detection result — the state plus the exact
- * intersection point on the light polygon. Used for both neural-network
- * inputs and sensor-ray rendering.
- */
 export interface TrafficReading {
   state: TrafficControlState;
   offset: number;
@@ -28,12 +22,6 @@ export interface TrafficReading {
   y: number;
 }
 
-/**
- * Encodes a traffic light state into the numeric input the neural network
- * consumes: `1` for red (stop/danger), `0.5` for yellow (caution), `0` for
- * green/off or "no light seen along this ray". Reversed encoding matches
- * the distance convention where higher = more urgent.
- */
 export function encodeTrafficState(state: TrafficControlState | null): number {
   switch (state) {
     case 'red':
@@ -50,42 +38,49 @@ export class Sensor {
   rayLength: number;
   raySpread: number;
   rayOffset: number;
-  trafficAwareness: boolean;
+  sophistication: Sophistication;
 
   rays: Point[][];
   readings: (IntersectionPoint | null)[];
-  /**
-   * Per-ray traffic-light detection result. `null` means no traffic control
-   * was seen along that ray (or the sensor is not traffic-aware). Populated
-   * only when `trafficAwareness` is true and traffic controls were supplied
-   * to {@link update}.
-   */
   trafficReadings: (TrafficReading | null)[];
+  classifiedReadings: (SensorReading | null)[];
 
   constructor(config?: {
     rayCount?: number;
     raySpread?: number;
     rayLength?: number;
     rayOffset?: number;
+    sophistication?: Sophistication;
     trafficAwareness?: boolean;
   }) {
     this.rayCount = config?.rayCount ?? DEFAULT_CAR_CONFIG.sensor.rayCount;
     this.rayLength = config?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength;
     this.raySpread = config?.raySpread ?? DEFAULT_CAR_CONFIG.sensor.raySpread;
     this.rayOffset = config?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset;
-    this.trafficAwareness = config?.trafficAwareness ?? false;
+
+    if (config?.sophistication) {
+      this.sophistication = config.sophistication;
+    } else if (config?.trafficAwareness) {
+      this.sophistication = 'traffic';
+    } else {
+      this.sophistication = 'basic';
+    }
 
     this.rays = [];
     this.readings = [];
     this.trafficReadings = [];
+    this.classifiedReadings = [];
   }
 
   update(
     x: number,
     y: number,
     angle: number,
-    polygons: Point[][] = [],
+    borders: Point[][] = [],
     trafficControls?: SensorTrafficControl[],
+    otherCars?: { polygon: Point[]; speed: number }[],
+    selfSpeed?: number,
+    selfMaxSpeed?: number,
   ): void {
     this.rays = SensorRaycaster.castRays(
       x,
@@ -96,25 +91,94 @@ export class Sensor {
       this.raySpread,
       this.rayOffset,
     );
-    this.readings = SensorRaycaster.getReadings(this.rays, polygons);
 
-    if (this.trafficAwareness && trafficControls && trafficControls.length) {
-      this.trafficReadings = this.#getTrafficReadings(
+    if (this.sophistication === 'classified') {
+      this.classifiedReadings = this.#getClassifiedReadings(
         this.rays,
-        this.readings,
-        trafficControls,
+        borders,
+        trafficControls ?? [],
+        otherCars ?? [],
+        selfSpeed ?? 0,
+        selfMaxSpeed ?? 1,
       );
-    } else {
+      this.readings = new Array(this.rays.length).fill(null);
       this.trafficReadings = new Array(this.rays.length).fill(null);
+    } else {
+      this.readings = SensorRaycaster.getReadings(this.rays, borders);
+
+      if (
+        this.sophistication === 'traffic' &&
+        trafficControls &&
+        trafficControls.length
+      ) {
+        this.trafficReadings = this.#getTrafficReadings(
+          this.rays,
+          this.readings,
+          trafficControls,
+        );
+      } else {
+        this.trafficReadings = new Array(this.rays.length).fill(null);
+      }
+
+      this.classifiedReadings = new Array(this.rays.length).fill(null);
     }
   }
 
-  /**
-   * Per-ray traffic-state detection. For each ray we find the closest traffic
-   * control polygon it intersects; if that hit is closer than the road-border
-   * hit (i.e. the light is in front of the wall, not behind it) the car "sees"
-   * that light's state. Otherwise the ray sees no light.
-   */
+  #getClassifiedReadings(
+    rays: Point[][],
+    borders: Point[][],
+    trafficControls: SensorTrafficControl[],
+    otherCars: { polygon: Point[]; speed: number }[],
+    selfSpeed: number,
+    selfMaxSpeed: number,
+  ): (SensorReading | null)[] {
+    const taggedHits = SensorRaycaster.getTaggedReadings(
+      rays,
+      borders,
+      otherCars,
+      trafficControls.map((tc) => ({
+        polygon: tc.polygon,
+        state: tc.state,
+      })),
+    );
+
+    return taggedHits.map((hit) => {
+      if (!hit) {
+        return {
+          distance: 1,
+          type: 'none' as const,
+          relativeSpeed: 0,
+          controlState: 0,
+          x: rays[0][1].x,
+          y: rays[0][1].y,
+        };
+      }
+
+      let relativeSpeed = 0;
+      if (hit.type === 'car' && hit.carSpeed !== undefined) {
+        relativeSpeed = this.#relativeSpeed(
+          hit.carSpeed,
+          selfSpeed,
+          selfMaxSpeed,
+        );
+      }
+
+      let controlState = 0;
+      if (hit.type === 'trafficControl' && hit.controlState !== undefined) {
+        controlState = encodeTrafficState(hit.controlState);
+      }
+
+      return {
+        distance: hit.offset,
+        type: hit.type,
+        relativeSpeed,
+        controlState,
+        x: hit.x,
+        y: hit.y,
+      };
+    });
+  }
+
   #getTrafficReadings(
     rays: Point[][],
     borderReadings: (IntersectionPoint | null)[],
@@ -160,7 +224,51 @@ export class Sensor {
     return result;
   }
 
+  #relativeSpeed(other: number, self: number, max: number): number {
+    return Math.max(-1, Math.min(1, (other - self) / max));
+  }
+
   draw(ctx: CanvasRenderingContext2D): void {
+    if (this.sophistication === 'classified') {
+      this.#drawClassified(ctx);
+    } else if (this.sophistication === 'traffic') {
+      this.#drawTraffic(ctx);
+    } else {
+      this.#drawBasic(ctx);
+    }
+  }
+
+  #drawBasic(ctx: CanvasRenderingContext2D): void {
+    for (let i = 0; i < this.rays.length; i++) {
+      const reading = this.readings[i];
+
+      if (reading) {
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'yellow';
+        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+        ctx.lineTo(reading.x, reading.y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.fillStyle = 'yellow';
+        ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'yellow';
+        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+        ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+
+  #drawTraffic(ctx: CanvasRenderingContext2D): void {
     for (let i = 0; i < this.rays.length; i++) {
       const reading = this.readings[i];
       const traffic = this.trafficReadings[i];
@@ -173,7 +281,6 @@ export class Sensor {
               ? '#FF0'
               : '#F00';
 
-        // Colored ray from car to traffic light
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = color;
@@ -181,7 +288,6 @@ export class Sensor {
         ctx.lineTo(traffic.x, traffic.y);
         ctx.stroke();
 
-        // Continue ray from light to wall (yellow) if wall exists
         if (reading) {
           ctx.beginPath();
           ctx.lineWidth = 2;
@@ -196,7 +302,6 @@ export class Sensor {
           ctx.fill();
         }
 
-        // Traffic dot with white border at the light intersection point
         ctx.beginPath();
         ctx.arc(traffic.x, traffic.y, 4, 0, Math.PI * 2);
         ctx.fillStyle = color;
@@ -205,7 +310,6 @@ export class Sensor {
         ctx.lineWidth = 1.5;
         ctx.stroke();
       } else if (reading) {
-        // Standard wall-only ray (no traffic)
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = 'yellow';
@@ -218,7 +322,6 @@ export class Sensor {
         ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Nothing hit — faint full-length ray
         ctx.save();
         ctx.globalAlpha = 0.2;
         ctx.beginPath();
@@ -228,6 +331,73 @@ export class Sensor {
         ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
         ctx.stroke();
         ctx.restore();
+      }
+    }
+  }
+
+  #drawClassified(ctx: CanvasRenderingContext2D): void {
+    for (let i = 0; i < this.rays.length; i++) {
+      const reading = this.classifiedReadings[i];
+
+      if (!reading || reading.type === 'none') {
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'yellow';
+        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+        ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
+
+      let rayColor: string;
+      let dotRadius: number;
+
+      switch (reading.type) {
+        case 'border':
+          rayColor = 'yellow';
+          dotRadius = 3;
+          break;
+        case 'car':
+          rayColor = 'red';
+          dotRadius = 3;
+          break;
+        case 'trafficControl':
+          rayColor =
+            reading.controlState >= 0.9
+              ? '#F00'
+              : reading.controlState >= 0.4
+                ? '#FF0'
+                : '#0F0';
+          dotRadius = 4;
+          break;
+        default:
+          rayColor = 'yellow';
+          dotRadius = 3;
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = rayColor;
+      ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+      ctx.lineTo(reading.x, reading.y);
+      ctx.stroke();
+
+      if (reading.type === 'trafficControl') {
+        ctx.beginPath();
+        ctx.arc(reading.x, reading.y, dotRadius, 0, Math.PI * 2);
+        ctx.fillStyle = rayColor;
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.fillStyle = rayColor;
+        ctx.arc(reading.x, reading.y, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
   }

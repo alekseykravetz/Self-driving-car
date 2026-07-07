@@ -1,6 +1,10 @@
 import { IntersectionPoint } from '../physics/sensorRaycaster.js';
 import { NeuralNetwork } from '../../neural-network/network.js';
 import { encodeTrafficState, type TrafficReading } from '../sensors/sensor.js';
+import type {
+  SensorReading,
+  Sophistication,
+} from '../sensors/sensorReading.js';
 
 export type Brain = unknown;
 
@@ -30,9 +34,20 @@ export class CarBrainAdapter {
    * Traffic-aware cars interleave a traffic-state reading next to each ray's
    * distance reading, so the input layer doubles the ray count (plus the
    * self-speed reading). Legacy cars keep the `rayCount + 1` layout.
+   * Classified sensors produce rayCount * 5 + 1 inputs.
    */
-  static inputLayerSize(rayCount: number, trafficAwareness: boolean): number {
-    return trafficAwareness ? rayCount * 2 + 1 : rayCount + 1;
+  static inputLayerSize(
+    rayCount: number,
+    sophistication: Sophistication,
+  ): number {
+    switch (sophistication) {
+      case 'classified':
+        return rayCount * 5 + 1;
+      case 'traffic':
+        return rayCount * 2 + 1;
+      default:
+        return rayCount + 1;
+    }
   }
 
   static computeControls(
@@ -41,9 +56,24 @@ export class CarBrainAdapter {
     maxSpeed: number,
     brain: Brain,
     trafficReadings?: (TrafficReading | null)[],
+    sophistication?: Sophistication,
+    classifiedReadings?: (SensorReading | null)[],
   ): BrainControlOutput {
     let offsets: number[];
-    if (trafficReadings && trafficReadings.length) {
+
+    if (sophistication === 'classified' && classifiedReadings) {
+      offsets = new Array(classifiedReadings.length * 5 + 1);
+      for (let i = 0; i < classifiedReadings.length; i++) {
+        const r = classifiedReadings[i];
+        const base = i * 5;
+        offsets[base] = r === null ? 0 : 1 - r.distance;
+        offsets[base + 1] = r?.type === 'border' ? 1 : 0;
+        offsets[base + 2] = r?.type === 'car' ? 1 : 0;
+        offsets[base + 3] = r?.type === 'trafficControl' ? 1 : 0;
+        offsets[base + 4] = r?.controlState ?? 0;
+      }
+      offsets[offsets.length - 1] = speed / maxSpeed;
+    } else if (trafficReadings && trafficReadings.length) {
       offsets = new Array(readings.length * 2 + 1);
       for (let i = 0; i < readings.length; i++) {
         offsets[i * 2] = readings[i] === null ? 0 : 1 - readings[i]!.offset;

@@ -1,4 +1,5 @@
 import { CarInfo } from '../car.js';
+import type { Sophistication } from '../sensors/sensorReading.js';
 
 /**
  * Parse a .car file content string into a CarInfo object.
@@ -24,6 +25,11 @@ export function parseCarFileContent(content: string): CarInfo | null {
  *
  * Top-level (global) function — see {@link parseCarFileContent} for the rationale.
  */
+function normalizeSoph(info: CarInfo): Sophistication {
+  if (info.sensor.sophistication) return info.sensor.sophistication;
+  return info.sensor.trafficAwareness ? 'traffic' : 'basic';
+}
+
 export function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
   const aHidden = a.hiddenLayers ?? [6];
   const bHidden = b.hiddenLayers ?? [6];
@@ -43,8 +49,7 @@ export function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
     a.sensor.rayLength === b.sensor.rayLength &&
     Math.abs(a.sensor.raySpread - b.sensor.raySpread) <= RAY_SPREAD_EPSILON &&
     a.sensor.rayOffset === b.sensor.rayOffset &&
-    (a.sensor.trafficAwareness ?? false) ===
-      (b.sensor.trafficAwareness ?? false)
+    normalizeSoph(a) === normalizeSoph(b)
   );
 }
 

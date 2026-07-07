@@ -53,7 +53,7 @@ export class Car {
         if (opts.controlType !== 'DUMMY') {
             this.sensor = new Sensor(opts.sensor);
             this.brain = CarBrainAdapter.createBrain([
-                CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.trafficAwareness),
+                CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.sophistication),
                 ...this.hiddenLayers,
                 4,
             ]);
@@ -90,13 +90,20 @@ export class Car {
             this.sensor.raySpread = info.sensor.raySpread;
             this.sensor.rayLength = info.sensor.rayLength;
             this.sensor.rayOffset = info.sensor.rayOffset;
-            this.sensor.trafficAwareness = info.sensor.trafficAwareness ?? false;
+            // Migrate trafficAwareness → sophistication
+            if (info.sensor.trafficAwareness === true &&
+                !info.sensor.sophistication) {
+                this.sensor.sophistication = 'traffic';
+            }
+            else {
+                this.sensor.sophistication = info.sensor.sophistication ?? 'basic';
+            }
             // If no brain was supplied but the sensor topology changed (e.g. a
             // .car file with trafficAwareness:true and no brain), rebuild the
             // brain so its input layer matches the sensor.
             if (!info.brain && this.useBrain) {
                 this.brain = CarBrainAdapter.createBrain([
-                    CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.trafficAwareness),
+                    CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.sophistication),
                     ...this.hiddenLayers,
                     4,
                 ]);
@@ -117,7 +124,7 @@ export class Car {
                 raySpread: this.sensor?.raySpread ?? DEFAULT_CAR_CONFIG.sensor.raySpread,
                 rayLength: this.sensor?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength,
                 rayOffset: this.sensor?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset,
-                trafficAwareness: this.sensor?.trafficAwareness ?? false,
+                sophistication: this.sensor?.sophistication ?? 'basic',
             },
         };
     }
@@ -144,17 +151,19 @@ export class Car {
             reverse: this.controls.reverse,
         };
     }
-    update(polygons = [], trafficControls) {
+    update(polygons = [], trafficControls, otherCars) {
         this.#applySteering();
         const becameDamaged = this.physics.update(this, this.#computeControlsState(), polygons);
         if (becameDamaged) {
             this.#callbacks?.onDamaged?.();
         }
         if (this.sensor && this.brain) {
-            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls);
+            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars, this.speed, this.maxSpeed);
             if (this.useBrain && this.controls instanceof Controls) {
-                const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.trafficAwareness
+                const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sophistication !== 'basic'
                     ? this.sensor.trafficReadings
+                    : undefined, this.sensor.sophistication, this.sensor.sophistication === 'classified'
+                    ? this.sensor.classifiedReadings
                     : undefined);
                 this.controls.forward = output.forward;
                 this.controls.left = output.left;
@@ -162,16 +171,15 @@ export class Car {
                 this.controls.reverse = output.reverse;
             }
             else {
-                // Not brain-driven (e.g. the KEYS car), but a brain exists for the
-                // visualizer. Feed it with the live sensor readings so the network
-                // panel shows real activations instead of stale/undefined values.
-                CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.trafficAwareness
+                CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sophistication !== 'basic'
                     ? this.sensor.trafficReadings
+                    : undefined, this.sensor.sophistication, this.sensor.sophistication === 'classified'
+                    ? this.sensor.classifiedReadings
                     : undefined);
             }
         }
         else if (this.sensor) {
-            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls);
+            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars, this.speed, this.maxSpeed);
         }
         this.#syncEngine();
     }

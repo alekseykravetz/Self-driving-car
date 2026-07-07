@@ -63,11 +63,12 @@ export function updateWorldCars(
       bordersForUpdate = queryBordersNearCar(borderGrid, car);
     }
 
-    const trafficControls: SensorTrafficControl[] = car.sensor?.trafficAwareness
-      ? queryTrafficControlsNearCar(trafficGrid, car)
-      : [];
+    const trafficControls: SensorTrafficControl[] =
+      car.sensor?.sophistication !== 'basic'
+        ? queryTrafficControlsNearCar(trafficGrid, car)
+        : [];
 
-    car.update(bordersForUpdate, trafficControls);
+    car.update(bordersForUpdate, trafficControls, []);
     aliveCount++;
   }
 

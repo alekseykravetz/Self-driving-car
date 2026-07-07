@@ -56,7 +56,6 @@ export function updateSimpleCars(cars, state, roadBorders, idleEnabled, bestCar,
             frozenCount++;
             continue;
         }
-        const nearbyPolygons = [...roadBorders];
         const minY = car.y - PROXIMITY_THRESHOLD;
         const maxY = car.y + PROXIMITY_THRESHOLD;
         let lo = 0;
@@ -68,10 +67,24 @@ export function updateSimpleCars(cars, state, roadBorders, idleEnabled, bestCar,
             else
                 hi = mid;
         }
-        for (let j = lo; j < state.traffic.length && state.traffic[j].y <= maxY; j++) {
-            nearbyPolygons.push(state.traffic[j].polygon);
+        const isClassified = car.sensor?.sophistication === 'classified';
+        if (isClassified) {
+            const otherCars = [];
+            for (let j = lo; j < state.traffic.length && state.traffic[j].y <= maxY; j++) {
+                otherCars.push({
+                    polygon: state.traffic[j].polygon,
+                    speed: state.traffic[j].speed,
+                });
+            }
+            car.update(roadBorders, undefined, otherCars);
         }
-        car.update(nearbyPolygons);
+        else {
+            const nearbyPolygons = [...roadBorders];
+            for (let j = lo; j < state.traffic.length && state.traffic[j].y <= maxY; j++) {
+                nearbyPolygons.push(state.traffic[j].polygon);
+            }
+            car.update(nearbyPolygons);
+        }
         aliveCount++;
     }
     return { aliveCount, deadCount, frozenCount };

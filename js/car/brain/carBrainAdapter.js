@@ -17,13 +17,34 @@ export class CarBrainAdapter {
      * Traffic-aware cars interleave a traffic-state reading next to each ray's
      * distance reading, so the input layer doubles the ray count (plus the
      * self-speed reading). Legacy cars keep the `rayCount + 1` layout.
+     * Classified sensors produce rayCount * 5 + 1 inputs.
      */
-    static inputLayerSize(rayCount, trafficAwareness) {
-        return trafficAwareness ? rayCount * 2 + 1 : rayCount + 1;
+    static inputLayerSize(rayCount, sophistication) {
+        switch (sophistication) {
+            case 'classified':
+                return rayCount * 5 + 1;
+            case 'traffic':
+                return rayCount * 2 + 1;
+            default:
+                return rayCount + 1;
+        }
     }
-    static computeControls(readings, speed, maxSpeed, brain, trafficReadings) {
+    static computeControls(readings, speed, maxSpeed, brain, trafficReadings, sophistication, classifiedReadings) {
         let offsets;
-        if (trafficReadings && trafficReadings.length) {
+        if (sophistication === 'classified' && classifiedReadings) {
+            offsets = new Array(classifiedReadings.length * 5 + 1);
+            for (let i = 0; i < classifiedReadings.length; i++) {
+                const r = classifiedReadings[i];
+                const base = i * 5;
+                offsets[base] = r === null ? 0 : 1 - r.distance;
+                offsets[base + 1] = r?.type === 'border' ? 1 : 0;
+                offsets[base + 2] = r?.type === 'car' ? 1 : 0;
+                offsets[base + 3] = r?.type === 'trafficControl' ? 1 : 0;
+                offsets[base + 4] = r?.controlState ?? 0;
+            }
+            offsets[offsets.length - 1] = speed / maxSpeed;
+        }
+        else if (trafficReadings && trafficReadings.length) {
             offsets = new Array(readings.length * 2 + 1);
             for (let i = 0; i < readings.length; i++) {
                 offsets[i * 2] = readings[i] === null ? 0 : 1 - readings[i].offset;

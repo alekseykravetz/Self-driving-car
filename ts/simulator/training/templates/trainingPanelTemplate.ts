@@ -211,11 +211,13 @@ export const TRAINING_PANEL_TEMPLATE = `
       />
     </div>
 
-    <div class="ctrl ctrl-checkbox">
-      <label title="Let the sensor detect traffic lights (doubles the brain input layer)">
-        <input type="checkbox" id="carTrafficAwareness" />
-        <span class="ctrl-label">Traffic Lights</span>
-      </label>
+    <div class="ctrl">
+      <span class="ctrl-label">Sophistication</span>
+      <select id="carSophistication">
+        <option value="basic">Basic</option>
+        <option value="traffic">Traffic</option>
+        <option value="classified">Classified</option>
+      </select>
     </div>
   </div>
 </div>

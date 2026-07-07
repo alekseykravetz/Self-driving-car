@@ -31,6 +31,13 @@ export function createCarsForTraining(
   return cars;
 }
 
+/**
+ * Check two brains for structural compatibility (same layer counts and
+ * input/output sizes). Since different sensor sophistication levels produce
+ * different input-layer sizes (`basic` → rayCount+1, `traffic` → rayCount*2+1,
+ * `classified` → rayCount*5+1), cross-sophistication swaps are automatically
+ * rejected — the input layer dimensions won't match.
+ */
 export function brainsCompatible(a: unknown, b: unknown): boolean {
   const na = a as NeuralNetwork | null;
   const nb = b as NeuralNetwork | null;

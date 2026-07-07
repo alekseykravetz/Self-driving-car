@@ -101,8 +101,6 @@ export function updateSimpleCars(
       continue;
     }
 
-    const nearbyPolygons: Point[][] = [...roadBorders];
-
     const minY = car.y - PROXIMITY_THRESHOLD;
     const maxY = car.y + PROXIMITY_THRESHOLD;
 
@@ -113,15 +111,33 @@ export function updateSimpleCars(
       if (state.traffic[mid].y < minY) lo = mid + 1;
       else hi = mid;
     }
-    for (
-      let j = lo;
-      j < state.traffic.length && state.traffic[j].y <= maxY;
-      j++
-    ) {
-      nearbyPolygons.push(state.traffic[j].polygon);
-    }
 
-    car.update(nearbyPolygons);
+    const isClassified = car.sensor?.sophistication === 'classified';
+
+    if (isClassified) {
+      const otherCars: { polygon: Point[]; speed: number }[] = [];
+      for (
+        let j = lo;
+        j < state.traffic.length && state.traffic[j].y <= maxY;
+        j++
+      ) {
+        otherCars.push({
+          polygon: state.traffic[j].polygon,
+          speed: state.traffic[j].speed,
+        });
+      }
+      car.update(roadBorders, undefined, otherCars);
+    } else {
+      const nearbyPolygons: Point[][] = [...roadBorders];
+      for (
+        let j = lo;
+        j < state.traffic.length && state.traffic[j].y <= maxY;
+        j++
+      ) {
+        nearbyPolygons.push(state.traffic[j].polygon);
+      }
+      car.update(nearbyPolygons);
+    }
     aliveCount++;
   }
 

@@ -22,6 +22,11 @@ export function parseCarFileContent(content) {
  *
  * Top-level (global) function — see {@link parseCarFileContent} for the rationale.
  */
+function normalizeSoph(info) {
+    if (info.sensor.sophistication)
+        return info.sensor.sophistication;
+    return info.sensor.trafficAwareness ? 'traffic' : 'basic';
+}
 export function compareCarInfoParams(a, b) {
     const aHidden = a.hiddenLayers ?? [6];
     const bHidden = b.hiddenLayers ?? [6];
@@ -40,8 +45,7 @@ export function compareCarInfoParams(a, b) {
         a.sensor.rayLength === b.sensor.rayLength &&
         Math.abs(a.sensor.raySpread - b.sensor.raySpread) <= RAY_SPREAD_EPSILON &&
         a.sensor.rayOffset === b.sensor.rayOffset &&
-        (a.sensor.trafficAwareness ?? false) ===
-            (b.sensor.trafficAwareness ?? false));
+        normalizeSoph(a) === normalizeSoph(b));
 }
 /**
  * Reusable car loader utility.
