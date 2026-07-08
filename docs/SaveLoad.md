@@ -51,7 +51,7 @@ The project uses two persistence mechanisms: browser localStorage for training s
       "rayLength": 150,
       "raySpread": 1.5707963267948966,
       "rayOffset": 0,
-      "trafficAwareness": false
+      "stateAware": false
     },
     "brain": {
       "levels": [
@@ -76,7 +76,7 @@ The project uses two persistence mechanisms: browser localStorage for training s
 
 Each entry is a complete `CarInfo` — physics config + sensor config + trained brain. This allows reproducing the exact car behavior.
 
-> The optional `sensor.trafficAwareness` field (defaults to `false` when absent) toggles AI traffic-light perception and changes the brain's input-layer size (`rayCount*2 + 1` when true, else `rayCount + 1`). It is settable from the training UI via the "Traffic Lights" checkbox in the init modal and the live training panel. Existing `.car` files without the field remain valid and drive identically; `brainsCompatible()` rejects brain swaps across the two input sizes. See [Physics](Physics.md#traffic-light-perception).
+> The optional `sensor.stateAware` field (defaults to `false` when absent) enables unified state-aware sensor readings per ray, changing the brain's input-layer size (`rayCount*2 + 1` when true, else `rayCount + 1`). It is settable from the training UI via the "State Aware" checkbox in the init modal and the live training panel. Existing `.car` files without the field remain valid and drive identically; `brainsCompatible()` rejects brain swaps across the two input sizes. See [Physics](Physics.md#traffic-light-perception).
 
 ---
 
@@ -311,8 +311,8 @@ CarLoader.compareCarParams(a: CarInfo, b: CarInfo): boolean;
 CarLoader.compareCarInfoParams(a: CarInfo, b: CarInfo): boolean;
 ```
 
-`compareCarInfoParams` now also compares `sensor.trafficAwareness`, so cars
-differing only in traffic awareness are not grouped together (their brains have
+`compareCarInfoParams` now also compares `sensor.stateAware`, so cars
+differing only in state awareness are not grouped together (their brains have
 incompatible input-layer sizes).
 
 ---

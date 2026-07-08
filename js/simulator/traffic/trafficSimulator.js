@@ -252,10 +252,10 @@ export class TrafficSimulator extends SimulatorShell {
             if (car.damaged)
                 continue;
             const obstacles = this.#collectBorders(car, borderMode);
-            const otherCars = car.sensor?.sophistication === 'classified'
+            const otherCars = car.sensor?.stateAware
                 ? this.#collectCarObstacles(car)
                 : [];
-            const trafficControls = car.sensor?.sophistication !== 'basic'
+            const trafficControls = car.sensor?.stateAware
                 ? queryTrafficControlsNearCar(this.#trafficGrid, car)
                 : [];
             car.update(obstacles, trafficControls, otherCars);
@@ -296,7 +296,7 @@ export class TrafficSimulator extends SimulatorShell {
             const dx = other.x - car.x;
             const dy = other.y - car.y;
             if (dx * dx + dy * dy <= reachWithBodySq) {
-                result.push({ polygon: other.polygon, speed: other.speed });
+                result.push(other.polygon);
             }
         }
         return result;

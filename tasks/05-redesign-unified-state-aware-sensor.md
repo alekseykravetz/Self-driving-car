@@ -20,10 +20,10 @@ The redesign replaces all three levels with a single `stateAware: boolean` flag 
 
 ### Brain input per ray
 
-| Mode | Per-ray inputs | Total input layer | Backward compat |
-|------|---------------|-------------------|-----------------|
-| Legacy (stateAware=false) | `[1-distance]` | `rayCount + 1` | All existing `.car` files |
-| New (stateAware=true) | `[1-distance, state]` | `rayCount * 2 + 1` | New brains only |
+| Mode                      | Per-ray inputs        | Total input layer  | Backward compat           |
+| ------------------------- | --------------------- | ------------------ | ------------------------- |
+| Legacy (stateAware=false) | `[1-distance]`        | `rayCount + 1`     | All existing `.car` files |
+| New (stateAware=true)     | `[1-distance, state]` | `rayCount * 2 + 1` | New brains only           |
 
 The `+1` in both cases is the self-speed (`speed / maxSpeed`).
 
@@ -31,15 +31,15 @@ The `+1` in both cases is the self-speed (`speed / maxSpeed`).
 
 The `state` value encodes "how blocking" the nearest obstacle is:
 
-| Obstacle | state | Brain interpretation |
-|----------|-------|---------------------|
-| No hit | 0 | Safe — drive on |
-| Wall / border | 1 | Stop |
-| Other car | 1 | Stop |
-| Green light | 0 | Safe — drive through |
-| Yellow light | 0.5 | Caution |
-| Red light | 1 | Stop |
-| Off light | 0 | Safe (treat as no signal) |
+| Obstacle      | state | Brain interpretation      |
+| ------------- | ----- | ------------------------- |
+| No hit        | 0     | Safe — drive on           |
+| Wall / border | 1     | Stop                      |
+| Other car     | 1     | Stop                      |
+| Green light   | 0     | Safe — drive through      |
+| Yellow light  | 0.5   | Caution                   |
+| Red light     | 1     | Stop                      |
+| Off light     | 0     | Safe (treat as no signal) |
 
 The existing `encodeTrafficState()` already returns `red=1, yellow=0.5, green/off=0` — reused for traffic lights. Walls and cars are `1` (blocking). No hit is `0` (safe).
 
@@ -47,12 +47,12 @@ The existing `encodeTrafficState()` already returns `red=1, yellow=0.5, green/of
 
 One unified `#drawStateAware()` replaces `#drawBasic`, `#drawTraffic`, and `#drawClassified`:
 
-| Nearest hit type | Ray color | Dot at hit | Continuation to wall | Wall dot |
-|-----------------|-----------|------------|---------------------|----------|
-| `none` | Faint yellow (full-length) | — | — | — |
-| `border` | Yellow | Yellow r=3 | — | — |
-| `car` | Red | Red r=3 | Yellow ray behind | Yellow r=3 |
-| `trafficControl` | Green/Yellow/Red (by state) | Colored r=4 + white border | Yellow ray behind | Yellow r=3 |
+| Nearest hit type | Ray color                   | Dot at hit                 | Continuation to wall | Wall dot   |
+| ---------------- | --------------------------- | -------------------------- | -------------------- | ---------- |
+| `none`           | Faint yellow (full-length)  | —                          | —                    | —          |
+| `border`         | Yellow                      | Yellow r=3                 | —                    | —          |
+| `car`            | Red                         | Red r=3                    | Yellow ray behind    | Yellow r=3 |
+| `trafficControl` | Green/Yellow/Red (by state) | Colored r=4 + white border | Yellow ray behind    | Yellow r=3 |
 
 Continuation only drawn when `borderHit.offset > reading.distance` (wall exists behind the nearest obstacle).
 
@@ -66,31 +66,31 @@ Continuation only drawn when `borderHit.offset > reading.distance` (wall exists 
 
 ## Files Changed
 
-| # | File | Change |
-|---|------|--------|
-| 1 | `ts/car/sensors/sensorReading.ts` | Redefine `SensorReading`: `{ distance, state, type, x, y }`. Remove `Sophistication` type, `relativeSpeed`, `controlState` fields. |
-| 2 | `ts/car/sensors/sensor.ts` | Replace `sophistication` with `stateAware: boolean`. Unified `update()` + `draw()`. Add `sensorReadings` array, remove `trafficReadings` / `classifiedReadings`. Remove `TrafficReading` interface, `#drawTraffic`, `#drawClassified`, `#getTrafficReadings`, `#relativeSpeed`. |
-| 3 | `ts/car/physics/sensorRaycaster.ts` | `TaggedHit`: remove `carSpeed`. Keep `controlState` for state computation. |
-| 4 | `ts/car/brain/carBrainAdapter.ts` | `inputLayerSize(rayCount, stateAware)`. Simplified `computeControls` — two branches (legacy vs state-aware). Remove `Sophistication` / `TrafficReading` imports. |
-| 5 | `ts/car/car.ts` | `CarInfo.sensor`: `stateAware` replaces `sophistication` + `trafficAwareness`. `CarOptions.sensor`: same. `load()`: rebuild polygon after dims, try/catch brain deserialize. `toInfo()`: serialize `stateAware`. `update()`: pass `sensor.sensorReadings` + `sensor.stateAware`. |
-| 6 | `ts/car/loader/carLoader.ts` | Replace `normalizeSoph` with `normalizeStateAware`. Update `compareCarInfoParams`. |
-| 7 | `ts/simulator/traffic/trafficSimulator.ts` | Gate `otherCars` / `trafficControls` on `stateAware`. `#collectCarObstacles` returns `Point[][]` (no `speed`). |
-| 8 | `ts/simulator/racing/raceSimulator.ts` | Gate `trafficControls` on `stateAware`. |
-| 9 | `ts/simulator/training/modes/worldModeBehavior.ts` | Gate `trafficControls` on `stateAware`. |
-| 10 | `ts/simulator/training/modes/simpleModeBehavior.ts` | Gate `otherCars` / `trafficControls` on `stateAware`. Pass `Point[][]` instead of `{ polygon, speed }[]`. |
-| 11 | `ts/simulator/training/trainingInitModal.ts` | Checkbox replaces `<select>`. Fix `#setConfigLocked` to disable checkbox too. |
-| 12 | `ts/simulator/training/templates/trainingInitModalTemplate.ts` | Checkbox HTML replaces `<select>`. |
-| 13 | `ts/simulator/training/trainingPanel.ts` | Checkbox replaces `<select>`. Update `getCarSettings`, `setCarSettings`, `#updateCarConfigSummary`. |
-| 14 | `ts/simulator/training/templates/trainingPanelTemplate.ts` | Checkbox HTML replaces `<select>`. |
-| 15 | `ts/simulator/training/genetics/poolManager.ts` | Update doc comment to reference `stateAware` instead of `sophistication`. |
-| 16 | `AGENTS.md` | Rewrite sensor/brain section for `stateAware`. Remove `sophistication` / `trafficAwareness` references. |
-| 17 | `GEMINI.md` | Same. |
-| 18 | `docs/Physics.md` | Update `SensorReading` interface, state encoding table, sensor visualization rules. |
-| 19 | `docs/NeuralNetwork.md` | Update input layer description. |
-| 20 | `docs/SaveLoad.md` | Update `CarInfo.sensor` fields. |
-| 21 | `docs/Architecture.md` | Update sensor/brain adapter description. |
-| 22 | `docs/Simulators.md` | Update gating logic description. |
-| 23 | `docs/WorldEditor.md` | Update traffic light perception description. |
+| #   | File                                                           | Change                                                                                                                                                                                                                                                                           |
+| --- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `ts/car/sensors/sensorReading.ts`                              | Redefine `SensorReading`: `{ distance, state, type, x, y }`. Remove `Sophistication` type, `relativeSpeed`, `controlState` fields.                                                                                                                                               |
+| 2   | `ts/car/sensors/sensor.ts`                                     | Replace `sophistication` with `stateAware: boolean`. Unified `update()` + `draw()`. Add `sensorReadings` array, remove `trafficReadings` / `classifiedReadings`. Remove `TrafficReading` interface, `#drawTraffic`, `#drawClassified`, `#getTrafficReadings`, `#relativeSpeed`.  |
+| 3   | `ts/car/physics/sensorRaycaster.ts`                            | `TaggedHit`: remove `carSpeed`. Keep `controlState` for state computation.                                                                                                                                                                                                       |
+| 4   | `ts/car/brain/carBrainAdapter.ts`                              | `inputLayerSize(rayCount, stateAware)`. Simplified `computeControls` — two branches (legacy vs state-aware). Remove `Sophistication` / `TrafficReading` imports.                                                                                                                 |
+| 5   | `ts/car/car.ts`                                                | `CarInfo.sensor`: `stateAware` replaces `sophistication` + `trafficAwareness`. `CarOptions.sensor`: same. `load()`: rebuild polygon after dims, try/catch brain deserialize. `toInfo()`: serialize `stateAware`. `update()`: pass `sensor.sensorReadings` + `sensor.stateAware`. |
+| 6   | `ts/car/loader/carLoader.ts`                                   | Replace `normalizeSoph` with `normalizeStateAware`. Update `compareCarInfoParams`.                                                                                                                                                                                               |
+| 7   | `ts/simulator/traffic/trafficSimulator.ts`                     | Gate `otherCars` / `trafficControls` on `stateAware`. `#collectCarObstacles` returns `Point[][]` (no `speed`).                                                                                                                                                                   |
+| 8   | `ts/simulator/racing/raceSimulator.ts`                         | Gate `trafficControls` on `stateAware`.                                                                                                                                                                                                                                          |
+| 9   | `ts/simulator/training/modes/worldModeBehavior.ts`             | Gate `trafficControls` on `stateAware`.                                                                                                                                                                                                                                          |
+| 10  | `ts/simulator/training/modes/simpleModeBehavior.ts`            | Gate `otherCars` / `trafficControls` on `stateAware`. Pass `Point[][]` instead of `{ polygon, speed }[]`.                                                                                                                                                                        |
+| 11  | `ts/simulator/training/trainingInitModal.ts`                   | Checkbox replaces `<select>`. Fix `#setConfigLocked` to disable checkbox too.                                                                                                                                                                                                    |
+| 12  | `ts/simulator/training/templates/trainingInitModalTemplate.ts` | Checkbox HTML replaces `<select>`.                                                                                                                                                                                                                                               |
+| 13  | `ts/simulator/training/trainingPanel.ts`                       | Checkbox replaces `<select>`. Update `getCarSettings`, `setCarSettings`, `#updateCarConfigSummary`.                                                                                                                                                                              |
+| 14  | `ts/simulator/training/templates/trainingPanelTemplate.ts`     | Checkbox HTML replaces `<select>`.                                                                                                                                                                                                                                               |
+| 15  | `ts/simulator/training/genetics/poolManager.ts`                | Update doc comment to reference `stateAware` instead of `sophistication`.                                                                                                                                                                                                        |
+| 16  | `AGENTS.md`                                                    | Rewrite sensor/brain section for `stateAware`. Remove `sophistication` / `trafficAwareness` references.                                                                                                                                                                          |
+| 17  | `GEMINI.md`                                                    | Same.                                                                                                                                                                                                                                                                            |
+| 18  | `docs/Physics.md`                                              | Update `SensorReading` interface, state encoding table, sensor visualization rules.                                                                                                                                                                                              |
+| 19  | `docs/NeuralNetwork.md`                                        | Update input layer description.                                                                                                                                                                                                                                                  |
+| 20  | `docs/SaveLoad.md`                                             | Update `CarInfo.sensor` fields.                                                                                                                                                                                                                                                  |
+| 21  | `docs/Architecture.md`                                         | Update sensor/brain adapter description.                                                                                                                                                                                                                                         |
+| 22  | `docs/Simulators.md`                                           | Update gating logic description.                                                                                                                                                                                                                                                 |
+| 23  | `docs/WorldEditor.md`                                          | Update traffic light perception description.                                                                                                                                                                                                                                     |
 
 ---
 

@@ -212,12 +212,8 @@ export const TRAINING_PANEL_TEMPLATE = `
     </div>
 
     <div class="ctrl">
-      <span class="ctrl-label">Sophistication</span>
-      <select id="carSophistication">
-        <option value="basic">Basic</option>
-        <option value="traffic">Traffic</option>
-        <option value="classified">Classified</option>
-      </select>
+      <span class="ctrl-label">State Aware</span>
+      <input type="checkbox" id="carStateAware" />
     </div>
   </div>
 </div>

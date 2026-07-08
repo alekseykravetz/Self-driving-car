@@ -31,11 +31,10 @@ Let me explore the codebase to understand the root causes of these issues.
 
 Let me investigate all three issues in parallel.
 
-
-
 **Tool: task**
 
 **Input:**
+
 ```json
 {
   "description": "Investigate issue 1: classified ray rendering",
@@ -45,7 +44,8 @@ Let me investigate all three issues in parallel.
 ```
 
 **Output:**
-```
+
+````
 <task id="ses_0be3065e3ffe6GxG9stlPB0H3D" state="completed">
 <task_result>
 Here is my complete analysis.
@@ -66,7 +66,7 @@ export interface SensorReading {
   x: number;
   y: number;
 }
-```
+````
 
 A `SensorReading` captures a **single** hit per ray — one type, one position, one distance. There is no field for a secondary/behind hit.
 
@@ -87,9 +87,9 @@ export interface TrafficReading {
 
 Traffic mode maintains **two independent arrays per ray**:
 
-| Array | Source | What it holds |
-|---|---|---|
-| `this.readings[i]` | `SensorRaycaster.getReadings(rays, borders)` | Closest **border** hit (wall) |
+| Array                     | Source                                                 | What it holds                                                      |
+| ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------ |
+| `this.readings[i]`        | `SensorRaycaster.getReadings(rays, borders)`           | Closest **border** hit (wall)                                      |
 | `this.trafficReadings[i]` | `#getTrafficReadings(rays, readings, trafficControls)` | Closest **traffic light** hit (only if closer than the border hit) |
 
 The draw logic processes both arrays per ray:
@@ -127,6 +127,7 @@ for (let i = 0; i < this.rays.length; i++) {
 ```
 
 **Summary of traffic mode:** When a ray passes through a traffic light and then hits a wall, you see **four visual elements**:
+
 - Colored ray segment: car → traffic light
 - Yellow continuation ray segment: traffic light → wall
 - Yellow dot (r=3) on the wall
@@ -140,8 +141,8 @@ Both the traffic light hit AND the wall hit are drawn.
 
 Classified mode maintains **one array per ray**:
 
-| Array | Source | What it holds |
-|---|---|---|
+| Array                        | Source                                                         | What it holds                                                     |
+| ---------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------- |
 | `this.classifiedReadings[i]` | `#getClassifiedReadings` → `SensorRaycaster.getTaggedReadings` | Only the **single closest hit** across all obstacle types per ray |
 
 This is the critical data-path difference. `SensorRaycaster.getTaggedReadings` (lines 80-133 of `sensorRaycaster.ts`):
@@ -192,7 +193,7 @@ Then `#getClassifiedReadings` (lines 127-180) maps each `TaggedHit` to a single 
 ```ts
 // Lines 338-403 — #drawClassified
 for (let i = 0; i < this.rays.length; i++) {
-  const reading = this.classifiedReadings[i];   // ← single hit only
+  const reading = this.classifiedReadings[i]; // ← single hit only
 
   // ... no-hit fallback ...
   // ... pick color based on reading.type ...
@@ -212,6 +213,7 @@ for (let i = 0; i < this.rays.length; i++) {
 ```
 
 **Summary of classified mode:** Only the single closest hit is drawn. When a traffic light is closer than a wall, you see:
+
 - One colored ray segment: car → traffic light
 - One colored dot on the traffic light (r=4 with white border)
 
@@ -221,11 +223,11 @@ The wall behind the traffic light is **never drawn** because the data for it was
 
 ## 4. Comparison and root cause of the bug
 
-| Aspect | `traffic` mode | `classified` mode |
-|---|---|---|
-| Data per ray | **2 independent arrays:** `readings` (border) + `trafficReadings` (light) | **1 array:** `classifiedReadings` (single closest hit) |
+| Aspect                                              | `traffic` mode                                                                                                   | `classified` mode                                                       |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Data per ray                                        | **2 independent arrays:** `readings` (border) + `trafficReadings` (light)                                        | **1 array:** `classifiedReadings` (single closest hit)                  |
 | Does the border hit survive when a light is closer? | **Yes** — `getReadings` is not filtered by traffic light hits. The border reading is still independently stored. | **No** — `getTaggedReadings` overwrites `minHit` and discards the wall. |
-| What is drawn when light < wall? | Colored ray to light + yellow continuation to wall + light dot + wall dot | Colored ray to light + light dot only. Wall is invisible. |
+| What is drawn when light < wall?                    | Colored ray to light + yellow continuation to wall + light dot + wall dot                                        | Colored ray to light + light dot only. Wall is invisible.               |
 
 **The root cause is two-fold:**
 
@@ -234,13 +236,15 @@ The wall behind the traffic light is **never drawn** because the data for it was
 2. **Drawing code:** Even if the wall data were available, `#drawClassified` (lines 338-403) only draws one ray segment and one dot per iteration. It has no logic for drawing a continuation segment past a traffic light hit like `#drawTraffic` does (lines 291-302).
 
 **To fix the bug, you would need both:**
+
 - `getTaggedReadings` (or a new method) to return **all** hits along a ray sorted by distance, not just the closest one, so the classified sensor can store both `{ type: 'trafficControl', ... }` and `{ type: 'border', ... }` for the same ray.
 - `#drawClassified` to draw multi-segment rays: the first hit in its own color, then continuation segments for secondary hits behind it.
 
 The traffic mode approach (two independent reading arrays that don't compete) is the pattern that already works — classified mode needs analogous multi-hit support.
 </task_result>
 </task>
-```
+
+````
 
 **Tool: task**
 
@@ -251,10 +255,11 @@ The traffic mode approach (two independent reading arrays that don't compete) is
   "prompt": "I need to investigate why the sophistication `<select>` in the training init modal doesn't sync with the selected car's sophistication.\n\nLook at `ts/simulator/training/trainingInitModal.ts`, specifically:\n1. The `#fillCarConfig` method - how does it populate the modal fields from a car's info?\n2. How other car params (like ray count, ray spread, etc.) are synced and disabled/greyed out when not allowed to change\n3. How the sophistication select (id `#tiCarSophistication`) is handled\n4. Compare the sophistication handling with how other params are handled\n\nAlso look at `ts/simulator/training/templates/trainingInitModalTemplate.ts` to see the HTML structure.\n\nReturn the exact code for `#fillCarConfig` and any related methods that sync car params to the modal.",
   "subagent_type": "explore"
 }
-```
+````
 
 **Output:**
-```
+
+````
 <task id="ses_0be3065b9ffea82cnoQTDvpayW" state="completed">
 <task_result>
 Now I have all the information needed. Here is my complete analysis:
@@ -276,16 +281,18 @@ The sophistication is a `<select>` element:
     <option value="classified">Classified</option>
   </select>
 </div>
-```
+````
 
 All other car config fields (height, width, rays, etc.) are `<input>` elements.
 
 ---
 
 ### File 2: The modal logic
+
 **`/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts`**
 
 #### `#fillCarConfig` (lines 125-147) — how modal fields are populated:
+
 ```typescript
 #fillCarConfig(c: CarInfo): void {
     this.#setValue('#tiCarHeight', c.height);
@@ -315,6 +322,7 @@ All other car config fields (height, width, rays, etc.) are `<input>` elements.
 All other fields use `#setValue(selector, value)`, but sophistication has its **own dedicated block** (lines 139-146) because `#setValue` only works on `<input>` elements.
 
 #### `#setValue` helper (lines 326-329) — only handles `<input>`, NOT `<select>`:
+
 ```typescript
 #setValue(selector: string, value: string | number): void {
     const el = this.querySelector<HTMLInputElement>(selector);
@@ -325,6 +333,7 @@ All other fields use `#setValue(selector, value)`, but sophistication has its **
 Since `#tiCarSophistication` is a `<select>`, calling `#setValue('#tiCarSophistication', ...)` would silently fail — `querySelector<HTMLInputElement>` would return `null`. The code avoids this by handling sophistication separately.
 
 #### `#setConfigLocked` (lines 249-255) — **BUG HERE** — does NOT disable the sophistication `<select>`:
+
 ```typescript
 #setConfigLocked(locked: boolean): void {
     this.querySelectorAll<HTMLInputElement>('#tiCarConfigGrid input').forEach(
@@ -343,6 +352,7 @@ The CSS selector `#tiCarConfigGrid input` matches **only `<input>` elements**. T
 This is inconsistent with every other car config field.
 
 #### `#applySourceLock` (lines 222-247) — calls `#fillCarConfig` and `#setConfigLocked`:
+
 ```typescript
 #applySourceLock(source: string): void {
     const note = this.querySelector<HTMLElement>('#tiConfigNote');
@@ -370,6 +380,7 @@ This is inconsistent with every other car config field.
 ### The sync flow — how the modal opens
 
 In `trainingSimulator.ts` (lines 168-192), `openInitModal()` does:
+
 ```typescript
 const defaults = {
     carCount: settings.carCount,
@@ -382,9 +393,10 @@ this.initModal.open({ defaults, ... });
 ```
 
 Then in `open()` (lines 57-78):
+
 ```typescript
-this.#fillCarConfig(options.defaults.carConfig);   // Step 1: fill from training panel values
-this.#refreshSources();                            // Step 2: determine brain source
+this.#fillCarConfig(options.defaults.carConfig); // Step 1: fill from training panel values
+this.#refreshSources(); // Step 2: determine brain source
 ```
 
 And `#refreshSources()` reads `StoreManager.getActiveCars()`, then calls `#applySourceLock(initial)` which may call `#fillCarConfig` **again** with the selected/pool car's `CarInfo`. This second call should override whatever was set in Step 1.
@@ -413,11 +425,11 @@ If the sync **visibly** fails, the most likely causes are:
 
 ### Summary of the gap
 
-| Aspect | `<input>` fields (other params) | `<select>` (sophistication) |
-|---|---|---|
-| Set by `#fillCarConfig` | Via `#setValue` (uses `HTMLInputElement`) | Separate block (lines 139-146, uses `HTMLSelectElement`) |
-| Locked by `#setConfigLocked` | Yes — selector `#tiCarConfigGrid input` matches them | **No** — selector does not match `<select>` |
-| Read by `#readCarConfig` | Via `#num` (uses `HTMLInputElement`) | Separate block (lines 309-312, uses `HTMLSelectElement`) |
+| Aspect                       | `<input>` fields (other params)                      | `<select>` (sophistication)                              |
+| ---------------------------- | ---------------------------------------------------- | -------------------------------------------------------- |
+| Set by `#fillCarConfig`      | Via `#setValue` (uses `HTMLInputElement`)            | Separate block (lines 139-146, uses `HTMLSelectElement`) |
+| Locked by `#setConfigLocked` | Yes — selector `#tiCarConfigGrid input` matches them | **No** — selector does not match `<select>`              |
+| Read by `#readCarConfig`     | Via `#num` (uses `HTMLInputElement`)                 | Separate block (lines 309-312, uses `HTMLSelectElement`) |
 
 The fix for `#setConfigLocked` would be to also disable the `<select>`:
 
@@ -438,7 +450,8 @@ The fix for `#setConfigLocked` would be to also disable the `<select>`:
 For the sync issue itself, the data pipeline should be verified: ensure that `StoreManager.getActiveCars()` returns `CarInfo` objects that have been through the `sophistication` migration (i.e., passed through `Car.load()`) rather than raw stored JSON that may lack the field.
 </task_result>
 </task>
-```
+
+````
 
 **Tool: task**
 
@@ -449,10 +462,11 @@ For the sync issue itself, the data pipeline should be verified: ensure that `St
   "prompt": "I need to investigate why loaded cars in the traffic simulator don't use the right brain or car size when the car was saved with `sophistication='classified'`.\n\nLook at:\n1. `ts/simulator/traffic/trafficSimulator.ts` - how cars are spawned/created when loaded. Find the car creation/loading logic, especially where a car is loaded from storage.\n2. `ts/car/loader/carLoader.ts` - how cars are loaded from storage, especially the `loadCar` or similar functions\n3. `ts/car/car.ts` - the `Car.load(info)` static method, especially how `sophistication` is handled during loading\n4. How the brain is rebuilt/assigned when loading a car with `sophistication='classified'`\n\nThe issue is that when a classified car is loaded and spawned in the traffic simulator, it doesn't get the correct brain (NN) or the correct car dimensions. Return the relevant code sections.",
   "subagent_type": "explore"
 }
-```
+````
 
 **Output:**
-```
+
+````
 <task id="ses_0be30615cffelAMbvXW1mEPylX" state="completed">
 <task_result>
 Now I have all the relevant code. Let me present the full analysis.
@@ -489,7 +503,7 @@ Here is the complete car loading flow for the traffic simulator and the bugs tha
     this.#cars.push(car);
     this.#statsPanel.setCars(this.#cars);
   }
-```
+````
 
 ### 2. Car constructor (`ts/car/car.ts`, lines 96–137) — runs first with defaults
 
@@ -609,9 +623,10 @@ In `Car.load()` (line 157–158), `this.width` and `this.height` are updated fro
 ### Bug B: Brain deserialization can throw, leaving the wrong (constructor) brain
 
 In `Car.load()` line 148–149:
+
 ```typescript
 if (info.brain) {
-    this.brain = CarBrainAdapter.deserialize(info.brain);  // can throw
+  this.brain = CarBrainAdapter.deserialize(info.brain); // can throw
 }
 ```
 
@@ -625,6 +640,7 @@ Even if `deserialize` succeeds, the brain as reconstructed from JSON (`{levels: 
 ### Bug C: Grace period — brain rebuilt only when no brain in info
 
 Lines 176–185:
+
 ```typescript
 if (!info.brain && this.useBrain) {
     this.brain = CarBrainAdapter.createBrain([...]);
@@ -634,7 +650,8 @@ if (!info.brain && this.useBrain) {
 If `info.brain` is undefined/null/falsy, a **fresh random brain** is created with the correct topology (e.g. `[26, 6, 4]` for classified). But it is **untrained** — all weights are random. This is not the trained brain the user expected, but at least the topology matches the sensor. If the saved `.car` file has no `brain` field (e.g. someone exported a car config without a trained brain), this is the path that runs.
 </task_result>
 </task>
-```
+
+````
 
 ---
 
@@ -666,7 +683,7 @@ Let me think about the flow:
 
 So the second call to `#fillCarConfig` should set the right sophistication. Unless the source has `null` for sophistication and no `trafficAwareness` flag, in which case it falls through to `'basic'`.
 
-But the user says it's not working. Let me think about the data flow more carefully. When a car is loaded from storage... The training panel has `#getCarInfo()` which returns the current config. Then when opening the init modal, `trainingSimulator.ts` passes `carConfig: this.trainingManager.getCarSettings()`. 
+But the user says it's not working. Let me think about the data flow more carefully. When a car is loaded from storage... The training panel has `#getCarInfo()` which returns the current config. Then when opening the init modal, `trainingSimulator.ts` passes `carConfig: this.trainingManager.getCarSettings()`.
 
 Wait, let me re-read the investigation. The `#fillCarConfig` is called in step 1 with `options.defaults.carConfig` which comes from the training panel. The training panel's `#getCarInfo()` returns `sophistication: this.sophisticationSelect?.value` which should be the current panel value. Then step 2, `#refreshSources()` may call `#fillCarConfig` again with the selected/pool car's info.
 
@@ -685,7 +702,7 @@ Actually, looking at the investigation results more carefully:
     }
     this.#setConfigLocked(sourceConfig !== null);
 }
-```
+````
 
 If `source` is 'manual', `sourceConfig` is null, so `#fillCarConfig` is NOT called again, BUT `#setConfigLocked(false)` is called which should enable all fields. Wait, but the first `#fillCarConfig` in `open()` was already called with the right `carConfig`. So this should work correctly for the 'manual' case.
 
@@ -693,12 +710,12 @@ Hmm, but the user said it's not syncing. Let me think about the `#fillCarConfig`
 
 ```typescript
 const sophSelect = this.querySelector<HTMLSelectElement>(
-    '#tiCarSophistication',
+  '#tiCarSophistication',
 );
 if (sophSelect) {
-    sophSelect.value =
-        c.sensor.sophistication ??
-        (c.sensor.trafficAwareness ? 'traffic' : 'basic');
+  sophSelect.value =
+    c.sensor.sophistication ??
+    (c.sensor.trafficAwareness ? 'traffic' : 'basic');
 }
 ```
 
@@ -717,10 +734,13 @@ So the sophistication stays at whatever default (basic) and isn't updated to mat
 Hmm, I think the issue could be related to the `CarInfo` object from the training panel. In `trainingPanel.ts`, `#getCarInfo()` might not be returning the correct sophistication. Let me also check if there's an issue where the training panel itself doesn't sync.
 
 Actually, let me re-read the investigation. It says:
+
 > The sync logic in `#fillCarConfig` for the sophistication select (lines 139-146) appears functionally correct — it queries the `<select>` properly and sets its value.
 
 But then:
+
 > If the sync visibly fails, the most likely causes are:
+>
 > 1. Stale raw data from `StoreManager.getActiveCars()` or localStorage pool. When cars are loaded from .car files or localStorage that predate the sophistication migration, the raw CarInfo objects may have neither sophistication nor trafficAwareness. The fallback lands on 'basic' for these old cars, even if they were actually traffic-aware. The Car.load() method does migrate, but StoreManager.getActiveCars() returns un-migrated raw CarInfo data — it never passes through Car.load().
 
 This seems very plausible for issue 2. But the user says "the sophistication not selected according to localstorage or our storage selected cars or loaded cars" — meaning even for properly saved cars with `sophistication='classified'`, the select doesn't update.
@@ -731,12 +751,12 @@ Actually, I wonder if there's a simpler bug. Let me look at `#fillCarConfig` aga
 
 ```typescript
 const sophSelect = this.querySelector<HTMLSelectElement>(
-    '#tiCarSophistication',
+  '#tiCarSophistication',
 );
 if (sophSelect) {
-    sophSelect.value =
-        c.sensor.sophistication ??
-        (c.sensor.trafficAwareness ? 'traffic' : 'basic');
+  sophSelect.value =
+    c.sensor.sophistication ??
+    (c.sensor.trafficAwareness ? 'traffic' : 'basic');
 }
 ```
 
@@ -747,11 +767,13 @@ Actually wait, the investigation says the code uses `this.querySelector`. If the
 Hmm, actually this is hard to debug without seeing the actual code execution. Let me focus on the plan.
 
 For issue 2, the fix involves:
+
 1. Using the same normalization logic consistently (migrate `trafficAwareness` → `sophistication`)
 2. Ensuring `#setConfigLocked` also disables the `<select>`
 3. Ensuring data sources (StoreManager, pool, etc.) provide properly migrated CarInfo objects
 
 For issue 3, the fix involves:
+
 1. Rebuilding the polygon after `Car.load()` changes dimensions
 2. Adding error handling around `CarBrainAdapter.deserialize(info.brain)` so the brain doesn't silently fail
 3. The fallback brain creation path should also trigger when deserialization fails
@@ -760,11 +782,10 @@ Now let me formulate a clear plan.
 
 Now I have a clear picture of all three bugs. Let me verify a few more details before presenting the plan.
 
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/sensors/sensor.ts",
@@ -774,6 +795,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/sensors/sensor.ts</path>
 <type>file</type>
@@ -788,12 +810,12 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 267:       }
 268:     }
 269:   }
-270: 
+270:
 271:   #drawTraffic(ctx: CanvasRenderingContext2D): void {
 272:     for (let i = 0; i < this.rays.length; i++) {
 273:       const reading = this.readings[i];
 274:       const traffic = this.trafficReadings[i];
-275: 
+275:
 276:       if (traffic) {
 277:         const color =
 278:           traffic.state === 'green'
@@ -801,14 +823,14 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 280:             : traffic.state === 'yellow'
 281:               ? '#FF0'
 282:               : '#F00';
-283: 
+283:
 284:         ctx.beginPath();
 285:         ctx.lineWidth = 2;
 286:         ctx.strokeStyle = color;
 287:         ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
 288:         ctx.lineTo(traffic.x, traffic.y);
 289:         ctx.stroke();
-290: 
+290:
 291:         if (reading) {
 292:           ctx.beginPath();
 293:           ctx.lineWidth = 2;
@@ -816,13 +838,13 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 295:           ctx.moveTo(traffic.x, traffic.y);
 296:           ctx.lineTo(reading.x, reading.y);
 297:           ctx.stroke();
-298: 
+298:
 299:           ctx.beginPath();
 300:           ctx.fillStyle = 'yellow';
 301:           ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
 302:           ctx.fill();
 303:         }
-304: 
+304:
 305:         ctx.beginPath();
 306:         ctx.arc(traffic.x, traffic.y, 4, 0, Math.PI * 2);
 307:         ctx.fillStyle = color;
@@ -837,7 +859,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 316:         ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
 317:         ctx.lineTo(reading.x, reading.y);
 318:         ctx.stroke();
-319: 
+319:
 320:         ctx.beginPath();
 321:         ctx.fillStyle = 'yellow';
 322:         ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
@@ -855,11 +877,11 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 334:       }
 335:     }
 336:   }
-337: 
+337:
 338:   #drawClassified(ctx: CanvasRenderingContext2D): void {
 339:     for (let i = 0; i < this.rays.length; i++) {
 340:       const reading = this.classifiedReadings[i];
-341: 
+341:
 342:       if (!reading || reading.type === 'none') {
 343:         ctx.save();
 344:         ctx.globalAlpha = 0.2;
@@ -872,10 +894,10 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 351:         ctx.restore();
 352:         continue;
 353:       }
-354: 
+354:
 355:       let rayColor: string;
 356:       let dotRadius: number;
-357: 
+357:
 358:       switch (reading.type) {
 359:         case 'border':
 360:           rayColor = 'yellow';
@@ -898,14 +920,14 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 377:           rayColor = 'yellow';
 378:           dotRadius = 3;
 379:       }
-380: 
+380:
 381:       ctx.beginPath();
 382:       ctx.lineWidth = 2;
 383:       ctx.strokeStyle = rayColor;
 384:       ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
 385:       ctx.lineTo(reading.x, reading.y);
 386:       ctx.stroke();
-387: 
+387:
 388:       if (reading.type === 'trafficControl') {
 389:         ctx.beginPath();
 390:         ctx.arc(reading.x, reading.y, dotRadius, 0, Math.PI * 2);
@@ -931,6 +953,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts",
@@ -940,6 +963,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts</path>
 <type>file</type>
@@ -949,30 +973,30 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 222:   #applySourceLock(source: string): void {
 223:     const note = this.querySelector<HTMLElement>('#tiConfigNote');
 224:     let sourceConfig: CarInfo | null = null;
-225: 
+225:
 226:     if (source === 'pool' && this.#storedPool.length > 0) {
 227:       sourceConfig = this.#storedPool[0];
 228:     } else if (source === 'selected' && this.#selectedCars.length > 0) {
 229:       sourceConfig = this.#selectedCars[0];
 230:     }
-231: 
+231:
 232:     if (sourceConfig) {
 233:       this.#fillCarConfig(sourceConfig);
 234:       if (note) note.textContent = '(locked to brain source)';
 235:     } else if (note) {
 236:       note.textContent = '';
 237:     }
-238: 
+238:
 239:     // Sync pool size to the number of cars in the chosen source.
 240:     if (source === 'pool') {
 241:       this.#setValue('#tiPoolCount', this.#storedPool.length);
 242:     } else if (source === 'selected') {
 243:       this.#setValue('#tiPoolCount', this.#selectedCars.length);
 244:     }
-245: 
+245:
 246:     this.#setConfigLocked(sourceConfig !== null);
 247:   }
-248: 
+248:
 249:   #setConfigLocked(locked: boolean): void {
 250:     this.querySelectorAll<HTMLInputElement>('#tiCarConfigGrid input').forEach(
 251:       (input) => {
@@ -980,18 +1004,18 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 253:       },
 254:     );
 255:   }
-256: 
+256:
 257:   // ── Result ───────────────────────────────────────────
-258: 
+258:
 259:   #start(): void {
 260:     const options = this.#options;
 261:     if (!options) return;
-262: 
+262:
 263:     const source =
 264:       this.querySelector<HTMLInputElement>(
 265:         'input[name="tiBrainSource"]:checked',
 266:       )?.value ?? 'fresh';
-267: 
+267:
 268:     const result: TrainingInitResult = {
 269:       carCount: this.#num('#tiCarCount', options.defaults.carCount, true),
 
@@ -1002,6 +1026,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/car.ts",
@@ -1011,6 +1036,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/car.ts</path>
 <type>file</type>
@@ -1021,7 +1047,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 143:     }
 144:     return car;
 145:   }
-146: 
+146:
 147:   load(info: CarInfo): void {
 148:     if (info.brain) {
 149:       this.brain = CarBrainAdapter.deserialize(info.brain);
@@ -1063,7 +1089,7 @@ Now I have a clear picture of all three bugs. Let me verify a few more details b
 185:       }
 186:     }
 187:   }
-188: 
+188:
 189:   toInfo(): CarInfo {
 190:     return {
 191:       brain: this.brain ? CarBrainAdapter.serialize(this.brain) : undefined,
@@ -1090,13 +1116,10 @@ Now let me also check the `#getClassifiedReadings` method to understand how clas
 
 Let me also check the training panel to understand the sync issue better.
 
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/sensors/sensor.ts",
@@ -1106,6 +1129,7 @@ Let me also check the training panel to understand the sync issue better.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/sensors/sensor.ts</path>
 <type>file</type>
@@ -1118,7 +1142,7 @@ Let me also check the training panel to understand the sync issue better.
 105:       this.trafficReadings = new Array(this.rays.length).fill(null);
 106:     } else {
 107:       this.readings = SensorRaycaster.getReadings(this.rays, borders);
-108: 
+108:
 109:       if (
 110:         this.sophistication === 'traffic' &&
 111:         trafficControls &&
@@ -1132,11 +1156,11 @@ Let me also check the training panel to understand the sync issue better.
 119:       } else {
 120:         this.trafficReadings = new Array(this.rays.length).fill(null);
 121:       }
-122: 
+122:
 123:       this.classifiedReadings = new Array(this.rays.length).fill(null);
 124:     }
 125:   }
-126: 
+126:
 127:   #getClassifiedReadings(
 128:     rays: Point[][],
 129:     borders: Point[][],
@@ -1154,7 +1178,7 @@ Let me also check the training panel to understand the sync issue better.
 141:         state: tc.state,
 142:       })),
 143:     );
-144: 
+144:
 145:     return taggedHits.map((hit) => {
 146:       if (!hit) {
 147:         return {
@@ -1166,7 +1190,7 @@ Let me also check the training panel to understand the sync issue better.
 153:           y: rays[0][1].y,
 154:         };
 155:       }
-156: 
+156:
 157:       let relativeSpeed = 0;
 158:       if (hit.type === 'car' && hit.carSpeed !== undefined) {
 159:         relativeSpeed = this.#relativeSpeed(
@@ -1175,12 +1199,12 @@ Let me also check the training panel to understand the sync issue better.
 162:           selfMaxSpeed,
 163:         );
 164:       }
-165: 
+165:
 166:       let controlState = 0;
 167:       if (hit.type === 'trafficControl' && hit.controlState !== undefined) {
 168:         controlState = encodeTrafficState(hit.controlState);
 169:       }
-170: 
+170:
 171:       return {
 172:         distance: hit.offset,
 173:         type: hit.type,
@@ -1191,7 +1215,7 @@ Let me also check the training panel to understand the sync issue better.
 178:       };
 179:     });
 180:   }
-181: 
+181:
 182:   #getTrafficReadings(
 183:     rays: Point[][],
 184:     borderReadings: (IntersectionPoint | null)[],
@@ -1199,17 +1223,17 @@ Let me also check the training panel to understand the sync issue better.
 186:   ): (TrafficReading | null)[] {
 187:     const result: (TrafficReading | null)[] = new Array(rays.length).fill(null);
 188:     if (trafficControls.length === 0) return result;
-189: 
+189:
 190:     for (let i = 0; i < rays.length; i++) {
 191:       const ray = rays[i];
 192:       const borderOffset = borderReadings[i]?.offset ?? Infinity;
 193:       let minOffset = Infinity;
 194:       let minState: TrafficControlState | null = null;
-195: 
+195:
 196:       for (let c = 0; c < trafficControls.length; c++) {
 197:         const poly = trafficControls[c].polygon;
 198:         if (poly.length < 2) continue;
-199: 
+199:
 200:         const edgeCount = poly.length === 2 ? 1 : poly.length;
 201:         for (let j = 0; j < edgeCount; j++) {
 202:           const offset = getIntersectionOffset(
@@ -1224,7 +1248,7 @@ Let me also check the training panel to understand the sync issue better.
 211:           }
 212:         }
 213:       }
-214: 
+214:
 215:       if (minState !== null) {
 216:         result[i] = {
 217:           state: minState,
@@ -1236,11 +1260,11 @@ Let me also check the training panel to understand the sync issue better.
 223:     }
 224:     return result;
 225:   }
-226: 
+226:
 227:   #relativeSpeed(other: number, self: number, max: number): number {
 228:     return Math.max(-1, Math.min(1, (other - self) / max));
 229:   }
-230: 
+230:
 231:   draw(ctx: CanvasRenderingContext2D): void {
 232:     if (this.sophistication === 'classified') {
 233:       this.#drawClassified(ctx);
@@ -1258,6 +1282,7 @@ Let me also check the training panel to understand the sync issue better.
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts",
@@ -1267,20 +1292,21 @@ Let me also check the training panel to understand the sync issue better.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts</path>
 <type>file</type>
 <content>
-50: 
+50:
 51:   connectedCallback(): void {
 52:     this.innerHTML = TRAINING_INIT_MODAL_TEMPLATE;
 53:     this.#bindEvents();
 54:   }
-55: 
+55:
 56:   /** Show the modal, prefilled from `defaults`, and report the choice. */
 57:   open(options: TrainingInitOpenOptions): void {
 58:     this.#options = options;
-59: 
+59:
 60:     const titleEl = this.querySelector<HTMLElement>('#tiTitle');
 61:     const subtitleEl = this.querySelector<HTMLElement>('#tiSubtitle');
 62:     if (titleEl) {
@@ -1293,14 +1319,14 @@ Let me also check the training panel to understand the sync issue better.
 69:           ? 'This restarts training. Choose the brain source and review settings.'
 70:           : 'Choose where the brains come from and review the car settings.';
 71:     }
-72: 
+72:
 73:     this.#fillTrainingParams(options.defaults);
 74:     this.#fillCarConfig(options.defaults.carConfig);
 75:     this.#refreshSources();
-76: 
+76:
 77:     this.classList.add('open');
 78:   }
-79: 
+79:
 80:   #bindEvents(): void {
 81:     this.querySelector<HTMLButtonElement>('#tiStartBtn')?.addEventListener(
 82:       'click',
@@ -1310,7 +1336,7 @@ Let me also check the training panel to understand the sync issue better.
 86:       'click',
 87:       () => this.#cancel(),
 88:     );
-89: 
+89:
 90:     // Click on the dimmed backdrop (but not the dialog) cancels.
 91:     this.querySelector<HTMLElement>('.ti-overlay')?.addEventListener(
 92:       'click',
@@ -1320,14 +1346,14 @@ Let me also check the training panel to understand the sync issue better.
 96:         }
 97:       },
 98:     );
-99: 
+99:
 100:     // Esc cancels while the modal is open.
 101:     document.addEventListener('keydown', (e) => {
 102:       if (e.key === 'Escape' && this.classList.contains('open')) {
 103:         this.#cancel();
 104:       }
 105:     });
-106: 
+106:
 107:     this.querySelectorAll<HTMLInputElement>(
 108:       'input[name="tiBrainSource"]',
 109:     ).forEach((radio) => {
@@ -1344,6 +1370,7 @@ Let me also check the training panel to understand the sync issue better.
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/traffic/trafficSimulator.ts",
@@ -1353,24 +1380,25 @@ Let me also check the training panel to understand the sync issue better.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/traffic/trafficSimulator.ts</path>
 <type>file</type>
 <content>
 270:     this.#trafficGrid.rebuild(buildTrafficControls(this.#world));
 271:   }
-272: 
+272:
 273:   // ── Spawning ─────────────────────────────────────────
-274: 
+274:
 275:   #handleSpawnClick(e: MouseEvent): void {
 276:     if (e.button !== 0 || !this.#world || !this.viewport) return;
-277: 
+277:
 278:     const info = this.toolbarPanel.getSelectedCars()[0] ?? null;
 279:     if (!info) {
 280:       alert('Pick a car in the Car selector before placing one.');
 281:       return;
 282:     }
-283: 
+283:
 284:     const point = this.viewport.getMouse(e);
 285:     const car = new Car({
 286:       controlType: 'AI',
@@ -1381,11 +1409,11 @@ Let me also check the training panel to understand the sync issue better.
 291:     });
 292:     car.load(info);
 293:     car.name = `Car ${++this.#spawnCount}`;
-294: 
+294:
 295:     this.#cars.push(car);
 296:     this.#statsPanel.setCars(this.#cars);
 297:   }
-298: 
+298:
 299:   /** Angle that faces the nearest road segment to `point` (start convention). */
 300:   #headingAt(point: Point): number {
 301:     if (!this.#world) return 0;
@@ -1405,15 +1433,10 @@ _Thinking:_
 
 Now let me also quickly check the database/car store to see how cars are saved and loaded, and what `getSelectedCars()` returns.
 
-
-
-
-
-
-
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "pattern": "getSelectedCars",
@@ -1422,6 +1445,7 @@ Now let me also quickly check the database/car store to see how cars are saved a
 ```
 
 **Output:**
+
 ```
 Found 5 matches
 /Users/alex/Code/Self-driving-car/ts/panels/assetSelectors.ts:
@@ -1444,6 +1468,7 @@ Found 5 matches
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "pattern": "getActiveCars",
@@ -1452,6 +1477,7 @@ Found 5 matches
 ```
 
 **Output:**
+
 ```
 Found 10 matches
 /Users/alex/Code/Self-driving-car/ts/store/storeManager.ts:
@@ -1495,15 +1521,10 @@ _Thinking:_
 
 Let me look at how `getActiveCars()` stores data and whether it returns migrated data or raw data. Also `storeManager.ts` seems to be worth investigating.
 
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts",
@@ -1513,13 +1534,14 @@ Let me look at how `getActiveCars()` stores data and whether it returns migrated
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts</path>
 <type>file</type>
 <content>
 390:     this.setActiveCarIds(next);
 391:   }
-392: 
+392:
 393:   /** Get all active cars' data (in selection order). */
 394:   getActiveCars(): CarInfo[] {
 395:     const all = this.getAllCars();
@@ -1527,12 +1549,12 @@ Let me look at how `getActiveCars()` stores data and whether it returns migrated
 397:       .map((id) => all.find((c) => c.id === id)?.data)
 398:       .filter((d): d is CarInfo => Boolean(d));
 399:   }
-400: 
+400:
 401:   /** Get the first active car's data, or null. */
 402:   getActiveCar(): CarInfo | null {
 403:     return this.getActiveCars()[0] ?? null;
 404:   }
-405: 
+405:
 406:   /** Names of the active cars for display (in selection order). */
 407:   getActiveCarNames(): string[] {
 408:     const all = this.getAllCars();
@@ -1540,9 +1562,9 @@ Let me look at how `getActiveCars()` stores data and whether it returns migrated
 410:       .map((id) => all.find((c) => c.id === id)?.name)
 411:       .filter((n): n is string => Boolean(n));
 412:   }
-413: 
+413:
 414:   // --- Loaded asset management ---
-415: 
+415:
 416:   /**
 417:    * Add a user-loaded world. Persists to localStorage when it fits; on quota
 418:    * overflow keeps it in memory only (lost on refresh). Returns the new entry.
@@ -1555,6 +1577,7 @@ Let me look at how `getActiveCars()` stores data and whether it returns migrated
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts",
@@ -1564,6 +1587,7 @@ Let me look at how `getActiveCars()` stores data and whether it returns migrated
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts</path>
 <type>file</type>
@@ -1591,19 +1615,19 @@ Let me look at how `getActiveCars()` stores data and whether it returns migrated
 145:         (c.sensor.trafficAwareness ? 'traffic' : 'basic');
 146:     }
 147:   }
-148: 
+148:
 149:   /** Re-read the available brain sources and enable/disable the radios. */
 150:   #refreshSources(): void {
 151:     this.#storedPool =
 152:       safeJsonParse<CarInfo[]>(localStorage.getItem('bestPool')) ?? [];
 153:     this.#selectedCars = StoreManager.getActiveCars();
-154: 
+154:
 155:     const poolAvailable = this.#storedPool.length > 0;
 156:     const selectedAvailable = this.#selectedCars.length > 0;
-157: 
+157:
 158:     this.#setSourceAvailability('pool', poolAvailable);
 159:     this.#setSourceAvailability('selected', selectedAvailable);
-160: 
+160:
 161:     const poolCountLabel = this.querySelector<HTMLElement>('#tiPoolCountLabel');
 162:     if (poolCountLabel) {
 163:       poolCountLabel.textContent = poolAvailable
@@ -1627,15 +1651,10 @@ Actually, I think I have enough information now. Let me formulate the plan.
 
 For issue 2, let me check one more thing - whether the `#applySourceLock` is actually called with the right value, and whether the initial source radio button is checked correctly when the modal opens.
 
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts",
@@ -1645,11 +1664,12 @@ For issue 2, let me check one more thing - whether the `#applySourceLock` is act
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts</path>
 <type>file</type>
 <content>
-160: 
+160:
 161:     const poolCountLabel = this.querySelector<HTMLElement>('#tiPoolCountLabel');
 162:     if (poolCountLabel) {
 163:       poolCountLabel.textContent = poolAvailable
@@ -1660,7 +1680,7 @@ For issue 2, let me check one more thing - whether the `#applySourceLock` is act
 168:     if (poolDesc && !poolAvailable) {
 169:       poolDesc.textContent = 'No saved pool in local storage.';
 170:     }
-171: 
+171:
 172:     const selCountLabel = this.querySelector<HTMLElement>(
 173:       '#tiSelectedCountLabel',
 174:     );
@@ -1687,6 +1707,7 @@ For issue 2, let me check one more thing - whether the `#applySourceLock` is act
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts",
@@ -1696,6 +1717,7 @@ For issue 2, let me check one more thing - whether the `#applySourceLock` is act
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts</path>
 <type>file</type>
@@ -1704,7 +1726,7 @@ For issue 2, let me check one more thing - whether the `#applySourceLock` is act
 286:     this.#options = null;
 287:     options.onCancel();
 288:   }
-289: 
+289:
 290:   #readCarConfig(): CarInfo {
 291:     const hidden = this.#parseHiddenLayers(
 292:       this.querySelector<HTMLInputElement>('#tiCarHiddenLayers')?.value ?? '6',
@@ -1743,15 +1765,10 @@ _Thinking:_
 
 Now let me check how the training panel reads/writes sophistication - specifically the `#getCarInfo` and `setCarSettings` methods in `trainingPanel.ts`.
 
-
-
-
-
-
-
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "include": "ts/simulator/training/trainingPanel.ts",
@@ -1760,6 +1777,7 @@ Now let me check how the training panel reads/writes sophistication - specifical
 ```
 
 **Output:**
+
 ```
 Found 3 matches
 /Users/alex/Code/Self-driving-car/ts/simulator/training/trainingPanel.ts:
@@ -1779,15 +1797,10 @@ _Thinking:_
 
 Let me read the relevant parts of trainingPanel.ts.
 
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingPanel.ts",
@@ -1797,6 +1810,7 @@ Let me read the relevant parts of trainingPanel.ts.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingPanel.ts</path>
 <type>file</type>
@@ -1814,7 +1828,7 @@ Let me read the relevant parts of trainingPanel.ts.
 420:       },
 421:     };
 422:   }
-423: 
+423:
 424:   #parseHiddenLayers(value: string): number[] {
 425:     const parts = value
 426:       .split(',')
@@ -1822,7 +1836,7 @@ Let me read the relevant parts of trainingPanel.ts.
 428:       .filter((n) => !isNaN(n) && n > 0);
 429:     return parts.length > 0 ? parts : [6];
 430:   }
-431: 
+431:
 432:   public setCarSettings(info: CarInfo): void {
 433:     if (this.#carMaxSpeedInput)
 434:       this.#carMaxSpeedInput.value = String(info.maxSpeed);
@@ -1859,7 +1873,7 @@ Let me read the relevant parts of trainingPanel.ts.
 465:     }
 466:     this.#updateCarConfigSummary();
 467:   }
-468: 
+468:
 469:   // ── Simulation Controls ──────────────────────────────
 
 (Showing lines 410-469 of 770. Use offset=470 to continue.)
@@ -1876,13 +1890,10 @@ Now let me also look at how `store:activeCar` data is stored - the `addCar` and 
 
 Let me also check one more thing - how is the `sensor` object serialized when saving a car to the store. That could be the root cause of issue 3.
 
-
-
-
-
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "include": "ts/store/storeManager.ts",
@@ -1891,6 +1902,7 @@ Let me also check one more thing - how is the `sensor` object serialized when sa
 ```
 
 **Output:**
+
 ```
 No files found
 ```
@@ -1898,6 +1910,7 @@ No files found
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingSimulator.ts",
@@ -1907,6 +1920,7 @@ No files found
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingSimulator.ts</path>
 <type>file</type>
@@ -1915,7 +1929,7 @@ No files found
 164:     }
 165:     toolbar?.setActive('keyG', this.#globalGreenWave);
 166:   }
-167: 
+167:
 168:   openInitModal(context: 'entry' | 'new'): void {
 169:     const settings = this.trainingManager.getSettings();
 170:     const defaults = {
@@ -1925,13 +1939,13 @@ No files found
 174:       idleRange: settings.idleRange,
 175:       carConfig: this.trainingManager.getCarSettings(),
 176:     };
-177: 
+177:
 178:     if (!this.initModal) {
 179:       if (context === 'new') this.trainingManager.newTraining();
 180:       else this.trainingManager.initializeCars();
 181:       return;
 182:     }
-183: 
+183:
 184:     this.initModal.open({
 185:       context,
 186:       defaults,
@@ -1954,15 +1968,10 @@ _Thinking:_
 
 Let me check one more important thing - where does `trainingManager.getCarSettings()` come from, and how does it relate to the live panel. Also let me check the `addCar` method in `storeManager.ts`.
 
-
-
-
-
-
-
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "include": "*.ts",
@@ -1971,6 +1980,7 @@ Let me check one more important thing - where does `trainingManager.getCarSettin
 ```
 
 **Output:**
+
 ```
 Found 5 matches
 /Users/alex/Code/Self-driving-car/ts/simulator/training/trainingSimulator.ts:
@@ -1996,15 +2006,10 @@ _Thinking:_
 
 OK, so `trainingManager.getCarSettings()` is `TrainingPanel.getCarSettings()`, which calls `#getCarInfo()` (line 386 likely). Let me see that method.
 
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingPanel.ts",
@@ -2014,6 +2019,7 @@ OK, so `trainingManager.getCarSettings()` is `TrainingPanel.getCarSettings()`, w
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingPanel.ts</path>
 <type>file</type>
@@ -2060,6 +2066,7 @@ OK, so `trainingManager.getCarSettings()` is `TrainingPanel.getCarSettings()`, w
 _Thinking:_
 
 OK so `getCarSettings()` returns the current live panel values including `sophistication`. This is passed to `open()` as `options.defaults.carConfig`. Then in `open()`:
+
 1. `this.#fillCarConfig(options.defaults.carConfig)` is called which should set the select correctly.
 2. Then `this.#refreshSources()` is called which determines the brain source.
 
@@ -2080,6 +2087,7 @@ Hmm, so where exactly is the sync breaking? Let me think more...
 Actually, I think the issue might be more subtle. When the training panel initially loads, `setCarSettings` is NOT called because there's no "initial car" to set it from. The panel just shows whatever values are in the HTML. The HTML defaults are "basic" for the select.
 
 When the user opens the modal:
+
 1. `getCarSettings()` reads from the LIVE panel (which may still show "basic" because no car has been selected yet).
 2. `#fillCarConfig` sets the modal select to the panel's value ("basic").
 3. `#refreshSources()` runs - if there ARE cars selected from storage/pool, it calls `#applySourceLock` which reads from `getActiveCars()` and calls `#fillCarConfig` with the correct sophistication.
@@ -2089,6 +2097,7 @@ But what if the modal opens BEFORE the user has selected any cars? Then `#refres
 Actually wait, let me re-read the user's complaint: "the sophistication not selected according to localstorage or our storage selected cars or loaded cars. not like other car params sync with selected and disabled when not allowed to change."
 
 I think the issue is: when the user switches the brain source radio from "Fresh" to "Selected" or "Pool", the config fields are supposed to:
+
 1. Sync to match the selected/pool car's params
 2. Become disabled (locked to brain source)
 
@@ -2098,25 +2107,20 @@ For the sync part: `#applySourceLock` DOES call `#fillCarConfig(sourceConfig)` w
 
 For the disable part: `#setConfigLocked` only selects `#tiCarConfigGrid input` - it doesn't include `<select>` elements. So the sophistication select STAYS EDITABLE even when config should be locked.
 
-Both issues are plausible. But the user says "the sophistication not selected" - this implies the sync doesn't work. Maybe the CarInfo from the pool/selected doesn't have `sensor.sophistication` set? 
+Both issues are plausible. But the user says "the sophistication not selected" - this implies the sync doesn't work. Maybe the CarInfo from the pool/selected doesn't have `sensor.sophistication` set?
 
 Hmm, wait — let me reconsider. The user loaded a car that was saved as `sophistication='classified'`. This CarInfo JSON should have `sensor: {..., sophistication: 'classified'}`. If the store stores it as-is, then `getActiveCars()` returns it with the field present. Then `#fillCarConfig` sets the select value. So it should work...
 
 Unless there's an issue with how the car is loaded into the store. Let me check `addCar` and how data gets stored.
 
-Actually, let me just look at the issue from a different angle. Maybe the issue is specific to the "Pool" source — when loading pool from localStorage, the pool items might be from before the sophistication migration. 
+Actually, let me just look at the issue from a different angle. Maybe the issue is specific to the "Pool" source — when loading pool from localStorage, the pool items might be from before the sophistication migration.
 
 OK actually I think I should focus on presenting the plan now. For issue 2, the concrete fixable item is `#setConfigLocked` needs to also disable the `<select>`. For the sync issue, I need to check the data quality for pool items (these are from `localStorage.getItem('bestPool')`). Let me look at what format pool items are stored in.
-
-
-
-
-
-
 
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "include": "*.ts",
@@ -2125,6 +2129,7 @@ OK actually I think I should focus on presenting the plan now. For issue 2, the 
 ```
 
 **Output:**
+
 ```
 Found 25 matches
 /Users/alex/Code/Self-driving-car/ts/store/storeManager.ts:
@@ -2198,9 +2203,9 @@ Found 25 matches
 
 _Thinking:_
 
-The pool is stored by `storageManager.ts` using `car.toInfo()`. So pool items should have the correct `sophistication` field because `car.toInfo()` writes it. 
+The pool is stored by `storageManager.ts` using `car.toInfo()`. So pool items should have the correct `sophistication` field because `car.toInfo()` writes it.
 
-OK, I think I have enough information. Let me now formulate a comprehensive plan for all three bugs. 
+OK, I think I have enough information. Let me now formulate a comprehensive plan for all three bugs.
 
 But let me also
 
@@ -2227,21 +2232,17 @@ The user asked me to continue. Let me look at the pool storage format to underst
 Let me also verify how the car store/save format works - specifically when saving from the training panel or other places.
 
 I need to understand:
+
 1. Whether pool items stored in localStorage may be from before the sophistication migration (lacking the `sophistication` field)
 2. Whether cars loaded into the store go through migration or are stored raw
 3. The full data flow for issue 3 - why cars loaded in traffic simulator don't get the right brain/size
 
 Let me read more files.
 
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts",
@@ -2251,6 +2252,7 @@ Let me read more files.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts</path>
 <type>file</type>
@@ -2269,7 +2271,7 @@ Let me read more files.
 12: import { safeJsonParse } from './serialization.js';
 13: import { parseWorldFileContent } from '../world/loader/worldLoader.js';
 14: import { CarLoader } from '../car/loader/carLoader.js';
-15: 
+15:
 16: /**
 17:  * StoreManager — Singleton that loads preloaded assets from /store/ via manifest.json.
 18:  * Provides active world/car selection persisted to localStorage.
@@ -2296,12 +2298,12 @@ Let me read more files.
 39:   'loadedCars',
 40: ];
 41: const SM_ARRAY_LS_KEYS = ['bestPool', 'raceCars', 'loadedWorlds', 'loadedCars'];
-42: 
+42:
 43: /** Generate a short, unique id for a user-loaded asset. */
 44: function smGenId(): string {
 45:   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 46: }
-47: 
+47:
 48: /** Detect start/target markers in a world data object. */
 49: function smWorldMarkers(data: object): {
 50:   hasStartMarker: boolean;
@@ -2314,7 +2316,7 @@ Let me read more files.
 57:     hasEndMarker: markings.some((m) => m.type === 'target'),
 58:   };
 59: }
-60: 
+60:
 61: /**
 62:  * Persist a value to localStorage. On QuotaExceededError, warn and keep the
 63:  * in-memory copy so oversized files still work for the current session.
@@ -2330,7 +2332,7 @@ Let me read more files.
 73:     );
 74:   }
 75: }
-76: 
+76:
 77: /** Normalize a stored world id, mapping legacy bare filenames to `store:`. */
 78: function smNormalizeWorldId(raw: string): string {
 79:   if (
@@ -2343,6 +2345,7 @@ Let me read more files.
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/genetics/storageManager.ts"
@@ -2350,6 +2353,7 @@ Let me read more files.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/genetics/storageManager.ts</path>
 <type>file</type>
@@ -2358,18 +2362,18 @@ Let me read more files.
 2: import type { Car } from '../../../car/car.js';
 3: import { safeJsonParse } from '../../../store/serialization.js';
 4: import { DEFAULT_CAR_CONFIG } from '../../../car/config.js';
-5: 
+5:
 6: export function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
 7:   const stored = localStorage.getItem('bestPool');
 8:   const storedPool = safeJsonParse<CarInfo[]>(stored);
 9:   if (storedPool) {
 10:     return storedPool;
 11:   }
-12: 
+12:
 13:   const legacyBrains = localStorage.getItem('bestBrains');
 14:   const legacyBrain = localStorage.getItem('bestBrain');
 15:   const legacyConfig = localStorage.getItem('bestCarInfo');
-16: 
+16:
 17:   if (legacyBrains || legacyBrain) {
 18:     let brains: unknown[] = [];
 19:     if (legacyBrains) {
@@ -2378,19 +2382,19 @@ Let me read more files.
 22:       const brain = safeJsonParse<unknown>(legacyBrain);
 23:       brains = brain ? [brain] : [];
 24:     }
-25: 
+25:
 26:     const baseConfig: CarInfo = safeJsonParse<CarInfo>(legacyConfig) ??
 27:       fallbackConfig ?? {
 28:         ...DEFAULT_CAR_CONFIG,
 29:         sensor: { ...DEFAULT_CAR_CONFIG.sensor },
 30:       };
-31: 
+31:
 32:     const pool: CarInfo[] = brains.map((brain) => ({
 33:       ...baseConfig,
 34:       sensor: { ...baseConfig.sensor },
 35:       brain,
 36:     }));
-37: 
+37:
 38:     localStorage.setItem('bestPool', JSON.stringify(pool));
 39:     localStorage.removeItem('bestBrain');
 40:     localStorage.removeItem('bestBrains');
@@ -2398,10 +2402,10 @@ Let me read more files.
 42:     console.log('Migrated legacy storage to unified bestPool.');
 43:     return pool;
 44:   }
-45: 
+45:
 46:   return [];
 47: }
-48: 
+48:
 49: export function savePoolToStorage(pool: CarInfo[]): void {
 50:   if (pool.length > 0) {
 51:     localStorage.setItem('bestPool', JSON.stringify(pool));
@@ -2410,7 +2414,7 @@ Let me read more files.
 54:     console.warn('Could not save: no cars with brains found.');
 55:   }
 56: }
-57: 
+57:
 58: export function discardStoredPool(): void {
 59:   localStorage.removeItem('bestPool');
 60:   localStorage.removeItem('bestBrain');
@@ -2418,12 +2422,12 @@ Let me read more files.
 62:   localStorage.removeItem('bestCarInfo');
 63:   console.log('Stored pool discarded from localStorage.');
 64: }
-65: 
+65:
 66: export function loadRaceCars(): CarInfo[] {
 67:   const stored = localStorage.getItem('raceCars');
 68:   return safeJsonParse<CarInfo[]>(stored) ?? [];
 69: }
-70: 
+70:
 71: export function saveRaceCars(cars: CarInfo[]): void {
 72:   if (cars.length > 0) {
 73:     localStorage.setItem('raceCars', JSON.stringify(cars));
@@ -2432,12 +2436,12 @@ Let me read more files.
 76:     localStorage.removeItem('raceCars');
 77:   }
 78: }
-79: 
+79:
 80: export function downloadCarFiles(
 81:   selectedCars: { car: Car; poolPosition: number }[],
 82: ): void {
 83:   if (selectedCars.length === 0) return;
-84: 
+84:
 85:   const now = new Date();
 86:   const dateStr =
 87:     String(now.getFullYear()) +
@@ -2445,17 +2449,17 @@ Let me read more files.
 89:     String(now.getDate()).padStart(2, '0') +
 90:     String(now.getHours()).padStart(2, '0') +
 91:     String(now.getMinutes()).padStart(2, '0');
-92: 
+92:
 93:   for (const { car, poolPosition } of selectedCars) {
 94:     const carInfo: CarInfo = car.toInfo();
-95: 
+95:
 96:     const fileName =
 97:       `${dateStr}_p${poolPosition + 1}` +
 98:       `_${carInfo.width}x${carInfo.height}` +
 99:       `_s${carInfo.maxSpeed}` +
 100:       `_rc${carInfo.sensor.rayCount}` +
 101:       `_rl${carInfo.sensor.rayLength}.car`;
-102: 
+102:
 103:     const json = JSON.stringify(carInfo, null, 2);
 104:     const blob = new Blob([json], { type: 'application/json' });
 105:     const url = URL.createObjectURL(blob);
@@ -2475,6 +2479,7 @@ Let me read more files.
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/loader/carLoader.ts",
@@ -2484,13 +2489,14 @@ Let me read more files.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/loader/carLoader.ts</path>
 <type>file</type>
 <content>
 1: import { CarInfo } from '../car.js';
 2: import type { Sophistication } from '../sensors/sensorReading.js';
-3: 
+3:
 4: /**
 5:  * Parse a .car file content string into a CarInfo object.
 6:  * Expects pure JSON `{...}`. Returns null if the content cannot be parsed.
@@ -2508,7 +2514,7 @@ Let me read more files.
 18:     return null;
 19:   }
 20: }
-21: 
+21:
 22: /**
 23:  * Compare two CarInfo objects by their physical parameters (excluding brain).
 24:  * Returns true if all params match.
@@ -2531,17 +2537,10 @@ _Thinking:_
 
 Now let me see the rest of compareCarInfoParams and how it uses normalizeSoph.
 
-
-
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/loader/carLoader.ts",
@@ -2551,13 +2550,14 @@ Now let me see the rest of compareCarInfoParams and how it uses normalizeSoph.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/loader/carLoader.ts</path>
 <type>file</type>
 <content>
 30:   return info.sensor.trafficAwareness ? 'traffic' : 'basic';
 31: }
-32: 
+32:
 33: export function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
 34:   const aHidden = a.hiddenLayers ?? [6];
 35:   const bHidden = b.hiddenLayers ?? [6];
@@ -2580,7 +2580,7 @@ Now let me see the rest of compareCarInfoParams and how it uses normalizeSoph.
 52:     normalizeSoph(a) === normalizeSoph(b)
 53:   );
 54: }
-55: 
+55:
 56: /**
 57:  * Reusable car loader utility.
 58:  * Handles file input, reading, and parsing of one or multiple pure-JSON .car files.
@@ -2588,7 +2588,7 @@ Now let me see the rest of compareCarInfoParams and how it uses normalizeSoph.
 60: export class CarLoader {
 61:   #input: HTMLInputElement;
 62:   #onLoad: (cars: CarInfo[]) => void;
-63: 
+63:
 64:   /**
 65:    * @param onLoad - Callback invoked with an array of parsed CarInfo objects.
 66:    * @param inputId - ID of an existing file input element (default: "loadCarInput").
@@ -2596,7 +2596,7 @@ Now let me see the rest of compareCarInfoParams and how it uses normalizeSoph.
 68:    */
 69:   constructor(onLoad: (cars: CarInfo[]) => void, inputId = 'loadCarInput') {
 70:     this.#onLoad = onLoad;
-71: 
+71:
 72:     let input = document.getElementById(inputId) as HTMLInputElement | null;
 73:     if (!input) {
 74:       input = this.#createInput(inputId);
@@ -2605,7 +2605,7 @@ Now let me see the rest of compareCarInfoParams and how it uses normalizeSoph.
 77:     this.#input.multiple = true;
 78:     this.#input.addEventListener('change', this.#handleFilesChange.bind(this));
 79:   }
-80: 
+80:
 81:   #createInput(inputId: string): HTMLInputElement {
 82:     const input = document.createElement('input');
 83:     input.type = 'file';
@@ -2616,20 +2616,20 @@ Now let me see the rest of compareCarInfoParams and how it uses normalizeSoph.
 88:     document.body.appendChild(input);
 89:     return input;
 90:   }
-91: 
+91:
 92:   #handleFilesChange(e: Event): void {
 93:     const input = e.target as HTMLInputElement;
 94:     const files = input.files;
-95: 
+95:
 96:     if (!files || files.length === 0) {
 97:       input.value = '';
 98:       return;
 99:     }
-100: 
+100:
 101:     const fileArray = Array.from(files);
 102:     const results: CarInfo[] = [];
 103:     let completed = 0;
-104: 
+104:
 105:     for (const file of fileArray) {
 106:       const reader = new FileReader();
 107:       reader.onload = (event) => {
@@ -2668,19 +2668,10 @@ _Thinking:_
 
 Now let me check how `StoreManager.addLoadedCars()` works - where does the data from CarLoader end up in the store, and what format?
 
-
-
-
-
-
-
-
-
-
-
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "include": "*.ts",
@@ -2689,6 +2680,7 @@ Now let me check how `StoreManager.addLoadedCars()` works - where does the data 
 ```
 
 **Output:**
+
 ```
 No files found
 ```
@@ -2701,17 +2693,10 @@ _Thinking:_
 
 Let me search more broadly for how loaded cars are added to the store.
 
-
-
-
-
-
-
-
-
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "include": "ts/store/storeManager.ts",
@@ -2720,6 +2705,7 @@ Let me search more broadly for how loaded cars are added to the store.
 ```
 
 **Output:**
+
 ```
 Found 13 matches
 /Users/alex/Code/Self-driving-car/ts/store/storeManager.ts:
@@ -2759,19 +2745,10 @@ _Thinking:_
 
 Let me read the `addLoadedCar` method and see what happens with the data.
 
-
-
-
-
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts",
@@ -2781,12 +2758,13 @@ Let me read the `addLoadedCar` method and see what happens with the data.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts</path>
 <type>file</type>
 <content>
 435:   }
-436: 
+436:
 437:   /**
 438:    * Add a user-loaded car. Persists to localStorage when it fits; on quota
 439:    * overflow keeps it in memory only (lost on refresh). Returns the new entry.
@@ -2806,9 +2784,9 @@ Let me read the `addLoadedCar` method and see what happens with the data.
 453:       data: entry.data,
 454:     };
 455:   }
-456: 
+456:
 457:   // --- localStorage state management ---
-458: 
+458:
 459:   getLocalStorageStates(): LocalStorageEntry[] {
 460:     const entries: LocalStorageEntry[] = [];
 461:     for (const key of SM_TRACKED_LS_KEYS) {
@@ -2823,6 +2801,7 @@ Let me read the `addLoadedCar` method and see what happens with the data.
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts",
@@ -2832,11 +2811,12 @@ Let me read the `addLoadedCar` method and see what happens with the data.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/store/storeManager.ts</path>
 <type>file</type>
 <content>
-315: 
+315:
 316:     for (const w of this.#worlds) {
 317:       out.push({
 318:         id: `store:${w.filename}`,
@@ -2847,10 +2827,10 @@ Let me read the `addLoadedCar` method and see what happens with the data.
 323:         hasEndMarker: w.hasEndMarker,
 324:       });
 325:     }
-326: 
+326:
 327:     return out;
 328:   }
-329: 
+329:
 330:   /** All selectable cars across sources, ordered loaded → store. */
 331:   getAllCars(): UnifiedCarEntry[] {
 332:     const out: UnifiedCarEntry[] = [];
@@ -2867,19 +2847,19 @@ Let me read the `addLoadedCar` method and see what happens with the data.
 343:     }
 344:     return out;
 345:   }
-346: 
+346:
 347:   // --- Active world selection (id-based) ---
-348: 
+348:
 349:   /** Active world id, e.g. `store:circle.world` | `loaded:x` | `editor`. */
 350:   getActiveWorldId(): string | null {
 351:     const raw = localStorage.getItem(SM_ACTIVE_WORLD_KEY);
 352:     return raw ? smNormalizeWorldId(raw) : null;
 353:   }
-354: 
+354:
 355:   setActiveWorldId(id: string): void {
 356:     localStorage.setItem(SM_ACTIVE_WORLD_KEY, id);
 357:   }
-358: 
+358:
 359:   /** Get the currently active world data (parsed JSON object), or null. */
 360:   getActiveWorld(): object | null {
 361:     const id = this.getActiveWorldId();
@@ -2902,12 +2882,14 @@ OK so `addLoadedCar` stores the raw `CarInfo data` as-is (no migration). And `ge
 So the data stored is the raw JSON from the `.car` file. If the `.car` file was saved with `sophistication: 'classified'`, it will contain that field. If it was an older `.car` file with `trafficAwareness: true` but no `sophistication`, the raw data won't have `sophistication`.
 
 Now, this raw data is what flows into:
+
 1. `trainingInitModal.ts` → `#refreshSources()` → `#applySourceLock(initial)` → `#fillCarConfig(sourceConfig)` — this checks `c.sensor.sophistication ?? (c.sensor.trafficAwareness ? 'traffic' : 'basic')`. So even old data would work here because of the `trafficAwareness` fallback.
 2. `trafficSimulator.ts` → `toolbarPanel.getSelectedCars()[0]` → `new Car()` then `car.load(info)` — `Car.load()` does the migration.
 
 So for the training init modal, the data should have `sophistication` if it was saved with it, and the fallback handles old data. The sync should work.
 
 BUT WAIT — there's a subtle issue I should consider. When the modal opens:
+
 1. Step 1: `this.#fillCarConfig(options.defaults.carConfig)` — sets from training panel values
 2. Step 2: `this.#refreshSources()` — determines brain source
 
@@ -2915,19 +2897,10 @@ In `#refreshSources()`, it checks `this.#storedPool.length` and `this.#selectedC
 
 Let me look at `#refreshSources` more carefully.
 
-
-
-
-
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts",
@@ -2937,6 +2910,7 @@ Let me look at `#refreshSources` more carefully.
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingInitModal.ts</path>
 <type>file</type>
@@ -2946,13 +2920,13 @@ Let me look at `#refreshSources` more carefully.
 151:     this.#storedPool =
 152:       safeJsonParse<CarInfo[]>(localStorage.getItem('bestPool')) ?? [];
 153:     this.#selectedCars = StoreManager.getActiveCars();
-154: 
+154:
 155:     const poolAvailable = this.#storedPool.length > 0;
 156:     const selectedAvailable = this.#selectedCars.length > 0;
-157: 
+157:
 158:     this.#setSourceAvailability('pool', poolAvailable);
 159:     this.#setSourceAvailability('selected', selectedAvailable);
-160: 
+160:
 161:     const poolCountLabel = this.querySelector<HTMLElement>('#tiPoolCountLabel');
 162:     if (poolCountLabel) {
 163:       poolCountLabel.textContent = poolAvailable
@@ -2963,7 +2937,7 @@ Let me look at `#refreshSources` more carefully.
 168:     if (poolDesc && !poolAvailable) {
 169:       poolDesc.textContent = 'No saved pool in local storage.';
 170:     }
-171: 
+171:
 172:     const selCountLabel = this.querySelector<HTMLElement>(
 173:       '#tiSelectedCountLabel',
 174:     );
@@ -2983,7 +2957,7 @@ Let me look at `#refreshSources` more carefully.
 188:         selDesc.textContent = 'Seed from the car(s) selected in the toolbar.';
 189:       }
 190:     }
-191: 
+191:
 192:     // Default selection: continue a saved pool if present, else selected
 193:     // car(s), else fresh.
 194:     const initial = poolAvailable
@@ -2997,7 +2971,7 @@ Let me look at `#refreshSources` more carefully.
 202:     if (radio) radio.checked = true;
 203:     this.#applySourceLock(initial);
 204:   }
-205: 
+205:
 206:   #setSourceAvailability(source: string, available: boolean): void {
 207:     const label = this.querySelector<HTMLElement>(
 208:       `.ti-source[data-source="${source}"]`,
@@ -3030,12 +3004,14 @@ Now, let me also think about whether the `bestPool` in localStorage could have s
 The fallback `c.sensor.sophistication ?? (c.sensor.trafficAwareness ? 'traffic' : 'basic')` handles this case, so old pools would still show as 'traffic'.
 
 OK so for issue 2, the fix is:
+
 1. `#setConfigLocked` should also disable the `<select>` for sophistication
 2. The sync IS happening (via `#applySourceLock` → `#fillCarConfig`), it works through the fallback chain
 
 But wait — the user says it's NOT syncing. Let me think about when the modal opens with "Fresh" selected first...
 
 Actually, I wonder if the user is testing a scenario where they:
+
 1. Have cars selected in the toolbar (with `sophistication='classified'`)
 2. Open the training modal
 3. The modal shows 'Fresh' as the brain source (because there's no pool)
@@ -3045,11 +3021,13 @@ Actually, I wonder if the user is testing a scenario where they:
 But maybe the issue is that step 2 (`#refreshSources`) doesn't actually run because the connectivity is broken or the template isn't properly bound?
 
 Actually wait, let me re-read the flow. `open()` calls:
+
 1. `this.#fillTrainingParams(options.defaults)` — sets pool-related fields
 2. `this.#fillCarConfig(options.defaults.carConfig)` — sets car config fields from training panel
 3. `this.#refreshSources()` — determines brain source
 
 `#refreshSources()` at line 192-203 determines `initial` and:
+
 - Sets the radio checked: `if (radio) radio.checked = true;`
 - Calls `this.#applySourceLock(initial)` — this calls `#fillCarConfig(sourceConfig)` for pool/selected sources
 
@@ -3064,18 +3042,20 @@ OK let me now think about issue 3 more carefully.
 **Issue 3: Traffic simulator car loading**
 
 The traffic simulator spawn code (line 285-292):
+
 ```typescript
 const car = new Car({
-    controlType: 'AI',
-    x: point.x,
-    y: point.y,
-    angle: this.#spawnAngle(point),
-    color: getRandomColor(),
+  controlType: 'AI',
+  x: point.x,
+  y: point.y,
+  angle: this.#spawnAngle(point),
+  color: getRandomColor(),
 });
 car.load(info);
 ```
 
 1. `new Car(...)` creates a car with:
+
    - Default width=25, height=63
    - Default sensor with `sophistication='basic'`
    - Brain with topology `[6, 6, 4]` (rayCount+1 = 6 for basic, then 6 hidden, then 4 outputs)
@@ -3088,6 +3068,7 @@ car.load(info);
    - If `!info.brain && this.useBrain`, rebuilds brain with correct topology
 
 So bugs:
+
 - **Polygon not regenerated:** After `load()`, `this.width` and `this.height` are updated but `this.polygon` still reflects the default dimensions. The polygon only gets rebuilt in `CarPhysics.update()` at the start of the next frame. But crucially, `this.physics.createPolygon(this)` uses `this.width` and `this.height`, so when `CarPhysics.update()` runs first (before the first `draw()`?), the polygon would be correct. But wait...
 
 Actually, let me check: the `handleSpawnClick` code spawns a car and adds it to `this.#cars`. Then when does `update()` get called? Let me look at the traffic simulator's update loop.
@@ -3122,18 +3103,21 @@ BUT — if someone loads a pool item that was converted from legacy format (no `
 So for the legacy migration path, the pool items get `sensor.trafficAwareness = true` (from the old `DEFAULT_CAR_CONFIG` which had `trafficAwareness` field) but NOT `sophistication`. When the modal reads this pool item, `c.sensor.sophistication` is undefined, `c.sensor.trafficAwareness` is true → selects 'traffic'. This is correct for the modal.
 
 But when `car.load(info)` processes this pool item:
+
 ```typescript
 if (info.sensor.trafficAwareness === true && !info.sensor.sophistication) {
-    this.sensor.sophistication = 'traffic';  // migration to traffic
+  this.sensor.sophistication = 'traffic'; // migration to traffic
 }
 ```
 
 This works correctly. The sensor is set to 'traffic'. Then the brain is deserialized from `info.brain` (which was present in the pool item). The brain has the topology from when it was trained (which could be traffic or basic, depending on when it was trained).
 
 Wait, the user says "i loaded car that saved as sophistication=classified". So they have a NEW car (saved with sophistication='classified') and:
+
 - The brain + sophistication aren't used correctly when spawning in traffic simulator
 
 Let me think about this differently. Maybe the issue is:
+
 1. Car was saved with `sophistication='classified'` and a brain trained for classified (26 inputs)
 2. Car is loaded via `CarLoader` → raw `CarInfo` with `sophistication='classified'` and `brain` field
 3. Car is added to store via `addLoadedCar(name, data)` → stored raw
@@ -3144,7 +3128,7 @@ Let me think about this differently. Maybe the issue is:
 8. Since `info.brain` is truthy, the `!info.brain` check fails, brain is NOT rebuilt
 
 This should work... unless:
-A. The deserialization silently gets corrupted? 
+A. The deserialization silently gets corrupted?
 B. The `CarInfo` doesn't have the `brain` field? (e.g., if the `.car` file was exported from toolbar's "download" which might call `toInfo()` which includes brain, but maybe another path?)
 C. The `.car` file was saved without a brain?
 
@@ -3176,6 +3160,7 @@ Hmm, actually let me think about the timing. In the traffic simulator update loo
 Actually, now I'm thinking: let me check whether the issue could be that the `Car` constructor creates a brain and sensor for `sophistication='basic'` (default), and then `load()` overwrites the brain. The brain's topology might be reconstructed from the serialized data. But `NeuralNetwork.deserialize` creates new Level objects with the stored weights/biases. The topology would be whatever was stored.
 
 Actually, let me take a step back and think about the specific complaints:
+
 1. "not the right brain(NN)" — the loaded brain is wrong. This could be because the brain from the `.car` file was trained for classified (26 inputs) but the car was reconstructed with a 'basic' sensor, or vice versa.
 2. "not the size of car" — the car dimensions are wrong. This is because `load()` updates `this.width`/`this.height` but doesn't regenerate `this.polygon`.
 
@@ -3192,12 +3177,14 @@ Actually, I've been reading the code and thinking about this for a while. Let me
 Let me focus on a concrete plan now:
 
 **Issue 1: Classified ray rendering** — Need to make classified mode draw both the traffic light hit AND the border/wall hit beyond it, like traffic mode does. This requires:
+
 - Extending `getTaggedReadings` or the sensor update to store BOTH the classified hit AND the border hit for each ray
 - Updating `#drawClassified` to draw multi-segment rays
 
 **Issue 2: Training init modal sophistication** — The select syncs correctly via `#fillCarConfig` but `#setConfigLocked` doesn't disable it.
 
 **Issue 3: Traffic simulator car loading** — Need to:
+
 - Rebuild polygon after `load()` changes dimensions
 - Add try/catch around brain deserialization
 - Possibly add more robust error handling
@@ -3215,10 +3202,12 @@ Now I have a thorough understanding of all three issues. Here's the plan:
 **Fix:** Two changes needed:
 
 ### 1a. Store border hit alongside classified hit in the sensor (`sensor.ts`)
+
 - Add a new field `classifiedReadings: (SensorReading | null)[]` already exists, but we also need the raw border hit for drawing
 - During `classified` update in `Sensor.update()`, also call `SensorRaycaster.getReadings(rays, borders)` and store it in `this.readings` (the existing border-only array). Today it gets zeroed out for classified mode.
 
 ### 1b. Update `#drawClassified()` to draw continuation ray and wall dot (`sensor.ts:338-403`)
+
 - After drawing the colored ray to the traffic light hit, check `this.readings[i]` for a border hit
 - If there's a border hit behind the traffic light: draw a yellow continuation ray from the light to the wall, plus a yellow dot (r=3) on the wall
 - This mirrors the pattern in `#drawTraffic` (lines 291-303) where `traffic` mode draws: colored ray → yellow continuation → yellow wall dot → colored light dot
@@ -3232,13 +3221,18 @@ Now I have a thorough understanding of all three issues. Here's the plan:
 **Fix in `trainingInitModal.ts`:**
 
 ### 2a. Also disable the `<select>` when locked
+
 Add to `#setConfigLocked`:
+
 ```typescript
-const sophSelect = this.querySelector<HTMLSelectElement>('#tiCarSophistication');
+const sophSelect = this.querySelector<HTMLSelectElement>(
+  '#tiCarSophistication',
+);
 if (sophSelect) sophSelect.disabled = locked;
 ```
 
 ### 2b. Verify sync is working
+
 The sync logic via `#fillCarConfig` → `#applySourceLock` is functionally correct — `sophSelect.value` is set with the proper `sophistication ?? (trafficAwareness ? 'traffic' : 'basic')` fallback. The raw `CarInfo` from pool/loaded/selected does flow through correctly. If you're seeing the wrong value, need to verify the pool items actually have `sophistication` set. But the lock/disable fix is the only code-level change needed here.
 
 ---
@@ -3248,35 +3242,42 @@ The sync logic via `#fillCarConfig` → `#applySourceLock` is functionally corre
 **Root causes:** Three bugs in `Car.load()` (`car.ts:147-187`):
 
 ### 3a. Polygon not regenerated after dimension change
+
 Lines 157-158 update `this.width`/`this.height` but `this.polygon` is never rebuilt. The polygon was created in the constructor with default dimensions. It only gets rebuilt inside `CarPhysics.update()`. Add after line 158:
+
 ```typescript
 this.polygon = this.physics.createPolygon(this);
 ```
 
 ### 3b. Brain deserialization can silently fail
+
 Line 149: `this.brain = CarBrainAdapter.deserialize(info.brain)` — no try/catch. If deserialization throws, `this.brain` stays as the constructor's default brain (basic topology, `[6, 6, 4]`). The fallback on line 176 (`!info.brain`) doesn't trigger because `info.brain` is still truthy. Fix: wrap in try/catch and clear `info.brain` on failure so the fallback creates the correct-sized brain:
+
 ```typescript
 if (info.brain) {
-    try {
-        this.brain = CarBrainAdapter.deserialize(info.brain);
-    } catch {
-        console.warn('Failed to deserialize brain, rebuilding with correct topology');
-        // Clear so the fallback below creates a fresh brain with the right size
-        delete info.brain;
-    }
+  try {
+    this.brain = CarBrainAdapter.deserialize(info.brain);
+  } catch {
+    console.warn(
+      'Failed to deserialize brain, rebuilding with correct topology',
+    );
+    // Clear so the fallback below creates a fresh brain with the right size
+    delete info.brain;
+  }
 }
 ```
+
 (This mutates `info` locally — safe since it's a fresh param and callers don't hold references.)
 
 ---
 
 ## Summary of files to edit
 
-| File | Change |
-|------|--------|
-| `ts/car/sensors/sensor.ts` | Store `this.readings` in classified mode; update `#drawClassified` to draw continuation ray + wall dot |
-| `ts/simulator/training/trainingInitModal.ts` | `#setConfigLocked` also disables `<select>` |
-| `ts/car/car.ts` | `load()`: rebuild polygon after dimension change; try/catch around brain deserialization |
+| File                                         | Change                                                                                                 |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `ts/car/sensors/sensor.ts`                   | Store `this.readings` in classified mode; update `#drawClassified` to draw continuation ray + wall dot |
+| `ts/simulator/training/trainingInitModal.ts` | `#setConfigLocked` also disables `<select>`                                                            |
+| `ts/car/car.ts`                              | `load()`: rebuild polygon after dimension change; try/catch around brain deserialization               |
 
 Ready to implement?
 
@@ -3297,14 +3298,16 @@ The user is questioning the architecture decision. They're asking why classified
 This is a good architectural point. Let me think about this:
 
 1. **Current state:**
+
    - `traffic` mode: Two independent arrays (`readings` for borders, `trafficReadings` for traffic lights). Drawing shows both.
    - `classified` mode: One array (`classifiedReadings`) with the single closest hit. Only one thing drawn per ray.
 
-2. **The issue:** Classified mode is supposed to be *more* capable than traffic mode (it detects borders, cars, AND traffic lights). But visually, it shows less information because it only shows the closest hit.
+2. **The issue:** Classified mode is supposed to be _more_ capable than traffic mode (it detects borders, cars, AND traffic lights). But visually, it shows less information because it only shows the closest hit.
 
 3. **The user's point:** Instead of adding separate handling for classified drawing, why not make the drawing logic unified or at least make classified match traffic's visual behavior? Classified should include everything traffic mode shows, plus car detection.
 
 The cleanest approach would be:
+
 - For classified mode, also store `this.readings` (border hits) just like traffic mode does
 - In `#drawClassified`, draw the classified hit (colored by type: yellow/red/green depending on border/car/control) AND then draw the continuation to the wall if there's a border behind it
 
@@ -3315,6 +3318,7 @@ Let me reconsider the plan for issue 1 with this in mind.
 Actually, the user seems to be asking a bigger question: why do we need different drawing paths (`#drawBasic`, `#drawTraffic`, `#drawClassified`) at all? Could classified replace them all?
 
 The answer is:
+
 - `basic` is a fast path for when you don't care about obstacles — just draws border hits in yellow
 - `traffic` adds traffic light detection — draws colored rays to lights + yellow continuation to walls
 - `classified` adds car detection on top — should draw everything traffic does, plus cars in red
@@ -3322,6 +3326,7 @@ The answer is:
 The user's suggestion is that classified should include everything and be the foundation, potentially replacing the need for separate drawing functions.
 
 This is a valid architectural concern. The fix for issue 1 should be:
+
 1. Store `this.readings` (border hits) for classified mode too (currently set to `null` array)
 2. Update `#drawClassified` to:
    - Draw the classified hit in its type-specific color (yellow for border, red for car, colored for traffic control)
@@ -3336,10 +3341,12 @@ Let me re-think the concrete fix for issue 1:
 ### Fix for Issue 1:
 
 In `Sensor.update()` at lines 95-124, when `sophistication === 'classified'`:
+
 - Currently: `this.readings = new Array(this.rays.length).fill(null)` — border readings are thrown away
 - Instead: `this.readings = SensorRaycaster.getReadings(this.rays, borders)` — keep border readings
 
 In `#drawClassified()` at lines 338-403:
+
 - After drawing the classified hit's ray to `reading.x, reading.y`:
   - If `reading.type === 'trafficControl'` and there's a border reading behind it (`this.readings[i]` with offset > reading.distance): draw continuation yellow ray from reading → border, plus yellow dot at border
   - If `reading.type === 'none'`: faint yellow ray (already handled)
@@ -3349,14 +3356,15 @@ In `#drawClassified()` at lines 338-403:
 Wait, but the border reading from `getReadings` uses the full list of borders. The classified reading from `getTaggedReadings` also scans borders. So they should agree on border hits for the same ray. But `getTaggedReadings` might find a different closest hit (e.g., a car or traffic light that's closer than any border). In that case, `getReadings` would still return the closest border hit.
 
 So the algorithm for `#drawClassified` would be:
+
 1. Get `reading = this.classifiedReadings[i]` (the closest hit of any type)
 2. Get `borderReading = this.readings[i]` (the closest border hit, regardless of other obstacles)
 3. If reading is `trafficControl` or `car`:
    a. Draw colored ray car → reading.x, reading.y
    b. Draw colored dot at reading position
    c. If borderReading exists AND borderReading's offset > reading.distance (border is behind):
-      - Draw yellow continuation ray from reading.x,reading.y → borderReading.x,borderReading.y
-      - Draw yellow dot at border position
+   - Draw yellow continuation ray from reading.x,reading.y → borderReading.x,borderReading.y
+   - Draw yellow dot at border position
 4. If reading is `border`: draw yellow ray + yellow dot (like basic mode)
 5. If reading is `none`: draw faint yellow ray
 
@@ -3384,6 +3392,7 @@ The fix should make classified a **superset** visually — it should show everyt
 This way classified rendering is a strict superset — it shows everything traffic mode shows plus car detection. Future obstacle types would naturally render inside the same loop without needing a new draw variant.
 
 Shall I proceed with this approach? The files to edit would be:
+
 - `ts/car/sensors/sensor.ts` — `update()` keeps border readings for classified; `#drawClassified` adds continuation ray + wall dot
 - `ts/simulator/training/trainingInitModal.ts` — `#setConfigLocked` disables `<select>`
 - `ts/car/car.ts` — polygon rebuild + try/catch on brain deserialize
@@ -3408,11 +3417,10 @@ Let me re-read the relevant code sections to make sure I have the exact data str
 
 Let me trace through the full data model for each mode so the picture is crystal clear.
 
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/sensors/sensor.ts",
@@ -3422,6 +3430,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/sensors/sensor.ts</path>
 <type>file</type>
@@ -3435,21 +3444,21 @@ Let me trace through the full data model for each mode so the picture is crystal
 7: import type { TrafficControlState } from '../../math/trafficControlGrid.js';
 8: import { getIntersectionOffset, lerp } from '../../math/utils.js';
 9: import type { SensorReading, Sophistication } from './sensorReading.js';
-10: 
+10:
 11: export type { Sophistication } from './sensorReading.js';
-12: 
+12:
 13: export interface SensorTrafficControl {
 14:   polygon: Point[];
 15:   state: TrafficControlState;
 16: }
-17: 
+17:
 18: export interface TrafficReading {
 19:   state: TrafficControlState;
 20:   offset: number;
 21:   x: number;
 22:   y: number;
 23: }
-24: 
+24:
 25: export function encodeTrafficState(state: TrafficControlState | null): number {
 26:   switch (state) {
 27:     case 'red':
@@ -3460,19 +3469,19 @@ Let me trace through the full data model for each mode so the picture is crystal
 32:       return 0;
 33:   }
 34: }
-35: 
+35:
 36: export class Sensor {
 37:   rayCount: number;
 38:   rayLength: number;
 39:   raySpread: number;
 40:   rayOffset: number;
 41:   sophistication: Sophistication;
-42: 
+42:
 43:   rays: Point[][];
 44:   readings: (IntersectionPoint | null)[];
 45:   trafficReadings: (TrafficReading | null)[];
 46:   classifiedReadings: (SensorReading | null)[];
-47: 
+47:
 48:   constructor(config?: {
 49:     rayCount?: number;
 50:     raySpread?: number;
@@ -3485,7 +3494,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 57:     this.rayLength = config?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength;
 58:     this.raySpread = config?.raySpread ?? DEFAULT_CAR_CONFIG.sensor.raySpread;
 59:     this.rayOffset = config?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset;
-60: 
+60:
 61:     if (config?.sophistication) {
 62:       this.sophistication = config.sophistication;
 63:     } else if (config?.trafficAwareness) {
@@ -3493,13 +3502,13 @@ Let me trace through the full data model for each mode so the picture is crystal
 65:     } else {
 66:       this.sophistication = 'basic';
 67:     }
-68: 
+68:
 69:     this.rays = [];
 70:     this.readings = [];
 71:     this.trafficReadings = [];
 72:     this.classifiedReadings = [];
 73:   }
-74: 
+74:
 75:   update(
 76:     x: number,
 77:     y: number,
@@ -3519,7 +3528,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 91:       this.raySpread,
 92:       this.rayOffset,
 93:     );
-94: 
+94:
 95:     if (this.sophistication === 'classified') {
 
 (Showing lines 1-95 of 404. Use offset=96 to continue.)
@@ -3529,6 +3538,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/sensors/sensorReading.ts"
@@ -3536,13 +3546,14 @@ Let me trace through the full data model for each mode so the picture is crystal
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/sensors/sensorReading.ts</path>
 <type>file</type>
 <content>
 1: export type ObstacleType = 'border' | 'car' | 'trafficControl' | 'none';
 2: export type Sophistication = 'basic' | 'traffic' | 'classified';
-3: 
+3:
 4: export interface SensorReading {
 5:   distance: number;
 6:   type: ObstacleType;
@@ -3559,6 +3570,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/brain/carBrainAdapter.ts",
@@ -3568,6 +3580,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/brain/carBrainAdapter.ts</path>
 <type>file</type>
@@ -3579,30 +3592,30 @@ Let me trace through the full data model for each mode so the picture is crystal
 5:   SensorReading,
 6:   Sophistication,
 7: } from '../sensors/sensorReading.js';
-8: 
+8:
 9: export type Brain = unknown;
-10: 
+10:
 11: export interface BrainControlOutput {
 12:   forward: boolean;
 13:   left: boolean;
 14:   right: boolean;
 15:   reverse: boolean;
 16: }
-17: 
+17:
 18: export class CarBrainAdapter {
 19:   static createBrain(layerCounts: number[]): Brain {
 20:     return new NeuralNetwork(layerCounts);
 21:   }
-22: 
+22:
 23:   static serialize(brain: Brain): unknown {
 24:     return NeuralNetwork.clone(brain as NeuralNetwork);
 25:   }
-26: 
+26:
 27:   static deserialize(data: unknown): Brain | undefined {
 28:     if (!data) return undefined;
 29:     return NeuralNetwork.deserialize(data);
 30:   }
-31: 
+31:
 32:   /**
 33:    * Size of the neural-network input layer for a given sensor configuration.
 34:    * Traffic-aware cars interleave a traffic-state reading next to each ray's
@@ -3623,7 +3636,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 49:         return rayCount + 1;
 50:     }
 51:   }
-52: 
+52:
 53:   static computeControls(
 54:     readings: (IntersectionPoint | null)[],
 55:     speed: number,
@@ -3634,7 +3647,7 @@ Let me trace through the full data model for each mode so the picture is crystal
 60:     classifiedReadings?: (SensorReading | null)[],
 61:   ): BrainControlOutput {
 62:     let offsets: number[];
-63: 
+63:
 64:     if (sophistication === 'classified' && classifiedReadings) {
 65:       offsets = new Array(classifiedReadings.length * 5 + 1);
 66:       for (let i = 0; i < classifiedReadings.length; i++) {
@@ -3661,9 +3674,9 @@ Let me trace through the full data model for each mode so the picture is crystal
 87:         .map((s) => (s === null ? 0 : 1 - s.offset))
 88:         .concat([speed / maxSpeed]);
 89:     }
-90: 
+90:
 91:     const outputs = NeuralNetwork.feedForward(offsets, brain as NeuralNetwork);
-92: 
+92:
 93:     return {
 94:       forward: !!outputs[0],
 95:       left: !!outputs[1],
@@ -3687,13 +3700,10 @@ Now I have all the data. Let me trace through the complete picture for each mode
 
 Let me also check `computeControls` in `car.ts` to see how it calls `CarBrainAdapter.computeControls` with the right arguments.
 
-
-
-
-
 **Tool: grep**
 
 **Input:**
+
 ```json
 {
   "include": "ts/car/car.ts",
@@ -3702,6 +3712,7 @@ Let me also check `computeControls` in `car.ts` to see how it calls `CarBrainAda
 ```
 
 **Output:**
+
 ```
 Found 4 matches
 /Users/alex/Code/Self-driving-car/ts/car/car.ts:
@@ -3718,6 +3729,7 @@ Found 4 matches
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/physics/sensorRaycaster.ts",
@@ -3727,6 +3739,7 @@ Found 4 matches
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/physics/sensorRaycaster.ts</path>
 <type>file</type>
@@ -3739,18 +3752,18 @@ Found 4 matches
 35:         ) +
 36:         carAngle +
 37:         rayOffset;
-38: 
+38:
 39:       const start: Point = { x: carX, y: carY } as Point;
 40:       const end: Point = {
 41:         x: carX - Math.sin(rayAngle) * rayLength,
 42:         y: carY - Math.cos(rayAngle) * rayLength,
 43:       } as Point;
-44: 
+44:
 45:       rays.push([start, end]);
 46:     }
 47:     return rays;
 48:   }
-49: 
+49:
 50:   static getReadings(
 51:     rays: Point[][],
 52:     polygons: Point[][],
@@ -3761,7 +3774,7 @@ Found 4 matches
 57:     }
 58:     return readings;
 59:   }
-60: 
+60:
 61:   static getReading(
 62:     ray: Point[],
 63:     polygons: Point[][],
@@ -3780,7 +3793,7 @@ Found 4 matches
 76:       offset: minOffset,
 77:     } as IntersectionPoint;
 78:   }
-79: 
+79:
 80:   static getTaggedReadings(
 81:     rays: Point[][],
 82:     borders: Point[][],
@@ -3790,7 +3803,7 @@ Found 4 matches
 86:     return rays.map((ray) => {
 87:       let minOffset = Infinity;
 88:       let minHit: TaggedHit | null = null;
-89: 
+89:
 90:       for (let i = 0; i < borders.length; i++) {
 91:         const offset = this.#nearestEdgeOffset(ray, borders[i]);
 92:         if (offset !== null && offset < minOffset) {
@@ -3803,7 +3816,7 @@ Found 4 matches
 99:           };
 100:         }
 101:       }
-102: 
+102:
 103:       for (let i = 0; i < carPolys.length; i++) {
 104:         const offset = this.#nearestEdgeOffset(ray, carPolys[i].polygon);
 105:         if (offset !== null && offset < minOffset) {
@@ -3817,7 +3830,7 @@ Found 4 matches
 113:           };
 114:         }
 115:       }
-116: 
+116:
 117:       for (let i = 0; i < controls.length; i++) {
 118:         const offset = this.#nearestEdgeOffset(ray, controls[i].polygon);
 119:         if (offset !== null && offset < minOffset) {
@@ -3834,15 +3847,10 @@ _Thinking:_
 
 Now let me also read the `computeControls` section in car.ts to see how the brain is called.
 
-
-
-
-
-
-
 **Tool: read**
 
 **Input:**
+
 ```json
 {
   "filePath": "/Users/alex/Code/Self-driving-car/ts/car/car.ts",
@@ -3852,6 +3860,7 @@ Now let me also read the `computeControls` section in car.ts to see how the brai
 ```
 
 **Output:**
+
 ```
 <path>/Users/alex/Code/Self-driving-car/ts/car/car.ts</path>
 <type>file</type>
@@ -3910,10 +3919,10 @@ Now let me also read the `computeControls` section in car.ts to see how the brai
 311:         this.maxSpeed,
 312:       );
 313:     }
-314: 
+314:
 315:     this.#syncEngine();
 316:   }
-317: 
+317:
 318:   #syncEngine(): void {
 319:     if (!this.#callbacks?.onEngineUpdate) return;
 
@@ -3934,6 +3943,7 @@ Here's the comprehensive picture:
 ## Ray/Rendering/Data Model per Sophistication Mode
 
 ### Sensor has 6 data arrays:
+
 - `this.rays` - ray segments (start→end points), always populated
 - `this.readings` - (IntersectionPoint | null)[] — border hits
 - `this.trafficReadings` - (TrafficReading | null)[] — traffic light hits
@@ -3942,12 +3952,14 @@ Here's the comprehensive picture:
 ### `Sensor.update()` populates differently per mode:
 
 #### basic
+
 - `this.rays = castRays()`
 - `this.readings = getReadings(rays, borders)` ← border hits
 - `this.trafficReadings = [null,...]` ← zeroed
 - `this.classifiedReadings = [null,...]` ← zeroed
 
 #### traffic
+
 - `this.rays = castRays()`
 - `this.readings = getReadings(rays, borders)` ← border hits (independent!)
 - `this.trafficReadings = getTrafficReadings(rays, readings, controls)` ← traffic hits (independent!)
@@ -3956,6 +3968,7 @@ Here's the comprehensive picture:
 Key: **readings and trafficReadings are COMPLETELY INDEPENDENT** — `readings[i]` always finds the closest border, regardless of whether a traffic light is in front of or behind it.
 
 #### classified (current - BROKEN)
+
 - `this.rays = castRays()`
 - `this.readings = [null,...]` ← **ZEROED** (border info thrown away!)
 - `this.trafficReadings = [null,...]` ← zeroed
@@ -3964,6 +3977,7 @@ Key: **readings and trafficReadings are COMPLETELY INDEPENDENT** — `readings[i
 The `getTaggedReadings` scans borders, then cars, then controls — all competing for `minOffset`. Only the closest hit wins per ray. If a traffic light is at offset 0.3 and a wall is at offset 0.8, only the traffic light hit is stored. The wall is lost.
 
 #### classified (after fix)
+
 - `this.rays = castRays()`
 - `this.readings = getReadings(rays, borders)` ← **KEPT** (border hits, same as basic/traffic!)
 - `this.trafficReadings = [null,...]` ← still zeroed (not needed)
@@ -3984,10 +3998,12 @@ The classified brain input reads from `this.classifiedReadings` only — which i
 #### `#drawClassified` — visual superset of `#drawTraffic`:
 
 For each ray `i`:
+
 1. `classifiedHit = this.classifiedReadings[i]` — the closest obstacle (any type)
 2. `borderHit = this.readings[i]` — the closest wall (always available now)
 
 **If `classifiedHit` is `trafficControl`:**
+
 - Draw colored ray (green/yellow/red) from car → traffic light position
 - Draw colored dot (r=4) with white border at traffic light
 - **If `borderHit` exists AND `borderHit.offset > classifiedHit.distance`:**
@@ -3996,6 +4012,7 @@ For each ray `i`:
   - _(Same as traffic mode's `#drawTraffic` lines 291-303)_
 
 **If `classifiedHit` is `car`:**
+
 - Draw red ray from car → car hit position
 - Draw red dot (r=3) at car hit
 - **If `borderHit` exists AND `borderHit.offset > classifiedHit.distance`:**
@@ -4003,15 +4020,18 @@ For each ray `i`:
   - Draw yellow dot (r=3) at wall
 
 **If `classifiedHit` is `border`:**
+
 - Draw yellow ray from car → wall hit
 - Draw yellow dot (r=3) at wall
 
 **If `classifiedHit` is `none` or null:**
+
 - Draw faint yellow full-length ray
 
 ### Does this affect the traffic light data for the brain?
 
 **No.** The brain input (`classifiedReadings`) is completely unchanged:
+
 - It still reports the closest obstacle only (one per ray)
 - `isControl` is still 1 when the closest hit is a traffic light
 - `controlState` still encodes the light state
@@ -4021,11 +4041,11 @@ The only change is that `this.readings` (border hits) is **no longer zeroed** fo
 
 ### Summary table
 
-| Mode | readings (border) | trafficReadings | classifiedReadings | Brain uses | Draw uses |
-|------|------------------|-----------------|-------------------|------------|-----------|
-| basic | getReadings(borders) | zeroed | zeroed | readings | readings |
-| traffic | getReadings(borders) | getTrafficReadings(...) | zeroed | readings + trafficReadings | readings + trafficReadings |
-| classified (**after fix**) | **getReadings(borders)** ← was zeroed | zeroed | getClassifiedReadings(...) | **classifiedReadings only** (unchanged) | classifiedReadings **+ readings** |
+| Mode                       | readings (border)                     | trafficReadings         | classifiedReadings         | Brain uses                              | Draw uses                         |
+| -------------------------- | ------------------------------------- | ----------------------- | -------------------------- | --------------------------------------- | --------------------------------- |
+| basic                      | getReadings(borders)                  | zeroed                  | zeroed                     | readings                                | readings                          |
+| traffic                    | getReadings(borders)                  | getTrafficReadings(...) | zeroed                     | readings + trafficReadings              | readings + trafficReadings        |
+| classified (**after fix**) | **getReadings(borders)** ← was zeroed | zeroed                  | getClassifiedReadings(...) | **classifiedReadings only** (unchanged) | classifiedReadings **+ readings** |
 
 The key insight: `this.readings` was always populated for basic and traffic modes. It was only blanked for classified mode — we're just restoring it. The brain input path and traffic light data are untouched.
 
@@ -4033,16 +4053,17 @@ Here's the full picture.
 
 ## Data arrays on `Sensor`
 
-| Field | Type | Purpose |
-|-------|------|---------|
-| `this.rays` | `Point[][]` | Ray segments (car → max range), always populated |
-| `this.readings` | `(IntersectionPoint \| null)[]` | Closest **border/wall** hit per ray |
-| `this.trafficReadings` | `(TrafficReading \| null)[]` | Closest **traffic light** hit per ray (closer than border) |
-| `this.classifiedReadings` | `(SensorReading \| null)[]` | Closest **any-type** hit per ray with type tag + metadata |
+| Field                     | Type                            | Purpose                                                    |
+| ------------------------- | ------------------------------- | ---------------------------------------------------------- |
+| `this.rays`               | `Point[][]`                     | Ray segments (car → max range), always populated           |
+| `this.readings`           | `(IntersectionPoint \| null)[]` | Closest **border/wall** hit per ray                        |
+| `this.trafficReadings`    | `(TrafficReading \| null)[]`    | Closest **traffic light** hit per ray (closer than border) |
+| `this.classifiedReadings` | `(SensorReading \| null)[]`     | Closest **any-type** hit per ray with type tag + metadata  |
 
 ## What `Sensor.update()` populates — per mode
 
 ### `basic`
+
 ```
 rays:             ✅ castRays()
 readings:         ✅ getReadings(rays, borders)     ← closest wall
@@ -4051,6 +4072,7 @@ classifiedReadings: ❌ all null
 ```
 
 ### `traffic`
+
 ```
 rays:             ✅ castRays()
 readings:         ✅ getReadings(rays, borders)     ← closest wall (independent!)
@@ -4061,6 +4083,7 @@ classifiedReadings: ❌ all null
 `readings` and `trafficReadings` are **completely independent** — `readings[i]` always finds the closest wall regardless of whether a traffic light sits in front of it. This is why drawing can show both: colored ray to the light, then yellow continuation to the wall, then wall dot.
 
 ### `classified` — **current (broken)**
+
 ```
 rays:             ✅ castRays()
 readings:         ❌ all null                       ← WALL DATA THROWN AWAY
@@ -4071,6 +4094,7 @@ classifiedReadings: ✅ #getClassifiedReadings(...)  ← single closest hit wins
 `getTaggedReadings` sweeps borders, cars, and controls all competing for one `minOffset`. If a traffic light is at offset 0.3 and a wall at offset 0.8, **only the light survives**. The wall is lost.
 
 ### `classified` — **after fix**
+
 ```
 rays:             ✅ castRays()
 readings:         ✅ getReadings(rays, borders)     ← RESTORED (same as basic/traffic!)
@@ -4093,21 +4117,23 @@ The brain never sees `this.readings` when in classified mode (see `car.ts:270-28
 ## Drawing after fix — `#drawClassified` as superset of `#drawTraffic`
 
 For each ray `i`:
+
 - `classifiedHit = this.classifiedReadings[i]` — closest obstacle of any type
 - `borderHit = this.readings[i]` — closest wall (now available!)
 
-| classifiedHit.type | Ray drawn | Dot drawn | Continuation to wall | Wall dot |
-|---|---|---|---|---|
-| `trafficControl` | Colored (G/Y/R) car→light | Colored r=4 + white border | Yellow ray light→wall | Yellow r=3 |
-| `car` | Red car→car hit | Red r=3 | Yellow ray car hit→wall | Yellow r=3 |
-| `border` | Yellow car→wall | Yellow r=3 | — | — |
-| `none` | Faint yellow full-length | — | — | — |
+| classifiedHit.type | Ray drawn                 | Dot drawn                  | Continuation to wall    | Wall dot   |
+| ------------------ | ------------------------- | -------------------------- | ----------------------- | ---------- |
+| `trafficControl`   | Colored (G/Y/R) car→light | Colored r=4 + white border | Yellow ray light→wall   | Yellow r=3 |
+| `car`              | Red car→car hit           | Red r=3                    | Yellow ray car hit→wall | Yellow r=3 |
+| `border`           | Yellow car→wall           | Yellow r=3                 | —                       | —          |
+| `none`             | Faint yellow full-length  | —                          | —                       | —          |
 
 The continuation+border-dot only triggers when `borderHit.offset > classifiedHit.distance` (there's a wall behind the obstacle).
 
 ## Does this affect the special traffic light data?
 
 **No.** The traffic light brain data path is untouched:
+
 - `classifiedReadings[i].type === 'trafficControl'` — unchanged
 - `classifiedReadings[i].controlState` — unchanged
 - `computeControls` reads from `classifiedReadings`, not `readings`
@@ -4129,4 +4155,3 @@ ask me if you think i do not good and after we accept the idia make detaild plan
 ## Assistant (Plan · DeepSeek V4 Pro · 159.8s)
 
 ---
-

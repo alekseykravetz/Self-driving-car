@@ -53,7 +53,7 @@ export class Car {
         if (opts.controlType !== 'DUMMY') {
             this.sensor = new Sensor(opts.sensor);
             this.brain = CarBrainAdapter.createBrain([
-                CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.sophistication),
+                CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.stateAware),
                 ...this.hiddenLayers,
                 4,
             ]);
@@ -73,11 +73,21 @@ export class Car {
     }
     load(info) {
         if (info.brain) {
-            this.brain = CarBrainAdapter.deserialize(info.brain);
+            try {
+                const deserialized = CarBrainAdapter.deserialize(info.brain);
+                if (deserialized) {
+                    this.brain = deserialized;
+                }
+            }
+            catch {
+                // Fall through — keep existing brain or create fresh below
+            }
         }
         if (info.hiddenLayers) {
             this.hiddenLayers = [...info.hiddenLayers];
         }
+        const dimsChanged = (info.width && info.width !== this.width) ||
+            (info.height && info.height !== this.height);
         this.maxSpeed = info.maxSpeed;
         this.friction = info.friction;
         this.acceleration = info.acceleration;
@@ -85,25 +95,18 @@ export class Car {
             this.width = info.width;
         if (info.height)
             this.height = info.height;
+        if (dimsChanged) {
+            this.polygon = this.physics.createPolygon(this);
+        }
         if (this.sensor) {
             this.sensor.rayCount = info.sensor.rayCount;
             this.sensor.raySpread = info.sensor.raySpread;
             this.sensor.rayLength = info.sensor.rayLength;
             this.sensor.rayOffset = info.sensor.rayOffset;
-            // Migrate trafficAwareness → sophistication
-            if (info.sensor.trafficAwareness === true &&
-                !info.sensor.sophistication) {
-                this.sensor.sophistication = 'traffic';
-            }
-            else {
-                this.sensor.sophistication = info.sensor.sophistication ?? 'basic';
-            }
-            // If no brain was supplied but the sensor topology changed (e.g. a
-            // .car file with trafficAwareness:true and no brain), rebuild the
-            // brain so its input layer matches the sensor.
+            this.sensor.stateAware = info.sensor.stateAware ?? false;
             if (!info.brain && this.useBrain) {
                 this.brain = CarBrainAdapter.createBrain([
-                    CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.sophistication),
+                    CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.stateAware),
                     ...this.hiddenLayers,
                     4,
                 ]);
@@ -124,7 +127,7 @@ export class Car {
                 raySpread: this.sensor?.raySpread ?? DEFAULT_CAR_CONFIG.sensor.raySpread,
                 rayLength: this.sensor?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength,
                 rayOffset: this.sensor?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset,
-                sophistication: this.sensor?.sophistication ?? 'basic',
+                stateAware: this.sensor?.stateAware ?? false,
             },
         };
     }
@@ -153,37 +156,26 @@ export class Car {
     }
     update(polygons = [], trafficControls, otherCars) {
         this.#applySteering();
-        // Physics needs all polygons (road borders + other cars for collision).
-        const collisionPolygons = otherCars && otherCars.length > 0
-            ? polygons.concat(otherCars.map((c) => c.polygon))
-            : polygons;
+        const collisionPolygons = otherCars && otherCars.length > 0 ? polygons.concat(otherCars) : polygons;
         const becameDamaged = this.physics.update(this, this.#computeControlsState(), collisionPolygons);
         if (becameDamaged) {
             this.#callbacks?.onDamaged?.();
         }
         if (this.sensor && this.brain) {
-            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars, this.speed, this.maxSpeed);
+            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
             if (this.useBrain && this.controls instanceof Controls) {
-                const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sophistication !== 'basic'
-                    ? this.sensor.trafficReadings
-                    : undefined, this.sensor.sophistication, this.sensor.sophistication === 'classified'
-                    ? this.sensor.classifiedReadings
-                    : undefined);
+                const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
                 this.controls.forward = output.forward;
                 this.controls.left = output.left;
                 this.controls.right = output.right;
                 this.controls.reverse = output.reverse;
             }
             else {
-                CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sophistication !== 'basic'
-                    ? this.sensor.trafficReadings
-                    : undefined, this.sensor.sophistication, this.sensor.sophistication === 'classified'
-                    ? this.sensor.classifiedReadings
-                    : undefined);
+                CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
             }
         }
         else if (this.sensor) {
-            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars, this.speed, this.maxSpeed);
+            this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
         }
         this.#syncEngine();
     }

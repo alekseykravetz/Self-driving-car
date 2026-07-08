@@ -51,7 +51,7 @@ export class TrainingPanelElement extends HTMLElement {
     #carRayLengthInput = null;
     #carRaySpreadInput = null;
     #carRayOffsetInput = null;
-    #carSophisticationSelect = null;
+    #carStateAwareCheck = null;
     #carHiddenLayersInput = null;
     #statGenEl = null;
     #statAliveEl = null;
@@ -137,7 +137,7 @@ export class TrainingPanelElement extends HTMLElement {
         this.#carRayLengthInput = this.querySelector('#carRayLength');
         this.#carRaySpreadInput = this.querySelector('#carRaySpread');
         this.#carRayOffsetInput = this.querySelector('#carRayOffset');
-        this.#carSophisticationSelect = this.querySelector('#carSophistication');
+        this.#carStateAwareCheck = this.querySelector('#carStateAware');
         this.#carHiddenLayersInput = this.querySelector('#carHiddenLayers');
         this.#statGenEl = this.querySelector('#stat-gen');
         this.#statAliveEl = this.querySelector('#stat-alive');
@@ -256,7 +256,7 @@ export class TrainingPanelElement extends HTMLElement {
             this.#carRaySpreadInput,
             this.#carRayOffsetInput,
             this.#carHiddenLayersInput,
-            this.#carSophisticationSelect,
+            this.#carStateAwareCheck,
         ];
         for (const input of carParamInputs) {
             if (input) {
@@ -297,7 +297,7 @@ export class TrainingPanelElement extends HTMLElement {
             ['📐', 'Ray Len', v(this.#carRayLengthInput)],
             ['🔦', 'Ray Spread', v(this.#carRaySpreadInput)],
             ['🎯', 'Ray Offset', v(this.#carRayOffsetInput)],
-            ['📡', 'Sensor', this.#carSophisticationSelect?.value ?? 'basic'],
+            ['🧠', 'State Aware', this.#carStateAwareCheck?.checked ? 'yes' : 'no'],
         ];
         this.#carConfigSummary.innerHTML = items
             .map(([emoji, label, value]) => `<span class="cfg-chip" title="${label}"><span class="cfg-chip-emoji">${emoji}</span><span class="cfg-chip-value">${value}</span></span>`)
@@ -328,7 +328,7 @@ export class TrainingPanelElement extends HTMLElement {
                 rayLength: this.#readNumericInput(this.#carRayLengthInput, 150, true),
                 raySpread: this.#readNumericInput(this.#carRaySpreadInput, Math.PI / 2),
                 rayOffset: this.#readNumericInput(this.#carRayOffsetInput, 0),
-                sophistication: this.#carSophisticationSelect?.value ?? 'basic',
+                stateAware: this.#carStateAwareCheck?.checked ?? false,
             },
         };
     }
@@ -370,10 +370,8 @@ export class TrainingPanelElement extends HTMLElement {
             this.#carRaySpreadInput.value = String(info.sensor.raySpread);
         if (this.#carRayOffsetInput)
             this.#carRayOffsetInput.value = String(info.sensor.rayOffset);
-        if (this.#carSophisticationSelect) {
-            this.#carSophisticationSelect.value =
-                info.sensor.sophistication ??
-                    (info.sensor.trafficAwareness ? 'traffic' : 'basic');
+        if (this.#carStateAwareCheck) {
+            this.#carStateAwareCheck.checked = info.sensor.stateAware ?? false;
         }
         this.#updateCarConfigSummary();
     }

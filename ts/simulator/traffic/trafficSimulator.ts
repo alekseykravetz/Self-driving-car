@@ -325,14 +325,12 @@ export class TrafficSimulator extends SimulatorShell {
       // Ghost wrecks: crashed cars stay frozen and invisible to everyone else.
       if (car.damaged) continue;
       const obstacles = this.#collectBorders(car, borderMode);
-      const otherCars =
-        car.sensor?.sophistication === 'classified'
-          ? this.#collectCarObstacles(car)
-          : [];
-      const trafficControls: SensorTrafficControl[] =
-        car.sensor?.sophistication !== 'basic'
-          ? queryTrafficControlsNearCar(this.#trafficGrid, car)
-          : [];
+      const otherCars = car.sensor?.stateAware
+        ? this.#collectCarObstacles(car)
+        : [];
+      const trafficControls: SensorTrafficControl[] = car.sensor?.stateAware
+        ? queryTrafficControlsNearCar(this.#trafficGrid, car)
+        : [];
       car.update(obstacles, trafficControls, otherCars);
     }
 
@@ -359,7 +357,7 @@ export class TrafficSimulator extends SimulatorShell {
    * Other alive cars within sensor reach. Crashed cars are always excluded,
    * so traffic flows around wrecks.
    */
-  #collectCarObstacles(car: Car): { polygon: Point[]; speed: number }[] {
+  #collectCarObstacles(car: Car): Point[][] {
     const MIN_RANGE = 100;
     const rayLength = car.sensor?.rayLength ?? MIN_RANGE;
     const reach = Math.max(rayLength, MIN_RANGE);
@@ -367,14 +365,14 @@ export class TrafficSimulator extends SimulatorShell {
     const reachWithBody = reach + bodyMargin;
     const reachWithBodySq = reachWithBody * reachWithBody;
 
-    const result: { polygon: Point[]; speed: number }[] = [];
+    const result: Point[][] = [];
     for (let j = 0; j < this.#cars.length; j++) {
       const other = this.#cars[j];
       if (other === car || other.damaged) continue;
       const dx = other.x - car.x;
       const dy = other.y - car.y;
       if (dx * dx + dy * dy <= reachWithBodySq) {
-        result.push({ polygon: other.polygon, speed: other.speed });
+        result.push(other.polygon);
       }
     }
     return result;

@@ -1,7 +1,6 @@
 import { TRAINING_INIT_MODAL_TEMPLATE } from './templates/trainingInitModalTemplate.js';
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
-import type { Sophistication } from '../../car/sensors/sensorReading.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
 import { safeJsonParse } from '../../store/serialization.js';
@@ -136,13 +135,9 @@ export class TrainingInitModalElement extends HTMLElement {
     this.#setValue('#tiCarRayLength', c.sensor.rayLength);
     this.#setValue('#tiCarRaySpread', c.sensor.raySpread);
     this.#setValue('#tiCarRayOffset', c.sensor.rayOffset);
-    const sophSelect = this.querySelector<HTMLSelectElement>(
-      '#tiCarSophistication',
-    );
-    if (sophSelect) {
-      sophSelect.value =
-        c.sensor.sophistication ??
-        (c.sensor.trafficAwareness ? 'traffic' : 'basic');
+    const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
+    if (saCheck) {
+      saCheck.checked = c.sensor.stateAware ?? false;
     }
   }
 
@@ -252,6 +247,8 @@ export class TrainingInitModalElement extends HTMLElement {
         input.disabled = locked;
       },
     );
+    const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
+    if (saCheck) saCheck.disabled = locked;
   }
 
   // ── Result ───────────────────────────────────────────
@@ -306,9 +303,9 @@ export class TrainingInitModalElement extends HTMLElement {
         rayLength: this.#num('#tiCarRayLength', 150, true),
         raySpread: this.#num('#tiCarRaySpread', Math.PI / 2),
         rayOffset: this.#num('#tiCarRayOffset', 0),
-        sophistication:
-          (this.querySelector<HTMLSelectElement>('#tiCarSophistication')
-            ?.value as Sophistication) ?? 'basic',
+        stateAware:
+          this.querySelector<HTMLInputElement>('#tiCarStateAware')?.checked ??
+          false,
       },
     };
   }
@@ -320,8 +317,6 @@ export class TrainingInitModalElement extends HTMLElement {
       .filter((n) => !isNaN(n) && n > 0);
     return parts.length > 0 ? parts : [6];
   }
-
-  // ── Small DOM helpers ────────────────────────────────
 
   #setValue(selector: string, value: string | number): void {
     const el = this.querySelector<HTMLInputElement>(selector);

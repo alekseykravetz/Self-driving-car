@@ -55,7 +55,7 @@ export class SensorRaycaster {
                 }
             }
             for (let i = 0; i < carPolys.length; i++) {
-                const offset = this.#nearestEdgeOffset(ray, carPolys[i].polygon);
+                const offset = this.#nearestEdgeOffset(ray, carPolys[i]);
                 if (offset !== null && offset < minOffset) {
                     minOffset = offset;
                     minHit = {
@@ -63,7 +63,6 @@ export class SensorRaycaster {
                         x: lerp(ray[0].x, ray[1].x, offset),
                         y: lerp(ray[0].y, ray[1].y, offset),
                         type: 'car',
-                        carSpeed: carPolys[i].speed,
                     };
                 }
             }

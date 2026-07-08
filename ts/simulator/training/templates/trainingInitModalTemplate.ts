@@ -107,12 +107,8 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
           <input type="number" id="tiCarRayOffset" min="-3.14" max="3.14" step="0.1" />
         </div>
         <div class="ctrl">
-          <span class="ctrl-label">Sophistication</span>
-          <select id="tiCarSophistication">
-            <option value="basic">Basic</option>
-            <option value="traffic">Traffic</option>
-            <option value="classified">Classified</option>
-          </select>
+          <span class="ctrl-label">State Aware</span>
+          <input type="checkbox" id="tiCarStateAware" />
         </div>
       </div>
     </div>

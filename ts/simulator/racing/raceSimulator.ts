@@ -285,10 +285,9 @@ export class RaceSimulator extends SimulatorShell {
         if (borderMode !== 'none' && this.#roadBorders) {
           obstacles = queryBordersNearCar(this.#borderGrid, car);
         }
-        const trafficControls: SensorTrafficControl[] =
-          car.sensor?.sophistication !== 'basic'
-            ? queryTrafficControlsNearCar(this.#trafficGrid, car)
-            : [];
+        const trafficControls: SensorTrafficControl[] = car.sensor?.stateAware
+          ? queryTrafficControlsNearCar(this.#trafficGrid, car)
+          : [];
         car.update(obstacles, trafficControls, []);
       }
     }

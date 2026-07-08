@@ -83,11 +83,9 @@ export class TrainingInitModalElement extends HTMLElement {
         this.#setValue('#tiCarRayLength', c.sensor.rayLength);
         this.#setValue('#tiCarRaySpread', c.sensor.raySpread);
         this.#setValue('#tiCarRayOffset', c.sensor.rayOffset);
-        const sophSelect = this.querySelector('#tiCarSophistication');
-        if (sophSelect) {
-            sophSelect.value =
-                c.sensor.sophistication ??
-                    (c.sensor.trafficAwareness ? 'traffic' : 'basic');
+        const saCheck = this.querySelector('#tiCarStateAware');
+        if (saCheck) {
+            saCheck.checked = c.sensor.stateAware ?? false;
         }
     }
     /** Re-read the available brain sources and enable/disable the radios. */
@@ -183,6 +181,9 @@ export class TrainingInitModalElement extends HTMLElement {
         this.querySelectorAll('#tiCarConfigGrid input').forEach((input) => {
             input.disabled = locked;
         });
+        const saCheck = this.querySelector('#tiCarStateAware');
+        if (saCheck)
+            saCheck.disabled = locked;
     }
     // ── Result ───────────────────────────────────────────
     #start() {
@@ -224,8 +225,8 @@ export class TrainingInitModalElement extends HTMLElement {
                 rayLength: this.#num('#tiCarRayLength', 150, true),
                 raySpread: this.#num('#tiCarRaySpread', Math.PI / 2),
                 rayOffset: this.#num('#tiCarRayOffset', 0),
-                sophistication: this.querySelector('#tiCarSophistication')
-                    ?.value ?? 'basic',
+                stateAware: this.querySelector('#tiCarStateAware')?.checked ??
+                    false,
             },
         };
     }
@@ -236,7 +237,6 @@ export class TrainingInitModalElement extends HTMLElement {
             .filter((n) => !isNaN(n) && n > 0);
         return parts.length > 0 ? parts : [6];
     }
-    // ── Small DOM helpers ────────────────────────────────
     #setValue(selector, value) {
         const el = this.querySelector(selector);
         if (el)

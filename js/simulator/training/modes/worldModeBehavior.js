@@ -35,7 +35,7 @@ export function updateWorldCars(cars, borderGrid, trafficGrid, borderMode, colli
         if (borderMode !== 'none') {
             bordersForUpdate = queryBordersNearCar(borderGrid, car);
         }
-        const trafficControls = car.sensor?.sophistication !== 'basic'
+        const trafficControls = car.sensor?.stateAware
             ? queryTrafficControlsNearCar(trafficGrid, car)
             : [];
         car.update(bordersForUpdate, trafficControls, []);
