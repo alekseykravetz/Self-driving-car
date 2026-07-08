@@ -196,22 +196,7 @@ export class Sensor {
                 ctx.arc(sr.x, sr.y, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
             }
-            // Continuation ray + wall dot: only for car hits, not traffic lights
-            // (the brain uses the light's distance — the wall behind is irrelevant).
-            if (sr.type === 'car' &&
-                borderHit &&
-                borderHit.offset - sr.distance > 0.01) {
-                ctx.beginPath();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = 'yellow';
-                ctx.moveTo(sr.x, sr.y);
-                ctx.lineTo(borderHit.x, borderHit.y);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.fillStyle = 'yellow';
-                ctx.arc(borderHit.x, borderHit.y, 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            // No continuation ray — the brain only sees the nearest obstacle.
         }
     }
 }
