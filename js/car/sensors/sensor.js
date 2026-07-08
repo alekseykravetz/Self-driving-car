@@ -196,8 +196,11 @@ export class Sensor {
                 ctx.arc(sr.x, sr.y, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
             }
-            // Continuation to wall when a non-border hit has a wall behind it
-            if (sr.type !== 'border' && borderHit && borderHit.offset > sr.distance) {
+            // Continuation ray + wall dot: only for car hits, not traffic lights
+            // (the brain uses the light's distance — the wall behind is irrelevant).
+            if (sr.type === 'car' &&
+                borderHit &&
+                borderHit.offset - sr.distance > 0.01) {
                 ctx.beginPath();
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = 'yellow';
