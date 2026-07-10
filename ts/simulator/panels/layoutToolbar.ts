@@ -4,6 +4,9 @@ export type LayoutMode = 'topview-big' | 'camera-big';
 
 export class LayoutToolbarElement extends HTMLElement {
   #_layoutMode: LayoutMode = 'topview-big';
+  #_showCameraView: boolean = true;
+  #_showVisualizer: boolean = true;
+  #_showMiniMap: boolean = true;
 
   #onLayoutModeChange: ((mode: LayoutMode) => void) | null = null;
   #onPanelToggle: (() => void) | null = null;
@@ -17,6 +20,7 @@ export class LayoutToolbarElement extends HTMLElement {
     this.innerHTML = LayoutToolbarElement.template;
     this.#initLayoutButtons();
     this.#initPanelToggles();
+    this.#syncCachedFromDOM();
   }
 
   get layoutMode(): LayoutMode {
@@ -24,22 +28,15 @@ export class LayoutToolbarElement extends HTMLElement {
   }
 
   get showCameraView(): boolean {
-    const el = this.querySelector(
-      '#showCameraView',
-    ) as HTMLButtonElement | null;
-    return el ? el.classList.contains('active') : true;
+    return this.#_showCameraView;
   }
 
   get showVisualizer(): boolean {
-    const el = this.querySelector(
-      '#showVisualizer',
-    ) as HTMLButtonElement | null;
-    return el ? el.classList.contains('active') : true;
+    return this.#_showVisualizer;
   }
 
   get showMiniMap(): boolean {
-    const el = this.querySelector('#showMiniMap') as HTMLButtonElement | null;
-    return el ? el.classList.contains('active') : true;
+    return this.#_showMiniMap;
   }
 
   setLayoutModeListener(listener: (mode: LayoutMode) => void): void {
@@ -50,11 +47,37 @@ export class LayoutToolbarElement extends HTMLElement {
     this.#onPanelToggle = listener;
   }
 
+  #syncCachedFromDOM(): void {
+    const cv = this.querySelector(
+      '#showCameraView',
+    ) as HTMLButtonElement | null;
+    this.#_showCameraView = cv ? cv.classList.contains('active') : true;
+    const vis = this.querySelector(
+      '#showVisualizer',
+    ) as HTMLButtonElement | null;
+    this.#_showVisualizer = vis ? vis.classList.contains('active') : true;
+    const mm = this.querySelector('#showMiniMap') as HTMLButtonElement | null;
+    this.#_showMiniMap = mm ? mm.classList.contains('active') : true;
+  }
+
+  /** Update cached state from a button's classList. */
+  #updateToggleCache(btn: HTMLButtonElement): void {
+    switch (btn.id) {
+      case 'showCameraView':
+        this.#_showCameraView = btn.classList.contains('active');
+        break;
+      case 'showVisualizer':
+        this.#_showVisualizer = btn.classList.contains('active');
+        break;
+      case 'showMiniMap':
+        this.#_showMiniMap = btn.classList.contains('active');
+        break;
+    }
+  }
+
   /**
    * Mobile defaults: uncheck the 3D view, network visualizer and mini-map so
-   * only the top-down view is rendered on small screens. The layout-toolbar
-   * panel itself is hidden via CSS; this clears the toggle state the layout
-   * reads each frame.
+   * only the top-down view is rendered on small screens.
    */
   applyMobileDefaults(): void {
     const cameraView = this.querySelector(
@@ -69,6 +92,7 @@ export class LayoutToolbarElement extends HTMLElement {
       '#showMiniMap',
     ) as HTMLButtonElement | null;
     if (miniMap) miniMap.classList.remove('active');
+    this.#syncCachedFromDOM();
   }
 
   setDefaultLayoutMode(mode: LayoutMode): void {
@@ -115,6 +139,7 @@ export class LayoutToolbarElement extends HTMLElement {
       btn.addEventListener('click', () => {
         if (btn.disabled) return;
         btn.classList.toggle('active');
+        this.#updateToggleCache(btn);
         if (this.#onPanelToggle) this.#onPanelToggle();
       });
     });

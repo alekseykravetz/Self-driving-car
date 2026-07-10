@@ -20,6 +20,8 @@ export class AnimationLoopToolbarElement extends HTMLElement {
   #lastFpsUpdate: number = 0;
   #currentFps: number = 0;
 
+  #cachedRenderInterval: number = 1;
+
   constructor() {
     super();
     this.id = 'animationLoopToolbar';
@@ -39,6 +41,16 @@ export class AnimationLoopToolbarElement extends HTMLElement {
 
     this.#updateTimeDisplay();
     this.#updateFpsDisplay();
+
+    const intervalInput = this.querySelector(
+      '#renderInterval',
+    ) as HTMLInputElement | null;
+    if (intervalInput) {
+      this.#cachedRenderInterval = this.#clampInterval(intervalInput.value);
+      intervalInput.addEventListener('change', () => {
+        this.#cachedRenderInterval = this.#clampInterval(intervalInput.value);
+      });
+    }
   }
 
   /** Whether the simulation step is currently paused. */
@@ -52,10 +64,12 @@ export class AnimationLoopToolbarElement extends HTMLElement {
    * Clamped to [1, 10]; 1 = draw every frame.
    */
   get renderInterval(): number {
-    const el = this.querySelector('#renderInterval') as HTMLInputElement | null;
-    const value = el ? Math.round(Number(el.value)) : 1;
-    if (!Number.isFinite(value)) return 1;
-    return Math.min(10, Math.max(1, value));
+    return this.#cachedRenderInterval;
+  }
+
+  #clampInterval(value: string): number {
+    const v = Math.round(Number(value));
+    return Number.isFinite(v) ? Math.min(10, Math.max(1, v)) : 1;
   }
 
   /** Record one animation frame. Called by SimulatorShell.animate(). */

@@ -56,6 +56,18 @@ export class TrainingPanelElement extends HTMLElement {
 
   #onCarsCreatedCallback: (cars: Car[]) => void = () => {};
 
+  // Cached values to avoid unnecessary DOM writes per frame.
+  #cachedIteration: number = -1;
+  #cachedAlive: number = -1;
+  #cachedDead: number = -1;
+  #cachedFrozen: number = -1;
+  #cachedMaxDist: number = -1;
+  #cachedBestSpeed: number = -1;
+
+  // Cache for localStorage pool read (invalidated on save/discard).
+  #cachedStoredPool: CarInfo[] | null = null;
+  #cachedStoredPoolValid: boolean = false;
+
   // Optional override for the "New Training" button. When set (by the training
   // simulator), the button opens the training-init modal instead of restarting
   // immediately. Falls back to newTraining() when unset.
@@ -545,6 +557,7 @@ export class TrainingPanelElement extends HTMLElement {
       downloadCarFiles(selectedCars);
     }
 
+    this.#cachedStoredPoolValid = false;
     // Reflect the new storage state immediately (the per-frame refresh is
     // throttled and is paused while training is paused).
     this.refreshPoolUI();
@@ -552,6 +565,7 @@ export class TrainingPanelElement extends HTMLElement {
 
   public discard(): void {
     discardStoredPool();
+    this.#cachedStoredPoolValid = false;
     this.refreshPoolUI();
   }
 
@@ -589,17 +603,31 @@ export class TrainingPanelElement extends HTMLElement {
     maxDist: number,
     bestCarSpeed: number = 0,
   ): void {
-    if (this.#statGenEl) this.#statGenEl.textContent = String(this.iteration);
-    if (this.#statAliveEl) this.#statAliveEl.textContent = String(alive);
-    if (this.#statDeadEl) this.#statDeadEl.textContent = String(dead);
-    if (this.#statFrozenEl) this.#statFrozenEl.textContent = String(frozen);
-    if (this.#statDistEl) {
-      this.#statDistEl.textContent = formatMetersFromWorldPixels(maxDist);
+    if (this.#statGenEl && this.#cachedIteration !== this.iteration) {
+      this.#statGenEl.textContent = String(this.iteration);
+      this.#cachedIteration = this.iteration;
     }
-    if (this.#statSpeedEl) {
+    if (this.#statAliveEl && this.#cachedAlive !== alive) {
+      this.#statAliveEl.textContent = String(alive);
+      this.#cachedAlive = alive;
+    }
+    if (this.#statDeadEl && this.#cachedDead !== dead) {
+      this.#statDeadEl.textContent = String(dead);
+      this.#cachedDead = dead;
+    }
+    if (this.#statFrozenEl && this.#cachedFrozen !== frozen) {
+      this.#statFrozenEl.textContent = String(frozen);
+      this.#cachedFrozen = frozen;
+    }
+    if (this.#statDistEl && this.#cachedMaxDist !== maxDist) {
+      this.#statDistEl.textContent = formatMetersFromWorldPixels(maxDist);
+      this.#cachedMaxDist = maxDist;
+    }
+    if (this.#statSpeedEl && this.#cachedBestSpeed !== bestCarSpeed) {
       this.#statSpeedEl.textContent = formatKmhFromPxPerFrame(
         Math.abs(bestCarSpeed),
       );
+      this.#cachedBestSpeed = bestCarSpeed;
     }
   }
 
@@ -680,8 +708,12 @@ export class TrainingPanelElement extends HTMLElement {
   }
 
   #updateStatusDots(): void {
-    const stored = localStorage.getItem('bestPool');
-    const storedPool: CarInfo[] | null = safeJsonParse<CarInfo[]>(stored);
+    if (!this.#cachedStoredPoolValid) {
+      const stored = localStorage.getItem('bestPool');
+      this.#cachedStoredPool = safeJsonParse<CarInfo[]>(stored);
+      this.#cachedStoredPoolValid = true;
+    }
+    const storedPool = this.#cachedStoredPool;
 
     if (this.#dotStorage) {
       const hasStorage = !!storedPool;

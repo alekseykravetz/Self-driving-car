@@ -11,59 +11,66 @@ export const LAYOUT_SMALL_VIEW_WIDTH = 300;
 const LAYOUT_MOBILE_MAX_WIDTH = 768;
 const LAYOUT_MOBILE_CONTROL_PANEL_WIDTH = 140;
 const LAYOUT_MOBILE_MIN_SMALL_VIEW_WIDTH = 90;
+let _cachedLayout = null;
 export function resizeSimulatorLayout(canvases, panelState, viewport) {
     const { gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas } = canvases;
     const { showCamera, showNetwork, showMiniMap, layoutMode } = panelState;
-    // Prefer the real flex layout box (#simulatorLayout) for the total width. Its
-    // clientWidth is the actual space the canvases + panels share, which avoids
-    // the window.innerWidth discrepancy seen on some phones (e.g. Galaxy S21
-    // Ultra) where innerWidth ignores the visual viewport and the rightmost panel
-    // gets clipped.
+    // ── Batch all layout reads first ──
     const layoutEl = document.getElementById('simulatorLayout');
     const viewportWidth = layoutEl?.clientWidth ||
         document.documentElement.clientWidth ||
         window.innerWidth;
-    const isMobile = viewportWidth <= LAYOUT_MOBILE_MAX_WIDTH;
-    // The control panel width is driven by CSS (and differs per breakpoint). Rather
-    // than trusting a hardcoded constant that can drift from what the browser
-    // actually renders, measure the live panel. Fall back to the constants when no
-    // panel element is present yet.
     const controlPanelEl = document.getElementById('trainingManagerPanel') ??
         document.getElementById('trafficStatsPanel');
     const measuredControlWidth = controlPanelEl?.getBoundingClientRect().width;
-    // Calculate used width by fixed panels
+    const innerH = window.innerHeight;
+    const isMobile = viewportWidth <= LAYOUT_MOBILE_MAX_WIDTH;
+    // ── Skip if nothing changed ──
+    const layout = {
+        viewportWidth,
+        controlPanelWidth: measuredControlWidth ?? 0,
+        innerHeight: innerH,
+        showCamera,
+        showNetwork,
+        showMiniMap,
+        layoutMode,
+    };
+    if (_cachedLayout &&
+        _cachedLayout.viewportWidth === layout.viewportWidth &&
+        _cachedLayout.controlPanelWidth === layout.controlPanelWidth &&
+        _cachedLayout.innerHeight === layout.innerHeight &&
+        _cachedLayout.showCamera === layout.showCamera &&
+        _cachedLayout.showNetwork === layout.showNetwork &&
+        _cachedLayout.showMiniMap === layout.showMiniMap &&
+        _cachedLayout.layoutMode === layout.layoutMode) {
+        return;
+    }
+    _cachedLayout = layout;
+    // ── Compute dimensions (no DOM reads) ──
     let usedWidth = measuredControlWidth && measuredControlWidth > 0
         ? Math.ceil(measuredControlWidth)
         : isMobile
             ? LAYOUT_MOBILE_CONTROL_PANEL_WIDTH
             : LAYOUT_CONTROL_PANEL_WIDTH;
-    // The mini-map floats as an overlay (instead of occupying the right panel)
-    // whenever the network visualizer is hidden. In that state it no longer
-    // consumes layout width, so the top-down/3D views can use the full space.
-    const floatingMiniMap = showMiniMap && !showNetwork;
-    // Network + minimap panel. Only the network visualizer reserves layout width;
-    // a floating mini-map is taken out of flow and costs nothing.
     const networkPanelWidth = showNetwork ? LAYOUT_NETWORK_PANEL_WIDTH : 0;
     usedWidth += networkPanelWidth;
-    // Right panel element visibility. Kept visible while a floating mini-map is
-    // shown so its canvas child still renders; the panel collapses to zero width
-    // because the floating canvas is positioned out of flow.
+    const availableWidth = Math.floor(viewportWidth - usedWidth);
+    // ── Batch all DOM writes ──
     const rightPanel = document.getElementById('rightPanel');
     if (rightPanel) {
         rightPanel.style.display = showNetwork || showMiniMap ? 'flex' : 'none';
     }
-    // Network canvas
     if (showNetwork) {
         networkCanvas.style.display = 'block';
         networkCanvas.width = LAYOUT_NETWORK_PANEL_WIDTH;
         networkCanvas.height = showMiniMap
-            ? window.innerHeight - LAYOUT_NETWORK_PANEL_WIDTH
-            : window.innerHeight;
+            ? innerH - LAYOUT_NETWORK_PANEL_WIDTH
+            : innerH;
     }
     else {
         networkCanvas.style.display = 'none';
     }
-    // Mini map canvas
+    const floatingMiniMap = showMiniMap && !showNetwork;
     if (showMiniMap) {
         miniMapCanvas.style.display = 'block';
         miniMapCanvas.classList.toggle('floating', floatingMiniMap);
@@ -74,32 +81,27 @@ export function resizeSimulatorLayout(canvases, panelState, viewport) {
         miniMapCanvas.style.display = 'none';
         miniMapCanvas.classList.remove('floating');
     }
-    // Layout mode: compute main and secondary view widths
-    const availableWidth = Math.floor(viewportWidth - usedWidth);
     if (showCamera) {
-        // On mobile shrink the secondary view to a fraction of the available width
-        // (clamped) so the main view never collapses to a negative width.
         const secondaryWidth = isMobile
             ? Math.max(LAYOUT_MOBILE_MIN_SMALL_VIEW_WIDTH, Math.round(availableWidth * 0.4))
             : LAYOUT_SMALL_VIEW_WIDTH;
         const mainWidth = availableWidth - secondaryWidth;
         const topViewBig = layoutMode === 'topview-big';
         gameCanvas.width = topViewBig ? mainWidth : secondaryWidth;
-        gameCanvas.height = window.innerHeight;
+        gameCanvas.height = innerH;
         cameraCanvas.width = topViewBig ? secondaryWidth : mainWidth;
-        cameraCanvas.height = window.innerHeight;
+        cameraCanvas.height = innerH;
         cameraCanvas.style.display = 'block';
         gameCanvas.style.order = topViewBig ? '0' : '1';
         cameraCanvas.style.order = topViewBig ? '1' : '0';
     }
     else {
-        // No camera view - game canvas takes all available space
         gameCanvas.width = availableWidth;
-        gameCanvas.height = window.innerHeight;
+        gameCanvas.height = innerH;
         cameraCanvas.style.display = 'none';
         gameCanvas.style.order = '0';
     }
     if (viewport) {
-        viewport.center = new Point(gameCanvas.width / 2, window.innerHeight / 2);
+        viewport.center = new Point(gameCanvas.width / 2, innerH / 2);
     }
 }

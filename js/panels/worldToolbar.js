@@ -4,6 +4,7 @@ import { WORLD_TOOLBAR_TEMPLATE } from './templates/worldToolbarTemplate.js';
 export class WorldToolbarElement extends HTMLElement {
     #modeControls;
     #assetSelectors;
+    #_showCameraDebug = false;
     constructor() {
         super();
         this.id = 'topControls';
@@ -13,6 +14,13 @@ export class WorldToolbarElement extends HTMLElement {
     connectedCallback() {
         this.innerHTML = WorldToolbarElement.template;
         this.#modeControls.init();
+        const debugCb = this.querySelector('#showCameraDebug');
+        if (debugCb) {
+            this.#_showCameraDebug = debugCb.checked;
+            debugCb.addEventListener('change', () => {
+                this.#_showCameraDebug = debugCb.checked;
+            });
+        }
     }
     get borderMode() {
         return this.#modeControls.borderMode;
@@ -24,8 +32,7 @@ export class WorldToolbarElement extends HTMLElement {
         return this.#modeControls.viewportMode;
     }
     get showCameraDebug() {
-        const el = this.querySelector('#showCameraDebug');
-        return el ? el.checked : false;
+        return this.#_showCameraDebug;
     }
     hideCameraDebug() {
         this.hideGroups('debug', 'debug-sep');

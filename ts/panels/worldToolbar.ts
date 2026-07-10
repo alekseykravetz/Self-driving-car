@@ -12,6 +12,7 @@ import { WORLD_TOOLBAR_TEMPLATE } from './templates/worldToolbarTemplate.js';
 export class WorldToolbarElement extends HTMLElement {
   #modeControls: ToolbarModeControls;
   #assetSelectors: ToolbarAssetSelectors;
+  #_showCameraDebug: boolean = false;
 
   constructor() {
     super();
@@ -23,6 +24,16 @@ export class WorldToolbarElement extends HTMLElement {
   connectedCallback(): void {
     this.innerHTML = WorldToolbarElement.template;
     this.#modeControls.init();
+
+    const debugCb = this.querySelector(
+      '#showCameraDebug',
+    ) as HTMLInputElement | null;
+    if (debugCb) {
+      this.#_showCameraDebug = debugCb.checked;
+      debugCb.addEventListener('change', () => {
+        this.#_showCameraDebug = debugCb.checked;
+      });
+    }
   }
 
   get borderMode(): BorderMode {
@@ -38,10 +49,7 @@ export class WorldToolbarElement extends HTMLElement {
   }
 
   get showCameraDebug(): boolean {
-    const el = this.querySelector(
-      '#showCameraDebug',
-    ) as HTMLInputElement | null;
-    return el ? el.checked : false;
+    return this.#_showCameraDebug;
   }
 
   hideCameraDebug(): void {
