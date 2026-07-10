@@ -149,7 +149,7 @@ export class WorldLayersToolbarElement extends HTMLElement {
     }
     /** Toggle the "items outdated" indicator on the regenerate button. */
     setStale(stale) {
-        if (this.#autoRegen)
+        if (stale && this.#autoRegen)
             return;
         const btn = this.querySelector('#regenerateItemsBtn');
         if (btn)
