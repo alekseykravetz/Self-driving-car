@@ -142,7 +142,6 @@ export class Sensor {
     #drawStateAware(ctx) {
         for (let i = 0; i < this.rays.length; i++) {
             const sr = this.sensorReadings[i];
-            const borderHit = this.readings[i];
             if (!sr || sr.type === 'none') {
                 ctx.save();
                 ctx.globalAlpha = 0.2;

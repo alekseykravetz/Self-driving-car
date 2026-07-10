@@ -307,7 +307,7 @@ CarLoader.allParamsMatch(cars: CarInfo[]): boolean;
 // Compare two car configs (ignoring brain)
 CarLoader.compareCarParams(a: CarInfo, b: CarInfo): boolean;
 
-// Group cars by matching physics + sensor params (incl. trafficAwareness)
+// Group cars by matching physics + sensor params (incl. stateAware)
 CarLoader.compareCarInfoParams(a: CarInfo, b: CarInfo): boolean;
 ```
 

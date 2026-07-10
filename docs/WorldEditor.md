@@ -532,7 +532,7 @@ The `state` property is normally updated by `TrafficManager.update()` each frame
 
 Right-clicking removes the light as with other markings.
 
-AI cars with `sensor.stateAware: true` additionally perceive `Light` markings through their sensor rays — a `TrafficControlGrid` (see [Simulators](Simulators.md#traffic-control-grid-tssimulatortrafficcontrolutilsts--tsmathtrafficcontrolgridts)) indexes light polygons and feeds each ray the live state (green=1, yellow=0.5, red/off=0) when the light sits in front of the road-border hit. Lights update inside `World.draw()`, so perception reads the previous frame's state (one-frame lag).
+AI cars with `sensor.stateAware: true` additionally perceive `Light` markings through their sensor rays — a `TrafficControlGrid` (see [Simulators](Simulators.md#traffic-control-grid-tssimulatortrafficcontrolutilsts--tsmathtrafficcontrolgridts)) indexes light polygons and feeds each ray the live state (green/off=0, yellow=0.5, red=1) when the light sits in front of the road-border hit. Lights update inside `World.draw()`, so perception reads the previous frame's state (one-frame lag).
 
 ### Marking Serialization
 

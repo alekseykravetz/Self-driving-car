@@ -353,8 +353,8 @@ This enables "bouncing off walls" behavior instead of instant death on collision
 ```typescript
 interface SensorReading {
   distance: number; // 0.0 = touching, 1.0 = at ray end (max length)
-  state: number; // 1=green, 0.5=yellow, 0=red/off/absent (for traffic-light rays)
-  type: 'obstacle' | 'traffic'; // What the ray hit
+  state: number; // How blocking: 0=safe, 0.5=caution, 1=stop
+  type: 'border' | 'car' | 'trafficControl' | 'none'; // What the ray hit
   x: number; // Intersection world X
   y: number; // Intersection world Y
 }
@@ -432,13 +432,13 @@ allocated per ray per car per frame.
 
 ### Default Sensor Configuration
 
-| Parameter    | Default Value | Description                                                                                                                                                                                                                                                                          |
-| ------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `rayCount`   | 5             | Number of rays in the sensor array                                                                                                                                                                                                                                                   |
-| `rayLength`  | 150           | Maximum detection distance (pixels)                                                                                                                                                                                                                                                  |
-| `raySpread`  | π/2 (90°)     | Total angular coverage of the sensor array                                                                                                                                                                                                                                           |
-| `rayOffset`  | 0             | Rotation offset (0 = centered on car heading)                                                                                                                                                                                                                                        |
-| `stateAware` | false         | When true, each ray produces two brain inputs: `[1-distance, state]` where state encodes traffic-light perception (green=1, yellow=0.5, red/off/absent=0). Settable from the training UI via the "State Aware" checkbox (init modal + live panel); defaults to off (legacy behavior) |
+| Parameter    | Default Value | Description                                                                                                                                                                                                                                                                            |
+| ------------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rayCount`   | 5             | Number of rays in the sensor array                                                                                                                                                                                                                                                     |
+| `rayLength`  | 150           | Maximum detection distance (pixels)                                                                                                                                                                                                                                                    |
+| `raySpread`  | π/2 (90°)     | Total angular coverage of the sensor array                                                                                                                                                                                                                                             |
+| `rayOffset`  | 0             | Rotation offset (0 = centered on car heading)                                                                                                                                                                                                                                          |
+| `stateAware` | false         | When true, each ray produces two brain inputs: `[1-distance, state]` where state encodes how blocking the nearest obstacle is (0=safe, 0.5=caution, 1=stop). Settable from the training UI via the "State Aware" checkbox (init modal + live panel); defaults to off (legacy behavior) |
 
 ### Traffic-Light Perception
 
@@ -446,11 +446,11 @@ When `stateAware` is `true`, `Sensor.update(x, y, angle, polygons, trafficContro
 
 1. Find the closest traffic-control polygon intersection.
 2. If that intersection's offset is **less** than the road-border hit offset (i.e. the light sits in front of the wall), the ray "sees" that light's state.
-3. The combined reading is stored in `sensorReadings[i]` as a `SensorReading` with `type='traffic'` and `state` encoded (green→1, yellow→0.5, red/off/absent→0). If no traffic light is visible the reading is `type='obstacle'` with `state=0`.
+3. The combined reading is stored in `sensorReadings[i]` as a `SensorReading` with `type='trafficControl'` and `state` encoded (green/off/absent→0, yellow→0.5, red→1). If no traffic light is visible the reading falls back to the road-border type with `state=0`.
 
 The traffic-control set is built per frame by the simulator via `buildTrafficControls(world)` (into a `TrafficControlGrid`) and `queryTrafficControlsNearCar(grid, car)` — mirroring `queryBordersNearCar` (sensor reach + body margin). The grid uses 150px cells and is rebuilt only when world markings change; light state is read live at query time through a `getState` closure, so a state change takes effect on the next query without a rebuild.
 
-`Sensor.draw()` renders the traffic detection with a colored ray from the car to the light intersection point (instead of offsetting a dot above the wall hit), plus a colored dot (r=4) with a white 1.5px border at the light position. When a wall exists behind the light, the yellow wall ray continues from the light point to the wall. See [Sensor Visualization](#sensor-visualization) for the full per-ray rules.
+`Sensor.draw()` renders a single ray from the car to the nearest obstacle at `(sr.x, sr.y)`, colored by `sr.type` (yellow for border, red for car, colored by state for traffic control) with a dot at the endpoint. No continuation ray is drawn past the nearest hit — the brain only sees the closest obstacle. See [Sensor Visualization](#sensor-visualization) for the full per-ray rules.
 
 > Lights still update via `TrafficManager` inside `World.draw()`, so perception reads the previous frame's light state — a one-frame lag, which is acceptable.
 
@@ -458,14 +458,14 @@ The traffic-control set is built per frame by the simulator via `buildTrafficCon
 
 When `drawSensor` is true, rays are rendered on the canvas. The per-ray rules depend on whether a road-border hit and/or a traffic-light detection exists:
 
-| Scenario             | Ray line                                                  | Endpoint dot                                                                           |
-| -------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Wall hit, no traffic | Yellow from car → wall                                    | Yellow dot (r=3) at wall                                                               |
-| Wall hit + traffic   | Colored\* from car → light, then yellow from light → wall | Yellow dot (r=3) at wall + colored dot (r=4, white 1.5px border) at light intersection |
-| No wall, no traffic  | Faint yellow full-length (α0.2)                           | None                                                                                   |
-| No wall + traffic    | Colored\* from car → light                                | Colored dot (r=4, white 1.5px border) at light intersection                            |
+| Scenario                | Ray line                        | Endpoint dot                                                |
+| ----------------------- | ------------------------------- | ----------------------------------------------------------- |
+| `type='border'`         | Yellow from car → wall          | Yellow dot (r=3) at wall                                    |
+| `type='car'`            | Red from car → other car        | Red dot (r=3) at car                                        |
+| `type='trafficControl'` | Colored\* from car → light      | Colored dot (r=4, white 1.5px border) at light intersection |
+| No hit (`type='none'`)  | Faint yellow full-length (α0.2) | None                                                        |
 
-\* Color matches the traffic-light state: `#0F0` (green), `#FF0` (yellow), `#F00` (red).
+\* Color matches the traffic-light state: `#0F0` (state ≤ 0.25), `#FF0` (0.25 < state < 0.9), `#F00` (state ≥ 0.9).
 
 The traffic intersection point is computed inside `#getReadings()` via `lerp()` and stored in a `SensorReading` (`{ distance, state, type, x, y }`), so the dot lands exactly on the light polygon — never offset from a wall.
 

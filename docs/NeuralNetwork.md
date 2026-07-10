@@ -127,12 +127,12 @@ between the distance inputs, so the input layer is `rayCount*2 + 1` instead of
 | Input       | Source                | Range  | Meaning                               |
 | ----------- | --------------------- | ------ | ------------------------------------- |
 | rayDist1-N  | `1 - sensor.distance` | [0, 1] | 0 = clear path, 1 = touching wall     |
-| rayState1-N | `SensorReading.state` | [0, 1] | green=1, yellow=0.5, red/off/absent=0 |
+| rayState1-N | `SensorReading.state` | [0, 1] | 0=green/off/absent, 0.5=yellow, 1=red |
 | speed       | `speed / maxSpeed`    | [0, 1] | 0 = stopped, 1 = max speed            |
 
-A state input is 0 for rays whose closest hit is a road border with no traffic
-light in front; it is non-zero only when a traffic light sits in front of the
-wall hit.
+A state input is 0 for rays whose closest hit is a road border with no other
+obstacle in front; it is non-zero when a traffic light (yellow=0.5, red=1) or
+another car (1) sits in front of the wall hit.
 
 ### Output Decoding
 

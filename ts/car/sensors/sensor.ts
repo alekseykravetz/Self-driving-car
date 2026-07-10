@@ -207,7 +207,6 @@ export class Sensor {
   #drawStateAware(ctx: CanvasRenderingContext2D): void {
     for (let i = 0; i < this.rays.length; i++) {
       const sr = this.sensorReadings[i];
-      const borderHit = this.readings[i];
 
       if (!sr || sr.type === 'none') {
         ctx.save();
