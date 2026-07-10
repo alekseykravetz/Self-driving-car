@@ -9,6 +9,7 @@ The canvas is the hero: a bright green-grass road surface (`#2a5`) where grey as
 Emoji icons replace SVG iconography throughout — a design choice that gives the interface an informal, accessible character. Floating toolbars with subtly rounded corners and thin white borders (`1px solid rgba(255,255,255,0.15)`) hover over the canvas, while side panels dock at fixed widths (200px controls, 300px network view). The typographic palette is minimal: Arial for labels, monospace for data, and Inter for the landing page.
 
 **Key Characteristics:**
+
 - Dark, near-black backgrounds (`#0f0f14`, `#000`) with semi-transparent UI overlays
 - Green grass road canvas (`#2a5`) as the primary bright color area
 - Hand-rolled Canvas 2D rendering — educational, schematic, from-scratch aesthetic
@@ -23,6 +24,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 ## 2. Color Palette & Roles
 
 ### Background & Surface
+
 - **Void Black** (`#000000`): World editor body, network canvas, mini-map canvas — the deepest background layer
 - **Dark Void** (`#0f0f14`): Landing page body, training panel, traffic stats panel — main UI surface
 - **Panel Glass** (`rgba(15, 15, 20, 0.92)`): Training manager panel, traffic stats panel
@@ -35,6 +37,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 - **Tooltip Base** (`rgba(10, 10, 15, 0.9)`): Label chips and tooltips
 
 ### Text
+
 - **Bright Silver** (`#e8e8e8`): Main body text
 - **Pure White** (`#ffffff`): Headings, selected pool rows, store titles
 - **Light Grey** (`#ccc` to `#e0e0e0`): Buttons, stat values, table rows
@@ -43,6 +46,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 - **Faint White** (`rgba(255,255,255,0.4-0.6)`): Control group labels, section titles, empty states
 
 ### Accent
+
 - **Mono Green** (`#7ddf7d`): Primary action text, landing page title gradient, positive states
 - **Teal** (`#4ecdc4`): Landing page title gradient companion
 - **Indigo** (`#6366f1`): Store panel active tab, radio buttons
@@ -51,6 +55,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 - **Cyan** (`deepskyblue` / `#0FF`): Previous pool car indicator, light override indicator
 
 ### Semantic / Status
+
 - **Status Green** (`#5cb85c`): Active/healthy status dot with `rgba(92,184,92,0.6)` glow
 - **Status Red** (`#d9534f`): Error/damaged status dot with `rgba(217,83,79,0.6)` glow
 - **Status Orange** (`#f0ad4e`): Warning status dot with `rgba(240,173,78,0.6)` glow
@@ -58,23 +63,27 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 - **Key Flash** (`#c08020` bg, `#ffb040` border): Momentary flash on key press
 
 ### Button Variants
+
 - **Primary Button**: bg `rgba(80,180,80,0.25)`, text `#7ddf7d`, border `rgba(80,180,80,0.3)`
 - **Danger Button**: bg `rgba(200,60,60,0.2)`, text `#e88`, border `rgba(200,60,60,0.25)`
 - **Warning Outline**: bg transparent, border `rgba(200,150,40,0.3)`, text `#f5a623`
 - **Success Outline**: bg transparent, border `rgba(60,200,60,0.3)`, text `#5cb85c`
 
 ### Border
+
 - **Subtle Border** (`rgba(255, 255, 255, 0.08)`): Cards, panel sections, table rows
 - **Visible Border** (`rgba(255, 255, 255, 0.12-0.15)`): Modals, popovers, toolbar outlines
 - **Strong Border** (`rgba(255, 255, 255, 0.3)`): Key indicators, control separators
 
 ### Input
+
 - **Input BG** (`rgba(255, 255, 255, 0.07)`): Text/number input backgrounds
 - **Input Border** (`rgba(255, 255, 255, 0.1)`): Default input border
 - **Input Focus** (`rgba(255, 200, 50, 0.6)`): Golden focus ring
 - **Checkbox Accent** (`#4caf50` / `#5cb85c`): Green checkbox accent
 
 ### Canvas Rendering
+
 - **Road Fill** (`#BBB`): Road surface color
 - **Road Border** (`white`): 4px road edge strokes
 - **Lane Dash** (`white`): Dashed center lines (`dash [15, 25]`, width 4)
@@ -87,6 +96,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 - **Corridor Walls** (`red`, width 4): Collision corridor borders
 
 ### Neural Network Visualizer
+
 - **Positive Weight** (`#FFB000` to `#FFE44D`): Amber range for positive activations
 - **Negative Weight** (pale cyan to `#00E5FF`): Cyan range for negative activations
 - **Zero/Neutral** (`rgba(40,40,40,1)`): Midpoint of legend gradient
@@ -98,6 +108,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 ## 3. Typography Rules
 
 ### Font Families
+
 - **UI Labels**: `Arial, sans-serif` — all UI chrome, buttons, panels, section titles, controls
 - **Monospace Data**: `'Courier New', monospace` / `monospace` — elapsed time, FPS, stat values, car name labels
 - **Landing Page**: `'Inter', sans-serif` — body text on the main page only
@@ -105,23 +116,24 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 
 ### Hierarchy
 
-| Role | Size | Weight | Line Height | Letter Spacing | Family |
-|------|------|--------|-------------|----------------|--------|
-| Landing Heading | 32px (2rem) | 800 | normal | normal | Inter |
-| Card Heading | 24px (1.5rem) | 700 | normal | normal | Arial |
-| Modal Title | 17.6px (1.1rem) | 700 | normal | normal | Arial |
-| Stat Value | 12px | 700 | normal | normal | monospace |
-| Section Title | 10px | 700 | 1px uppercase | 1px | Arial |
-| Button Large | 13px | 600 | normal | normal | Arial |
-| Button Small | 11px | 500 | normal | normal | Arial |
-| Body Text | 0.85rem (~13.5px) | 400 | normal | normal | Arial |
-| Stat Label | 10px | 600 | 1px uppercase | 0.4px | Arial |
-| Control Label | 10px | 400 | 1px uppercase | 0.6px | Arial |
-| Car Name | 13px | 700 | normal | normal | monospace |
-| Key Indicator | 13px | 700 | normal | normal | monospace |
-| Tooltip | 11px | 400 | normal | normal | Arial |
+| Role            | Size              | Weight | Line Height   | Letter Spacing | Family    |
+| --------------- | ----------------- | ------ | ------------- | -------------- | --------- |
+| Landing Heading | 32px (2rem)       | 800    | normal        | normal         | Inter     |
+| Card Heading    | 24px (1.5rem)     | 700    | normal        | normal         | Arial     |
+| Modal Title     | 17.6px (1.1rem)   | 700    | normal        | normal         | Arial     |
+| Stat Value      | 12px              | 700    | normal        | normal         | monospace |
+| Section Title   | 10px              | 700    | 1px uppercase | 1px            | Arial     |
+| Button Large    | 13px              | 600    | normal        | normal         | Arial     |
+| Button Small    | 11px              | 500    | normal        | normal         | Arial     |
+| Body Text       | 0.85rem (~13.5px) | 400    | normal        | normal         | Arial     |
+| Stat Label      | 10px              | 600    | 1px uppercase | 0.4px          | Arial     |
+| Control Label   | 10px              | 400    | 1px uppercase | 0.6px          | Arial     |
+| Car Name        | 13px              | 700    | normal        | normal         | monospace |
+| Key Indicator   | 13px              | 700    | normal        | normal         | monospace |
+| Tooltip         | 11px              | 400    | normal        | normal         | Arial     |
 
 ### Principles
+
 - **Uppercase + spacing** for labels: section titles, stat labels, control group labels all use `text-transform: uppercase` with `letter-spacing: 0.4-1px`
 - **Weight range 400-800**: Light weights avoided — readability on dark backgrounds requires at least 400
 - **10px minimum**: Tiny labels (stat labels, section titles) at 10px are acceptable in this data-dense interface
@@ -133,6 +145,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 ### Buttons
 
 **Large Button (`.btn-lg`):**
+
 - Default: height 38px, full width, padding 0 12px, borderRadius 8px, bg `rgba(255,255,255,0.1)`, text `#e0e0e0`, fontSize 13px, fontWeight 600, fontFamily Arial
 - Hover: bg `rgba(255,255,255,0.18)`, transform `scale(1.02)`
 - Active: transform `scale(0.98)`
@@ -140,11 +153,13 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 - `.btn-danger`: bg `rgba(200,60,60,0.2)`, text `#e88`, border `rgba(200,60,60,0.25)`
 
 **Small Button (`.btn-sm`):**
+
 - Default: height 32px, full width, padding 0 8px, borderRadius 6px, bg `rgba(255,255,255,0.08)`, text `#ccc`, fontSize 11px, fontWeight 500
 - Hover: bg `rgba(255,255,255,0.15)`, text `#fff`
 - Variants: `.btn-danger-outline` (red border), `.btn-warning-outline` (amber), `.btn-success-outline` (green)
 
 **Toolbar Button (`.toolbar-btn`):**
+
 - Size: 32x32px, no padding, borderRadius 5px
 - Font: 16px (emoji)
 - Default: bg `rgba(255,255,255,0.1)`, opacity 0.7
@@ -155,6 +170,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 ### Input Controls
 
 **Number/Text Input:**
+
 - Size: border `1px solid rgba(255,255,255,0.1)`, borderRadius 6px, padding 5px 6px
 - Font: fontSize 12px, textAlign center
 - Default: bg `rgba(255,255,255,0.07)`, text `#e0e0e0`
@@ -162,66 +178,80 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 - Number spin buttons hidden (custom inc/dec via `.num-btn`)
 
 **Checkbox:**
+
 - Size: 14x14px (18x18px in training panel)
 - Accent: `#4caf50` / `#5cb85c`
 
 **Radio Button:**
+
 - Accent: `#6366f1` (indigo)
 
 **Number Input Row (`.num-input-row`):**
+
 - Flex layout with `.num-btn`: 22x22px, borderRadius 4px, bg `rgba(255,255,255,0.1)`
 
 **Spawn Car Select:**
+
 - Size: height 32px, max-width 140px
 - Default: bg `rgba(255,255,255,0.1)`, text `#fff`, fontSize 12px
 
 ### Panels & Sections
 
 **Panel Section (`.panel-section`):**
+
 - Padding: 10px, bottomBorder: `1px solid rgba(255,255,255,0.08)`
 
 **Section Title (`.section-title`):**
+
 - Font: 10px Arial 700, uppercase, letterSpacing 1px, color `rgba(255,255,255,0.4)`
 - BottomBorder: `1px solid rgba(255,255,255,0.06)`
 
 **Stat Row (`.stat-row`):**
+
 - Padding: 3px 6px, borderRadius 6px, bg `rgba(255,255,255,0.04)`
 - Label: 10px Arial, uppercase, color `#888`
 - Value: 12px monospace, weight 700, color `#e8e8e8`
 
 ### Floating Toolbar
+
 - Position: absolute, top 10px, left 10px, z-index 10
 - Size: padding 6px 10px, borderRadius 8px
 - Background: `rgba(0,0,0,0.6)`
 - Outline: `1px solid rgba(255,255,255,0.15)`
 
 ### Modal / Dialog
+
 - Overlay: `rgba(0,0,0,0.6)`, `backdrop-filter: blur(2px)`
 - Dialog: bg `#1b1d24`, border `1px solid rgba(255,255,255,0.12)`, borderRadius 12px
 - BoxShadow: `0 18px 50px rgba(0,0,0,0.55)`
 - Width: `min(560px, 100%)`
 
 ### Card / Popover
+
 - **Landing Card**: bg `rgba(255,255,255,0.04)`, border `1px solid rgba(255,255,255,0.08)`, borderRadius 16px, padding 32px 28px, hover borderColor `rgba(255,255,255,0.15)`, translateY -2px
 - **Asset Popover**: bg `rgba(20,20,25,0.97)`, border `1px solid rgba(255,255,255,0.15)`, borderRadius 8px, boxShadow `0 6px 18px rgba(0,0,0,0.5)`
 
 ### Tooltip
+
 - **CSS (HTML)**: bg `rgba(0,0,0,0.9)`, text `white`, fontSize 11px Arial, borderRadius 4px, padding 6px 10px
 - **Canvas (NN)**: bg `rgba(10,10,15,0.85)`, text `rgba(240,240,240,0.95)`, fontSize 11px monospace, border `1px solid rgba(255,255,255,0.35)`, borderRadius 6px
 
 ### Key Indicator (Shortcut Keys)
+
 - Size: min-width 32px, height 32px, borderRadius 4px
 - Default: bg `#333`, border `1px solid #555`, text `#888`, fontSize 13px monospace 700
 - Active: bg `#2a8a2a`, border `#4cdf4c`, green glow
 - Flash: bg `#c08020`, border `#ffb040`, amber glow
 
 ### Tables
+
 - **Pool Table**: font 10px Arial (headers), 11px monospace (values); header uppercase `#888`; row hover `rgba(255,255,255,0.08)`; selected: bg `rgba(66,165,245,0.25)`, outline `1px solid rgba(66,165,245,0.5)`
 - **Store Table**: font 0.85rem; header `rgba(255,255,255,0.5)` uppercase; cell `rgba(255,255,255,0.85)`; sticky header bg `#16161c`
 
 ## 5. Layout Principles
 
 ### Spacing System
+
 - Base unit: 4px (very compact)
 - Common values: 3px, 6px, 8px, 10px, 12px, 20px, 28px, 32px
 - Panel padding: 10px
@@ -255,36 +285,40 @@ body.main-page
 ```
 
 ### Race Page Layout
+
 - Game canvas: full viewport
 - Mini-map: right 20px, bottom 20px, circular (border-radius 50%), 50% opacity
 - Stats panel: right 20px, top 20px, black bg, 50% opacity
 - Counter: centered, 40vmin, white, 50% opacity
 
 ### Border Radius Scale
-| Value | Context |
-|-------|---------|
-| 4px | Key indicators, number buttons |
-| 5px | Toolbar buttons |
-| 6px | Small buttons, inputs, stat rows, tooltips |
-| 8px | Large buttons, floating toolbars, popovers |
-| 12px | Modals |
-| 16px | Landing cards |
+
+| Value | Context                                    |
+| ----- | ------------------------------------------ |
+| 4px   | Key indicators, number buttons             |
+| 5px   | Toolbar buttons                            |
+| 6px   | Small buttons, inputs, stat rows, tooltips |
+| 8px   | Large buttons, floating toolbars, popovers |
+| 12px  | Modals                                     |
+| 16px  | Landing cards                              |
 
 ## 6. Depth & Elevation
 
-| Level | Treatment | Use |
-|-------|-----------|-----|
-| Level 0 (Flat) | No shadow, no border | Canvas elements, road, car polygons, sensor rays |
-| Level 1 (Surface) | 1px border `rgba(255,255,255,0.08)` | Cards, panel sections |
-| Level 2 (Floating) | `rgba(0,0,0,0.6)` bg + 1px `rgba(255,255,255,0.12-0.15)` border | Toolbars, popovers |
-| Level 3 (Modal) | `rgba(0,0,0,0.6)` backdrop + blur(2px) + `0 18px 50px rgba(0,0,0,0.55)` | Modal dialogs |
+| Level              | Treatment                                                               | Use                                              |
+| ------------------ | ----------------------------------------------------------------------- | ------------------------------------------------ |
+| Level 0 (Flat)     | No shadow, no border                                                    | Canvas elements, road, car polygons, sensor rays |
+| Level 1 (Surface)  | 1px border `rgba(255,255,255,0.08)`                                     | Cards, panel sections                            |
+| Level 2 (Floating) | `rgba(0,0,0,0.6)` bg + 1px `rgba(255,255,255,0.12-0.15)` border         | Toolbars, popovers                               |
+| Level 3 (Modal)    | `rgba(0,0,0,0.6)` backdrop + blur(2px) + `0 18px 50px rgba(0,0,0,0.55)` | Modal dialogs                                    |
 
 ### Depth Philosophy
+
 Depth is communicated through background opacity and thin white borders rather than box-shadows. The floating toolbar pattern — semi-transparent black backgrounds with a barely-there white outline — lets the simulation canvas remain at the same z-level, with UI overlays appearing as glass panels rather than elevated surfaces. Modal dialogs use both backdrop blur and a substantial shadow to indicate they sit above everything.
 
 ## 7. Do's and Don'ts
 
 ### Do
+
 - Use dark backgrounds (`#0f0f14`, `#000`) as the default — the simulation canvas is the only bright area
 - Keep panels semi-transparent (`rgba(0,0,0,0.6)`) so simulation content shows through
 - Use green (`#7ddf7d`) for primary actions and positive states — it's the sole chromatic accent
@@ -297,6 +331,7 @@ Depth is communicated through background opacity and thin white borders rather t
 - Keep the neural network visualizer on the right side with amber-cyan diverging palette
 
 ### Don't
+
 - Add shadows to panels — use semi-transparent backgrounds with thin white borders instead
 - Use WebGL or Three.js — the educational value of hand-rolled Canvas 2D is a core feature
 - Introduce SVG icon sets — emoji are sufficient and keep the codebase dependency-free
@@ -310,12 +345,14 @@ Depth is communicated through background opacity and thin white borders rather t
 ## 8. Responsive Behavior
 
 ### Breakpoints
-| Name | Width | Key Changes |
-|------|-------|-------------|
-| Desktop | >768px | Full layout: 200px control panel, 300px network, camera optional |
-| Mobile | <=768px | Control panel shrinks to 140px, store tables collapse (Active + Filename only), world editor bottom controls hidden, simulator toolbar hides Viewport and Borders groups, race page shows phone tilt instead of keyboard |
+
+| Name    | Width   | Key Changes                                                                                                                                                                                                              |
+| ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Desktop | >768px  | Full layout: 200px control panel, 300px network, camera optional                                                                                                                                                         |
+| Mobile  | <=768px | Control panel shrinks to 140px, store tables collapse (Active + Filename only), world editor bottom controls hidden, simulator toolbar hides Viewport and Borders groups, race page shows phone tilt instead of keyboard |
 
 ### Layout Changes
+
 - **Control Panel**: 200px desktop → 140px mobile — labels hide, only values shown
 - **Store Tables**: Collapse to 2 columns (Active + Filename) on mobile
 - **World Editor**: Bottom controls (`#controls`) hidden entirely on mobile
@@ -324,6 +361,7 @@ Depth is communicated through background opacity and thin white borders rather t
 - **Toolbar Groups**: Viewport and Borders groups hidden on mobile simulator toolbar
 
 ### Collapsing Strategy
+
 - Side panels maintain their position but narrow
 - Floating toolbars wrap to multiple rows if needed
 - Bottom editor controls hide completely on mobile (the graph/marking toggle remains)
@@ -332,6 +370,7 @@ Depth is communicated through background opacity and thin white borders rather t
 ## 9. Agent Prompt Guide
 
 ### Quick Color Reference
+
 - Backgrounds: "Dark Void (#0f0f14)", "Void Black (#000000)", "Overlay Smoke (rgba(0,0,0,0.6))"
 - Canvas: "Grass Canvas (#2a5)"
 - Primary text: "Bright Silver (#e8e8e8)"
@@ -343,6 +382,7 @@ Depth is communicated through background opacity and thin white borders rather t
 - Input focus: "Golden (rgba(255,200,50,0.6))"
 
 ### Example Component Prompts
+
 - "Create a floating toolbar with 32x32px emoji buttons on a semi-transparent black background with thin white border, positioned absolutely at top 10px left 10px"
 - "Design a control panel 200px wide with dark background, containing uppercase 10px section titles with letter-spacing 1px, stat rows with monospace values, and large green-accent primary buttons"
 - "Build a side panel with a 300px network visualizer showing neurons as dark discs connected by amber/cyan lines on a pure black background"
@@ -350,6 +390,7 @@ Depth is communicated through background opacity and thin white borders rather t
 - "Render a stat row with 10px uppercase label (#888) and 12px bold monospace value (#e8e8e8) on a rgba(255,255,255,0.04) background with 6px border-radius"
 
 ### Iteration Guide
+
 1. Focus on data density — this is a simulator interface, not a marketing site. Every pixel should inform
 2. Use uppercase + letter-spacing for all labels — it's the most consistent visual pattern across the UI
 3. Keep the canvas dominant — UI chrome should never exceed 30% of viewport width

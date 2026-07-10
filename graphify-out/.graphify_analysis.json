@@ -2243,19 +2243,10 @@
       "opencode_plugins_graphify_graphifyplugin",
       "opencode_plugins_graphify_rationale_4"
     ],
-    "102": [
-      "scripts_publish_site",
-      "scripts_publish_site_sh__entry"
-    ],
-    "103": [
-      "eslint_config"
-    ],
-    "104": [
-      "js_car_carstate"
-    ],
-    "105": [
-      "js_car_sensors_sensorreading"
-    ]
+    "102": ["scripts_publish_site", "scripts_publish_site_sh__entry"],
+    "103": ["eslint_config"],
+    "104": ["js_car_carstate"],
+    "105": ["js_car_sensors_sensorreading"]
   },
   "cohesion": {
     "0": 0.08903908316191596,
@@ -2441,10 +2432,7 @@
     {
       "source": "movePointsInward()",
       "target": "lerp2D()",
-      "source_files": [
-        "js/camera/extrusion.js",
-        "js/math/utils.js"
-      ],
+      "source_files": ["js/camera/extrusion.js", "js/math/utils.js"],
       "confidence": "EXTRACTED",
       "relation": "calls",
       "why": "bridges separate communities"
@@ -2452,10 +2440,7 @@
     {
       "source": "extrudeTreeShapes()",
       "target": "lerp()",
-      "source_files": [
-        "js/camera/extrusion.js",
-        "js/math/utils.js"
-      ],
+      "source_files": ["js/camera/extrusion.js", "js/math/utils.js"],
       "confidence": "EXTRACTED",
       "relation": "calls",
       "why": "bridges separate communities"
