@@ -1,5 +1,12 @@
 # AGENTS.md — Self-Driving Car Simulator
 
+## Graphify
+
+- **Graphify** knowledge graph lives in `graphify-out/` (2048 nodes, 5940 edges).
+- Rebuild after code changes: `graphify update .` (or `graphify . --code-only` for full rebuild).
+- The `graphify` CLI is at `~/Library/Python/3.14/bin/graphify` — add to PATH or use `python3 -m graphify`.
+- To include docs/images in the graph, set `GOOGLE_API_KEY` (or another supported LLM key) and drop `--code-only`.
+
 ## Build & dev
 
 - **No bundler** — `tsc` compiles `ts/` → `js/` (mirrored structure). Each HTML page loads a single `<script type="module">` entry point.
