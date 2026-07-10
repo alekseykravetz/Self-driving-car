@@ -77,6 +77,7 @@ export class WorldEditor {
   #mode: EditorType = 'graph';
   #viewportMode: 'mouse' | 'touchpad' = 'mouse';
   #oldGraphHash: string | null = null;
+  #autoRegen: boolean = false;
 
   // Per-layer visibility (local editor preference, persisted to localStorage —
   // never saved into the world file).
@@ -284,9 +285,10 @@ export class WorldEditor {
       this.#layerVisibility = visibility;
       saveLayerVisibility(visibility);
     });
-    this.#worldLayersToolbar.setRegenerateListener(() =>
-      this.regenerateItems(),
-    );
+    this.#worldLayersToolbar.setAutoRegenListener((on) => {
+      this.#autoRegen = on;
+      if (on) this.regenerateItems();
+    });
     // The editor has no live traffic, so the heatmap overlay toggle is irrelevant.
     this.#worldLayersToolbar.hideOverlays();
   }
@@ -497,14 +499,16 @@ export class WorldEditor {
     // Reset viewport transforms
     this.#viewport.reset();
 
-    // On graph change, refresh only the cheap road geometry + marking anchors.
-    // Expensive item placement is left to the explicit Regenerate items action.
+    // On graph change, refresh cheap road geometry + marking anchors,
+    // and optionally the expensive building/tree placement (auto-regen).
     const currentGraphHash = this.#world.graph.hash();
     if (currentGraphHash !== this.#oldGraphHash) {
       WorldGenerator.generateRoads(this.#world);
       WorldGenerator.reanchorMarkings(this.#world);
       this.#oldGraphHash = currentGraphHash;
-      if (this.#world.buildings.length || this.#world.trees.length) {
+      if (this.#autoRegen) {
+        this.#world.generate({ roads: false, buildings: true, trees: true });
+      } else if (this.#world.buildings.length || this.#world.trees.length) {
         this.#worldLayersToolbar?.setStale(true);
       }
     }

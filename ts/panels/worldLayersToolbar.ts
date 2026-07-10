@@ -43,7 +43,8 @@ export class WorldLayersToolbarElement extends HTMLElement {
   #visibility: WorldLayerVisibility = { ...DEFAULT_LAYER_VISIBILITY };
   #showHeatmap: boolean = false;
   #onChange: ((v: WorldLayerVisibility) => void) | null = null;
-  #onRegenerate: (() => void) | null = null;
+  #onAutoRegen: ((on: boolean) => void) | null = null;
+  #autoRegen: boolean = false;
   #onHeatmapChange: ((on: boolean) => void) | null = null;
 
   constructor() {
@@ -74,7 +75,7 @@ export class WorldLayersToolbarElement extends HTMLElement {
       <div class="controls-group" data-items>
         <span class="controls-group-label">Items</span>
         <div class="world-layers-keys">
-          <button id="regenerateItemsBtn" title="Regenerate items — rebuild buildings & trees">♻️</button>
+          <button id="regenerateItemsBtn" class="toolbar-btn" title="Regenerate items — rebuild buildings & trees">♻️</button>
         </div>
       </div>
       <div class="controls-separator" data-overlays></div>
@@ -105,7 +106,9 @@ export class WorldLayersToolbarElement extends HTMLElement {
       '#regenerateItemsBtn',
     );
     regenBtn?.addEventListener('click', () => {
-      if (this.#onRegenerate) this.#onRegenerate();
+      this.#autoRegen = !this.#autoRegen;
+      this.#applyButtonState(regenBtn, this.#autoRegen);
+      if (this.#onAutoRegen) this.#onAutoRegen(this.#autoRegen);
     });
 
     this.#syncButtons();
@@ -122,6 +125,10 @@ export class WorldLayersToolbarElement extends HTMLElement {
     });
     const heatmapBtn = this.querySelector<HTMLButtonElement>('#showHeatmapBtn');
     if (heatmapBtn) this.#applyButtonState(heatmapBtn, this.#showHeatmap);
+    const regenBtn = this.querySelector<HTMLButtonElement>(
+      '#regenerateItemsBtn',
+    );
+    if (regenBtn) this.#applyButtonState(regenBtn, this.#autoRegen);
   }
 
   /** Replace the visibility state and refresh the buttons. */
@@ -140,9 +147,15 @@ export class WorldLayersToolbarElement extends HTMLElement {
     this.#onChange = cb;
   }
 
-  /** Register a handler called when the ♻️ Regenerate items action is clicked. */
-  setRegenerateListener(cb: () => void): void {
-    this.#onRegenerate = cb;
+  /** Register a handler called when the ♻️ auto-regen toggle changes. */
+  setAutoRegenListener(cb: (on: boolean) => void): void {
+    this.#onAutoRegen = cb;
+  }
+
+  /** Set auto-regen state from outside and sync the button. */
+  setAutoRegen(on: boolean): void {
+    this.#autoRegen = on;
+    this.#syncButtons();
   }
 
   /** Current heatmap overlay visibility. */
@@ -164,6 +177,7 @@ export class WorldLayersToolbarElement extends HTMLElement {
 
   /** Toggle the "items outdated" indicator on the regenerate button. */
   setStale(stale: boolean): void {
+    if (this.#autoRegen) return;
     const btn = this.querySelector<HTMLButtonElement>('#regenerateItemsBtn');
     if (btn) btn.classList.toggle('stale', stale);
   }
