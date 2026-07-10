@@ -558,11 +558,21 @@ were rewritten to allocate nothing per car/ray/segment:
   runs once per `renderInterval` frames (user-adjustable in the
   animation-loop-toolbar panel). Heavy frames no longer drag the simulation rate down — the picture
   updates less often, training throughput is unchanged.
+- **No DOM queries in hot path**: toggle states (`renderInterval`, camera/visualizer/minimap
+  visibility, camera debug) are cached in `#` private fields and updated via `change`/`click`
+  event handlers instead of calling `querySelector()` every frame.
+- **Layout resize skip-on-no-change**: `resizeSimulatorLayout` compares cached viewport
+  width, panel width, inner height, and toggle states against the previous call — if nothing
+  changed the entire function returns before any DOM reads or writes.
+- **Dirty-checked stats display**: `updateStatsDisplay` skips `.textContent` writes when the
+  value hasn't changed since the last render frame, avoiding unnecessary repaints.
+- **Cached localStorage reads**: `#updateStatusDots` reads `localStorage` once and caches
+  the result in memory; the cache is invalidated only on `save()` / `discard()`.
 - **Batched alpha + per-car transform**: regular cars set `globalAlpha` once for
   the whole batch and draw their sprite via a manual transform inverse instead of
   paying a `save`/`restore` pair each — removing ~2 context-state ops per car.
 - **Throttled panel DOM**: the pool table (`innerHTML` rebuild) and status dots
-  (a `localStorage` read) refresh ~4×/sec instead of every frame.
+  refresh ~4×/sec instead of every frame.
 - **Viewport culling**: cars outside the visible X/Y bounds are skipped entirely.
 - **Camera frustum**: triangular polygon clips world geometry before projection.
 - **Mini-map**: uses a pre-scaled graph (×0.05) rather than full geometry.

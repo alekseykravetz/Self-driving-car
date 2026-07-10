@@ -97,6 +97,8 @@ The `<animation-loop-toolbar>` custom element provides real-time controls and mo
    - Physics always runs at full 60 FPS; only draw pass is throttled
    - Higher values = more frames skipped = faster simulation with choppier visuals
    - Useful for speeding up training without affecting physics accuracy
+   - The `<input>` value is read once on `change` and cached in `#cachedRenderInterval` —
+     no `querySelector` in the hot path (every rAF frame).
 
 3. **Elapsed Simulation Time** (HH:MM:SS)
 
@@ -334,8 +336,15 @@ the pool per the chosen source, then runs `newTraining()`.
 > [Render Decoupling](#render-decoupling-physics-vs-draw-rate).
 >
 > **Panel DOM throttle.** `updateBestCarAndPool` selects the pool every frame but
-> only re-renders the pool table (`innerHTML`) and status dots (a `localStorage`
-> read) every ~15 frames. `save()`/`discard()` force an immediate refresh.
+> only re-renders the pool table (`innerHTML`) and status dots every ~15 frames.
+> `save()`/`discard()` force an immediate refresh.
+>
+> **Additional optimisations:**
+>
+> - `updateStatsDisplay` skips `.textContent` writes when values haven't changed
+>   (dirty checks on each stat field), avoiding unnecessary repaints every frame.
+> - `#updateStatusDots` caches the `localStorage` read in `#cachedStoredPool`;
+>   the cache is invalidated only on `save()` / `discard()`.
 
 ### Statistics Display
 
@@ -1013,13 +1022,17 @@ type LayoutMode = 'topview-big' | 'camera-big';
 
 ```typescript
 function resizeSimulatorLayout(canvases, panelState, viewport): void {
-  // 1. Calculate available width = window - controlPanel - rightPanel
+  // 1. Batch all DOM reads first: viewport size, control panel width, inner height
+  // 2. Skip entirely if none of these changed compared to the previous call
+  //    (compares cached viewportWidth, controlPanelWidth, innerHeight, and all
+  //    toggle states — avoids DOM reads/writes when the user is just watching)
+  // 3. Calculate available width = window - controlPanel - rightPanel
   //    (the network visualizer reserves width; a floating mini-map does not)
-  // 2. Split remaining between gameCanvas and cameraCanvas based on layout mode
-  // 3. Show/hide rightPanel based on showNetwork || showMiniMap
-  // 4. Allocate network canvas height (full or partial if minimap shown)
-  // 5. Float the mini-map (bottom-left overlay) when the visualizer is hidden
-  // 6. Update viewport center if it exists
+  // 4. Split remaining between gameCanvas and cameraCanvas based on layout mode
+  // 5. Show/hide rightPanel based on showNetwork || showMiniMap
+  // 6. Allocate network canvas height (full or partial if minimap shown)
+  // 7. Float the mini-map (bottom-left overlay) when the visualizer is hidden
+  // 8. Update viewport center if it exists
 }
 ```
 
