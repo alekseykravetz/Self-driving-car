@@ -31,10 +31,15 @@ export class NetworkVisualizer {
     #mouseY = 0;
     /** When true every value is drawn, not just the hovered one. */
     #showAllValues = false;
+    /** When true, input neurons are labelled as distance/state pairs. */
+    #stateAware = false;
+    set stateAware(v) {
+        this.#stateAware = v;
+    }
     /** Bounds of the on-canvas density-toggle button (set each draw). */
     #toggleRect = null;
     static NODE_RADIUS = 18;
-    static MARGIN = 50;
+    static MARGIN = 30;
     /** |signal| below this counts as "idle" (no particles). */
     static SIGNAL_THRESHOLD = 0.04;
     /** Pixel tolerance when hit-testing a connection line. */
@@ -92,8 +97,10 @@ export class NetworkVisualizer {
      * @param ctx  Target 2D context.
      * @param network Brain to render.
      * @param time `requestAnimationFrame` timestamp (ms) driving the animation.
+     * @param stateAware When true, input labels show distance/state pairs per ray.
      */
-    draw(ctx, network, time) {
+    draw(ctx, network, time, stateAware = false) {
+        this.#stateAware = stateAware;
         const layout = this.#buildLayout(ctx, network);
         this.#layout = layout;
         // Which elements are "focused" (hovered or related to the hovered neuron)?
@@ -151,7 +158,7 @@ export class NetworkVisualizer {
             rowValues.push(levels[r - 1].outputs);
             rowBiases.push(levels[r - 1].biases);
         }
-        const inputLabels = _a.#inputLabels(rowValues[0].length);
+        const inputLabels = _a.#inputLabels(rowValues[0].length, this.#stateAware);
         const outputLabels = ['forward', 'left', 'right', 'reverse'];
         const outputArrows = ['up', 'left', 'right', 'down'];
         const rowY = (r) => rows === 1 ? top + height / 2 : top + height * (1 - r / (rows - 1));
@@ -212,11 +219,22 @@ export class NetworkVisualizer {
         }
         return { neurons, edges, rows };
     }
-    /** Input axis labels: `ray1…rayN` then the trailing `speed` input. */
-    static #inputLabels(count) {
+    /** Input axis labels: `ray1…rayN` (or paired `ray1 d`/`ray1 s` when stateAware),
+     *  then the trailing `speed` input.
+     */
+    static #inputLabels(count, stateAware) {
         const labels = [];
-        for (let i = 0; i < count - 1; i++)
-            labels.push(`ray${i + 1}`);
+        if (stateAware) {
+            const rayCount = (count - 1) / 2;
+            for (let i = 0; i < rayCount; i++) {
+                labels.push(`ray${i + 1} d`);
+                labels.push(`ray${i + 1} s`);
+            }
+        }
+        else {
+            for (let i = 0; i < count - 1; i++)
+                labels.push(`ray${i + 1}`);
+        }
         labels.push('speed');
         return labels;
     }

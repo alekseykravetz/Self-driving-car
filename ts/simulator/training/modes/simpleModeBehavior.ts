@@ -319,7 +319,12 @@ export class SimpleTrainingStrategy {
     const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
     this.#parent.drawHeatmap(heatViewPoint);
 
-    this.#parent.drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain);
+    const shownCar = keysCar ?? bestCar;
+    this.#parent.drawNetworkVisualizer(
+      time,
+      shownCar?.brain ?? bestCar.brain,
+      shownCar?.sensor?.stateAware,
+    );
 
     if (this.#parent.miniMap) {
       const viewPoint = scale(this.#parent.viewport.getOffset(), -1);

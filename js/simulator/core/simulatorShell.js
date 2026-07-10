@@ -201,12 +201,12 @@ export class SimulatorShell {
      * Render the neural-network visualizer for the given brain into the network
      * canvas. No-op when the visualizer toggle is off or no brain is provided.
      */
-    drawNetworkVisualizer(time, brain) {
+    drawNetworkVisualizer(time, brain, stateAware) {
         if (!this.layoutToolbar.showVisualizer)
             return;
         this.networkCtx.clearRect(0, 0, this.networkCanvas.width, this.networkCanvas.height);
         if (brain) {
-            this.networkVisualizer.draw(this.networkCtx, brain, time);
+            this.networkVisualizer.draw(this.networkCtx, brain, time, stateAware);
         }
     }
     /** Whether the simulation step is currently paused. Driven by the toolbar. */

@@ -181,7 +181,8 @@ export class SimpleTrainingStrategy {
         drawSimulatorCars(this.#parent.gameCtx, cars, this.#parent.trainingManager.bestPool, viewportTop - 100, viewportBottom + 100, drawMasks, 'gold', this.#parent.trainingManager.prevPoolCars, 'deepskyblue', -Infinity, Infinity, trackingKeys);
         const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
         this.#parent.drawHeatmap(heatViewPoint);
-        this.#parent.drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain);
+        const shownCar = keysCar ?? bestCar;
+        this.#parent.drawNetworkVisualizer(time, shownCar?.brain ?? bestCar.brain, shownCar?.sensor?.stateAware);
         if (this.#parent.miniMap) {
             const viewPoint = scale(this.#parent.viewport.getOffset(), -1);
             const floatingMiniMap = this.#parent.layoutToolbar.showMiniMap &&

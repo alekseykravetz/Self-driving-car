@@ -435,7 +435,11 @@ export class TrafficSimulator extends SimulatorShell {
         : { viewPoint, cars: this.#cars },
     );
 
-    this.drawNetworkVisualizer(time, selected?.brain);
+    this.drawNetworkVisualizer(
+      time,
+      selected?.brain,
+      selected?.sensor?.stateAware,
+    );
 
     if (this.layoutToolbar.showCameraView && this.camera) {
       const keyCar = selected ?? this.#cars[0];

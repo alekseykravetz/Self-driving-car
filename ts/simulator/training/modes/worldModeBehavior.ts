@@ -270,7 +270,12 @@ export class WorldTrainingStrategy {
         : { viewPoint, cars },
     );
 
-    this.#parent.drawNetworkVisualizer(time, keysCar?.brain ?? bestCar.brain);
+    const shownCar = keysCar ?? bestCar;
+    this.#parent.drawNetworkVisualizer(
+      time,
+      shownCar?.brain ?? bestCar.brain,
+      shownCar?.sensor?.stateAware,
+    );
     const debugCtx = this.#parent.toolbarPanel.showCameraDebug
       ? this.#parent.gameCtx
       : undefined;
