@@ -17,6 +17,12 @@ export function parseCarFileContent(content) {
     }
 }
 /**
+ * Normalize the stateAware field — old files may omit it, default to false.
+ */
+function normalizeStateAware(info) {
+    return info.sensor.stateAware ?? false;
+}
+/**
  * Compare two CarInfo objects by their physical parameters (excluding brain).
  * Returns true if all params match.
  *
@@ -40,8 +46,7 @@ export function compareCarInfoParams(a, b) {
         a.sensor.rayLength === b.sensor.rayLength &&
         Math.abs(a.sensor.raySpread - b.sensor.raySpread) <= RAY_SPREAD_EPSILON &&
         a.sensor.rayOffset === b.sensor.rayOffset &&
-        (a.sensor.trafficAwareness ?? false) ===
-            (b.sensor.trafficAwareness ?? false));
+        normalizeStateAware(a) === normalizeStateAware(b));
 }
 /**
  * Reusable car loader utility.

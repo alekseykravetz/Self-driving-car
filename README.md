@@ -19,7 +19,7 @@ Cars learn to navigate procedurally-generated worlds through evolutionary select
 - **Live Traffic Jam** — Click anywhere on a loaded world to drop trained cars that immediately drive themselves, collide with each other, and build an emergent traffic jam
 - **Spatial Congestion Heatmap** — Toggle a 🌡️ colour overlay (blue → red) on any simulator to see where traffic accumulates and idles over time
 - **Traffic Simulation** — Coordinated traffic lights with green/yellow/red cycling at intersections
-- **Traffic-Light Perception** — AI cars with `sensor.trafficAwareness: true` detect traffic lights via their ray network and feed the light state (green=1, yellow=0.5, red/off=0) as an extra input per ray; enabled per car via the "Traffic Lights" checkbox in the training car-config (init modal and live panel), defaults to off so legacy cars keep the original input layer and drive unchanged
+- **Traffic-Light Perception** — AI cars with `sensor.stateAware: true` detect traffic lights and other cars via their ray network and feed the obstacle state (0=safe, 0.5=caution, 1=stop) as an extra input per ray; enabled per car via the "State Aware" checkbox in the training car-config (init modal and live panel), defaults to off so legacy cars keep the original input layer and drive unchanged
 - **Mini-Map** — Real-time overview of all cars and the world graph
 - **Save/Load System** — Persist worlds, trained brains, and car configurations to files or localStorage
 

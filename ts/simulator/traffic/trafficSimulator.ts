@@ -324,12 +324,14 @@ export class TrafficSimulator extends SimulatorShell {
       const car = this.#cars[i];
       // Ghost wrecks: crashed cars stay frozen and invisible to everyone else.
       if (car.damaged) continue;
-      const obstacles = this.#collectObstacles(car, borderMode);
-      const trafficControls: SensorTrafficControl[] = car.sensor
-        ?.trafficAwareness
+      const obstacles = this.#collectBorders(car, borderMode);
+      const otherCars = car.sensor?.stateAware
+        ? this.#collectCarObstacles(car)
+        : [];
+      const trafficControls: SensorTrafficControl[] = car.sensor?.stateAware
         ? queryTrafficControlsNearCar(this.#trafficGrid, car)
         : [];
-      car.update(obstacles, trafficControls);
+      car.update(obstacles, trafficControls, otherCars);
     }
 
     this.recordHeatmap(this.#cars);
@@ -344,16 +346,18 @@ export class TrafficSimulator extends SimulatorShell {
   }
 
   /**
-   * Obstacle polygons a single car senses/collides with this step:
-   *   - nearby road borders (narrow-phase filtered),
-   *   - the body polygons of other *alive* cars within reach (car-vs-car).
-   * Both follow the toolbar border/collision mode: when it is 'none' there is
-   * no collision at all (free driving). Crashed cars are always excluded, so
-   * traffic flows around wrecks.
+   * Road borders a single car senses/collides with this step.
    */
-  #collectObstacles(car: Car, borderMode: BorderMode): Point[][] {
+  #collectBorders(car: Car, borderMode: BorderMode): Point[][] {
     if (borderMode === 'none') return [];
+    return queryBordersNearCar(this.#borderGrid, car);
+  }
 
+  /**
+   * Other alive cars within sensor reach. Crashed cars are always excluded,
+   * so traffic flows around wrecks.
+   */
+  #collectCarObstacles(car: Car): Point[][] {
     const MIN_RANGE = 100;
     const rayLength = car.sensor?.rayLength ?? MIN_RANGE;
     const reach = Math.max(rayLength, MIN_RANGE);
@@ -361,26 +365,17 @@ export class TrafficSimulator extends SimulatorShell {
     const reachWithBody = reach + bodyMargin;
     const reachWithBodySq = reachWithBody * reachWithBody;
 
-    const obstacles: Point[][] = [];
-
-    // Road borders (broad-phase grid query + narrow-phase distance filter).
-    const nearby = queryBordersNearCar(this.#borderGrid, car);
-    for (let j = 0; j < nearby.length; j++) {
-      obstacles.push(nearby[j]);
-    }
-
-    // Car-vs-car: small populations, so a distance-filtered O(n²) scan is fine.
+    const result: Point[][] = [];
     for (let j = 0; j < this.#cars.length; j++) {
       const other = this.#cars[j];
       if (other === car || other.damaged) continue;
       const dx = other.x - car.x;
       const dy = other.y - car.y;
       if (dx * dx + dy * dy <= reachWithBodySq) {
-        obstacles.push(other.polygon);
+        result.push(other.polygon);
       }
     }
-
-    return obstacles;
+    return result;
   }
 
   // ── Render ───────────────────────────────────────────

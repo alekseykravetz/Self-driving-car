@@ -493,7 +493,7 @@ class TrafficControlGrid {
 (broad phase + reach filter, mirroring `queryBordersNearCar`). World mode, Live
 Traffic Jam, and Racing own one grid each and forward the queried controls into
 `car.update(obstacles, trafficControls)` for cars with
-`sensor.trafficAwareness === true`. See [Simulators](Simulators.md#traffic-control-grid-tssimulatortrafficcontrolutilsts--tsmathtrafficcontrolgridts).
+`sensor.stateAware === true`. See [Simulators](Simulators.md#traffic-control-grid-tssimulatortrafficcontrolutilsts--tsmathtrafficcontrolgridts).
 
 ---
 

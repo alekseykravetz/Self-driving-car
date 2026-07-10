@@ -63,11 +63,11 @@ export function updateWorldCars(
       bordersForUpdate = queryBordersNearCar(borderGrid, car);
     }
 
-    const trafficControls: SensorTrafficControl[] = car.sensor?.trafficAwareness
+    const trafficControls: SensorTrafficControl[] = car.sensor?.stateAware
       ? queryTrafficControlsNearCar(trafficGrid, car)
       : [];
 
-    car.update(bordersForUpdate, trafficControls);
+    car.update(bordersForUpdate, trafficControls, []);
     aliveCount++;
   }
 

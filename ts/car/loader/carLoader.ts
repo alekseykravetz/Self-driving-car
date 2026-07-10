@@ -19,6 +19,13 @@ export function parseCarFileContent(content: string): CarInfo | null {
 }
 
 /**
+ * Normalize the stateAware field — old files may omit it, default to false.
+ */
+function normalizeStateAware(info: CarInfo): boolean {
+  return info.sensor.stateAware ?? false;
+}
+
+/**
  * Compare two CarInfo objects by their physical parameters (excluding brain).
  * Returns true if all params match.
  *
@@ -43,8 +50,7 @@ export function compareCarInfoParams(a: CarInfo, b: CarInfo): boolean {
     a.sensor.rayLength === b.sensor.rayLength &&
     Math.abs(a.sensor.raySpread - b.sensor.raySpread) <= RAY_SPREAD_EPSILON &&
     a.sensor.rayOffset === b.sensor.rayOffset &&
-    (a.sensor.trafficAwareness ?? false) ===
-      (b.sensor.trafficAwareness ?? false)
+    normalizeStateAware(a) === normalizeStateAware(b)
   );
 }
 

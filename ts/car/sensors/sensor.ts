@@ -6,34 +6,15 @@ import type { Point } from '../../math/primitives/point.js';
 import { DEFAULT_CAR_CONFIG } from '../config.js';
 import type { TrafficControlState } from '../../math/trafficControlGrid.js';
 import { getIntersectionOffset, lerp } from '../../math/utils.js';
+import type { SensorReading } from './sensorReading.js';
 
-/**
- * A traffic control polygon paired with its current state, passed to the
- * sensor each frame so rays can detect lights ahead of the car.
- */
+export type { SensorReading } from './sensorReading.js';
+
 export interface SensorTrafficControl {
   polygon: Point[];
   state: TrafficControlState;
 }
 
-/**
- * Per-ray traffic-light detection result — the state plus the exact
- * intersection point on the light polygon. Used for both neural-network
- * inputs and sensor-ray rendering.
- */
-export interface TrafficReading {
-  state: TrafficControlState;
-  offset: number;
-  x: number;
-  y: number;
-}
-
-/**
- * Encodes a traffic light state into the numeric input the neural network
- * consumes: `1` for red (stop/danger), `0.5` for yellow (caution), `0` for
- * green/off or "no light seen along this ray". Reversed encoding matches
- * the distance convention where higher = more urgent.
- */
 export function encodeTrafficState(state: TrafficControlState | null): number {
   switch (state) {
     case 'red':
@@ -50,42 +31,37 @@ export class Sensor {
   rayLength: number;
   raySpread: number;
   rayOffset: number;
-  trafficAwareness: boolean;
+  stateAware: boolean;
 
   rays: Point[][];
   readings: (IntersectionPoint | null)[];
-  /**
-   * Per-ray traffic-light detection result. `null` means no traffic control
-   * was seen along that ray (or the sensor is not traffic-aware). Populated
-   * only when `trafficAwareness` is true and traffic controls were supplied
-   * to {@link update}.
-   */
-  trafficReadings: (TrafficReading | null)[];
+  sensorReadings: (SensorReading | null)[];
 
   constructor(config?: {
     rayCount?: number;
     raySpread?: number;
     rayLength?: number;
     rayOffset?: number;
-    trafficAwareness?: boolean;
+    stateAware?: boolean;
   }) {
     this.rayCount = config?.rayCount ?? DEFAULT_CAR_CONFIG.sensor.rayCount;
     this.rayLength = config?.rayLength ?? DEFAULT_CAR_CONFIG.sensor.rayLength;
     this.raySpread = config?.raySpread ?? DEFAULT_CAR_CONFIG.sensor.raySpread;
     this.rayOffset = config?.rayOffset ?? DEFAULT_CAR_CONFIG.sensor.rayOffset;
-    this.trafficAwareness = config?.trafficAwareness ?? false;
+    this.stateAware = config?.stateAware ?? false;
 
     this.rays = [];
     this.readings = [];
-    this.trafficReadings = [];
+    this.sensorReadings = [];
   }
 
   update(
     x: number,
     y: number,
     angle: number,
-    polygons: Point[][] = [],
+    borders: Point[][] = [],
     trafficControls?: SensorTrafficControl[],
+    otherCars?: Point[][],
   ): void {
     this.rays = SensorRaycaster.castRays(
       x,
@@ -96,116 +72,113 @@ export class Sensor {
       this.raySpread,
       this.rayOffset,
     );
-    this.readings = SensorRaycaster.getReadings(this.rays, polygons);
 
-    if (this.trafficAwareness && trafficControls && trafficControls.length) {
-      this.trafficReadings = this.#getTrafficReadings(
+    this.readings = SensorRaycaster.getReadings(this.rays, borders);
+
+    if (this.stateAware) {
+      this.sensorReadings = this.#getStateAwareReadings(
         this.rays,
         this.readings,
-        trafficControls,
+        trafficControls ?? [],
+        otherCars ?? [],
       );
     } else {
-      this.trafficReadings = new Array(this.rays.length).fill(null);
+      this.sensorReadings = new Array(this.rays.length).fill(null);
     }
   }
 
-  /**
-   * Per-ray traffic-state detection. For each ray we find the closest traffic
-   * control polygon it intersects; if that hit is closer than the road-border
-   * hit (i.e. the light is in front of the wall, not behind it) the car "sees"
-   * that light's state. Otherwise the ray sees no light.
-   */
-  #getTrafficReadings(
+  #getStateAwareReadings(
     rays: Point[][],
     borderReadings: (IntersectionPoint | null)[],
     trafficControls: SensorTrafficControl[],
-  ): (TrafficReading | null)[] {
-    const result: (TrafficReading | null)[] = new Array(rays.length).fill(null);
-    if (trafficControls.length === 0) return result;
+    otherCars: Point[][],
+  ): (SensorReading | null)[] {
+    return rays.map((ray, i) => {
+      const borderHit = borderReadings[i];
+      let minOffset = borderHit?.offset ?? Infinity;
+      let state = 0;
+      let type: SensorReading['type'] = 'border';
+      let hitX = borderHit?.x ?? ray[1].x;
+      let hitY = borderHit?.y ?? ray[1].y;
 
-    for (let i = 0; i < rays.length; i++) {
-      const ray = rays[i];
-      const borderOffset = borderReadings[i]?.offset ?? Infinity;
-      let minOffset = Infinity;
-      let minState: TrafficControlState | null = null;
-
-      for (let c = 0; c < trafficControls.length; c++) {
-        const poly = trafficControls[c].polygon;
-        if (poly.length < 2) continue;
-
-        const edgeCount = poly.length === 2 ? 1 : poly.length;
-        for (let j = 0; j < edgeCount; j++) {
-          const offset = getIntersectionOffset(
-            ray[0],
-            ray[1],
-            poly[j],
-            poly[(j + 1) % poly.length],
-          );
-          if (offset >= 0 && offset < minOffset && offset < borderOffset) {
-            minOffset = offset;
-            minState = trafficControls[c].state;
-          }
+      for (let c = 0; c < otherCars.length; c++) {
+        const offset = this.#polygonRayOffset(ray, otherCars[c]);
+        if (offset !== null && offset < minOffset) {
+          minOffset = offset;
+          state = 1;
+          type = 'car';
+          hitX = lerp(ray[0].x, ray[1].x, offset);
+          hitY = lerp(ray[0].y, ray[1].y, offset);
         }
       }
 
-      if (minState !== null) {
-        result[i] = {
-          state: minState,
-          offset: minOffset,
-          x: lerp(ray[0].x, ray[1].x, minOffset),
-          y: lerp(ray[0].y, ray[1].y, minOffset),
+      for (let c = 0; c < trafficControls.length; c++) {
+        const tc = trafficControls[c];
+        const offset = this.#polygonRayOffset(ray, tc.polygon);
+        if (offset !== null && offset < minOffset) {
+          minOffset = offset;
+          state = encodeTrafficState(tc.state);
+          type = 'trafficControl';
+          hitX = lerp(ray[0].x, ray[1].x, offset);
+          hitY = lerp(ray[0].y, ray[1].y, offset);
+        }
+      }
+
+      if (minOffset === Infinity) {
+        return {
+          distance: 1,
+          state: 0,
+          type: 'none',
+          x: ray[1].x,
+          y: ray[1].y,
         };
       }
+
+      if (type === 'border') {
+        state = 1;
+      }
+
+      return {
+        distance: minOffset,
+        state,
+        type,
+        x: hitX,
+        y: hitY,
+      };
+    });
+  }
+
+  #polygonRayOffset(ray: Point[], poly: Point[]): number | null {
+    if (poly.length < 2) return null;
+    let minOffset = Infinity;
+    const edgeCount = poly.length === 2 ? 1 : poly.length;
+    for (let j = 0; j < edgeCount; j++) {
+      const offset = getIntersectionOffset(
+        ray[0],
+        ray[1],
+        poly[j],
+        poly[(j + 1) % poly.length],
+      );
+      if (offset >= 0 && offset < minOffset) {
+        minOffset = offset;
+      }
     }
-    return result;
+    return minOffset === Infinity ? null : minOffset;
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
+    if (this.stateAware) {
+      this.#drawStateAware(ctx);
+    } else {
+      this.#drawBasic(ctx);
+    }
+  }
+
+  #drawBasic(ctx: CanvasRenderingContext2D): void {
     for (let i = 0; i < this.rays.length; i++) {
       const reading = this.readings[i];
-      const traffic = this.trafficReadings[i];
 
-      if (traffic) {
-        const color =
-          traffic.state === 'green'
-            ? '#0F0'
-            : traffic.state === 'yellow'
-              ? '#FF0'
-              : '#F00';
-
-        // Colored ray from car to traffic light
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = color;
-        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
-        ctx.lineTo(traffic.x, traffic.y);
-        ctx.stroke();
-
-        // Continue ray from light to wall (yellow) if wall exists
-        if (reading) {
-          ctx.beginPath();
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = 'yellow';
-          ctx.moveTo(traffic.x, traffic.y);
-          ctx.lineTo(reading.x, reading.y);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.fillStyle = 'yellow';
-          ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Traffic dot with white border at the light intersection point
-        ctx.beginPath();
-        ctx.arc(traffic.x, traffic.y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      } else if (reading) {
-        // Standard wall-only ray (no traffic)
+      if (reading) {
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = 'yellow';
@@ -218,7 +191,6 @@ export class Sensor {
         ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Nothing hit — faint full-length ray
         ctx.save();
         ctx.globalAlpha = 0.2;
         ctx.beginPath();
@@ -229,6 +201,71 @@ export class Sensor {
         ctx.stroke();
         ctx.restore();
       }
+    }
+  }
+
+  #drawStateAware(ctx: CanvasRenderingContext2D): void {
+    for (let i = 0; i < this.rays.length; i++) {
+      const sr = this.sensorReadings[i];
+
+      if (!sr || sr.type === 'none') {
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'yellow';
+        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+        ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
+
+      let rayColor: string;
+      let dotRadius: number;
+
+      switch (sr.type) {
+        case 'border':
+          rayColor = 'yellow';
+          dotRadius = 3;
+          break;
+        case 'car':
+          rayColor = '#F00';
+          dotRadius = 3;
+          break;
+        case 'trafficControl':
+          rayColor =
+            sr.state >= 0.9 ? '#F00' : sr.state >= 0.4 ? '#FF0' : '#0F0';
+          dotRadius = 4;
+          break;
+        default:
+          rayColor = 'yellow';
+          dotRadius = 3;
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = rayColor;
+      ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
+      ctx.lineTo(sr.x, sr.y);
+      ctx.stroke();
+
+      if (sr.type === 'trafficControl') {
+        ctx.beginPath();
+        ctx.arc(sr.x, sr.y, dotRadius, 0, Math.PI * 2);
+        ctx.fillStyle = rayColor;
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.fillStyle = rayColor;
+        ctx.arc(sr.x, sr.y, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // No continuation ray — the brain only sees the nearest obstacle.
     }
   }
 }

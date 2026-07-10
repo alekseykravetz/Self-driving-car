@@ -684,8 +684,8 @@ directly via `roadBorders`.
 A second spatial hash grid (also 150px cells) dedicated to indexing `Light`
 marking polygons for AI traffic-light perception. It mirrors the border grid's
 build/query pattern but is consumed only by cars with
-`sensor.trafficAwareness === true` (a per-car flag toggled in the training UI
-via the "Traffic Lights" checkbox in the init modal and live training panel;
+`sensor.stateAware === true` (a per-car flag toggled in the training UI
+via the "State Aware" checkbox in the init modal and live training panel;
 defaults to off → legacy input layer):
 
 | Function                                 | Purpose                                                                                                                                     |
@@ -798,8 +798,8 @@ function updateWorldCars(
 
 The simulator owns a `TrafficControlGrid` (built from the loaded world's `Light`
 markings via `buildTrafficControls(world)` and rebuilt on world change). Per
-frame, cars with `sensor.trafficAwareness === true` are passed the
-`SensorTrafficControl[]` near them; non-traffic-aware cars receive nothing and
+frame, cars with `sensor.stateAware === true` are passed the
+`SensorTrafficControl[]` near them; non-state-aware cars receive nothing and
 keep the legacy input layer. Simple mode is unchanged (no lights).
 
 ### Fitness (World Mode)
@@ -934,9 +934,9 @@ feeds it to `car.update(obstacles, trafficControls)`:
 | Traffic lights  | `TrafficControlGrid` broad phase + reach filter (only for traffic-aware cars) |
 
 The simulator owns a `TrafficControlGrid` rebuilt on world load (via
-`buildTrafficControls(world)`). Per frame, traffic-aware cars receive
+`buildTrafficControls(world)`). Per frame, state-aware cars receive
 `queryTrafficControlsNearCar(grid, car)` as the second `car.update()` argument;
-non-traffic-aware cars are passed nothing and drive with the legacy input layer.
+non-state-aware cars are passed nothing and drive with the legacy input layer.
 
 Both follow the toolbar **border mode**: when it is `none` there is no collision
 at all (free driving). When a car crashes it becomes **ghosted**:

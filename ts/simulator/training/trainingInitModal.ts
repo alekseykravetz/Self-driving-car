@@ -135,11 +135,9 @@ export class TrainingInitModalElement extends HTMLElement {
     this.#setValue('#tiCarRayLength', c.sensor.rayLength);
     this.#setValue('#tiCarRaySpread', c.sensor.raySpread);
     this.#setValue('#tiCarRayOffset', c.sensor.rayOffset);
-    const trafficCheckbox = this.querySelector<HTMLInputElement>(
-      '#tiCarTrafficAwareness',
-    );
-    if (trafficCheckbox) {
-      trafficCheckbox.checked = c.sensor.trafficAwareness ?? false;
+    const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
+    if (saCheck) {
+      saCheck.checked = c.sensor.stateAware ?? false;
     }
   }
 
@@ -249,6 +247,8 @@ export class TrainingInitModalElement extends HTMLElement {
         input.disabled = locked;
       },
     );
+    const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
+    if (saCheck) saCheck.disabled = locked;
   }
 
   // ── Result ───────────────────────────────────────────
@@ -303,9 +303,9 @@ export class TrainingInitModalElement extends HTMLElement {
         rayLength: this.#num('#tiCarRayLength', 150, true),
         raySpread: this.#num('#tiCarRaySpread', Math.PI / 2),
         rayOffset: this.#num('#tiCarRayOffset', 0),
-        trafficAwareness:
-          this.querySelector<HTMLInputElement>('#tiCarTrafficAwareness')
-            ?.checked ?? false,
+        stateAware:
+          this.querySelector<HTMLInputElement>('#tiCarStateAware')?.checked ??
+          false,
       },
     };
   }
@@ -317,8 +317,6 @@ export class TrainingInitModalElement extends HTMLElement {
       .filter((n) => !isNaN(n) && n > 0);
     return parts.length > 0 ? parts : [6];
   }
-
-  // ── Small DOM helpers ────────────────────────────────
 
   #setValue(selector: string, value: string | number): void {
     const el = this.querySelector<HTMLInputElement>(selector);

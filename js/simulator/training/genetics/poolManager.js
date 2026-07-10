@@ -23,6 +23,13 @@ export function createCarsForTraining(count, type, config, startInfo) {
     }
     return cars;
 }
+/**
+ * Check two brains for structural compatibility (same layer counts and
+ * input/output sizes). Since different sensor stateAware modes produce
+ * different input-layer sizes (stateAware=false → rayCount+1,
+ * stateAware=true → rayCount*2+1), cross-mode swaps are automatically
+ * rejected — the input layer dimensions won't match.
+ */
 export function brainsCompatible(a, b) {
     const na = a;
     const nb = b;

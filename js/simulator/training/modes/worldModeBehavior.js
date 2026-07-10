@@ -35,10 +35,10 @@ export function updateWorldCars(cars, borderGrid, trafficGrid, borderMode, colli
         if (borderMode !== 'none') {
             bordersForUpdate = queryBordersNearCar(borderGrid, car);
         }
-        const trafficControls = car.sensor?.trafficAwareness
+        const trafficControls = car.sensor?.stateAware
             ? queryTrafficControlsNearCar(trafficGrid, car)
             : [];
-        car.update(bordersForUpdate, trafficControls);
+        car.update(bordersForUpdate, trafficControls, []);
         aliveCount++;
     }
     return { aliveCount, deadCount, frozenCount };

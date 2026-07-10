@@ -155,20 +155,20 @@ Vehicle physics, perception, and control abstraction. The main `Car` class is an
 orchestrator — motion, collision, rendering, and AI control mapping are delegated
 to focused collaborators.
 
-| Module                       | Responsibility                                                                                                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config.ts`                  | Default car configuration (`maxSpeed`, `acceleration`, etc.)                                                                                                                          |
-| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls, audio callbacks                                                                                                             |
-| `physics/carPhysics.ts`      | Motion (speed + translation), polygon creation, damage assessment. Steering (angle) handled by Car directly                                                                           |
-| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                                                                                                                                            |
-| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors)                                                                                                                           |
-| `carState.ts`                | `CarState` + `ControlsState` interfaces (breaks circular deps)                                                                                                                        |
-| `brain/carBrainAdapter.ts`   | Sole bridge to NeuralNetwork: create, serialize, deserialize, feedforward; `inputLayerSize(rayCount, trafficAwareness)` picks `rayCount*2+1` (traffic-aware) vs `rayCount+1` (legacy) |
-| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, normalized readings; optional `trafficControls` param + `trafficAwareness` flag for traffic-light perception                                   |
-| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                                                                                                                                                        |
-| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                                                                                                                                               |
-| `controls/cameraControls.ts` | Webcam-based marker steering                                                                                                                                                          |
-| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                                                                                                                                             |
+| Module                       | Responsibility                                                                                                                                                                |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config.ts`                  | Default car configuration (`maxSpeed`, `acceleration`, etc.)                                                                                                                  |
+| `car.ts`                     | Orchestrator: sensor, brain, physics, renderer, controls, audio callbacks                                                                                                     |
+| `physics/carPhysics.ts`      | Motion (speed + translation), polygon creation, damage assessment. Steering (angle) handled by Car directly                                                                   |
+| `physics/sensorRaycaster.ts` | Pure ray generation and intersection logic                                                                                                                                    |
+| `rendering/carRenderer.ts`   | Sprite caching, mask compositing, draw (color/name/sensors)                                                                                                                   |
+| `carState.ts`                | `CarState` + `ControlsState` interfaces (breaks circular deps)                                                                                                                |
+| `brain/carBrainAdapter.ts`   | Sole bridge to NeuralNetwork: create, serialize, deserialize, feedforward; `inputLayerSize(rayCount, stateAware)` picks `rayCount*2+1` (state-aware) vs `rayCount+1` (legacy) |
+| `sensors/sensor.ts`          | Ray-casting state, obstacle detection, unified `sensorReadings` array; optional `trafficControls` param + `stateAware` flag for traffic-light perception                      |
+| `controls/controls.ts`       | Keyboard input, AI/DUMMY modes                                                                                                                                                |
+| `controls/phoneControls.ts`  | Device orientation (accelerometer tilt)                                                                                                                                       |
+| `controls/cameraControls.ts` | Webcam-based marker steering                                                                                                                                                  |
+| `controls/markerDetector.ts` | K-means blue pixel clustering for markers                                                                                                                                     |
 
 **Factory method**: `Car.fromInfo(opts, info?)` provides an explicit, deterministic
 path for car rehydration from persisted `CarInfo`. The existing `load(info)`
@@ -349,15 +349,15 @@ for clarity — the main element remains as a composition root.
 Sensor.update()
     │
     ▼
-rays[] ──intersect──▶ roadBorders, buildings, traffic cars
-    │                  (+ trafficControls for cars with sensor.trafficAwareness)
+rays[] ──intersect──▶ roadBorders, buildings, traffic cars (as Point[][])
+    │                  (+ trafficControls for cars with sensor.stateAware)
     │
     ▼
-readings[] (normalized 0-1 offsets, closer = higher value)
-    │   (+ trafficReadings[]: green=1, yellow=0.5, red/off=0 per ray, traffic-aware only)
+sensorReadings[] (unified SensorReading[]: { distance, state, type, x, y })
+    │   (state-aware: each ray has distance + state; legacy: readings[] only)
     │
     ▼
-NeuralNetwork.feedForward(readings [+ trafficStates] + speed)
+NeuralNetwork.feedForward(distances [+ states] + speed)
     │
     ▼
 outputs[4] (binary: forward, left, right, reverse)
