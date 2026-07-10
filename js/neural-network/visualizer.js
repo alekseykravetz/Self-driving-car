@@ -14,8 +14,9 @@
  *    Idle connections are calm dim lines. Particle phase is derived from `time`
  *    so there are no per-frame particle allocations.
  *  - Hover inspection: hover a neuron to see its bias/activation and every
- *    incoming weight labelled by its line; hover a connection for a tooltip with
- *    its weight and live `input × weight` contribution.
+ *    connection weight (incoming and outgoing) labelled by its line; hover a
+ *    connection for a tooltip with its weight and live `input × weight`
+ *    contribution.
  *  - Density toggle (`v` key / on-canvas button) to show every value at once, and
  *    an always-on colour legend.
  */
@@ -111,7 +112,12 @@ export class NetworkVisualizer {
             const n = layout.neurons[focusedNeuron];
             for (let e = 0; e < layout.edges.length; e++) {
                 const edge = layout.edges[e];
+                // Incoming: edges targeting this neuron.
                 if (edge.fromRow === n.rowIndex - 1 && edge.j === n.nodeIndex) {
+                    focusedEdges.add(e);
+                }
+                // Outgoing: edges originating from this neuron.
+                if (edge.fromRow === n.rowIndex && edge.i === n.nodeIndex) {
                     focusedEdges.add(e);
                 }
             }
@@ -119,9 +125,9 @@ export class NetworkVisualizer {
         const hasFocus = focusedNeuron >= 0 || this.#hover?.kind === 'connection';
         this.#drawEdges(ctx, layout, time, focusedEdges, hasFocus);
         this.#drawNeurons(ctx, layout, focusedNeuron, hasFocus);
-        // Inline weight labels for every incoming connection of a hovered neuron.
+        // Inline weight labels for every connection of a hovered neuron.
         if (focusedNeuron >= 0) {
-            this.#drawIncomingWeightLabels(ctx, layout, focusedEdges);
+            this.#drawWeightLabels(ctx, layout, focusedEdges, focusedNeuron);
         }
         this.#drawLegend(ctx);
         // Cursor tooltip for a hovered connection.
@@ -408,22 +414,27 @@ export class NetworkVisualizer {
         }
     }
     /**
-     * When a neuron is hovered, label every incoming connection's weight near its
-     * *source* (input) neuron. All incoming lines converge on the hovered neuron,
-     * so labelling the source ends spreads the numbers out instead of stacking
-     * them on top of each other next to the target.
+     * When a neuron is hovered, label every connection's weight at the far end
+     * from the hovered neuron (source end for incoming edges, target end for
+     * outgoing), so labels spread out instead of stacking on top of the hovered
+     * node.
      */
-    #drawIncomingWeightLabels(ctx, layout, focusedEdges) {
+    #drawWeightLabels(ctx, layout, focusedEdges, hoveredNeuron) {
+        const n = layout.neurons[hoveredNeuron];
         for (const e of focusedEdges) {
             const edge = layout.edges[e];
-            // Sit a fixed distance up the line from the source neuron, clear of the
-            // node itself, so each label hugs its own input neuron.
             const dx = edge.x2 - edge.x1;
             const dy = edge.y2 - edge.y1;
             const len = Math.hypot(dx, dy) || 1;
             const offset = _a.NODE_RADIUS + 12;
-            const x = edge.x1 + (dx / len) * offset;
-            const y = edge.y1 + (dy / len) * offset;
+            // Sit the label at the far end of the line from the hovered neuron.
+            const isOutgoing = edge.fromRow === n.rowIndex && edge.i === n.nodeIndex;
+            const x = isOutgoing
+                ? edge.x2 - (dx / len) * offset
+                : edge.x1 + (dx / len) * offset;
+            const y = isOutgoing
+                ? edge.y2 - (dy / len) * offset
+                : edge.y1 + (dy / len) * offset;
             _a.#drawLabelChip(ctx, [edge.weight.toFixed(2)], x, y, 'center');
         }
     }

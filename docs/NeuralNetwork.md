@@ -396,8 +396,9 @@ corner next to the density-toggle button.
 ### Hover inspection
 
 - **Hover a neuron** → a white highlight ring appears, its activation `a=` and
-  bias `b=` are shown beside it, **every incoming connection weight** is labelled
-  near its line, and unrelated elements dim to reduce clutter.
+  bias `b=` are shown beside it, **every connection weight** (both incoming and
+  outgoing) is labelled near its far end, and unrelated elements dim to reduce
+  clutter.
 - **Hover a connection** → the line brightens and a cursor tooltip shows the
   `weight`, the source `input`, the live `contrib = input × weight`, and the
   `src → dst` neuron indices. The tooltip is clamped to stay on-canvas.
