@@ -15,6 +15,11 @@ export interface SensorTrafficControl {
   state: TrafficControlState;
 }
 
+const TRAFFIC_STATE_RED_THRESHOLD = 0.9;
+const TRAFFIC_STATE_YELLOW_THRESHOLD = 0.4;
+const BASIC_RAY_DOT_RADIUS = 3;
+const TRAFFIC_RAY_DOT_RADIUS = 4;
+
 export function encodeTrafficState(state: TrafficControlState | null): number {
   switch (state) {
     case 'red':
@@ -188,7 +193,7 @@ export class Sensor {
 
         ctx.beginPath();
         ctx.fillStyle = 'yellow';
-        ctx.arc(reading.x, reading.y, 3, 0, Math.PI * 2);
+        ctx.arc(reading.x, reading.y, BASIC_RAY_DOT_RADIUS, 0, Math.PI * 2);
         ctx.fill();
       } else {
         ctx.save();
@@ -227,20 +232,24 @@ export class Sensor {
       switch (sr.type) {
         case 'border':
           rayColor = 'yellow';
-          dotRadius = 3;
+          dotRadius = BASIC_RAY_DOT_RADIUS;
           break;
         case 'car':
           rayColor = '#F00';
-          dotRadius = 3;
+          dotRadius = BASIC_RAY_DOT_RADIUS;
           break;
         case 'trafficControl':
           rayColor =
-            sr.state >= 0.9 ? '#F00' : sr.state >= 0.4 ? '#FF0' : '#0F0';
-          dotRadius = 4;
+            sr.state >= TRAFFIC_STATE_RED_THRESHOLD
+              ? '#F00'
+              : sr.state >= TRAFFIC_STATE_YELLOW_THRESHOLD
+                ? '#FF0'
+                : '#0F0';
+          dotRadius = TRAFFIC_RAY_DOT_RADIUS;
           break;
         default:
           rayColor = 'yellow';
-          dotRadius = 3;
+          dotRadius = BASIC_RAY_DOT_RADIUS;
       }
 
       ctx.beginPath();

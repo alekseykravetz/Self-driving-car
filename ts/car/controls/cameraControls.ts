@@ -2,6 +2,10 @@ import { MarkerDetector, Marker } from './markerDetector.js';
 import { Point } from '../../math/primitives/point.js';
 import { average, distance } from '../../math/utils.js';
 
+const VIDEO_DOWNSCALE_FACTOR = 4;
+const REVERSE_SIZE_RATIO = 0.8;
+const FORWARD_SIZE_RATIO = 1.2;
+
 export class CameraControls {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -52,9 +56,9 @@ export class CameraControls {
           this.video.onloadeddata = () => {
             if (!this.video) return; // Type guard
             // Adjust canvas size based on video dimensions for performance
-            const scaleFactor = 4;
-            this.canvas.width = this.video.videoWidth / scaleFactor;
-            this.canvas.height = this.video.videoHeight / scaleFactor;
+            this.canvas.width = this.video.videoWidth / VIDEO_DOWNSCALE_FACTOR;
+            this.canvas.height =
+              this.video.videoHeight / VIDEO_DOWNSCALE_FACTOR;
             this.tempCanvas.width = this.canvas.width;
             this.tempCanvas.height = this.canvas.height;
             // Start the processing loop once video data is loaded
@@ -107,11 +111,10 @@ export class CameraControls {
     } else {
       // Once initialized, compare current size to expected size
       const sizeRatio = currentSize / this.expectedSize;
-      if (sizeRatio < 0.8) {
-        // Threshold for moving backward
+      if (sizeRatio < REVERSE_SIZE_RATIO) {
         this.forward = false;
         this.reverse = true;
-      } else if (sizeRatio > 1.2) {
+      } else if (sizeRatio > FORWARD_SIZE_RATIO) {
         // Optional: Threshold for moving forward (if stopped)
         this.forward = true;
         this.reverse = false;

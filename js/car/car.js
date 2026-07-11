@@ -5,7 +5,7 @@ import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
 import { CarRenderer } from './rendering/carRenderer.js';
 import { CarBrainAdapter } from './brain/carBrainAdapter.js';
-import { STEERING_SPEED, DEFAULT_CAR_CONFIG } from './config.js';
+import { STEERING_SPEED, DEFAULT_CAR_CONFIG, NN_OUTPUT_COUNT, DEFAULT_HIDDEN_LAYERS, } from './config.js';
 export class Car {
     name;
     type;
@@ -47,7 +47,7 @@ export class Car {
         this.angle = opts.angle ?? 0;
         this.damaged = false;
         this.fitness = 0;
-        this.hiddenLayers = opts.hiddenLayers ?? [6];
+        this.hiddenLayers = opts.hiddenLayers ?? DEFAULT_HIDDEN_LAYERS;
         this.useBrain = opts.controlType === 'AI';
         this.#callbacks = opts.callbacks;
         if (opts.controlType !== 'DUMMY') {
@@ -55,7 +55,7 @@ export class Car {
             this.brain = CarBrainAdapter.createBrain([
                 CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.stateAware),
                 ...this.hiddenLayers,
-                4,
+                NN_OUTPUT_COUNT,
             ]);
         }
         this.controls = new Controls(opts.controlType);
@@ -108,7 +108,7 @@ export class Car {
                 this.brain = CarBrainAdapter.createBrain([
                     CarBrainAdapter.inputLayerSize(this.sensor.rayCount, this.sensor.stateAware),
                     ...this.hiddenLayers,
-                    4,
+                    NN_OUTPUT_COUNT,
                 ]);
             }
         }

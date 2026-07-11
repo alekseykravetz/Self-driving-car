@@ -1,5 +1,6 @@
 import { Point } from '../../math/primitives/point.js';
 import { distance } from '../../math/utils.js';
+const KMEANS_ITERATIONS = 10;
 export class MarkerDetector {
     threshold;
     thresholdValue; // Store numeric value for easier use
@@ -62,8 +63,7 @@ export class MarkerDetector {
         // K-means clustering (simplified)
         let group1 = [];
         let group2 = [];
-        // Use a fixed number of iterations
-        for (let iter = 0; iter < 10; iter++) {
+        for (let iter = 0; iter < KMEANS_ITERATIONS; iter++) {
             group1 = points.filter((p) => distance(new Point(p.x, p.y), centroid1) <
                 distance(new Point(p.x, p.y), centroid2));
             group2 = points.filter((p) => distance(new Point(p.x, p.y), centroid1) >=

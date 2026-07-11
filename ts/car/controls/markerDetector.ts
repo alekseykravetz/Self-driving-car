@@ -11,6 +11,8 @@ export interface Marker {
   radius: number;
 }
 
+const KMEANS_ITERATIONS = 10;
+
 export class MarkerDetector {
   threshold: HTMLInputElement;
   thresholdValue: number; // Store numeric value for easier use
@@ -89,8 +91,7 @@ export class MarkerDetector {
     let group1: PointWithBlueness[] = [];
     let group2: PointWithBlueness[] = [];
 
-    // Use a fixed number of iterations
-    for (let iter = 0; iter < 10; iter++) {
+    for (let iter = 0; iter < KMEANS_ITERATIONS; iter++) {
       group1 = points.filter(
         (p) =>
           distance(new Point(p.x, p.y), centroid1 as Point) <
