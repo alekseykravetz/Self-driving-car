@@ -4,7 +4,7 @@ export class CarPhysics {
     update(state, controls, polygons = []) {
         if (state.damaged)
             return false;
-        this.move(state, controls);
+        this.#move(state, controls);
         state.fitness += state.speed;
         state.polygon = this.createPolygon(state);
         const becameDamaged = this.assessDamage(state.polygon, polygons);
@@ -14,7 +14,7 @@ export class CarPhysics {
         }
         return becameDamaged;
     }
-    move(state, controls) {
+    #move(state, controls) {
         if (controls.forward) {
             state.speed += state.acceleration;
         }

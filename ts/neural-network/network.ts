@@ -173,10 +173,10 @@ export class Level {
       this.weights[i] = new Array(outputCount);
     }
 
-    Level.randomize(this);
+    Level.#randomize(this);
   }
 
-  private static randomize(level: Level): void {
+  static #randomize(level: Level): void {
     // Initialize weights with random values between -1 and 1
     for (let i: number = 0; i < level.inputs.length; i++) {
       for (let j: number = 0; j < level.outputs.length; j++) {

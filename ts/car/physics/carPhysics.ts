@@ -11,7 +11,7 @@ export class CarPhysics {
   ): boolean {
     if (state.damaged) return false;
 
-    this.move(state, controls);
+    this.#move(state, controls);
     state.fitness += state.speed;
     state.polygon = this.createPolygon(state);
 
@@ -23,7 +23,7 @@ export class CarPhysics {
     return becameDamaged;
   }
 
-  private move(state: CarState, controls: ControlsState): void {
+  #move(state: CarState, controls: ControlsState): void {
     if (controls.forward) {
       state.speed += state.acceleration;
     }

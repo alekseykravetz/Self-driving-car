@@ -132,9 +132,9 @@ export class Level {
         for (let i = 0; i < inputCount; i++) {
             this.weights[i] = new Array(outputCount);
         }
-        Level.randomize(this);
+        Level.#randomize(this);
     }
-    static randomize(level) {
+    static #randomize(level) {
         // Initialize weights with random values between -1 and 1
         for (let i = 0; i < level.inputs.length; i++) {
             for (let j = 0; j < level.outputs.length; j++) {
