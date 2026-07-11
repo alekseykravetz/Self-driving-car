@@ -62,7 +62,6 @@ export class Car {
         this.physics = new CarPhysics();
         this.renderer = new CarRenderer(this);
         this.polygon = this.physics.createPolygon(this);
-        this.update();
     }
     static fromInfo(opts, info) {
         const car = new Car(opts);
@@ -161,6 +160,10 @@ export class Car {
         if (becameDamaged) {
             this.#callbacks?.onDamaged?.();
         }
+        this.#processBrain(polygons, trafficControls, otherCars);
+        this.#syncEngine();
+    }
+    #processBrain(polygons, trafficControls, otherCars) {
         if (this.sensor && this.brain) {
             this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
             if (this.useBrain && this.controls instanceof Controls) {
@@ -177,7 +180,6 @@ export class Car {
         else if (this.sensor) {
             this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
         }
-        this.#syncEngine();
     }
     #syncEngine() {
         if (!this.#callbacks?.onEngineUpdate)

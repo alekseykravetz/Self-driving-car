@@ -133,7 +133,6 @@ export class Car {
     this.renderer = new CarRenderer(this);
 
     this.polygon = this.physics.createPolygon(this);
-    this.update();
   }
 
   static fromInfo(opts: CarOptions, info?: CarInfo | null): Car {
@@ -254,6 +253,16 @@ export class Car {
       this.#callbacks?.onDamaged?.();
     }
 
+    this.#processBrain(polygons, trafficControls, otherCars);
+
+    this.#syncEngine();
+  }
+
+  #processBrain(
+    polygons: Point[][],
+    trafficControls?: SensorTrafficControl[],
+    otherCars?: Point[][],
+  ): void {
     if (this.sensor && this.brain) {
       this.sensor.update(
         this.x,
@@ -296,8 +305,6 @@ export class Car {
         otherCars,
       );
     }
-
-    this.#syncEngine();
   }
 
   #syncEngine(): void {
