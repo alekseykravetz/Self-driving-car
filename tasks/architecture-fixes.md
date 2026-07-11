@@ -61,14 +61,17 @@ Type-only import of `Car` from `ts/car/` creates a conceptual dependency upward.
 ## 5. Fix ES2022 Private Field Violations
 
 ### 5a. `ts/car/physics/carPhysics.ts:26`
+
 - [ ] `private move(...)` → `#move(...)`
 - [ ] Update internal references: `this.move(...)` → `this.#move(...)`
 
 ### 5b. `ts/neural-network/network.ts:179`
+
 - [ ] `private static randomize(level: Level)` → `static #randomize(level: Level)`
 - [ ] Update internal references
 
 ### 5c. `ts/neural-network/visualizer.ts:98-105` (optional — static readonly constants)
+
 - [ ] Consider extracting `NODE_RADIUS`, `MARGIN`, etc. as module-level `const` exports instead of `private static readonly` class properties
 
 ---
@@ -76,20 +79,24 @@ Type-only import of `Car` from `ts/car/` creates a conceptual dependency upward.
 ## 6. Extract Named Constants for Magic Numbers
 
 ### 6a. `ts/car/sensors/sensor.ts`
+
 - [ ] `0.9` → `TRAFFIC_STATE_RED_THRESHOLD`
 - [ ] `0.4` → `TRAFFIC_STATE_YELLOW_THRESHOLD`
 - [ ] `3` → `BASIC_RAY_DOT_RADIUS`
 - [ ] `4` → `TRAFFIC_RAY_DOT_RADIUS`
 
 ### 6b. `ts/car/controls/cameraControls.ts`
+
 - [ ] `4` (scale factor) → `VIDEO_DOWNSCALE_FACTOR`
 - [ ] `0.8` → `REVERSE_SIZE_RATIO`
 - [ ] `1.2` → `FORWARD_SIZE_RATIO`
 
 ### 6c. `ts/car/controls/markerDetector.ts`
+
 - [ ] `10` (k-means iterations) → `KMEANS_ITERATIONS`
 
 ### 6d. `ts/car/car.ts`
+
 - [ ] `4` (NN output size) → `NN_OUTPUT_COUNT` in `ts/car/config.ts`
 - [ ] Default `[6]` (hidden layers) → `DEFAULT_HIDDEN_LAYERS` in `ts/car/config.ts`
 
@@ -108,13 +115,16 @@ Type-only import of `Car` from `ts/car/` creates a conceptual dependency upward.
 ## 8. Reduce God-Object Surface in `car.ts`
 
 ### 8a. Extract `update()` brain-inference into `#processBrain()`
+
 - [ ] Pull the 30-line sensor/brain inference block (lines ~250-280) into a dedicated `#processBrain(time, polygons, trafficControls, otherCars)` method
 - [ ] `update()` becomes: apply steering → run physics → `#processBrain()` → sync engine
 
 ### 8b. Move defaults to `config.ts`
+
 - [ ] Move `default hiddenLayers = [6]` from constructor to `ts/car/config.ts` as `DEFAULT_HIDDEN_LAYERS`
 
 ### 8c. Fix constructor calling `this.update()`
+
 - [ ] Remove `this.update()` from constructor (line 131)
 - [ ] If any code depends on this side-effect, call `car.update()` explicitly after construction (or add an `init()` method)
 - [ ] Audit callers of `new Car(...)` to ensure nothing breaks
