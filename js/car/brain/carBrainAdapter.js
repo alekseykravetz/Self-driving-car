@@ -20,6 +20,13 @@ export class CarBrainAdapter {
     static inputLayerSize(rayCount, stateAware) {
         return stateAware ? rayCount * 2 + 1 : rayCount + 1;
     }
+    static brainsCompatible(brain, rayCount, stateAware) {
+        const nn = brain;
+        if (!nn.levels || nn.levels.length === 0)
+            return false;
+        const expectedInput = CarBrainAdapter.inputLayerSize(rayCount, stateAware);
+        return nn.levels[0].inputs.length === expectedInput;
+    }
     static computeControls(readings, speed, maxSpeed, brain, sensorReadings, stateAware) {
         let offsets;
         if (stateAware && sensorReadings) {

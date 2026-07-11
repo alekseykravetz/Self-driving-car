@@ -3,7 +3,11 @@ import { Controls } from './controls/controls.js';
 import { PhoneControls } from './controls/phoneControls.js';
 import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
-import { CarRenderer, type CarDrawOptions } from './rendering/carRenderer.js';
+import {
+  CarRenderer,
+  type CarDrawOptions,
+  type CarDrawData,
+} from './rendering/carRenderer.js';
 import { CarBrainAdapter, type Brain } from './brain/carBrainAdapter.js';
 import {
   STEERING_SPEED,
@@ -130,7 +134,7 @@ export class Car {
     this.controls = new Controls(opts.controlType);
 
     this.physics = new CarPhysics();
-    this.renderer = new CarRenderer(this);
+    this.renderer = new CarRenderer();
 
     this.polygon = this.physics.createPolygon(this);
   }
@@ -183,6 +187,16 @@ export class Car {
           ...this.hiddenLayers,
           NN_OUTPUT_COUNT,
         ]);
+      }
+      if (
+        this.brain &&
+        !CarBrainAdapter.brainsCompatible(
+          this.brain,
+          this.sensor.rayCount,
+          this.sensor.stateAware,
+        )
+      ) {
+        this.brain = undefined;
       }
     }
   }
@@ -312,8 +326,23 @@ export class Car {
     this.#callbacks.onEngineUpdate(this.speed, this.maxSpeed);
   }
 
+  toDrawData(): CarDrawData {
+    return {
+      polygon: this.polygon,
+      damaged: this.damaged,
+      color: this.color,
+      name: this.name,
+      sensor: this.sensor,
+      x: this.x,
+      y: this.y,
+      angle: this.angle,
+      width: this.width,
+      height: this.height,
+    };
+  }
+
   draw(ctx: CanvasRenderingContext2D, options: CarDrawOptions = {}): void {
-    this.renderer.draw(ctx, options);
+    this.renderer.draw(ctx, this.toDrawData(), options);
   }
 
   setCallbacks(cb: CarCallbacks): void {

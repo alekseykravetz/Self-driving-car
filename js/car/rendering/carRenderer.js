@@ -1,10 +1,8 @@
 export class CarRenderer {
-    car;
     image;
     static #sharedImage = null;
     static #spriteCache = new Map();
-    constructor(car) {
-        this.car = car;
+    constructor() {
         this.image = CarRenderer.#getSharedImage();
     }
     static #getSharedImage() {
@@ -37,7 +35,7 @@ export class CarRenderer {
         }
         return sprite;
     }
-    draw(ctx, options = {}) {
+    draw(ctx, data, options = {}) {
         const { showSensor = false, showMask = true, colorOverride, alpha, showName = false, } = options;
         const needsRestore = showSensor || showName;
         if (needsRestore)
@@ -46,42 +44,42 @@ export class CarRenderer {
         if (alpha !== undefined) {
             ctx.globalAlpha = alpha;
         }
-        if (this.car.sensor && showSensor) {
-            this.car.sensor.draw(ctx);
+        if (data.sensor && showSensor) {
+            data.sensor.draw(ctx);
         }
-        const effectiveColor = colorOverride ?? this.car.color;
+        const effectiveColor = colorOverride ?? data.color;
         if (showMask) {
-            const sprite = this.car.damaged
+            const sprite = data.damaged
                 ? null
-                : CarRenderer.#getSprite(effectiveColor, this.car.width, this.car.height);
-            ctx.translate(this.car.x, this.car.y);
-            ctx.rotate(-this.car.angle);
-            ctx.drawImage(sprite ?? this.image, -this.car.width / 2, -this.car.height / 2, this.car.width, this.car.height);
-            ctx.rotate(this.car.angle);
-            ctx.translate(-this.car.x, -this.car.y);
+                : CarRenderer.#getSprite(effectiveColor, data.width, data.height);
+            ctx.translate(data.x, data.y);
+            ctx.rotate(-data.angle);
+            ctx.drawImage(sprite ?? this.image, -data.width / 2, -data.height / 2, data.width, data.height);
+            ctx.rotate(data.angle);
+            ctx.translate(-data.x, -data.y);
         }
         else {
-            if (this.car.damaged) {
+            if (data.damaged) {
                 ctx.fillStyle = 'gray';
             }
             else {
                 ctx.fillStyle = effectiveColor;
             }
             ctx.beginPath();
-            ctx.moveTo(this.car.polygon[0].x, this.car.polygon[0].y);
-            for (let i = 1; i < this.car.polygon.length; i++) {
-                ctx.lineTo(this.car.polygon[i].x, this.car.polygon[i].y);
+            ctx.moveTo(data.polygon[0].x, data.polygon[0].y);
+            for (let i = 1; i < data.polygon.length; i++) {
+                ctx.lineTo(data.polygon[i].x, data.polygon[i].y);
             }
             ctx.fill();
         }
-        if (showName && this.car.name) {
+        if (showName && data.name) {
             ctx.font = 'bold 13px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.shadowColor = 'rgba(0,0,0,0.9)';
             ctx.shadowBlur = 5;
             ctx.fillStyle = 'white';
-            ctx.fillText(this.car.name, this.car.x, this.car.y);
+            ctx.fillText(data.name, data.x, data.y);
         }
         if (alpha !== undefined) {
             ctx.globalAlpha = prevAlpha;

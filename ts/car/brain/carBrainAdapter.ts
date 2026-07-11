@@ -35,6 +35,17 @@ export class CarBrainAdapter {
     return stateAware ? rayCount * 2 + 1 : rayCount + 1;
   }
 
+  static brainsCompatible(
+    brain: Brain,
+    rayCount: number,
+    stateAware: boolean,
+  ): boolean {
+    const nn = brain as NeuralNetwork;
+    if (!nn.levels || nn.levels.length === 0) return false;
+    const expectedInput = CarBrainAdapter.inputLayerSize(rayCount, stateAware);
+    return nn.levels[0].inputs.length === expectedInput;
+  }
+
   static computeControls(
     readings: (IntersectionPoint | null)[],
     speed: number,

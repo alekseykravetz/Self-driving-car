@@ -1,4 +1,18 @@
-import { Car } from '../car.js';
+import type { Point } from '../../math/primitives/point.js';
+import type { Sensor } from '../sensors/sensor.js';
+
+export interface CarDrawData {
+  polygon: Point[];
+  damaged: boolean;
+  color: string;
+  name?: string;
+  sensor?: Sensor;
+  x: number;
+  y: number;
+  angle: number;
+  width: number;
+  height: number;
+}
 
 export interface CarDrawOptions {
   showSensor?: boolean;
@@ -9,15 +23,13 @@ export interface CarDrawOptions {
 }
 
 export class CarRenderer {
-  car: Car;
   image: HTMLImageElement;
 
   static #sharedImage: HTMLImageElement | null = null;
 
   static #spriteCache: Map<string, HTMLCanvasElement> = new Map();
 
-  constructor(car: Car) {
-    this.car = car;
+  constructor() {
     this.image = CarRenderer.#getSharedImage();
   }
 
@@ -57,7 +69,11 @@ export class CarRenderer {
     return sprite;
   }
 
-  draw(ctx: CanvasRenderingContext2D, options: CarDrawOptions = {}): void {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    data: CarDrawData,
+    options: CarDrawOptions = {},
+  ): void {
     const {
       showSensor = false,
       showMask = true,
@@ -74,54 +90,50 @@ export class CarRenderer {
       ctx.globalAlpha = alpha;
     }
 
-    if (this.car.sensor && showSensor) {
-      this.car.sensor.draw(ctx);
+    if (data.sensor && showSensor) {
+      data.sensor.draw(ctx);
     }
 
-    const effectiveColor = colorOverride ?? this.car.color;
+    const effectiveColor = colorOverride ?? data.color;
 
     if (showMask) {
-      const sprite = this.car.damaged
+      const sprite = data.damaged
         ? null
-        : CarRenderer.#getSprite(
-            effectiveColor,
-            this.car.width,
-            this.car.height,
-          );
+        : CarRenderer.#getSprite(effectiveColor, data.width, data.height);
 
-      ctx.translate(this.car.x, this.car.y);
-      ctx.rotate(-this.car.angle);
+      ctx.translate(data.x, data.y);
+      ctx.rotate(-data.angle);
       ctx.drawImage(
         sprite ?? this.image,
-        -this.car.width / 2,
-        -this.car.height / 2,
-        this.car.width,
-        this.car.height,
+        -data.width / 2,
+        -data.height / 2,
+        data.width,
+        data.height,
       );
-      ctx.rotate(this.car.angle);
-      ctx.translate(-this.car.x, -this.car.y);
+      ctx.rotate(data.angle);
+      ctx.translate(-data.x, -data.y);
     } else {
-      if (this.car.damaged) {
+      if (data.damaged) {
         ctx.fillStyle = 'gray';
       } else {
         ctx.fillStyle = effectiveColor;
       }
       ctx.beginPath();
-      ctx.moveTo(this.car.polygon[0].x, this.car.polygon[0].y);
-      for (let i = 1; i < this.car.polygon.length; i++) {
-        ctx.lineTo(this.car.polygon[i].x, this.car.polygon[i].y);
+      ctx.moveTo(data.polygon[0].x, data.polygon[0].y);
+      for (let i = 1; i < data.polygon.length; i++) {
+        ctx.lineTo(data.polygon[i].x, data.polygon[i].y);
       }
       ctx.fill();
     }
 
-    if (showName && this.car.name) {
+    if (showName && data.name) {
       ctx.font = 'bold 13px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,0.9)';
       ctx.shadowBlur = 5;
       ctx.fillStyle = 'white';
-      ctx.fillText(this.car.name, this.car.x, this.car.y);
+      ctx.fillText(data.name, data.x, data.y);
     }
 
     if (alpha !== undefined) {
