@@ -1,8 +1,6 @@
 import { Point } from '../primitives/point.js';
 import { Segment } from '../primitives/segment.js';
 import { getNearestSegment } from '../utils.js';
-import { drawPoint } from '../../rendering/pointRenderer.js';
-import { drawSegment } from '../../rendering/segmentRenderer.js';
 export class Graph {
     points;
     segments;
@@ -159,13 +157,5 @@ export class Graph {
         // re instantiated the same reference
         this.points.length = 0;
         this.segments.length = 0;
-    }
-    draw(ctx) {
-        for (let segment of this.segments) {
-            drawSegment(ctx, segment);
-        }
-        for (let point of this.points) {
-            drawPoint(ctx, point);
-        }
     }
 }

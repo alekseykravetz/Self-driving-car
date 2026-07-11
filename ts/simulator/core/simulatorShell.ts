@@ -220,7 +220,9 @@ export abstract class SimulatorShell {
    */
   recordHeatmap(cars: Car[]): void {
     if (!this.heatmapVisible) return;
-    this.heatmapGrid.record(cars);
+    this.heatmapGrid.record(
+      cars.map((c) => ({ x: c.x, y: c.y, speed: c.speed, damaged: c.damaged })),
+    );
   }
 
   /**

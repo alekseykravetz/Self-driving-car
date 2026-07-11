@@ -53,17 +53,17 @@ export class HeatmapGrid {
      *
      * O(cars) per frame with O(1) cell lookup per car; no cross-car interaction.
      */
-    record(cars) {
+    record(vehicles) {
         this.#totalFrames++;
         const cellSize = this.cellSize;
         const threshold = IDLE_SPEED_THRESHOLD;
         const cells = this.#cells;
-        for (let i = 0; i < cars.length; i++) {
-            const car = cars[i];
-            if (car.damaged)
+        for (let i = 0; i < vehicles.length; i++) {
+            const v = vehicles[i];
+            if (v.damaged)
                 continue;
-            const col = Math.floor(car.x / cellSize);
-            const row = Math.floor(car.y / cellSize);
+            const col = Math.floor(v.x / cellSize);
+            const row = Math.floor(v.y / cellSize);
             const key = this.#cellKey(col, row);
             let cell = cells.get(key);
             if (!cell) {
@@ -71,7 +71,7 @@ export class HeatmapGrid {
                 cells.set(key, cell);
             }
             cell.occupancyFrames++;
-            if (Math.abs(car.speed) < threshold) {
+            if (Math.abs(v.speed) < threshold) {
                 cell.idleFrames++;
             }
         }

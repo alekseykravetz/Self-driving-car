@@ -265,7 +265,12 @@ export class GraphEditor {
   // todo: change name to draw in all editors
   // Renders the graph and editor-specific visuals (hovered, selected points, intent line) onto the canvas.
   public display(): void {
-    this.#graph.draw(this.#ctx);
+    for (const seg of this.#graph.segments) {
+      drawSegment(this.#ctx, seg);
+    }
+    for (const point of this.#graph.points) {
+      drawPoint(this.#ctx, point);
+    }
 
     if (this.#hovered) {
       drawPoint(this.#ctx, this.#hovered, { fill: true });

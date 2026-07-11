@@ -173,7 +173,7 @@ export class SimulatorShell {
     recordHeatmap(cars) {
         if (!this.heatmapVisible)
             return;
-        this.heatmapGrid.record(cars);
+        this.heatmapGrid.record(cars.map((c) => ({ x: c.x, y: c.y, speed: c.speed, damaged: c.damaged })));
     }
     /**
      * Paint the heatmap overlay on the game canvas. Call from a subclass
