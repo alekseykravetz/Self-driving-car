@@ -5,7 +5,7 @@ import { StoreManager } from '../../store/storeManager.js';
 import { createCarsForTraining, getSortedAICars, getTopAICars, getTopCarInfoPool, applyPoolToCars, inferHiddenLayers, } from './genetics/poolManager.js';
 import { loadPoolFromStorage, savePoolToStorage, discardStoredPool, downloadCarFiles, } from './genetics/storageManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
-import { formatMetersFromWorldPixels, formatKmhFromPxPerFrame, } from '../../math/utils.js';
+import { formatMetersFromWorldPixels, formatKmhFromPxPerFrame, } from '../../math/worldUnits.js';
 export class TrainingPanelElement extends HTMLElement {
     iteration = 0;
     maxDistancePassed = 0;

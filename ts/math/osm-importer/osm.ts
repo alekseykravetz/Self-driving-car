@@ -3,9 +3,8 @@ import { Segment } from '../primitives/segment.js';
 import {
   METERS_PER_DEGREE_LATITUDE,
   WORLD_PIXELS_PER_METER,
-  invLerp,
-  degToRad,
-} from '../utils.js';
+} from '../worldUnits.js';
+import { invLerp, degToRad } from '../utils.js';
 
 // --- Interfaces for OSM Data Structure ---
 interface OsmNodeElement {

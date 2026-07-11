@@ -3,7 +3,7 @@ import type { Car } from '../../car/car.js';
 import {
   formatKmhFromPxPerFrame,
   formatMetersFromWorldPixels,
-} from '../../math/utils.js';
+} from '../../math/worldUnits.js';
 
 /**
  * <traffic-panel> — side panel for the Live Traffic Jam simulator.

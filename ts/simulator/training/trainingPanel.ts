@@ -22,7 +22,7 @@ import { safeJsonParse } from '../../store/serialization.js';
 import {
   formatMetersFromWorldPixels,
   formatKmhFromPxPerFrame,
-} from '../../math/utils.js';
+} from '../../math/worldUnits.js';
 
 export interface TrainingManagerOptions {
   evaluateFitness: (car: Car) => number;

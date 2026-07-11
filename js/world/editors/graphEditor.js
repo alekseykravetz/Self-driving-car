@@ -1,5 +1,6 @@
 import { Segment } from '../../math/primitives/segment.js';
-import { getNearestPoint, subtract, normalize, perpendicular, scale, add, formatMetersFromWorldPixels, formatDegrees, } from '../../math/utils.js';
+import { formatMetersFromWorldPixels } from '../../math/worldUnits.js';
+import { getNearestPoint, subtract, normalize, perpendicular, scale, add, formatDegrees, } from '../../math/utils.js';
 import { drawPoint } from '../../rendering/pointRenderer.js';
 import { drawSegment } from '../../rendering/segmentRenderer.js';
 export class GraphEditor {

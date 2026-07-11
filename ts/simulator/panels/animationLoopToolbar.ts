@@ -1,5 +1,5 @@
 import { ANIMATION_LOOP_TOOLBAR_TEMPLATE } from './templates/animationLoopToolbarTemplate.js';
-import { formatElapsedTime } from '../../math/utils.js';
+import { formatElapsedTime } from '../../math/worldUnits.js';
 
 /**
  * <animation-loop-toolbar> — floating toolbar that manages the simulator

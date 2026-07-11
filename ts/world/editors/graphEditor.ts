@@ -2,6 +2,7 @@ import { Viewport } from '../../viewport/viewport.js';
 import { Graph } from '../../math/graph/graph.js';
 import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
+import { formatMetersFromWorldPixels } from '../../math/worldUnits.js';
 import {
   getNearestPoint,
   subtract,
@@ -9,7 +10,6 @@ import {
   perpendicular,
   scale,
   add,
-  formatMetersFromWorldPixels,
   formatDegrees,
 } from '../../math/utils.js';
 import { drawPoint } from '../../rendering/pointRenderer.js';

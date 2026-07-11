@@ -1,6 +1,7 @@
 import { Point } from '../primitives/point.js';
 import { Segment } from '../primitives/segment.js';
-import { METERS_PER_DEGREE_LATITUDE, WORLD_PIXELS_PER_METER, invLerp, degToRad, } from '../utils.js';
+import { METERS_PER_DEGREE_LATITUDE, WORLD_PIXELS_PER_METER, } from '../worldUnits.js';
+import { invLerp, degToRad } from '../utils.js';
 export class Osm {
     /**
      * Parses raw OSM data (typically from Overpass API JSON) to extract nodes and ways,

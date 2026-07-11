@@ -1,7 +1,4 @@
 import { Point } from './primitives/point.js';
-export const WORLD_PIXELS_PER_METER = 14;
-export const SIMULATION_FPS = 60;
-export const METERS_PER_DEGREE_LATITUDE = 111000;
 export function getNearestPoint(location, points, threshold = Number.MAX_SAFE_INTEGER) {
     let minDistance = Number.MAX_SAFE_INTEGER;
     let nearestPoint = null;
@@ -29,49 +26,11 @@ export function getNearestSegment(location, segments, threshold = Number.MAX_SAF
 export function distance(p1, p2) {
     return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
-export function worldPixelsToMeters(px) {
-    return px / WORLD_PIXELS_PER_METER;
-}
-export function metersToWorldPixels(meters) {
-    return meters * WORLD_PIXELS_PER_METER;
-}
-export function pxPerFrameToKmh(pxPerFrame) {
-    return (pxPerFrame * SIMULATION_FPS * 3.6) / WORLD_PIXELS_PER_METER;
-}
-export function kmhToPxPerFrame(kmh) {
-    return ((kmh / 3.6) * WORLD_PIXELS_PER_METER) / SIMULATION_FPS;
-}
 export function radiansToDegrees(radians) {
     return (radians * 180) / Math.PI;
 }
-export function formatMetersFromWorldPixels(px) {
-    return `${worldPixelsToMeters(px).toFixed(1)} m`;
-}
-export function formatKmhFromPxPerFrame(pxPerFrame) {
-    return `${pxPerFrameToKmh(pxPerFrame).toFixed(1)} km/h`;
-}
 export function formatDegrees(radians) {
     return `${radiansToDegrees(radians).toFixed(0)}°`;
-}
-/**
- * Convert simulation frames to real-world seconds based on SIMULATION_FPS.
- * At 60 FPS: 60 frames = 1 second
- */
-export function framesToSeconds(frames) {
-    return frames / SIMULATION_FPS;
-}
-/**
- * Format elapsed simulation time as HH:MM:SS string.
- * @param frames Total elapsed simulation frames
- * @returns Formatted time string like "00:05:30" for 5 minutes 30 seconds
- */
-export function formatElapsedTime(frames) {
-    const totalSeconds = Math.floor(framesToSeconds(frames));
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    const pad = (num) => String(num).padStart(2, '0');
-    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 export function average(p1, p2) {
     return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);

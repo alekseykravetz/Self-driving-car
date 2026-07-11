@@ -1,6 +1,7 @@
 import { Point } from '../math/primitives/point.js';
 import { ScaleIndicator } from './scaleIndicator.js';
-import { scale, subtract, add, WORLD_PIXELS_PER_METER } from '../math/utils.js';
+import { scale, subtract, add } from '../math/utils.js';
+import { WORLD_PIXELS_PER_METER } from '../math/worldUnits.js';
 export class Viewport {
     canvas;
     #ctx;

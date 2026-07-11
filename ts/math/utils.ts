@@ -1,10 +1,6 @@
 import { Point } from './primitives/point.js';
 import { Segment } from './primitives/segment.js';
 
-export const WORLD_PIXELS_PER_METER = 14;
-export const SIMULATION_FPS = 60;
-export const METERS_PER_DEGREE_LATITUDE = 111000;
-
 export function getNearestPoint(
   location: Point,
   points: Point[],
@@ -43,59 +39,12 @@ export function distance(p1: Point, p2: Point): number {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
-export function worldPixelsToMeters(px: number): number {
-  return px / WORLD_PIXELS_PER_METER;
-}
-
-export function metersToWorldPixels(meters: number): number {
-  return meters * WORLD_PIXELS_PER_METER;
-}
-
-export function pxPerFrameToKmh(pxPerFrame: number): number {
-  return (pxPerFrame * SIMULATION_FPS * 3.6) / WORLD_PIXELS_PER_METER;
-}
-
-export function kmhToPxPerFrame(kmh: number): number {
-  return ((kmh / 3.6) * WORLD_PIXELS_PER_METER) / SIMULATION_FPS;
-}
-
 export function radiansToDegrees(radians: number): number {
   return (radians * 180) / Math.PI;
 }
 
-export function formatMetersFromWorldPixels(px: number): string {
-  return `${worldPixelsToMeters(px).toFixed(1)} m`;
-}
-
-export function formatKmhFromPxPerFrame(pxPerFrame: number): string {
-  return `${pxPerFrameToKmh(pxPerFrame).toFixed(1)} km/h`;
-}
-
 export function formatDegrees(radians: number): string {
   return `${radiansToDegrees(radians).toFixed(0)}°`;
-}
-
-/**
- * Convert simulation frames to real-world seconds based on SIMULATION_FPS.
- * At 60 FPS: 60 frames = 1 second
- */
-export function framesToSeconds(frames: number): number {
-  return frames / SIMULATION_FPS;
-}
-
-/**
- * Format elapsed simulation time as HH:MM:SS string.
- * @param frames Total elapsed simulation frames
- * @returns Formatted time string like "00:05:30" for 5 minutes 30 seconds
- */
-export function formatElapsedTime(frames: number): string {
-  const totalSeconds = Math.floor(framesToSeconds(frames));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  const pad = (num: number) => String(num).padStart(2, '0');
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 export function average(p1: Point, p2: Point): Point {
