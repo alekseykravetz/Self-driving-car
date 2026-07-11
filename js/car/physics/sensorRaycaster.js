@@ -1,4 +1,5 @@
-import { lerp, getIntersectionOffset } from '../../math/utils.js';
+import { lerp } from '../../math/utils.js';
+import { nearestEdgeOffset } from '../../math/collision.js';
 export class SensorRaycaster {
     static castRays(carX, carY, carAngle, rayCount, rayLength, raySpread, rayOffset) {
         const rays = [];
@@ -25,7 +26,7 @@ export class SensorRaycaster {
     static getReading(ray, polygons) {
         let minOffset = Infinity;
         for (let i = 0; i < polygons.length; i++) {
-            const offset = this.#nearestEdgeOffset(ray, polygons[i]);
+            const offset = nearestEdgeOffset(ray, polygons[i]);
             if (offset !== null && offset < minOffset) {
                 minOffset = offset;
             }
@@ -43,7 +44,7 @@ export class SensorRaycaster {
             let minOffset = Infinity;
             let minHit = null;
             for (let i = 0; i < borders.length; i++) {
-                const offset = this.#nearestEdgeOffset(ray, borders[i]);
+                const offset = nearestEdgeOffset(ray, borders[i]);
                 if (offset !== null && offset < minOffset) {
                     minOffset = offset;
                     minHit = {
@@ -55,7 +56,7 @@ export class SensorRaycaster {
                 }
             }
             for (let i = 0; i < carPolys.length; i++) {
-                const offset = this.#nearestEdgeOffset(ray, carPolys[i]);
+                const offset = nearestEdgeOffset(ray, carPolys[i]);
                 if (offset !== null && offset < minOffset) {
                     minOffset = offset;
                     minHit = {
@@ -67,7 +68,7 @@ export class SensorRaycaster {
                 }
             }
             for (let i = 0; i < controls.length; i++) {
-                const offset = this.#nearestEdgeOffset(ray, controls[i].polygon);
+                const offset = nearestEdgeOffset(ray, controls[i].polygon);
                 if (offset !== null && offset < minOffset) {
                     minOffset = offset;
                     minHit = {
@@ -81,18 +82,5 @@ export class SensorRaycaster {
             }
             return minHit;
         });
-    }
-    static #nearestEdgeOffset(ray, poly) {
-        if (poly.length < 2)
-            return null;
-        let minOffset = Infinity;
-        const edgeCount = poly.length === 2 ? 1 : poly.length;
-        for (let j = 0; j < edgeCount; j++) {
-            const offset = getIntersectionOffset(ray[0], ray[1], poly[j], poly[(j + 1) % poly.length]);
-            if (offset >= 0 && offset < minOffset) {
-                minOffset = offset;
-            }
-        }
-        return minOffset === Infinity ? null : minOffset;
     }
 }

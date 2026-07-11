@@ -1,6 +1,24 @@
 import { Point } from './primitives/point.js';
 import { getIntersectionOffset } from './utils.js';
 
+export function nearestEdgeOffset(ray: Point[], poly: Point[]): number | null {
+  if (poly.length < 2) return null;
+  let minOffset = Infinity;
+  const edgeCount = poly.length === 2 ? 1 : poly.length;
+  for (let j = 0; j < edgeCount; j++) {
+    const offset = getIntersectionOffset(
+      ray[0],
+      ray[1],
+      poly[j],
+      poly[(j + 1) % poly.length],
+    );
+    if (offset >= 0 && offset < minOffset) {
+      minOffset = offset;
+    }
+  }
+  return minOffset === Infinity ? null : minOffset;
+}
+
 export function polysIntersect(poly1: Point[], poly2: Point[]): boolean {
   const n1 = poly1.length;
   const n2 = poly2.length;

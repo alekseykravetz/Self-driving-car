@@ -1,6 +1,7 @@
 import { SensorRaycaster, } from '../physics/sensorRaycaster.js';
 import { DEFAULT_CAR_CONFIG } from '../config.js';
-import { getIntersectionOffset, lerp } from '../../math/utils.js';
+import { lerp } from '../../math/utils.js';
+import { nearestEdgeOffset } from '../../math/collision.js';
 const TRAFFIC_STATE_RED_THRESHOLD = 0.9;
 const TRAFFIC_STATE_YELLOW_THRESHOLD = 0.4;
 const BASIC_RAY_DOT_RADIUS = 3;
@@ -53,7 +54,7 @@ export class Sensor {
             let hitX = borderHit?.x ?? ray[1].x;
             let hitY = borderHit?.y ?? ray[1].y;
             for (let c = 0; c < otherCars.length; c++) {
-                const offset = this.#polygonRayOffset(ray, otherCars[c]);
+                const offset = nearestEdgeOffset(ray, otherCars[c]);
                 if (offset !== null && offset < minOffset) {
                     minOffset = offset;
                     state = 1;
@@ -64,7 +65,7 @@ export class Sensor {
             }
             for (let c = 0; c < trafficControls.length; c++) {
                 const tc = trafficControls[c];
-                const offset = this.#polygonRayOffset(ray, tc.polygon);
+                const offset = nearestEdgeOffset(ray, tc.polygon);
                 if (offset !== null && offset < minOffset) {
                     minOffset = offset;
                     state = encodeTrafficState(tc.state);
@@ -93,19 +94,6 @@ export class Sensor {
                 y: hitY,
             };
         });
-    }
-    #polygonRayOffset(ray, poly) {
-        if (poly.length < 2)
-            return null;
-        let minOffset = Infinity;
-        const edgeCount = poly.length === 2 ? 1 : poly.length;
-        for (let j = 0; j < edgeCount; j++) {
-            const offset = getIntersectionOffset(ray[0], ray[1], poly[j], poly[(j + 1) % poly.length]);
-            if (offset >= 0 && offset < minOffset) {
-                minOffset = offset;
-            }
-        }
-        return minOffset === Infinity ? null : minOffset;
     }
     draw(ctx) {
         if (this.stateAware) {
