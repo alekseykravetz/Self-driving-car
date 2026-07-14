@@ -25,14 +25,11 @@ export class CorridorEditor {
     // Tunnel (open-ended) mode mirrors the graph editor's one-way toggle:
     // active while 't' is held OR latched via the shortcuts toolbar.
     #isOpen = false;
-    #openHeld = false;
-    #openLatched = false;
-    #toolbar = null;
+    #keyboardManager = null;
     #boundMouseDown;
     #boundMouseMove;
     #boundContextMenu;
-    #boundKeyDown;
-    #boundKeyUp;
+    #bindings;
     constructor(viewport, world) {
         this.#viewport = viewport;
         this.#world = world;
@@ -41,54 +38,48 @@ export class CorridorEditor {
         this.#boundMouseDown = this.#handleMouseDown.bind(this);
         this.#boundMouseMove = this.#handleMouseMove.bind(this);
         this.#boundContextMenu = (e) => e.preventDefault();
-        this.#boundKeyDown = this.#handleKeyDown.bind(this);
-        this.#boundKeyUp = this.#handleKeyUp.bind(this);
+        this.#bindings = this.#buildBindings();
     }
     /**
-     * Connect the shared <shortcuts-toolbar> so the tunnel toggle ('t') can be
-     * latched by clicking its indicator.
+     * Connect the {@link KeyboardManager} so the tunnel toggle ('t') is
+     * registered while the corridor editor is enabled.
      */
-    setShortcutsToolbar(toolbar) {
-        this.#toolbar = toolbar;
-        toolbar.setClickListener((id) => {
-            if (id === 'keyT') {
-                this.#openLatched = !this.#openLatched;
-                this.#updateOpen();
-            }
-        });
-        this.#updateOpen();
+    bindKeyboard(km) {
+        this.#keyboardManager = km;
     }
     enable() {
         this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
         this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
         this.#canvas.addEventListener('contextmenu', this.#boundContextMenu);
-        window.addEventListener('keydown', this.#boundKeyDown);
-        window.addEventListener('keyup', this.#boundKeyUp);
+        this.#keyboardManager?.pushBindings(this.#bindings);
     }
     disable() {
         this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
         this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
         this.#canvas.removeEventListener('contextmenu', this.#boundContextMenu);
-        window.removeEventListener('keydown', this.#boundKeyDown);
-        window.removeEventListener('keyup', this.#boundKeyUp);
+        this.#keyboardManager?.popBindings();
         this.#start = null;
         this.#hovered = null;
     }
-    #handleKeyDown(e) {
-        if (e.key === 't') {
-            this.#openHeld = true;
-            this.#updateOpen();
-        }
-    }
-    #handleKeyUp(e) {
-        if (e.key === 't') {
-            this.#openHeld = false;
-            this.#updateOpen();
-        }
-    }
-    #updateOpen() {
-        this.#isOpen = this.#openHeld || this.#openLatched;
-        this.#toolbar?.setActive('keyT', this.#isOpen);
+    #buildBindings() {
+        return [
+            {
+                id: 'keyT',
+                key: 't',
+                label: 'T',
+                title: 'T — Tunnel (open-ended) corridor mode. Hold or click to latch; the next corridor you draw has open ends.',
+                group: 'Corridor',
+                kind: 'toggle',
+                toggle: {
+                    onActivate: () => {
+                        this.#isOpen = true;
+                    },
+                    onDeactivate: () => {
+                        this.#isOpen = false;
+                    },
+                },
+            },
+        ];
     }
     #handleMouseMove(e) {
         this.#mouse = this.#viewport.getMouse(e, true);

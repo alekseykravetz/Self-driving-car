@@ -1,30 +1,18 @@
 import { SHORTCUTS_TOOLBAR_TEMPLATE } from './templates/shortcutsToolbarTemplate.js';
 export class ShortcutsToolbarElement extends HTMLElement {
-    #onClick = null;
-    #displayDefs = [];
-    #boundKeyDown;
-    #boundKeyUp;
+    #onToggle = null;
     constructor() {
         super();
         this.id = 'shortcutsToolbar';
-        this.#boundKeyDown = (e) => this.#handleDisplayKey(e, true);
-        this.#boundKeyUp = (e) => this.#handleDisplayKey(e, false);
     }
     connectedCallback() {
         this.innerHTML = ShortcutsToolbarElement.template;
-        window.addEventListener('keydown', this.#boundKeyDown);
-        window.addEventListener('keyup', this.#boundKeyUp);
-    }
-    disconnectedCallback() {
-        window.removeEventListener('keydown', this.#boundKeyDown);
-        window.removeEventListener('keyup', this.#boundKeyUp);
     }
     /**
      * Render the indicators for this page. Definitions are grouped by `group`
      * (separated by a vertical rule) and laid out in declaration order.
      */
     setShortcuts(defs) {
-        this.#displayDefs = defs.filter((d) => d.display && d.keys?.length);
         const groups = [];
         for (const def of defs) {
             let group = groups.find((g) => g.name === def.group);
@@ -46,11 +34,9 @@ export class ShortcutsToolbarElement extends HTMLElement {
         const container = this.querySelector('.shortcuts-groups');
         if (container)
             container.innerHTML = html;
-        // Wire click-to-latch on the toggle indicators.
         this.querySelectorAll('.key-indicator.clickable').forEach((el) => {
             el.addEventListener('click', () => {
-                if (this.#onClick)
-                    this.#onClick(el.id);
+                this.#onToggle?.(el.id);
             });
         });
     }
@@ -72,17 +58,12 @@ export class ShortcutsToolbarElement extends HTMLElement {
         if (el)
             el.classList.toggle('active', active);
     }
-    /** Register a handler called with the indicator id when a toggle is clicked. */
-    setClickListener(listener) {
-        this.#onClick = listener;
-    }
-    #handleDisplayKey(e, down) {
-        const key = e.key.toLowerCase();
-        for (const def of this.#displayDefs) {
-            if (def.keys.some((k) => k.toLowerCase() === key)) {
-                this.setActive(def.id, down);
-            }
-        }
+    /**
+     * Register a handler called with the indicator id when a toggle indicator
+     * is clicked. Used by {@link KeyboardManager} to implement click-to-latch.
+     */
+    setToggleHandler(handler) {
+        this.#onToggle = handler;
     }
     static template = SHORTCUTS_TOOLBAR_TEMPLATE;
 }

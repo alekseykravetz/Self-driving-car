@@ -16,6 +16,7 @@ import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Osm } from '../../math/osm-importer/osm.js';
 import { StoreManager } from '../../store/storeManager.js';
+import { KeyboardManager } from '../../panels/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
 /** localStorage key for the editor's per-layer visibility preference. */
@@ -67,12 +68,14 @@ export class WorldEditor {
     #corridorBtn;
     #worldToolbar;
     #shortcutsToolbar;
+    #keyboardManager;
     #worldLayersToolbar;
     constructor(canvas, miniMapCanvas) {
         this.#canvas = canvas;
         this.#ctx = canvas.getContext('2d');
         this.#miniMapCanvas = miniMapCanvas;
         this.#assignElementReferences();
+        this.#keyboardManager = new KeyboardManager(this.#shortcutsToolbar);
         this.#addEventListeners();
         const worldString = localStorage.getItem('editorWorld');
         const storedWorld = safeJsonParse(worldString);
@@ -140,58 +143,17 @@ export class WorldEditor {
         this.#worldToolbar.hideGroups('car', 'borders', 'borders-sep', 'tracking', 'tracking-sep', 'debug', 'debug-sep');
         // Viewport wheel-mode toggle (mouse vs. touchpad) driven by the toolbar.
         this.#worldToolbar.setViewportModeListener((mode) => this.setViewportMode(mode));
-        // Populate the shared shortcuts toolbar with the graph-editor keys plus the
-        // viewport zoom modifier. Behavior stays in GraphEditor / Viewport.
-        this.#shortcutsToolbar.setShortcuts([
-            {
-                id: 'keyS',
-                label: 'S',
-                title: 'S — Set path start point (hover a point)',
-                group: 'Graph',
-                kind: 'momentary',
-            },
-            {
-                id: 'keyE',
-                label: 'E',
-                title: 'E — Set path end point (hover a point)',
-                group: 'Graph',
-                kind: 'momentary',
-            },
-            {
-                id: 'keyC',
-                label: 'C',
-                title: 'C — Clear computed path and start/end points',
-                group: 'Graph',
-                kind: 'momentary',
-            },
-            {
-                id: 'keyO',
-                label: 'O',
-                title: 'O — One-way road mode. Hold while creating a segment, or click to latch it on permanently.',
-                group: 'Graph',
-                kind: 'toggle',
-            },
-            {
-                id: 'keyH',
-                label: 'H',
-                title: 'H — Hard-separation road mode (solid centre line). Hold while creating a segment, or click to latch it on permanently.',
-                group: 'Graph',
-                kind: 'toggle',
-            },
-            {
-                id: 'keyT',
-                label: 'T',
-                title: 'T — Tunnel (open-ended) corridor mode. Hold or click to latch; the next corridor you draw has open ends.',
-                group: 'Corridor',
-                kind: 'toggle',
-            },
+        // Populate the shared shortcuts toolbar with the always-active keys.
+        // Editor-specific shortcuts (S, E, C, O, H, T) are registered by the
+        // editors themselves via KeyboardManager.pushBindings().
+        this.#keyboardManager.setBindings([
             {
                 id: 'keyCtrl',
+                key: '',
                 label: 'Ctrl',
                 title: 'Ctrl + scroll wheel — Zoom in/out (touchpad mode)',
                 group: 'View',
-                kind: 'momentary',
-                display: true,
+                kind: 'display',
                 keys: ['Control'],
             },
         ]);
@@ -233,9 +195,9 @@ export class WorldEditor {
     /* Creates instances of all editor tools. */
     initializeEditors(viewport, world) {
         const graphEditor = new GraphEditor(viewport, world.graph);
-        graphEditor.setShortcutsToolbar(this.#shortcutsToolbar);
+        graphEditor.bindKeyboard(this.#keyboardManager);
         const corridorEditor = new CorridorEditor(viewport, world);
-        corridorEditor.setShortcutsToolbar(this.#shortcutsToolbar);
+        corridorEditor.bindKeyboard(this.#keyboardManager);
         const tools = {
             graph: {
                 button: this.#graphBtn,

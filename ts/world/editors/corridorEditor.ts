@@ -6,7 +6,10 @@ import { Corridor } from '../corridor.js';
 import { getNearestPoint } from '../../math/utils.js';
 import { drawPoint } from '../../rendering/pointRenderer.js';
 import { drawSegment } from '../../rendering/segmentRenderer.js';
-import { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+import {
+  KeyboardManager,
+  ShortcutBinding,
+} from '../../panels/keyboardManager.js';
 
 /**
  * Authoring tool for {@link Corridor} world objects.
@@ -31,15 +34,13 @@ export class CorridorEditor {
   // Tunnel (open-ended) mode mirrors the graph editor's one-way toggle:
   // active while 't' is held OR latched via the shortcuts toolbar.
   #isOpen: boolean = false;
-  #openHeld: boolean = false;
-  #openLatched: boolean = false;
-  #toolbar: ShortcutsToolbarElement | null = null;
+  #keyboardManager: KeyboardManager | null = null;
 
   #boundMouseDown: (event: MouseEvent) => void;
   #boundMouseMove: (event: MouseEvent) => void;
   #boundContextMenu: (event: MouseEvent) => void;
-  #boundKeyDown: (event: KeyboardEvent) => void;
-  #boundKeyUp: (event: KeyboardEvent) => void;
+
+  #bindings: ShortcutBinding[];
 
   constructor(viewport: Viewport, world: World) {
     this.#viewport = viewport;
@@ -50,60 +51,54 @@ export class CorridorEditor {
     this.#boundMouseDown = this.#handleMouseDown.bind(this);
     this.#boundMouseMove = this.#handleMouseMove.bind(this);
     this.#boundContextMenu = (e: MouseEvent) => e.preventDefault();
-    this.#boundKeyDown = this.#handleKeyDown.bind(this);
-    this.#boundKeyUp = this.#handleKeyUp.bind(this);
+
+    this.#bindings = this.#buildBindings();
   }
 
   /**
-   * Connect the shared <shortcuts-toolbar> so the tunnel toggle ('t') can be
-   * latched by clicking its indicator.
+   * Connect the {@link KeyboardManager} so the tunnel toggle ('t') is
+   * registered while the corridor editor is enabled.
    */
-  public setShortcutsToolbar(toolbar: ShortcutsToolbarElement): void {
-    this.#toolbar = toolbar;
-    toolbar.setClickListener((id) => {
-      if (id === 'keyT') {
-        this.#openLatched = !this.#openLatched;
-        this.#updateOpen();
-      }
-    });
-    this.#updateOpen();
+  public bindKeyboard(km: KeyboardManager): void {
+    this.#keyboardManager = km;
   }
 
   public enable(): void {
     this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.addEventListener('contextmenu', this.#boundContextMenu);
-    window.addEventListener('keydown', this.#boundKeyDown);
-    window.addEventListener('keyup', this.#boundKeyUp);
+    this.#keyboardManager?.pushBindings(this.#bindings);
   }
 
   public disable(): void {
     this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.removeEventListener('contextmenu', this.#boundContextMenu);
-    window.removeEventListener('keydown', this.#boundKeyDown);
-    window.removeEventListener('keyup', this.#boundKeyUp);
+    this.#keyboardManager?.popBindings();
     this.#start = null;
     this.#hovered = null;
   }
 
-  #handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === 't') {
-      this.#openHeld = true;
-      this.#updateOpen();
-    }
-  }
-
-  #handleKeyUp(e: KeyboardEvent): void {
-    if (e.key === 't') {
-      this.#openHeld = false;
-      this.#updateOpen();
-    }
-  }
-
-  #updateOpen(): void {
-    this.#isOpen = this.#openHeld || this.#openLatched;
-    this.#toolbar?.setActive('keyT', this.#isOpen);
+  #buildBindings(): ShortcutBinding[] {
+    return [
+      {
+        id: 'keyT',
+        key: 't',
+        label: 'T',
+        title:
+          'T — Tunnel (open-ended) corridor mode. Hold or click to latch; the next corridor you draw has open ends.',
+        group: 'Corridor',
+        kind: 'toggle',
+        toggle: {
+          onActivate: () => {
+            this.#isOpen = true;
+          },
+          onDeactivate: () => {
+            this.#isOpen = false;
+          },
+        },
+      },
+    ];
   }
 
   #handleMouseMove(e: MouseEvent): void {

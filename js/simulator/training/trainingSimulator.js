@@ -1,6 +1,7 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import { SimpleTrainingStrategy } from './modes/simpleModeBehavior.js';
 import { WorldTrainingStrategy } from './modes/worldModeBehavior.js';
+import { KeyboardManager } from '../../panels/keyboardManager.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
 import { discardStoredPool, savePoolToStorage, } from './genetics/storageManager.js';
@@ -13,7 +14,7 @@ import { angle } from '../../math/utils.js';
 import { buildRoadBorders } from '../spatialGridUtils.js';
 export class TrainingSimulator extends SimulatorShell {
     #strategy;
-    #globalGreenWave = false;
+    #keyboardManager = null;
     world = null;
     roadBorders = null;
     trainingManager;
@@ -33,66 +34,8 @@ export class TrainingSimulator extends SimulatorShell {
         }
         this.trainingManager.setNewTrainingHandler(() => this.openInitModal('new'));
         this.#initPauseToggleClicks();
-        this.#initGreenWaveHandler();
-        this.#initShortcutsToolbar();
+        this.#initKeyboardManager();
         this.animate(0);
-    }
-    #initShortcutsToolbar() {
-        const toolbar = document.querySelector('shortcuts-toolbar');
-        toolbar?.setShortcuts([
-            {
-                id: 'keyUp',
-                label: '\u2191 / W',
-                title: 'Arrow Up / W \u2014 Accelerate (drive the \u{1f3ae} user car)',
-                group: 'Drive',
-                kind: 'momentary',
-                display: true,
-                keys: ['ArrowUp', 'w'],
-            },
-            {
-                id: 'keyDown',
-                label: '\u2193 / S',
-                title: 'Arrow Down / S \u2014 Brake / reverse',
-                group: 'Drive',
-                kind: 'momentary',
-                display: true,
-                keys: ['ArrowDown', 's'],
-            },
-            {
-                id: 'keyLeft',
-                label: '\u2190 / A',
-                title: 'Arrow Left / A \u2014 Steer left',
-                group: 'Drive',
-                kind: 'momentary',
-                display: true,
-                keys: ['ArrowLeft', 'a'],
-            },
-            {
-                id: 'keyRight',
-                label: '\u2192 / D',
-                title: 'Arrow Right / D \u2014 Steer right',
-                group: 'Drive',
-                kind: 'momentary',
-                display: true,
-                keys: ['ArrowRight', 'd'],
-            },
-            {
-                id: 'keyG',
-                label: 'G',
-                title: 'G \u2014 Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
-                group: 'Traffic',
-                kind: 'toggle',
-            },
-            {
-                id: 'keyCtrl',
-                label: 'Ctrl',
-                title: 'Ctrl + scroll wheel \u2014 Zoom in/out (touchpad mode)',
-                group: 'View',
-                kind: 'momentary',
-                display: true,
-                keys: ['Control'],
-            },
-        ]);
     }
     #initPauseToggleClicks() {
         const toggle = (e) => {
@@ -103,31 +46,84 @@ export class TrainingSimulator extends SimulatorShell {
         this.gameCanvas.addEventListener('click', toggle);
         this.cameraCanvas.addEventListener('click', toggle);
     }
-    #initGreenWaveHandler() {
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'g' || e.key === 'G') {
-                this.#toggleGreenWave();
-            }
-        });
+    #initKeyboardManager() {
+        const toolbar = document.querySelector('shortcuts-toolbar');
+        if (!toolbar)
+            return;
+        this.#keyboardManager = new KeyboardManager(toolbar);
+        this.#keyboardManager.setBindings([
+            {
+                id: 'keyUp',
+                key: '',
+                label: '\u2191 / W',
+                title: 'Arrow Up / W \u2014 Accelerate (drive the \u{1f3ae} user car)',
+                group: 'Drive',
+                kind: 'display',
+                keys: ['ArrowUp', 'w'],
+            },
+            {
+                id: 'keyDown',
+                key: '',
+                label: '\u2193 / S',
+                title: 'Arrow Down / S \u2014 Brake / reverse',
+                group: 'Drive',
+                kind: 'display',
+                keys: ['ArrowDown', 's'],
+            },
+            {
+                id: 'keyLeft',
+                key: '',
+                label: '\u2190 / A',
+                title: 'Arrow Left / A \u2014 Steer left',
+                group: 'Drive',
+                kind: 'display',
+                keys: ['ArrowLeft', 'a'],
+            },
+            {
+                id: 'keyRight',
+                key: '',
+                label: '\u2192 / D',
+                title: 'Arrow Right / D \u2014 Steer right',
+                group: 'Drive',
+                kind: 'display',
+                keys: ['ArrowRight', 'd'],
+            },
+            {
+                id: 'keyG',
+                key: 'g',
+                label: 'G',
+                title: 'G \u2014 Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
+                group: 'Traffic',
+                kind: 'toggle',
+                toggle: {
+                    onActivate: () => this.#enableGreenWave(),
+                    onDeactivate: () => this.#disableGreenWave(),
+                },
+            },
+            {
+                id: 'keyCtrl',
+                key: '',
+                label: 'Ctrl',
+                title: 'Ctrl + scroll wheel \u2014 Zoom in/out (touchpad mode)',
+                group: 'View',
+                kind: 'display',
+                keys: ['Control'],
+            },
+        ]);
     }
-    /** Toggle global green wave: force all lights green or restore normal cycling. */
-    #toggleGreenWave() {
+    #enableGreenWave() {
         if (!this.world || !(this.world instanceof World))
             return;
-        const toolbar = document.querySelector('shortcuts-toolbar');
-        if (this.#globalGreenWave) {
-            this.world.trafficManager.releaseAllOverrides();
-            this.#globalGreenWave = false;
-        }
-        else {
-            for (const marking of this.world.markings) {
-                if (marking instanceof Light) {
-                    this.world.trafficManager.overrideLight(marking, 'green');
-                }
+        for (const marking of this.world.markings) {
+            if (marking instanceof Light) {
+                this.world.trafficManager.overrideLight(marking, 'green');
             }
-            this.#globalGreenWave = true;
         }
-        toolbar?.setActive('keyG', this.#globalGreenWave);
+    }
+    #disableGreenWave() {
+        if (!this.world || !(this.world instanceof World))
+            return;
+        this.world.trafficManager.releaseAllOverrides();
     }
     openInitModal(context) {
         const settings = this.trainingManager.getSettings();

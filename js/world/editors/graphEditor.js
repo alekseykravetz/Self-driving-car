@@ -14,14 +14,7 @@ export class GraphEditor {
     #mouse = null; // Current mouse position (relative to viewport/canvas)
     #isOneWay = false;
     #isSeparated = false;
-    // One-way mode is active while the 'o' key is held OR while latched on via a
-    // click on the shortcuts toolbar. The effective `isOneWay` is `held || latched`.
-    #oneWayHeld = false;
-    #oneWayLatched = false;
-    // Hard-separation mode mirrors one-way: active while 'h' is held OR latched.
-    #separatedHeld = false;
-    #separatedLatched = false;
-    #toolbar = null;
+    #keyboardManager = null;
     // Temporary points for finding shortest path operation
     #startPoint = null;
     #endPoint = null;
@@ -30,8 +23,7 @@ export class GraphEditor {
     #boundMouseMove;
     #boundMouseUp;
     #boundContextMenu;
-    #boundKeyDown;
-    #boundKeyUp;
+    #bindings;
     constructor(viewport, graph) {
         this.#viewport = viewport;
         this.#canvas = viewport.canvas;
@@ -43,107 +35,125 @@ export class GraphEditor {
             this.#dragging = false;
         };
         this.#boundContextMenu = (e) => e.preventDefault();
-        this.#boundKeyDown = this.#handleKeyDown.bind(this);
-        this.#boundKeyUp = this.#handleKeyUp.bind(this);
+        this.#bindings = this.#buildBindings();
     }
     #addEventListeners() {
         this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
         this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
         this.#canvas.addEventListener('mouseup', this.#boundMouseUp);
         this.#canvas.addEventListener('contextmenu', this.#boundContextMenu);
-        window.addEventListener('keydown', this.#boundKeyDown);
-        window.addEventListener('keyup', this.#boundKeyUp);
     }
     #removeEventListeners() {
         this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
         this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
         this.#canvas.removeEventListener('mouseup', this.#boundMouseUp);
         this.#canvas.removeEventListener('contextmenu', this.#boundContextMenu);
-        window.removeEventListener('keydown', this.#boundKeyDown);
     }
-    // Activates the graph editor by adding event listeners.
     enable() {
         this.#addEventListeners();
+        this.#keyboardManager?.pushBindings(this.#bindings);
     }
     /**
-     * Connect the shared <shortcuts-toolbar> so key actions light their
-     * indicators and the one-way toggle can be latched by clicking it.
+     * Connect the {@link KeyboardManager} so this editor's shortcuts are
+     * registered while the editor is enabled.
      */
-    setShortcutsToolbar(toolbar) {
-        this.#toolbar = toolbar;
-        toolbar.setClickListener((id) => {
-            if (id === 'keyO') {
-                this.#oneWayLatched = !this.#oneWayLatched;
-                this.#updateOneWay();
-            }
-            if (id === 'keyH') {
-                this.#separatedLatched = !this.#separatedLatched;
-                this.#updateSeparated();
-            }
-        });
-        this.#updateOneWay();
-        this.#updateSeparated();
+    bindKeyboard(km) {
+        this.#keyboardManager = km;
     }
-    // Deactivates the graph editor by removing event listeners and resetting state.
     disable() {
         this.#removeEventListeners();
+        this.#keyboardManager?.popBindings();
         this.#selected = null;
         this.#hovered = null;
         this.#dragging = false;
         this.#startPoint = null;
         this.#endPoint = null;
     }
-    // Handles keyboard events for specific editor actions like finding shortest path or creating one way segments.
-    #handleKeyDown(e) {
-        if (this.#mouse) {
-            if (e.key === 's') {
-                this.#startPoint = this.#mouse;
-                this.#toolbar?.flash('keyS');
-            }
-            if (e.key === 'e') {
-                this.#endPoint = this.#mouse;
-                this.#toolbar?.flash('keyE');
-            }
-        }
-        if (e.key === 'c') {
-            this.#startPoint = null;
-            this.#endPoint = null;
-            this.shortestPath = null;
-            this.#toolbar?.flash('keyC');
-        }
-        if (e.key === 'o') {
-            this.#oneWayHeld = true;
-            this.#updateOneWay();
-        }
-        if (e.key === 'h') {
-            this.#separatedHeld = true;
-            this.#updateSeparated();
-        }
+    #buildBindings() {
+        return [
+            {
+                id: 'keyS',
+                key: 's',
+                label: 'S',
+                title: 'S — Set path start point (hover a point)',
+                group: 'Graph',
+                kind: 'momentary',
+                handler: {
+                    onKeyDown: () => {
+                        if (this.#mouse)
+                            this.#startPoint = this.#mouse;
+                        this.#computeShortestPath();
+                    },
+                },
+            },
+            {
+                id: 'keyE',
+                key: 'e',
+                label: 'E',
+                title: 'E — Set path end point (hover a point)',
+                group: 'Graph',
+                kind: 'momentary',
+                handler: {
+                    onKeyDown: () => {
+                        if (this.#mouse)
+                            this.#endPoint = this.#mouse;
+                        this.#computeShortestPath();
+                    },
+                },
+            },
+            {
+                id: 'keyC',
+                key: 'c',
+                label: 'C',
+                title: 'C — Clear computed path and start/end points',
+                group: 'Graph',
+                kind: 'momentary',
+                handler: {
+                    onKeyDown: () => {
+                        this.#startPoint = null;
+                        this.#endPoint = null;
+                        this.shortestPath = null;
+                    },
+                },
+            },
+            {
+                id: 'keyO',
+                key: 'o',
+                label: 'O',
+                title: 'O — One-way road mode. Hold while creating a segment, or click to latch it on permanently.',
+                group: 'Graph',
+                kind: 'toggle',
+                toggle: {
+                    onActivate: () => {
+                        this.#isOneWay = true;
+                    },
+                    onDeactivate: () => {
+                        this.#isOneWay = false;
+                    },
+                },
+            },
+            {
+                id: 'keyH',
+                key: 'h',
+                label: 'H',
+                title: 'H — Hard-separation road mode (solid centre line). Hold while creating a segment, or click to latch it on permanently.',
+                group: 'Graph',
+                kind: 'toggle',
+                toggle: {
+                    onActivate: () => {
+                        this.#isSeparated = true;
+                    },
+                    onDeactivate: () => {
+                        this.#isSeparated = false;
+                    },
+                },
+            },
+        ];
+    }
+    #computeShortestPath() {
         if (this.#startPoint && this.#endPoint) {
             this.shortestPath = this.#graph.getShortestPath(this.#startPoint, this.#endPoint);
         }
-    }
-    #handleKeyUp(e) {
-        if (e.key === 'o') {
-            this.#oneWayHeld = false;
-            this.#updateOneWay();
-        }
-        if (e.key === 'h') {
-            this.#separatedHeld = false;
-            this.#updateSeparated();
-        }
-    }
-    // Recompute the effective one-way state (held OR latched) and sync the
-    // toolbar indicator.
-    #updateOneWay() {
-        this.#isOneWay = this.#oneWayHeld || this.#oneWayLatched;
-        this.#toolbar?.setActive('keyO', this.#isOneWay);
-    }
-    // Recompute the effective hard-separation state (held OR latched) and sync
-    // the toolbar indicator.
-    #updateSeparated() {
-        this.#isSeparated = this.#separatedHeld || this.#separatedLatched;
-        this.#toolbar?.setActive('keyH', this.#isSeparated);
     }
     // Handles mouse movement over the canvas. Updates hovered state and drags selected points.
     #handleMouseMove(e) {

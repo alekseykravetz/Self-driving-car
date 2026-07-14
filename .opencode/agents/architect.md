@@ -1,7 +1,7 @@
 ---
-description: "Audits codebase architecture, flags violations of layer isolation / FSD / Atomic Design, and suggests refactoring strategies. Uses graphify for codebase understanding before analysis."
+description: 'Audits codebase architecture, flags violations of layer isolation / FSD / Atomic Design, and suggests refactoring strategies. Uses graphify for codebase understanding before analysis.'
 mode: subagent
-color: "#8b5cf6"
+color: '#8b5cf6'
 temperature: 0.1
 permission:
   read: allow
@@ -9,8 +9,8 @@ permission:
   glob: allow
   grep: allow
   bash:
-    "*": ask
-    "graphify *": allow
+    '*': ask
+    'graphify *': allow
   webfetch: allow
 ---
 
@@ -51,6 +51,7 @@ You are auditing a browser-based autonomous vehicle simulation platform built wi
 ## 3. Design Pattern Evaluation
 
 ### Desired Patterns (Good)
+
 - Factory / Serialization Pattern (`static load(info)` + `toInfo()`)
 - Template Method Pattern (`SimulatorShell` abstract scaffolding)
 - Flyweight Pattern (cached car sprites by color/size)
@@ -58,6 +59,7 @@ You are auditing a browser-based autonomous vehicle simulation platform built wi
 - Side-effect import for custom element registration
 
 ### Anti-Patterns to Flag (Bad)
+
 - God Objects (e.g., `Car` mixing physics, HTML view, audio)
 - State Leakage & Mutation (genetic algorithm must deep-copy brain configs)
 - Magic Numbers (must be extracted to config objects like `SensorConfig`, `CarPhysicsConfig`)
@@ -76,15 +78,18 @@ You are auditing a browser-based autonomous vehicle simulation platform built wi
 Present analysis using this formal report layout:
 
 ### Architectural Violations & Concerns
+
 - File/Location: [path]
 - Issue: [detailed explanation]
 - Impact: [runtime errors, performance, coupling]
 - Remediation: [explicit refactoring advice]
 
 ### Commendable Implementations
+
 - [document modules with excellent isolation, clean serialization, spatial indexing, or precise standard compliance]
 
 ### Structural Reorganization Recommendations
+
 - [concrete file relocations, split pathways, barrel file removals, or layer boundary shifts]
 
 ## Graphify Usage

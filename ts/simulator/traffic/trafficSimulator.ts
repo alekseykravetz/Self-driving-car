@@ -4,6 +4,7 @@ import { SpatialHashGrid } from '../../math/spatialGrid.js';
 import type { GridSegment } from '../../math/spatialGrid.js';
 import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import type { TrafficPanelElement } from './trafficPanel.js';
+import { KeyboardManager } from '../../panels/keyboardManager.js';
 import type { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
@@ -70,12 +71,7 @@ export class TrafficSimulator extends SimulatorShell {
   // config changes).
   #hoverEvent: MouseEvent | null = null;
   #reverseHeading: boolean = false;
-  // Reverse heading is active while 'r' is held OR while latched on by clicking
-  // the shortcuts toolbar; the effective `#reverseHeading` is `held || latched`.
-  #reverseHeld: boolean = false;
-  #reverseLatched: boolean = false;
-  #globalGreenWave: boolean = false;
-  #shortcutsToolbar: ShortcutsToolbarElement | null = null;
+  #keyboardManager: KeyboardManager | null = null;
   #previewCar: Car | null = null;
   #previewInfo: CarInfo | null = null;
 
@@ -109,27 +105,8 @@ export class TrafficSimulator extends SimulatorShell {
       () => (this.#hoverEvent = null),
     );
 
-    // Hold 'r' to flip the spawn heading 180° (preview + actual spawn). The
-    // shortcuts toolbar can also latch it on with a click.
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'r' || e.key === 'R') {
-        this.#reverseHeld = true;
-        this.#updateReverse();
-      }
-    });
-    window.addEventListener('keyup', (e) => {
-      if (e.key === 'r' || e.key === 'R') {
-        this.#reverseHeld = false;
-        this.#updateReverse();
-      }
-    });
-
-    // 'G' toggles global green wave over all traffic lights.
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'g' || e.key === 'G') {
-        this.#toggleGreenWave();
-      }
-    });
+    // 'R' (reverse heading) and 'G' (green wave) shortcuts are registered
+    // via KeyboardManager in #initToolbar().
 
     // Load the active world (store/loaded selection, then the editor's copy).
     const storeWorld =
@@ -146,44 +123,55 @@ export class TrafficSimulator extends SimulatorShell {
     // so the toolbar's pool-tracking group is irrelevant here.
     this.toolbarPanel.hideGroups('tracking-sep', 'tracking');
 
-    // Shortcuts toolbar: spawn-heading flip ('r') plus the viewport zoom
-    // modifier. The reverse toggle can be held or click-latched.
-    this.#shortcutsToolbar = document.querySelector(
+    // Shortcuts toolbar: spawn-heading flip ('r'), green wave ('g'), and
+    // viewport zoom modifier. All key routing is handled by KeyboardManager.
+    const toolbar = document.querySelector(
       'shortcuts-toolbar',
     ) as ShortcutsToolbarElement | null;
-    this.#shortcutsToolbar?.setShortcuts([
-      {
-        id: 'keyR',
-        label: 'R',
-        title:
-          'R — Flip spawn heading 180°. Hold while placing a car, or click to latch it on permanently.',
-        group: 'Spawn',
-        kind: 'toggle',
-      },
-      {
-        id: 'keyG',
-        label: 'G',
-        title:
-          'G — Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
-        group: 'Spawn',
-        kind: 'toggle',
-      },
-      {
-        id: 'keyCtrl',
-        label: 'Ctrl',
-        title: 'Ctrl + scroll wheel — Zoom in/out (touchpad mode)',
-        group: 'View',
-        kind: 'momentary',
-        display: true,
-        keys: ['Control'],
-      },
-    ]);
-    this.#shortcutsToolbar?.setClickListener((id) => {
-      if (id === 'keyR') {
-        this.#reverseLatched = !this.#reverseLatched;
-        this.#updateReverse();
-      }
-    });
+    if (toolbar) {
+      this.#keyboardManager = new KeyboardManager(toolbar);
+      this.#keyboardManager.setBindings([
+        {
+          id: 'keyR',
+          key: 'r',
+          label: 'R',
+          title:
+            'R — Flip spawn heading 180°. Hold while placing a car, or click to latch it on permanently.',
+          group: 'Spawn',
+          kind: 'toggle',
+          toggle: {
+            onActivate: () => {
+              this.#reverseHeading = true;
+            },
+            onDeactivate: () => {
+              this.#reverseHeading = false;
+            },
+          },
+        },
+        {
+          id: 'keyG',
+          key: 'g',
+          label: 'G',
+          title:
+            'G — Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
+          group: 'Spawn',
+          kind: 'toggle',
+          toggle: {
+            onActivate: () => this.#enableGreenWave(),
+            onDeactivate: () => this.#disableGreenWave(),
+          },
+        },
+        {
+          id: 'keyCtrl',
+          key: '',
+          label: 'Ctrl',
+          title: 'Ctrl + scroll wheel — Zoom in/out (touchpad mode)',
+          group: 'View',
+          kind: 'display',
+          keys: ['Control'],
+        },
+      ]);
+    }
 
     // Single-select car: the chosen car is painted on the next road click.
     // Switching world reloads everything (and drops the placed cars). Loading a
@@ -195,28 +183,18 @@ export class TrafficSimulator extends SimulatorShell {
     });
   }
 
-  // Recompute the effective reverse-heading state (held OR latched) and sync the
-  // toolbar indicator.
-  #updateReverse(): void {
-    this.#reverseHeading = this.#reverseHeld || this.#reverseLatched;
-    this.#shortcutsToolbar?.setActive('keyR', this.#reverseHeading);
+  #enableGreenWave(): void {
+    if (!this.#world) return;
+    for (const marking of this.#world.markings) {
+      if (marking instanceof Light) {
+        this.#world.trafficManager.overrideLight(marking, 'green');
+      }
+    }
   }
 
-  /** Toggle global green wave: force all lights green or restore normal cycling. */
-  #toggleGreenWave(): void {
+  #disableGreenWave(): void {
     if (!this.#world) return;
-    if (this.#globalGreenWave) {
-      this.#world.trafficManager.releaseAllOverrides();
-      this.#globalGreenWave = false;
-    } else {
-      for (const marking of this.#world.markings) {
-        if (marking instanceof Light) {
-          this.#world.trafficManager.overrideLight(marking, 'green');
-        }
-      }
-      this.#globalGreenWave = true;
-    }
-    this.#shortcutsToolbar?.setActive('keyG', this.#globalGreenWave);
+    this.#world.trafficManager.releaseAllOverrides();
   }
 
   #initStatsPanel(): void {
