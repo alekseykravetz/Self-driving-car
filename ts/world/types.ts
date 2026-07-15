@@ -88,6 +88,18 @@ export const DEFAULT_LAYER_VISIBILITY: WorldLayerVisibility = {
   buildings: true,
 };
 
+export type EditorType =
+  | 'graph'
+  | 'marking'
+  | 'stop'
+  | 'crossing'
+  | 'start'
+  | 'parking'
+  | 'light'
+  | 'target'
+  | 'corridor'
+  | 'yield';
+
 export interface WorldDrawOptions {
   viewPoint: Point;
   /** Cars to render on top of the world (draw-time input, not world state). */

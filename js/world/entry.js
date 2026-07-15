@@ -53,6 +53,7 @@ import '../panels/assetSelectors.js';
 import '../panels/worldToolbar.js';
 import '../panels/shortcutsToolbar.js';
 import '../panels/worldLayersToolbar.js';
+import '../panels/editorToolbar.js';
 (async () => {
     await StoreManager.init();
     function resizeCanvas() {

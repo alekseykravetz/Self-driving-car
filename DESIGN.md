@@ -355,7 +355,7 @@ Depth is communicated through background opacity and thin white borders rather t
 
 - **Control Panel**: 200px desktop → 140px mobile — labels hide, only values shown
 - **Store Tables**: Collapse to 2 columns (Active + Filename) on mobile
-- **World Editor**: Bottom controls (`#controls`) hidden entirely on mobile
+- **World Editor**: `<editor-toolbar>` hidden entirely on mobile
 - **Race Page**: Keyboard/camera links hidden, phone tilt controls shown instead
 - **Landing Page**: Cards stack in single column, card padding reduces
 - **Toolbar Groups**: Viewport and Borders groups hidden on mobile simulator toolbar
@@ -364,7 +364,7 @@ Depth is communicated through background opacity and thin white borders rather t
 
 - Side panels maintain their position but narrow
 - Floating toolbars wrap to multiple rows if needed
-- Bottom editor controls hide completely on mobile (the graph/marking toggle remains)
+- `<editor-toolbar>` hides completely on mobile (mode switching uses keyboard shortcuts instead)
 - Store tables sacrifice columns rather than rows
 
 ## 9. Agent Prompt Guide
