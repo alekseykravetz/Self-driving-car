@@ -1364,10 +1364,9 @@ input[type='file'] {
   flex: 0 0 auto;
 }
 
-/* Inactive layer-toggle: grayscale + extra dim on top of .toolbar-btn base */
+/* Inactive layer-toggle: dimmer background on top of .toolbar-btn base */
 #worldLayersToolbar .layer-toggle:not(.active) {
-  filter: grayscale(80%);
-  opacity: 0.45;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 /* "Items outdated" hint on the Regenerate button after a graph edit. */
