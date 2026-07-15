@@ -1,6 +1,6 @@
 # Neural Network & Neuroevolution
 
-The AI brain system in `ts/neural-network/` implements a feedforward neural network trained via genetic algorithms (no backpropagation). The network makes binary decisions about car controls each frame.
+The AI brain system in `ts/neural-network/` implements a feedforward neural network trained via genetic algorithms (neuroevolution) or, in the Human Backpropagation mode, via online straight-through-estimator backpropagation. The network makes binary decisions about car controls each frame.
 
 ---
 
@@ -54,6 +54,11 @@ class NeuralNetwork {
 
   constructor(neuronCounts: number[]);
   static feedForward(givenInputs: number[], network: NeuralNetwork): number[];
+  static trainStep(
+    network: NeuralNetwork,
+    targets: number[],
+    lr?: number,
+  ): void;
   static mutate(network: NeuralNetwork, amount: number): void;
   static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork;
   static mutateFromPool(brains: NeuralNetwork[], amount: number): NeuralNetwork;
@@ -86,7 +91,111 @@ static feedForward(givenInputs: number[], network: NeuralNetwork): number[] {
 
 ---
 
-## Typical Network Configuration
+## Online Imitation Learning (`NeuralNetwork.trainStep`)
+
+In addition to neuroevolution, the network supports **online backpropagation** via
+the straight-through estimator (STE). This is used exclusively by the [Human
+Backpropagation mode](#human-backpropagation-mode) to train a single car's brain
+to imitate the human's keypresses each frame.
+
+### Method
+
+```typescript
+static trainStep(
+  network: NeuralNetwork,
+  targets: number[],
+  lr: number = 0.1,
+): void;
+```
+
+Assumes `feedForward(inputVector, network)` was just called on the current
+frame's input, so each `level.inputs[]` and `level.outputs[]` already holds
+fresh values. Trains every layer via the straight-through estimator (treats the
+binary-step derivative as 1), so inference keeps using step activation and
+pool/crossover compatibility is unaffected.
+
+### Algorithm
+
+1. **Output layer:** perceptron error `delta = target - output` (STE: `step' = 1`,
+   so no extra factor).
+2. **Hidden layers:** backprop through the next level's weights;
+   `delta_hidden[k] = Σ_j w_next[k][j] * delta_next[j]` (again `step' = 1`).
+3. **Update rule:** `w[input][output] += lr * delta * input`;
+   `bias -= lr * delta`.
+
+### Bias sign convention
+
+This codebase uses `z = Σ w·x − bias` with `step(z > 0)`, so to raise `z` when
+the error is positive we **decrease** the bias (opposite of the usual
+`b += lr·err` convention). The update rule `bias -= lr * delta` implements this.
+
+### Guards (applied in `Car.#processBrain`)
+
+- **Not when damaged** — don't learn from crashes.
+- **Not when no keys are pressed** — skip idle frames so "release keys" frames
+  don't overwrite lessons via recency bias.
+- **Not in autopilot mode** — the brain is driving, not learning.
+- **Only for `Controls`-type cars** — excludes Camera/Phone control schemes.
+
+### Learning rate
+
+The default `lr = 0.1` is tunable from the Human Backpropagation panel
+(0.01–0.5). Higher values converge faster but risk oscillation; lower values
+produce smoother learning.
+
+---
+
+## Human Backpropagation Mode
+
+A standalone simulator (`html/human-training.html`) that uses `trainStep` to
+teach a neural network by having a human drive the car. The brain learns to
+imitate the human's keypresses in real time — no genetic algorithm, no
+population, no generations.
+
+### How it works
+
+1. A single KEYS car is created with a fresh (or saved) brain.
+2. Each frame, the forward pass runs (populating `level.inputs[]`/`outputs[]`
+   for the visualizer), and the brain's output is compared to the human's actual
+   keypresses.
+3. When the human is driving (not in autopilot, not damaged, keys pressed),
+   `NeuralNetwork.trainStep` nudges the brain's weights toward the human's
+   actions.
+4. The network visualizer shows **match rings** on output neurons: green when
+   the brain's output agrees with the human's key, red when it disagrees.
+5. A running accuracy percentage tracks how often the brain matches the human
+   across all four control channels.
+
+### Autopilot toggle
+
+The panel's "Autopilot" checkbox switches the car to brain-driven driving
+(`Car.#autopilot = true`): the brain's output controls the car, learning pauses,
+and the accuracy display shows `—`. Switch back to resume teaching.
+
+### Persistence
+
+The brain is auto-saved to localStorage key `humanTrainedCar` (a single
+`CarInfo` JSON) every ~60 frames, on crash, and on page unload. Reloading the
+page restores the trained brain and resumes training. A "Download .car" button
+exports the brain as a standard `.car` file; "Reset brain" clears the save and
+starts fresh.
+
+### Car configuration
+
+A config modal (`<human-training-config-modal>`) shown on entry and via a
+"Config" button lets the user set all car/sensor parameters (height, width,
+hidden layers, max speed, accel, friction, ray count/length/spread/offset,
+state-aware checkbox). When a saved brain exists, the config is locked (brain
+topology is fixed by the saved sensor/hidden-layer dims); "Reset brain" unlocks
+it.
+
+### Crash behavior
+
+On crash, the car auto-respawns at the start position with the **same trained
+brain** — training continues seamlessly. The brain is saved before respawn so
+no progress is lost.
+
+---
 
 ```
 ┌─────────────────────────────────────┐
@@ -316,10 +425,15 @@ hover.
 ```typescript
 class NetworkVisualizer {
   // Draw the whole network; `time` (ms) drives the signal-flow animation.
+  // `match` (optional) draws green/red rings on output neurons to show
+  // whether the brain's output matches the human's keypress — used by
+  // the Human Backpropagation mode.
   draw(
     ctx: CanvasRenderingContext2D,
     network: NeuralNetwork,
     time: number,
+    stateAware?: boolean,
+    match?: (boolean | null)[],
   ): void;
 
   // Mouse/keyboard interactivity (wired by the simulator shell).

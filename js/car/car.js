@@ -5,6 +5,7 @@ import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
 import { CarRenderer, } from './rendering/carRenderer.js';
 import { CarBrainAdapter } from './brain/carBrainAdapter.js';
+import { NeuralNetwork } from '../neural-network/network.js';
 import { STEERING_SPEED, DEFAULT_CAR_CONFIG, NN_OUTPUT_COUNT, DEFAULT_HIDDEN_LAYERS, } from './config.js';
 export class Car {
     name;
@@ -33,6 +34,15 @@ export class Car {
     physics;
     renderer;
     #callbacks;
+    #learningFromHuman = false;
+    #autopilot = false;
+    #learningRate = 0.1;
+    #lastBrainOutput = {
+        forward: false,
+        left: false,
+        right: false,
+        reverse: false,
+    };
     constructor(opts) {
         this.x = opts.x;
         this.y = opts.y;
@@ -170,15 +180,29 @@ export class Car {
     #processBrain(polygons, trafficControls, otherCars) {
         if (this.sensor && this.brain) {
             this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
-            if (this.useBrain && this.controls instanceof Controls) {
-                const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
+            const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
+            this.#lastBrainOutput = output;
+            if ((this.useBrain || this.#autopilot) &&
+                this.controls instanceof Controls) {
                 this.controls.forward = output.forward;
                 this.controls.left = output.left;
                 this.controls.right = output.right;
                 this.controls.reverse = output.reverse;
             }
-            else {
-                CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
+            if (this.#learningFromHuman &&
+                !this.#autopilot &&
+                !this.damaged &&
+                this.controls instanceof Controls &&
+                (this.controls.forward ||
+                    this.controls.left ||
+                    this.controls.right ||
+                    this.controls.reverse)) {
+                NeuralNetwork.trainStep(this.brain, [
+                    this.controls.forward ? 1 : 0,
+                    this.controls.left ? 1 : 0,
+                    this.controls.right ? 1 : 0,
+                    this.controls.reverse ? 1 : 0,
+                ], this.#learningRate);
             }
         }
         else if (this.sensor) {
@@ -209,5 +233,38 @@ export class Car {
     }
     setCallbacks(cb) {
         this.#callbacks = cb;
+    }
+    setLearningFromHuman(enabled) {
+        this.#learningFromHuman = enabled;
+    }
+    get learningFromHuman() {
+        return this.#learningFromHuman;
+    }
+    setAutopilot(enabled) {
+        this.#autopilot = enabled;
+    }
+    get autopilot() {
+        return this.#autopilot;
+    }
+    set learningRate(v) {
+        this.#learningRate = v;
+    }
+    get learningRate() {
+        return this.#learningRate;
+    }
+    setLearningRate(v) {
+        this.#learningRate = v;
+    }
+    get lastBrainOutput() {
+        return this.#lastBrainOutput;
+    }
+    respawn(startInfo) {
+        this.x = startInfo.x;
+        this.y = startInfo.y;
+        this.angle = startInfo.angle;
+        this.speed = 0;
+        this.damaged = false;
+        this.fitness = 0;
+        this.polygon = this.physics.createPolygon(this);
     }
 }

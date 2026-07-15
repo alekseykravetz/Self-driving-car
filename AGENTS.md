@@ -34,6 +34,7 @@
 - **Traffic-light perception:** `TrafficControlGrid` (`ts/math/trafficControlGrid.ts`) indexes `Light` polygons (150px cells, mirrors `SpatialHashGrid`); rebuilt only when world markings change, light _state_ read live at query time via a `getState` closure. `ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)`.
 - **Unified state-aware sensor:** `Sensor.stateAware: boolean` replaces the old `sophistication` enum. When `stateAware=true`, each ray produces two brain inputs: `[1-distance, state]` where state encodes how blocking the nearest obstacle is (0=clear, 0.5=caution, 1=stop). Legacy mode (`stateAware=false`) uses `[1-distance]` per ray. Total input layer: `stateAware ? rayCount*2+1 : rayCount+1` (the +1 is self-speed). `brainsCompatible()` validates layer dimensions to reject cross-mode swaps.
 - **Traffic control override:** `Light` has `#overridden` flag + `override(state)`/`releaseOverride()` methods. `TrafficManager.update()` skips overridden lights (pauses automatic cycling). Left-click a placed light in the world editor: first click pauses cycling (state='off'), then cycles off→green→yellow→red→release (back to regular cycling). Press `G` in the traffic simulator or training simulator (world mode) to force all lights green / restore normal cycling. Override state is ephemeral (not persisted). `LightEditor` uses `stopImmediatePropagation()` on mousedown to intercept clicks on existing lights before the base `MarkingEditor` places a new one.
+- **Human Backpropagation mode:** `html/human-training.html` is a standalone single-car simulator (`HumanBackpropSimulator extends SimulatorShell`) with no AI population/gene pool. The KEYS car's brain is trained online each frame via `NeuralNetwork.trainStep` (STE backprop) to imitate human keypresses; `Car.#autopilot` toggles brain-driven driving (pauses learning); `Car.#lastBrainOutput` exposes the brain's prediction for accuracy display. The network visualizer draws green/red match rings on output neurons via the optional `match` parameter to `NetworkVisualizer.draw()` / `SimulatorShell.drawNetworkVisualizer()`. Brain persists to localStorage key `humanTrainedCar`. Car config is set via `<human-training-config-modal>` (locked to saved brain topology when a save exists).
 - **Centralised keyboard manager:** `KeyboardManager` (`ts/panels/keyboardManager.ts`) owns ALL key routing. No module registers `window` keydown/keyup directly — they call `km.setBindings()`, `km.pushBindings()`, or `km.popBindings()` instead. The manager auto-syncs `ShortcutsToolbarElement` (flash for momentary, setActive for toggle/display). Display keys (Ctrl, arrows) have `kind: 'display'` + `keys[]`; the manager lights the indicator while the physical key is held.
 - **Held/latched toggle extracted:** `LatchedToggle` (`ts/panels/latchedToggle.ts`) replaces 4 copies of the held/latched state machine. Toggle bindings in `KeyboardManager` create a `LatchedToggle` internally; the binding's `toggle.onActivate`/`onDeactivate` fire when the effective state changes. Click-to-latch on the toolbar is wired automatically.
 - **Editors use push/pop lifecycle:** `GraphEditor` and `CorridorEditor` call `km.pushBindings(bindings)` in `enable()` and `km.popBindings()` in `disable()`. World sets root bindings (Ctrl display) via `km.setBindings()` — editor shortcuts are registered only while active. No raw `window.addEventListener` anywhere.
@@ -69,6 +70,7 @@
 - `html/traffic.html` — Live Traffic Jam
 - `html/race.html` — Racing (`?mode=camera` or `?mode=phone`)
 - `html/world.html` — World editor
+- `html/human-training.html` — Human Backpropagation training (`?mode=simple` for simple road)
 
 ## Testing
 
@@ -77,9 +79,10 @@
 
 ## Persistence
 
-| localStorage key                        | Content                            |
-| --------------------------------------- | ---------------------------------- |
-| `bestPool`                              | Top-K car configs with brains      |
-| `raceCars`                              | Cars loaded via race "Load car(s)" |
-| `editorWorld`                           | World saved by editor              |
-| `store:activeWorld` / `store:activeCar` | Active store selection             |
+| localStorage key                        | Content                                       |
+| --------------------------------------- | --------------------------------------------- |
+| `bestPool`                              | Top-K car configs with brains                 |
+| `raceCars`                              | Cars loaded via race "Load car(s)"            |
+| `editorWorld`                           | World saved by editor                         |
+| `humanTrainedCar`                       | Human-backprop trained brain (single CarInfo) |
+| `store:activeWorld` / `store:activeCar` | Active store selection                        |

@@ -256,6 +256,7 @@ export abstract class SimulatorShell {
     time: number,
     brain: unknown,
     stateAware?: boolean,
+    match?: (boolean | null)[],
   ): void {
     if (!this.layoutToolbar.showVisualizer) return;
     this.networkCtx.clearRect(
@@ -270,6 +271,7 @@ export abstract class SimulatorShell {
         brain as NeuralNetwork,
         time,
         stateAware,
+        match,
       );
     }
   }

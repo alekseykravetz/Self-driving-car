@@ -132,11 +132,12 @@ class AnimationLoopToolbarElement extends HTMLElement {
 
 ### Subclasses
 
-| Class               | File                                         | Page              |
-| ------------------- | -------------------------------------------- | ----------------- |
-| `TrainingSimulator` | `ts/simulator/training/trainingSimulator.ts` | `/html/simulator` |
-| `TrafficSimulator`  | `ts/simulator/traffic/trafficSimulator.ts`   | `/html/traffic`   |
-| `RaceSimulator`     | `ts/simulator/racing/raceSimulator.ts`       | `/html/race`      |
+| Class                    | File                                                   | Page                   |
+| ------------------------ | ------------------------------------------------------ | ---------------------- |
+| `TrainingSimulator`      | `ts/simulator/training/trainingSimulator.ts`           | `/html/simulator`      |
+| `TrafficSimulator`       | `ts/simulator/traffic/trafficSimulator.ts`             | `/html/traffic`        |
+| `RaceSimulator`          | `ts/simulator/racing/raceSimulator.ts`                 | `/html/race`           |
+| `HumanBackpropSimulator` | `ts/simulator/humanTraining/humanBackpropSimulator.ts` | `/html/human-training` |
 
 ---
 
@@ -994,6 +995,93 @@ destroying expand state.
 | Side panel     | `<training-panel>`                | `<traffic-panel>`                        |
 | Tracking       | Toolbar tracking mode (best/keys) | Stats-panel selection                    |
 | Toolbar extras | —                                 | Spawn Car picker; tracking group hidden  |
+
+---
+
+## Human Backpropagation Simulator (`ts/simulator/humanTraining/humanBackpropSimulator.ts`)
+
+### Purpose
+
+A standalone single-car simulator where a human teaches a neural network to
+drive by example. The car's brain learns to imitate the human's keypresses each
+frame via online backpropagation (`NeuralNetwork.trainStep`). No AI population,
+gene pool, generations, or training panel — just one car, one brain, one
+teacher.
+
+### Access
+
+Navigate to `/html/human-training` (Full World) or
+`/html/human-training?mode=simple` (Simple Road), or click "Human
+Backpropagation" 🎓 on the landing page.
+
+### Architecture
+
+`HumanBackpropSimulator extends SimulatorShell` — reuses the shared scaffolding
+(canvases, viewport, camera, mini-map, toolbars, RAF loop, network visualizer)
+and implements the single-car update/draw behaviour. It supports both simple
+road and full world modes (selected via `?mode=simple` URL param), reusing the
+same `SimpleWorld` / `World` setup and traffic generation as the training
+simulator.
+
+```typescript
+class HumanBackpropSimulator extends SimulatorShell {
+  #mode: 'simple' | 'world';
+  #panel: HumanTrainingPanelElement;
+  #configModal: HumanTrainingConfigModalElement;
+  #car: Car | null; // single KEYS car
+  #carConfig: CarInfo; // active car config
+  world: IWorld | null;
+  roadBorders: Point[][] | null;
+
+  protected update(): void; // step car + traffic, track viewport, accuracy, auto-save
+  protected draw(time): void; // world + car + visualizer (with match rings) + camera
+}
+```
+
+### Car lifecycle
+
+1. On entry, the config modal (`<human-training-config-modal>`) collects car
+   parameters. If a saved brain exists in `humanTrainedCar`, the config is
+   locked to the saved brain's topology.
+2. `#applyConfigAndCreateCar` creates a single KEYS car with the chosen config,
+   loading the saved brain if present (else a fresh random brain).
+3. `Car.setLearningFromHuman(true)` enables per-frame training.
+4. On crash, `#onCrash` saves the brain and respawns the car at the start
+   (keeping the brain).
+5. "Reset brain" clears the save and creates a fresh random brain. "Reset car"
+   respawns without touching the brain. "Config" reopens the modal.
+
+### Accuracy display
+
+Each frame, `#updateAccuracy` compares the brain's `lastBrainOutput` to the
+human's actual keypresses across all 4 channels (forward/left/right/reverse).
+Match/mismatch is shown two ways:
+
+- **Network visualizer** — green/red rings on output neurons (via the `match`
+  parameter to `NetworkVisualizer.draw`).
+- **Panel** — a running accuracy percentage + per-key match dots.
+
+In autopilot mode, accuracy shows `—` and rings disappear (the brain is
+driving, not being compared).
+
+### Persistence
+
+| Key               | Content                                                                                       |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| `humanTrainedCar` | Single `CarInfo` (brain + config), auto-saved every ~60 frames + on crash + on `beforeunload` |
+
+### Differences from the training simulator
+
+| Aspect                | Training `TrainingSimulator` | `HumanBackpropSimulator`           |
+| --------------------- | ---------------------------- | ---------------------------------- |
+| Population            | N AI cars + 1 KEYS car       | 1 KEYS car only                    |
+| Learning method       | Neuroevolution (GA)          | Online backprop (STE)              |
+| Side panel            | `<training-panel>`           | `<human-training-panel>`           |
+| Config UI             | `<training-init-modal>`      | `<human-training-config-modal>`    |
+| Gene pool/generations | Yes                          | No                                 |
+| Brain persistence     | `bestPool` (top-K CarInfo[]) | `humanTrainedCar` (single CarInfo) |
+| Autopilot toggle      | No                           | Yes (test trained brain)           |
+| Accuracy display      | No                           | Match rings + % counter            |
 
 ---
 

@@ -108,6 +108,51 @@ export class NeuralNetwork {
         return cloned;
     }
     /**
+     * Straight-through estimator (STE) backpropagation training step.
+     *
+     * Assumes `feedForward` was just called on the current frame's input so each
+     * level's `inputs[]`/`outputs[]` holds fresh values.
+     *
+     * The network uses `z = Σ w·x − bias`, so bias is *decreased* when error is
+     * positive (to make the neuron fire more easily).
+     *
+     * Uses STE: the binary step activation is treated as the identity during the
+     * backward pass, so gradients pass through unchanged.
+     */
+    static trainStep(network, targets, lr = 0.1) {
+        const numLevels = network.levels.length;
+        if (numLevels === 0)
+            return;
+        const levelErrors = new Array(numLevels);
+        const lastLevel = network.levels[numLevels - 1];
+        levelErrors[numLevels - 1] = new Array(lastLevel.outputs.length);
+        for (let i = 0; i < lastLevel.outputs.length; i++) {
+            levelErrors[numLevels - 1][i] = targets[i] - lastLevel.outputs[i];
+        }
+        for (let k = numLevels - 1; k >= 0; k--) {
+            const level = network.levels[k];
+            const errors = levelErrors[k];
+            if (k > 0) {
+                const prevErrors = new Array(level.inputs.length).fill(0);
+                for (let j = 0; j < level.inputs.length; j++) {
+                    for (let i = 0; i < level.outputs.length; i++) {
+                        prevErrors[j] += level.weights[j][i] * errors[i];
+                    }
+                }
+                levelErrors[k - 1] = prevErrors;
+            }
+            for (let i = 0; i < level.outputs.length; i++) {
+                const error = errors[i];
+                if (error === 0)
+                    continue;
+                level.biases[i] -= lr * error;
+                for (let j = 0; j < level.inputs.length; j++) {
+                    level.weights[j][i] += lr * error * level.inputs[j];
+                }
+            }
+        }
+    }
+    /**
      * Generates a new network by crossing over and mutating from a pool of networks.
      * Clones parents before crossover to prevent mutation of the original pool.
      */

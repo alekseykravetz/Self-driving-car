@@ -1815,6 +1815,67 @@ training-init-modal.open {
   display: block;
 }
 
+human-training-config-modal {
+  display: none;
+}
+
+human-training-config-modal.open {
+  display: block;
+}
+
+human-training-panel #trainingManagerPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: rgba(15, 15, 20, 0.92);
+  border-radius: 0;
+  min-width: 180px;
+  max-width: 200px;
+  width: 200px;
+  flex-shrink: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  order: 20;
+}
+
+.ht-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: all 0.15s;
+}
+
+.ht-key.match {
+  color: #5cb85c;
+  border: 1px solid #5cb85c;
+  background: rgba(92, 184, 92, 0.12);
+}
+
+.ht-key.mismatch {
+  color: #d9534f;
+  border: 1px solid #d9534f;
+  background: rgba(217, 83, 79, 0.12);
+}
+
+.ht-key.idle {
+  color: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#htAccuracyPct {
+  font-weight: 700;
+  font-size: 13px;
+}
+
 .ti-overlay {
   position: fixed;
   inset: 0;

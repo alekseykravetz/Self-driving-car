@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Self-driving car — Human Backpropagation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="stylesheet" href="/styles/style.css" />
+  </head>
+  <body>
+    <div id="simulatorLayout">
+      <canvas id="gameCanvas"></canvas>
+      <canvas id="cameraCanvas"></canvas>
+      <div id="rightPanel">
+        <canvas id="networkCanvas"></canvas>
+        <canvas id="miniMapCanvas"></canvas>
+      </div>
+      <human-training-panel></human-training-panel>
+    </div>
+
+    <human-training-config-modal></human-training-config-modal>
+
+    <div id="simulatorToolbar">
+      <world-toolbar></world-toolbar>
+      <layout-toolbar></layout-toolbar>
+      <animation-loop-toolbar></animation-loop-toolbar>
+      <shortcuts-toolbar></shortcuts-toolbar>
+    </div>
+
+    <script type="module" src="/js/simulator/humanTraining/entry.js"></script>
+  </body>
+</html>

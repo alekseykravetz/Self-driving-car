@@ -34,6 +34,8 @@ export class NetworkVisualizer {
     #showAllValues = false;
     /** When true, input neurons are labelled as distance/state pairs. */
     #stateAware = false;
+    /** Per-output match status (true=correct, false=incorrect, null=no data). */
+    #match = null;
     set stateAware(v) {
         this.#stateAware = v;
     }
@@ -100,8 +102,9 @@ export class NetworkVisualizer {
      * @param time `requestAnimationFrame` timestamp (ms) driving the animation.
      * @param stateAware When true, input labels show distance/state pairs per ray.
      */
-    draw(ctx, network, time, stateAware = false) {
+    draw(ctx, network, time, stateAware = false, match) {
         this.#stateAware = stateAware;
+        this.#match = match ?? null;
         const layout = this.#buildLayout(ctx, network);
         this.#layout = layout;
         // Which elements are "focused" (hovered or related to the hovered neuron)?
@@ -325,6 +328,18 @@ export class NetworkVisualizer {
                 ctx.lineWidth = 2;
                 ctx.arc(node.x, node.y, node.r + 4, 0, Math.PI * 2);
                 ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                ctx.stroke();
+            }
+            // Match ring on output neurons (green = correct prediction, red = wrong).
+            if (this.#match &&
+                node.arrow !== null &&
+                this.#match[node.nodeIndex] !== null &&
+                this.#match[node.nodeIndex] !== undefined) {
+                const ok = this.#match[node.nodeIndex];
+                ctx.beginPath();
+                ctx.lineWidth = 3;
+                ctx.arc(node.x, node.y, node.r + 6, 0, Math.PI * 2);
+                ctx.strokeStyle = ok ? 'rgba(80,220,120,0.95)' : 'rgba(240,80,80,0.95)';
                 ctx.stroke();
             }
             // Output direction arrow drawn inside the node.
