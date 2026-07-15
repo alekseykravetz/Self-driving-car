@@ -108,28 +108,103 @@ After writing `tasks/<slug>.md`, output:
 
 Then stop. Do NOT call the build agent. Do NOT edit source. Wait for the user.
 
-## Step 5 — Hand off (only after user says proceed)
+## Step 5 — Hand off to build (only after user says proceed)
 
-When the user replies `proceed` (or equivalent), call the **build** agent via the `task` tool with a prompt that:
+When the user replies `proceed` (or equivalent), call the **build** agent via the `task` tool. Build runs on a cheaper model (deepseek-v4-flash-free) — the plan MD is what makes this safe: it's detailed enough that a cheaper model can execute it mechanically.
+
+The `task` prompt to build:
 
 1. Names the plan MD by absolute path.
 2. Tells build to read it fully before doing anything.
-3. Asks build to follow the plan exactly and report back when done, including which docs it touched.
+3. Asks build to follow the plan exactly, implement every bullet in `## Implementation`, run `npm run fix:all` when done, and report back which files it changed.
 4. Does NOT restate the plan — the MD is the source of truth.
 
 Example handoff prompt:
 
 ```
 Read /Users/alex/Code/Self-driving-car/tasks/<slug>.md fully and implement it.
-Follow the plan exactly. When done, report which files you changed and which
-docs/*.md you updated. Do not deviate from the plan without flagging it first.
+Follow the plan exactly. Implement every bullet in the ## Implementation section.
+When done, run `npm run fix:all`. Report back: (1) which files you changed,
+(2) which bullets you completed, (3) anything you skipped or couldn't do.
+Do not deviate from the plan without flagging it first.
 ```
 
-## Step 6 — Docs sync
+## Step 6 — Reviewer loop (catches incomplete implementation)
 
-After build reports done, follow the `docs-sync` skill: ensure every doc listed in the plan's "Docs to update" section is actually updated, `AGENTS.md` conventions are appended if a new convention was introduced, and any new `docs/*.md` file is created.
+After build reports done, call the **reviewer** agent via the `task` tool. Reviewer runs on the same cheap model but is read-only — it checks build's work against the plan.
 
-## Step 7 — Archive
+The `task` prompt to reviewer:
+
+```
+Review the implementation of /Users/alex/Code/Self-driving-car/tasks/<slug>.md.
+Phase: code.
+
+Build reported these changes:
+<paste build's report here>
+
+Verify every bullet in ## Implementation was done, run tsc --noEmit and
+npm run lint:log, check acceptance criteria at the code level, and flag
+any out-of-scope changes. Return your structured gap report.
+```
+
+### Reviewer verdict handling
+
+- **PASS** → proceed to Step 7 (docs sync).
+- **GAPS_FOUND** → extract the gap list from the reviewer's report and send build back via `task` with a targeted fix prompt:
+
+  ```
+  The reviewer found these gaps in your implementation of
+  /Users/alex/Code/Self-driving-car/tasks/<slug>.md:
+
+  1. <gap from reviewer>
+  2. <gap from reviewer>
+  ...
+
+  Fix every gap. Run `npm run fix:all` when done. Report back what you fixed.
+  ```
+
+  Then call reviewer again with the same plan MD + build's fix report.
+
+- **Max 2 review rounds.** If after the 2nd round the reviewer still reports GAPS_FOUND, STOP and report the remaining gaps to the user:
+
+  > Build could not fully complete the plan after 2 review rounds. Remaining gaps:
+  > <list gaps>
+  > Please review and decide: fix manually, adjust the plan, or accept as-is.
+
+  Wait for the user's decision. Do not loop further.
+
+## Step 7 — Docs sync (planner does this, NOT build)
+
+After the reviewer confirms code is complete (PASS), load the `docs-sync` skill and write the docs yourself. You run on glm-5.2 — docs are this repo's regression surface (no automated tests), so doc quality and AGENTS.md convention decisions need the smart model.
+
+Follow the `docs-sync` skill's protocol:
+1. Read the plan's `## Docs to update` section.
+2. Read each listed doc, edit it to reflect the change, match the existing tone.
+3. Decide if a new `docs/*.md` is warranted (high bar — see docs-sync skill).
+4. Append to `AGENTS.md` only if a new convention/gotcha/key/persistence entry is needed.
+
+Build does NOT touch docs. The plan's `## Docs to update` section tells YOU what to write — build implements code only.
+
+## Step 8 — Reviewer docs check (light)
+
+After you finish writing docs, call the reviewer one more time with phase `docs`:
+
+```
+Review the docs for /Users/alex/Code/Self-driving-car/tasks/<slug>.md.
+Phase: docs.
+
+The plan's ## Docs to update section lists:
+<paste the docs-to-update section>
+
+Verify every listed doc was actually edited with the content described,
+AGENTS.md has any new conventions the plan specified, and no stale
+content was left behind. Return your structured gap report.
+```
+
+- **PASS** → proceed to Step 9 (archive).
+- **GAPS_FOUND** → fix the docs yourself (you're the smart model, no need to delegate) and re-run the reviewer. Max 1 docs review round — if still gaps, report to user.
+
+## Step 9 — Archive
 
 When the user confirms the work is complete:
 
@@ -148,3 +223,16 @@ Do NOT archive until the user explicitly confirms completion. "Looks good" or "w
 - The user invokes a command directly → run the command.
 
 If unsure whether a request warrants the full flow, default to running it — the interview step is cheap and the plan is useful even for small changes.
+
+## Cost model summary
+
+| Step | Agent | Model | Why |
+|---|---|---|---|
+| Interview + plan writing | planner | glm-5.2 (smart) | Judgment, ambiguity resolution |
+| Code implementation | build | deepseek-v4-flash-free (cheap) | Mechanical execution from detailed plan |
+| Code review | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification, tsc/lint |
+| Docs writing | planner | glm-5.2 (smart) | Doc quality is the regression surface |
+| Docs review | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification |
+| Archive | planner | glm-5.2 (smart) | Trivial, just file moves |
+
+The expensive judgment work (planning, docs) stays on the smart model. The token-heavy mechanical work (implementation, review) runs on the cheap model. The plan MD is the bridge that makes this safe — it's detailed enough that a cheap model can execute without judgment.

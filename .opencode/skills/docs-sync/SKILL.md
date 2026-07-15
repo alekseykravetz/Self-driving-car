@@ -7,6 +7,10 @@ description: Use after implementing a change, to keep documentation in sync. Ens
 
 This repo has no automated tests — documentation IS the regression surface. Every behavioral or architectural change must be reflected in `docs/` and `AGENTS.md` before the task is archived.
 
+**You (the planner agent, running on glm-5.2) write the docs yourself.** Do NOT delegate docs to the build agent — build runs on a cheaper model and is not suited for the judgment calls required here (matching tone, deciding new docs, AGENTS.md convention decisions). The build agent implements code only; you handle docs.
+
+The reviewer agent (cheap model) will verify your docs work afterward via a checklist — it checks that every doc listed in the plan's `## Docs to update` was actually edited, but it does not write or judge quality. That's your job.
+
 ## Existing docs (as of this writing)
 
 ```

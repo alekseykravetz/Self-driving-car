@@ -4,5 +4,10 @@
   "skills": {
     "paths": [".opencode/skills"]
   },
+  "agent": {
+    "build": {
+      "model": "opencode/deepseek-v4-flash-free"
+    }
+  },
   "plugin": [".opencode/plugins/graphify.js"]
 }
