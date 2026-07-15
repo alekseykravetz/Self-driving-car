@@ -26,17 +26,17 @@ Read `docs/Architecture.md` first to understand the doc house style (heading dep
 
 From the just-complemented change, list every area touched:
 
-| Code area                                       | Doc(s) to check                          |
-| ----------------------------------------------- | ---------------------------------------- |
+| Code area                                       | Doc(s) to check                            |
+| ----------------------------------------------- | ------------------------------------------ |
 | `ts/car/` (physics, sensors, controls, brain)   | `docs/Physics.md`, `docs/NeuralNetwork.md` |
-| `ts/world/`, markings, lights                   | `docs/WorldEditor.md`                    |
-| `ts/simulator/`, training, race, traffic shells | `docs/Simulators.md`, `docs/Race.md`     |
-| `ts/panels/`, keyboard manager, toolbars        | `docs/Keyboard.md`, `docs/Controls.md`   |
-| `ts/rendering/`, viewport, camera               | `docs/Viewport.md`, `docs/Camera.md`     |
-| `ts/store/`, serialization, save files          | `docs/SaveLoad.md`, `docs/Store.md`      |
-| `ts/math/`, primitives, grids, heatmaps         | `docs/Math.md`, `docs/Units.md`          |
-| Audio / sound engine                            | `docs/Sound.md`                          |
-| New project-wide convention                     | `AGENTS.md` (append to relevant section) |
+| `ts/world/`, markings, lights                   | `docs/WorldEditor.md`                      |
+| `ts/simulator/`, training, race, traffic shells | `docs/Simulators.md`, `docs/Race.md`       |
+| `ts/panels/`, keyboard manager, toolbars        | `docs/Keyboard.md`, `docs/Controls.md`     |
+| `ts/rendering/`, viewport, camera               | `docs/Viewport.md`, `docs/Camera.md`       |
+| `ts/store/`, serialization, save files          | `docs/SaveLoad.md`, `docs/Store.md`        |
+| `ts/math/`, primitives, grids, heatmaps         | `docs/Math.md`, `docs/Units.md`            |
+| Audio / sound engine                            | `docs/Sound.md`                            |
+| New project-wide convention                     | `AGENTS.md` (append to relevant section)   |
 
 ## Step 2 — Update each touched doc
 
@@ -44,7 +44,7 @@ For each doc in your list:
 
 1. **Read the existing doc fully** — do not append blindly. The change may belong in an existing section, or it may obsolete a paragraph that needs removing.
 2. **Match the existing tone and heading depth.** This repo's docs use `##` for sections, `###` for subsections, tables for enumerations, and inline code for symbols/paths.
-3. **Reference AGENTS.md for conventions, do not duplicate them.** A doc explains *what* a feature does and *how* to use it; AGENTS.md records the *rule* the codebase enforces. If you find yourself copying a rule into a doc, link to `AGENTS.md §<section>` instead.
+3. **Reference AGENTS.md for conventions, do not duplicate them.** A doc explains _what_ a feature does and _how_ to use it; AGENTS.md records the _rule_ the codebase enforces. If you find yourself copying a rule into a doc, link to `AGENTS.md §<section>` instead.
 4. **Update diagrams/tables if the change alters them.** The state-aware sensor table in `docs/Physics.md` and the keyboard bindings table in `docs/Keyboard.md` are examples of tables that must stay in sync.
 5. **Note one-frame lags, ephemeral state, and other gotchas** in the relevant doc — these belong in docs, not just AGENTS.md key-gotchas.
 

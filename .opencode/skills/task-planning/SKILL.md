@@ -48,25 +48,29 @@ The plan MD MUST be self-contained: a fresh build agent with zero prior conversa
 
 **Date:** YYYY-MM-DD
 **Slug:** <slug>
-**Entry points affected:** <list html/* files, or "none — shared ts/ only">
+**Entry points affected:** <list html/\* files, or "none — shared ts/ only">
 **Save-file impact:** <none | new field on .car/.world | breaking | migration needed>
 **Backward compat:** <preserved | brain dims change | localStorage key added>
 
 ## Goal
+
 <2-4 sentences. What the user wants and why.>
 
 ## Context (read first)
+
 <Absolute file paths the implementer MUST read before writing code. Include line
 ranges when relevant. Pull conventions from AGENTS.md by reference, do not
 copy them.>
 
 ## Scope
+
 - **In scope:** <bullet list of concrete changes>
 - **Out of scope:** <explicit non-goals>
 
 ## Implementation
 
 ### <Area 1, e.g. "ts/car/sensors/sensor.ts">
+
 - <Change as a bullet, concrete enough to act on: function name, new field,
   expected signature, which existing helper to reuse.>
 - <Reference the AGENTS.md rule that applies, e.g. "Sensor must stay decoupled
@@ -75,20 +79,23 @@ copy them.>
 ### <Area 2 ...>
 
 ## Brain / persistence considerations
+
 <If the change touches brain input dims, sensor mode, or save schema, spell out
 exactly how brainsCompatible() / Car.load() / serialization must handle it.
 If none, write "None.">
 
 ## Acceptance criteria
+
 - <Concrete, checkable bullet. e.g. "Opening simulator.html and enabling
   state-aware mode renders a colored dot at each traffic-light ray endpoint.">
 - <Each criterion must be verifiable by opening an HTML page — there are no
   automated tests in this repo.>
 
 ## Docs to update
-- <List every docs/*.md file that needs edits, and AGENTS.md if a convention
+
+- <List every docs/\*.md file that needs edits, and AGENTS.md if a convention
   is added/changed. See docs-sync skill for the doc-update protocol.>
-- <If a new docs/*.md is warranted, name it and give a one-line purpose.>
+- <If a new docs/\*.md is warranted, name it and give a one-line purpose.>
 ```
 
 ### Writing rules
@@ -178,6 +185,7 @@ any out-of-scope changes. Return your structured gap report.
 After the reviewer confirms code is complete (PASS), load the `docs-sync` skill and write the docs yourself. You run on glm-5.2 — docs are this repo's regression surface (no automated tests), so doc quality and AGENTS.md convention decisions need the smart model.
 
 Follow the `docs-sync` skill's protocol:
+
 1. Read the plan's `## Docs to update` section.
 2. Read each listed doc, edit it to reflect the change, match the existing tone.
 3. Decide if a new `docs/*.md` is warranted (high bar — see docs-sync skill).
@@ -226,13 +234,13 @@ If unsure whether a request warrants the full flow, default to running it — th
 
 ## Cost model summary
 
-| Step | Agent | Model | Why |
-|---|---|---|---|
-| Interview + plan writing | planner | glm-5.2 (smart) | Judgment, ambiguity resolution |
-| Code implementation | build | deepseek-v4-flash-free (cheap) | Mechanical execution from detailed plan |
-| Code review | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification, tsc/lint |
-| Docs writing | planner | glm-5.2 (smart) | Doc quality is the regression surface |
-| Docs review | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification |
-| Archive | planner | glm-5.2 (smart) | Trivial, just file moves |
+| Step                     | Agent    | Model                          | Why                                     |
+| ------------------------ | -------- | ------------------------------ | --------------------------------------- |
+| Interview + plan writing | planner  | glm-5.2 (smart)                | Judgment, ambiguity resolution          |
+| Code implementation      | build    | deepseek-v4-flash-free (cheap) | Mechanical execution from detailed plan |
+| Code review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification, tsc/lint        |
+| Docs writing             | planner  | glm-5.2 (smart)                | Doc quality is the regression surface   |
+| Docs review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification                  |
+| Archive                  | planner  | glm-5.2 (smart)                | Trivial, just file moves                |
 
 The expensive judgment work (planning, docs) stays on the smart model. The token-heavy mechanical work (implementation, review) runs on the cheap model. The plan MD is the bridge that makes this safe — it's detailed enough that a cheap model can execute without judgment.
