@@ -121,7 +121,7 @@ button:hover,
   white-space: normal;
   text-align: center;
   pointer-events: none;
-  z-index: 100;
+  z-index: 200;
   text-shadow: none;
   line-height: 1.3;
 }
@@ -171,7 +171,7 @@ input[type='file'] {
 .key-indicator[title]:hover::after {
   content: attr(title);
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.9);
@@ -181,12 +181,12 @@ input[type='file'] {
   font-weight: normal;
   padding: 6px 10px;
   border-radius: 4px;
-  white-space: nowrap;
-  max-width: 280px;
   white-space: normal;
+  max-width: 280px;
+  width: max-content;
   text-align: center;
   pointer-events: none;
-  z-index: 100;
+  z-index: 200;
   line-height: 1.3;
 }
 
@@ -333,33 +333,29 @@ input[type='file'] {
   height: 32px;
   border: none;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.07);
   font-size: 16px;
   padding: 0;
   margin: 0;
   cursor: pointer;
   position: relative;
-  opacity: 0.7;
   transition:
     background 0.15s,
-    opacity 0.15s,
     outline-color 0.15s;
 }
 
 .toolbar-btn:hover {
   background: rgba(255, 255, 255, 0.22);
-  opacity: 0.9;
 }
 
 .toolbar-btn.active {
   background: rgba(255, 255, 255, 0.18);
   outline: 2px solid rgba(255, 255, 255, 0.4);
-  opacity: 1;
 }
 
 .toolbar-btn:disabled {
   cursor: not-allowed;
-  opacity: 0.25;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .toolbar-btn[title]:hover::after {
