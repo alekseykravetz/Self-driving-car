@@ -63,7 +63,7 @@ export class WorldLayersToolbarElement extends HTMLElement {
 
     const toggles = WORLD_LAYER_BUTTONS.map(
       (b) =>
-        `<button class="toolbar-btn layer-toggle" data-layer="${b.id}" title="${b.title}">${b.emoji}</button>`,
+        `<button class="toolbar-btn layer-toggle" data-layer="${b.id}" data-tooltip="${b.title}">${b.emoji}</button>`,
     ).join('');
 
     container.innerHTML = `
@@ -75,14 +75,14 @@ export class WorldLayersToolbarElement extends HTMLElement {
       <div class="controls-group" data-items>
         <span class="controls-group-label">Items</span>
         <div class="world-layers-keys">
-          <button id="regenerateItemsBtn" class="toolbar-btn" title="Regenerate items — rebuild buildings & trees">♻️</button>
+          <button id="regenerateItemsBtn" class="toolbar-btn" data-tooltip="Regenerate items — rebuild buildings & trees">♻️</button>
         </div>
       </div>
       <div class="controls-separator" data-overlays></div>
       <div class="controls-group" data-overlays>
         <span class="controls-group-label">Overlays</span>
         <div class="world-layers-keys">
-          <button id="showHeatmapBtn" class="toolbar-btn layer-toggle" title="Traffic congestion heatmap — paint vehicle occupancy per grid cell">🌡️</button>
+          <button id="showHeatmapBtn" class="toolbar-btn layer-toggle" data-tooltip="Traffic congestion heatmap — paint vehicle occupancy per grid cell">🌡️</button>
         </div>
       </div>`;
 

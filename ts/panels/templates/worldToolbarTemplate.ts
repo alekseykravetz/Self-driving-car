@@ -5,14 +5,14 @@ export const WORLD_TOOLBAR_TEMPLATE = `
         <button
           id="saveBtn"
           class="toolbar-btn"
-          title="Save — Save world to file and localStorage"
+          data-tooltip="Save — Save world to file and localStorage"
         >
           💾
         </button>
         <button
           id="disposeBtn"
           class="toolbar-btn"
-          title="Clear — Reset all graph points and segments"
+          data-tooltip="Clear — Reset all graph points and segments"
         >
           ❌
         </button>
@@ -29,7 +29,7 @@ export const WORLD_TOOLBAR_TEMPLATE = `
             type="button"
             id="loadWorldBtn"
             class="toolbar-btn"
-            title="Load / select world"
+            data-tooltip="Load / select world"
           >
             🌍
           </button>
@@ -44,7 +44,7 @@ export const WORLD_TOOLBAR_TEMPLATE = `
         <button
           id="openOsmPanelBtn"
           class="toolbar-btn world-editor-action"
-          title="Import from OSM — Paste OpenStreetMap data to generate roads"
+          data-tooltip="Import from OSM — Paste OpenStreetMap data to generate roads"
           style="display: none"
         >
           🗺️
@@ -59,7 +59,7 @@ export const WORLD_TOOLBAR_TEMPLATE = `
           type="button"
           id="loadCarBtn"
           class="toolbar-btn"
-          title="Load / select car(s)"
+          data-tooltip="Load / select car(s)"
         >
           🚗
         </button>
@@ -97,21 +97,21 @@ export const WORLD_TOOLBAR_TEMPLATE = `
         <button
           id="borderModeNone"
           class="toolbar-btn"
-          title="No borders"
+          data-tooltip="No borders"
         >
           🚫
         </button>
         <button
           id="borderModeDamage"
           class="toolbar-btn active"
-          title="Damage on collision"
+          data-tooltip="Damage on collision"
         >
           💀
         </button>
         <button
           id="borderModeCollision"
           class="toolbar-btn"
-          title="Collision with borders"
+          data-tooltip="Collision with borders"
         >
           🛡️
         </button>
@@ -126,21 +126,21 @@ export const WORLD_TOOLBAR_TEMPLATE = `
         <button
           id="trackModeNone"
           class="toolbar-btn"
-          title="No tracking (free drag)"
+          data-tooltip="No tracking (free drag)"
         >
           ✋
         </button>
         <button
           id="trackModeBest"
           class="toolbar-btn active"
-          title="Track best car"
+          data-tooltip="Track best car"
         >
           🏆
         </button>
         <button
           id="trackModeKeys"
           class="toolbar-btn"
-          title="Track user-controlled car"
+          data-tooltip="Track user-controlled car"
         >
           🎮
         </button>
@@ -155,14 +155,14 @@ export const WORLD_TOOLBAR_TEMPLATE = `
         <button
           id="viewportModeMouse"
           class="toolbar-btn active"
-          title="Mouse mode — scroll wheel zooms"
+          data-tooltip="Mouse mode — scroll wheel zooms"
         >
           🖱️
         </button>
         <button
           id="viewportModeTouchpad"
           class="toolbar-btn"
-          title="Touchpad mode — two-finger scroll pans, hold Ctrl to zoom"
+          data-tooltip="Touchpad mode — two-finger scroll pans, hold Ctrl to zoom"
         >
           ☝️
         </button>
@@ -173,7 +173,7 @@ export const WORLD_TOOLBAR_TEMPLATE = `
 
     <div class="controls-group" data-group="debug">
       <span class="controls-group-label">Debug</span>
-      <label class="view-toggle-label" title="Show camera debug overlay">
+      <label class="view-toggle-label" data-tooltip="Show camera debug overlay">
         <input type="checkbox" id="showCameraDebug" />
         <span>Cam</span>
       </label>

@@ -1220,13 +1220,13 @@ input[type='file'] {
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Tooltip below the button (toolbar sits at the top of the screen) */
-.toolbar-btn[title]:hover::after {
-  content: attr(title);
+/* Tooltip below the button (toolbar sits at the top-left of the screen) */
+.toolbar-btn[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
   position: absolute;
   top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  transform: none;
   background-color: rgba(0, 0, 0, 0.9);
   color: white;
   font-size: 11px;
@@ -1298,12 +1298,12 @@ input[type='file'] {
   box-shadow: 0 0 6px rgba(255, 176, 64, 0.6);
 }
 
-.key-indicator[title]:hover::after {
-  content: attr(title);
+.key-indicator[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
   position: absolute;
   top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  transform: none;
   background-color: rgba(0, 0, 0, 0.9);
   color: white;
   font-size: 11px;
@@ -1314,7 +1314,7 @@ input[type='file'] {
   white-space: normal;
   max-width: 280px;
   width: max-content;
-  z-index: 100;
+  z-index: 200;
   pointer-events: none;
 }
 

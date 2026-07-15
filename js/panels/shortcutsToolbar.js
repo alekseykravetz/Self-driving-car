@@ -42,7 +42,7 @@ export class ShortcutsToolbarElement extends HTMLElement {
     }
     #indicatorHtml(def) {
         const clickable = def.kind === 'toggle' ? ' clickable' : '';
-        return `<span class="key-indicator${clickable}" id="${def.id}" title="${def.title}">${def.label}</span>`;
+        return `<span class="key-indicator${clickable}" id="${def.id}" data-tooltip="${def.title}">${def.label}</span>`;
     }
     /** Briefly highlight an indicator to acknowledge a one-shot action. */
     flash(id) {

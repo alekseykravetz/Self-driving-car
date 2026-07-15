@@ -6,7 +6,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
           type="button"
           id="loopPauseBtn"
           class="toolbar-btn active"
-          title="Pause / resume the simulation"
+          data-tooltip="Pause / resume the simulation"
         >
           ⏸️
         </button>
@@ -19,7 +19,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
       <span class="controls-group-label">Render fr</span>
       <label
         class="view-toggle-label"
-        title="Draw 1 of every N frames (physics always runs at full rate). Higher = fewer redraws = faster sim with choppier visuals."
+        data-tooltip="Draw 1 of every N frames (physics always runs at full rate). Higher = fewer redraws = faster sim with choppier visuals."
       >
         <span>1 /</span>
         <input
@@ -42,7 +42,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
         <span
           id="elapsedTimeDisplay"
           class="elapsed-time"
-          title="Elapsed simulation time (HH:MM:SS)"
+          data-tooltip="Elapsed simulation time (HH:MM:SS)"
         >
           00:00:00
         </span>
@@ -50,7 +50,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
           type="button"
           id="resetTimeBtn"
           class="reset-time-btn"
-          title="Reset elapsed time"
+          data-tooltip="Reset elapsed time"
         >
           ⟲
         </button>
@@ -64,7 +64,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
       <span
         id="fpsDisplay"
         class="fps-display"
-        title="Actual rendering frames per second"
+        data-tooltip="Actual rendering frames per second"
       >
         0 fps
       </span>

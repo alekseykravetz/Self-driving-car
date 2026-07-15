@@ -5,14 +5,14 @@ export const LAYOUT_TOOLBAR_TEMPLATE = `
         <button
           id="layoutTopBig"
           class="toolbar-btn active"
-          title="Top view large, 3D small"
+          data-tooltip="Top view large, 3D small"
         >
           🗺️
         </button>
         <button
           id="layoutCameraBig"
           class="toolbar-btn"
-          title="3D view large, Top view small"
+          data-tooltip="3D view large, Top view small"
         >
           🎥
         </button>
@@ -28,7 +28,7 @@ export const LAYOUT_TOOLBAR_TEMPLATE = `
           type="button"
           id="showCameraView"
           class="toolbar-btn view-toggle-btn active"
-          title="Show 3D perspective view"
+          data-tooltip="Show 3D perspective view"
         >
           🧊
         </button>
@@ -36,7 +36,7 @@ export const LAYOUT_TOOLBAR_TEMPLATE = `
           type="button"
           id="showVisualizer"
           class="toolbar-btn view-toggle-btn active"
-          title="Show neural network visualizer"
+          data-tooltip="Show neural network visualizer"
         >
           🧠
         </button>
@@ -44,7 +44,7 @@ export const LAYOUT_TOOLBAR_TEMPLATE = `
           type="button"
           id="showMiniMap"
           class="toolbar-btn view-toggle-btn active"
-          title="Show mini map"
+          data-tooltip="Show mini map"
         >
           🧭
         </button>
