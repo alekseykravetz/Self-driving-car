@@ -103,8 +103,8 @@ button:hover,
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
 }
 
-button[title]:hover::after,
-.file-input-label[title]:hover::after {
+#controls button[title]:hover::after,
+#controls .file-input-label[title]:hover::after {
   content: attr(title);
   position: absolute;
   bottom: calc(100% + 8px);
