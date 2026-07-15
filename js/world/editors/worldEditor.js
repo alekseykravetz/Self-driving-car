@@ -1,4 +1,4 @@
-import { DEFAULT_LAYER_VISIBILITY } from '../types.js';
+import { DEFAULT_LAYER_VISIBILITY, } from '../types.js';
 import { World } from '../world.js';
 import { WorldGenerator } from '../generation/worldGenerator.js';
 import { GraphEditor } from './graphEditor.js';
@@ -56,16 +56,7 @@ export class WorldEditor {
     #closeOsmPanelBtn;
     #parseOsmDataBtn;
     #osmDataContainer;
-    #graphBtn;
-    #markingBtn;
-    #startBtn;
-    #targetBtn;
-    #stopBtn;
-    #crossingBtn;
-    #yieldBtn;
-    #parkingBtn;
-    #lightBtn;
-    #corridorBtn;
+    #editorToolbar;
     #worldToolbar;
     #shortcutsToolbar;
     #keyboardManager;
@@ -104,16 +95,7 @@ export class WorldEditor {
         this.#parseOsmDataBtn = getElement('parseOsmDataBtn');
         this.#osmDataContainer =
             getElement('osmDataContainer');
-        this.#graphBtn = getElement('graphBtn');
-        this.#markingBtn = getElement('markingBtn');
-        this.#startBtn = getElement('startBtn');
-        this.#targetBtn = getElement('targetBtn');
-        this.#stopBtn = getElement('stopBtn');
-        this.#crossingBtn = getElement('crossingBtn');
-        this.#yieldBtn = getElement('yieldBtn');
-        this.#parkingBtn = getElement('parkingBtn');
-        this.#lightBtn = getElement('lightBtn');
-        this.#corridorBtn = getElement('corridorBtn');
+        this.#editorToolbar = document.querySelector('editor-toolbar');
         this.#worldToolbar = document.querySelector('world-toolbar');
         this.#shortcutsToolbar = document.querySelector('shortcuts-toolbar');
         this.#worldLayersToolbar = document.querySelector('world-layers-toolbar');
@@ -125,17 +107,8 @@ export class WorldEditor {
         this.#openOsmPanelBtn.addEventListener('click', this.openOsmPanel.bind(this));
         this.#closeOsmPanelBtn.addEventListener('click', this.closeOsmPanel.bind(this));
         this.#parseOsmDataBtn.addEventListener('click', this.parseOsmData.bind(this));
-        // Mode setting buttons
-        this.#graphBtn.addEventListener('click', () => this.setMode('graph'));
-        this.#markingBtn.addEventListener('click', () => this.setMode('marking'));
-        this.#startBtn.addEventListener('click', () => this.setMode('start'));
-        this.#targetBtn.addEventListener('click', () => this.setMode('target'));
-        this.#stopBtn.addEventListener('click', () => this.setMode('stop'));
-        this.#crossingBtn.addEventListener('click', () => this.setMode('crossing'));
-        this.#yieldBtn.addEventListener('click', () => this.setMode('yield'));
-        this.#parkingBtn.addEventListener('click', () => this.setMode('parking'));
-        this.#lightBtn.addEventListener('click', () => this.setMode('light'));
-        this.#corridorBtn.addEventListener('click', () => this.setMode('corridor'));
+        // Editor mode switching via the <editor-toolbar> custom element
+        this.#editorToolbar.setModeChangeListener((mode) => this.setMode(mode));
         // The shared <world-toolbar> hosts the World group (load/save/dispose/OSM)
         // and the Viewport mode toggle. Reveal the editor-only actions and hide the
         // simulator-only groups (Car, Borders, Tracking, Debug).
@@ -199,60 +172,29 @@ export class WorldEditor {
         const corridorEditor = new CorridorEditor(viewport, world);
         corridorEditor.bindKeyboard(this.#keyboardManager);
         const tools = {
-            graph: {
-                button: this.#graphBtn,
-                editor: graphEditor,
-            },
-            marking: {
-                button: this.#markingBtn,
-                editor: new MarkingEditor(viewport, world),
-            },
-            stop: { button: this.#stopBtn, editor: new StopEditor(viewport, world) },
-            crossing: {
-                button: this.#crossingBtn,
-                editor: new CrossingEditor(viewport, world),
-            },
-            start: {
-                button: this.#startBtn,
-                editor: new StartEditor(viewport, world),
-            },
-            parking: {
-                button: this.#parkingBtn,
-                editor: new ParkingEditor(viewport, world),
-            },
-            light: {
-                button: this.#lightBtn,
-                editor: new LightEditor(viewport, world),
-            },
-            target: {
-                button: this.#targetBtn,
-                editor: new TargetEditor(viewport, world),
-            },
-            corridor: {
-                button: this.#corridorBtn,
-                editor: corridorEditor,
-            },
-            yield: {
-                button: this.#yieldBtn,
-                editor: new YieldEditor(viewport, world),
-            },
-        }; // Assert final type
+            graph: graphEditor,
+            marking: new MarkingEditor(viewport, world),
+            stop: new StopEditor(viewport, world),
+            crossing: new CrossingEditor(viewport, world),
+            start: new StartEditor(viewport, world),
+            parking: new ParkingEditor(viewport, world),
+            light: new LightEditor(viewport, world),
+            target: new TargetEditor(viewport, world),
+            corridor: corridorEditor,
+            yield: new YieldEditor(viewport, world),
+        };
         return tools;
     }
     /* Sets the active editor mode. */
     setMode(mode) {
         this.#mode = mode;
-        this.disableEditors(); // Disable all editors first
-        this.#editors[mode].button.style.backgroundColor = 'white';
-        this.#editors[mode].button.style.filter = '';
-        this.#editors[mode].editor.enable(); // Enable the selected editor
+        this.disableEditors();
+        this.#editors[mode].enable();
     }
     /* Disables all editor tools and resets button styles. */
     disableEditors() {
-        for (const tool of Object.values(this.#editors)) {
-            tool.button.style.backgroundColor = 'gray';
-            tool.button.style.filter = 'grayscale(100%)';
-            tool.editor.disable();
+        for (const editor of Object.values(this.#editors)) {
+            editor.disable();
         }
     }
     /* Sets the viewport wheel-input mode (mouse vs. touchpad) on both viewports. */
@@ -363,8 +305,8 @@ export class WorldEditor {
         this.#world.draw(this.#ctx, { viewPoint, layers: this.#layerVisibility });
         // Draw editor previews (e.g., marking intent) with transparency
         this.#ctx.globalAlpha = this.#mode === 'graph' ? 0.5 : 0.2;
-        for (const [, tool] of Object.entries(this.#editors)) {
-            tool.editor.display(); // Call display method of active editor
+        for (const editor of Object.values(this.#editors)) {
+            editor.display();
         }
         this.#ctx.globalAlpha = 1.0; // Reset alpha
         this.#viewport.drawScaleIndicator(this.#ctx);

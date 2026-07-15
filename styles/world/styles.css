@@ -30,7 +30,7 @@ h1 {
   height: 100vh;
 }
 
-#controls {
+editor-toolbar {
   position: absolute;
   bottom: 20px;
   left: 50%;
@@ -45,7 +45,7 @@ h1 {
   gap: 4px;
 }
 
-#controls .controls-group {
+editor-toolbar .controls-group {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -79,6 +79,34 @@ h1 {
   margin: 0 6px;
 }
 
+.editor-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #888;
+  filter: grayscale(100%);
+  font-size: 20px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 5px;
+  text-shadow: 1px 1px black;
+  cursor: pointer;
+  position: relative;
+  transition:
+    background-color 0.15s,
+    filter 0.15s,
+    box-shadow 0.15s;
+}
+
+.editor-mode-btn:hover {
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+.editor-mode-btn.active {
+  background-color: white;
+  filter: none;
+}
+
 button,
 .file-input-label {
   display: inline-flex;
@@ -103,8 +131,7 @@ button:hover,
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
 }
 
-#controls button[data-tooltip]:hover::after,
-#controls .file-input-label[data-tooltip]:hover::after {
+.editor-mode-btn[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + 8px);
@@ -548,7 +575,7 @@ input[type='file'] {
   }
 
   /* Editor toolbar is impractical on phones — hide it entirely */
-  #controls {
+  editor-toolbar {
     display: none;
   }
 }

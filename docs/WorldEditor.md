@@ -783,9 +783,13 @@ panels:
 - **Shared `<shortcuts-toolbar>`** (top-left, from `ts/panels/`): visualizes the
   graph-editor keys (`S` / `E` / `C` / `O`) plus the `Ctrl` zoom modifier. The
   `O` one-way indicator is click-latchable. Replaces the old inline
-  `#keyIndicators` block that used to live in the bottom `#controls` panel.
-- **Bottom `#controls` panel**: editor-mode buttons (Graph, Marking, Stop, Start,
-  Light, Crossing, Target, Parking, Yield) and the auto-generate toggle.
+  `#keyIndicators` block that used to live in the bottom controls panel.
+- **`<editor-toolbar>`** (bottom-center, from `ts/panels/editorToolbar.ts`): custom element
+  wrapping the editor-mode buttons (Graph, Marking, Stop, Start,
+  Light, Crossing, Target, Parking, Yield, Corridor). Replaces the old
+
+  `<div id="controls">`. Active state is driven by CSS `.active` class instead
+  of inline style mutations in `WorldEditor`.
 
 The OSM text-area panel (`#osmPanel`) stays in `world.html`; only its open button
 moved into the shared toolbar.
