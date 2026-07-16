@@ -114,6 +114,20 @@ export class Car {
   };
   #brainChangedThisFrame: boolean = false;
 
+  #replayBuffer: {
+    inputs: number[];
+    targets: number[];
+    isTurn: boolean;
+  }[] = [];
+  #replayBufferMaxSize: number = 4096;
+  #batchSize: number = 16;
+  #prevControlState: {
+    forward: boolean;
+    left: boolean;
+    right: boolean;
+    reverse: boolean;
+  } | null = null;
+
   constructor(opts: CarOptions) {
     this.x = opts.x;
     this.y = opts.y;
@@ -331,16 +345,60 @@ export class Car {
           this.controls.right ||
           this.controls.reverse)
       ) {
-        this.#brainChangedThisFrame = NeuralNetwork.trainStep(
-          this.brain as NeuralNetwork,
-          [
-            this.controls.forward ? 1 : 0,
-            this.controls.left ? 1 : 0,
-            this.controls.right ? 1 : 0,
-            this.controls.reverse ? 1 : 0,
-          ],
-          this.#learningRate,
+        const inputVector = CarBrainAdapter.buildInput(
+          this.sensor.readings,
+          this.speed,
+          this.maxSpeed,
+          this.sensor.sensorReadings,
+          this.sensor.stateAware,
         );
+        const targets: [number, number, number, number] = [
+          this.controls.forward ? 1 : 0,
+          this.controls.left ? 1 : 0,
+          this.controls.right ? 1 : 0,
+          this.controls.reverse ? 1 : 0,
+        ];
+
+        const prev = this.#prevControlState;
+        const isDecisionPoint =
+          prev !== null &&
+          (targets[0] !== (prev.forward ? 1 : 0) ||
+            targets[1] !== (prev.left ? 1 : 0) ||
+            targets[2] !== (prev.right ? 1 : 0) ||
+            targets[3] !== (prev.reverse ? 1 : 0));
+        this.#prevControlState = {
+          forward: this.controls.forward,
+          left: this.controls.left,
+          right: this.controls.right,
+          reverse: this.controls.reverse,
+        };
+
+        const isTurn = targets[1] === 1 || targets[2] === 1;
+        this.#replayBuffer.push({ inputs: inputVector, targets, isTurn });
+        if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
+          this.#replayBuffer.shift();
+        }
+
+        const lr = this.#learningRate;
+        const scale = 1 / Math.max(this.#batchSize, 1);
+        const perOutputLR: [number, number, number, number] = [
+          lr * 0.5 * scale,
+          lr * 2 * scale,
+          lr * 2 * scale,
+          lr * 0.5 * scale,
+        ];
+
+        this.#brainChangedThisFrame = this.#trainBatch(perOutputLR);
+
+        if (isDecisionPoint) {
+          const brain = this.brain as NeuralNetwork;
+          for (let i = 0; i < 3; i++) {
+            NeuralNetwork.feedForward(inputVector, brain);
+            if (NeuralNetwork.trainStep(brain, targets, perOutputLR)) {
+              this.#brainChangedThisFrame = true;
+            }
+          }
+        }
       }
     } else if (this.sensor) {
       this.sensor.update(
@@ -352,6 +410,71 @@ export class Car {
         otherCars,
       );
     }
+  }
+
+  #trainBatch(lr: [number, number, number, number]): boolean {
+    const buffer = this.#replayBuffer;
+    const brain = this.brain as NeuralNetwork;
+    const bufferLen = buffer.length;
+    let changed = false;
+
+    if (bufferLen < this.#batchSize) {
+      for (let i = 0; i < bufferLen; i++) {
+        NeuralNetwork.feedForward(buffer[i].inputs, brain);
+        if (NeuralNetwork.trainStep(brain, buffer[i].targets, lr)) {
+          changed = true;
+        }
+      }
+      return changed;
+    }
+
+    const turnIdx: number[] = [];
+    const straightIdx: number[] = [];
+    for (let i = 0; i < bufferLen; i++) {
+      if (buffer[i].isTurn) turnIdx.push(i);
+      else straightIdx.push(i);
+    }
+
+    const halfBatch = this.#batchSize >> 1;
+    const selected: number[] = [];
+
+    for (let i = 0; i < halfBatch && turnIdx.length > 0; i++) {
+      selected.push(
+        turnIdx.splice(Math.floor(Math.random() * turnIdx.length), 1)[0],
+      );
+    }
+    for (
+      let i = selected.length;
+      i < this.#batchSize && straightIdx.length > 0;
+      i++
+    ) {
+      selected.push(
+        straightIdx.splice(
+          Math.floor(Math.random() * straightIdx.length),
+          1,
+        )[0],
+      );
+    }
+    while (selected.length < this.#batchSize) {
+      const idx = Math.floor(Math.random() * bufferLen);
+      if (!selected.includes(idx)) selected.push(idx);
+    }
+
+    for (let i = selected.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = selected[i];
+      selected[i] = selected[j];
+      selected[j] = tmp;
+    }
+
+    for (const idx of selected) {
+      NeuralNetwork.feedForward(buffer[idx].inputs, brain);
+      if (NeuralNetwork.trainStep(brain, buffer[idx].targets, lr)) {
+        changed = true;
+      }
+    }
+
+    return changed;
   }
 
   #syncEngine(): void {

@@ -104,7 +104,7 @@ to imitate the human's keypresses each frame.
 static trainStep(
   network: NeuralNetwork,
   targets: number[],
-  lr: number = 0.1,
+  lr: number | number[] = 0.1,
 ): boolean;
 ```
 
@@ -119,6 +119,12 @@ output neuron had a non-zero error), `false` otherwise. The Human Backpropagatio
 panel uses this to pulse a "brain activity" indicator — the dot lights green
 only on frames where the brain actually learned something.
 
+`lr` can be a single number (applied uniformly to all outputs) or an array of
+per-output learning rates `[forward, left, right, reverse]`. When an array is
+passed, per-neuron LR **only applies to the last (output) level** — hidden
+layers use `lr[0]` as the base rate. This prevents the array from being indexed
+beyond its length (which would produce `NaN`).
+
 ### Algorithm
 
 1. **Output layer:** perceptron error `delta = target - output` (STE: `step' = 1`,
@@ -127,6 +133,13 @@ only on frames where the brain actually learned something.
    `delta_hidden[k] = Σ_j w_next[k][j] * delta_next[j]` (again `step' = 1`).
 3. **Update rule:** `w[input][output] += lr * delta * input`;
    `bias -= lr * delta`.
+
+### Safety guards
+
+- **NaN/Inf prevention** — `!isFinite(error)` and `!isFinite(effectiveLR)`
+  guards skip corrupted values; `||` short-circuits zero-error neurons.
+- **Weight clamping** — all weights and biases are clamped to `[-10, 10]` after
+  every update to prevent unbounded growth from repeated training steps.
 
 ### Bias sign convention
 
@@ -150,6 +163,12 @@ the error is positive we **decrease** the bias (opposite of the usual
 The default `lr = 0.1` is tunable from the Human Backpropagation panel
 (0.01–0.5). Higher values converge faster but risk oscillation; lower values
 produce smoother learning.
+
+**Per-output scaling** — the Human Backpropagation mode applies separate
+multipliers per output channel: `forward: 0.5×`, `left: 2×`, `right: 2×`,
+`reverse: 0.5×` of the base slider value. The step LR is also divided by the
+batch size (`1 / batchSize`) so the total per-frame gradient magnitude stays
+independent of the replay-buffer batch size. See the Simulators doc for details.
 
 ---
 

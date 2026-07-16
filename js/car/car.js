@@ -44,6 +44,10 @@ export class Car {
         reverse: false,
     };
     #brainChangedThisFrame = false;
+    #replayBuffer = [];
+    #replayBufferMaxSize = 4096;
+    #batchSize = 16;
+    #prevControlState = null;
     constructor(opts) {
         this.x = opts.x;
         this.y = opts.y;
@@ -199,17 +203,102 @@ export class Car {
                     this.controls.left ||
                     this.controls.right ||
                     this.controls.reverse)) {
-                this.#brainChangedThisFrame = NeuralNetwork.trainStep(this.brain, [
+                const inputVector = CarBrainAdapter.buildInput(this.sensor.readings, this.speed, this.maxSpeed, this.sensor.sensorReadings, this.sensor.stateAware);
+                const targets = [
                     this.controls.forward ? 1 : 0,
                     this.controls.left ? 1 : 0,
                     this.controls.right ? 1 : 0,
                     this.controls.reverse ? 1 : 0,
-                ], this.#learningRate);
+                ];
+                const prev = this.#prevControlState;
+                const isDecisionPoint = prev !== null &&
+                    (targets[0] !== (prev.forward ? 1 : 0) ||
+                        targets[1] !== (prev.left ? 1 : 0) ||
+                        targets[2] !== (prev.right ? 1 : 0) ||
+                        targets[3] !== (prev.reverse ? 1 : 0));
+                this.#prevControlState = {
+                    forward: this.controls.forward,
+                    left: this.controls.left,
+                    right: this.controls.right,
+                    reverse: this.controls.reverse,
+                };
+                const isTurn = targets[1] === 1 || targets[2] === 1;
+                this.#replayBuffer.push({ inputs: inputVector, targets, isTurn });
+                if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
+                    this.#replayBuffer.shift();
+                }
+                const lr = this.#learningRate;
+                const scale = 1 / Math.max(this.#batchSize, 1);
+                const perOutputLR = [
+                    lr * 0.5 * scale,
+                    lr * 2 * scale,
+                    lr * 2 * scale,
+                    lr * 0.5 * scale,
+                ];
+                this.#brainChangedThisFrame = this.#trainBatch(perOutputLR);
+                if (isDecisionPoint) {
+                    const brain = this.brain;
+                    for (let i = 0; i < 3; i++) {
+                        NeuralNetwork.feedForward(inputVector, brain);
+                        if (NeuralNetwork.trainStep(brain, targets, perOutputLR)) {
+                            this.#brainChangedThisFrame = true;
+                        }
+                    }
+                }
             }
         }
         else if (this.sensor) {
             this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
         }
+    }
+    #trainBatch(lr) {
+        const buffer = this.#replayBuffer;
+        const brain = this.brain;
+        const bufferLen = buffer.length;
+        let changed = false;
+        if (bufferLen < this.#batchSize) {
+            for (let i = 0; i < bufferLen; i++) {
+                NeuralNetwork.feedForward(buffer[i].inputs, brain);
+                if (NeuralNetwork.trainStep(brain, buffer[i].targets, lr)) {
+                    changed = true;
+                }
+            }
+            return changed;
+        }
+        const turnIdx = [];
+        const straightIdx = [];
+        for (let i = 0; i < bufferLen; i++) {
+            if (buffer[i].isTurn)
+                turnIdx.push(i);
+            else
+                straightIdx.push(i);
+        }
+        const halfBatch = this.#batchSize >> 1;
+        const selected = [];
+        for (let i = 0; i < halfBatch && turnIdx.length > 0; i++) {
+            selected.push(turnIdx.splice(Math.floor(Math.random() * turnIdx.length), 1)[0]);
+        }
+        for (let i = selected.length; i < this.#batchSize && straightIdx.length > 0; i++) {
+            selected.push(straightIdx.splice(Math.floor(Math.random() * straightIdx.length), 1)[0]);
+        }
+        while (selected.length < this.#batchSize) {
+            const idx = Math.floor(Math.random() * bufferLen);
+            if (!selected.includes(idx))
+                selected.push(idx);
+        }
+        for (let i = selected.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = selected[i];
+            selected[i] = selected[j];
+            selected[j] = tmp;
+        }
+        for (const idx of selected) {
+            NeuralNetwork.feedForward(buffer[idx].inputs, brain);
+            if (NeuralNetwork.trainStep(brain, buffer[idx].targets, lr)) {
+                changed = true;
+            }
+        }
+        return changed;
     }
     #syncEngine() {
         if (!this.#callbacks?.onEngineUpdate)

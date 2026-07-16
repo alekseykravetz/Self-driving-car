@@ -46,6 +46,34 @@ export class CarBrainAdapter {
     return nn.levels[0].inputs.length === expectedInput;
   }
 
+  /**
+   * Build the input vector for the neural network from sensor readings.
+   * Exposed separately so callers (e.g., replay buffer) can store the input
+   * without also running inference.
+   */
+  static buildInput(
+    readings: (IntersectionPoint | null)[],
+    speed: number,
+    maxSpeed: number,
+    sensorReadings?: (SensorReading | null)[],
+    stateAware?: boolean,
+  ): number[] {
+    if (stateAware && sensorReadings) {
+      const offsets = new Array(sensorReadings.length * 2 + 1);
+      for (let i = 0; i < sensorReadings.length; i++) {
+        const sr = sensorReadings[i];
+        offsets[i * 2] = sr === null ? 0 : 1 - sr.distance;
+        offsets[i * 2 + 1] = sr?.state ?? 0;
+      }
+      offsets[offsets.length - 1] = speed / maxSpeed;
+      return offsets;
+    } else {
+      return readings
+        .map((s) => (s === null ? 0 : 1 - s.offset))
+        .concat([speed / maxSpeed]);
+    }
+  }
+
   static computeControls(
     readings: (IntersectionPoint | null)[],
     speed: number,
@@ -54,21 +82,13 @@ export class CarBrainAdapter {
     sensorReadings?: (SensorReading | null)[],
     stateAware?: boolean,
   ): BrainControlOutput {
-    let offsets: number[];
-
-    if (stateAware && sensorReadings) {
-      offsets = new Array(sensorReadings.length * 2 + 1);
-      for (let i = 0; i < sensorReadings.length; i++) {
-        const sr = sensorReadings[i];
-        offsets[i * 2] = sr === null ? 0 : 1 - sr.distance;
-        offsets[i * 2 + 1] = sr?.state ?? 0;
-      }
-      offsets[offsets.length - 1] = speed / maxSpeed;
-    } else {
-      offsets = readings
-        .map((s) => (s === null ? 0 : 1 - s.offset))
-        .concat([speed / maxSpeed]);
-    }
+    const offsets = CarBrainAdapter.buildInput(
+      readings,
+      speed,
+      maxSpeed,
+      sensorReadings,
+      stateAware,
+    );
 
     const outputs = NeuralNetwork.feedForward(offsets, brain as NeuralNetwork);
 

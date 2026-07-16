@@ -118,6 +118,9 @@ export class NeuralNetwork {
      *
      * Uses STE: the binary step activation is treated as the identity during the
      * backward pass, so gradients pass through unchanged.
+     *
+     * @param lr Learning rate (single number) or per-output learning rates (array).
+     *        When an array, each output neuron uses its own LR: [forward, left, right, reverse].
      */
     static trainStep(network, targets, lr = 0.1) {
         const numLevels = network.levels.length;
@@ -144,12 +147,21 @@ export class NeuralNetwork {
             }
             for (let i = 0; i < level.outputs.length; i++) {
                 const error = errors[i];
-                if (error === 0)
+                if (error === 0 || !isFinite(error))
                     continue;
                 changed = true;
-                level.biases[i] -= lr * error;
+                let effectiveLR;
+                if (Array.isArray(lr)) {
+                    effectiveLR = k === numLevels - 1 ? lr[i] : lr[0];
+                }
+                else {
+                    effectiveLR = lr;
+                }
+                if (!isFinite(effectiveLR))
+                    continue;
+                level.biases[i] = Math.max(-10, Math.min(10, level.biases[i] - effectiveLR * error));
                 for (let j = 0; j < level.inputs.length; j++) {
-                    level.weights[j][i] += lr * error * level.inputs[j];
+                    level.weights[j][i] = Math.max(-10, Math.min(10, level.weights[j][i] + effectiveLR * error * level.inputs[j]));
                 }
             }
         }
