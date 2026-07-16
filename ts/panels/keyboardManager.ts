@@ -20,6 +20,13 @@ export interface ShortcutBinding extends ShortcutDef {
     onActivate: () => void;
     onDeactivate: () => void;
   };
+  /**
+   * When true, the toggle uses press-to-toggle (latch) behavior:
+   * each keydown calls toggleLatch(), keyup is a no-op.
+   * When false (default), uses held/latched behavior:
+   * keydown sets physical hold, keyup releases it.
+   */
+  latchOnly?: boolean;
 }
 
 /**
@@ -159,7 +166,11 @@ export class KeyboardManager {
           b.handler?.onKeyDown();
           this.#toolbar.flash(b.id);
         } else if (b.kind === 'toggle') {
-          this.#toggleState.get(b.id)?.setPhysicalHold(true);
+          if (b.latchOnly) {
+            this.#toggleState.get(b.id)?.toggleLatch();
+          } else {
+            this.#toggleState.get(b.id)?.setPhysicalHold(true);
+          }
         }
       }
     }
@@ -173,7 +184,9 @@ export class KeyboardManager {
           this.#toolbar.setActive(b.id, false);
         }
       } else if (b.kind === 'toggle' && b.key === key) {
-        this.#toggleState.get(b.id)?.setPhysicalHold(false);
+        if (!b.latchOnly) {
+          this.#toggleState.get(b.id)?.setPhysicalHold(false);
+        }
       }
     }
   }

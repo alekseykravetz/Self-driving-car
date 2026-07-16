@@ -13,6 +13,7 @@ export class HumanTrainingPanelElement extends HTMLElement {
   #htLearningState: HTMLElement | null = null;
   #htWeightIndicator: HTMLElement | null = null;
   #htTrainingFrames: HTMLElement | null = null;
+  #htBrainInspector: HTMLElement | null = null;
   #htKeyForwardPct: HTMLElement | null = null;
   #htKeyLeftPct: HTMLElement | null = null;
   #htKeyRightPct: HTMLElement | null = null;
@@ -43,6 +44,7 @@ export class HumanTrainingPanelElement extends HTMLElement {
     this.#htLearningState = this.querySelector('#htLearningState');
     this.#htWeightIndicator = this.querySelector('#htWeightIndicator');
     this.#htTrainingFrames = this.querySelector('#htTrainingFrames');
+    this.#htBrainInspector = this.querySelector('#htBrainInspector');
     this.#htKeyForwardPct = this.querySelector('#htKeyForwardPct');
     this.#htKeyLeftPct = this.querySelector('#htKeyLeftPct');
     this.#htKeyRightPct = this.querySelector('#htKeyRightPct');
@@ -165,6 +167,12 @@ export class HumanTrainingPanelElement extends HTMLElement {
   setTrainingFrames(count: number): void {
     if (this.#htTrainingFrames) {
       this.#htTrainingFrames.textContent = count.toLocaleString();
+    }
+  }
+
+  setBrainInfo(html: string): void {
+    if (this.#htBrainInspector) {
+      this.#htBrainInspector.innerHTML = html;
     }
   }
 

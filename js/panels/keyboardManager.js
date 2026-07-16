@@ -130,7 +130,12 @@ export class KeyboardManager {
                     this.#toolbar.flash(b.id);
                 }
                 else if (b.kind === 'toggle') {
-                    this.#toggleState.get(b.id)?.setPhysicalHold(true);
+                    if (b.latchOnly) {
+                        this.#toggleState.get(b.id)?.toggleLatch();
+                    }
+                    else {
+                        this.#toggleState.get(b.id)?.setPhysicalHold(true);
+                    }
                 }
             }
         }
@@ -144,7 +149,9 @@ export class KeyboardManager {
                 }
             }
             else if (b.kind === 'toggle' && b.key === key) {
-                this.#toggleState.get(b.id)?.setPhysicalHold(false);
+                if (!b.latchOnly) {
+                    this.#toggleState.get(b.id)?.setPhysicalHold(false);
+                }
             }
         }
     }

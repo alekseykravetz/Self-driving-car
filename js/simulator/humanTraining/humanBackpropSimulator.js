@@ -41,6 +41,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
     #trainingFrames = 0;
     #autoSaveFrameCounter = 0;
     #AUTO_SAVE_INTERVAL = 60;
+    #brainInspectorCounter = 0;
+    #BRAIN_INSPECTOR_INTERVAL = 10;
     constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host) {
         super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
         this.#mode =
@@ -270,6 +272,11 @@ export class HumanBackpropSimulator extends SimulatorShell {
         this.#panel.setSpeed(pxPerFrameToKmh(Math.abs(this.#car.speed)));
         this.#panel.setWeightChangePulse(this.#car.brainChangedThisFrame);
         this.#panel.setTrainingFrames(this.#trainingFrames);
+        this.#brainInspectorCounter++;
+        if (this.#brainInspectorCounter >= this.#BRAIN_INSPECTOR_INTERVAL) {
+            this.#updateBrainInspector();
+            this.#brainInspectorCounter = 0;
+        }
         this.#autoSaveFrameCounter++;
         if (this.#autoSaveFrameCounter >= this.#AUTO_SAVE_INTERVAL) {
             this.#saveCar();
@@ -320,6 +327,38 @@ export class HumanBackpropSimulator extends SimulatorShell {
         this.#panel.setAccuracy(match, pct);
         const perChannel = perChannelTotal.map((t, i) => t > 0 ? Math.round((100 * perChannelMatched[i]) / t) : null);
         this.#panel.setPerChannelAccuracy(perChannel);
+    }
+    #updateBrainInspector() {
+        if (!this.#car?.brain)
+            return;
+        const nn = this.#car
+            .brain;
+        let html = '';
+        for (let i = 0; i < nn.levels.length; i++) {
+            const level = nn.levels[i];
+            html += '<div class="ht-brain-layer">';
+            html += `<div class="ht-brain-layer-title">Layer ${i + 1}: ${level.inputs.length}\u2192${level.outputs.length}</div>`;
+            html +=
+                '<div class="ht-brain-row"><span class="ht-brain-label">biases:</span> ';
+            html += level.biases
+                .map((b) => `<span class="ht-brain-val ${b > 0 ? 'pos' : 'neg'}">${b.toFixed(2)}</span>`)
+                .join(' ');
+            html += '</div>';
+            html +=
+                '<div class="ht-brain-row"><span class="ht-brain-label">weights:</span></div>';
+            html += '<div class="ht-brain-weights">';
+            for (let j = 0; j < level.weights.length; j++) {
+                html += '<div class="ht-brain-weight-row">';
+                for (let k = 0; k < level.weights[j].length; k++) {
+                    const w = level.weights[j][k];
+                    html += `<span class="ht-brain-val ${w > 0 ? 'pos' : 'neg'}">${w.toFixed(2)}</span>`;
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            html += '</div>';
+        }
+        this.#panel.setBrainInfo(html);
     }
     draw(time) {
         if (!this.#car || !this.world || !this.viewport || !this.roadBorders)
@@ -385,7 +424,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
         const simpleWorld = this.world;
         const startInfo = this.getStartInfo();
         this.#simpleState.traffic = generateInitialTraffic((lane) => simpleWorld.getLaneCenter(lane), startInfo.angle);
-        this.#simpleState.lastGeneratedTrafficY = startInfo.y;
+        this.#simpleState.lastGeneratedTrafficY =
+            SIMPLE_MODE_CONFIG.initialTrafficY;
     }
     #onCrash() {
         this.#saveCar();
@@ -475,6 +515,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
                 title: 'L \u2014 Toggle learning on/off (when off, driving does not train the brain)',
                 group: 'Training',
                 kind: 'toggle',
+                latchOnly: true,
                 toggle: {
                     onActivate: () => this.#setLearning(true),
                     onDeactivate: () => this.#setLearning(false),

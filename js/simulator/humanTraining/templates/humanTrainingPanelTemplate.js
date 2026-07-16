@@ -12,7 +12,7 @@ export const HUMAN_TRAINING_PANEL_TEMPLATE = `
       <summary>How it works</summary>
       <div class="ht-howto-content">
         <p><strong>1. Drive</strong> \u2014 use arrow keys or WASD. The car\u2019s neural network watches your keypresses and the sensor readings.</p>
-        <p><strong>2. Learn</strong> \u2014 each frame you press a key, the brain adjusts its weights to imitate you (backpropagation). Green rings = brain matches your key, red = mismatch.</p>
+        <p><strong>2. Learn</strong> \u2014 each frame you press a key, the brain adjusts its weights to imitate you (backpropagation). Green = brain matches your key, red = mismatch. When learning is ON, the brain adapts within 1-2 frames, so expect mostly green once it has learned a pattern. Turn learning OFF to see the brain\u2019s actual predictions vs your input \u2014 red appears when you do something the brain hasn\u2019t learned.</p>
         <p><strong>3. Toggle learning</strong> \u2014 press <kbd>L</kbd> to pause/resume learning. Drive freely without training the brain.</p>
         <p><strong>4. Autopilot</strong> \u2014 check the box to let the brain drive. Learning pauses. See if it can handle the road on its own.</p>
         <p><strong>5. Save</strong> \u2014 the brain auto-saves to localStorage every second and on crash/close. Reload to resume training.</p>
@@ -103,6 +103,12 @@ export const HUMAN_TRAINING_PANEL_TEMPLATE = `
       <button id="htResetBrain" class="btn-lg btn-danger">Reset brain</button>
       <button id="htResetCar" class="btn-lg">Reset car</button>
     </div>
+  </div>
+
+  <!-- Brain inspector -->
+  <div class="panel-section">
+    <div class="section-title">Brain Inspector</div>
+    <div id="htBrainInspector" class="ht-brain-inspector"></div>
   </div>
 
   <!-- Status -->

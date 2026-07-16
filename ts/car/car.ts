@@ -394,6 +394,12 @@ export class Car {
     this.#autopilot = enabled;
     if (this.controls instanceof Controls) {
       this.controls.frozen = enabled;
+      if (!enabled) {
+        this.controls.forward = false;
+        this.controls.left = false;
+        this.controls.right = false;
+        this.controls.reverse = false;
+      }
     }
   }
 

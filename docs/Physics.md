@@ -101,7 +101,10 @@ to controls only when `useBrain` (AI) or `#autopilot` (KEYS car in test mode).
 pressed, and learning not paused via the L-key toggle). When autopilot is
 engaged, `Car.setAutopilot(true)` also sets `controls.frozen = true` so the
 `Controls` keyboard listeners become no-op — without this, human keypresses
-would overwrite the brain's controls between frames. See [NeuralNetwork.md § Online Imitation Learning](NeuralNetwork.md#online-imitation-learning-networktrainstep).
+would overwrite the brain's controls between frames. When autopilot is
+**disengaged**, `Car.setAutopilot(false)` resets all four controls to `false`
+so the car stops immediately (the brain's last output doesn't linger as
+phantom forward movement). See [NeuralNetwork.md § Online Imitation Learning](NeuralNetwork.md#online-imitation-learning-networktrainstep).
 
 ### Learning toggle (L key)
 
@@ -111,8 +114,9 @@ learning on/off without stopping driving. When learning is paused
 car does not train the network, but the forward pass still runs so the
 visualizer and accuracy display keep working. The panel shows **LEARNING**
 (green) or **PAUSED** (orange), and the shortcuts toolbar L indicator reflects
-the state. The toggle is wired via `KeyboardManager` as a `toggle` binding;
-`KeyboardManager.setToggleActive('keyLearn', true)` initialises the indicator
+the state. The toggle is wired via `KeyboardManager` as a `toggle` binding with
+`latchOnly: true` (press-to-toggle: each keydown flips the state, keyup is a
+no-op — the state persists after releasing L); `KeyboardManager.setToggleActive('keyLearn', true)` initialises the indicator
 to active after the car is created.
 
 ### `trainStep` return value

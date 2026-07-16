@@ -185,7 +185,9 @@ paused, the brain's weights are frozen — driving the car does not train it, bu
 the forward pass still runs so the visualizer and accuracy display keep working.
 The panel shows **LEARNING** (green) or **PAUSED** (orange), and the shortcuts
 toolbar L indicator reflects the state. Learning is ON by default when the car
-is created.
+is created. The L key uses `latchOnly: true` on the `KeyboardManager` toggle
+binding — each keydown flips the state (press-to-toggle), and keyup is a no-op
+so the state persists after releasing the key.
 
 ### Autopilot toggle
 
@@ -196,7 +198,9 @@ overwriting the brain's controls between frames, `Car.setAutopilot(true)` also
 sets `controls.frozen = true` on the `Controls` instance — the keyboard
 listeners become no-op while frozen. The panel shows an "AUTOPILOT ACTIVE"
 banner. Switch back to resume human driving and restore the previous learning
-state.
+state. When autopilot is disengaged, all four controls are reset to `false` so
+the car stops immediately (no phantom forward movement from the brain's last
+output).
 
 ### Persistence
 
