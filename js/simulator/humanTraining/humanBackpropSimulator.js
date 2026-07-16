@@ -96,7 +96,10 @@ export class HumanBackpropSimulator extends SimulatorShell {
     #openConfigModal(context) {
         const savedInfo = safeJsonParse(localStorage.getItem('humanTrainedCar'));
         let defaults;
-        if (savedInfo) {
+        if (this.#car) {
+            defaults = this.#car.toInfo();
+        }
+        else if (savedInfo) {
             defaults = savedInfo;
         }
         else {
@@ -116,10 +119,9 @@ export class HumanBackpropSimulator extends SimulatorShell {
                 },
             };
         }
-        const lockedToSavedBrain = savedInfo !== null;
         this.#configModal.open({
             defaults,
-            lockedToSavedBrain,
+            lockedToSavedBrain: false,
             onStart: (result) => this.#applyConfigAndCreateCar(result.carConfig, savedInfo),
             onCancel: () => this.#onConfigCancel(context),
         });
@@ -146,12 +148,14 @@ export class HumanBackpropSimulator extends SimulatorShell {
                 stateAware: carConfig.sensor.stateAware ?? false,
             },
         };
+        this.#car = new CarClass(opts);
         if (savedInfo) {
-            this.#car = CarClass.fromInfo(opts, savedInfo);
-            this.#panel.setStatus('Brain: loaded from save');
+            const brainLoaded = this.#tryLoadBrain(savedInfo, carConfig);
+            this.#panel.setStatus(brainLoaded
+                ? 'Brain: loaded from save'
+                : 'Brain: fresh (config changed, brain reset)');
         }
         else {
-            this.#car = new CarClass(opts);
             this.#panel.setStatus('Brain: fresh');
         }
         this.#car.setLearningFromHuman(true);
@@ -164,6 +168,21 @@ export class HumanBackpropSimulator extends SimulatorShell {
         if (context === 'entry' && !this.#car) {
             this.#applyConfigAndCreateCar(this.#defaultCarInfo(), null);
         }
+    }
+    #tryLoadBrain(savedInfo, config) {
+        if (!savedInfo.brain)
+            return false;
+        const savedBrain = CarBrainAdapter.deserialize(savedInfo.brain);
+        if (!savedBrain ||
+            !CarBrainAdapter.brainsCompatible(savedBrain, config.sensor.rayCount, config.sensor.stateAware ?? false)) {
+            return false;
+        }
+        this.#car.brain = savedBrain;
+        const nn = savedBrain;
+        this.#car.hiddenLayers = nn.levels
+            .slice(0, -1)
+            .map((l) => l.outputs.length);
+        return true;
     }
     #defaultCarInfo() {
         return {
@@ -331,9 +350,22 @@ export class HumanBackpropSimulator extends SimulatorShell {
     onPausedRender() {
         // No-op — keep the last visualizer frame
     }
+    #regenTraffic() {
+        if (this.#mode !== 'simple' || !this.world)
+            return;
+        const simpleWorld = this.world;
+        const startInfo = this.getStartInfo();
+        this.#simpleState.traffic = generateInitialTraffic((lane) => simpleWorld.getLaneCenter(lane), startInfo.angle);
+        this.#simpleState.lastGeneratedTrafficY = startInfo.y;
+    }
     #onCrash() {
         this.#saveCar();
         this.#car?.respawn(this.getStartInfo());
+        if (this.#car && this.viewport) {
+            this.viewport.offset.x = -this.#car.x;
+            this.viewport.offset.y = -this.#car.y;
+        }
+        this.#regenTraffic();
         this.#matchFrames = 0;
         this.#matchTotal = 0;
     }
@@ -364,6 +396,12 @@ export class HumanBackpropSimulator extends SimulatorShell {
         };
         panel.onResetCar = () => {
             this.#car?.respawn(this.getStartInfo());
+            if (this.#car && this.viewport) {
+                this.viewport.offset.x = -this.#car.x;
+                this.viewport.offset.y = -this.#car.y;
+            }
+            this.#snapCameraToStart();
+            this.#regenTraffic();
             this.#matchFrames = 0;
             this.#matchTotal = 0;
         };
@@ -378,6 +416,11 @@ export class HumanBackpropSimulator extends SimulatorShell {
             ]);
         }
         this.#car?.respawn(this.getStartInfo());
+        if (this.#car && this.viewport) {
+            this.viewport.offset.x = -this.#car.x;
+            this.viewport.offset.y = -this.#car.y;
+        }
+        this.#regenTraffic();
         this.#panel.setStatus('Brain: fresh');
         this.#matchFrames = 0;
         this.#matchTotal = 0;

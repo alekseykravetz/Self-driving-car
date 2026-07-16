@@ -270,6 +270,7 @@ export class Car {
     trafficControls?: SensorTrafficControl[],
     otherCars?: Point[][],
   ): void {
+    this.#processBrain(polygons, trafficControls, otherCars);
     this.#applySteering();
 
     const collisionPolygons =
@@ -282,8 +283,6 @@ export class Car {
     if (becameDamaged) {
       this.#callbacks?.onDamaged?.();
     }
-
-    this.#processBrain(polygons, trafficControls, otherCars);
 
     this.#syncEngine();
   }

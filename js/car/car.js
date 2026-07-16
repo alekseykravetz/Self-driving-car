@@ -168,13 +168,13 @@ export class Car {
         };
     }
     update(polygons = [], trafficControls, otherCars) {
+        this.#processBrain(polygons, trafficControls, otherCars);
         this.#applySteering();
         const collisionPolygons = otherCars && otherCars.length > 0 ? polygons.concat(otherCars) : polygons;
         const becameDamaged = this.physics.update(this, this.#computeControlsState(), collisionPolygons);
         if (becameDamaged) {
             this.#callbacks?.onDamaged?.();
         }
-        this.#processBrain(polygons, trafficControls, otherCars);
         this.#syncEngine();
     }
     #processBrain(polygons, trafficControls, otherCars) {

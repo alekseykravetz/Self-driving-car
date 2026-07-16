@@ -1823,6 +1823,10 @@ human-training-config-modal.open {
   display: block;
 }
 
+human-training-panel {
+  display: flex;
+}
+
 human-training-panel #trainingManagerPanel {
   display: flex;
   flex-direction: column;
