@@ -39,6 +39,7 @@ import {
 import { generateInitialTraffic } from '../training/modes/trafficFactory.js';
 import { downloadCarFiles } from '../training/genetics/storageManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
+import { pxPerFrameToKmh } from '../../math/worldUnits.js';
 import type { IWorld } from '../../world/types.js';
 import type { HumanTrainingPanelElement } from './humanTrainingPanel.js';
 import type { HumanTrainingConfigModalElement } from './humanTrainingConfigModal.js';
@@ -56,9 +57,10 @@ export class HumanBackpropSimulator extends SimulatorShell {
   #simpleState: SimpleSimState = new SimpleSimState();
   #keyboardManager: KeyboardManager | null = null;
 
-  #matchFrames = 0;
-  #matchTotal = 0;
+  #accuracyWindow: (boolean | null)[][] = [];
+  #ACCURACY_WINDOW_SIZE = 120;
   #currentMatch: (boolean | null)[] = [null, null, null, null];
+  #trainingFrames: number = 0;
   #autoSaveFrameCounter = 0;
   #AUTO_SAVE_INTERVAL = 60;
 
@@ -195,6 +197,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
     savedInfo: CarInfo | null,
   ): void {
     this.#carConfig = carConfig;
+    this.#trainingFrames = 0;
     const startInfo = this.getStartInfo();
     const opts = {
       x: startInfo.x,
@@ -231,6 +234,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
     this.#car.setLearningFromHuman(true);
     this.#car.setLearningRate(this.#panel.learningRate);
     this.#car.setCallbacks({ onDamaged: () => this.#onCrash() });
+    this.#panel.setLearningState(true);
+    this.#keyboardManager?.setToggleActive('keyLearn', true);
 
     this.#snapCameraToStart();
     this.animationLoopToolbar.setPaused(false);
@@ -357,6 +362,19 @@ export class HumanBackpropSimulator extends SimulatorShell {
     }
 
     this.#updateAccuracy();
+
+    if (
+      this.#car.learningFromHuman &&
+      !this.#car.autopilot &&
+      !this.#car.damaged
+    ) {
+      this.#trainingFrames++;
+    }
+
+    this.#panel.setSpeed(pxPerFrameToKmh(Math.abs(this.#car.speed)));
+    this.#panel.setWeightChangePulse(this.#car.brainChangedThisFrame);
+    this.#panel.setTrainingFrames(this.#trainingFrames);
+
     this.#autoSaveFrameCounter++;
     if (this.#autoSaveFrameCounter >= this.#AUTO_SAVE_INTERVAL) {
       this.#saveCar();
@@ -364,13 +382,18 @@ export class HumanBackpropSimulator extends SimulatorShell {
     }
   }
 
+  #setLearning(enabled: boolean): void {
+    this.#car?.setLearningFromHuman(enabled);
+    this.#panel.setLearningState(enabled);
+  }
+
   #updateAccuracy(): void {
     if (!this.#car) return;
     if (this.#panel.autopilotEnabled || this.#car.damaged) {
       this.#currentMatch = [null, null, null, null];
       this.#panel.setAccuracy(this.#currentMatch, null);
-      this.#matchFrames = 0;
-      this.#matchTotal = 0;
+      this.#panel.setPerChannelAccuracy([null, null, null, null]);
+      this.#accuracyWindow = [];
       return;
     }
 
@@ -384,16 +407,32 @@ export class HumanBackpropSimulator extends SimulatorShell {
     ];
     this.#currentMatch = match;
 
-    for (let i = 0; i < 4; i++) {
-      this.#matchTotal++;
-      if (match[i]) this.#matchFrames++;
+    this.#accuracyWindow.push(match);
+    if (this.#accuracyWindow.length > this.#ACCURACY_WINDOW_SIZE) {
+      this.#accuracyWindow.shift();
     }
 
-    const pct =
-      this.#matchTotal > 0
-        ? Math.round((100 * this.#matchFrames) / this.#matchTotal)
-        : null;
+    let total = 0,
+      matched = 0;
+    const perChannelMatched = [0, 0, 0, 0];
+    const perChannelTotal = [0, 0, 0, 0];
+    for (const frame of this.#accuracyWindow) {
+      for (let i = 0; i < 4; i++) {
+        total++;
+        perChannelTotal[i]++;
+        if (frame[i]) {
+          matched++;
+          perChannelMatched[i]++;
+        }
+      }
+    }
+    const pct = total > 0 ? Math.round((100 * matched) / total) : null;
     this.#panel.setAccuracy(match, pct);
+
+    const perChannel: (number | null)[] = perChannelTotal.map((t, i) =>
+      t > 0 ? Math.round((100 * perChannelMatched[i]) / t) : null,
+    );
+    this.#panel.setPerChannelAccuracy(perChannel);
   }
 
   protected draw(time: number): void {
@@ -492,8 +531,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
       this.viewport.offset.y = -this.#car.y;
     }
     this.#regenTraffic();
-    this.#matchFrames = 0;
-    this.#matchTotal = 0;
+    this.#accuracyWindow = [];
   }
 
   #saveCar(): void {
@@ -505,8 +543,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
     const panel = this.#panel;
     panel.onAutopilotChange = (enabled) => {
       this.#car?.setAutopilot(enabled);
-      this.#matchFrames = 0;
-      this.#matchTotal = 0;
+      this.#panel.setAutopilotActive(enabled);
+      this.#accuracyWindow = [];
     };
     panel.onLearningRateChange = (v) => {
       this.#car?.setLearningRate(v);
@@ -528,8 +566,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
       }
       this.#snapCameraToStart();
       this.#regenTraffic();
-      this.#matchFrames = 0;
-      this.#matchTotal = 0;
+      this.#accuracyWindow = [];
+      this.#trainingFrames = 0;
     };
   }
 
@@ -552,8 +590,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
     }
     this.#regenTraffic();
     this.#panel.setStatus('Brain: fresh');
-    this.#matchFrames = 0;
-    this.#matchTotal = 0;
+    this.#accuracyWindow = [];
+    this.#trainingFrames = 0;
   }
 
   #initPauseToggleClicks(): void {
@@ -572,6 +610,19 @@ export class HumanBackpropSimulator extends SimulatorShell {
     if (!toolbar) return;
     this.#keyboardManager = new KeyboardManager(toolbar);
     this.#keyboardManager.setBindings([
+      {
+        id: 'keyLearn',
+        key: 'l',
+        label: 'L',
+        title:
+          'L \u2014 Toggle learning on/off (when off, driving does not train the brain)',
+        group: 'Training',
+        kind: 'toggle',
+        toggle: {
+          onActivate: () => this.#setLearning(true),
+          onDeactivate: () => this.#setLearning(false),
+        },
+      },
       {
         id: 'keyUp',
         key: '',

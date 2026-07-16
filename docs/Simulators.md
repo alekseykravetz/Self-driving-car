@@ -1059,10 +1059,44 @@ Match/mismatch is shown two ways:
 
 - **Network visualizer** — green/red rings on output neurons (via the `match`
   parameter to `NetworkVisualizer.draw`).
-- **Panel** — a running accuracy percentage + per-key match dots.
+- **Panel** — a rolling-window accuracy percentage (last 120 frames ≈ 2 seconds)
+  + per-key match dots + per-channel accuracy % under each key indicator.
+
+The rolling window ensures the accuracy reflects **recent** driving conditions
+rather than all-time cumulative — when the user switches from forward-only to
+dodging traffic (pressing left/right), the percentage drops quickly to reveal
+the mismatches instead of being diluted by hundreds of forward-only frames.
+Per-channel accuracy (↑/←/→/↓ each with their own %) makes it clear which
+controls the brain has learned and which it still struggles with.
 
 In autopilot mode, accuracy shows `—` and rings disappear (the brain is
 driving, not being compared).
+
+### Learning toggle (L key)
+
+Press **L** to toggle learning on/off without stopping driving. When learning is
+paused, the brain's weights are frozen — driving does not train the network, but
+the forward pass still runs so the visualizer and accuracy display keep working.
+Learning is ON by default when the car is created. The panel shows LEARNING
+(green) or PAUSED (orange), and the shortcuts toolbar L indicator reflects the
+state.
+
+### Panel info
+
+The `<human-training-panel>` displays live training information:
+
+- **How it works** — a collapsible section explaining the 5-step training flow.
+- **Learning state** — LEARNING (green) / PAUSED (orange) indicator with L-key
+  hint.
+- **Autopilot banner** — "AUTOPILOT ACTIVE" shown when the brain is driving.
+- **Car speed** — current speed in km/h, updated every frame.
+- **Accuracy** — rolling-window % + per-channel % under each key indicator.
+- **Brain activity** — a dot that pulses green on frames where `trainStep`
+  actually changed weights (learning is on, keys pressed, non-zero error).
+- **Training frames** — total frames where learning was active this session.
+- **Learning rate** — slider (0.01–0.5).
+- **Buttons** — Config, Download .car, Reset brain, Reset car.
+- **Status** — "Brain: fresh" or "Brain: loaded from save".
 
 ### Persistence
 
@@ -1081,7 +1115,8 @@ driving, not being compared).
 | Gene pool/generations | Yes                          | No                                 |
 | Brain persistence     | `bestPool` (top-K CarInfo[]) | `humanTrainedCar` (single CarInfo) |
 | Autopilot toggle      | No                           | Yes (test trained brain)           |
-| Accuracy display      | No                           | Match rings + % counter            |
+| Learning toggle (L)   | N/A                          | Yes (pause/resume training)        |
+| Accuracy display      | No                           | Match rings + rolling-window %     |
 
 ---
 

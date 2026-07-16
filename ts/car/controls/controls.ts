@@ -11,6 +11,7 @@ export class Controls {
   public left: boolean;
   public right: boolean;
   public reverse: boolean;
+  public frozen: boolean = false;
 
   constructor(type: ControlType | string) {
     this.forward = false;
@@ -44,6 +45,7 @@ export class Controls {
 
   #addKeyboardListeners(): void {
     document.addEventListener('keydown', (event: KeyboardEvent): void => {
+      if (this.frozen) return;
       switch (event.key) {
         case 'ArrowLeft':
         case 'a':
@@ -64,6 +66,7 @@ export class Controls {
       }
     });
     document.addEventListener('keyup', (event: KeyboardEvent): void => {
+      if (this.frozen) return;
       switch (event.key) {
         case 'ArrowLeft':
         case 'a':

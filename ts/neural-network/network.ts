@@ -151,10 +151,11 @@ export class NeuralNetwork {
     network: NeuralNetwork,
     targets: number[],
     lr: number = 0.1,
-  ): void {
+  ): boolean {
     const numLevels = network.levels.length;
-    if (numLevels === 0) return;
+    if (numLevels === 0) return false;
 
+    let changed = false;
     const levelErrors: number[][] = new Array(numLevels);
 
     const lastLevel = network.levels[numLevels - 1];
@@ -180,12 +181,14 @@ export class NeuralNetwork {
       for (let i = 0; i < level.outputs.length; i++) {
         const error = errors[i];
         if (error === 0) continue;
+        changed = true;
         level.biases[i] -= lr * error;
         for (let j = 0; j < level.inputs.length; j++) {
           level.weights[j][i] += lr * error * level.inputs[j];
         }
       }
     }
+    return changed;
   }
 
   /**

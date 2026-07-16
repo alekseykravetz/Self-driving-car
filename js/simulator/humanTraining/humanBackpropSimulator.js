@@ -22,6 +22,7 @@ import { SIMPLE_MODE_CONFIG, SimpleSimState, updateSimpleTraffic, updateSimpleCa
 import { generateInitialTraffic } from '../training/modes/trafficFactory.js';
 import { downloadCarFiles } from '../training/genetics/storageManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
+import { pxPerFrameToKmh } from '../../math/worldUnits.js';
 export class HumanBackpropSimulator extends SimulatorShell {
     #mode;
     #panel;
@@ -34,9 +35,10 @@ export class HumanBackpropSimulator extends SimulatorShell {
     #trafficGrid = new TrafficControlGrid(150);
     #simpleState = new SimpleSimState();
     #keyboardManager = null;
-    #matchFrames = 0;
-    #matchTotal = 0;
+    #accuracyWindow = [];
+    #ACCURACY_WINDOW_SIZE = 120;
     #currentMatch = [null, null, null, null];
+    #trainingFrames = 0;
     #autoSaveFrameCounter = 0;
     #AUTO_SAVE_INTERVAL = 60;
     constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host) {
@@ -257,6 +259,14 @@ export class HumanBackpropSimulator extends SimulatorShell {
             this.camera.move(this.#car);
         }
         this.#updateAccuracy();
+        if (this.#car.learningFromHuman &&
+            !this.#car.autopilot &&
+            !this.#car.damaged) {
+            this.#trainingFrames++;
+        }
+        this.#panel.setSpeed(pxPerFrameToKmh(Math.abs(this.#car.speed)));
+        this.#panel.setWeightChangePulse(this.#car.brainChangedThisFrame);
+        this.#panel.setTrainingFrames(this.#trainingFrames);
         this.#autoSaveFrameCounter++;
         if (this.#autoSaveFrameCounter >= this.#AUTO_SAVE_INTERVAL) {
             this.#saveCar();
@@ -269,8 +279,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
         if (this.#panel.autopilotEnabled || this.#car.damaged) {
             this.#currentMatch = [null, null, null, null];
             this.#panel.setAccuracy(this.#currentMatch, null);
-            this.#matchFrames = 0;
-            this.#matchTotal = 0;
+            this.#panel.setPerChannelAccuracy([null, null, null, null]);
+            this.#accuracyWindow = [];
             return;
         }
         const human = this.#car.controls;
@@ -282,15 +292,27 @@ export class HumanBackpropSimulator extends SimulatorShell {
             brain.reverse === human.reverse,
         ];
         this.#currentMatch = match;
-        for (let i = 0; i < 4; i++) {
-            this.#matchTotal++;
-            if (match[i])
-                this.#matchFrames++;
+        this.#accuracyWindow.push(match);
+        if (this.#accuracyWindow.length > this.#ACCURACY_WINDOW_SIZE) {
+            this.#accuracyWindow.shift();
         }
-        const pct = this.#matchTotal > 0
-            ? Math.round((100 * this.#matchFrames) / this.#matchTotal)
-            : null;
+        let total = 0, matched = 0;
+        const perChannelMatched = [0, 0, 0, 0];
+        const perChannelTotal = [0, 0, 0, 0];
+        for (const frame of this.#accuracyWindow) {
+            for (let i = 0; i < 4; i++) {
+                total++;
+                perChannelTotal[i]++;
+                if (frame[i]) {
+                    matched++;
+                    perChannelMatched[i]++;
+                }
+            }
+        }
+        const pct = total > 0 ? Math.round((100 * matched) / total) : null;
         this.#panel.setAccuracy(match, pct);
+        const perChannel = perChannelTotal.map((t, i) => t > 0 ? Math.round((100 * perChannelMatched[i]) / t) : null);
+        this.#panel.setPerChannelAccuracy(perChannel);
     }
     draw(time) {
         if (!this.#car || !this.world || !this.viewport || !this.roadBorders)
@@ -366,8 +388,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
             this.viewport.offset.y = -this.#car.y;
         }
         this.#regenTraffic();
-        this.#matchFrames = 0;
-        this.#matchTotal = 0;
+        this.#accuracyWindow = [];
     }
     #saveCar() {
         if (!this.#car)
@@ -378,8 +399,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
         const panel = this.#panel;
         panel.onAutopilotChange = (enabled) => {
             this.#car?.setAutopilot(enabled);
-            this.#matchFrames = 0;
-            this.#matchTotal = 0;
+            this.#panel.setAutopilotActive(enabled);
+            this.#accuracyWindow = [];
         };
         panel.onLearningRateChange = (v) => {
             this.#car?.setLearningRate(v);
@@ -402,8 +423,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
             }
             this.#snapCameraToStart();
             this.#regenTraffic();
-            this.#matchFrames = 0;
-            this.#matchTotal = 0;
+            this.#accuracyWindow = [];
+            this.#trainingFrames = 0;
         };
     }
     #resetBrain() {
@@ -422,8 +443,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
         }
         this.#regenTraffic();
         this.#panel.setStatus('Brain: fresh');
-        this.#matchFrames = 0;
-        this.#matchTotal = 0;
+        this.#accuracyWindow = [];
+        this.#trainingFrames = 0;
     }
     #initPauseToggleClicks() {
         const toggle = (e) => {

@@ -43,6 +43,7 @@ export class Car {
         right: false,
         reverse: false,
     };
+    #brainChangedThisFrame = false;
     constructor(opts) {
         this.x = opts.x;
         this.y = opts.y;
@@ -178,6 +179,7 @@ export class Car {
         this.#syncEngine();
     }
     #processBrain(polygons, trafficControls, otherCars) {
+        this.#brainChangedThisFrame = false;
         if (this.sensor && this.brain) {
             this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
             const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
@@ -197,7 +199,7 @@ export class Car {
                     this.controls.left ||
                     this.controls.right ||
                     this.controls.reverse)) {
-                NeuralNetwork.trainStep(this.brain, [
+                this.#brainChangedThisFrame = NeuralNetwork.trainStep(this.brain, [
                     this.controls.forward ? 1 : 0,
                     this.controls.left ? 1 : 0,
                     this.controls.right ? 1 : 0,
@@ -242,6 +244,9 @@ export class Car {
     }
     setAutopilot(enabled) {
         this.#autopilot = enabled;
+        if (this.controls instanceof Controls) {
+            this.controls.frozen = enabled;
+        }
     }
     get autopilot() {
         return this.#autopilot;
@@ -257,6 +262,9 @@ export class Car {
     }
     get lastBrainOutput() {
         return this.#lastBrainOutput;
+    }
+    get brainChangedThisFrame() {
+        return this.#brainChangedThisFrame;
     }
     respawn(startInfo) {
         this.x = startInfo.x;

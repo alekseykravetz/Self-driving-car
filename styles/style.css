@@ -1880,6 +1880,153 @@ human-training-panel #trainingManagerPanel {
   font-size: 13px;
 }
 
+.ht-howto {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ht-howto summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: #5cb8ff;
+  font-weight: 600;
+}
+
+.ht-howto-content p {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+.ht-howto-content kbd {
+  display: inline-block;
+  padding: 1px 4px;
+  font-family: monospace;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.ht-banner {
+  background: rgba(80, 180, 255, 0.15);
+  border: 1px solid rgba(80, 180, 255, 0.5);
+  color: #5cb8ff;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  margin: 4px 0;
+}
+
+.ht-learning-state {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.ht-learning-state.learning {
+  color: #5cb85c;
+  background: rgba(92, 184, 92, 0.12);
+  border: 1px solid rgba(92, 184, 92, 0.3);
+}
+
+.ht-learning-state.paused {
+  color: #f0ad4e;
+  background: rgba(240, 173, 78, 0.12);
+  border: 1px solid rgba(240, 173, 78, 0.3);
+}
+
+.ht-hint {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  margin-top: 2px;
+}
+
+.ht-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.ht-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.ht-info-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ht-info-value {
+  color: #ddd;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.ht-key-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.ht-key-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ht-key-pct {
+  font-size: 10px;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ht-weight-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.1s;
+}
+
+.ht-weight-dot.pulse {
+  background: #5cb85c;
+  box-shadow: 0 0 6px rgba(92, 184, 92, 0.6);
+}
+
+.ht-slider-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: #aaa;
+}
+
+.ht-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ht-status {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .ti-overlay {
   position: fixed;
   inset: 0;

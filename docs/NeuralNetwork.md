@@ -58,7 +58,7 @@ class NeuralNetwork {
     network: NeuralNetwork,
     targets: number[],
     lr?: number,
-  ): void;
+  ): boolean;
   static mutate(network: NeuralNetwork, amount: number): void;
   static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork;
   static mutateFromPool(brains: NeuralNetwork[], amount: number): NeuralNetwork;
@@ -105,7 +105,7 @@ static trainStep(
   network: NeuralNetwork,
   targets: number[],
   lr: number = 0.1,
-): void;
+): boolean;
 ```
 
 Assumes `feedForward(inputVector, network)` was just called on the current
@@ -113,6 +113,11 @@ frame's input, so each `level.inputs[]` and `level.outputs[]` already holds
 fresh values. Trains every layer via the straight-through estimator (treats the
 binary-step derivative as 1), so inference keeps using step activation and
 pool/crossover compatibility is unaffected.
+
+Returns `true` if any weight or bias was updated this step (i.e. at least one
+output neuron had a non-zero error), `false` otherwise. The Human Backpropagation
+panel uses this to pulse a "brain activity" indicator — the dot lights green
+only on frames where the brain actually learned something.
 
 ### Algorithm
 
@@ -135,6 +140,9 @@ the error is positive we **decrease** the bias (opposite of the usual
 - **Not when no keys are pressed** — skip idle frames so "release keys" frames
   don't overwrite lessons via recency bias.
 - **Not in autopilot mode** — the brain is driving, not learning.
+- **Not when learning is paused** — the L-key toggle sets `#learningFromHuman`
+  to `false`, halting all weight updates while still allowing the forward pass
+  (so the visualizer and accuracy display keep working).
 - **Only for `Controls`-type cars** — excludes Camera/Phone control schemes.
 
 ### Learning rate
@@ -154,23 +162,41 @@ population, no generations.
 
 ### How it works
 
-1. A single KEYS car is created with a fresh (or saved) brain.
+1. A single KEYS car is created with a fresh (or saved) brain. Learning is **ON
+   by default**.
 2. Each frame, the forward pass runs (populating `level.inputs[]`/`outputs[]`
    for the visualizer), and the brain's output is compared to the human's actual
    keypresses.
-3. When the human is driving (not in autopilot, not damaged, keys pressed),
-   `NeuralNetwork.trainStep` nudges the brain's weights toward the human's
-   actions.
+3. When the human is driving (not in autopilot, not damaged, keys pressed, and
+   learning is ON), `NeuralNetwork.trainStep` nudges the brain's weights toward
+   the human's actions. The return value (`boolean`) indicates whether any
+   weights changed — used to pulse the panel's brain-activity dot.
 4. The network visualizer shows **match rings** on output neurons: green when
    the brain's output agrees with the human's key, red when it disagrees.
-5. A running accuracy percentage tracks how often the brain matches the human
-   across all four control channels.
+5. A **rolling-window accuracy** percentage (last 120 frames ≈ 2 seconds) tracks
+   how often the brain matches the human across all four control channels.
+   Per-channel accuracy is shown under each key indicator so the user can see
+   that left/right accuracy is lower than forward accuracy.
+
+### Learning toggle (L key)
+
+Press **L** to toggle learning on/off independently of driving. When learning is
+paused, the brain's weights are frozen — driving the car does not train it, but
+the forward pass still runs so the visualizer and accuracy display keep working.
+The panel shows **LEARNING** (green) or **PAUSED** (orange), and the shortcuts
+toolbar L indicator reflects the state. Learning is ON by default when the car
+is created.
 
 ### Autopilot toggle
 
 The panel's "Autopilot" checkbox switches the car to brain-driven driving
 (`Car.#autopilot = true`): the brain's output controls the car, learning pauses,
-and the accuracy display shows `—`. Switch back to resume teaching.
+and the accuracy display shows `—`. To prevent the human's keyboard from
+overwriting the brain's controls between frames, `Car.setAutopilot(true)` also
+sets `controls.frozen = true` on the `Controls` instance — the keyboard
+listeners become no-op while frozen. The panel shows an "AUTOPILOT ACTIVE"
+banner. Switch back to resume human driving and restore the previous learning
+state.
 
 ### Persistence
 

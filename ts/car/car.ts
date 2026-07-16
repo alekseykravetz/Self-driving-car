@@ -112,6 +112,7 @@ export class Car {
     right: false,
     reverse: false,
   };
+  #brainChangedThisFrame: boolean = false;
 
   constructor(opts: CarOptions) {
     this.x = opts.x;
@@ -292,6 +293,7 @@ export class Car {
     trafficControls?: SensorTrafficControl[],
     otherCars?: Point[][],
   ): void {
+    this.#brainChangedThisFrame = false;
     if (this.sensor && this.brain) {
       this.sensor.update(
         this.x,
@@ -329,7 +331,7 @@ export class Car {
           this.controls.right ||
           this.controls.reverse)
       ) {
-        NeuralNetwork.trainStep(
+        this.#brainChangedThisFrame = NeuralNetwork.trainStep(
           this.brain as NeuralNetwork,
           [
             this.controls.forward ? 1 : 0,
@@ -390,6 +392,9 @@ export class Car {
 
   setAutopilot(enabled: boolean): void {
     this.#autopilot = enabled;
+    if (this.controls instanceof Controls) {
+      this.controls.frozen = enabled;
+    }
   }
 
   get autopilot(): boolean {
@@ -415,6 +420,10 @@ export class Car {
     reverse: boolean;
   } {
     return this.#lastBrainOutput;
+  }
+
+  get brainChangedThisFrame(): boolean {
+    return this.#brainChangedThisFrame;
   }
 
   respawn(startInfo: { x: number; y: number; angle: number }): void {

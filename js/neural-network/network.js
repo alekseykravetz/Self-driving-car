@@ -122,7 +122,8 @@ export class NeuralNetwork {
     static trainStep(network, targets, lr = 0.1) {
         const numLevels = network.levels.length;
         if (numLevels === 0)
-            return;
+            return false;
+        let changed = false;
         const levelErrors = new Array(numLevels);
         const lastLevel = network.levels[numLevels - 1];
         levelErrors[numLevels - 1] = new Array(lastLevel.outputs.length);
@@ -145,12 +146,14 @@ export class NeuralNetwork {
                 const error = errors[i];
                 if (error === 0)
                     continue;
+                changed = true;
                 level.biases[i] -= lr * error;
                 for (let j = 0; j < level.inputs.length; j++) {
                     level.weights[j][i] += lr * error * level.inputs[j];
                 }
             }
         }
+        return changed;
     }
     /**
      * Generates a new network by crossing over and mutating from a pool of networks.
