@@ -86,12 +86,12 @@ class Car {
 The `Car` class has additional private fields used by the Human Backpropagation
 mode (`html/human-training.html`):
 
-| Field                    | Type                                | Purpose                                                                                           |
-| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `#learningFromHuman`     | `boolean`                           | When true, train the brain each frame to imitate human keypresses via `NeuralNetwork.trainStep`   |
-| `#autopilot`             | `boolean`                           | When true, the brain drives the car (controls overwritten by brain output) and learning is paused |
-| `#learningRate`          | `number`                            | Per-frame STE update rate (default 0.1, adjustable from the panel)                                |
-| `#lastBrainOutput`       | `{ forward, left, right, reverse }` | The brain's most recent prediction, exposed for accuracy display                                  |
+| Field                    | Type                                | Purpose                                                                                                       |
+| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `#learningFromHuman`     | `boolean`                           | When true, train the brain each frame to imitate human keypresses via `NeuralNetwork.trainStep`               |
+| `#autopilot`             | `boolean`                           | When true, the brain drives the car (controls overwritten by brain output) and learning is paused             |
+| `#learningRate`          | `number`                            | Per-frame STE update rate (default 0.1, adjustable from the panel)                                            |
+| `#lastBrainOutput`       | `{ forward, left, right, reverse }` | The brain's most recent prediction, exposed for accuracy display                                              |
 | `#brainChangedThisFrame` | `boolean`                           | True when `trainStep` updated at least one weight/bias this frame; exposed for the panel's brain-activity dot |
 
 The forward pass in `#processBrain()` **always** runs (so `#lastBrainOutput` is

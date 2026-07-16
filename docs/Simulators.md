@@ -1060,7 +1060,7 @@ Match/mismatch is shown two ways:
 - **Network visualizer** — green/red rings on output neurons (via the `match`
   parameter to `NetworkVisualizer.draw`).
 - **Panel** — a rolling-window accuracy percentage (last 120 frames ≈ 2 seconds)
-  + per-key match dots + per-channel accuracy % under each key indicator.
+  - per-key match dots + per-channel accuracy % under each key indicator.
 
 The rolling window ensures the accuracy reflects **recent** driving conditions
 rather than all-time cumulative — when the user switches from forward-only to

@@ -55,6 +55,18 @@ export class KeyboardManager {
         this.#rebuild();
     }
     /**
+     * Programmatically set a toggle binding's active state.
+     * No-op if the toggle is already in the desired state.
+     */
+    setToggleActive(id, active) {
+        const toggle = this.#toggleState.get(id);
+        if (!toggle)
+            return;
+        if (toggle.active !== active) {
+            toggle.toggleLatch();
+        }
+    }
+    /**
      * Tear down: remove all window listeners and clear state.
      */
     dispose() {

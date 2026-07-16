@@ -2,11 +2,21 @@ import { HUMAN_TRAINING_PANEL_TEMPLATE } from './templates/humanTrainingPanelTem
 export class HumanTrainingPanelElement extends HTMLElement {
     #htMode = null;
     #htAutopilot = null;
+    #htAutopilotBanner = null;
     #htAccuracyPct = null;
     #htKeyEls = [];
     #htLearningRate = null;
     #htLearningRateVal = null;
     #htStatus = null;
+    #htSpeed = null;
+    #htLearningState = null;
+    #htWeightIndicator = null;
+    #htTrainingFrames = null;
+    #htKeyForwardPct = null;
+    #htKeyLeftPct = null;
+    #htKeyRightPct = null;
+    #htKeyReversePct = null;
+    #learningActive = true;
     #onAutopilotChange = null;
     #onLearningRateChange = null;
     #onConfig = null;
@@ -17,6 +27,7 @@ export class HumanTrainingPanelElement extends HTMLElement {
         this.innerHTML = HUMAN_TRAINING_PANEL_TEMPLATE;
         this.#htMode = this.querySelector('#htMode');
         this.#htAutopilot = this.querySelector('#htAutopilot');
+        this.#htAutopilotBanner = this.querySelector('#htAutopilotBanner');
         this.#htAccuracyPct = this.querySelector('#htAccuracyPct');
         document
             .querySelectorAll('.ht-key')
@@ -24,6 +35,14 @@ export class HumanTrainingPanelElement extends HTMLElement {
         this.#htLearningRate = this.querySelector('#htLearningRate');
         this.#htLearningRateVal = this.querySelector('#htLearningRateVal');
         this.#htStatus = this.querySelector('#htStatus');
+        this.#htSpeed = this.querySelector('#htSpeed');
+        this.#htLearningState = this.querySelector('#htLearningState');
+        this.#htWeightIndicator = this.querySelector('#htWeightIndicator');
+        this.#htTrainingFrames = this.querySelector('#htTrainingFrames');
+        this.#htKeyForwardPct = this.querySelector('#htKeyForwardPct');
+        this.#htKeyLeftPct = this.querySelector('#htKeyLeftPct');
+        this.#htKeyRightPct = this.querySelector('#htKeyRightPct');
+        this.#htKeyReversePct = this.querySelector('#htKeyReversePct');
         this.#htAutopilot?.addEventListener('change', () => {
             this.#onAutopilotChange?.(this.#htAutopilot.checked);
         });
@@ -93,6 +112,53 @@ export class HumanTrainingPanelElement extends HTMLElement {
     }
     set onResetCar(cb) {
         this.#onResetCar = cb;
+    }
+    setSpeed(kmh) {
+        if (this.#htSpeed) {
+            this.#htSpeed.textContent = `${kmh.toFixed(1)} km/h`;
+        }
+    }
+    setLearningState(active) {
+        this.#learningActive = active;
+        if (this.#htLearningState) {
+            this.#htLearningState.textContent = active ? 'LEARNING' : 'PAUSED';
+            this.#htLearningState.className =
+                'ht-learning-state ' + (active ? 'learning' : 'paused');
+        }
+    }
+    setAutopilotActive(active) {
+        if (this.#htAutopilotBanner) {
+            this.#htAutopilotBanner.style.display = active ? 'block' : 'none';
+        }
+        if (active) {
+            this.setLearningState(false);
+        }
+        else {
+            this.setLearningState(this.#learningActive);
+        }
+    }
+    setWeightChangePulse(active) {
+        if (this.#htWeightIndicator) {
+            this.#htWeightIndicator.classList.toggle('pulse', active);
+        }
+    }
+    setTrainingFrames(count) {
+        if (this.#htTrainingFrames) {
+            this.#htTrainingFrames.textContent = count.toLocaleString();
+        }
+    }
+    setPerChannelAccuracy(pcts) {
+        const els = [
+            this.#htKeyForwardPct,
+            this.#htKeyLeftPct,
+            this.#htKeyRightPct,
+            this.#htKeyReversePct,
+        ];
+        for (let i = 0; i < els.length && i < pcts.length; i++) {
+            if (els[i]) {
+                els[i].textContent = pcts[i] !== null ? `${pcts[i]}%` : '\u2014';
+            }
+        }
     }
 }
 customElements.define('human-training-panel', HumanTrainingPanelElement);

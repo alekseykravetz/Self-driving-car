@@ -130,6 +130,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
     }
     #applyConfigAndCreateCar(carConfig, savedInfo) {
         this.#carConfig = carConfig;
+        this.#trainingFrames = 0;
         const startInfo = this.getStartInfo();
         const opts = {
             x: startInfo.x,
@@ -163,6 +164,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
         this.#car.setLearningFromHuman(true);
         this.#car.setLearningRate(this.#panel.learningRate);
         this.#car.setCallbacks({ onDamaged: () => this.#onCrash() });
+        this.#panel.setLearningState(true);
+        this.#keyboardManager?.setToggleActive('keyLearn', true);
         this.#snapCameraToStart();
         this.animationLoopToolbar.setPaused(false);
     }
@@ -272,6 +275,10 @@ export class HumanBackpropSimulator extends SimulatorShell {
             this.#saveCar();
             this.#autoSaveFrameCounter = 0;
         }
+    }
+    #setLearning(enabled) {
+        this.#car?.setLearningFromHuman(enabled);
+        this.#panel.setLearningState(enabled);
     }
     #updateAccuracy() {
         if (!this.#car)
@@ -461,6 +468,18 @@ export class HumanBackpropSimulator extends SimulatorShell {
             return;
         this.#keyboardManager = new KeyboardManager(toolbar);
         this.#keyboardManager.setBindings([
+            {
+                id: 'keyLearn',
+                key: 'l',
+                label: 'L',
+                title: 'L \u2014 Toggle learning on/off (when off, driving does not train the brain)',
+                group: 'Training',
+                kind: 'toggle',
+                toggle: {
+                    onActivate: () => this.#setLearning(true),
+                    onDeactivate: () => this.#setLearning(false),
+                },
+            },
             {
                 id: 'keyUp',
                 key: '',
