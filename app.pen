@@ -22737,11 +22737,11 @@
             {
               "type": "frame",
               "id": "z1El6",
-              "x": 0,
-              "y": 0,
+              "x": -2.2737367544323206e-13,
+              "y": -157,
               "name": "WorldCanvas",
-              "width": 1400,
-              "height": 900,
+              "width": 1602,
+              "height": 1210,
               "fill": {
                 "type": "image",
                 "enabled": true,
