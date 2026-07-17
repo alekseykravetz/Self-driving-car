@@ -1,4 +1,4 @@
-import { IntersectionPoint } from '../physics/sensorRaycaster.js';
+import type { IntersectionPoint } from '../physics/sensorRaycaster.js';
 import { NeuralNetwork } from '../../neural-network/network.js';
 import type { SensorReading } from '../sensors/sensorReading.js';
 
@@ -72,6 +72,15 @@ export class CarBrainAdapter {
         .map((s) => (s === null ? 0 : 1 - s.offset))
         .concat([speed / maxSpeed]);
     }
+  }
+
+  static trainStep(
+    brain: Brain,
+    inputs: number[],
+    targets: number[],
+    lr: number | number[],
+  ): boolean {
+    return NeuralNetwork.trainStep(brain as NeuralNetwork, inputs, targets, lr);
   }
 
   static computeControls(

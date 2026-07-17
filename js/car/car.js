@@ -5,7 +5,6 @@ import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
 import { CarRenderer, } from './rendering/carRenderer.js';
 import { CarBrainAdapter } from './brain/carBrainAdapter.js';
-import { NeuralNetwork } from '../neural-network/network.js';
 import { STEERING_SPEED, DEFAULT_CAR_CONFIG, NN_OUTPUT_COUNT, DEFAULT_HIDDEN_LAYERS, } from './config.js';
 export class Car {
     name;
@@ -242,7 +241,7 @@ export class Car {
                 if (isDecisionPoint) {
                     const brain = this.brain;
                     for (let i = 0; i < 3; i++) {
-                        if (NeuralNetwork.trainStep(brain, inputVector, targets, perOutputLR)) {
+                        if (CarBrainAdapter.trainStep(brain, inputVector, targets, perOutputLR)) {
                             this.#brainChangedThisFrame = true;
                         }
                     }
@@ -260,7 +259,7 @@ export class Car {
         let changed = false;
         if (bufferLen < this.#batchSize) {
             for (let i = 0; i < bufferLen; i++) {
-                if (NeuralNetwork.trainStep(brain, buffer[i].inputs, buffer[i].targets, lr)) {
+                if (CarBrainAdapter.trainStep(brain, buffer[i].inputs, buffer[i].targets, lr)) {
                     changed = true;
                 }
             }
@@ -294,7 +293,7 @@ export class Car {
             selected[j] = tmp;
         }
         for (const idx of selected) {
-            if (NeuralNetwork.trainStep(brain, buffer[idx].inputs, buffer[idx].targets, lr)) {
+            if (CarBrainAdapter.trainStep(brain, buffer[idx].inputs, buffer[idx].targets, lr)) {
                 changed = true;
             }
         }

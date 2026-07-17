@@ -49,6 +49,9 @@ export class CarBrainAdapter {
                 .concat([speed / maxSpeed]);
         }
     }
+    static trainStep(brain, inputs, targets, lr) {
+        return NeuralNetwork.trainStep(brain, inputs, targets, lr);
+    }
     static computeControls(readings, speed, maxSpeed, brain, sensorReadings, stateAware) {
         const offsets = CarBrainAdapter.buildInput(readings, speed, maxSpeed, sensorReadings, stateAware);
         const outputs = NeuralNetwork.feedForward(offsets, brain);
