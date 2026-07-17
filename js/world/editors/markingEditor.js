@@ -1,6 +1,5 @@
 import { Marking } from '../markings/marking.js';
 import { getNearestSegment } from '../../math/utils.js';
-import { drawPolygon } from '../../rendering/polygonRenderer.js';
 export class MarkingEditor {
     viewport;
     world;
@@ -113,7 +112,7 @@ export class MarkingEditor {
     /** Displays the current marking intent (preview) on the canvas. */
     display() {
         if (this.intent) {
-            drawPolygon(this.ctx, this.intent.polygon);
+            this.intent.draw(this.ctx);
         }
     }
 }

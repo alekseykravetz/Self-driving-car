@@ -4,7 +4,6 @@ import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
 import { Marking } from '../markings/marking.js';
 import { getNearestSegment } from '../../math/utils.js';
-import { drawPolygon } from '../../rendering/polygonRenderer.js';
 
 export class MarkingEditor {
   protected viewport: Viewport;
@@ -142,7 +141,7 @@ export class MarkingEditor {
   /** Displays the current marking intent (preview) on the canvas. */
   display(): void {
     if (this.intent) {
-      drawPolygon(this.ctx, this.intent.polygon);
+      this.intent.draw(this.ctx);
     }
   }
 }
