@@ -298,6 +298,17 @@ export class HumanBackpropSimulator extends SimulatorShell {
             return;
         }
         const human = this.#car.controls;
+        // Accuracy compares the brain's prediction against the keys you're actually
+        // pressing. On idle frames (no keys held) there is nothing meaningful to
+        // compare — the trained brain still "wants" to drive forward — so freeze the
+        // display instead of feeding brain-vs-idle mismatches into the rolling
+        // window (which would otherwise drag the number to 0% whenever you stop
+        // driving, even with learning turned off).
+        const driving = human.forward || human.left || human.right || human.reverse;
+        if (!driving) {
+            this.#currentMatch = [null, null, null, null];
+            return;
+        }
         const brain = this.#car.lastBrainOutput;
         const match = [
             brain.forward === human.forward,
