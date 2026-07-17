@@ -140,21 +140,41 @@ beyond its length (which would produce `NaN`).
 
 ### Algorithm
 
-1. **Forward pass:** compute `a = σ(z)` per neuron, feeding sigmoid activations
+Weights and biases stay in the genetic cars' `[-1, 1]` range, so the brain
+inspector, the network visualizer, and the saved-brain format all stay
+consistent (no big numbers, no special-casing). Three ingredients keep training
+well-behaved at that small scale:
+
+- **Sigmoid gain** (`GAIN = 2`) — the training sigmoid is `σ(GAIN·z)`, sharp
+  enough to approximate the hard binary step even with small weights. Without
+  it, small weights make the sigmoid soft (outputs near 0.5) and training no
+  longer matches step inference, which tanks accuracy.
+- **Label smoothing** (`ε = 0.1`) — targets become `0.1 / 0.9` instead of
+  `0 / 1`, so cross-entropy no longer drives the sigmoid to fully saturate. This
+  is what stops the weights from blowing up (fully saturating a sigmoid requires
+  ever-larger weights).
+- **Weight decay** (`λ = 0.002`) — a gentle L2 pull toward 0 keeping weights off
+  the clamp boundary.
+
+Steps:
+
+1. **Forward pass:** `a = σ(GAIN·z)` per neuron, feeding sigmoid activations
    forward through every layer.
-2. **Output layer:** `δ = σ(z) − target` (the well-conditioned sigmoid +
-   cross-entropy gradient — a graded error, not the binary `±1` of STE).
+2. **Output layer:** `δ = GAIN · (a − smooth(target))` (the sigmoid +
+   cross-entropy gradient with label smoothing — a graded error, not the binary
+   `±1` of STE).
 3. **Hidden layers:** backprop through the next level's weights and multiply by
-   the sigmoid derivative: `δ_hidden[k] = (Σ_j w_next[k][j] · δ_next[j]) · a[k] · (1 − a[k])`.
-4. **Update rule:** `w[input][output] -= lr · δ · input`; `bias += lr · δ`
-   (see bias-sign convention below).
+   the sigmoid derivative: `δ_hidden[k] = (Σ_j w_next[k][j] · δ_next[j]) · GAIN · a[k] · (1 − a[k])`.
+4. **Update rule:** `w[input][output] -= lr · (δ · input + λ · w)`;
+   `bias += lr · δ` (see bias-sign convention below).
 
 ### Safety guards
 
 - **NaN/Inf prevention** — `!isFinite(di)` and `!isFinite(effectiveLR)`
   guards skip corrupted values; neurons with a zero delta are also skipped.
-- **Weight clamping** — all weights and biases are clamped to `[-10, 10]` after
-  every update to prevent unbounded growth from repeated training steps.
+- **Weight clamping** — all weights and biases are clamped to `[-1, 1]` after
+  every update, matching the range used by the genetic cars' init/mutation so a
+  backprop-trained brain is indistinguishable in scale from an evolved one.
 
 ### Bias sign convention
 

@@ -122,6 +122,19 @@ export class NeuralNetwork {
      * does not depend on a prior `feedForward` call and never reads the binary
      * `level.outputs` left over from inference.
      *
+     * Weights and biases are kept in the same `[-1, 1]` range the genetic cars
+     * use, so the brain inspector, the network visualizer, and the saved-brain
+     * format all stay consistent. Three ingredients make training well-behaved at
+     * that scale:
+     *   - **Sigmoid gain** (`GAIN`): sharpens the training sigmoid so it still
+     *     approximates the hard binary step even when weights are small (avoids a
+     *     soft-sigmoid train/inference mismatch that would tank accuracy).
+     *   - **Label smoothing** (`LABEL_SMOOTH`): targets become 0.1 / 0.9 instead
+     *     of 0 / 1, so cross-entropy no longer drives the sigmoid to fully
+     *     saturate — the weights it wants stay finite instead of blowing up.
+     *   - **Weight decay** (`WEIGHT_DECAY`): a gentle L2 pull toward 0 that keeps
+     *     weights away from the clamp boundary.
+     *
      * Bias-sign note: since `z = Σ w·x − bias`, `∂z/∂bias = −1`, so the bias is
      * *increased* by `lr · δ` (equivalently decreased when the neuron should fire
      * more), while weights are updated by `−lr · δ · input`.
@@ -135,7 +148,14 @@ export class NeuralNetwork {
         const numLevels = network.levels.length;
         if (numLevels === 0)
             return false;
-        const sigmoid = (z) => 1 / (1 + Math.exp(-z));
+        // Keep parameters in the genetic cars' [-1, 1] range so every consumer
+        // (visualizer, inspector, saved brains) stays consistent.
+        const CLAMP = 1;
+        const GAIN = 2; // sigmoid steepness — sharp decisions from small weights
+        const LABEL_SMOOTH = 0.1; // targets → 0.1 / 0.9 instead of 0 / 1
+        const WEIGHT_DECAY = 0.002;
+        const clamp = (v) => Math.max(-CLAMP, Math.min(CLAMP, v));
+        const sigmoid = (z) => 1 / (1 + Math.exp(-GAIN * z));
         // Forward pass with sigmoid activations, keeping each level's activation
         // vector. activations[0] is the raw input; activations[k+1] is level k's out.
         const activations = new Array(numLevels + 1);
@@ -154,13 +174,15 @@ export class NeuralNetwork {
             activations[k + 1] = out;
         }
         // Backward pass: deltas[k][i] = ∂L/∂z for output i of level k.
+        // The GAIN factor is the derivative of σ(GAIN·z) w.r.t. z.
         const deltas = new Array(numLevels);
         const outIdx = numLevels - 1;
         const outAct = activations[numLevels];
         deltas[outIdx] = new Array(outAct.length);
         for (let i = 0; i < outAct.length; i++) {
-            // Sigmoid + cross-entropy → δ = σ(z) − target (graded, well-conditioned).
-            deltas[outIdx][i] = outAct[i] - targets[i];
+            // Sigmoid + cross-entropy with label smoothing → δ = GAIN·(σ − target).
+            const smoothed = targets[i] * (1 - 2 * LABEL_SMOOTH) + LABEL_SMOOTH;
+            deltas[outIdx][i] = GAIN * (outAct[i] - smoothed);
         }
         for (let k = numLevels - 2; k >= 0; k--) {
             const nextLevel = network.levels[k + 1];
@@ -172,11 +194,12 @@ export class NeuralNetwork {
                 for (let i = 0; i < nextLevel.outputs.length; i++) {
                     sum += nextLevel.weights[j][i] * nextDelta[i];
                 }
-                d[j] = sum * act[j] * (1 - act[j]); // × sigmoid'(z)
+                d[j] = sum * GAIN * act[j] * (1 - act[j]); // × sigmoid'(GAIN·z)
             }
             deltas[k] = d;
         }
-        // Apply weight/bias updates with gradient descent + clamping.
+        // Apply weight/bias updates with gradient descent, weight decay, and the
+        // [-1, 1] clamp.
         let changed = false;
         for (let k = 0; k < numLevels; k++) {
             const level = network.levels[k];
@@ -191,12 +214,15 @@ export class NeuralNetwork {
                     : lr;
                 if (!isFinite(effectiveLR))
                     continue;
-                const newBias = Math.max(-10, Math.min(10, level.biases[i] + effectiveLR * di));
+                const newBias = clamp(level.biases[i] + effectiveLR * di);
                 if (newBias !== level.biases[i])
                     changed = true;
                 level.biases[i] = newBias;
                 for (let j = 0; j < inp.length; j++) {
-                    level.weights[j][i] = Math.max(-10, Math.min(10, level.weights[j][i] - effectiveLR * di * (inp[j] ?? 0)));
+                    const w = level.weights[j][i];
+                    // Gradient + L2 weight decay, then clamp back into [-1, 1].
+                    const grad = di * (inp[j] ?? 0) + WEIGHT_DECAY * w;
+                    level.weights[j][i] = clamp(w - effectiveLR * grad);
                 }
             }
         }
