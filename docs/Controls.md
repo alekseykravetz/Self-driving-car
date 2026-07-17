@@ -47,6 +47,13 @@ The project supports multiple input methods for controlling cars. All control sy
 | --- | ------------------------------------------------------------------------------------------------ |
 | `G` | Toggle global green wave — force all traffic lights green, press again to restore normal cycling |
 
+### Human Backpropagation Training (`html/human-training.html`)
+
+| Key | Action                                                                 |
+| --- | ---------------------------------------------------------------------- |
+| `L` | Toggle learning on/off (latch-only — state persists after key release) |
+| `G` | Toggle global green wave — force all traffic lights green (world mode) |
+
 ---
 
 ## Shortcuts Toolbar (`<shortcuts-toolbar>`)
@@ -117,6 +124,7 @@ class Controls {
   left: boolean;
   right: boolean;
   reverse: boolean;
+  frozen: boolean; // When true, keydown/keyup listeners are no-op
 
   constructor(type: ControlType);
 }
@@ -126,7 +134,10 @@ class Controls {
 
 #### KEYS Mode — Human keyboard input
 
-Registers `keydown` and `keyup` event listeners on `document`:
+Registers `keydown` and `keyup` event listeners on `document`. When `frozen`
+is `true`, both listeners return immediately without changing any flags — used
+by `Car.setAutopilot(true)` in Human Backpropagation mode to prevent keyboard
+input from overwriting the brain's controls.
 
 ```typescript
 document.addEventListener('keydown', (e) => {

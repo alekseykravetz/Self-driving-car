@@ -1098,17 +1098,15 @@ of how rarely the human actually presses turn keys.
 Instead of a single LR for all four output channels, the Human Backpropagation
 mode applies separate multipliers:
 
-| Output  | Multiplier | At default `lr=0.1`, per-step | Rationale                     |
-| ------- | ---------- | ----------------------------- | ----------------------------- |
-| forward | `0.5`      | `0.003125`                    | Well-learned, needs less push |
-| left    | `2`        | `0.0125`                      | Under-represented, boost it   |
-| right   | `2`        | `0.0125`                      | Under-represented, boost it   |
-| reverse | `0.5`      | `0.003125`                    | Seldom used, no special need  |
+| Output  | Multiplier | At default `lr=0.1`, per-step | Rationale                    |
+| ------- | ---------- | ----------------------------- | ---------------------------- |
+| forward | `1`        | `0.1`                         | Well-learned, baseline rate  |
+| left    | `1.5`      | `0.15`                        | Under-represented, boost it  |
+| right   | `1.5`      | `0.15`                        | Under-represented, boost it  |
+| reverse | `1`        | `0.1`                         | Seldom used, no special need |
 
-The per-step LR is also divided by `batchSize` (`scale = 1 / batchSize`) so the
-total per-frame gradient magnitude (summed over the batch) stays ≈ the original
-single-sample update. Turn outputs get **4×** the effective per-frame gradient
-of forward.
+No division by batch size — each replay sample is a full SGD step. Turn
+outputs get **1.5×** the effective per-step gradient of forward.
 
 The per-output array only applies to the **last (output) level** of the network.
 Hidden layers use `lr[0]` (the forward rate) as a single scalar — see
@@ -1136,9 +1134,7 @@ categories regardless of their natural frequency.
 
 All `trainStep` updates have `isFinite()` guards on both `error` and
 `effectiveLR` to prevent NaN propagation, and all weights/biases are clamped to
-`[-10, 10]` after each update. The per-frame gradient is normalized by batch
-size so the total update magnitude is consistent with a single-sample training
-step, preventing oscillation at high batch counts.
+`[-1, 1]` after each update (matching the genetic cars' range).
 
 ### Learning toggle (L key)
 

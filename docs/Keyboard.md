@@ -156,21 +156,30 @@ TrafficSimulator.#initToolbar():
   → km.setBindings([keyR, keyG, keyCtrl])
 ```
 
+### Human Backpropagation Simulator (static set)
+
+```
+HumanBackpropSimulator.#initToolbar():
+  → new KeyboardManager(toolbar)
+  → km.setBindings([keyL, keyG, keyCtrl])
+```
+
 ---
 
 ## Files
 
-| File                                              | Role                                                                                          |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `ts/panels/keyboardManager.ts`                    | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync |
-| `ts/panels/latchedToggle.ts`                      | Held/latched state machine (extracted from 4 prior copies)                                    |
-| `ts/panels/shortcutsToolbar.ts`                   | `<shortcuts-toolbar>` custom element — purely presentational rendering of key indicators      |
-| `ts/panels/templates/shortcutsToolbarTemplate.ts` | Static HTML template for the toolbar                                                          |
-| `ts/world/editors/worldEditor.ts`                 | Creates `KeyboardManager`, sets root bindings, passes to editors                              |
-| `ts/world/editors/graphEditor.ts`                 | Defines shortcut bindings for S/E/C/O/H keys, calls `pushBindings`/`popBindings`              |
-| `ts/world/editors/corridorEditor.ts`              | Defines shortcut bindings for T key, calls `pushBindings`/`popBindings`                       |
-| `ts/simulator/training/trainingSimulator.ts`      | Creates `KeyboardManager` with training simulator bindings (arrows, G, Ctrl)                  |
-| `ts/simulator/traffic/trafficSimulator.ts`        | Creates `KeyboardManager` with traffic simulator bindings (R, G, Ctrl)                        |
+| File                                                   | Role                                                                                          |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `ts/panels/keyboardManager.ts`                         | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync |
+| `ts/panels/latchedToggle.ts`                           | Held/latched state machine (extracted from 4 prior copies)                                    |
+| `ts/panels/shortcutsToolbar.ts`                        | `<shortcuts-toolbar>` custom element — purely presentational rendering of key indicators      |
+| `ts/panels/templates/shortcutsToolbarTemplate.ts`      | Static HTML template for the toolbar                                                          |
+| `ts/world/editors/worldEditor.ts`                      | Creates `KeyboardManager`, sets root bindings, passes to editors                              |
+| `ts/world/editors/graphEditor.ts`                      | Defines shortcut bindings for S/E/C/O/H keys, calls `pushBindings`/`popBindings`              |
+| `ts/world/editors/corridorEditor.ts`                   | Defines shortcut bindings for T key, calls `pushBindings`/`popBindings`                       |
+| `ts/simulator/training/trainingSimulator.ts`           | Creates `KeyboardManager` with training simulator bindings (arrows, G, Ctrl)                  |
+| `ts/simulator/traffic/trafficSimulator.ts`             | Creates `KeyboardManager` with traffic simulator bindings (R, G, Ctrl)                        |
+| `ts/simulator/humanTraining/humanBackpropSimulator.ts` | Creates `KeyboardManager` with Human Backpropagation bindings (L, G, Ctrl)                    |
 
 ---
 
@@ -178,7 +187,8 @@ TrafficSimulator.#initToolbar():
 
 1. **No direct `window` keydown/keyup.** All keyboard routing goes through
    `KeyboardManager`. The only exception is `controls.ts` (arrow/WASD for car
-   driving) and `simulatorShell.ts` (`v` for network-visualizer density toggle),
+   driving — though `controls.frozen` can suppress them when the brain is in
+   autopilot) and `simulatorShell.ts` (`v` for network-visualizer density toggle),
    both of which have no toolbar indicator and are not part of the shortcut system.
 
 2. **Toolbar is presentation-only.** `ShortcutsToolbarElement` has no key listeners
