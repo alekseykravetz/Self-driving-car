@@ -1,0 +1,24 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wlGrad" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7ddf7d" />
+      <stop offset="1" stop-color="#4ecdc4" />
+    </linearGradient>
+  </defs>
+  <!-- Globe longitude lines -->
+  <g stroke="url(#wlGrad)" stroke-width="1.2" stroke-linecap="round" opacity="0.35">
+    <ellipse cx="12" cy="12" rx="3" ry="8" />
+    <ellipse cx="12" cy="12" rx="7" ry="8" />
+    <line x1="12" y1="4" x2="12" y2="20" />
+  </g>
+  <!-- Globe latitude lines -->
+  <g stroke="url(#wlGrad)" stroke-width="1.2" stroke-linecap="round" opacity="0.35">
+    <ellipse cx="12" cy="12" rx="8" ry="3" />
+    <ellipse cx="12" cy="12" rx="8" ry="6" />
+  </g>
+  <!-- Globe outline -->
+  <circle cx="12" cy="12" r="8" stroke="url(#wlGrad)" stroke-width="1.5" />
+  <!-- Orbital loading ring -->
+  <path d="M 4 12 A 10 10 0 0 1 16 3.5" stroke="url(#wlGrad)" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+  <circle cx="16" cy="3.5" r="1.8" fill="url(#wlGrad)" />
+</svg>
