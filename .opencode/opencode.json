@@ -9,5 +9,13 @@
       "model": "opencode/deepseek-v4-flash-free"
     }
   },
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"],
+      "enabled": true,
+      "env": {}
+    }
+  },
   "plugin": [".opencode/plugins/graphify.js"]
 }
