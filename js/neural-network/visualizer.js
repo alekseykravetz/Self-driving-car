@@ -41,14 +41,14 @@ export class NetworkVisualizer {
     }
     /** Bounds of the on-canvas density-toggle button (set each draw). */
     #toggleRect = null;
-    static NODE_RADIUS = 18;
-    static MARGIN = 30;
+    static #NODE_RADIUS = 18;
+    static #MARGIN = 30;
     /** |signal| below this counts as "idle" (no particles). */
-    static SIGNAL_THRESHOLD = 0.04;
+    static #SIGNAL_THRESHOLD = 0.04;
     /** Pixel tolerance when hit-testing a connection line. */
-    static EDGE_HIT_TOLERANCE = 5;
+    static #EDGE_HIT_TOLERANCE = 5;
     /** Height of the reserved bottom strip that holds the colour legend. */
-    static LEGEND_BAND = 30;
+    static #LEGEND_BAND = 30;
     // ---------------------------------------------------------------------------
     // Public API used by the owning canvas / simulator shell
     // ---------------------------------------------------------------------------
@@ -146,14 +146,14 @@ export class NetworkVisualizer {
      * row 0 is the input layer (bottom), the last row is the output layer (top).
      */
     #buildLayout(ctx, network) {
-        const R = _a.NODE_RADIUS;
-        const marginX = _a.MARGIN;
+        const R = _a.#NODE_RADIUS;
+        const marginX = _a.#MARGIN;
         // Reserve vertical bands so labels/legend never overlap the neuron rows:
         // extra room on top for the output text labels, and room at the bottom for
         // the input text labels plus the dedicated legend strip.
         const marginTop = 42;
         const marginBottom = 40;
-        const legendBand = _a.LEGEND_BAND;
+        const legendBand = _a.#LEGEND_BAND;
         const left = marginX;
         const top = marginTop;
         const width = ctx.canvas.width - marginX * 2;
@@ -265,7 +265,7 @@ export class NetworkVisualizer {
             ctx.strokeStyle = _a.#color(edge.weight, dim ? 0.08 : _a.#alpha(edge.weight));
             ctx.stroke();
             // Signal-flow particles on connections that are actually active.
-            if (!dim && Math.abs(edge.signal) > _a.SIGNAL_THRESHOLD) {
+            if (!dim && Math.abs(edge.signal) > _a.#SIGNAL_THRESHOLD) {
                 this.#drawSignalParticles(ctx, edge, e, time, focused);
             }
         }
@@ -441,7 +441,7 @@ export class NetworkVisualizer {
             const dx = edge.x2 - edge.x1;
             const dy = edge.y2 - edge.y1;
             const len = Math.hypot(dx, dy) || 1;
-            const offset = _a.NODE_RADIUS + 12;
+            const offset = _a.#NODE_RADIUS + 12;
             // Sit the label at the far end of the line from the hovered neuron.
             const isOutgoing = edge.fromRow === n.rowIndex && edge.i === n.nodeIndex;
             const x = isOutgoing
@@ -462,7 +462,7 @@ export class NetworkVisualizer {
         const barH = 10;
         const x = pad;
         // Sit inside the reserved bottom band so it never overlaps the input row.
-        const y = ctx.canvas.height - _a.LEGEND_BAND + 4;
+        const y = ctx.canvas.height - _a.#LEGEND_BAND + 4;
         // Gradient bar cyan(−1) → dark(0) → amber(+1).
         const grad = ctx.createLinearGradient(x, 0, x + barW, 0);
         grad.addColorStop(0, _a.#color(-1, 1));
@@ -531,7 +531,7 @@ export class NetworkVisualizer {
         }
         // Nearest connection within tolerance.
         let best = -1;
-        let bestDist = _a.EDGE_HIT_TOLERANCE;
+        let bestDist = _a.#EDGE_HIT_TOLERANCE;
         for (let e = 0; e < layout.edges.length; e++) {
             const edge = layout.edges[e];
             const d = _a.#pointSegmentDistance(x, y, edge.x1, edge.y1, edge.x2, edge.y2);

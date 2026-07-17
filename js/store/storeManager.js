@@ -84,8 +84,8 @@ function smCountItems(key, value) {
     return Array.isArray(parsed) ? parsed.length : null;
 }
 export class StoreManager {
-    static instance = null;
-    static initPromise = null;
+    static #instance = null;
+    static #initPromise = null;
     #worlds = [];
     #cars = [];
     // User-loaded assets. Persisted to localStorage when they fit; otherwise kept
@@ -94,17 +94,18 @@ export class StoreManager {
     #loadedCars = [];
     // World saved by the world editor (renamed from the legacy `world` key).
     #editorWorld = null;
+    // Note: constructor intentionally uses `private` — ES2022 `#` is not supported on constructors.
     constructor() { }
     /** Initialize the StoreManager singleton — fetches manifest and all assets. */
     static async init() {
-        if (this.instance)
-            return this.instance;
-        if (this.initPromise)
-            return this.initPromise;
-        this.initPromise = this.load();
-        return this.initPromise;
+        if (this.#instance)
+            return this.#instance;
+        if (this.#initPromise)
+            return this.#initPromise;
+        this.#initPromise = this.#load();
+        return this.#initPromise;
     }
-    static async load() {
+    static async #load() {
         const mgr = new StoreManager();
         // Migrate legacy keys and load user assets before touching the network so
         // local state is consistent even if the manifest fetch fails.
@@ -169,7 +170,7 @@ export class StoreManager {
         catch (e) {
             console.warn('StoreManager: failed to load manifest, continuing without store assets', e);
         }
-        this.instance = mgr;
+        this.#instance = mgr;
         return mgr;
     }
     /**
@@ -419,50 +420,50 @@ export class StoreManager {
     // --- Static convenience methods (require init() to have been called) ---
     /** The initialized singleton instance, or null if init() has not run. */
     static getInstance() {
-        return this.instance;
+        return this.#instance;
     }
     /** Get the active world (static convenience). Returns null if not initialized or no active world. */
     static getActiveWorld() {
-        return this.instance?.getActiveWorld() ?? null;
+        return this.#instance?.getActiveWorld() ?? null;
     }
     /** Get the world saved by the world editor (static convenience). */
     static getEditorWorld() {
-        return this.instance?.getEditorWorld() ?? null;
+        return this.#instance?.getEditorWorld() ?? null;
     }
     /** Get the active world's display name (static convenience). */
     static getActiveWorldName() {
-        return this.instance?.getActiveWorldName() ?? null;
+        return this.#instance?.getActiveWorldName() ?? null;
     }
     /** Get the active cars' display names (static convenience). */
     static getActiveCarNames() {
-        return this.instance?.getActiveCarNames() ?? [];
+        return this.#instance?.getActiveCarNames() ?? [];
     }
     /** Get all stored cars (static convenience). Returns [] if not initialized. */
     static getCars() {
-        return this.instance?.getCars() ?? [];
+        return this.#instance?.getCars() ?? [];
     }
     /** Get the active car (static convenience). Returns null if not initialized or no active car. */
     static getActiveCar() {
-        return this.instance?.getActiveCar() ?? null;
+        return this.#instance?.getActiveCar() ?? null;
     }
     /** Get all active cars (static convenience). Returns [] if not initialized. */
     static getActiveCars() {
-        return this.instance?.getActiveCars() ?? [];
+        return this.#instance?.getActiveCars() ?? [];
     }
     /** Get all selectable worlds across sources (static convenience). */
     static getAllWorlds() {
-        return this.instance?.getAllWorlds() ?? [];
+        return this.#instance?.getAllWorlds() ?? [];
     }
     /** Get all selectable cars across sources (static convenience). */
     static getAllCars() {
-        return this.instance?.getAllCars() ?? [];
+        return this.#instance?.getAllCars() ?? [];
     }
     /** Get the active world id (static convenience). */
     static getActiveWorldId() {
-        return this.instance?.getActiveWorldId() ?? null;
+        return this.#instance?.getActiveWorldId() ?? null;
     }
     /** Get the active car ids (static convenience). */
     static getActiveCarIds() {
-        return this.instance?.getActiveCarIds() ?? [];
+        return this.#instance?.getActiveCarIds() ?? [];
     }
 }
