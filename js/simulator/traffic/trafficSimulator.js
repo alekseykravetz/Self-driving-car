@@ -243,13 +243,16 @@ export class TrafficSimulator extends SimulatorShell {
             if (car.damaged)
                 continue;
             const obstacles = this.#collectBorders(car, borderMode);
-            const otherCars = car.sensor?.stateAware
-                ? this.#collectCarObstacles(car)
-                : [];
+            const carObstacles = this.#collectCarObstacles(car);
             const trafficControls = car.sensor?.stateAware
                 ? queryTrafficControlsNearCar(this.#trafficGrid, car)
                 : [];
-            car.update(obstacles, trafficControls, otherCars);
+            if (car.sensor?.stateAware) {
+                car.update(obstacles, trafficControls, carObstacles);
+            }
+            else {
+                car.update([...obstacles, ...carObstacles], trafficControls);
+            }
         }
         this.recordHeatmap(this.#cars);
         // Follow the car selected in the stats panel (if any).
