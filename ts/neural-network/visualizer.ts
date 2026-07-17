@@ -88,6 +88,9 @@ export class NetworkVisualizer {
   /** When true, input neurons are labelled as distance/state pairs. */
   #stateAware = false;
 
+  /** Per-output match status (true=correct, false=incorrect, null=no data). */
+  #match: (boolean | null)[] | null = null;
+
   set stateAware(v: boolean) {
     this.#stateAware = v;
   }
@@ -169,8 +172,10 @@ export class NetworkVisualizer {
     network: NeuralNetwork,
     time: number,
     stateAware = false,
+    match?: (boolean | null)[],
   ): void {
     this.#stateAware = stateAware;
+    this.#match = match ?? null;
     const layout = this.#buildLayout(ctx, network);
     this.#layout = layout;
 
@@ -456,6 +461,21 @@ export class NetworkVisualizer {
         ctx.lineWidth = 2;
         ctx.arc(node.x, node.y, node.r + 4, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.stroke();
+      }
+
+      // Match ring on output neurons (green = correct prediction, red = wrong).
+      if (
+        this.#match &&
+        node.arrow !== null &&
+        this.#match[node.nodeIndex] !== null &&
+        this.#match[node.nodeIndex] !== undefined
+      ) {
+        const ok = this.#match[node.nodeIndex];
+        ctx.beginPath();
+        ctx.lineWidth = 3;
+        ctx.arc(node.x, node.y, node.r + 6, 0, Math.PI * 2);
+        ctx.strokeStyle = ok ? 'rgba(80,220,120,0.95)' : 'rgba(240,80,80,0.95)';
         ctx.stroke();
       }
 

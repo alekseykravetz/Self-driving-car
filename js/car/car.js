@@ -5,6 +5,7 @@ import { CameraControls } from './controls/cameraControls.js';
 import { CarPhysics } from './physics/carPhysics.js';
 import { CarRenderer, } from './rendering/carRenderer.js';
 import { CarBrainAdapter } from './brain/carBrainAdapter.js';
+import { NeuralNetwork } from '../neural-network/network.js';
 import { STEERING_SPEED, DEFAULT_CAR_CONFIG, NN_OUTPUT_COUNT, DEFAULT_HIDDEN_LAYERS, } from './config.js';
 export class Car {
     name;
@@ -33,6 +34,20 @@ export class Car {
     physics;
     renderer;
     #callbacks;
+    #learningFromHuman = false;
+    #autopilot = false;
+    #learningRate = 0.1;
+    #lastBrainOutput = {
+        forward: false,
+        left: false,
+        right: false,
+        reverse: false,
+    };
+    #brainChangedThisFrame = false;
+    #replayBuffer = [];
+    #replayBufferMaxSize = 4096;
+    #batchSize = 16;
+    #prevControlState = null;
     constructor(opts) {
         this.x = opts.x;
         this.y = opts.y;
@@ -158,32 +173,132 @@ export class Car {
         };
     }
     update(polygons = [], trafficControls, otherCars) {
+        this.#processBrain(polygons, trafficControls, otherCars);
         this.#applySteering();
         const collisionPolygons = otherCars && otherCars.length > 0 ? polygons.concat(otherCars) : polygons;
         const becameDamaged = this.physics.update(this, this.#computeControlsState(), collisionPolygons);
         if (becameDamaged) {
             this.#callbacks?.onDamaged?.();
         }
-        this.#processBrain(polygons, trafficControls, otherCars);
         this.#syncEngine();
     }
     #processBrain(polygons, trafficControls, otherCars) {
+        this.#brainChangedThisFrame = false;
         if (this.sensor && this.brain) {
             this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
-            if (this.useBrain && this.controls instanceof Controls) {
-                const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
+            const output = CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
+            this.#lastBrainOutput = output;
+            if ((this.useBrain || this.#autopilot) &&
+                this.controls instanceof Controls) {
                 this.controls.forward = output.forward;
                 this.controls.left = output.left;
                 this.controls.right = output.right;
                 this.controls.reverse = output.reverse;
             }
-            else {
-                CarBrainAdapter.computeControls(this.sensor.readings, this.speed, this.maxSpeed, this.brain, this.sensor.sensorReadings, this.sensor.stateAware);
+            if (this.#learningFromHuman &&
+                !this.#autopilot &&
+                !this.damaged &&
+                this.controls instanceof Controls &&
+                (this.controls.forward ||
+                    this.controls.left ||
+                    this.controls.right ||
+                    this.controls.reverse)) {
+                const inputVector = CarBrainAdapter.buildInput(this.sensor.readings, this.speed, this.maxSpeed, this.sensor.sensorReadings, this.sensor.stateAware);
+                const targets = [
+                    this.controls.forward ? 1 : 0,
+                    this.controls.left ? 1 : 0,
+                    this.controls.right ? 1 : 0,
+                    this.controls.reverse ? 1 : 0,
+                ];
+                const prev = this.#prevControlState;
+                const isDecisionPoint = prev !== null &&
+                    (targets[0] !== (prev.forward ? 1 : 0) ||
+                        targets[1] !== (prev.left ? 1 : 0) ||
+                        targets[2] !== (prev.right ? 1 : 0) ||
+                        targets[3] !== (prev.reverse ? 1 : 0));
+                this.#prevControlState = {
+                    forward: this.controls.forward,
+                    left: this.controls.left,
+                    right: this.controls.right,
+                    reverse: this.controls.reverse,
+                };
+                const isTurn = targets[1] === 1 || targets[2] === 1;
+                this.#replayBuffer.push({ inputs: inputVector, targets, isTurn });
+                if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
+                    this.#replayBuffer.shift();
+                }
+                // Per-output learning rates. Turn channels (left/right) are rare
+                // relative to forward, so give them a boost even though the replay
+                // batch is class-balanced. No division by batch size — each replay
+                // sample is a full SGD step.
+                const lr = this.#learningRate;
+                const perOutputLR = [
+                    lr,
+                    lr * 1.5,
+                    lr * 1.5,
+                    lr,
+                ];
+                this.#brainChangedThisFrame = this.#trainBatch(perOutputLR);
+                if (isDecisionPoint) {
+                    const brain = this.brain;
+                    for (let i = 0; i < 3; i++) {
+                        if (NeuralNetwork.trainStep(brain, inputVector, targets, perOutputLR)) {
+                            this.#brainChangedThisFrame = true;
+                        }
+                    }
+                }
             }
         }
         else if (this.sensor) {
             this.sensor.update(this.x, this.y, this.angle, polygons, trafficControls, otherCars);
         }
+    }
+    #trainBatch(lr) {
+        const buffer = this.#replayBuffer;
+        const brain = this.brain;
+        const bufferLen = buffer.length;
+        let changed = false;
+        if (bufferLen < this.#batchSize) {
+            for (let i = 0; i < bufferLen; i++) {
+                if (NeuralNetwork.trainStep(brain, buffer[i].inputs, buffer[i].targets, lr)) {
+                    changed = true;
+                }
+            }
+            return changed;
+        }
+        const turnIdx = [];
+        const straightIdx = [];
+        for (let i = 0; i < bufferLen; i++) {
+            if (buffer[i].isTurn)
+                turnIdx.push(i);
+            else
+                straightIdx.push(i);
+        }
+        const halfBatch = this.#batchSize >> 1;
+        const selected = [];
+        for (let i = 0; i < halfBatch && turnIdx.length > 0; i++) {
+            selected.push(turnIdx.splice(Math.floor(Math.random() * turnIdx.length), 1)[0]);
+        }
+        for (let i = selected.length; i < this.#batchSize && straightIdx.length > 0; i++) {
+            selected.push(straightIdx.splice(Math.floor(Math.random() * straightIdx.length), 1)[0]);
+        }
+        while (selected.length < this.#batchSize) {
+            const idx = Math.floor(Math.random() * bufferLen);
+            if (!selected.includes(idx))
+                selected.push(idx);
+        }
+        for (let i = selected.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = selected[i];
+            selected[i] = selected[j];
+            selected[j] = tmp;
+        }
+        for (const idx of selected) {
+            if (NeuralNetwork.trainStep(brain, buffer[idx].inputs, buffer[idx].targets, lr)) {
+                changed = true;
+            }
+        }
+        return changed;
     }
     #syncEngine() {
         if (!this.#callbacks?.onEngineUpdate)
@@ -209,5 +324,50 @@ export class Car {
     }
     setCallbacks(cb) {
         this.#callbacks = cb;
+    }
+    setLearningFromHuman(enabled) {
+        this.#learningFromHuman = enabled;
+    }
+    get learningFromHuman() {
+        return this.#learningFromHuman;
+    }
+    setAutopilot(enabled) {
+        this.#autopilot = enabled;
+        if (this.controls instanceof Controls) {
+            this.controls.frozen = enabled;
+            if (!enabled) {
+                this.controls.forward = false;
+                this.controls.left = false;
+                this.controls.right = false;
+                this.controls.reverse = false;
+            }
+        }
+    }
+    get autopilot() {
+        return this.#autopilot;
+    }
+    set learningRate(v) {
+        this.#learningRate = v;
+    }
+    get learningRate() {
+        return this.#learningRate;
+    }
+    setLearningRate(v) {
+        this.#learningRate = v;
+    }
+    get lastBrainOutput() {
+        return this.#lastBrainOutput;
+    }
+    get brainChangedThisFrame() {
+        return this.#brainChangedThisFrame;
+    }
+    respawn(startInfo) {
+        this.x = startInfo.x;
+        this.y = startInfo.y;
+        this.angle = startInfo.angle;
+        this.speed = 0;
+        this.damaged = false;
+        this.fitness = 0;
+        this.polygon = this.physics.createPolygon(this);
     }
 }

@@ -1,6 +1,6 @@
 # Neural Network & Neuroevolution
 
-The AI brain system in `ts/neural-network/` implements a feedforward neural network trained via genetic algorithms (no backpropagation). The network makes binary decisions about car controls each frame.
+The AI brain system in `ts/neural-network/` implements a feedforward neural network trained via genetic algorithms (neuroevolution) or, in the Human Backpropagation mode, via online straight-through-estimator backpropagation. The network makes binary decisions about car controls each frame.
 
 ---
 
@@ -54,6 +54,12 @@ class NeuralNetwork {
 
   constructor(neuronCounts: number[]);
   static feedForward(givenInputs: number[], network: NeuralNetwork): number[];
+  static trainStep(
+    network: NeuralNetwork,
+    inputs: number[],
+    targets: number[],
+    lr?: number | number[],
+  ): boolean;
   static mutate(network: NeuralNetwork, amount: number): void;
   static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork;
   static mutateFromPool(brains: NeuralNetwork[], amount: number): NeuralNetwork;
@@ -86,7 +92,195 @@ static feedForward(givenInputs: number[], network: NeuralNetwork): number[] {
 
 ---
 
-## Typical Network Configuration
+## Online Imitation Learning (`NeuralNetwork.trainStep`)
+
+In addition to neuroevolution, the network supports **online backpropagation** via
+a **sigmoid relaxation** of the binary-step network. This is used exclusively by
+the [Human Backpropagation mode](#human-backpropagation-mode) to train a single
+car's brain to imitate the human's keypresses each frame.
+
+### Why a sigmoid relaxation
+
+The network activates when `z = Σ w·x − bias > 0` (binary step). The logistic
+`σ(z)` shares the **exact same decision boundary** (`σ(z) > 0.5 ⟺ z > 0 ⟺
+sum > bias`), so a network trained on the smooth surrogate produces the correct
+binary-step decisions at inference time. Unlike a straight-through estimator
+(which treats `step' = 1` and yields a coarse, poorly-conditioned gradient that
+fails to train multi-layer networks), the sigmoid gives real graded errors and
+proper multi-layer credit assignment — while inference stays pure binary step,
+keeping the brain compatible with the genetic/AI cars, serialization, and the
+visualizer.
+
+### Method
+
+```typescript
+static trainStep(
+  network: NeuralNetwork,
+  inputs: number[],
+  targets: number[],
+  lr: number | number[] = 0.1,
+): boolean;
+```
+
+Runs its **own** sigmoid forward pass from `inputs` (it does not depend on a
+prior `feedForward` call and never reads the binary `level.outputs` left by
+inference), then backpropagates and updates every layer. Inference continues to
+use binary step, so pool/crossover compatibility is unaffected.
+
+Returns `true` if any weight or bias was updated this step (i.e. at least one
+output neuron had a non-zero error), `false` otherwise. The Human Backpropagation
+panel uses this to pulse a "brain activity" indicator — the dot lights green
+only on frames where the brain actually learned something.
+
+`lr` can be a single number (applied uniformly to all outputs) or an array of
+per-output learning rates `[forward, left, right, reverse]`. When an array is
+passed, per-neuron LR **only applies to the last (output) level** — hidden
+layers use `lr[0]` as the base rate. This prevents the array from being indexed
+beyond its length (which would produce `NaN`).
+
+### Algorithm
+
+Weights and biases stay in the genetic cars' `[-1, 1]` range, so the brain
+inspector, the network visualizer, and the saved-brain format all stay
+consistent (no big numbers, no special-casing). Three ingredients keep training
+well-behaved at that small scale:
+
+- **Sigmoid gain** (`GAIN = 2`) — the training sigmoid is `σ(GAIN·z)`, sharp
+  enough to approximate the hard binary step even with small weights. Without
+  it, small weights make the sigmoid soft (outputs near 0.5) and training no
+  longer matches step inference, which tanks accuracy.
+- **Label smoothing** (`ε = 0.1`) — targets become `0.1 / 0.9` instead of
+  `0 / 1`, so cross-entropy no longer drives the sigmoid to fully saturate. This
+  is what stops the weights from blowing up (fully saturating a sigmoid requires
+  ever-larger weights).
+- **Weight decay** (`λ = 0.002`) — a gentle L2 pull toward 0 keeping weights off
+  the clamp boundary.
+
+Steps:
+
+1. **Forward pass:** `a = σ(GAIN·z)` per neuron, feeding sigmoid activations
+   forward through every layer.
+2. **Output layer:** `δ = GAIN · (a − smooth(target))` (the sigmoid +
+   cross-entropy gradient with label smoothing — a graded error, not the binary
+   `±1` of STE).
+3. **Hidden layers:** backprop through the next level's weights and multiply by
+   the sigmoid derivative: `δ_hidden[k] = (Σ_j w_next[k][j] · δ_next[j]) · GAIN · a[k] · (1 − a[k])`.
+4. **Update rule:** `w[input][output] -= lr · (δ · input + λ · w)`;
+   `bias += lr · δ` (see bias-sign convention below).
+
+### Safety guards
+
+- **NaN/Inf prevention** — `!isFinite(di)` and `!isFinite(effectiveLR)`
+  guards skip corrupted values; neurons with a zero delta are also skipped.
+- **Weight clamping** — all weights and biases are clamped to `[-1, 1]` after
+  every update, matching the range used by the genetic cars' init/mutation so a
+  backprop-trained brain is indistinguishable in scale from an evolved one.
+
+### Bias sign convention
+
+This codebase uses `z = Σ w·x − bias`, so `∂z/∂bias = −1` and gradient descent
+becomes `bias += lr · δ` (with `δ = ∂L/∂z`). Equivalently, the bias is
+**decreased** when a neuron should fire more easily — the opposite of the usual
+`b -= lr·δ` convention for `z = Σ w·x + bias`.
+
+### Guards (applied in `Car.#processBrain`)
+
+- **Not when damaged** — don't learn from crashes.
+- **Not when no keys are pressed** — skip idle frames so "release keys" frames
+  don't overwrite lessons via recency bias.
+- **Not in autopilot mode** — the brain is driving, not learning.
+- **Not when learning is paused** — the L-key toggle sets `#learningFromHuman`
+  to `false`, halting all weight updates while still allowing the forward pass
+  (so the visualizer and accuracy display keep working).
+- **Only for `Controls`-type cars** — excludes Camera/Phone control schemes.
+
+### Learning rate
+
+The default `lr = 0.1` is tunable from the Human Backpropagation panel
+(0.01–0.5). Higher values converge faster but risk oscillation; lower values
+produce smoother learning.
+
+**Per-output scaling** — the Human Backpropagation mode boosts the (rarer) turn
+channels: `forward: 1×`, `left: 1.5×`, `right: 1.5×`, `reverse: 1×` of the base
+slider value. Each replay sample is a **full** SGD step (the LR is _not_ divided
+by the batch size — doing so previously made learning ~16× too slow to converge).
+See the Simulators doc for details.
+
+---
+
+## Human Backpropagation Mode
+
+A standalone simulator (`html/human-training.html`) that uses `trainStep` to
+teach a neural network by having a human drive the car. The brain learns to
+imitate the human's keypresses in real time — no genetic algorithm, no
+population, no generations.
+
+### How it works
+
+1. A single KEYS car is created with a fresh (or saved) brain. Learning is **ON
+   by default**.
+2. Each frame, the forward pass runs (populating `level.inputs[]`/`outputs[]`
+   for the visualizer), and the brain's output is compared to the human's actual
+   keypresses.
+3. When the human is driving (not in autopilot, not damaged, keys pressed, and
+   learning is ON), `NeuralNetwork.trainStep` nudges the brain's weights toward
+   the human's actions. The return value (`boolean`) indicates whether any
+   weights changed — used to pulse the panel's brain-activity dot.
+4. The network visualizer shows **match rings** on output neurons: green when
+   the brain's output agrees with the human's key, red when it disagrees.
+5. A **rolling-window accuracy** percentage (last 120 frames ≈ 2 seconds) tracks
+   how often the brain matches the human across all four control channels.
+   Per-channel accuracy is shown under each key indicator so the user can see
+   that left/right accuracy is lower than forward accuracy.
+
+### Learning toggle (L key)
+
+Press **L** to toggle learning on/off independently of driving. When learning is
+paused, the brain's weights are frozen — driving the car does not train it, but
+the forward pass still runs so the visualizer and accuracy display keep working.
+The panel shows **LEARNING** (green) or **PAUSED** (orange), and the shortcuts
+toolbar L indicator reflects the state. Learning is ON by default when the car
+is created. The L key uses `latchOnly: true` on the `KeyboardManager` toggle
+binding — each keydown flips the state (press-to-toggle), and keyup is a no-op
+so the state persists after releasing the key.
+
+### Autopilot toggle
+
+The panel's "Autopilot" checkbox switches the car to brain-driven driving
+(`Car.#autopilot = true`): the brain's output controls the car, learning pauses,
+and the accuracy display shows `—`. To prevent the human's keyboard from
+overwriting the brain's controls between frames, `Car.setAutopilot(true)` also
+sets `controls.frozen = true` on the `Controls` instance — the keyboard
+listeners become no-op while frozen. The panel shows an "AUTOPILOT ACTIVE"
+banner. Switch back to resume human driving and restore the previous learning
+state. When autopilot is disengaged, all four controls are reset to `false` so
+the car stops immediately (no phantom forward movement from the brain's last
+output).
+
+### Persistence
+
+The brain is auto-saved to localStorage key `humanTrainedCar` (a single
+`CarInfo` JSON) every ~60 frames, on crash, and on page unload. Reloading the
+page restores the trained brain and resumes training. A "Download .car" button
+exports the brain as a standard `.car` file; "Reset brain" clears the save and
+starts fresh.
+
+### Car configuration
+
+A config modal (`<human-training-config-modal>`) shown on entry and via a
+"Config" button lets the user set all car/sensor parameters (height, width,
+hidden layers, max speed, accel, friction, ray count/length/spread/offset,
+state-aware checkbox). When a saved brain exists, the config is locked (brain
+topology is fixed by the saved sensor/hidden-layer dims); "Reset brain" unlocks
+it.
+
+### Crash behavior
+
+On crash, the car auto-respawns at the start position with the **same trained
+brain** — training continues seamlessly. The brain is saved before respawn so
+no progress is lost.
+
+---
 
 ```
 ┌─────────────────────────────────────┐
@@ -316,10 +510,15 @@ hover.
 ```typescript
 class NetworkVisualizer {
   // Draw the whole network; `time` (ms) drives the signal-flow animation.
+  // `match` (optional) draws green/red rings on output neurons to show
+  // whether the brain's output matches the human's keypress — used by
+  // the Human Backpropagation mode.
   draw(
     ctx: CanvasRenderingContext2D,
     network: NeuralNetwork,
     time: number,
+    stateAware?: boolean,
+    match?: (boolean | null)[],
   ): void;
 
   // Mouse/keyboard interactivity (wired by the simulator shell).

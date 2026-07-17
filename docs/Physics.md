@@ -77,8 +77,81 @@ class Car {
   draw(ctx, drawSensor?, drawMask?): void; // Render car
   load(info: CarInfo): void; // Apply config to this car
   toInfo(): CarInfo; // Serialize to CarInfo
+  respawn(startInfo: { x: number; y: number; angle: number }): void; // Reset position keeping brain (human backprop)
 }
 ```
+
+### Human Backpropagation Fields
+
+The `Car` class has additional private fields used by the Human Backpropagation
+mode (`html/human-training.html`):
+
+| Field                    | Type                                | Purpose                                                                                                       |
+| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `#learningFromHuman`     | `boolean`                           | When true, train the brain each frame to imitate human keypresses via `NeuralNetwork.trainStep`               |
+| `#autopilot`             | `boolean`                           | When true, the brain drives the car (controls overwritten by brain output) and learning is paused             |
+| `#learningRate`          | `number`                            | Per-frame STE update rate (default 0.1, adjustable from the panel)                                            |
+| `#lastBrainOutput`       | `{ forward, left, right, reverse }` | The brain's most recent prediction, exposed for accuracy display                                              |
+| `#brainChangedThisFrame` | `boolean`                           | True when `trainStep` updated at least one weight/bias this frame; exposed for the panel's brain-activity dot |
+
+The forward pass in `#processBrain()` **always** runs (so `#lastBrainOutput` is
+fresh for the visualizer/accuracy even in human mode). Brain output is applied
+to controls only when `useBrain` (AI) or `#autopilot` (KEYS car in test mode).
+`trainStep` is called only in human mode (not autopilot, not damaged, keys
+pressed, and learning not paused via the L-key toggle). When autopilot is
+engaged, `Car.setAutopilot(true)` also sets `controls.frozen = true` so the
+`Controls` keyboard listeners become no-op — without this, human keypresses
+would overwrite the brain's controls between frames. When autopilot is
+**disengaged**, `Car.setAutopilot(false)` resets all four controls to `false`
+so the car stops immediately (the brain's last output doesn't linger as
+phantom forward movement). See [NeuralNetwork.md § Online Imitation Learning](NeuralNetwork.md#online-imitation-learning-networktrainstep).
+
+### Learning toggle (L key)
+
+Learning is **ON by default** when the car is created. Press **L** to toggle
+learning on/off without stopping driving. When learning is paused
+(`#learningFromHuman = false`), the brain's weights are frozen — driving the
+car does not train the network, but the forward pass still runs so the
+visualizer and accuracy display keep working. The panel shows **LEARNING**
+(green) or **PAUSED** (orange), and the shortcuts toolbar L indicator reflects
+the state. The toggle is wired via `KeyboardManager` as a `toggle` binding with
+`latchOnly: true` (press-to-toggle: each keydown flips the state, keyup is a
+no-op — the state persists after releasing L); `KeyboardManager.setToggleActive('keyLearn', true)` initialises the indicator
+to active after the car is created.
+
+### `trainStep` return value
+
+`NeuralNetwork.trainStep` returns `boolean` — `true` if any weight or bias was
+updated this step (at least one output neuron had a non-zero error), `false`
+otherwise. `Car.#processBrain` captures this into `#brainChangedThisFrame`,
+which the panel reads to pulse a brain-activity dot: the dot lights green only
+on frames where the brain actually learned something.
+
+### Rolling-window accuracy
+
+Accuracy is tracked over a **rolling 120-frame window** (≈ 2 seconds at 60 fps),
+not cumulatively. This ensures the percentage reflects recent driving
+conditions — when the user switches from forward-only to dodging traffic
+(pressing left/right), the percentage drops quickly to reveal mismatches
+instead of being diluted by hundreds of forward-only frames. Per-channel
+accuracy (↑/←/→/↓ each with their own %) is shown under each key indicator in
+the panel, making it clear which controls the brain has learned and which it
+still struggles with. In autopilot or crash mode, accuracy shows `—` and the
+window clears.
+
+### Panel info displays
+
+The `<human-training-panel>` shows live training information beyond the
+accuracy metrics:
+
+| Display          | Source                          | Update frequency |
+| ---------------- | ------------------------------- | ---------------- |
+| Car speed        | `pxPerFrameToKmh(car.speed)`    | Every frame      |
+| Brain activity   | `car.brainChangedThisFrame`     | Every frame      |
+| Training frames  | Session counter (not persisted) | Every frame      |
+| Per-channel %    | Rolling 120-frame window        | Every frame      |
+| Learning state   | `car.learningFromHuman`         | On toggle (L)    |
+| Autopilot banner | `car.autopilot`                 | On toggle        |
 
 ---
 

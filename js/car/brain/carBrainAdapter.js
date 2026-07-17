@@ -27,22 +27,30 @@ export class CarBrainAdapter {
         const expectedInput = CarBrainAdapter.inputLayerSize(rayCount, stateAware);
         return nn.levels[0].inputs.length === expectedInput;
     }
-    static computeControls(readings, speed, maxSpeed, brain, sensorReadings, stateAware) {
-        let offsets;
+    /**
+     * Build the input vector for the neural network from sensor readings.
+     * Exposed separately so callers (e.g., replay buffer) can store the input
+     * without also running inference.
+     */
+    static buildInput(readings, speed, maxSpeed, sensorReadings, stateAware) {
         if (stateAware && sensorReadings) {
-            offsets = new Array(sensorReadings.length * 2 + 1);
+            const offsets = new Array(sensorReadings.length * 2 + 1);
             for (let i = 0; i < sensorReadings.length; i++) {
                 const sr = sensorReadings[i];
                 offsets[i * 2] = sr === null ? 0 : 1 - sr.distance;
                 offsets[i * 2 + 1] = sr?.state ?? 0;
             }
             offsets[offsets.length - 1] = speed / maxSpeed;
+            return offsets;
         }
         else {
-            offsets = readings
+            return readings
                 .map((s) => (s === null ? 0 : 1 - s.offset))
                 .concat([speed / maxSpeed]);
         }
+    }
+    static computeControls(readings, speed, maxSpeed, brain, sensorReadings, stateAware) {
+        const offsets = CarBrainAdapter.buildInput(readings, speed, maxSpeed, sensorReadings, stateAware);
         const outputs = NeuralNetwork.feedForward(offsets, brain);
         return {
             forward: !!outputs[0],

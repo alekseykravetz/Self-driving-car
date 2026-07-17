@@ -62,13 +62,14 @@ It is a **new main-page section** with two sub-modes (Simple Road and Full World
 
 ### 1. `ts/neural-network/network.ts` — port `trainStep` from the branch
 
-Add the `static trainStep(network, targets, lr=0.1)` method verbatim from the `backpropogation-training-from-user` branch (the STE backprop). It assumes `feedForward` was just called on the current frame's input so each `level.inputs[]`/`level.outputs[]` holds fresh values. Keep the existing doc comment explaining the bias sign (`z = Σ w·x − bias`, so bias is *decreased* when error is positive). No other changes to this file.
+Add the `static trainStep(network, targets, lr=0.1)` method verbatim from the `backpropogation-training-from-user` branch (the STE backprop). It assumes `feedForward` was just called on the current frame's input so each `level.inputs[]`/`level.outputs[]` holds fresh values. Keep the existing doc comment explaining the bias sign (`z = Σ w·x − bias`, so bias is _decreased_ when error is positive). No other changes to this file.
 
 ### 2. `ts/car/car.ts` — learning hook, autopilot, accuracy output
 
 Add imports: `import { NeuralNetwork } from '../neural-network/network.js';` (needed to call `trainStep`).
 
 Add private fields (after `#callbacks`):
+
 - `#learningFromHuman: boolean = false` — when true, train the brain each frame to imitate the human's keypresses.
 - `#autopilot: boolean = false` — when true, the brain drives the car (controls overwritten by brain output) and learning is paused.
 - `#learningRate: number = 0.1` — per-frame STE update rate, adjustable from the panel.
@@ -121,6 +122,7 @@ Rewrite `#processBrain()` so the forward pass **always** runs (so `#lastBrainOut
 ```
 
 Add public API at the end of the class:
+
 - `setLearningFromHuman(enabled: boolean): void`
 - `get learningFromHuman(): boolean`
 - `setAutopilot(enabled: boolean): void`
@@ -129,6 +131,7 @@ Add public API at the end of the class:
 - `get lastBrainOutput(): { forward: boolean; left: boolean; right: boolean; reverse: boolean }`
 
 Add a `respawn(startInfo: { x: number; y: number; angle: number }): void` method that resets the car for auto-respawn on crash (keeps the brain):
+
 ```ts
 respawn(startInfo: { x: number; y: number; angle: number }): void {
   this.x = startInfo.x;
@@ -146,14 +149,22 @@ respawn(startInfo: { x: number; y: number; angle: number }): void {
 ### 3. `ts/neural-network/visualizer.ts` — output-neuron match highlighting
 
 Extend `draw()` signature:
+
 ```ts
 draw(ctx, network, time, stateAware = false, match?: (boolean | null)[]): void
 ```
+
 Store `match` in a field `#match: (boolean | null)[] | null = null` (set at the top of `draw`, default `null`).
 
 In `#drawNeurons()`, after the existing hovered-neuron highlight ring block (lines ~453-460), add a match ring for **output neurons only**:
+
 ```ts
-if (this.#match && node.arrow !== null && this.#match[node.nodeIndex] !== null && this.#match[node.nodeIndex] !== undefined) {
+if (
+  this.#match &&
+  node.arrow !== null &&
+  this.#match[node.nodeIndex] !== null &&
+  this.#match[node.nodeIndex] !== undefined
+) {
   const ok = this.#match[node.nodeIndex];
   ctx.beginPath();
   ctx.lineWidth = 3;
@@ -162,11 +173,13 @@ if (this.#match && node.arrow !== null && this.#match[node.nodeIndex] !== null &
   ctx.stroke();
 }
 ```
+
 `node.arrow !== null` identifies output-row neurons (only they carry direction arrows); `node.nodeIndex` aligns with the output index (0=forward,1=left,2=right,3=reverse). `null`/`undefined` entries draw no ring (used in autopilot mode where accuracy is not meaningful).
 
 ### 4. `ts/simulator/core/simulatorShell.ts` — pass `match` through
 
 Extend `drawNetworkVisualizer`:
+
 ```ts
 drawNetworkVisualizer(time: number, brain: unknown, stateAware?: boolean, match?: (boolean | null)[]): void {
   if (!this.layoutToolbar.showVisualizer) return;
@@ -176,6 +189,7 @@ drawNetworkVisualizer(time: number, brain: unknown, stateAware?: boolean, match?
   }
 }
 ```
+
 No other shell changes.
 
 ### 5. `ts/simulator/humanTraining/templates/humanTrainingConfigModalTemplate.ts` — new
@@ -198,7 +212,7 @@ export interface HumanTrainingConfigResult {
   carConfig: CarInfo;
 }
 export interface HumanTrainingConfigOpenOptions {
-  defaults: CarInfo;          // current config to prefill
+  defaults: CarInfo; // current config to prefill
   lockedToSavedBrain: boolean; // true when a saved brain exists → lock inputs
   onStart: (result: HumanTrainingConfigResult) => void;
   onCancel: () => void;
@@ -206,6 +220,7 @@ export interface HumanTrainingConfigOpenOptions {
 ```
 
 Methods (port the helpers from `trainingInitModal.ts`):
+
 - `connectedCallback()`: `this.innerHTML = HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE`; `this.#bindEvents()`.
 - `open(options)`: prefill via `#fillCarConfig(options.defaults)`; if `options.lockedToSavedBrain`, call `#setConfigLocked(true)` and set `#htcConfigNote` to "(locked to saved brain)"; else unlock and clear the note. Add `.open` class.
 - `#bindEvents()`: `#htcStartBtn` click → `#start()`; `#htcCancelBtn` click → `#cancel()`; backdrop click → cancel; Esc → cancel (guard with `.open` class).
@@ -236,6 +251,7 @@ Export `HUMAN_TRAINING_PANEL_TEMPLATE` — a `<aside>`-style panel (mirror the v
 `class HumanTrainingPanelElement extends HTMLElement` with `connectedCallback()` setting `innerHTML = HUMAN_TRAINING_PANEL_TEMPLATE` and wiring DOM refs.
 
 Public API used by the simulator:
+
 - `setMode(mode: 'simple' | 'world'): void` — updates `#htMode` text.
 - `setAutopilot(enabled: boolean): void` — checks/unchecks `#htAutopilot` without firing change (programmatic).
 - `get autopilotEnabled(): boolean`
@@ -253,9 +269,10 @@ Public API used by the simulator:
 
 ### 9. `ts/simulator/humanTraining/humanBackpropSimulator.ts` — new
 
-`class HumanBackpropSimulator extends SimulatorShell`. Constructor takes the same 5 args as `TrainingSimulator` (gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host). 
+`class HumanBackpropSimulator extends SimulatorShell`. Constructor takes the same 5 args as `TrainingSimulator` (gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host).
 
 Fields:
+
 - `#mode: 'simple' | 'world'` (from `?mode=simple` URL param).
 - `#panel: HumanTrainingPanelElement` (`document.querySelector('human-training-panel')`).
 - `#configModal: HumanTrainingConfigModalElement` (`document.querySelector('human-training-config-modal')`).
@@ -269,6 +286,7 @@ Fields:
 - Auto-save: `#autoSaveFrameCounter = 0`, `#AUTO_SAVE_INTERVAL = 60`.
 
 Constructor body:
+
 1. `super(...)` (sets up canvases, toolbars, visualizer interactivity).
 2. Read URL param: `new URLSearchParams(window.location.search).get('mode') === 'simple'` → `#mode`.
 3. `this.#panel = document.querySelector('human-training-panel')`.
@@ -282,17 +300,20 @@ Constructor body:
 11. `this.animate(0)`.
 
 `#initMode()`:
+
 - **World mode:** `this.toolbarPanel.configureSelectors({ carMode: 'single', onWorldSelected: (entry) => this.#initWorld(entry?.data as World | null) })`. Load `StoreManager.getActiveWorld() ?? StoreManager.getEditorWorld()` → `#initWorld(world)`.
 - **Simple mode:** `this.toolbarPanel.hideGroups('world', 'borders', 'borders-sep')`; `this.toolbarPanel.configureSelectors({ carMode: 'single' })`; `this.toolbarPanel.hideCameraDebug()`; `this.layoutToolbar.setDefaultLayoutMode('camera-big')`. Create `SimpleWorld(canvas.width/2, SIMPLE_MODE_CONFIG.simpleRoadWidth)`, set `this.world`, viewport (`new Viewport(canvas, 1, new Point(-simpleWorld.getCenter(), -100))`), minimap, camera. Generate initial traffic. Build road borders.
 - Both modes then call `this.#snapCameraToStart()` (no car created yet).
 
 `#openConfigModal(context: 'entry' | 'config')`:
+
 - Read saved `CarInfo` from `localStorage.getItem('humanTrainedCar')` via `safeJsonParse<CarInfo>`.
 - Determine defaults: if a saved info exists, use it as the config defaults (so the user sees the saved car's params); else build a `CarInfo` from `DEFAULT_CAR_CONFIG` + `DEFAULT_HIDDEN_LAYERS` + `stateAware: false` (no brain field).
 - `lockedToSavedBrain = savedInfo !== null` — when a saved brain exists, the config is locked (brain topology is fixed by the saved sensor/hidden-layer dims).
 - `this.#configModal.open({ defaults, lockedToSavedBrain, onStart: (result) => this.#applyConfigAndCreateCar(result.carConfig, savedInfo), onCancel: () => this.#onConfigCancel(context) })`.
 
 `#applyConfigAndCreateCar(carConfig: CarInfo, savedInfo: CarInfo | null)`:
+
 - `this.#carConfig = carConfig`.
 - Build `CarOptions` from `carConfig` + start position (`this.getStartInfo()`), `controlType: 'KEYS'`, `hiddenLayers: carConfig.hiddenLayers`, `sensor: { rayCount, raySpread, rayLength, rayOffset, stateAware }`.
 - If `savedInfo` exists: `this.#car = Car.fromInfo(opts, savedInfo)`; `this.#panel.setStatus('Brain: loaded from save')`.
@@ -304,6 +325,7 @@ Constructor body:
 - `this.animationLoopToolbar.setPaused(false)`.
 
 `#onConfigCancel(context)`:
+
 - If `context === 'entry'` and no car exists yet, create one with `DEFAULT_CAR_CONFIG` defaults (so the page isn't empty): `this.#applyConfigAndCreateCar(this.#defaultCarInfo(), null)`. If a car already exists (context === 'config'), just close the modal — keep the current car.
 
 `#defaultCarInfo(): CarInfo` — build from `DEFAULT_CAR_CONFIG` + `DEFAULT_HIDDEN_LAYERS` + `stateAware: false`, no brain field.
@@ -317,6 +339,7 @@ Constructor body:
 `#rebuildGrid()` (world mode only): `this.#borderGrid.build(this.roadBorders as GridSegment[])`; `this.#trafficGrid.rebuild(buildTrafficControls(this.world))`.
 
 `update()` (called every animation frame):
+
 - Guard: if no car / world / viewport / roadBorders, return.
 - **Simple mode:** `updateSimpleTraffic(this.#simpleState, this.#car, this.world as SimpleWorld, this.roadBorders, this.getStartInfo())`; then `updateSimpleCars([this.#car], this.#simpleState, this.roadBorders, false, this.#car, 0)` (single-element array; idle disabled).
 - **World mode:** query borders near car (`queryBordersNearCar(this.#borderGrid, this.#car)`); query traffic controls if `car.sensor?.stateAware` (`queryTrafficControlsNearCar(this.#trafficGrid, this.#car)`); `this.#car.update(borders, trafficControls, [])`.
@@ -325,10 +348,12 @@ Constructor body:
 - Auto-save: increment `#autoSaveFrameCounter`; when `>= #AUTO_SAVE_INTERVAL`, call `this.#saveCar()` and reset counter.
 
 `#updateAccuracy()`:
+
 - If `this.#panel.autopilotEnabled` or `this.#car.damaged`: call `this.#panel.setAccuracy([null,null,null,null], null)` (no accuracy in autopilot/crashed); reset running counters so the % restarts cleanly when switching back.
 - Else: read human keys from `this.#car.controls` (cast `as Controls`) and brain output from `this.#car.lastBrainOutput`. Build `match = [brain.forward===human.forward, brain.left===human.left, brain.right===human.right, brain.reverse===human.reverse]`. Update running counts: for each of the 4 channels, `#matchTotal++` and `#matchFrames++` when matched. Compute `pct = round(100 * #matchFrames / #matchTotal)`. Call `this.#panel.setAccuracy(match, pct)`.
 
 `draw(time)`:
+
 - Guard as in `update()`.
 - `this.resizeLayout()`; `this.viewport.reset()`.
 - **World mode:** `this.world.draw(this.gameCtx, { viewPoint, showStartMarkings: false, layers: this.worldLayers })`; `this.viewport.drawScaleIndicator(this.gameCtx)`.
@@ -340,6 +365,7 @@ Constructor body:
 - `this.renderCameraView()` — render camera view with the single car as keyCar (no traffic in world mode; pass `traffic: #simpleState.traffic` in simple mode). Since there's no `renderCameraView` helper on the shell, inline: `if (this.layoutToolbar.showCameraView && this.camera) this.camera.render(this.cameraCtx, this.world, { keyCar: this.#car, bestCar: this.#car, cars: [this.#car], showTrees: this.worldLayers.trees, showBuildings: this.worldLayers.buildings, traffic: simpleMode ? this.#simpleState.traffic : undefined })`.
 
 `#onCrash()` — auto-respawn keeping the brain:
+
 - `this.#saveCar()` (persist the latest brain before respawn).
 - `this.#car.respawn(this.getStartInfo())`.
 - Reset accuracy counters (`#matchFrames = 0; #matchTotal = 0`).
@@ -347,6 +373,7 @@ Constructor body:
 `#saveCar()` — `localStorage.setItem('humanTrainedCar', JSON.stringify(this.#car.toInfo()))`.
 
 `#wirePanel()`:
+
 - `panel.onAutopilotChange = (enabled) => { this.#car?.setAutopilot(enabled); this.#matchFrames = 0; this.#matchTotal = 0; }`.
 - `panel.onLearningRateChange = (v) => { this.#car?.setLearningRate(v); }`.
 - `panel.onConfig = () => { this.#openConfigModal('config'); }`.
@@ -355,6 +382,7 @@ Constructor body:
 - `panel.onResetCar = () => { this.#car?.respawn(this.getStartInfo()); this.#matchFrames = 0; this.#matchTotal = 0; }`.
 
 `#resetBrain()`:
+
 - `localStorage.removeItem('humanTrainedCar')`.
 - If `this.#car` and `this.#car.sensor`: `this.#car.brain = CarBrainAdapter.createBrain([CarBrainAdapter.inputLayerSize(this.#car.sensor.rayCount, this.#car.sensor.stateAware), ...this.#car.hiddenLayers, NN_OUTPUT_COUNT])`.
 - `this.#car?.respawn(this.getStartInfo())`.
@@ -379,7 +407,13 @@ Mirror `ts/simulator/entry.ts`: import every module that registers custom elemen
 (async () => {
   await StoreManager.init();
   const host = new SimulatorPageHost();
-  new HumanBackpropSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+  new HumanBackpropSimulator(
+    gameCanvas,
+    networkCanvas,
+    miniMapCanvas,
+    cameraCanvas,
+    host,
+  );
 })();
 ```
 
@@ -392,12 +426,14 @@ Mirror `html/simulator.html` structure but replace `<training-panel>` with `<hum
 ### 12. `index.html` — new landing card
 
 Add a new `<section class="landing-card">` (place it after the "AI Training Simulators" card, before "Live Traffic Jam"). Icon `🎓`, title "Human Backpropagation", description: "Teach a neural network by driving. The car learns from your keypresses in real time via backpropagation — watch the network match your driving, then let it take the wheel." Two `card-btn` links:
+
 - `html/human-training.html?mode=simple` — "Simple Road" / "3-lane road, learn to dodge traffic"
 - `html/human-training.html` — "Full World" / "Custom maps, learn to navigate roads & lights"
 
 ### 13. `styles/style.css` — new panel + landing card styles
 
 Add styles for `<human-training-panel>`:
+
 - Layout it like the existing training panel sidebar (flex column, padding, gap). Reuse the existing `#rightPanel` / panel color variables (dark translucent background, rounded).
 - `.ht-key` — inline-block, monospace, padding, border-radius; `.ht-key.match` green border/text; `.ht-key.mismatch` red; `.ht-key.idle` dim grey.
 - `#htAccuracyPct` — bold, larger font.

@@ -11,6 +11,7 @@ export class Controls {
     left;
     right;
     reverse;
+    frozen = false;
     constructor(type) {
         this.forward = false;
         this.left = false;
@@ -41,6 +42,8 @@ export class Controls {
     }
     #addKeyboardListeners() {
         document.addEventListener('keydown', (event) => {
+            if (this.frozen)
+                return;
             switch (event.key) {
                 case 'ArrowLeft':
                 case 'a':
@@ -61,6 +64,8 @@ export class Controls {
             }
         });
         document.addEventListener('keyup', (event) => {
+            if (this.frozen)
+                return;
             switch (event.key) {
                 case 'ArrowLeft':
                 case 'a':

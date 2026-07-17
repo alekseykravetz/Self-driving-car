@@ -132,11 +132,12 @@ class AnimationLoopToolbarElement extends HTMLElement {
 
 ### Subclasses
 
-| Class               | File                                         | Page              |
-| ------------------- | -------------------------------------------- | ----------------- |
-| `TrainingSimulator` | `ts/simulator/training/trainingSimulator.ts` | `/html/simulator` |
-| `TrafficSimulator`  | `ts/simulator/traffic/trafficSimulator.ts`   | `/html/traffic`   |
-| `RaceSimulator`     | `ts/simulator/racing/raceSimulator.ts`       | `/html/race`      |
+| Class                    | File                                                   | Page                   |
+| ------------------------ | ------------------------------------------------------ | ---------------------- |
+| `TrainingSimulator`      | `ts/simulator/training/trainingSimulator.ts`           | `/html/simulator`      |
+| `TrafficSimulator`       | `ts/simulator/traffic/trafficSimulator.ts`             | `/html/traffic`        |
+| `RaceSimulator`          | `ts/simulator/racing/raceSimulator.ts`                 | `/html/race`           |
+| `HumanBackpropSimulator` | `ts/simulator/humanTraining/humanBackpropSimulator.ts` | `/html/human-training` |
 
 ---
 
@@ -994,6 +995,196 @@ destroying expand state.
 | Side panel     | `<training-panel>`                | `<traffic-panel>`                        |
 | Tracking       | Toolbar tracking mode (best/keys) | Stats-panel selection                    |
 | Toolbar extras | —                                 | Spawn Car picker; tracking group hidden  |
+
+---
+
+## Human Backpropagation Simulator (`ts/simulator/humanTraining/humanBackpropSimulator.ts`)
+
+### Purpose
+
+A standalone single-car simulator where a human teaches a neural network to
+drive by example. The car's brain learns to imitate the human's keypresses each
+frame via online backpropagation (`NeuralNetwork.trainStep`). No AI population,
+gene pool, generations, or training panel — just one car, one brain, one
+teacher.
+
+### Access
+
+Navigate to `/html/human-training` (Full World) or
+`/html/human-training?mode=simple` (Simple Road), or click "Human
+Backpropagation" 🎓 on the landing page.
+
+### Architecture
+
+`HumanBackpropSimulator extends SimulatorShell` — reuses the shared scaffolding
+(canvases, viewport, camera, mini-map, toolbars, RAF loop, network visualizer)
+and implements the single-car update/draw behaviour. It supports both simple
+road and full world modes (selected via `?mode=simple` URL param), reusing the
+same `SimpleWorld` / `World` setup and traffic generation as the training
+simulator.
+
+```typescript
+class HumanBackpropSimulator extends SimulatorShell {
+  #mode: 'simple' | 'world';
+  #panel: HumanTrainingPanelElement;
+  #configModal: HumanTrainingConfigModalElement;
+  #car: Car | null; // single KEYS car
+  #carConfig: CarInfo; // active car config
+  world: IWorld | null;
+  roadBorders: Point[][] | null;
+
+  protected update(): void; // step car + traffic, track viewport, accuracy, auto-save
+  protected draw(time): void; // world + car + visualizer (with match rings) + camera
+}
+```
+
+### Car lifecycle
+
+1. On entry, the config modal (`<human-training-config-modal>`) collects car
+   parameters. If a saved brain exists in `humanTrainedCar`, the config is
+   locked to the saved brain's topology.
+2. `#applyConfigAndCreateCar` creates a single KEYS car with the chosen config,
+   loading the saved brain if present (else a fresh random brain).
+3. `Car.setLearningFromHuman(true)` enables per-frame training.
+4. On crash, `#onCrash` saves the brain and respawns the car at the start
+   (keeping the brain).
+5. "Reset brain" clears the save and creates a fresh random brain. "Reset car"
+   respawns without touching the brain. "Config" reopens the modal.
+
+### Accuracy display
+
+Each frame, `#updateAccuracy` compares the brain's `lastBrainOutput` to the
+human's actual keypresses across all 4 channels (forward/left/right/reverse).
+Match/mismatch is shown two ways:
+
+- **Network visualizer** — green/red rings on output neurons (via the `match`
+  parameter to `NetworkVisualizer.draw`).
+- **Panel** — a rolling-window accuracy percentage (last 120 frames ≈ 2 seconds)
+  - per-key match dots + per-channel accuracy % under each key indicator.
+
+The rolling window ensures the accuracy reflects **recent** driving conditions
+rather than all-time cumulative — when the user switches from forward-only to
+dodging traffic (pressing left/right), the percentage drops quickly to reveal
+the mismatches instead of being diluted by hundreds of forward-only frames.
+Per-channel accuracy (↑/←/→/↓ each with their own %) makes it clear which
+controls the brain has learned and which it still struggles with.
+
+In autopilot mode, accuracy shows `—` and rings disappear (the brain is
+driving, not being compared).
+
+Training improvements to address the class-imbalance problem
+(turn-learning washed out by dominant forward-only frames):
+
+#### Experience replay buffer
+
+A ring buffer (max **4096** entries) stores recent `{inputs, targets, isTurn}`
+pairs for every frame where the human presses at least one key. Instead of
+training on just the current frame, the system samples a balanced batch of
+**16** entries each frame from the buffer via `#trainBatch()`:
+
+1. Buffer entries are separated into **turn** (left or right = 1) and **straight**
+   (neither).
+2. A batch is sampled at **50/50 ratio** — 8 turn + 8 straight examples.
+3. Each sampled entry is replayed via `trainStep(brain, storedInputs, storedTargets, lr)`,
+   which runs its own sigmoid forward pass internally (no separate `feedForward`).
+4. The batch is shuffled so the order doesn't bias which output gets updated
+   first.
+
+This ensures the network sees a balanced training signal every frame, regardless
+of how rarely the human actually presses turn keys.
+
+#### Per-output learning rates
+
+Instead of a single LR for all four output channels, the Human Backpropagation
+mode applies separate multipliers:
+
+| Output  | Multiplier | At default `lr=0.1`, per-step | Rationale                     |
+| ------- | ---------- | ----------------------------- | ----------------------------- |
+| forward | `0.5`      | `0.003125`                    | Well-learned, needs less push |
+| left    | `2`        | `0.0125`                      | Under-represented, boost it   |
+| right   | `2`        | `0.0125`                      | Under-represented, boost it   |
+| reverse | `0.5`      | `0.003125`                    | Seldom used, no special need  |
+
+The per-step LR is also divided by `batchSize` (`scale = 1 / batchSize`) so the
+total per-frame gradient magnitude (summed over the batch) stays ≈ the original
+single-sample update. Turn outputs get **4×** the effective per-frame gradient
+of forward.
+
+The per-output array only applies to the **last (output) level** of the network.
+Hidden layers use `lr[0]` (the forward rate) as a single scalar — see
+`NeuralNetwork.md` for the reasoning.
+
+#### Decision-point bonus
+
+Training on every frame causes turn learning to be immediately forgotten after
+the human releases the turn key. The decision-point mechanism detects when the
+human's control state **changes** (any of forward/left/right/reverse transitions
+between pressed and released). On these frames, the exact current input/target
+pair is trained an extra **3 iterations** on top of the balanced batch from the
+replay buffer. This amplifies the signal of conscious control decisions without
+overfitting to any single frame.
+
+#### Balanced sampling under-scores straight frames
+
+Because the replay buffer always contains vastly more straight examples than
+turn ones, a naive random sample would still be dominated by straight. The
+`#trainBatch()` method explicitly **separates** turn and straight entries and
+sampled them evenly — guaranteeing the network gets equal exposure to both
+categories regardless of their natural frequency.
+
+#### Weight stability
+
+All `trainStep` updates have `isFinite()` guards on both `error` and
+`effectiveLR` to prevent NaN propagation, and all weights/biases are clamped to
+`[-10, 10]` after each update. The per-frame gradient is normalized by batch
+size so the total update magnitude is consistent with a single-sample training
+step, preventing oscillation at high batch counts.
+
+### Learning toggle (L key)
+
+Press **L** to toggle learning on/off without stopping driving. When learning is
+paused, the brain's weights are frozen — driving does not train the network, but
+the forward pass still runs so the visualizer and accuracy display keep working.
+Learning is ON by default when the car is created. The panel shows LEARNING
+(green) or PAUSED (orange), and the shortcuts toolbar L indicator reflects the
+state.
+
+### Panel info
+
+The `<human-training-panel>` displays live training information:
+
+- **How it works** — a collapsible section explaining the 5-step training flow.
+- **Learning state** — LEARNING (green) / PAUSED (orange) indicator with L-key
+  hint.
+- **Autopilot banner** — "AUTOPILOT ACTIVE" shown when the brain is driving.
+- **Car speed** — current speed in km/h, updated every frame.
+- **Accuracy** — rolling-window % + per-channel % under each key indicator.
+- **Brain activity** — a dot that pulses green on frames where `trainStep`
+  actually changed weights (learning is on, keys pressed, non-zero error).
+- **Training frames** — total frames where learning was active this session.
+- **Learning rate** — slider (0.01–0.5).
+- **Buttons** — Config, Download .car, Reset brain, Reset car.
+- **Status** — "Brain: fresh" or "Brain: loaded from save".
+
+### Persistence
+
+| Key               | Content                                                                                       |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| `humanTrainedCar` | Single `CarInfo` (brain + config), auto-saved every ~60 frames + on crash + on `beforeunload` |
+
+### Differences from the training simulator
+
+| Aspect                | Training `TrainingSimulator` | `HumanBackpropSimulator`           |
+| --------------------- | ---------------------------- | ---------------------------------- |
+| Population            | N AI cars + 1 KEYS car       | 1 KEYS car only                    |
+| Learning method       | Neuroevolution (GA)          | Online backprop (STE)              |
+| Side panel            | `<training-panel>`           | `<human-training-panel>`           |
+| Config UI             | `<training-init-modal>`      | `<human-training-config-modal>`    |
+| Gene pool/generations | Yes                          | No                                 |
+| Brain persistence     | `bestPool` (top-K CarInfo[]) | `humanTrainedCar` (single CarInfo) |
+| Autopilot toggle      | No                           | Yes (test trained brain)           |
+| Learning toggle (L)   | N/A                          | Yes (pause/resume training)        |
+| Accuracy display      | No                           | Match rings + rolling-window %     |
 
 ---
 
