@@ -143,7 +143,7 @@ The `CorridorEditor` follows the same pattern with its own `[keyT]` bindings.
 ```
 TrainingSimulator.#initKeyboardManager():
   → new KeyboardManager(toolbar)
-  → km.setBindings([keyUp, keyDown, keyLeft, keyRight, keyG, keyCtrl])
+  → km.setBindings([keyUp, keyDown, keyLeft, keyRight, keyG, keyV, keyCtrl])
 ```
 
 All bindings are always-active — there is no editor context switching.
@@ -153,7 +153,7 @@ All bindings are always-active — there is no editor context switching.
 ```
 TrafficSimulator.#initToolbar():
   → new KeyboardManager(toolbar)
-  → km.setBindings([keyR, keyG, keyCtrl])
+  → km.setBindings([keyR, keyG, keyV, keyCtrl])
 ```
 
 ### Human Backpropagation Simulator (static set)
@@ -161,7 +161,7 @@ TrafficSimulator.#initToolbar():
 ```
 HumanBackpropSimulator.#initToolbar():
   → new KeyboardManager(toolbar)
-  → km.setBindings([keyL, keyG, keyCtrl])
+  → km.setBindings([keyL, keyG, keyV, keyCtrl])
 ```
 
 ---
@@ -188,8 +188,8 @@ HumanBackpropSimulator.#initToolbar():
 1. **No direct `window` keydown/keyup.** All keyboard routing goes through
    `KeyboardManager`. The only exception is `controls.ts` (arrow/WASD for car
    driving — though `controls.frozen` can suppress them when the brain is in
-   autopilot) and `simulatorShell.ts` (`v` for network-visualizer density toggle),
-   both of which have no toolbar indicator and are not part of the shortcut system.
+   autopilot), which has no toolbar indicator and is not part of the shortcut
+   system.
 
 2. **Toolbar is presentation-only.** `ShortcutsToolbarElement` has no key listeners
    and knows nothing about what the shortcuts do. It only renders indicators and
@@ -207,3 +207,15 @@ HumanBackpropSimulator.#initToolbar():
 5. **Editors own their bindings.** `GraphEditor` and `CorridorEditor` define their
    own shortcut sets and register them via `pushBindings`/`popBindings`. The world
    editor only sets the root (always-active) bindings like Ctrl.
+
+6. **Modal dialogs receive KeyboardManager.** `TrainingInitModalElement` and
+   `HumanTrainingConfigModalElement` get a `KeyboardManager` reference via
+   `setKeyboardManager()` and use `pushBindings`/`popBindings` for the Escape key
+   (pushed on open, popped on close via `#start()` or `#cancel()`).
+
+7. **`v` key is a momentary binding in simulators.** The network-visualizer density
+   toggle (`visDensity`) is registered as a `momentary` binding in each simulator's
+   KeyboardManager setup (`TrainingSimulator`, `HumanBackpropSimulator`,
+   `TrafficSimulator`). `RaceSimulator` lacks a KeyboardManager and does not
+   expose the binding. The old raw `keydown` listener in `simulatorShell.ts` was
+   removed in favour of this centralised approach.

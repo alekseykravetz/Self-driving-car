@@ -42,13 +42,14 @@ import { Envelope } from '../math/primitives/envelope.js';
 
 ### Entry Points
 
-| Page                  | Entry module            |
-| --------------------- | ----------------------- |
-| `html/simulator.html` | `ts/simulator/entry.ts` |
-| `html/traffic.html`   | `ts/traffic/entry.ts`   |
-| `html/race.html`      | `ts/race/entry.ts`      |
-| `html/world.html`     | `ts/world/entry.ts`     |
-| `index.html`          | `ts/store/entry.ts`     |
+| Page                       | Entry module                                           |
+| -------------------------- | ------------------------------------------------------ |
+| `html/simulator.html`      | `ts/simulator/entry.ts`                                |
+| `html/traffic.html`        | `ts/traffic/entry.ts`                                  |
+| `html/race.html`           | `ts/race/entry.ts`                                     |
+| `html/world.html`          | `ts/world/entry.ts`                                    |
+| `html/human-training.html` | `ts/simulator/humanTraining/humanBackpropSimulator.ts` |
+| `index.html`               | `ts/store/entry.ts`                                    |
 
 ### Dependency Graph (Import Order)
 
@@ -75,6 +76,7 @@ math/primitives (Point, Segment, Polygon, Envelope)
   → simulator/training/trainingSimulator
   → simulator/traffic/trafficSimulator
   → simulator/racing/raceSimulator
+  → simulator/humanTraining/humanBackpropSimulator
   → entry points (import everything needed and bootstrap)
 ```
 
@@ -408,6 +410,7 @@ fitness = distance traveled along corridor/road
 | `bestPool`          | Array of top-performing car configs with brains     | JSON `CarInfo[]`  |
 | `raceCars`          | Cars loaded via the race "Load car(s)" button       | JSON `CarInfo[]`  |
 | `editorWorld`       | World saved by the world editor                     | JSON world object |
+| `humanTrainedCar`   | Human-backprop trained brain (single CarInfo)       | JSON `CarInfo`    |
 | `store:activeWorld` | Active store world id (`store:`/`loaded:`/`editor`) | string            |
 | `store:activeCar`   | Active store car ids (multi-select)                 | JSON `string[]`   |
 
@@ -438,12 +441,13 @@ fitness = distance traveled along corridor/road
 
 ## HTML Entry Points
 
-| File             | Key Modules                                                                              | Purpose                          |
-| ---------------- | ---------------------------------------------------------------------------------------- | -------------------------------- |
-| `index.html`     | None (static links only)                                                                 | Landing page with mode selection |
-| `simulator.html` | Full stack + SimpleWorld + TrafficFactory + SimpleModeBehavior                           | AI training (both modes)         |
-| `race.html`      | Full stack + RaceSimulator + SimulatorShell + Sound + WorldLoader + CarLoader + Controls | All race modes via URL params    |
-| `world.html`     | World + Editors + Viewport + WorldLoader + OSM importer                                  | Map creation & editing           |
+| File                       | Key Modules                                                                                       | Purpose                          |
+| -------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `index.html`               | None (static links only)                                                                          | Landing page with mode selection |
+| `simulator.html`           | Full stack + SimpleWorld + TrafficFactory + SimpleModeBehavior                                    | AI training (both modes)         |
+| `race.html`                | Full stack + RaceSimulator + SimulatorShell + Sound + WorldLoader + CarLoader + Controls          | All race modes via URL params    |
+| `world.html`               | World + Editors + Viewport + WorldLoader + OSM importer                                           | Map creation & editing           |
+| `html/human-training.html` | Full stack + HumanBackpropSimulator + SimulatorShell + NetworkVisualizer + ConfigModal + Controls | Human Backpropagation training   |
 
 ---
 

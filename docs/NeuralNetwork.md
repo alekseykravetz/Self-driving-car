@@ -223,7 +223,7 @@ population, no generations.
    for the visualizer), and the brain's output is compared to the human's actual
    keypresses.
 3. When the human is driving (not in autopilot, not damaged, keys pressed, and
-   learning is ON), `NeuralNetwork.trainStep` nudges the brain's weights toward
+   learning is ON), `CarBrainAdapter.trainStep` nudges the brain's weights toward
    the human's actions. The return value (`boolean`) indicates whether any
    weights changed — used to pulse the panel's brain-activity dot.
 4. The network visualizer shows **match rings** on output neurons: green when

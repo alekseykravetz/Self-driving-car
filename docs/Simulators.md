@@ -1004,7 +1004,7 @@ destroying expand state.
 
 A standalone single-car simulator where a human teaches a neural network to
 drive by example. The car's brain learns to imitate the human's keypresses each
-frame via online backpropagation (`NeuralNetwork.trainStep`). No AI population,
+frame via online backpropagation (`CarBrainAdapter.trainStep`). No AI population,
 gene pool, generations, or training panel — just one car, one brain, one
 teacher.
 

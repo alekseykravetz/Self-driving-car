@@ -88,7 +88,7 @@ mode (`html/human-training.html`):
 
 | Field                    | Type                                | Purpose                                                                                                       |
 | ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `#learningFromHuman`     | `boolean`                           | When true, train the brain each frame to imitate human keypresses via `NeuralNetwork.trainStep`               |
+| `#learningFromHuman`     | `boolean`                           | When true, train the brain each frame to imitate human keypresses via `CarBrainAdapter.trainStep`             |
 | `#autopilot`             | `boolean`                           | When true, the brain drives the car (controls overwritten by brain output) and learning is paused             |
 | `#learningRate`          | `number`                            | Per-frame STE update rate (default 0.1, adjustable from the panel)                                            |
 | `#lastBrainOutput`       | `{ forward, left, right, reverse }` | The brain's most recent prediction, exposed for accuracy display                                              |
@@ -121,7 +121,7 @@ to active after the car is created.
 
 ### `trainStep` return value
 
-`NeuralNetwork.trainStep` returns `boolean` — `true` if any weight or bias was
+`CarBrainAdapter.trainStep` returns `boolean` — `true` if any weight or bias was
 updated this step (at least one output neuron had a non-zero error), `false`
 otherwise. `Car.#processBrain` captures this into `#brainChangedThisFrame`,
 which the panel reads to pulse a brain-activity dot: the dot lights green only
