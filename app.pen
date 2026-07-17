@@ -3238,18 +3238,16 @@
       "y": 0,
       "name": "Landing Page",
       "clip": true,
-      "width": 800,
-      "height": 750,
+      "width": 1200,
+      "height": 1600,
       "fill": "#0f0f14",
-      "layout": "none",
+      "layout": "vertical",
       "children": [
         {
           "type": "frame",
           "id": "JPy5J",
-          "x": 0,
-          "y": 0,
           "name": "Header",
-          "width": 800,
+          "width": "fill_container",
           "layout": "vertical",
           "gap": 6,
           "padding": [
@@ -3313,7 +3311,7 @@
               "id": "XeMfA",
               "name": "Subtitle",
               "fill": "#888888",
-              "content": "Neural network-powered autonomous driving simulation",
+              "content": "Train neural networks, race against AI, and build your own worlds.",
               "fontFamily": "Inter",
               "fontSize": 16,
               "fontWeight": "normal"
@@ -3322,15 +3320,13 @@
         },
         {
           "type": "frame",
-          "id": "hBVp6",
-          "x": 0,
-          "y": 110,
-          "name": "CardsGrid",
-          "width": 800,
-          "height": 660,
+          "id": "bzq5m",
+          "name": "CardsSection",
+          "width": "fill_container",
+          "layout": "vertical",
           "gap": 24,
           "padding": [
-            10,
+            12,
             24,
             40,
             24
@@ -3338,65 +3334,30 @@
           "children": [
             {
               "type": "frame",
-              "id": "sCtA2",
-              "name": "Col1",
+              "id": "V1yOxP",
+              "name": "Row1",
               "width": "fill_container",
-              "layout": "vertical",
               "gap": 24,
               "children": [
                 {
-                  "type": "frame",
-                  "id": "xTQLe",
+                  "id": "q5IhWH",
+                  "type": "ref",
+                  "ref": "x7CR9C",
                   "name": "AI Training Card",
                   "width": "fill_container",
-                  "fill": "#ffffff0a",
-                  "cornerRadius": 16,
-                  "stroke": "#ffffff14",
-                  "strokeWidth": 1,
-                  "layout": "vertical",
-                  "gap": 12,
-                  "padding": [
-                    32,
-                    28
-                  ],
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "xh8Td",
-                      "name": "Icon",
-                      "fill": "#ffffff",
-                      "content": "🧠",
-                      "fontFamily": "Inter",
-                      "fontSize": 40,
-                      "fontWeight": "normal"
+                  "descendants": {
+                    "j47L6Z": {
+                      "content": "🧠"
                     },
-                    {
-                      "type": "text",
-                      "id": "UWBcz",
-                      "name": "Title",
-                      "fill": "#ffffff",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "AI Training",
-                      "fontFamily": "Inter",
-                      "fontSize": 24,
-                      "fontWeight": "700"
+                    "PveGr": {
+                      "content": "AI Training Simulators"
                     },
-                    {
-                      "type": "text",
-                      "id": "J6oxv",
-                      "name": "Desc",
-                      "fill": "#999999",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "Evolve neural networks with genetic algorithms",
-                      "fontFamily": "Inter",
-                      "fontSize": 14.4,
-                      "fontWeight": "normal"
+                    "zwOE7": {
+                      "content": "Evolve neural networks through neuroevolution. Watch cars learn to navigate roads using genetic algorithms and sensor-based perception."
                     },
-                    {
+                    "YlWFk": {
                       "type": "frame",
-                      "id": "ZzPo0",
+                      "id": "rX4nx",
                       "name": "Links",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -3404,8 +3365,8 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "xQrfJ",
-                          "name": "SimpleRoad",
+                          "id": "jsRge",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -3420,7 +3381,7 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "NmaG0",
+                              "id": "oVIhd",
                               "name": "Icon",
                               "fill": "#ffffff",
                               "content": "🛣️",
@@ -3430,7 +3391,7 @@
                             },
                             {
                               "type": "frame",
-                              "id": "H9H3aq",
+                              "id": "pbFwc",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -3438,7 +3399,7 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "W135SX",
+                                  "id": "w4Z63",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
                                   "content": "Simple Road",
@@ -3448,10 +3409,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "MVx9H",
-                                  "name": "Sub",
+                                  "id": "AZL7Z",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Quick training on a straight road",
+                                  "content": "3-lane straight road with traffic",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -3462,8 +3423,8 @@
                         },
                         {
                           "type": "frame",
-                          "id": "R1S3eJ",
-                          "name": "FullSim",
+                          "id": "QE292",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -3478,17 +3439,17 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "eIEDK",
+                              "id": "Jwccy",
                               "name": "Icon",
                               "fill": "#ffffff",
-                              "content": "🌆",
+                              "content": "🌐",
                               "fontFamily": "Inter",
                               "fontSize": 24,
                               "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
-                              "id": "A0XZva",
+                              "id": "HzbiN",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -3496,7 +3457,7 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "T2j8v",
+                                  "id": "u1z8sI",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
                                   "content": "Full Simulator",
@@ -3506,10 +3467,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "b8SWkt",
-                                  "name": "Sub",
+                                  "id": "bb26A",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Complex world with traffic",
+                                  "content": "Custom maps, camera view & advanced training",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -3520,61 +3481,27 @@
                         }
                       ]
                     }
-                  ]
+                  }
                 },
                 {
-                  "type": "frame",
-                  "id": "t9DOUn",
+                  "id": "pDZTW",
+                  "type": "ref",
+                  "ref": "x7CR9C",
                   "name": "Human Training Card",
                   "width": "fill_container",
-                  "fill": "#ffffff0a",
-                  "cornerRadius": 16,
-                  "stroke": "#ffffff14",
-                  "strokeWidth": 1,
-                  "layout": "vertical",
-                  "gap": 12,
-                  "padding": [
-                    32,
-                    28
-                  ],
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "mbp0j",
-                      "name": "Icon",
-                      "fill": "#ffffff",
-                      "content": "🎮",
-                      "fontFamily": "Inter",
-                      "fontSize": 40,
-                      "fontWeight": "normal"
+                  "descendants": {
+                    "j47L6Z": {
+                      "content": "🎓"
                     },
-                    {
-                      "type": "text",
-                      "id": "rdYus",
-                      "name": "Title",
-                      "fill": "#ffffff",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "Human Backpropagation",
-                      "fontFamily": "Inter",
-                      "fontSize": 24,
-                      "fontWeight": "700"
+                    "PveGr": {
+                      "content": "Human Backpropagation"
                     },
-                    {
-                      "type": "text",
-                      "id": "ysXSo",
-                      "name": "Desc",
-                      "fill": "#999999",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "Train a brain by driving yourself",
-                      "fontFamily": "Inter",
-                      "fontSize": 14.4,
-                      "fontWeight": "normal"
+                    "zwOE7": {
+                      "content": "Teach a neural network by driving. The car learns from your keypresses in real time via backpropagation — watch the network match your driving, then let it take the wheel."
                     },
-                    {
+                    "YlWFk": {
                       "type": "frame",
-                      "id": "buHSH",
+                      "id": "utfQg",
                       "name": "Links",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -3582,8 +3509,8 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "Q7iI8",
-                          "name": "SimpleRoad",
+                          "id": "iPkJI",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -3598,7 +3525,7 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "O5vnY0",
+                              "id": "p5I0MC",
                               "name": "Icon",
                               "fill": "#ffffff",
                               "content": "🛣️",
@@ -3608,7 +3535,7 @@
                             },
                             {
                               "type": "frame",
-                              "id": "bgA4T",
+                              "id": "S0LsL",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -3616,7 +3543,7 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "ac51c",
+                                  "id": "GI1GE",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
                                   "content": "Simple Road",
@@ -3626,10 +3553,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "s3gNA",
-                                  "name": "Sub",
+                                  "id": "a4BDMw",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Straight road training",
+                                  "content": "3-lane road, learn to dodge traffic",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -3640,8 +3567,8 @@
                         },
                         {
                           "type": "frame",
-                          "id": "teeXC",
-                          "name": "FullWorld",
+                          "id": "U0gNcX",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -3656,17 +3583,17 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "h29wg",
+                              "id": "S9UmY",
                               "name": "Icon",
                               "fill": "#ffffff",
-                              "content": "🌆",
+                              "content": "🌐",
                               "fontFamily": "Inter",
                               "fontSize": 24,
                               "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
-                              "id": "HiVjw",
+                              "id": "ie17v",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -3674,7 +3601,7 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "qqdoI",
+                                  "id": "GHsuz",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
                                   "content": "Full World",
@@ -3684,10 +3611,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "d4syE",
-                                  "name": "Sub",
+                                  "id": "o0b9sp",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Complex environment",
+                                  "content": "Custom maps, learn to navigate roads & lights",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -3698,71 +3625,36 @@
                         }
                       ]
                     }
-                  ]
+                  }
                 }
               ]
             },
             {
               "type": "frame",
-              "id": "B4QazF",
-              "name": "Col2",
+              "id": "LdEq8",
+              "name": "Row2",
               "width": "fill_container",
-              "layout": "vertical",
               "gap": 24,
               "children": [
                 {
-                  "type": "frame",
-                  "id": "lqqvy",
+                  "id": "TlyYA",
+                  "type": "ref",
+                  "ref": "x7CR9C",
                   "name": "Traffic Card",
                   "width": "fill_container",
-                  "fill": "#ffffff0a",
-                  "cornerRadius": 16,
-                  "stroke": "#ffffff14",
-                  "strokeWidth": 1,
-                  "layout": "vertical",
-                  "gap": 12,
-                  "padding": [
-                    32,
-                    28
-                  ],
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "Whn0l",
-                      "name": "Icon",
-                      "fill": "#ffffff",
-                      "content": "🚦",
-                      "fontFamily": "Inter",
-                      "fontSize": 40,
-                      "fontWeight": "normal"
+                  "descendants": {
+                    "j47L6Z": {
+                      "content": "🚦"
                     },
-                    {
-                      "type": "text",
-                      "id": "iXcL8",
-                      "name": "Title",
-                      "fill": "#ffffff",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "Live Traffic Jam",
-                      "fontFamily": "Inter",
-                      "fontSize": 24,
-                      "fontWeight": "700"
+                    "PveGr": {
+                      "content": "Live Traffic Jam"
                     },
-                    {
-                      "type": "text",
-                      "id": "CVRDD",
-                      "name": "Desc",
-                      "fill": "#999999",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "Watch AI cars navigate traffic",
-                      "fontFamily": "Inter",
-                      "fontSize": 14.4,
-                      "fontWeight": "normal"
+                    "zwOE7": {
+                      "content": "Load a world and click the road to drop trained cars. Watch them drive themselves, weave through traffic, and crash — building your own living traffic jam one car at a time."
                     },
-                    {
+                    "YlWFk": {
                       "type": "frame",
-                      "id": "yZ8cM",
+                      "id": "rB85K",
                       "name": "Links",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -3770,8 +3662,8 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "xiE1W",
-                          "name": "Open",
+                          "id": "UMMGD",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -3786,17 +3678,17 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "fvQxd",
+                              "id": "Y7XEYq",
                               "name": "Icon",
                               "fill": "#ffffff",
-                              "content": "🚗",
+                              "content": "🚕",
                               "fontFamily": "Inter",
                               "fontSize": 24,
                               "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
-                              "id": "Lf8sY",
+                              "id": "C6dPu",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -3804,7 +3696,7 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "WEpPt",
+                                  "id": "V2WhsE",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
                                   "content": "Open Traffic Jam",
@@ -3814,10 +3706,10 @@
                                 },
                                 {
                                   "type": "text",
-                                  "id": "E7RxeU",
-                                  "name": "Sub",
+                                  "id": "JO90f",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Spawn and observe",
+                                  "content": "Click to spawn self-driving cars on any map",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -3828,61 +3720,27 @@
                         }
                       ]
                     }
-                  ]
+                  }
                 },
                 {
-                  "type": "frame",
-                  "id": "XagTz",
+                  "id": "hxVDd",
+                  "type": "ref",
+                  "ref": "x7CR9C",
                   "name": "Games Card",
                   "width": "fill_container",
-                  "fill": "#ffffff0a",
-                  "cornerRadius": 16,
-                  "stroke": "#ffffff14",
-                  "strokeWidth": 1,
-                  "layout": "vertical",
-                  "gap": 12,
-                  "padding": [
-                    32,
-                    28
-                  ],
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "uEMJn",
-                      "name": "Icon",
-                      "fill": "#ffffff",
-                      "content": "🏁",
-                      "fontFamily": "Inter",
-                      "fontSize": 40,
-                      "fontWeight": "normal"
+                  "descendants": {
+                    "j47L6Z": {
+                      "content": "🏁"
                     },
-                    {
-                      "type": "text",
-                      "id": "MkIkg",
-                      "name": "Title",
-                      "fill": "#ffffff",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "Games",
-                      "fontFamily": "Inter",
-                      "fontSize": 24,
-                      "fontWeight": "700"
+                    "PveGr": {
+                      "content": "Games"
                     },
-                    {
-                      "type": "text",
-                      "id": "Jbgak",
-                      "name": "Desc",
-                      "fill": "#999999",
-                      "textGrowth": "fixed-width",
-                      "width": "fill_container",
-                      "content": "Race against AI opponents",
-                      "fontFamily": "Inter",
-                      "fontSize": 14.4,
-                      "fontWeight": "normal"
+                    "zwOE7": {
+                      "content": "Race against AI opponents using keyboard, webcam markers, or phone tilt. Test your driving skills on custom tracks."
                     },
-                    {
+                    "YlWFk": {
                       "type": "frame",
-                      "id": "Wbn3N",
+                      "id": "BdO3u",
                       "name": "Links",
                       "width": "fill_container",
                       "layout": "vertical",
@@ -3890,8 +3748,8 @@
                       "children": [
                         {
                           "type": "frame",
-                          "id": "oU7IB",
-                          "name": "Race",
+                          "id": "s6GELI",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -3906,17 +3764,17 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "LazOC",
+                              "id": "x3PdzO",
                               "name": "Icon",
                               "fill": "#ffffff",
-                              "content": "🏎️",
+                              "content": "⌨️",
                               "fontFamily": "Inter",
                               "fontSize": 24,
                               "fontWeight": "normal"
                             },
                             {
                               "type": "frame",
-                              "id": "ArGPj",
+                              "id": "HOpuc",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -3924,20 +3782,20 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "nenLz",
+                                  "id": "W1EWO",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
-                                  "content": "Race (Keyboard)",
+                                  "content": "Race",
                                   "fontFamily": "Inter",
                                   "fontSize": 15.2,
                                   "fontWeight": "600"
                                 },
                                 {
                                   "type": "text",
-                                  "id": "pw3uX",
-                                  "name": "Sub",
+                                  "id": "a1K8Lt",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Classic race mode",
+                                  "content": "Keyboard controls vs AI",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -3948,8 +3806,8 @@
                         },
                         {
                           "type": "frame",
-                          "id": "jKXRh",
-                          "name": "Camera",
+                          "id": "EirlD",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -3964,7 +3822,7 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "y0bYn",
+                              "id": "h3LneU",
                               "name": "Icon",
                               "fill": "#ffffff",
                               "content": "📷",
@@ -3974,7 +3832,7 @@
                             },
                             {
                               "type": "frame",
-                              "id": "wOscQ",
+                              "id": "ljsHJ",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -3982,20 +3840,20 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "PbceK",
+                                  "id": "wuVpY",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
-                                  "content": "Race Camera",
+                                  "content": "Race (Camera)",
                                   "fontFamily": "Inter",
                                   "fontSize": 15.2,
                                   "fontWeight": "600"
                                 },
                                 {
                                   "type": "text",
-                                  "id": "YfR5M",
-                                  "name": "Sub",
+                                  "id": "m2eY5",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Third-person view",
+                                  "content": "Steer with webcam markers",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -4006,8 +3864,8 @@
                         },
                         {
                           "type": "frame",
-                          "id": "PYes8",
-                          "name": "Phone",
+                          "id": "IhOPR",
+                          "name": "CardBtn",
                           "width": "fill_container",
                           "fill": "#ffffff0f",
                           "cornerRadius": 12,
@@ -4022,7 +3880,7 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "I9DY0",
+                              "id": "pbZjn",
                               "name": "Icon",
                               "fill": "#ffffff",
                               "content": "📱",
@@ -4032,7 +3890,7 @@
                             },
                             {
                               "type": "frame",
-                              "id": "k2w1Uc",
+                              "id": "H5FSaE",
                               "name": "Text",
                               "width": "fill_container",
                               "layout": "vertical",
@@ -4040,20 +3898,20 @@
                               "children": [
                                 {
                                   "type": "text",
-                                  "id": "llzkO",
+                                  "id": "Zs6ui",
                                   "name": "Title",
                                   "fill": "#e8e8e8",
-                                  "content": "Race Phone",
+                                  "content": "Race (Phone)",
                                   "fontFamily": "Inter",
                                   "fontSize": 15.2,
                                   "fontWeight": "600"
                                 },
                                 {
                                   "type": "text",
-                                  "id": "BhZNj",
-                                  "name": "Sub",
+                                  "id": "FlQGi",
+                                  "name": "Subtitle",
                                   "fill": "#777777",
-                                  "content": "Mobile tilt controls",
+                                  "content": "Tilt your phone to steer",
                                   "fontFamily": "Inter",
                                   "fontSize": 12.48,
                                   "fontWeight": "normal"
@@ -4064,63 +3922,29 @@
                         }
                       ]
                     }
-                  ]
+                  }
                 }
               ]
             },
             {
-              "type": "frame",
-              "id": "UxsA3",
+              "id": "d6lD1",
+              "type": "ref",
+              "ref": "x7CR9C",
               "name": "World Editor Card",
               "width": "fill_container",
-              "fill": "#ffffff0a",
-              "cornerRadius": 16,
-              "stroke": "#ffffff14",
-              "strokeWidth": 1,
-              "layout": "vertical",
-              "gap": 12,
-              "padding": [
-                32,
-                28
-              ],
-              "children": [
-                {
-                  "type": "text",
-                  "id": "P6Y14B",
-                  "name": "Icon",
-                  "fill": "#ffffff",
-                  "content": "🗺️",
-                  "fontFamily": "Inter",
-                  "fontSize": 40,
-                  "fontWeight": "normal"
+              "descendants": {
+                "j47L6Z": {
+                  "content": "🗺️"
                 },
-                {
-                  "type": "text",
-                  "id": "Ts6py",
-                  "name": "Title",
-                  "fill": "#ffffff",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "World Editor",
-                  "fontFamily": "Inter",
-                  "fontSize": 24,
-                  "fontWeight": "700"
+                "PveGr": {
+                  "content": "World Editor"
                 },
-                {
-                  "type": "text",
-                  "id": "yGw65",
-                  "name": "Desc",
-                  "fill": "#999999",
-                  "textGrowth": "fixed-width",
-                  "width": "fill_container",
-                  "content": "Design custom road networks",
-                  "fontFamily": "Inter",
-                  "fontSize": 14.4,
-                  "fontWeight": "normal"
+                "zwOE7": {
+                  "content": "Design custom road networks, place buildings, trees, traffic lights, and more. Import real-world maps from OpenStreetMap."
                 },
-                {
+                "YlWFk": {
                   "type": "frame",
-                  "id": "RpHzr",
+                  "id": "RrKeP",
                   "name": "Links",
                   "width": "fill_container",
                   "layout": "vertical",
@@ -4128,8 +3952,8 @@
                   "children": [
                     {
                       "type": "frame",
-                      "id": "pNKQh",
-                      "name": "Open",
+                      "id": "MqQx7",
+                      "name": "CardBtn",
                       "width": "fill_container",
                       "fill": "#ffffff0f",
                       "cornerRadius": 12,
@@ -4144,7 +3968,7 @@
                       "children": [
                         {
                           "type": "text",
-                          "id": "wmEF8",
+                          "id": "QdLMI",
                           "name": "Icon",
                           "fill": "#ffffff",
                           "content": "✏️",
@@ -4154,7 +3978,7 @@
                         },
                         {
                           "type": "frame",
-                          "id": "k2eGyG",
+                          "id": "wZzhF",
                           "name": "Text",
                           "width": "fill_container",
                           "layout": "vertical",
@@ -4162,7 +3986,7 @@
                           "children": [
                             {
                               "type": "text",
-                              "id": "upUEG",
+                              "id": "IPddz",
                               "name": "Title",
                               "fill": "#e8e8e8",
                               "content": "Open Editor",
@@ -4172,10 +3996,10 @@
                             },
                             {
                               "type": "text",
-                              "id": "W9GYXz",
-                              "name": "Sub",
+                              "id": "XVYFf",
+                              "name": "Subtitle",
                               "fill": "#777777",
-                              "content": "Build and edit road graphs",
+                              "content": "Create and edit worlds",
                               "fontFamily": "Inter",
                               "fontSize": 12.48,
                               "fontWeight": "normal"
@@ -4183,6 +4007,394 @@
                           ]
                         }
                       ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Adfw7",
+          "name": "Store Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            24,
+            40,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "yRErQ",
+              "name": "StoreHeader",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                0,
+                0,
+                12,
+                0
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "yi8U1",
+                  "name": "StoreTitle",
+                  "fill": "#ffffff",
+                  "content": "📦 Store Files",
+                  "fontFamily": "Inter",
+                  "fontSize": 22,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "mg3bH",
+                  "name": "Tabs",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "fM2eW",
+                      "name": "WorldsTab",
+                      "fill": "#ffffff14",
+                      "cornerRadius": [
+                        6,
+                        0,
+                        0,
+                        6
+                      ],
+                      "padding": [
+                        8,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "q8huN",
+                          "name": "Label",
+                          "fill": "#cccccc",
+                          "content": "🗺️ Worlds (0/0)",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xFeXI",
+                      "name": "CarsTab",
+                      "fill": "#ffffff0a",
+                      "padding": [
+                        8,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "FbRmo",
+                          "name": "Label",
+                          "fill": "#888888",
+                          "content": "🚗 Cars (0/0)",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "AHMEw",
+                      "name": "LSTab",
+                      "fill": "#ffffff0a",
+                      "cornerRadius": [
+                        0,
+                        6,
+                        6,
+                        0
+                      ],
+                      "padding": [
+                        8,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "y4jdI",
+                          "name": "Label",
+                          "fill": "#888888",
+                          "content": "💾 LocalStorage (0/0)",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "aARub",
+              "name": "WorldsTable",
+              "width": "fill_container",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "nAPPI",
+                  "name": "TableHeader",
+                  "width": "fill_container",
+                  "fill": "#ffffff08",
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "TwutG",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Selected",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "POyQA",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Name",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Q9f5M",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Source",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "bxhqa",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Start",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "gqIy1",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Target",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "awnWE",
+                  "name": "Row",
+                  "width": "fill_container",
+                  "stroke": "#ffffff08",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "lHhOT",
+                      "name": "Selected",
+                      "fill": "#e8e8e8",
+                      "content": "✓",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "p0ug4",
+                      "name": "Name",
+                      "fill": "#e8e8e8",
+                      "content": "custom-map",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "dnrFG",
+                      "name": "Source",
+                      "fill": "#e8e8e8",
+                      "content": "editor",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "GXRfb",
+                      "name": "Start",
+                      "fill": "#e8e8e8",
+                      "content": "✓",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NBE7w",
+                      "name": "Target",
+                      "fill": "#e8e8e8",
+                      "content": "✗",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lJiG1",
+              "name": "CarsTable",
+              "opacity": 0.5,
+              "width": "fill_container",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "YXsdj",
+                  "name": "TableHeader",
+                  "width": "fill_container",
+                  "fill": "#ffffff08",
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "w0sA7",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Selected",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "DJpAh",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Name",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "e4AI3",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Source",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Y8nGj",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Layers",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "CeCm1",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Speed",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "e32ubq",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Accel",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "sbKFt",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Friction",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Zdrwa",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Rays",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "DFKMf",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Len",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "cIj3b",
+                      "name": "Col",
+                      "fill": "#888888",
+                      "content": "Spread",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
                     }
                   ]
                 }
