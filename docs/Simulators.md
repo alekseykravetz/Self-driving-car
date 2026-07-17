@@ -1085,8 +1085,8 @@ training on just the current frame, the system samples a balanced batch of
 1. Buffer entries are separated into **turn** (left or right = 1) and **straight**
    (neither).
 2. A batch is sampled at **50/50 ratio** — 8 turn + 8 straight examples.
-3. Each sampled entry is replayed: `feedForward(storedInputs)` then
-   `trainStep(brain, storedTargets)`.
+3. Each sampled entry is replayed via `trainStep(brain, storedInputs, storedTargets, lr)`,
+   which runs its own sigmoid forward pass internally (no separate `feedForward`).
 4. The batch is shuffled so the order doesn't bias which output gets updated
    first.
 

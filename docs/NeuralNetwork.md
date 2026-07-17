@@ -56,8 +56,9 @@ class NeuralNetwork {
   static feedForward(givenInputs: number[], network: NeuralNetwork): number[];
   static trainStep(
     network: NeuralNetwork,
+    inputs: number[],
     targets: number[],
-    lr?: number,
+    lr?: number | number[],
   ): boolean;
   static mutate(network: NeuralNetwork, amount: number): void;
   static crossover(net1: NeuralNetwork, net2: NeuralNetwork): NeuralNetwork;
@@ -94,25 +95,37 @@ static feedForward(givenInputs: number[], network: NeuralNetwork): number[] {
 ## Online Imitation Learning (`NeuralNetwork.trainStep`)
 
 In addition to neuroevolution, the network supports **online backpropagation** via
-the straight-through estimator (STE). This is used exclusively by the [Human
-Backpropagation mode](#human-backpropagation-mode) to train a single car's brain
-to imitate the human's keypresses each frame.
+a **sigmoid relaxation** of the binary-step network. This is used exclusively by
+the [Human Backpropagation mode](#human-backpropagation-mode) to train a single
+car's brain to imitate the human's keypresses each frame.
+
+### Why a sigmoid relaxation
+
+The network activates when `z = Σ w·x − bias > 0` (binary step). The logistic
+`σ(z)` shares the **exact same decision boundary** (`σ(z) > 0.5 ⟺ z > 0 ⟺
+sum > bias`), so a network trained on the smooth surrogate produces the correct
+binary-step decisions at inference time. Unlike a straight-through estimator
+(which treats `step' = 1` and yields a coarse, poorly-conditioned gradient that
+fails to train multi-layer networks), the sigmoid gives real graded errors and
+proper multi-layer credit assignment — while inference stays pure binary step,
+keeping the brain compatible with the genetic/AI cars, serialization, and the
+visualizer.
 
 ### Method
 
 ```typescript
 static trainStep(
   network: NeuralNetwork,
+  inputs: number[],
   targets: number[],
   lr: number | number[] = 0.1,
 ): boolean;
 ```
 
-Assumes `feedForward(inputVector, network)` was just called on the current
-frame's input, so each `level.inputs[]` and `level.outputs[]` already holds
-fresh values. Trains every layer via the straight-through estimator (treats the
-binary-step derivative as 1), so inference keeps using step activation and
-pool/crossover compatibility is unaffected.
+Runs its **own** sigmoid forward pass from `inputs` (it does not depend on a
+prior `feedForward` call and never reads the binary `level.outputs` left by
+inference), then backpropagates and updates every layer. Inference continues to
+use binary step, so pool/crossover compatibility is unaffected.
 
 Returns `true` if any weight or bias was updated this step (i.e. at least one
 output neuron had a non-zero error), `false` otherwise. The Human Backpropagation
@@ -127,25 +140,28 @@ beyond its length (which would produce `NaN`).
 
 ### Algorithm
 
-1. **Output layer:** perceptron error `delta = target - output` (STE: `step' = 1`,
-   so no extra factor).
-2. **Hidden layers:** backprop through the next level's weights;
-   `delta_hidden[k] = Σ_j w_next[k][j] * delta_next[j]` (again `step' = 1`).
-3. **Update rule:** `w[input][output] += lr * delta * input`;
-   `bias -= lr * delta`.
+1. **Forward pass:** compute `a = σ(z)` per neuron, feeding sigmoid activations
+   forward through every layer.
+2. **Output layer:** `δ = σ(z) − target` (the well-conditioned sigmoid +
+   cross-entropy gradient — a graded error, not the binary `±1` of STE).
+3. **Hidden layers:** backprop through the next level's weights and multiply by
+   the sigmoid derivative: `δ_hidden[k] = (Σ_j w_next[k][j] · δ_next[j]) · a[k] · (1 − a[k])`.
+4. **Update rule:** `w[input][output] -= lr · δ · input`; `bias += lr · δ`
+   (see bias-sign convention below).
 
 ### Safety guards
 
-- **NaN/Inf prevention** — `!isFinite(error)` and `!isFinite(effectiveLR)`
-  guards skip corrupted values; `||` short-circuits zero-error neurons.
+- **NaN/Inf prevention** — `!isFinite(di)` and `!isFinite(effectiveLR)`
+  guards skip corrupted values; neurons with a zero delta are also skipped.
 - **Weight clamping** — all weights and biases are clamped to `[-10, 10]` after
   every update to prevent unbounded growth from repeated training steps.
 
 ### Bias sign convention
 
-This codebase uses `z = Σ w·x − bias` with `step(z > 0)`, so to raise `z` when
-the error is positive we **decrease** the bias (opposite of the usual
-`b += lr·err` convention). The update rule `bias -= lr * delta` implements this.
+This codebase uses `z = Σ w·x − bias`, so `∂z/∂bias = −1` and gradient descent
+becomes `bias += lr · δ` (with `δ = ∂L/∂z`). Equivalently, the bias is
+**decreased** when a neuron should fire more easily — the opposite of the usual
+`b -= lr·δ` convention for `z = Σ w·x + bias`.
 
 ### Guards (applied in `Car.#processBrain`)
 
@@ -164,11 +180,11 @@ The default `lr = 0.1` is tunable from the Human Backpropagation panel
 (0.01–0.5). Higher values converge faster but risk oscillation; lower values
 produce smoother learning.
 
-**Per-output scaling** — the Human Backpropagation mode applies separate
-multipliers per output channel: `forward: 0.5×`, `left: 2×`, `right: 2×`,
-`reverse: 0.5×` of the base slider value. The step LR is also divided by the
-batch size (`1 / batchSize`) so the total per-frame gradient magnitude stays
-independent of the replay-buffer batch size. See the Simulators doc for details.
+**Per-output scaling** — the Human Backpropagation mode boosts the (rarer) turn
+channels: `forward: 1×`, `left: 1.5×`, `right: 1.5×`, `reverse: 1×` of the base
+slider value. Each replay sample is a **full** SGD step (the LR is _not_ divided
+by the batch size — doing so previously made learning ~16× too slow to converge).
+See the Simulators doc for details.
 
 ---
 

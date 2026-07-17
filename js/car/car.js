@@ -227,20 +227,22 @@ export class Car {
                 if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
                     this.#replayBuffer.shift();
                 }
+                // Per-output learning rates. Turn channels (left/right) are rare
+                // relative to forward, so give them a boost even though the replay
+                // batch is class-balanced. No division by batch size — each replay
+                // sample is a full SGD step.
                 const lr = this.#learningRate;
-                const scale = 1 / Math.max(this.#batchSize, 1);
                 const perOutputLR = [
-                    lr * 0.5 * scale,
-                    lr * 2 * scale,
-                    lr * 2 * scale,
-                    lr * 0.5 * scale,
+                    lr,
+                    lr * 1.5,
+                    lr * 1.5,
+                    lr,
                 ];
                 this.#brainChangedThisFrame = this.#trainBatch(perOutputLR);
                 if (isDecisionPoint) {
                     const brain = this.brain;
                     for (let i = 0; i < 3; i++) {
-                        NeuralNetwork.feedForward(inputVector, brain);
-                        if (NeuralNetwork.trainStep(brain, targets, perOutputLR)) {
+                        if (NeuralNetwork.trainStep(brain, inputVector, targets, perOutputLR)) {
                             this.#brainChangedThisFrame = true;
                         }
                     }
@@ -258,8 +260,7 @@ export class Car {
         let changed = false;
         if (bufferLen < this.#batchSize) {
             for (let i = 0; i < bufferLen; i++) {
-                NeuralNetwork.feedForward(buffer[i].inputs, brain);
-                if (NeuralNetwork.trainStep(brain, buffer[i].targets, lr)) {
+                if (NeuralNetwork.trainStep(brain, buffer[i].inputs, buffer[i].targets, lr)) {
                     changed = true;
                 }
             }
@@ -293,8 +294,7 @@ export class Car {
             selected[j] = tmp;
         }
         for (const idx of selected) {
-            NeuralNetwork.feedForward(buffer[idx].inputs, brain);
-            if (NeuralNetwork.trainStep(brain, buffer[idx].targets, lr)) {
+            if (NeuralNetwork.trainStep(brain, buffer[idx].inputs, buffer[idx].targets, lr)) {
                 changed = true;
             }
         }

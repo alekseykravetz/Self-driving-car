@@ -136,72 +136,107 @@ export class NeuralNetwork {
   }
 
   /**
-   * Straight-through estimator (STE) backpropagation training step.
+   * Supervised backpropagation training step using a sigmoid relaxation of the
+   * network's binary step activation.
    *
-   * Assumes `feedForward` was just called on the current frame's input so each
-   * level's `inputs[]`/`outputs[]` holds fresh values.
+   * The network computes `z = Σ w·x − bias` then activates when `z > 0`
+   * (i.e. `sum > bias`). The logistic `σ(z)` shares the exact same decision
+   * boundary (`σ(z) > 0.5 ⟺ z > 0`), so training the smooth surrogate and then
+   * running the hard step at inference time is consistent. This gives real,
+   * graded gradients (and proper multi-layer credit assignment) that the binary
+   * step / straight-through estimator cannot provide.
    *
-   * The network uses `z = Σ w·x − bias`, so bias is *decreased* when error is
-   * positive (to make the neuron fire more easily).
+   * Runs its own forward pass from `inputs` (using sigmoid activations) so it
+   * does not depend on a prior `feedForward` call and never reads the binary
+   * `level.outputs` left over from inference.
    *
-   * Uses STE: the binary step activation is treated as the identity during the
-   * backward pass, so gradients pass through unchanged.
+   * Bias-sign note: since `z = Σ w·x − bias`, `∂z/∂bias = −1`, so the bias is
+   * *increased* by `lr · δ` (equivalently decreased when the neuron should fire
+   * more), while weights are updated by `−lr · δ · input`.
    *
+   * @param inputs The input vector for this frame (same vector fed to feedForward).
+   * @param targets Desired binary outputs (0/1) per output neuron.
    * @param lr Learning rate (single number) or per-output learning rates (array).
-   *        When an array, each output neuron uses its own LR: [forward, left, right, reverse].
+   *        When an array, each output neuron uses its own LR; hidden levels use `lr[0]`.
    */
   static trainStep(
     network: NeuralNetwork,
+    inputs: number[],
     targets: number[],
     lr: number | number[] = 0.1,
   ): boolean {
     const numLevels = network.levels.length;
     if (numLevels === 0) return false;
 
-    let changed = false;
-    const levelErrors: number[][] = new Array(numLevels);
+    const sigmoid = (z: number): number => 1 / (1 + Math.exp(-z));
 
-    const lastLevel = network.levels[numLevels - 1];
-    levelErrors[numLevels - 1] = new Array(lastLevel.outputs.length);
-    for (let i = 0; i < lastLevel.outputs.length; i++) {
-      levelErrors[numLevels - 1][i] = targets[i] - lastLevel.outputs[i];
+    // Forward pass with sigmoid activations, keeping each level's activation
+    // vector. activations[0] is the raw input; activations[k+1] is level k's out.
+    const activations: number[][] = new Array(numLevels + 1);
+    activations[0] = inputs;
+    for (let k = 0; k < numLevels; k++) {
+      const level = network.levels[k];
+      const inp = activations[k];
+      const out = new Array<number>(level.outputs.length);
+      for (let i = 0; i < level.outputs.length; i++) {
+        let sum = 0;
+        for (let j = 0; j < inp.length; j++) {
+          sum += (inp[j] ?? 0) * level.weights[j][i];
+        }
+        out[i] = sigmoid(sum - level.biases[i]);
+      }
+      activations[k + 1] = out;
     }
 
-    for (let k = numLevels - 1; k >= 0; k--) {
-      const level = network.levels[k];
-      const errors = levelErrors[k];
-
-      if (k > 0) {
-        const prevErrors = new Array(level.inputs.length).fill(0);
-        for (let j = 0; j < level.inputs.length; j++) {
-          for (let i = 0; i < level.outputs.length; i++) {
-            prevErrors[j] += level.weights[j][i] * errors[i];
-          }
+    // Backward pass: deltas[k][i] = ∂L/∂z for output i of level k.
+    const deltas: number[][] = new Array(numLevels);
+    const outIdx = numLevels - 1;
+    const outAct = activations[numLevels];
+    deltas[outIdx] = new Array<number>(outAct.length);
+    for (let i = 0; i < outAct.length; i++) {
+      // Sigmoid + cross-entropy → δ = σ(z) − target (graded, well-conditioned).
+      deltas[outIdx][i] = outAct[i] - targets[i];
+    }
+    for (let k = numLevels - 2; k >= 0; k--) {
+      const nextLevel = network.levels[k + 1];
+      const nextDelta = deltas[k + 1];
+      const act = activations[k + 1];
+      const d = new Array<number>(act.length).fill(0);
+      for (let j = 0; j < act.length; j++) {
+        let sum = 0;
+        for (let i = 0; i < nextLevel.outputs.length; i++) {
+          sum += nextLevel.weights[j][i] * nextDelta[i];
         }
-        levelErrors[k - 1] = prevErrors;
+        d[j] = sum * act[j] * (1 - act[j]); // × sigmoid'(z)
       }
+      deltas[k] = d;
+    }
 
+    // Apply weight/bias updates with gradient descent + clamping.
+    let changed = false;
+    for (let k = 0; k < numLevels; k++) {
+      const level = network.levels[k];
+      const inp = activations[k];
+      const delta = deltas[k];
       for (let i = 0; i < level.outputs.length; i++) {
-        const error = errors[i];
-        if (error === 0 || !isFinite(error)) continue;
-        changed = true;
-        let effectiveLR: number;
-        if (Array.isArray(lr)) {
-          effectiveLR = k === numLevels - 1 ? lr[i] : lr[0];
-        } else {
-          effectiveLR = lr;
-        }
+        const di = delta[i];
+        if (di === 0 || !isFinite(di)) continue;
+        const effectiveLR = Array.isArray(lr)
+          ? ((k === outIdx ? lr[i] : lr[0]) ?? lr[0])
+          : lr;
         if (!isFinite(effectiveLR)) continue;
-        level.biases[i] = Math.max(
+        const newBias = Math.max(
           -10,
-          Math.min(10, level.biases[i] - effectiveLR * error),
+          Math.min(10, level.biases[i] + effectiveLR * di),
         );
-        for (let j = 0; j < level.inputs.length; j++) {
+        if (newBias !== level.biases[i]) changed = true;
+        level.biases[i] = newBias;
+        for (let j = 0; j < inp.length; j++) {
           level.weights[j][i] = Math.max(
             -10,
             Math.min(
               10,
-              level.weights[j][i] + effectiveLR * error * level.inputs[j],
+              level.weights[j][i] - effectiveLR * di * (inp[j] ?? 0),
             ),
           );
         }
