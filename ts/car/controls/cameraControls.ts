@@ -1,4 +1,4 @@
-import { MarkerDetector, Marker } from './markerDetector.js';
+import { MarkerDetector, type Marker } from './markerDetector.js';
 import { Point } from '../../math/primitives/point.js';
 import { average, distance } from '../../math/utils.js';
 
