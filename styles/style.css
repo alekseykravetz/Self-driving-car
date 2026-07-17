@@ -111,11 +111,11 @@ body.main-page {
 
 .landing-sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
-  padding: 12px 24px 40px;
+  padding: 12px 16px 40px;
 }
 
 .landing-card {
@@ -1508,7 +1508,7 @@ input[type='file'] {
 
 store-panel {
   display: block;
-  grid-column: span 2;
+  grid-column: span 3;
   min-width: 0;
 }
 
