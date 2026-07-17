@@ -1,0 +1,287 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_md",
+      "label": "04-feature-b1-multi-class-sensor-readings.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "label": "Feature B1: Multi-Class Sensor Readings",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_core_concept",
+      "label": "Core Concept",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_design_decisions",
+      "label": "Design Decisions",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_target_files",
+      "label": "Target Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L17"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "label": "Implementation Steps",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L38"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_1_create_ts_car_sensors_sensorreading_ts",
+      "label": "1. Create `ts/car/sensors/sensorReading.ts`",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L40"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_2_extend_raycaster_with_tagged_hit_detection",
+      "label": "2. Extend raycaster with tagged hit detection",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L58"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_3_rewrite_sensor_class",
+      "label": "3. Rewrite `Sensor` class",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L96"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_4_update_carbrainadapter",
+      "label": "4. Update `CarBrainAdapter`",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L155"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_5_update_car_carinfo",
+      "label": "5. Update `Car` + `CarInfo`",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L179"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_6_update_comparecarinfoparams_carloader_ts",
+      "label": "6. Update `compareCarInfoParams` (carLoader.ts)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L242"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_7_wire_simulators",
+      "label": "7. Wire simulators",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L255"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_8_update_ui",
+      "label": "8. Update UI",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L287"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_9_serialization_compatibility",
+      "label": "9. Serialization & compatibility",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L330"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_performance_safeguards",
+      "label": "Performance Safeguards",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L341"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_acceptance_criteria",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L350"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_references",
+      "label": "References",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L365"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_core_concept",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_design_decisions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_target_files",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_1_create_ts_car_sensors_sensorreading_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_2_extend_raycaster_with_tagged_hit_detection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_3_rewrite_sensor_class",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_4_update_carbrainadapter",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L155",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_5_update_car_carinfo",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L179",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_6_update_comparecarinfoparams_carloader_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L242",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_7_wire_simulators",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L255",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_8_update_ui",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L287",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_implementation_steps",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_9_serialization_compatibility",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L330",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_performance_safeguards",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L341",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_acceptance_criteria",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L350",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_04_feature_b1_multi_class_sensor_readings_references",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/04-feature-b1-multi-class-sensor-readings.md",
+      "source_location": "L365",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

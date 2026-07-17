@@ -1,0 +1,431 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_md",
+      "label": "codebase-analysis-report.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "label": "Codebase Analysis \u2014 Discovery Report (Filled)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_1_project_overview",
+      "label": "\ud83d\udce6 1. Project Overview",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L8"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_2_technology_stack",
+      "label": "\ud83e\uddf0 2. Technology Stack",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L26"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_class_module_patterns",
+      "label": "\ud83e\uddf1 3. Class & Module Patterns",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L52"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_1_plain_classes_vs_custom_elements_vs_free_functions",
+      "label": "3.1 Plain Classes vs Custom Elements vs Free Functions",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L54"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_2_recurring_design_patterns",
+      "label": "3.2 Recurring Design Patterns",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L81"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_3_class_size_complexity",
+      "label": "3.3 Class Size & Complexity",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L105"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_state_data_flow",
+      "label": "\ud83d\udd04 4. State & Data Flow",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L119"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_1_in_memory_instance_state",
+      "label": "4.1 In-Memory / Instance State",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L123"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_2_shared_global_state",
+      "label": "4.2 Shared / \"Global\" State",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L132"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_3_persistence_localstorage",
+      "label": "4.3 Persistence (`localStorage`)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L138"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_4_async_loading_flow",
+      "label": "4.4 Async / Loading Flow",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L151"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_5_styling_approaches",
+      "label": "\ud83c\udfa8 5. Styling Approaches",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L164"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_6_asset_loading_file_i_o_patterns",
+      "label": "\ud83c\udf10 6. Asset Loading & File I/O Patterns",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L184"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_7_project_folder_structure",
+      "label": "\ud83d\uddc2\ufe0f 7. Project & Folder Structure",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L199"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_8_naming_conventions",
+      "label": "\ud83d\udcdd 8. Naming Conventions",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L225"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "label": "\u26a0\ufe0f 9. Anti-Patterns & Problem Areas",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L241"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_1_god_classes_oversized_files_verified",
+      "label": "9.1 God Classes / Oversized Files (verified)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L243"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_2_duplicate_code",
+      "label": "9.2 Duplicate Code",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L253"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_3_global_scope_coupling",
+      "label": "9.3 Global-Scope Coupling",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L259"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_4_inconsistent_error_handling",
+      "label": "9.4 Inconsistent Error Handling",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L265"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_5_legacy_deprecated_patterns",
+      "label": "9.5 Legacy / Deprecated Patterns",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L269"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_6_dead_unused_code",
+      "label": "9.6 Dead & Unused Code",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L278"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_10_summary_statistics",
+      "label": "\ud83d\udcca 10. Summary Statistics",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L285"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_11_improvement_opportunities_quick_wins",
+      "label": "\ud83e\udded 11. Improvement Opportunities (Quick Wins)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L308"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_notes_for_next_step",
+      "label": "\ud83d\udccc Notes for Next Step",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L322"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_1_project_overview",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_2_technology_stack",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_class_module_patterns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_class_module_patterns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_1_plain_classes_vs_custom_elements_vs_free_functions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_class_module_patterns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_2_recurring_design_patterns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_class_module_patterns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_3_3_class_size_complexity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_state_data_flow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_state_data_flow",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_1_in_memory_instance_state",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_state_data_flow",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_2_shared_global_state",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L132",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_state_data_flow",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_3_persistence_localstorage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_state_data_flow",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_4_4_async_loading_flow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L151",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_5_styling_approaches",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L164",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_6_asset_loading_file_i_o_patterns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L184",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_7_project_folder_structure",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L199",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_8_naming_conventions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L225",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L241",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_1_god_classes_oversized_files_verified",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L243",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_2_duplicate_code",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L253",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_3_global_scope_coupling",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L259",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_4_inconsistent_error_handling",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L265",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_5_legacy_deprecated_patterns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L269",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_anti_patterns_problem_areas",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_9_6_dead_unused_code",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L278",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_10_summary_statistics",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L285",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_11_improvement_opportunities_quick_wins",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L308",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_codebase_analysis_discovery_report_filled",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_codebase_analysis_report_notes_for_next_step",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/codebase-analysis-report.md",
+      "source_location": "L322",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

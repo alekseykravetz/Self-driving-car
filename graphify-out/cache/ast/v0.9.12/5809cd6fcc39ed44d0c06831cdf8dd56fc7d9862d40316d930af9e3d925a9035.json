@@ -1,0 +1,127 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_md",
+      "label": "integrate-spatial-grid-into-carphysics.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_integrate_spatial_grid_into_carphysics_assessdamage",
+      "label": "Integrate spatial grid into CarPhysics.assessDamage()",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_problem",
+      "label": "Problem",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_impact",
+      "label": "Impact",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_resolution_option_2_adopted",
+      "label": "Resolution (Option 2 \u2014 adopted)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L15"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_what_changed",
+      "label": "What changed",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L23"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_files_modified",
+      "label": "Files modified",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L33"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_performance_note",
+      "label": "Performance note",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L45"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_integrate_spatial_grid_into_carphysics_assessdamage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_integrate_spatial_grid_into_carphysics_assessdamage",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_problem",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_integrate_spatial_grid_into_carphysics_assessdamage",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_impact",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_integrate_spatial_grid_into_carphysics_assessdamage",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_resolution_option_2_adopted",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_resolution_option_2_adopted",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_what_changed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_resolution_option_2_adopted",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_files_modified",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_resolution_option_2_adopted",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_integrate_spatial_grid_integrate_spatial_grid_into_carphysics_performance_note",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-integrate-spatial-grid/integrate-spatial-grid-into-carphysics.md",
+      "source_location": "L45",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

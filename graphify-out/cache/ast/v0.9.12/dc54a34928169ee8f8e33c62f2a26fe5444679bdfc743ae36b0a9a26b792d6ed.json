@@ -1,0 +1,1167 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_md",
+      "label": "ai_agent_refactor_plan.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "label": "AI Agent Refactor Plan",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_purpose",
+      "label": "Purpose",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_global_guardrails",
+      "label": "Global Guardrails",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_recommended_execution_order",
+      "label": "Recommended Execution Order",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L14"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_structural_reorganization_recommendations",
+      "label": "Structural Reorganization Recommendations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L22"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_1_harden_neural_network_serialization",
+      "label": "Subtask 1 \u2014 Harden Neural Network Serialization",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L52"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L54"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L58"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L63"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L72"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L78"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_2_introduce_a_car_factory_deserializer",
+      "label": "Subtask 2 \u2014 Introduce a Car Factory/Deserializer",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L84"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_86",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L86"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_90",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L90"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_95",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L95"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_102",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L102"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_108",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L108"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_3_extract_car_physics_from_the_main_car_class",
+      "label": "Subtask 3 \u2014 Extract Car Physics from the Main Car Class",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L114"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_116",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L116"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_120",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L120"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_125",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L125"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_131",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L131"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_137",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L137"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_4_extract_car_rendering_and_sprite_caching",
+      "label": "Subtask 4 \u2014 Extract Car Rendering and Sprite Caching",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L143"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_145",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L145"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_149",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L149"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_154",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L154"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_160",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L160"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_166",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L166"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_5_extract_car_brain_adapter_for_control_mapping",
+      "label": "Subtask 5 \u2014 Extract Car Brain Adapter for Control Mapping",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L172"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_174",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L174"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_178",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L178"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_183",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L183"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_189",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L189"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_195",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L195"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_6_isolate_sensor_raycasting_logic",
+      "label": "Subtask 6 \u2014 Isolate Sensor Raycasting Logic",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L201"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_203",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L203"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_207",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L207"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_212",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L212"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_218",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L218"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_224",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L224"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_7_decouple_simulator_shell_from_page_specific_dom_queries",
+      "label": "Subtask 7 \u2014 Decouple Simulator Shell from Page-Specific DOM Queries",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L230"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_232",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L232"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_236",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L236"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_241",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L241"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_247",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L247"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_253",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L253"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_8_extract_race_ui_from_race_gameplay_logic",
+      "label": "Subtask 8 \u2014 Extract Race UI from Race Gameplay Logic",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L259"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_261",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L261"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_265",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L265"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_270",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L270"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_276",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L276"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_282",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L282"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_9_split_world_toolbar_responsibilities",
+      "label": "Subtask 9 \u2014 Split World Toolbar Responsibilities",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L288"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_290",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L290"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_294",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L294"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_299",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L299"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_305",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L305"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_311",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L311"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_10_separate_world_generation_from_world_state",
+      "label": "Subtask 10 \u2014 Separate World Generation from World State",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L317"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_319",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L319"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_323",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L323"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_328",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L328"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_334",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L334"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_340",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L340"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_11_review_typescript_module_configuration",
+      "label": "Subtask 11 \u2014 Review TypeScript Module Configuration",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L346"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_348",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L348"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_352",
+      "label": "Files",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L352"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_356",
+      "label": "What to Implement",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L356"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_361",
+      "label": "Acceptance Criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L361"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_366",
+      "label": "Agent Prompt",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L366"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_definition_of_done_for_each_subtask",
+      "label": "Definition of Done for Each Subtask",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L372"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_purpose",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_global_guardrails",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_recommended_execution_order",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_structural_reorganization_recommendations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_1_harden_neural_network_serialization",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_1_harden_neural_network_serialization",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_1_harden_neural_network_serialization",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_1_harden_neural_network_serialization",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_1_harden_neural_network_serialization",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L72",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_1_harden_neural_network_serialization",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L78",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_2_introduce_a_car_factory_deserializer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L84",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_2_introduce_a_car_factory_deserializer",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_86",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_2_introduce_a_car_factory_deserializer",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_90",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L90",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_2_introduce_a_car_factory_deserializer",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_95",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_2_introduce_a_car_factory_deserializer",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_102",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_2_introduce_a_car_factory_deserializer",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_108",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L108",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_3_extract_car_physics_from_the_main_car_class",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_3_extract_car_physics_from_the_main_car_class",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_116",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_3_extract_car_physics_from_the_main_car_class",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_120",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_3_extract_car_physics_from_the_main_car_class",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_125",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_3_extract_car_physics_from_the_main_car_class",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_131",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_3_extract_car_physics_from_the_main_car_class",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_137",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_4_extract_car_rendering_and_sprite_caching",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L143",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_4_extract_car_rendering_and_sprite_caching",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_145",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L145",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_4_extract_car_rendering_and_sprite_caching",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_149",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L149",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_4_extract_car_rendering_and_sprite_caching",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_154",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L154",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_4_extract_car_rendering_and_sprite_caching",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_160",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_4_extract_car_rendering_and_sprite_caching",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_166",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_5_extract_car_brain_adapter_for_control_mapping",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L172",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_5_extract_car_brain_adapter_for_control_mapping",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_174",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L174",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_5_extract_car_brain_adapter_for_control_mapping",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_178",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L178",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_5_extract_car_brain_adapter_for_control_mapping",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_183",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L183",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_5_extract_car_brain_adapter_for_control_mapping",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_189",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L189",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_5_extract_car_brain_adapter_for_control_mapping",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_195",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L195",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_6_isolate_sensor_raycasting_logic",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L201",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_6_isolate_sensor_raycasting_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_203",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L203",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_6_isolate_sensor_raycasting_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_207",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L207",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_6_isolate_sensor_raycasting_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_212",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L212",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_6_isolate_sensor_raycasting_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_218",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L218",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_6_isolate_sensor_raycasting_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_224",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L224",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_7_decouple_simulator_shell_from_page_specific_dom_queries",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L230",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_7_decouple_simulator_shell_from_page_specific_dom_queries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_232",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L232",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_7_decouple_simulator_shell_from_page_specific_dom_queries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_236",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L236",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_7_decouple_simulator_shell_from_page_specific_dom_queries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_241",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L241",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_7_decouple_simulator_shell_from_page_specific_dom_queries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_247",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L247",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_7_decouple_simulator_shell_from_page_specific_dom_queries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_253",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L253",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_8_extract_race_ui_from_race_gameplay_logic",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L259",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_8_extract_race_ui_from_race_gameplay_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_261",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L261",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_8_extract_race_ui_from_race_gameplay_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_265",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L265",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_8_extract_race_ui_from_race_gameplay_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_270",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L270",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_8_extract_race_ui_from_race_gameplay_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_276",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L276",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_8_extract_race_ui_from_race_gameplay_logic",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_282",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L282",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_9_split_world_toolbar_responsibilities",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L288",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_9_split_world_toolbar_responsibilities",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_290",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L290",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_9_split_world_toolbar_responsibilities",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_294",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L294",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_9_split_world_toolbar_responsibilities",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_299",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L299",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_9_split_world_toolbar_responsibilities",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_305",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L305",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_9_split_world_toolbar_responsibilities",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_311",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L311",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_10_separate_world_generation_from_world_state",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L317",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_10_separate_world_generation_from_world_state",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_319",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L319",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_10_separate_world_generation_from_world_state",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_323",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L323",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_10_separate_world_generation_from_world_state",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_328",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L328",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_10_separate_world_generation_from_world_state",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_334",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L334",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_10_separate_world_generation_from_world_state",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_340",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L340",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_11_review_typescript_module_configuration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L346",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_11_review_typescript_module_configuration",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_goal_348",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L348",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_11_review_typescript_module_configuration",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_files_352",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L352",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_11_review_typescript_module_configuration",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_what_to_implement_356",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L356",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_11_review_typescript_module_configuration",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_acceptance_criteria_361",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L361",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_subtask_11_review_typescript_module_configuration",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_agent_prompt_366",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L366",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_ai_agent_refactor_plan",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_agent_refactor_plan_definition_of_done_for_each_subtask",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_agent_refactor_plan.md",
+      "source_location": "L372",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

@@ -1,0 +1,287 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_md",
+      "label": "human-backprop-bugfixes.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "label": "Human Backpropagation \u2014 Bugfixes & Panel Redesign",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_goal",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L9"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_context_read_first",
+      "label": "Context (read first)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L18"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_scope",
+      "label": "Scope",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L33"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "label": "Implementation",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L52"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_1_ts_car_controls_controls_ts_add_frozen_flag",
+      "label": "1. `ts/car/controls/controls.ts` \u2014 add `frozen` flag",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L54"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_2_ts_car_car_ts_wire_frozen_to_autopilot_add_brain_change_flag_add_learning_state_getter",
+      "label": "2. `ts/car/car.ts` \u2014 wire `frozen` to autopilot, add brain-change flag, add learning-state getter",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L62"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_3_ts_neural_network_network_ts_trainstep_returns_boolean",
+      "label": "3. `ts/neural-network/network.ts` \u2014 `trainStep` returns boolean",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L103"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_4_ts_simulator_humantraining_humanbackpropsimulator_ts_rolling_accuracy_l_key_toggle_panel_info_wiring",
+      "label": "4. `ts/simulator/humanTraining/humanBackpropSimulator.ts` \u2014 rolling accuracy, L-key toggle, panel info wiring",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L115"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_5_ts_simulator_humantraining_humantrainingpanel_ts_new_panel_api_methods",
+      "label": "5. `ts/simulator/humanTraining/humanTrainingPanel.ts` \u2014 new panel API methods",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L263"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_6_ts_simulator_humantraining_templates_humantrainingpaneltemplate_ts_redesigned_template",
+      "label": "6. `ts/simulator/humanTraining/templates/humanTrainingPanelTemplate.ts` \u2014 redesigned template",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L309"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_7_ts_panels_keyboardmanager_ts_add_settoggleactive_method",
+      "label": "7. `ts/panels/keyboardManager.ts` \u2014 add `setToggleActive` method",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L450"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_8_ts_panels_latchedtoggle_ts_no_changes_needed",
+      "label": "8. `ts/panels/latchedToggle.ts` \u2014 no changes needed",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L466"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_9_styles_style_css_new_panel_styles",
+      "label": "9. `styles/style.css` \u2014 new panel styles",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L470"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_brain_persistence_considerations",
+      "label": "Brain / persistence considerations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L498"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_acceptance_criteria",
+      "label": "Acceptance criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L502"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_docs_to_update",
+      "label": "Docs to update",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L519"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_goal",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_context_read_first",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_scope",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_1_ts_car_controls_controls_ts_add_frozen_flag",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_2_ts_car_car_ts_wire_frozen_to_autopilot_add_brain_change_flag_add_learning_state_getter",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_3_ts_neural_network_network_ts_trainstep_returns_boolean",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L103",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_4_ts_simulator_humantraining_humanbackpropsimulator_ts_rolling_accuracy_l_key_toggle_panel_info_wiring",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_5_ts_simulator_humantraining_humantrainingpanel_ts_new_panel_api_methods",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L263",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_6_ts_simulator_humantraining_templates_humantrainingpaneltemplate_ts_redesigned_template",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L309",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_7_ts_panels_keyboardmanager_ts_add_settoggleactive_method",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L450",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_8_ts_panels_latchedtoggle_ts_no_changes_needed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L466",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_9_styles_style_css_new_panel_styles",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L470",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_brain_persistence_considerations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L498",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_acceptance_criteria",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L502",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_human_backpropagation_bugfixes_panel_redesign",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260716_human_backprop_bugfixes_human_backprop_bugfixes_docs_to_update",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md",
+      "source_location": "L519",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

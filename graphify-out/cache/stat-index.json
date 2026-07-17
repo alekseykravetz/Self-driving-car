@@ -1,13 +1,13 @@
 {
   "/Users/alex/Code/Self-driving-car/.opencode/opencode.json": {
-    "size": 57,
-    "mtime_ns": 1783708685405635230,
-    "word_count": 6,
-    "hash": "db6043f8268cde619294e9ccda4fad41be8b341fad412ae04319a95d1e45252b"
+    "size": 269,
+    "mtime_ns": 1784117814976138102,
+    "word_count": 21,
+    "hash": "8ed4f9215900401bb95b62f7282cfb201fdb1f225674ebc41a7f315d717c7b7f"
   },
   "/Users/alex/Code/Self-driving-car/.opencode/plugins/graphify.js": {
     "size": 1402,
-    "mtime_ns": 1783708685405358175,
+    "mtime_ns": 1783710841395556550,
     "word_count": 197
   },
   "/Users/alex/Code/Self-driving-car/.vscode/settings.json": {
@@ -17,10 +17,10 @@
     "hash": "0c06033780d148cfde0ed57a9c58b7b985cd1e5253b0de0dff72188f14a9fb1e"
   },
   "/Users/alex/Code/Self-driving-car/AGENTS.md": {
-    "size": 6904,
-    "mtime_ns": 1783688773101949863,
-    "word_count": 878,
-    "hash": "5259fd932a8b73c90b26939c4204b90ae979ded2caf7bbff10535600713ffb4b"
+    "size": 15729,
+    "mtime_ns": 1784288892704955205,
+    "word_count": 1970,
+    "hash": "fda58b25dca90a08ccc2c8be23602fcc3ab446e4aefc03004d201988267d0953"
   },
   "/Users/alex/Code/Self-driving-car/GEMINI.md": {
     "size": 10143,
@@ -83,10 +83,10 @@
     "hash": "4bec45df71d1959129c81c25652f705fbb8058f5695b94d35a27d5120a808e8c"
   },
   "/Users/alex/Code/Self-driving-car/docs/Controls.md": {
-    "size": 13180,
-    "mtime_ns": 1783427809151334847,
-    "word_count": 1567,
-    "hash": "6fc712d3f338aec541757391965eb0faeb24e897f12b603571f07f115c848904"
+    "size": 13859,
+    "mtime_ns": 1784289213234321927,
+    "word_count": 1650,
+    "hash": "c85bad33958e1fbe6dd70fb24fd3afb77019ba34c95293760d0a2ce61fe64493"
   },
   "/Users/alex/Code/Self-driving-car/docs/Math.md": {
     "size": 25190,
@@ -95,16 +95,16 @@
     "hash": "4795e7ddc5d202880fbacc4d87661d2ac1744ca3001e734a96eaf3bd3e49a335"
   },
   "/Users/alex/Code/Self-driving-car/docs/NeuralNetwork.md": {
-    "size": 17677,
-    "mtime_ns": 1783692530616744709,
-    "word_count": 2223,
-    "hash": "82ae9c45d40a386927fb359dac7ceb7fa28ceac20bb4993bfeb2f82e96af87f6"
+    "size": 27352,
+    "mtime_ns": 1784288892705469452,
+    "word_count": 3684,
+    "hash": "3e354f04efcac4e3fa0afee3a12eb0987cfcb5a3b16117552823690305a063db"
   },
   "/Users/alex/Code/Self-driving-car/docs/Physics.md": {
-    "size": 27546,
-    "mtime_ns": 1783688773105892558,
-    "word_count": 3685,
-    "hash": "8aeec0b2723dc203088ad4a9e8932019bc8695085fcef2021f2fabe7ffa62cee"
+    "size": 32537,
+    "mtime_ns": 1784288892705992716,
+    "word_count": 4312,
+    "hash": "b3fa80dceda5bb237788a76bf58dfd68c6cca96213eca19a67fb65dfa226584a"
   },
   "/Users/alex/Code/Self-driving-car/docs/ProjectGoal.md": {
     "size": 2766,
@@ -125,10 +125,10 @@
     "hash": "8892179126bb3a25556489c3ec783cb987bebeb8dda9d632d9cbefb84742c3c0"
   },
   "/Users/alex/Code/Self-driving-car/docs/Simulators.md": {
-    "size": 55584,
-    "mtime_ns": 1783691042494710305,
-    "word_count": 6947,
-    "hash": "af6649a7fc32aef51d2e4f7d406e84f24c7a251075230f0940c62416b1b2cd45"
+    "size": 65031,
+    "mtime_ns": 1784289213843709016,
+    "word_count": 8203,
+    "hash": "d71a68deba716bc80f5ffbe0eb2757c6102ece127b3ffec6a9fc0d1c14e6c814"
   },
   "/Users/alex/Code/Self-driving-car/docs/Sound.md": {
     "size": 5524,
@@ -155,10 +155,10 @@
     "hash": "07fd9f4ec094eb91f4f209d49caa0468b40d983fd1deecc1243f6265fa3e42a7"
   },
   "/Users/alex/Code/Self-driving-car/docs/WorldEditor.md": {
-    "size": 32049,
-    "mtime_ns": 1783688773107738984,
-    "word_count": 4268,
-    "hash": "d583ebd71a7a44714edd199521cf829f859925f65832f5c2cb3b12471b423ee1"
+    "size": 32245,
+    "mtime_ns": 1784113036317707008,
+    "word_count": 4290,
+    "hash": "3320a1caf3d1744f58ca64e7400230c8c2693031a4ec01e6a8974d849bebe920"
   },
   "/Users/alex/Code/Self-driving-car/eslint.config.mjs": {
     "size": 1497,
@@ -167,9 +167,8 @@
   },
   "/Users/alex/Code/Self-driving-car/html/race.html": {
     "size": 919,
-    "mtime_ns": 1783346881675278493,
-    "word_count": 58,
-    "hash": "4596ca83337336d3531860c80993293f8536ab6c76b6c5a058a46315c631a933"
+    "mtime_ns": 1784060231731017540,
+    "word_count": 58
   },
   "/Users/alex/Code/Self-driving-car/html/simulator.html": {
     "size": 1005,
@@ -184,355 +183,353 @@
     "hash": "bd67d995d6fd4f60d5015d210319dc2f8499b6855bda318b7d32cf52c3c73839"
   },
   "/Users/alex/Code/Self-driving-car/html/world.html": {
-    "size": 3035,
-    "mtime_ns": 1783346881676396650,
-    "word_count": 237,
-    "hash": "c3696bd52435277168617284f68a7e8c48d9b42b7aa62e5cbee9bfff12c479ca"
+    "size": 1168,
+    "mtime_ns": 1784113036318148551,
+    "word_count": 73
   },
   "/Users/alex/Code/Self-driving-car/index.html": {
-    "size": 4664,
-    "mtime_ns": 1783346881676932509,
-    "word_count": 346,
-    "hash": "07785dc9bd3b827913633cea14e1cb1d49e18746d07f0421c9e4c491c07708e8"
+    "size": 5715,
+    "mtime_ns": 1784288892707376096,
+    "word_count": 429
   },
   "/Users/alex/Code/Self-driving-car/js/audio/sound.js": {
     "size": 5575,
-    "mtime_ns": 1783692739067220144,
+    "mtime_ns": 1784289213993351545,
     "word_count": 527
   },
   "/Users/alex/Code/Self-driving-car/js/camera/camera.js": {
     "size": 9026,
-    "mtime_ns": 1783692739182738132,
+    "mtime_ns": 1784289214187170754,
     "word_count": 911
   },
   "/Users/alex/Code/Self-driving-car/js/camera/extrusion.js": {
     "size": 8456,
-    "mtime_ns": 1783692739170075474,
+    "mtime_ns": 1784289214176044814,
     "word_count": 916
   },
   "/Users/alex/Code/Self-driving-car/js/camera/types.js": {
     "size": 11,
-    "mtime_ns": 1783692739126200706,
+    "mtime_ns": 1784289214099109324,
     "word_count": 2
   },
   "/Users/alex/Code/Self-driving-car/js/car/brain/carBrainAdapter.js": {
-    "size": 1758,
-    "mtime_ns": 1783692739121206280,
-    "word_count": 203
+    "size": 2481,
+    "mtime_ns": 1784289214050691611,
+    "word_count": 277
   },
   "/Users/alex/Code/Self-driving-car/js/car/car.js": {
-    "size": 7126,
-    "mtime_ns": 1783692739125703513,
-    "word_count": 549
+    "size": 13896,
+    "mtime_ns": 1784289214097090466,
+    "word_count": 1146
   },
   "/Users/alex/Code/Self-driving-car/js/car/carState.js": {
     "size": 11,
-    "mtime_ns": 1783692739107095172,
+    "mtime_ns": 1784289214030450379,
     "word_count": 2
   },
   "/Users/alex/Code/Self-driving-car/js/car/config.js": {
-    "size": 416,
-    "mtime_ns": 1783692739082031774,
-    "word_count": 49
+    "size": 492,
+    "mtime_ns": 1784289214007270237,
+    "word_count": 59
   },
   "/Users/alex/Code/Self-driving-car/js/car/controls/cameraControls.js": {
-    "size": 7747,
-    "mtime_ns": 1783692739106529016,
-    "word_count": 726
+    "size": 7829,
+    "mtime_ns": 1784289214029735066,
+    "word_count": 729
   },
   "/Users/alex/Code/Self-driving-car/js/car/controls/controls.js": {
-    "size": 2730,
-    "mtime_ns": 1783692739094727283,
-    "word_count": 237
+    "size": 2856,
+    "mtime_ns": 1784289214018227249,
+    "word_count": 246
   },
   "/Users/alex/Code/Self-driving-car/js/car/controls/markerDetector.js": {
-    "size": 4363,
-    "mtime_ns": 1783692739100781017,
-    "word_count": 474
+    "size": 4364,
+    "mtime_ns": 1784289214023925129,
+    "word_count": 471
   },
   "/Users/alex/Code/Self-driving-car/js/car/controls/phoneControls.js": {
     "size": 2818,
-    "mtime_ns": 1783692739097356256,
+    "mtime_ns": 1784289214020424526,
     "word_count": 298
   },
   "/Users/alex/Code/Self-driving-car/js/car/loader/carLoader.js": {
     "size": 5752,
-    "mtime_ns": 1783692739185209042,
+    "mtime_ns": 1784289214193403056,
     "word_count": 632
   },
   "/Users/alex/Code/Self-driving-car/js/car/physics/carPhysics.js": {
-    "size": 3791,
-    "mtime_ns": 1783692739110344518,
+    "size": 3793,
+    "mtime_ns": 1784289214034303268,
     "word_count": 408
   },
   "/Users/alex/Code/Self-driving-car/js/car/physics/sensorRaycaster.js": {
-    "size": 3801,
-    "mtime_ns": 1783692739081480629,
-    "word_count": 396
+    "size": 3294,
+    "mtime_ns": 1784289214006729384,
+    "word_count": 333
   },
   "/Users/alex/Code/Self-driving-car/js/car/rendering/carRenderer.js": {
-    "size": 3377,
-    "mtime_ns": 1783692739113503956,
-    "word_count": 287
+    "size": 3243,
+    "mtime_ns": 1784289214037479078,
+    "word_count": 284
   },
   "/Users/alex/Code/Self-driving-car/js/car/sensors/sensor.js": {
-    "size": 7277,
-    "mtime_ns": 1783692739090851734,
-    "word_count": 615
+    "size": 7211,
+    "mtime_ns": 1784289214014709503,
+    "word_count": 569
   },
   "/Users/alex/Code/Self-driving-car/js/car/sensors/sensorReading.js": {
     "size": 11,
-    "mtime_ns": 1783692739082639357,
+    "mtime_ns": 1784289214007763877,
     "word_count": 2
   },
   "/Users/alex/Code/Self-driving-car/js/math/collision.js": {
-    "size": 537,
-    "mtime_ns": 1783692739058384291,
-    "word_count": 87
+    "size": 1014,
+    "mtime_ns": 1784289213982723034,
+    "word_count": 156
   },
   "/Users/alex/Code/Self-driving-car/js/math/color.js": {
     "size": 321,
-    "mtime_ns": 1783692739059246856,
+    "mtime_ns": 1784289213983660719,
     "word_count": 55
   },
   "/Users/alex/Code/Self-driving-car/js/math/graph/graph.js": {
-    "size": 6556,
-    "mtime_ns": 1783692739134125089,
-    "word_count": 621
+    "size": 6226,
+    "mtime_ns": 1784289214117243313,
+    "word_count": 588
   },
   "/Users/alex/Code/Self-driving-car/js/math/heatmapGrid.js": {
-    "size": 2855,
-    "mtime_ns": 1783692739187376276,
+    "size": 2857,
+    "mtime_ns": 1784289214195542621,
     "word_count": 388
   },
   "/Users/alex/Code/Self-driving-car/js/math/osm-importer/osm.js": {
-    "size": 4750,
-    "mtime_ns": 1783692739205203418,
-    "word_count": 610
+    "size": 4785,
+    "mtime_ns": 1784289214203075030,
+    "word_count": 615
   },
   "/Users/alex/Code/Self-driving-car/js/math/primitives/envelope.js": {
     "size": 1463,
-    "mtime_ns": 1783692739136198489,
+    "mtime_ns": 1784289214120171954,
     "word_count": 184
   },
   "/Users/alex/Code/Self-driving-car/js/math/primitives/point.js": {
     "size": 262,
-    "mtime_ns": 1783692739041433375,
+    "mtime_ns": 1784289213966860661,
     "word_count": 46
   },
   "/Users/alex/Code/Self-driving-car/js/math/primitives/polygon.js": {
     "size": 5473,
-    "mtime_ns": 1783692739072982263,
+    "mtime_ns": 1784289213999168316,
     "word_count": 578
   },
   "/Users/alex/Code/Self-driving-car/js/math/primitives/segment.js": {
     "size": 1332,
-    "mtime_ns": 1783692739046706301,
+    "mtime_ns": 1784289213971631417,
     "word_count": 135
   },
   "/Users/alex/Code/Self-driving-car/js/math/spatialGrid.js": {
     "size": 4090,
-    "mtime_ns": 1783692739199521864,
+    "mtime_ns": 1784289214199382616,
     "word_count": 486
   },
   "/Users/alex/Code/Self-driving-car/js/math/trafficControlGrid.js": {
     "size": 3892,
-    "mtime_ns": 1783692739077179490,
+    "mtime_ns": 1784289214003054592,
     "word_count": 430
   },
   "/Users/alex/Code/Self-driving-car/js/math/utils.js": {
-    "size": 6428,
-    "mtime_ns": 1783692739056503029,
-    "word_count": 958
+    "size": 4915,
+    "mtime_ns": 1784289213979893155,
+    "word_count": 786
   },
   "/Users/alex/Code/Self-driving-car/js/mini-map/miniMap.js": {
     "size": 3604,
-    "mtime_ns": 1783692739163897267,
+    "mtime_ns": 1784289214160799604,
     "word_count": 348
   },
   "/Users/alex/Code/Self-driving-car/js/neural-network/network.js": {
-    "size": 7677,
-    "mtime_ns": 1783692739119425134,
-    "word_count": 870
+    "size": 13966,
+    "mtime_ns": 1784289214048094185,
+    "word_count": 1739
   },
   "/Users/alex/Code/Self-driving-car/js/neural-network/visualizer.js": {
-    "size": 27502,
-    "mtime_ns": 1783692739228640323,
-    "word_count": 3355
+    "size": 28247,
+    "mtime_ns": 1784289214223445056,
+    "word_count": 3427
   },
   "/Users/alex/Code/Self-driving-car/js/panels/assetSelectors.js": {
     "size": 7885,
-    "mtime_ns": 1783692739264501316,
+    "mtime_ns": 1784289214239121056,
     "word_count": 562
   },
   "/Users/alex/Code/Self-driving-car/js/panels/modeControls.js": {
     "size": 3539,
-    "mtime_ns": 1783692739267192362,
+    "mtime_ns": 1784289214251127791,
     "word_count": 223
   },
   "/Users/alex/Code/Self-driving-car/js/panels/shortcutsToolbar.js": {
-    "size": 3410,
-    "mtime_ns": 1783692739270082640,
-    "word_count": 293
+    "size": 2590,
+    "mtime_ns": 1784289214244350321,
+    "word_count": 234
   },
   "/Users/alex/Code/Self-driving-car/js/panels/templates/shortcutsToolbarTemplate.js": {
     "size": 365,
-    "mtime_ns": 1783692739267754166,
+    "mtime_ns": 1784289214242646550,
     "word_count": 52
   },
   "/Users/alex/Code/Self-driving-car/js/panels/templates/worldLayersToolbarTemplate.js": {
     "size": 375,
-    "mtime_ns": 1783692739270475599,
+    "mtime_ns": 1784289214251553858,
     "word_count": 52
   },
   "/Users/alex/Code/Self-driving-car/js/panels/templates/worldToolbarTemplate.js": {
-    "size": 5554,
-    "mtime_ns": 1783692739274212365,
+    "size": 5652,
+    "mtime_ns": 1784289214257307700,
     "word_count": 338
   },
   "/Users/alex/Code/Self-driving-car/js/panels/worldLayersToolbar.js": {
-    "size": 7023,
-    "mtime_ns": 1783692739273684042,
-    "word_count": 657
+    "size": 7565,
+    "mtime_ns": 1784289214256708914,
+    "word_count": 695
   },
   "/Users/alex/Code/Self-driving-car/js/panels/worldToolbar.js": {
     "size": 2614,
-    "mtime_ns": 1783692739276043185,
+    "mtime_ns": 1784289214258984829,
     "word_count": 172
   },
   "/Users/alex/Code/Self-driving-car/js/race/entry.js": {
     "size": 4991,
-    "mtime_ns": 1783692739343106260,
+    "mtime_ns": 1784289214336968556,
     "word_count": 314
   },
   "/Users/alex/Code/Self-driving-car/js/rendering/envelopeRenderer.js": {
     "size": 158,
-    "mtime_ns": 1783692739309503046,
+    "mtime_ns": 1784289214305732346,
     "word_count": 16
   },
   "/Users/alex/Code/Self-driving-car/js/rendering/heatmapRenderer.js": {
     "size": 2830,
-    "mtime_ns": 1783692739285334920,
+    "mtime_ns": 1784289214273263885,
     "word_count": 399
   },
   "/Users/alex/Code/Self-driving-car/js/rendering/pointRenderer.js": {
     "size": 641,
-    "mtime_ns": 1783692739127098755,
+    "mtime_ns": 1784289214157047772,
     "word_count": 83
   },
   "/Users/alex/Code/Self-driving-car/js/rendering/polygonRenderer.js": {
     "size": 500,
-    "mtime_ns": 1783692739137562844,
+    "mtime_ns": 1784289214121931271,
     "word_count": 53
   },
   "/Users/alex/Code/Self-driving-car/js/rendering/segmentRenderer.js": {
     "size": 367,
-    "mtime_ns": 1783692739127788956,
+    "mtime_ns": 1784289214126812980,
     "word_count": 39
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/core/simulatorShell.js": {
-    "size": 10639,
-    "mtime_ns": 1783692739288836098,
-    "word_count": 1098
+    "size": 10722,
+    "mtime_ns": 1784289214280950626,
+    "word_count": 1111
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/entry.js": {
     "size": 4083,
-    "mtime_ns": 1783692739379140760,
+    "mtime_ns": 1784289214374814437,
     "word_count": 221
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/panels/animationLoopToolbar.js": {
-    "size": 4418,
-    "mtime_ns": 1783692739281354275,
+    "size": 4423,
+    "mtime_ns": 1784289214264625174,
     "word_count": 406
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/panels/layoutToolbar.js": {
     "size": 4827,
-    "mtime_ns": 1783692739279156526,
+    "mtime_ns": 1784289214261757432,
     "word_count": 347
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/panels/templates/animationLoopToolbarTemplate.js": {
-    "size": 1809,
-    "mtime_ns": 1783692739279604410,
+    "size": 1844,
+    "mtime_ns": 1784289214262287457,
     "word_count": 123
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/panels/templates/layoutToolbarTemplate.js": {
-    "size": 1346,
-    "mtime_ns": 1783692739276481831,
+    "size": 1381,
+    "mtime_ns": 1784289214259458460,
     "word_count": 86
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/racing/racePanel.js": {
     "size": 3917,
-    "mtime_ns": 1783692739291751049,
+    "mtime_ns": 1784289214284676682,
     "word_count": 275
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/racing/raceSimulator.js": {
     "size": 11964,
-    "mtime_ns": 1783692739329332541,
+    "mtime_ns": 1784289214322865003,
     "word_count": 957
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/rendering/layoutManager.js": {
     "size": 4596,
-    "mtime_ns": 1783692739283838366,
+    "mtime_ns": 1784289214267982331,
     "word_count": 429
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/spatialGridUtils.js": {
     "size": 2751,
-    "mtime_ns": 1783692739320231206,
+    "mtime_ns": 1784289214312851089,
     "word_count": 420
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/traffic/templates/trafficPanelTemplate.js": {
     "size": 1139,
-    "mtime_ns": 1783692739379412553,
+    "mtime_ns": 1784289214392612128,
     "word_count": 82
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/traffic/trafficPanel.js": {
-    "size": 8591,
-    "mtime_ns": 1783692739382912307,
+    "size": 8596,
+    "mtime_ns": 1784289214396428580,
     "word_count": 886
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/traffic/trafficSimulator.js": {
-    "size": 19827,
-    "mtime_ns": 1783692739389181371,
-    "word_count": 1973
+    "size": 18956,
+    "mtime_ns": 1784289214403211678,
+    "word_count": 1853
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/trafficControlUtils.js": {
     "size": 1782,
-    "mtime_ns": 1783692739321222430,
+    "mtime_ns": 1784289214313929873,
     "word_count": 241
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/genetics/poolManager.js": {
     "size": 3753,
-    "mtime_ns": 1783692739359598628,
+    "mtime_ns": 1784289214353950834,
     "word_count": 421
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/genetics/storageManager.js": {
     "size": 3562,
-    "mtime_ns": 1783692739323273595,
+    "mtime_ns": 1784289214315996988,
     "word_count": 296
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/modes/borderCollision.js": {
     "size": 1508,
-    "mtime_ns": 1783692739324282131,
+    "mtime_ns": 1784289214317126330,
     "word_count": 159
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/modes/simpleModeBehavior.js": {
     "size": 9474,
-    "mtime_ns": 1783692739351825495,
+    "mtime_ns": 1784289214345922842,
     "word_count": 705
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/modes/trafficFactory.js": {
     "size": 1673,
-    "mtime_ns": 1783692739346347283,
+    "mtime_ns": 1784289214340444796,
     "word_count": 203
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/modes/worldModeBehavior.js": {
     "size": 8150,
-    "mtime_ns": 1783692739355876678,
+    "mtime_ns": 1784289214349842358,
     "word_count": 574
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/rendering/carRenderer.js": {
     "size": 3384,
-    "mtime_ns": 1783692739341418594,
+    "mtime_ns": 1784289214335270359,
     "word_count": 466
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/rendering/layoutManager.js": {
@@ -542,232 +539,232 @@
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/templates/trainingInitModalTemplate.js": {
     "size": 5294,
-    "mtime_ns": 1783692739370545467,
+    "mtime_ns": 1784289214365211201,
     "word_count": 361
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/templates/trainingPanelTemplate.js": {
     "size": 8955,
-    "mtime_ns": 1783692739356398910,
+    "mtime_ns": 1784289214350675643,
     "word_count": 588
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/trainingInitModal.js": {
     "size": 11017,
-    "mtime_ns": 1783692739374500621,
+    "mtime_ns": 1784289214369674998,
     "word_count": 860
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/trainingPanel.js": {
-    "size": 30703,
-    "mtime_ns": 1783692739370085445,
+    "size": 30708,
+    "mtime_ns": 1784289214364611271,
     "word_count": 2330
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/training/trainingSimulator.js": {
-    "size": 9867,
-    "mtime_ns": 1783692739378443633,
-    "word_count": 752
+    "size": 9679,
+    "mtime_ns": 1784289214373929220,
+    "word_count": 735
   },
   "/Users/alex/Code/Self-driving-car/js/simulator/views/simulatorPageHost.js": {
     "size": 943,
-    "mtime_ns": 1783692739281978545,
+    "mtime_ns": 1784289214265681666,
     "word_count": 99
   },
   "/Users/alex/Code/Self-driving-car/js/store/entry.js": {
     "size": 246,
-    "mtime_ns": 1783692739397775397,
+    "mtime_ns": 1784289214409620710,
     "word_count": 16
   },
   "/Users/alex/Code/Self-driving-car/js/store/serialization.js": {
     "size": 300,
-    "mtime_ns": 1783692739060462300,
+    "mtime_ns": 1784289213985154159,
     "word_count": 39
   },
   "/Users/alex/Code/Self-driving-car/js/store/storeManager.js": {
     "size": 17378,
-    "mtime_ns": 1783692739245976086,
+    "mtime_ns": 1784289214234861874,
     "word_count": 1810
   },
   "/Users/alex/Code/Self-driving-car/js/store/storePanel.js": {
     "size": 12545,
-    "mtime_ns": 1783692739397249670,
+    "mtime_ns": 1784289214409103271,
     "word_count": 1011
   },
   "/Users/alex/Code/Self-driving-car/js/store/templates/storePanelTemplate.js": {
     "size": 2857,
-    "mtime_ns": 1783692739391386013,
+    "mtime_ns": 1784289214403710305,
     "word_count": 164
   },
   "/Users/alex/Code/Self-driving-car/js/store/types.js": {
     "size": 11,
-    "mtime_ns": 1783692739229216580,
+    "mtime_ns": 1784289214224065352,
     "word_count": 2
   },
   "/Users/alex/Code/Self-driving-car/js/traffic/entry.js": {
     "size": 3407,
-    "mtime_ns": 1783692739398432384,
+    "mtime_ns": 1784289214410271876,
     "word_count": 186
   },
   "/Users/alex/Code/Self-driving-car/js/utils.js": {
     "size": 191,
-    "mtime_ns": 1783692739061513228,
+    "mtime_ns": 1784289213986669078,
     "word_count": 20
   },
   "/Users/alex/Code/Self-driving-car/js/viewport/scaleIndicator.js": {
     "size": 3569,
-    "mtime_ns": 1783692739155771839,
+    "mtime_ns": 1784289214148355895,
     "word_count": 304
   },
   "/Users/alex/Code/Self-driving-car/js/viewport/viewport.js": {
-    "size": 9562,
-    "mtime_ns": 1783692739161578371,
-    "word_count": 1104
+    "size": 9602,
+    "mtime_ns": 1784289214155224461,
+    "word_count": 1109
   },
   "/Users/alex/Code/Self-driving-car/js/world/corridor.js": {
     "size": 3612,
-    "mtime_ns": 1783692739143104066,
+    "mtime_ns": 1784289214130316644,
     "word_count": 454
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/corridorEditor.js": {
-    "size": 6050,
-    "mtime_ns": 1783692739400750629,
-    "word_count": 559
+    "size": 5766,
+    "mtime_ns": 1784289214412381687,
+    "word_count": 550
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/crossingEditor.js": {
     "size": 864,
-    "mtime_ns": 1783692739337065627,
+    "mtime_ns": 1784289214330967409,
     "word_count": 101
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/graphEditor.js": {
-    "size": 10721,
-    "mtime_ns": 1783692739335236629,
-    "word_count": 1007
+    "size": 10906,
+    "mtime_ns": 1784289214328862070,
+    "word_count": 982
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/lightEditor.js": {
     "size": 2437,
-    "mtime_ns": 1783692739338879700,
+    "mtime_ns": 1784289214332770328,
     "word_count": 231
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/markingEditor.js": {
     "size": 5156,
-    "mtime_ns": 1783692739331825133,
+    "mtime_ns": 1784289214324979681,
     "word_count": 538
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/parkingEditor.js": {
     "size": 867,
-    "mtime_ns": 1783692739337672092,
+    "mtime_ns": 1784289214331653503,
     "word_count": 105
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/startEditor.js": {
     "size": 822,
-    "mtime_ns": 1783692739336580636,
+    "mtime_ns": 1784289214330232988,
     "word_count": 102
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/stopEditor.js": {
     "size": 807,
-    "mtime_ns": 1783692739335966013,
+    "mtime_ns": 1784289214329572618,
     "word_count": 102
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/targetEditor.js": {
     "size": 831,
-    "mtime_ns": 1783692739339555151,
+    "mtime_ns": 1784289214333348285,
     "word_count": 102
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/worldEditor.js": {
-    "size": 18358,
-    "mtime_ns": 1783692739407357459,
-    "word_count": 1562
+    "size": 14862,
+    "mtime_ns": 1784289214417064619,
+    "word_count": 1296
   },
   "/Users/alex/Code/Self-driving-car/js/world/editors/yieldEditor.js": {
     "size": 822,
-    "mtime_ns": 1783692739340170232,
+    "mtime_ns": 1784289214333872910,
     "word_count": 102
   },
   "/Users/alex/Code/Self-driving-car/js/world/entry.js": {
-    "size": 2644,
-    "mtime_ns": 1783692739409055248,
-    "word_count": 156
+    "size": 2681,
+    "mtime_ns": 1784289214417976201,
+    "word_count": 158
   },
   "/Users/alex/Code/Self-driving-car/js/world/generation/worldGenerator.js": {
     "size": 8987,
-    "mtime_ns": 1783692739308821141,
+    "mtime_ns": 1784289214305112250,
     "word_count": 984
   },
   "/Users/alex/Code/Self-driving-car/js/world/items/building.js": {
     "size": 4995,
-    "mtime_ns": 1783692739147809606,
+    "mtime_ns": 1784289214136027062,
     "word_count": 546
   },
   "/Users/alex/Code/Self-driving-car/js/world/items/tree.js": {
     "size": 8418,
-    "mtime_ns": 1783692739153010053,
+    "mtime_ns": 1784289214145905652,
     "word_count": 1027
   },
   "/Users/alex/Code/Self-driving-car/js/world/loader/worldLoader.js": {
     "size": 3010,
-    "mtime_ns": 1783692739230639467,
+    "mtime_ns": 1784289214225861085,
     "word_count": 351
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/crossing.js": {
     "size": 987,
-    "mtime_ns": 1783692739293014628,
+    "mtime_ns": 1784289214286762921,
     "word_count": 91
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/light.js": {
     "size": 3656,
-    "mtime_ns": 1783692739296128684,
+    "mtime_ns": 1784289214292129261,
     "word_count": 422
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/marking.js": {
     "size": 4600,
-    "mtime_ns": 1783692739140052704,
+    "mtime_ns": 1784289214125939148,
     "word_count": 506
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/markingLoader.js": {
     "size": 1947,
-    "mtime_ns": 1783692739301877809,
+    "mtime_ns": 1784289214298168101,
     "word_count": 188
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/parking.js": {
     "size": 1076,
-    "mtime_ns": 1783692739294224835,
+    "mtime_ns": 1784289214288324280,
     "word_count": 98
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/start.js": {
     "size": 2310,
-    "mtime_ns": 1783692739297290479,
+    "mtime_ns": 1784289214293277543,
     "word_count": 301
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/stop.js": {
     "size": 999,
-    "mtime_ns": 1783692739298571402,
+    "mtime_ns": 1784289214294350146,
     "word_count": 95
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/target.js": {
     "size": 501,
-    "mtime_ns": 1783692739300609304,
+    "mtime_ns": 1784289214296850149,
     "word_count": 59
   },
   "/Users/alex/Code/Self-driving-car/js/world/markings/yield.js": {
     "size": 1002,
-    "mtime_ns": 1783692739299807764,
+    "mtime_ns": 1784289214295742508,
     "word_count": 95
   },
   "/Users/alex/Code/Self-driving-car/js/world/simple/simpleWorld.js": {
     "size": 3825,
-    "mtime_ns": 1783692739345179135,
+    "mtime_ns": 1784289214339033616,
     "word_count": 424
   },
   "/Users/alex/Code/Self-driving-car/js/world/trafficManager.js": {
     "size": 5164,
-    "mtime_ns": 1783692739304171041,
+    "mtime_ns": 1784289214300468106,
     "word_count": 541
   },
   "/Users/alex/Code/Self-driving-car/js/world/types.js": {
     "size": 163,
-    "mtime_ns": 1783692739164448346,
+    "mtime_ns": 1784289214161304672,
     "word_count": 18
   },
   "/Users/alex/Code/Self-driving-car/js/world/world.js": {
     "size": 14148,
-    "mtime_ns": 1783692739318602045,
+    "mtime_ns": 1784289214311164999,
     "word_count": 1386
   },
   "/Users/alex/Code/Self-driving-car/package.json": {
@@ -1102,14 +1099,14 @@
     "word_count": 148
   },
   "/Users/alex/Code/Self-driving-car/ts/car/brain/carBrainAdapter.ts": {
-    "size": 2120,
-    "mtime_ns": 1783688773119516141,
-    "word_count": 263
+    "size": 3004,
+    "mtime_ns": 1784288892715628153,
+    "word_count": 358
   },
   "/Users/alex/Code/Self-driving-car/ts/car/car.ts": {
-    "size": 8249,
-    "mtime_ns": 1783688773119953505,
-    "word_count": 736
+    "size": 15167,
+    "mtime_ns": 1784288892716180873,
+    "word_count": 1454
   },
   "/Users/alex/Code/Self-driving-car/ts/car/carState.ts": {
     "size": 383,
@@ -1117,24 +1114,24 @@
     "word_count": 45
   },
   "/Users/alex/Code/Self-driving-car/ts/car/config.ts": {
-    "size": 387,
-    "mtime_ns": 1783346881748577865,
-    "word_count": 49
+    "size": 463,
+    "mtime_ns": 1783784856426237135,
+    "word_count": 59
   },
   "/Users/alex/Code/Self-driving-car/ts/car/controls/cameraControls.ts": {
-    "size": 7346,
-    "mtime_ns": 1783346881749603108,
-    "word_count": 775
+    "size": 7435,
+    "mtime_ns": 1783784856308800840,
+    "word_count": 778
   },
   "/Users/alex/Code/Self-driving-car/ts/car/controls/controls.ts": {
-    "size": 2281,
-    "mtime_ns": 1783346881750223446,
-    "word_count": 253
+    "size": 2377,
+    "mtime_ns": 1784288892716551577,
+    "word_count": 264
   },
   "/Users/alex/Code/Self-driving-car/ts/car/controls/markerDetector.ts": {
-    "size": 4455,
-    "mtime_ns": 1783346881750958166,
-    "word_count": 536
+    "size": 4461,
+    "mtime_ns": 1783784852528520298,
+    "word_count": 533
   },
   "/Users/alex/Code/Self-driving-car/ts/car/controls/phoneControls.ts": {
     "size": 3280,
@@ -1147,24 +1144,24 @@
     "word_count": 680
   },
   "/Users/alex/Code/Self-driving-car/ts/car/physics/carPhysics.ts": {
-    "size": 3492,
-    "mtime_ns": 1783350292063427124,
-    "word_count": 449
+    "size": 3486,
+    "mtime_ns": 1783784713358600064,
+    "word_count": 448
   },
   "/Users/alex/Code/Self-driving-car/ts/car/physics/sensorRaycaster.ts": {
-    "size": 4123,
-    "mtime_ns": 1783688773120918981,
-    "word_count": 499
+    "size": 3605,
+    "mtime_ns": 1783785115138852684,
+    "word_count": 429
   },
   "/Users/alex/Code/Self-driving-car/ts/car/rendering/carRenderer.ts": {
-    "size": 3456,
-    "mtime_ns": 1783346881754782486,
-    "word_count": 332
+    "size": 3584,
+    "mtime_ns": 1783785558455210236,
+    "word_count": 361
   },
   "/Users/alex/Code/Self-driving-car/ts/car/sensors/sensor.ts": {
-    "size": 7221,
-    "mtime_ns": 1783688773121534665,
-    "word_count": 722
+    "size": 7087,
+    "mtime_ns": 1783785058308698005,
+    "word_count": 669
   },
   "/Users/alex/Code/Self-driving-car/ts/car/sensors/sensorReading.ts": {
     "size": 194,
@@ -1172,9 +1169,9 @@
     "word_count": 26
   },
   "/Users/alex/Code/Self-driving-car/ts/math/collision.ts": {
-    "size": 607,
-    "mtime_ns": 1783350032761400114,
-    "word_count": 98
+    "size": 1111,
+    "mtime_ns": 1783785038145736854,
+    "word_count": 174
   },
   "/Users/alex/Code/Self-driving-car/ts/math/color.ts": {
     "size": 332,
@@ -1182,19 +1179,19 @@
     "word_count": 58
   },
   "/Users/alex/Code/Self-driving-car/ts/math/graph/graph.ts": {
-    "size": 6815,
-    "mtime_ns": 1783346881756408829,
-    "word_count": 713
+    "size": 6484,
+    "mtime_ns": 1783784374719291579,
+    "word_count": 678
   },
   "/Users/alex/Code/Self-driving-car/ts/math/heatmapGrid.ts": {
-    "size": 2860,
-    "mtime_ns": 1783368909415822454,
-    "word_count": 415
+    "size": 2932,
+    "mtime_ns": 1783784398104236724,
+    "word_count": 421
   },
   "/Users/alex/Code/Self-driving-car/ts/math/osm-importer/osm.ts": {
-    "size": 5509,
-    "mtime_ns": 1783346881757168473,
-    "word_count": 777
+    "size": 5540,
+    "mtime_ns": 1783784121797436214,
+    "word_count": 782
   },
   "/Users/alex/Code/Self-driving-car/ts/math/primitives/envelope.ts": {
     "size": 1565,
@@ -1227,9 +1224,9 @@
     "word_count": 636
   },
   "/Users/alex/Code/Self-driving-car/ts/math/utils.ts": {
-    "size": 7131,
-    "mtime_ns": 1783346881761514153,
-    "word_count": 1094
+    "size": 5498,
+    "mtime_ns": 1783784139370910077,
+    "word_count": 905
   },
   "/Users/alex/Code/Self-driving-car/ts/mini-map/miniMap.ts": {
     "size": 4024,
@@ -1237,14 +1234,14 @@
     "word_count": 417
   },
   "/Users/alex/Code/Self-driving-car/ts/neural-network/network.ts": {
-    "size": 7786,
-    "mtime_ns": 1783449790078176684,
-    "word_count": 962
+    "size": 13616,
+    "mtime_ns": 1784288892717219170,
+    "word_count": 1845
   },
   "/Users/alex/Code/Self-driving-car/ts/neural-network/visualizer.ts": {
-    "size": 28656,
-    "mtime_ns": 1783692537632065725,
-    "word_count": 3776
+    "size": 29373,
+    "mtime_ns": 1784288892717755011,
+    "word_count": 3858
   },
   "/Users/alex/Code/Self-driving-car/ts/panels/assetSelectors.ts": {
     "size": 7739,
@@ -1257,9 +1254,9 @@
     "word_count": 349
   },
   "/Users/alex/Code/Self-driving-car/ts/panels/shortcutsToolbar.ts": {
-    "size": 5156,
-    "mtime_ns": 1783346881766345914,
-    "word_count": 607
+    "size": 4538,
+    "mtime_ns": 1784110748475190121,
+    "word_count": 569
   },
   "/Users/alex/Code/Self-driving-car/ts/panels/templates/shortcutsToolbarTemplate.ts": {
     "size": 365,
@@ -1272,14 +1269,14 @@
     "word_count": 52
   },
   "/Users/alex/Code/Self-driving-car/ts/panels/templates/worldToolbarTemplate.ts": {
-    "size": 5554,
-    "mtime_ns": 1783346881768268103,
+    "size": 5652,
+    "mtime_ns": 1784110734470495976,
     "word_count": 338
   },
   "/Users/alex/Code/Self-driving-car/ts/panels/worldLayersToolbar.ts": {
-    "size": 7307,
-    "mtime_ns": 1783371728399304320,
-    "word_count": 733
+    "size": 7864,
+    "mtime_ns": 1784110750789638768,
+    "word_count": 778
   },
   "/Users/alex/Code/Self-driving-car/ts/panels/worldToolbar.ts": {
     "size": 3190,
@@ -1288,7 +1285,7 @@
   },
   "/Users/alex/Code/Self-driving-car/ts/race/entry.ts": {
     "size": 5315,
-    "mtime_ns": 1783346881770342066,
+    "mtime_ns": 1784060238948234615,
     "word_count": 361
   },
   "/Users/alex/Code/Self-driving-car/ts/rendering/envelopeRenderer.ts": {
@@ -1317,9 +1314,9 @@
     "word_count": 64
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/core/simulatorShell.ts": {
-    "size": 11986,
-    "mtime_ns": 1783691635612176268,
-    "word_count": 1304
+    "size": 12115,
+    "mtime_ns": 1784288892718807565,
+    "word_count": 1322
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/entry.ts": {
     "size": 4293,
@@ -1327,8 +1324,8 @@
     "word_count": 239
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/panels/animationLoopToolbar.ts": {
-    "size": 4397,
-    "mtime_ns": 1783689545292232087,
+    "size": 4402,
+    "mtime_ns": 1783784118317724745,
     "word_count": 447
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/panels/layoutToolbar.ts": {
@@ -1337,13 +1334,13 @@
     "word_count": 451
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/panels/templates/animationLoopToolbarTemplate.ts": {
-    "size": 1809,
-    "mtime_ns": 1783346881776006006,
+    "size": 1844,
+    "mtime_ns": 1784110745093964598,
     "word_count": 123
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/panels/templates/layoutToolbarTemplate.ts": {
-    "size": 1346,
-    "mtime_ns": 1783371732480180438,
+    "size": 1381,
+    "mtime_ns": 1784110739698485883,
     "word_count": 86
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/racing/racePanel.ts": {
@@ -1372,14 +1369,14 @@
     "word_count": 82
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/traffic/trafficPanel.ts": {
-    "size": 8568,
-    "mtime_ns": 1783346881780036153,
+    "size": 8573,
+    "mtime_ns": 1783784121408317075,
     "word_count": 998
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/traffic/trafficSimulator.ts": {
-    "size": 19389,
-    "mtime_ns": 1783691648707215603,
-    "word_count": 2132
+    "size": 18458,
+    "mtime_ns": 1784052405019858794,
+    "word_count": 2009
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/trafficControlUtils.ts": {
     "size": 2119,
@@ -1442,14 +1439,14 @@
     "word_count": 991
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingPanel.ts": {
-    "size": 30185,
-    "mtime_ns": 1783689647771574241,
+    "size": 30190,
+    "mtime_ns": 1783784126550750658,
     "word_count": 2661
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/training/trainingSimulator.ts": {
-    "size": 10026,
-    "mtime_ns": 1783427809156050025,
-    "word_count": 922
+    "size": 9812,
+    "mtime_ns": 1784052423108304210,
+    "word_count": 901
   },
   "/Users/alex/Code/Self-driving-car/ts/simulator/views/simulatorPageHost.ts": {
     "size": 1492,
@@ -1502,9 +1499,9 @@
     "word_count": 364
   },
   "/Users/alex/Code/Self-driving-car/ts/viewport/viewport.ts": {
-    "size": 10007,
-    "mtime_ns": 1783346881794899942,
-    "word_count": 1242
+    "size": 10047,
+    "mtime_ns": 1783784111417349407,
+    "word_count": 1247
   },
   "/Users/alex/Code/Self-driving-car/ts/world/corridor.ts": {
     "size": 4438,
@@ -1512,9 +1509,9 @@
     "word_count": 583
   },
   "/Users/alex/Code/Self-driving-car/ts/world/editors/corridorEditor.ts": {
-    "size": 6206,
-    "mtime_ns": 1783346881796219516,
-    "word_count": 646
+    "size": 5803,
+    "mtime_ns": 1784052405478516094,
+    "word_count": 625
   },
   "/Users/alex/Code/Self-driving-car/ts/world/editors/crossingEditor.ts": {
     "size": 1079,
@@ -1522,9 +1519,9 @@
     "word_count": 132
   },
   "/Users/alex/Code/Self-driving-car/ts/world/editors/graphEditor.ts": {
-    "size": 10696,
-    "mtime_ns": 1783346881797408969,
-    "word_count": 1132
+    "size": 10352,
+    "mtime_ns": 1784052405507696624,
+    "word_count": 1093
   },
   "/Users/alex/Code/Self-driving-car/ts/world/editors/lightEditor.ts": {
     "size": 2540,
@@ -1557,9 +1554,9 @@
     "word_count": 133
   },
   "/Users/alex/Code/Self-driving-car/ts/world/editors/worldEditor.ts": {
-    "size": 18982,
-    "mtime_ns": 1783371791948747157,
-    "word_count": 1754
+    "size": 15570,
+    "mtime_ns": 1784113036321255113,
+    "word_count": 1461
   },
   "/Users/alex/Code/Self-driving-car/ts/world/editors/yieldEditor.ts": {
     "size": 1031,
@@ -1567,9 +1564,9 @@
     "word_count": 133
   },
   "/Users/alex/Code/Self-driving-car/ts/world/entry.ts": {
-    "size": 2707,
-    "mtime_ns": 1783346881802262526,
-    "word_count": 164
+    "size": 2744,
+    "mtime_ns": 1784113036321580823,
+    "word_count": 166
   },
   "/Users/alex/Code/Self-driving-car/ts/world/generation/worldGenerator.ts": {
     "size": 9710,
@@ -1647,9 +1644,9 @@
     "word_count": 612
   },
   "/Users/alex/Code/Self-driving-car/ts/world/types.ts": {
-    "size": 3082,
-    "mtime_ns": 1783353426281232182,
-    "word_count": 367
+    "size": 3239,
+    "mtime_ns": 1784113036322025433,
+    "word_count": 391
   },
   "/Users/alex/Code/Self-driving-car/ts/world/world.ts": {
     "size": 14119,
@@ -1661,5 +1658,198 @@
     "mtime_ns": 1783346881813617785,
     "word_count": 1446,
     "hash": "542a3f30f5c263d3077523f82202c4094b1a17fa0bdce6ac8c3d3229029b2fe7"
+  },
+  "/Users/alex/Code/Self-driving-car/.opencode/agents/architect.md": {
+    "size": 6606,
+    "mtime_ns": 1784052395813556975,
+    "word_count": 878,
+    "hash": "7262d5f3bc35a15e18d16cc74946caf46517dcd73fac35fb9bc3949eb1ca1eb4"
+  },
+  "/Users/alex/Code/Self-driving-car/.opencode/agents/planner.md": {
+    "size": 3696,
+    "mtime_ns": 1784122453935372067,
+    "word_count": 518,
+    "hash": "dd2f33945deef18ed5a8740abb9f087849c80d6cdd050f5f191ccf2530be3f96"
+  },
+  "/Users/alex/Code/Self-driving-car/.opencode/agents/reviewer.md": {
+    "size": 5511,
+    "mtime_ns": 1784122453968152934,
+    "word_count": 887,
+    "hash": "6b02a4fd399921f15e1e52e84b84bcc11e59a72b597925462a4fc9e4a281ec2c"
+  },
+  "/Users/alex/Code/Self-driving-car/.opencode/package.json": {
+    "size": 65,
+    "mtime_ns": 1783783257869153313,
+    "word_count": 7,
+    "hash": "94c4ed5e269aa15c6f29bfcb0a9d6ae43b49ebf1ac7213ae914aa4b4e2829dbc"
+  },
+  "/Users/alex/Code/Self-driving-car/.opencode/skills/docs-sync/SKILL.md": {
+    "size": 6206,
+    "mtime_ns": 1784122454078786383,
+    "word_count": 892,
+    "hash": "471f2d1c4b75a229d3eeecdec054e2c93ba48ccd98f57d975170aa1770690def"
+  },
+  "/Users/alex/Code/Self-driving-car/.opencode/skills/task-planning/SKILL.md": {
+    "size": 12581,
+    "mtime_ns": 1784122454138221299,
+    "word_count": 1947,
+    "hash": "54e0dfb5cd66b0409a9e6e21fb77cad607971e5dc9a633b37f85078fac8df347"
+  },
+  "/Users/alex/Code/Self-driving-car/DESIGN.md": {
+    "size": 21743,
+    "mtime_ns": 1784113036317073766,
+    "word_count": 2924,
+    "hash": "44841a3e095eed8fdfdbd2e39c4596ac67455b4ff277128a331cf9bf1c55a626"
+  },
+  "/Users/alex/Code/Self-driving-car/docs/Keyboard.md": {
+    "size": 9079,
+    "mtime_ns": 1784289213253215601,
+    "word_count": 875,
+    "hash": "4170bd761680f246b8f2f688366db625f99a8a2411942cbb70c553228ce6f53a"
+  },
+  "/Users/alex/Code/Self-driving-car/html/human-training.html": {
+    "size": 1009,
+    "mtime_ns": 1784288892706979398,
+    "word_count": 53
+  },
+  "/Users/alex/Code/Self-driving-car/js/math/worldUnits.js": {
+    "size": 1208,
+    "mtime_ns": 1784289214149660737,
+    "word_count": 122
+  },
+  "/Users/alex/Code/Self-driving-car/js/panels/editorToolbar.js": {
+    "size": 1007,
+    "mtime_ns": 1784289214241935247,
+    "word_count": 67
+  },
+  "/Users/alex/Code/Self-driving-car/js/panels/keyboardManager.js": {
+    "size": 5957,
+    "mtime_ns": 1784289214248741478,
+    "word_count": 537
+  },
+  "/Users/alex/Code/Self-driving-car/js/panels/latchedToggle.js": {
+    "size": 1017,
+    "mtime_ns": 1784289214245917404,
+    "word_count": 126
+  },
+  "/Users/alex/Code/Self-driving-car/js/panels/templates/editorToolbarTemplate.js": {
+    "size": 1947,
+    "mtime_ns": 1784289214239637191,
+    "word_count": 165
+  },
+  "/Users/alex/Code/Self-driving-car/js/simulator/humanTraining/entry.js": {
+    "size": 4201,
+    "mtime_ns": 1784289214392159947,
+    "word_count": 204
+  },
+  "/Users/alex/Code/Self-driving-car/js/simulator/humanTraining/humanBackpropSimulator.js": {
+    "size": 24046,
+    "mtime_ns": 1784289214391279016,
+    "word_count": 1768
+  },
+  "/Users/alex/Code/Self-driving-car/js/simulator/humanTraining/humanTrainingConfigModal.js": {
+    "size": 4970,
+    "mtime_ns": 1784289214381895216,
+    "word_count": 332
+  },
+  "/Users/alex/Code/Self-driving-car/js/simulator/humanTraining/humanTrainingPanel.js": {
+    "size": 6254,
+    "mtime_ns": 1784289214378344767,
+    "word_count": 466
+  },
+  "/Users/alex/Code/Self-driving-car/js/simulator/humanTraining/templates/humanTrainingConfigModalTemplate.js": {
+    "size": 2751,
+    "mtime_ns": 1784289214379193787,
+    "word_count": 193
+  },
+  "/Users/alex/Code/Self-driving-car/js/simulator/humanTraining/templates/humanTrainingPanelTemplate.js": {
+    "size": 4638,
+    "mtime_ns": 1784289214375235999,
+    "word_count": 403
+  },
+  "/Users/alex/Code/Self-driving-car/tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md": {
+    "size": 10155,
+    "mtime_ns": 1783710849157722262,
+    "word_count": 1187,
+    "hash": "a50ebf2bc81d3d973df1ef88fd01f3e51d9e63170ba0fa995f3e96f6bf98f6fc"
+  },
+  "/Users/alex/Code/Self-driving-car/tasks/archive/20260711-architech-audit/architecture-fixes.md": {
+    "size": 5889,
+    "mtime_ns": 1783783976971135832,
+    "word_count": 766,
+    "hash": "37aa40036b03d95ac17dc29ab6c9197efbaf7aa8f5186347621adaec8ef336ed"
+  },
+  "/Users/alex/Code/Self-driving-car/tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes-r2.md": {
+    "size": 16642,
+    "mtime_ns": 1784288892714374645,
+    "word_count": 2084,
+    "hash": "3b2985fec86c972f1597defd2ffb6fac8ce1e8b9ac0c57fa7a18adfce0d75beb"
+  },
+  "/Users/alex/Code/Self-driving-car/tasks/archive/20260716-human-backprop-bugfixes/human-backprop-bugfixes.md": {
+    "size": 28127,
+    "mtime_ns": 1784288892714765211,
+    "word_count": 3386,
+    "hash": "383d18afef141878e8f54e66bd44aff5b440e3830f9e04fcfe6e842f084e98f8"
+  },
+  "/Users/alex/Code/Self-driving-car/tasks/archive/20260716-human-backprop-bugfixes/human-backpropagation-training.md": {
+    "size": 38832,
+    "mtime_ns": 1784288892715207188,
+    "word_count": 4398,
+    "hash": "a1162e4800d8ffd3e620ded34d0c66a437ccb6b23ae2b2dcfe427913017be64a"
+  },
+  "/Users/alex/Code/Self-driving-car/ts/math/worldUnits.ts": {
+    "size": 1326,
+    "mtime_ns": 1783784102691398055,
+    "word_count": 139
+  },
+  "/Users/alex/Code/Self-driving-car/ts/panels/editorToolbar.ts": {
+    "size": 1190,
+    "mtime_ns": 1784113036320539047,
+    "word_count": 97
+  },
+  "/Users/alex/Code/Self-driving-car/ts/panels/keyboardManager.ts": {
+    "size": 6554,
+    "mtime_ns": 1784288892718172543,
+    "word_count": 704
+  },
+  "/Users/alex/Code/Self-driving-car/ts/panels/latchedToggle.ts": {
+    "size": 1048,
+    "mtime_ns": 1784052146271680021,
+    "word_count": 143
+  },
+  "/Users/alex/Code/Self-driving-car/ts/panels/templates/editorToolbarTemplate.ts": {
+    "size": 1947,
+    "mtime_ns": 1784113036320834812,
+    "word_count": 165
+  },
+  "/Users/alex/Code/Self-driving-car/ts/simulator/humanTraining/entry.ts": {
+    "size": 4411,
+    "mtime_ns": 1784288892719209645,
+    "word_count": 222
+  },
+  "/Users/alex/Code/Self-driving-car/ts/simulator/humanTraining/humanBackpropSimulator.ts": {
+    "size": 23440,
+    "mtime_ns": 1784288892719597171,
+    "word_count": 2000
+  },
+  "/Users/alex/Code/Self-driving-car/ts/simulator/humanTraining/humanTrainingConfigModal.ts": {
+    "size": 5298,
+    "mtime_ns": 1784288892720030586,
+    "word_count": 406
+  },
+  "/Users/alex/Code/Self-driving-car/ts/simulator/humanTraining/humanTrainingPanel.ts": {
+    "size": 6561,
+    "mtime_ns": 1784288892720434251,
+    "word_count": 618
+  },
+  "/Users/alex/Code/Self-driving-car/ts/simulator/humanTraining/templates/humanTrainingConfigModalTemplate.ts": {
+    "size": 2751,
+    "mtime_ns": 1784288892720987766,
+    "word_count": 193
+  },
+  "/Users/alex/Code/Self-driving-car/ts/simulator/humanTraining/templates/humanTrainingPanelTemplate.ts": {
+    "size": 4638,
+    "mtime_ns": 1784288892721428779,
+    "word_count": 403
   }
 }

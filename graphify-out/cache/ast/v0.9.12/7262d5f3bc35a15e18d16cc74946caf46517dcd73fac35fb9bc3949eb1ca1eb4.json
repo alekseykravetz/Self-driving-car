@@ -1,0 +1,207 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "label": "architect.md",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_workflow",
+      "label": "Workflow",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L21"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_1_core_architectural_constraints_to_enforce",
+      "label": "1. Core Architectural Constraints to Enforce",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L31"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_2_structural_folder_boundary_auditing_fsd_atomic_design",
+      "label": "2. Structural & Folder Boundary Auditing (FSD & Atomic Design)",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L42"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_3_design_pattern_evaluation",
+      "label": "3. Design Pattern Evaluation",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L51"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_desired_patterns_good",
+      "label": "Desired Patterns (Good)",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L53"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_anti_patterns_to_flag_bad",
+      "label": "Anti-Patterns to Flag (Bad)",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L61"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_4_code_standards_style_adherence",
+      "label": "4. Code Standards & Style Adherence",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L68"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_5_output_reporting_schema",
+      "label": "5. Output Reporting Schema",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L76"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_architectural_violations_concerns",
+      "label": "Architectural Violations & Concerns",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L80"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_commendable_implementations",
+      "label": "Commendable Implementations",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L87"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_structural_reorganization_recommendations",
+      "label": "Structural Reorganization Recommendations",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L91"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_architect_graphify_usage",
+      "label": "Graphify Usage",
+      "file_type": "document",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L95"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_workflow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_1_core_architectural_constraints_to_enforce",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_2_structural_folder_boundary_auditing_fsd_atomic_design",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_3_design_pattern_evaluation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_3_design_pattern_evaluation",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_desired_patterns_good",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_3_design_pattern_evaluation",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_anti_patterns_to_flag_bad",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_4_code_standards_style_adherence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_5_output_reporting_schema",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_5_output_reporting_schema",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_architectural_violations_concerns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_5_output_reporting_schema",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_commendable_implementations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_5_output_reporting_schema",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_structural_reorganization_recommendations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_architect_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_architect_graphify_usage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/architect.md",
+      "source_location": "L95",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

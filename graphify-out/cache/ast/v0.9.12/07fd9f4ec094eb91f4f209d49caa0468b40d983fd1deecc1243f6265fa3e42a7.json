@@ -1,0 +1,415 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_md",
+      "label": "Viewport.md",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "label": "Viewport System",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_class_structure",
+      "label": "Class Structure",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_coordinate_system",
+      "label": "Coordinate System",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L51"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_world_space",
+      "label": "World Space",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L53"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_screen_space",
+      "label": "Screen Space",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L59"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_transformation_formula",
+      "label": "Transformation Formula",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L64"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_reset_per_frame_transform_application",
+      "label": "Reset (Per-Frame Transform Application)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L81"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_mouse_world_coordinate_conversion",
+      "label": "Mouse \u2192 World Coordinate Conversion",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L106"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_pan_middle_click_drag",
+      "label": "Pan (Middle-Click Drag)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L125"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_mouse_down_initiate_pan",
+      "label": "Mouse Down (initiate pan)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L127"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_mouse_move_update_offset_during_drag",
+      "label": "Mouse Move (update offset during drag)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L138"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_mouse_up_finalize_pan",
+      "label": "Mouse Up (finalize pan)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L149"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_zoom_scroll_wheel",
+      "label": "Zoom (Scroll Wheel)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L164"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_event_listener_setup",
+      "label": "Event Listener Setup",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L187"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_viewport_in_simulator_auto_tracking",
+      "label": "Viewport in Simulator (Auto-Tracking)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L203"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_viewport_state_persistence",
+      "label": "Viewport State Persistence",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L219"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_mini_map_ts_mini_map_minimap_ts",
+      "label": "Mini-Map (`ts/mini-map/miniMap.ts`)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L239"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_class_structure_241",
+      "label": "Class Structure",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L241"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_rendering",
+      "label": "Rendering",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L278"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_usage_in_simulator",
+      "label": "Usage in Simulator",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L314"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_usage_in_race",
+      "label": "Usage in Race",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L323"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_scale_indicator_ts_viewport_scaleindicator_ts",
+      "label": "Scale Indicator (`ts/viewport/scaleIndicator.ts`)",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L336"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_class_structure_340",
+      "label": "Class Structure",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L340"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_display_modes",
+      "label": "Display Modes",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L374"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_viewport_integration",
+      "label": "Integration",
+      "file_type": "document",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L393"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_md",
+      "target": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_class_structure",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_coordinate_system",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_coordinate_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_world_space",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_coordinate_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_screen_space",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_coordinate_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_transformation_formula",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_reset_per_frame_transform_application",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_mouse_world_coordinate_conversion",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_pan_middle_click_drag",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_pan_middle_click_drag",
+      "target": "users_alex_code_self_driving_car_docs_viewport_mouse_down_initiate_pan",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_pan_middle_click_drag",
+      "target": "users_alex_code_self_driving_car_docs_viewport_mouse_move_update_offset_during_drag",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_pan_middle_click_drag",
+      "target": "users_alex_code_self_driving_car_docs_viewport_mouse_up_finalize_pan",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L149",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_zoom_scroll_wheel",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L164",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_event_listener_setup",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L187",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_viewport_in_simulator_auto_tracking",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L203",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_viewport_state_persistence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L219",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_mini_map_ts_mini_map_minimap_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L239",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_mini_map_ts_mini_map_minimap_ts",
+      "target": "users_alex_code_self_driving_car_docs_viewport_class_structure_241",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L241",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_mini_map_ts_mini_map_minimap_ts",
+      "target": "users_alex_code_self_driving_car_docs_viewport_rendering",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L278",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_mini_map_ts_mini_map_minimap_ts",
+      "target": "users_alex_code_self_driving_car_docs_viewport_usage_in_simulator",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L314",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_mini_map_ts_mini_map_minimap_ts",
+      "target": "users_alex_code_self_driving_car_docs_viewport_usage_in_race",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L323",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_viewport_system",
+      "target": "users_alex_code_self_driving_car_docs_viewport_scale_indicator_ts_viewport_scaleindicator_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L336",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_scale_indicator_ts_viewport_scaleindicator_ts",
+      "target": "users_alex_code_self_driving_car_docs_viewport_class_structure_340",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L340",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_scale_indicator_ts_viewport_scaleindicator_ts",
+      "target": "users_alex_code_self_driving_car_docs_viewport_display_modes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L374",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_viewport_scale_indicator_ts_viewport_scaleindicator_ts",
+      "target": "users_alex_code_self_driving_car_docs_viewport_integration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Viewport.md",
+      "source_location": "L393",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

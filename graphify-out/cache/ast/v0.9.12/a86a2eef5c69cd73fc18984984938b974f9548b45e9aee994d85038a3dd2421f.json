@@ -1,0 +1,255 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_md",
+      "label": "ai_architect_audit_report.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_ai_architecture_audit_report_self_driving_car_simulator",
+      "label": "AI Architecture Audit Report \u2014 Self-Driving Car Simulator",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "label": "1. Architectural Violations & Concerns",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_critical_circular_dependencies",
+      "label": "CRITICAL: Circular Dependencies",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L5"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_critical_layer_2_upward_import_layer_boundary_violation",
+      "label": "CRITICAL: Layer 2 Upward Import (Layer Boundary Violation)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_moderate_god_object_car",
+      "label": "MODERATE: God Object \u2014 `Car`",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L15"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_moderate_audio_leakage_into_entity_layer",
+      "label": "MODERATE: Audio Leakage into Entity Layer",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L19"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_moderate_missing_encapsulation_in_physics",
+      "label": "MODERATE: Missing Encapsulation in Physics",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L23"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_minor_magic_numbers_spread",
+      "label": "MINOR: Magic Numbers Spread",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L27"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_minor_inconsistent_private_field_usage",
+      "label": "MINOR: Inconsistent Private Field Usage",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L33"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_minor_misc_ts_utils_ts_bag",
+      "label": "MINOR: Misc `ts/utils.ts` Bag",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L37"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_2_commendable_implementations",
+      "label": "2. Commendable Implementations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L43"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_3_structural_reorganization_recommendations",
+      "label": "3. Structural Reorganization Recommendations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L61"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_immediate_priority",
+      "label": "Immediate Priority",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L63"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_medium_priority",
+      "label": "Medium Priority",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L72"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_low_priority_nice_to_have",
+      "label": "Low Priority / Nice-to-Have",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L82"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_ai_architecture_audit_report_self_driving_car_simulator",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_ai_architecture_audit_report_self_driving_car_simulator",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_critical_circular_dependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_critical_layer_2_upward_import_layer_boundary_violation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_moderate_god_object_car",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_moderate_audio_leakage_into_entity_layer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_moderate_missing_encapsulation_in_physics",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_minor_magic_numbers_spread",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_minor_inconsistent_private_field_usage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_1_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_minor_misc_ts_utils_ts_bag",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_ai_architecture_audit_report_self_driving_car_simulator",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_2_commendable_implementations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_ai_architecture_audit_report_self_driving_car_simulator",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_3_structural_reorganization_recommendations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_3_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_immediate_priority",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_3_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_medium_priority",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L72",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_3_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_circular_dependencies_ai_architect_audit_report_low_priority_nice_to_have",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-circular-dependencies/ai_architect_audit_report.md",
+      "source_location": "L82",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

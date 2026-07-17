@@ -1,0 +1,223 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_md",
+      "label": "auto-regenerate-items-toggle.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_task_auto_regenerate_items_toggle_in_world_editor",
+      "label": "Task \u2014 Auto-Regenerate Items Toggle in World Editor",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_background",
+      "label": "Background",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "label": "What changes",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L32"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_1_world_layers_toolbar_button_becomes_a_toggle",
+      "label": "1. `<world-layers-toolbar>` \u2014 Button becomes a toggle",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L34"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2_worldeditor_wire_toggle_into_the_draw_loop",
+      "label": "2. `WorldEditor` \u2014 Wire toggle into the draw loop",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L70"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2a_new_field",
+      "label": "2a. New field",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L74"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2b_change_callback_registration_in_addeventlisteners_line_287",
+      "label": "2b. Change callback registration (in `#addEventListeners`, line ~287)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L80"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2c_modify_the_draw_loop_lines_500_510",
+      "label": "2c. Modify the `draw()` loop (lines 500\u2013510)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L95"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2d_regenerateitems_stays_as_is_lines_484_493",
+      "label": "2d. `regenerateItems()` stays as-is (lines 484\u2013493)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L140"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_3_css_toggle_visual_style_for_the_regenerate_button",
+      "label": "3. CSS \u2014 Toggle visual style for the regenerate button",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L147"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_4_edge_cases",
+      "label": "4. Edge cases",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L170"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_5_files_changed",
+      "label": "5. Files changed",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L185"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_6_implementation_order",
+      "label": "6. Implementation order",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L198"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_task_auto_regenerate_items_toggle_in_world_editor",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_task_auto_regenerate_items_toggle_in_world_editor",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_background",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_task_auto_regenerate_items_toggle_in_world_editor",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_1_world_layers_toolbar_button_becomes_a_toggle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2_worldeditor_wire_toggle_into_the_draw_loop",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2_worldeditor_wire_toggle_into_the_draw_loop",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2a_new_field",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L74",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2_worldeditor_wire_toggle_into_the_draw_loop",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2b_change_callback_registration_in_addeventlisteners_line_287",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2_worldeditor_wire_toggle_into_the_draw_loop",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2c_modify_the_draw_loop_lines_500_510",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2_worldeditor_wire_toggle_into_the_draw_loop",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_2d_regenerateitems_stays_as_is_lines_484_493",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L140",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_3_css_toggle_visual_style_for_the_regenerate_button",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L147",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_4_edge_cases",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_5_files_changed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L185",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_what_changes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_auto_regenerate_items_toggle_auto_regenerate_items_toggle_6_implementation_order",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-auto-regenerate-items-toggle/auto-regenerate-items-toggle.md",
+      "source_location": "L198",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

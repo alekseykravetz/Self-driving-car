@@ -1,0 +1,335 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_md",
+      "label": "ai_architect_audit_report.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "label": "AI Architect Audit Report",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_1_layer_isolation_import_hygiene",
+      "label": "1. Layer Isolation & Import Hygiene",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L9"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_commendable",
+      "label": "Commendable",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L13"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_violations",
+      "label": "Violations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L22"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_2_structural_folder_boundaries_fsd",
+      "label": "2. Structural & Folder Boundaries (FSD)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L36"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_commendable_40",
+      "label": "Commendable",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L40"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_violations_47",
+      "label": "Violations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L47"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_3_design_pattern_evaluation",
+      "label": "3. Design Pattern Evaluation",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L60"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_desired_patterns_good",
+      "label": "Desired Patterns (Good)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L62"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_anti_patterns_bad",
+      "label": "Anti-Patterns (Bad)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L73"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_magic_numbers",
+      "label": "Magic Numbers",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L75"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_god_object_minor_smell",
+      "label": "God Object (Minor Smell)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L86"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_4_code_standards_style_adherence",
+      "label": "4. Code Standards & Style Adherence",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L95"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_commendable_97",
+      "label": "Commendable",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L97"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_violations_105",
+      "label": "Violations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L105"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_5_structural_reorganization_recommendations",
+      "label": "5. Structural Reorganization Recommendations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L114"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_high_priority",
+      "label": "High Priority",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L116"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_medium_priority",
+      "label": "Medium Priority",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L127"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_low_priority",
+      "label": "Low Priority",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L135"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_appendix_files_reviewed",
+      "label": "Appendix: Files Reviewed",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L143"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_1_layer_isolation_import_hygiene",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_1_layer_isolation_import_hygiene",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_commendable",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_1_layer_isolation_import_hygiene",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_violations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_2_structural_folder_boundaries_fsd",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_2_structural_folder_boundaries_fsd",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_commendable_40",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_2_structural_folder_boundaries_fsd",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_violations_47",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_3_design_pattern_evaluation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_3_design_pattern_evaluation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_desired_patterns_good",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_3_design_pattern_evaluation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_anti_patterns_bad",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_anti_patterns_bad",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_magic_numbers",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_anti_patterns_bad",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_god_object_minor_smell",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_4_code_standards_style_adherence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_4_code_standards_style_adherence",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_commendable_97",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_4_code_standards_style_adherence",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_violations_105",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_5_structural_reorganization_recommendations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_5_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_high_priority",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_5_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_medium_priority",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_5_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_low_priority",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L135",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_ai_architect_audit_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_ai_architect_small_fixes_ai_architect_audit_report_appendix_files_reviewed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-ai-architect-small-fixes/ai_architect_audit_report.md",
+      "source_location": "L143",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

@@ -1,0 +1,1212 @@
+{
+  ".opencode/opencode.json": {
+    "mtime": 1783708685.405635,
+    "ast_hash": "abcc8b9dcd80bca5f9dde6d9f0c3ae79",
+    "semantic_hash": "abcc8b9dcd80bca5f9dde6d9f0c3ae79"
+  },
+  ".opencode/plugins/graphify.js": {
+    "mtime": 1783708685.405358,
+    "ast_hash": "3ea725724bc8ebe483c9f13d6aa1124f",
+    "semantic_hash": "3ea725724bc8ebe483c9f13d6aa1124f"
+  },
+  ".vscode/settings.json": {
+    "mtime": 1783346881.671966,
+    "ast_hash": "619093e6eaa177e21a2b5496d7236251",
+    "semantic_hash": "619093e6eaa177e21a2b5496d7236251"
+  },
+  "eslint.config.mjs": {
+    "mtime": 1783346881.6748693,
+    "ast_hash": "ea39e2361c9d685d3fad9b9ef851ad25",
+    "semantic_hash": "ea39e2361c9d685d3fad9b9ef851ad25"
+  },
+  "js/audio/sound.js": {
+    "mtime": 1783692739.0672202,
+    "ast_hash": "f9cd1d555c8d60882cdaad5aaab620a1",
+    "semantic_hash": "f9cd1d555c8d60882cdaad5aaab620a1"
+  },
+  "js/camera/camera.js": {
+    "mtime": 1783692739.182738,
+    "ast_hash": "05f8e6e9c3cb61d79d84e18b1d853a63",
+    "semantic_hash": "05f8e6e9c3cb61d79d84e18b1d853a63"
+  },
+  "js/camera/extrusion.js": {
+    "mtime": 1783692739.1700754,
+    "ast_hash": "c9c5e11963763dc1e7597b9b47953e1c",
+    "semantic_hash": "c9c5e11963763dc1e7597b9b47953e1c"
+  },
+  "js/camera/types.js": {
+    "mtime": 1783692739.1262007,
+    "ast_hash": "e2ebd7ddedcadeeadbf819c35985c768",
+    "semantic_hash": "e2ebd7ddedcadeeadbf819c35985c768"
+  },
+  "js/car/brain/carBrainAdapter.js": {
+    "mtime": 1783692739.1212063,
+    "ast_hash": "6e8affa7642f6237e959e62c71dbea31",
+    "semantic_hash": "6e8affa7642f6237e959e62c71dbea31"
+  },
+  "js/car/car.js": {
+    "mtime": 1783692739.1257036,
+    "ast_hash": "a446b426a61cd83556b36082832b546f",
+    "semantic_hash": "a446b426a61cd83556b36082832b546f"
+  },
+  "js/car/carState.js": {
+    "mtime": 1783692739.1070952,
+    "ast_hash": "e2ebd7ddedcadeeadbf819c35985c768",
+    "semantic_hash": "e2ebd7ddedcadeeadbf819c35985c768"
+  },
+  "js/car/config.js": {
+    "mtime": 1783692739.0820317,
+    "ast_hash": "d144704b2ca296c2a5905401cacc9653",
+    "semantic_hash": "d144704b2ca296c2a5905401cacc9653"
+  },
+  "js/car/controls/cameraControls.js": {
+    "mtime": 1783692739.106529,
+    "ast_hash": "3021b6ab29d6952f548b9a0c27956721",
+    "semantic_hash": "3021b6ab29d6952f548b9a0c27956721"
+  },
+  "js/car/controls/controls.js": {
+    "mtime": 1783692739.0947273,
+    "ast_hash": "6b4d106e92097ed6a1353f0f3e7fed8e",
+    "semantic_hash": "6b4d106e92097ed6a1353f0f3e7fed8e"
+  },
+  "js/car/controls/markerDetector.js": {
+    "mtime": 1783692739.100781,
+    "ast_hash": "38dd76b0f2d4b9ea16986f3e01695840",
+    "semantic_hash": "38dd76b0f2d4b9ea16986f3e01695840"
+  },
+  "js/car/controls/phoneControls.js": {
+    "mtime": 1783692739.0973563,
+    "ast_hash": "b6a51ca57b6c3cec449cd0de49268f27",
+    "semantic_hash": "b6a51ca57b6c3cec449cd0de49268f27"
+  },
+  "js/car/loader/carLoader.js": {
+    "mtime": 1783692739.185209,
+    "ast_hash": "56788137a38f4a8b01fc321fb039ca0f",
+    "semantic_hash": "56788137a38f4a8b01fc321fb039ca0f"
+  },
+  "js/car/physics/carPhysics.js": {
+    "mtime": 1783692739.1103444,
+    "ast_hash": "930012798cb06910c2fa2a7474c28d13",
+    "semantic_hash": "930012798cb06910c2fa2a7474c28d13"
+  },
+  "js/car/physics/sensorRaycaster.js": {
+    "mtime": 1783692739.0814807,
+    "ast_hash": "2200b1863f6d9b400334e3e39c738909",
+    "semantic_hash": "2200b1863f6d9b400334e3e39c738909"
+  },
+  "js/car/rendering/carRenderer.js": {
+    "mtime": 1783692739.113504,
+    "ast_hash": "ca1c256c02ddc48af4524a50bcfa3634",
+    "semantic_hash": "ca1c256c02ddc48af4524a50bcfa3634"
+  },
+  "js/car/sensors/sensor.js": {
+    "mtime": 1783692739.0908518,
+    "ast_hash": "21e7dd0a29415e3cb0cb0285bb202b4b",
+    "semantic_hash": "21e7dd0a29415e3cb0cb0285bb202b4b"
+  },
+  "js/car/sensors/sensorReading.js": {
+    "mtime": 1783692739.0826395,
+    "ast_hash": "e2ebd7ddedcadeeadbf819c35985c768",
+    "semantic_hash": "e2ebd7ddedcadeeadbf819c35985c768"
+  },
+  "js/math/collision.js": {
+    "mtime": 1783692739.0583842,
+    "ast_hash": "864c3082f101929fab4e730df6b6f4d7",
+    "semantic_hash": "864c3082f101929fab4e730df6b6f4d7"
+  },
+  "js/math/color.js": {
+    "mtime": 1783692739.0592468,
+    "ast_hash": "f09de2dad53f9d59d507febfc1d46b22",
+    "semantic_hash": "f09de2dad53f9d59d507febfc1d46b22"
+  },
+  "js/math/graph/graph.js": {
+    "mtime": 1783692739.134125,
+    "ast_hash": "433e8b525bafdc5b754aee5fb53fbdc7",
+    "semantic_hash": "433e8b525bafdc5b754aee5fb53fbdc7"
+  },
+  "js/math/heatmapGrid.js": {
+    "mtime": 1783692739.1873763,
+    "ast_hash": "916c8e8e57adc85d4fff95201e1252e5",
+    "semantic_hash": "916c8e8e57adc85d4fff95201e1252e5"
+  },
+  "js/math/osm-importer/osm.js": {
+    "mtime": 1783692739.2052035,
+    "ast_hash": "c1af6c97fe218cacbbee41b58e8ca005",
+    "semantic_hash": "c1af6c97fe218cacbbee41b58e8ca005"
+  },
+  "js/math/primitives/envelope.js": {
+    "mtime": 1783692739.1361985,
+    "ast_hash": "4621e5e6d5e20cdb5a033e38efeb6cec",
+    "semantic_hash": "4621e5e6d5e20cdb5a033e38efeb6cec"
+  },
+  "js/math/primitives/point.js": {
+    "mtime": 1783692739.0414333,
+    "ast_hash": "ddffde8c197d7810889e1a6023c64483",
+    "semantic_hash": "ddffde8c197d7810889e1a6023c64483"
+  },
+  "js/math/primitives/polygon.js": {
+    "mtime": 1783692739.0729823,
+    "ast_hash": "2d8bb4e7da94a2a0796f425fccb194e5",
+    "semantic_hash": "2d8bb4e7da94a2a0796f425fccb194e5"
+  },
+  "js/math/primitives/segment.js": {
+    "mtime": 1783692739.0467062,
+    "ast_hash": "4f3ea44c19af361a443eb66ffb51aed4",
+    "semantic_hash": "4f3ea44c19af361a443eb66ffb51aed4"
+  },
+  "js/math/spatialGrid.js": {
+    "mtime": 1783692739.1995218,
+    "ast_hash": "6a7e5e42998d12eb77e02c13e1ddca65",
+    "semantic_hash": "6a7e5e42998d12eb77e02c13e1ddca65"
+  },
+  "js/math/trafficControlGrid.js": {
+    "mtime": 1783692739.0771794,
+    "ast_hash": "c172deee51d6dee3ce5a51d7ffc3b83d",
+    "semantic_hash": "c172deee51d6dee3ce5a51d7ffc3b83d"
+  },
+  "js/math/utils.js": {
+    "mtime": 1783692739.056503,
+    "ast_hash": "c1f815dbc8a6e81f40b7e87179ab59ca",
+    "semantic_hash": "c1f815dbc8a6e81f40b7e87179ab59ca"
+  },
+  "js/mini-map/miniMap.js": {
+    "mtime": 1783692739.1638973,
+    "ast_hash": "c10b3056100a288206df4e5794d81770",
+    "semantic_hash": "c10b3056100a288206df4e5794d81770"
+  },
+  "js/neural-network/network.js": {
+    "mtime": 1783692739.119425,
+    "ast_hash": "71210ed0e4ab2352cafa06ae41d0e681",
+    "semantic_hash": "71210ed0e4ab2352cafa06ae41d0e681"
+  },
+  "js/neural-network/visualizer.js": {
+    "mtime": 1783692739.2286403,
+    "ast_hash": "868012a8edfad05e5937317eef4920c7",
+    "semantic_hash": "868012a8edfad05e5937317eef4920c7"
+  },
+  "js/panels/assetSelectors.js": {
+    "mtime": 1783692739.2645013,
+    "ast_hash": "b6b23c846f4287c45d803a03da9fcb11",
+    "semantic_hash": "b6b23c846f4287c45d803a03da9fcb11"
+  },
+  "js/panels/modeControls.js": {
+    "mtime": 1783692739.2671924,
+    "ast_hash": "6f98d7b4b634cc923b86a29bf716aa3f",
+    "semantic_hash": "6f98d7b4b634cc923b86a29bf716aa3f"
+  },
+  "js/panels/shortcutsToolbar.js": {
+    "mtime": 1783692739.2700827,
+    "ast_hash": "6e9196d4e0be76d557c4bd583c3d0ac2",
+    "semantic_hash": "6e9196d4e0be76d557c4bd583c3d0ac2"
+  },
+  "js/panels/templates/shortcutsToolbarTemplate.js": {
+    "mtime": 1783692739.267754,
+    "ast_hash": "308d978d384fae45ca064a1285aed65a",
+    "semantic_hash": "308d978d384fae45ca064a1285aed65a"
+  },
+  "js/panels/templates/worldLayersToolbarTemplate.js": {
+    "mtime": 1783692739.2704756,
+    "ast_hash": "796ba7ff1589b6f49d803d7e6fbec286",
+    "semantic_hash": "796ba7ff1589b6f49d803d7e6fbec286"
+  },
+  "js/panels/templates/worldToolbarTemplate.js": {
+    "mtime": 1783692739.2742124,
+    "ast_hash": "ff52112e56b37620551aeaba94410469",
+    "semantic_hash": "ff52112e56b37620551aeaba94410469"
+  },
+  "js/panels/worldLayersToolbar.js": {
+    "mtime": 1783692739.273684,
+    "ast_hash": "fb2e013ae2f11e4015c2f2d7e8b71667",
+    "semantic_hash": "fb2e013ae2f11e4015c2f2d7e8b71667"
+  },
+  "js/panels/worldToolbar.js": {
+    "mtime": 1783692739.2760432,
+    "ast_hash": "a5c75c6ae4321bba1cc94e001957b57b",
+    "semantic_hash": "a5c75c6ae4321bba1cc94e001957b57b"
+  },
+  "js/race/entry.js": {
+    "mtime": 1783692739.3431063,
+    "ast_hash": "26be3fad12f012e857716bd97aab3c13",
+    "semantic_hash": "26be3fad12f012e857716bd97aab3c13"
+  },
+  "js/rendering/envelopeRenderer.js": {
+    "mtime": 1783692739.309503,
+    "ast_hash": "716294e6109c5237d73c69f4697a4978",
+    "semantic_hash": "716294e6109c5237d73c69f4697a4978"
+  },
+  "js/rendering/heatmapRenderer.js": {
+    "mtime": 1783692739.2853348,
+    "ast_hash": "90c6116c3cd1bbee75dd0b0495e9c082",
+    "semantic_hash": "90c6116c3cd1bbee75dd0b0495e9c082"
+  },
+  "js/rendering/pointRenderer.js": {
+    "mtime": 1783692739.1270988,
+    "ast_hash": "6a8aebe7e17c7eb53b26bedb872c9c3c",
+    "semantic_hash": "6a8aebe7e17c7eb53b26bedb872c9c3c"
+  },
+  "js/rendering/polygonRenderer.js": {
+    "mtime": 1783692739.1375628,
+    "ast_hash": "b53dc5062b661df036724067df21d93c",
+    "semantic_hash": "b53dc5062b661df036724067df21d93c"
+  },
+  "js/rendering/segmentRenderer.js": {
+    "mtime": 1783692739.127789,
+    "ast_hash": "0a22151281ac992c7a0e2328cab2c39a",
+    "semantic_hash": "0a22151281ac992c7a0e2328cab2c39a"
+  },
+  "js/simulator/core/simulatorShell.js": {
+    "mtime": 1783692739.288836,
+    "ast_hash": "4fc2853746091199e7101525681aaba2",
+    "semantic_hash": "4fc2853746091199e7101525681aaba2"
+  },
+  "js/simulator/entry.js": {
+    "mtime": 1783692739.3791409,
+    "ast_hash": "531ac381361e7668edfa6b37b77dad33",
+    "semantic_hash": "531ac381361e7668edfa6b37b77dad33"
+  },
+  "js/simulator/panels/animationLoopToolbar.js": {
+    "mtime": 1783692739.2813542,
+    "ast_hash": "e882125c055e71795d8cafd5ab0f90dd",
+    "semantic_hash": "e882125c055e71795d8cafd5ab0f90dd"
+  },
+  "js/simulator/panels/layoutToolbar.js": {
+    "mtime": 1783692739.2791564,
+    "ast_hash": "5e30a3b0f1f250ecf9b115f461222c97",
+    "semantic_hash": "5e30a3b0f1f250ecf9b115f461222c97"
+  },
+  "js/simulator/panels/templates/animationLoopToolbarTemplate.js": {
+    "mtime": 1783692739.2796044,
+    "ast_hash": "87107e09b4d7ac98f15ae13d5dc06ebd",
+    "semantic_hash": "87107e09b4d7ac98f15ae13d5dc06ebd"
+  },
+  "js/simulator/panels/templates/layoutToolbarTemplate.js": {
+    "mtime": 1783692739.2764819,
+    "ast_hash": "9bfa28065983ddfa8e43553393b34f2d",
+    "semantic_hash": "9bfa28065983ddfa8e43553393b34f2d"
+  },
+  "js/simulator/racing/racePanel.js": {
+    "mtime": 1783692739.2917511,
+    "ast_hash": "349115779d0979b9714870f77430a051",
+    "semantic_hash": "349115779d0979b9714870f77430a051"
+  },
+  "js/simulator/racing/raceSimulator.js": {
+    "mtime": 1783692739.3293326,
+    "ast_hash": "a6926749e2469f6ff7a0c0e9bcba6041",
+    "semantic_hash": "a6926749e2469f6ff7a0c0e9bcba6041"
+  },
+  "js/simulator/rendering/layoutManager.js": {
+    "mtime": 1783692739.2838383,
+    "ast_hash": "c01aafc287cd07e575967d86a2505ac3",
+    "semantic_hash": "c01aafc287cd07e575967d86a2505ac3"
+  },
+  "js/simulator/spatialGridUtils.js": {
+    "mtime": 1783692739.3202312,
+    "ast_hash": "462994381c668b40b28c5f88aeef70c6",
+    "semantic_hash": "462994381c668b40b28c5f88aeef70c6"
+  },
+  "js/simulator/traffic/templates/trafficPanelTemplate.js": {
+    "mtime": 1783692739.3794127,
+    "ast_hash": "8de07d2575a8b4305d5752bcbbdb0b97",
+    "semantic_hash": "8de07d2575a8b4305d5752bcbbdb0b97"
+  },
+  "js/simulator/traffic/trafficPanel.js": {
+    "mtime": 1783692739.3829124,
+    "ast_hash": "a7da99ce54edfe603216601a493e2abb",
+    "semantic_hash": "a7da99ce54edfe603216601a493e2abb"
+  },
+  "js/simulator/traffic/trafficSimulator.js": {
+    "mtime": 1783692739.3891814,
+    "ast_hash": "ac19d43c50b5f10fa33a6b42f44b6c55",
+    "semantic_hash": "ac19d43c50b5f10fa33a6b42f44b6c55"
+  },
+  "js/simulator/trafficControlUtils.js": {
+    "mtime": 1783692739.3212225,
+    "ast_hash": "c699bfaab343c29402979c5208eda3d0",
+    "semantic_hash": "c699bfaab343c29402979c5208eda3d0"
+  },
+  "js/simulator/training/genetics/poolManager.js": {
+    "mtime": 1783692739.3595986,
+    "ast_hash": "b0a94219b6f32b78b4547ac5568c61ff",
+    "semantic_hash": "b0a94219b6f32b78b4547ac5568c61ff"
+  },
+  "js/simulator/training/genetics/storageManager.js": {
+    "mtime": 1783692739.3232737,
+    "ast_hash": "2907a6f5f9f8baddd58b8ea537369f77",
+    "semantic_hash": "2907a6f5f9f8baddd58b8ea537369f77"
+  },
+  "js/simulator/training/modes/borderCollision.js": {
+    "mtime": 1783692739.3242822,
+    "ast_hash": "bd11fcbbd66e932bf8f3ec6a014a0a3a",
+    "semantic_hash": "bd11fcbbd66e932bf8f3ec6a014a0a3a"
+  },
+  "js/simulator/training/modes/simpleModeBehavior.js": {
+    "mtime": 1783692739.3518255,
+    "ast_hash": "77c06bf8a748a98a39cf4030c9469b55",
+    "semantic_hash": "77c06bf8a748a98a39cf4030c9469b55"
+  },
+  "js/simulator/training/modes/trafficFactory.js": {
+    "mtime": 1783692739.3463473,
+    "ast_hash": "e49a57b6d5d6644b74e7983b405f7c94",
+    "semantic_hash": "e49a57b6d5d6644b74e7983b405f7c94"
+  },
+  "js/simulator/training/modes/worldModeBehavior.js": {
+    "mtime": 1783692739.3558767,
+    "ast_hash": "a6861a24e4d1a76d5225ea3ed0cebd65",
+    "semantic_hash": "a6861a24e4d1a76d5225ea3ed0cebd65"
+  },
+  "js/simulator/training/rendering/carRenderer.js": {
+    "mtime": 1783692739.3414185,
+    "ast_hash": "e92c08140ff2e6e7630927442cd0b838",
+    "semantic_hash": "e92c08140ff2e6e7630927442cd0b838"
+  },
+  "js/simulator/training/rendering/layoutManager.js": {
+    "mtime": 1783692739.3909085,
+    "ast_hash": "3b4a03cba638625f7a606a42d2d1ead2",
+    "semantic_hash": "3b4a03cba638625f7a606a42d2d1ead2"
+  },
+  "js/simulator/training/templates/trainingInitModalTemplate.js": {
+    "mtime": 1783692739.3705454,
+    "ast_hash": "4fcc73ff17f3e96c0d292f4ce2448554",
+    "semantic_hash": "4fcc73ff17f3e96c0d292f4ce2448554"
+  },
+  "js/simulator/training/templates/trainingPanelTemplate.js": {
+    "mtime": 1783692739.3563988,
+    "ast_hash": "61b4e84ab09a46782322563d59db11eb",
+    "semantic_hash": "61b4e84ab09a46782322563d59db11eb"
+  },
+  "js/simulator/training/trainingInitModal.js": {
+    "mtime": 1783692739.3745005,
+    "ast_hash": "9ea02aaff86bd2c3fd136d1b9d8958c0",
+    "semantic_hash": "9ea02aaff86bd2c3fd136d1b9d8958c0"
+  },
+  "js/simulator/training/trainingPanel.js": {
+    "mtime": 1783692739.3700855,
+    "ast_hash": "cacac5bf2d05201c7d1afd2128b0f966",
+    "semantic_hash": "cacac5bf2d05201c7d1afd2128b0f966"
+  },
+  "js/simulator/training/trainingSimulator.js": {
+    "mtime": 1783692739.3784437,
+    "ast_hash": "2e8c7198136f047b0bb97882c5699114",
+    "semantic_hash": "2e8c7198136f047b0bb97882c5699114"
+  },
+  "js/simulator/views/simulatorPageHost.js": {
+    "mtime": 1783692739.2819786,
+    "ast_hash": "9eb47e373142f60a4c344ee1de48a03c",
+    "semantic_hash": "9eb47e373142f60a4c344ee1de48a03c"
+  },
+  "js/store/entry.js": {
+    "mtime": 1783692739.3977754,
+    "ast_hash": "62f071ac592b89e7100897dc49a944f9",
+    "semantic_hash": "62f071ac592b89e7100897dc49a944f9"
+  },
+  "js/store/serialization.js": {
+    "mtime": 1783692739.0604622,
+    "ast_hash": "d37c3c56666204912323f870e6ef9031",
+    "semantic_hash": "d37c3c56666204912323f870e6ef9031"
+  },
+  "js/store/storeManager.js": {
+    "mtime": 1783692739.245976,
+    "ast_hash": "e24df22c5087535f45507e7c7b04a2db",
+    "semantic_hash": "e24df22c5087535f45507e7c7b04a2db"
+  },
+  "js/store/storePanel.js": {
+    "mtime": 1783692739.3972497,
+    "ast_hash": "d0e5f3f74b0d8339aafebcf35e7326df",
+    "semantic_hash": "d0e5f3f74b0d8339aafebcf35e7326df"
+  },
+  "js/store/templates/storePanelTemplate.js": {
+    "mtime": 1783692739.391386,
+    "ast_hash": "5ea56a86535298e80f59a9d30a5a5897",
+    "semantic_hash": "5ea56a86535298e80f59a9d30a5a5897"
+  },
+  "js/store/types.js": {
+    "mtime": 1783692739.2292166,
+    "ast_hash": "e2ebd7ddedcadeeadbf819c35985c768",
+    "semantic_hash": "e2ebd7ddedcadeeadbf819c35985c768"
+  },
+  "js/traffic/entry.js": {
+    "mtime": 1783692739.3984325,
+    "ast_hash": "b00eb5ec638f32f6b03a76275d048f78",
+    "semantic_hash": "b00eb5ec638f32f6b03a76275d048f78"
+  },
+  "js/utils.js": {
+    "mtime": 1783692739.0615132,
+    "ast_hash": "ebd594997ea481136d4ae058d4f5854a",
+    "semantic_hash": "ebd594997ea481136d4ae058d4f5854a"
+  },
+  "js/viewport/scaleIndicator.js": {
+    "mtime": 1783692739.1557717,
+    "ast_hash": "271c4ddaddd6a6a958e093bf1f950b7a",
+    "semantic_hash": "271c4ddaddd6a6a958e093bf1f950b7a"
+  },
+  "js/viewport/viewport.js": {
+    "mtime": 1783692739.1615784,
+    "ast_hash": "1654f3fef83ed7d41531c54785f94785",
+    "semantic_hash": "1654f3fef83ed7d41531c54785f94785"
+  },
+  "js/world/corridor.js": {
+    "mtime": 1783692739.143104,
+    "ast_hash": "5a07bb8d73a03f67fdf0dd2b0f874001",
+    "semantic_hash": "5a07bb8d73a03f67fdf0dd2b0f874001"
+  },
+  "js/world/editors/corridorEditor.js": {
+    "mtime": 1783692739.4007506,
+    "ast_hash": "fa460ba3d905344cd13e643f3d3a972a",
+    "semantic_hash": "fa460ba3d905344cd13e643f3d3a972a"
+  },
+  "js/world/editors/crossingEditor.js": {
+    "mtime": 1783692739.3370657,
+    "ast_hash": "b7bd9b42ebf823272bf3f943509f2659",
+    "semantic_hash": "b7bd9b42ebf823272bf3f943509f2659"
+  },
+  "js/world/editors/graphEditor.js": {
+    "mtime": 1783692739.3352365,
+    "ast_hash": "bba2dda96b0c72a9d86926db2a2c2310",
+    "semantic_hash": "bba2dda96b0c72a9d86926db2a2c2310"
+  },
+  "js/world/editors/lightEditor.js": {
+    "mtime": 1783692739.3388796,
+    "ast_hash": "10fe0e943d3aee95dcc4d596214ec64c",
+    "semantic_hash": "10fe0e943d3aee95dcc4d596214ec64c"
+  },
+  "js/world/editors/markingEditor.js": {
+    "mtime": 1783692739.331825,
+    "ast_hash": "b3321b5e67f62b2c0169b19e8c3a118a",
+    "semantic_hash": "b3321b5e67f62b2c0169b19e8c3a118a"
+  },
+  "js/world/editors/parkingEditor.js": {
+    "mtime": 1783692739.337672,
+    "ast_hash": "338c25ca8270b03b764ea2a0928b2ee5",
+    "semantic_hash": "338c25ca8270b03b764ea2a0928b2ee5"
+  },
+  "js/world/editors/startEditor.js": {
+    "mtime": 1783692739.3365808,
+    "ast_hash": "3272d9e82897f2a2d4ea712b4bf4ead9",
+    "semantic_hash": "3272d9e82897f2a2d4ea712b4bf4ead9"
+  },
+  "js/world/editors/stopEditor.js": {
+    "mtime": 1783692739.335966,
+    "ast_hash": "6b9abb6b0a3c27173cc617f173a7c486",
+    "semantic_hash": "6b9abb6b0a3c27173cc617f173a7c486"
+  },
+  "js/world/editors/targetEditor.js": {
+    "mtime": 1783692739.3395553,
+    "ast_hash": "8c1a091946fcd9356434abe21d96d9af",
+    "semantic_hash": "8c1a091946fcd9356434abe21d96d9af"
+  },
+  "js/world/editors/worldEditor.js": {
+    "mtime": 1783692739.4073575,
+    "ast_hash": "63a78e1cea991309d2440543597f6e43",
+    "semantic_hash": "63a78e1cea991309d2440543597f6e43"
+  },
+  "js/world/editors/yieldEditor.js": {
+    "mtime": 1783692739.3401701,
+    "ast_hash": "2600a85da5ba35f65d89cb329cffd55b",
+    "semantic_hash": "2600a85da5ba35f65d89cb329cffd55b"
+  },
+  "js/world/entry.js": {
+    "mtime": 1783692739.4090552,
+    "ast_hash": "4feca969dffe36d01009c809dc814956",
+    "semantic_hash": "4feca969dffe36d01009c809dc814956"
+  },
+  "js/world/generation/worldGenerator.js": {
+    "mtime": 1783692739.3088212,
+    "ast_hash": "7d93166e30cf7aa51040ec5ee6f229cb",
+    "semantic_hash": "7d93166e30cf7aa51040ec5ee6f229cb"
+  },
+  "js/world/items/building.js": {
+    "mtime": 1783692739.1478095,
+    "ast_hash": "9335d089758e5888b66a938f614b5502",
+    "semantic_hash": "9335d089758e5888b66a938f614b5502"
+  },
+  "js/world/items/tree.js": {
+    "mtime": 1783692739.1530101,
+    "ast_hash": "f9218bc9e81dfcd7c5d295bf1a0c828f",
+    "semantic_hash": "f9218bc9e81dfcd7c5d295bf1a0c828f"
+  },
+  "js/world/loader/worldLoader.js": {
+    "mtime": 1783692739.2306395,
+    "ast_hash": "f6e6683fedf30b4a0e0432affed43490",
+    "semantic_hash": "f6e6683fedf30b4a0e0432affed43490"
+  },
+  "js/world/markings/crossing.js": {
+    "mtime": 1783692739.2930145,
+    "ast_hash": "19900417efbaea79c98b596e6ed28e02",
+    "semantic_hash": "19900417efbaea79c98b596e6ed28e02"
+  },
+  "js/world/markings/light.js": {
+    "mtime": 1783692739.2961287,
+    "ast_hash": "768bcc7b7b186f6b430ca2ec554e5c08",
+    "semantic_hash": "768bcc7b7b186f6b430ca2ec554e5c08"
+  },
+  "js/world/markings/marking.js": {
+    "mtime": 1783692739.1400528,
+    "ast_hash": "00958ddab8fc2547ce3c44e44b3e81d1",
+    "semantic_hash": "00958ddab8fc2547ce3c44e44b3e81d1"
+  },
+  "js/world/markings/markingLoader.js": {
+    "mtime": 1783692739.3018777,
+    "ast_hash": "f76544028cfb6ebde7c92af91d3ef0f1",
+    "semantic_hash": "f76544028cfb6ebde7c92af91d3ef0f1"
+  },
+  "js/world/markings/parking.js": {
+    "mtime": 1783692739.2942247,
+    "ast_hash": "13edc4cdccd4df18d115a3550d66795f",
+    "semantic_hash": "13edc4cdccd4df18d115a3550d66795f"
+  },
+  "js/world/markings/start.js": {
+    "mtime": 1783692739.2972906,
+    "ast_hash": "4aa51cf13c5e76fd9a62d6cfefa5cf55",
+    "semantic_hash": "4aa51cf13c5e76fd9a62d6cfefa5cf55"
+  },
+  "js/world/markings/stop.js": {
+    "mtime": 1783692739.2985713,
+    "ast_hash": "8b300bc040497e18b6024a9204fb1343",
+    "semantic_hash": "8b300bc040497e18b6024a9204fb1343"
+  },
+  "js/world/markings/target.js": {
+    "mtime": 1783692739.3006094,
+    "ast_hash": "6ffa875a28071bee4842befae6f94a3c",
+    "semantic_hash": "6ffa875a28071bee4842befae6f94a3c"
+  },
+  "js/world/markings/yield.js": {
+    "mtime": 1783692739.2998078,
+    "ast_hash": "3868d0c878522475b61d14dd6718f23c",
+    "semantic_hash": "3868d0c878522475b61d14dd6718f23c"
+  },
+  "js/world/simple/simpleWorld.js": {
+    "mtime": 1783692739.345179,
+    "ast_hash": "ea18551f15848ee320676e6564d6549a",
+    "semantic_hash": "ea18551f15848ee320676e6564d6549a"
+  },
+  "js/world/trafficManager.js": {
+    "mtime": 1783692739.304171,
+    "ast_hash": "4ccb976b5fcffa0064210f54f876e17b",
+    "semantic_hash": "4ccb976b5fcffa0064210f54f876e17b"
+  },
+  "js/world/types.js": {
+    "mtime": 1783692739.1644483,
+    "ast_hash": "84628c6b80983089f8649a312d594cc3",
+    "semantic_hash": "84628c6b80983089f8649a312d594cc3"
+  },
+  "js/world/world.js": {
+    "mtime": 1783692739.318602,
+    "ast_hash": "b7ad2dc5c39f02266be5dfe5bb7a3fe3",
+    "semantic_hash": "b7ad2dc5c39f02266be5dfe5bb7a3fe3"
+  },
+  "package.json": {
+    "mtime": 1783346881.742876,
+    "ast_hash": "f29c2f3db27e18b27698df4eff3e95fd",
+    "semantic_hash": "f29c2f3db27e18b27698df4eff3e95fd"
+  },
+  "saves/ashkelon-osm-data.json": {
+    "mtime": 1778923577.0,
+    "ast_hash": "a22d06cc41dd45d90093dfeed6a7fcd9",
+    "semantic_hash": "a22d06cc41dd45d90093dfeed6a7fcd9"
+  },
+  "saves/kohav-hazafon-osm-data.json": {
+    "mtime": 1778923577.0,
+    "ast_hash": "7333e113368310fff899486bf8d76be5",
+    "semantic_hash": "7333e113368310fff899486bf8d76be5"
+  },
+  "scripts/migrate-worlds.mjs": {
+    "mtime": 1782987156.0,
+    "ast_hash": "2ae17075763e070e73157314c3251c3d",
+    "semantic_hash": "2ae17075763e070e73157314c3251c3d"
+  },
+  "scripts/publish-site.sh": {
+    "mtime": 1781452028.0,
+    "ast_hash": "d961e03962caaadfac95e4c9129a27fb",
+    "semantic_hash": "d961e03962caaadfac95e4c9129a27fb"
+  },
+  "serve.json": {
+    "mtime": 1781373574.0,
+    "ast_hash": "87ce7e0efe9254523ecbdc273716cda0",
+    "semantic_hash": "87ce7e0efe9254523ecbdc273716cda0"
+  },
+  "store/manifest.json": {
+    "mtime": 1781878120.0,
+    "ast_hash": "81654cb80cfbcd3b4b79a9d85fdb7dc5",
+    "semantic_hash": "81654cb80cfbcd3b4b79a9d85fdb7dc5"
+  },
+  "ts/audio/sound.ts": {
+    "mtime": 1783346881.744195,
+    "ast_hash": "1659f026f2f2ddf48cb9df455c458730",
+    "semantic_hash": "1659f026f2f2ddf48cb9df455c458730"
+  },
+  "ts/camera/camera.ts": {
+    "mtime": 1783346881.744992,
+    "ast_hash": "a0c3e85eab725f50bac8dceb8544bc2e",
+    "semantic_hash": "a0c3e85eab725f50bac8dceb8544bc2e"
+  },
+  "ts/camera/extrusion.ts": {
+    "mtime": 1783346881.745718,
+    "ast_hash": "7a7370c467a31bac342a18d1f4aaf99b",
+    "semantic_hash": "7a7370c467a31bac342a18d1f4aaf99b"
+  },
+  "ts/camera/types.ts": {
+    "mtime": 1783346881.7464168,
+    "ast_hash": "d5f2f6990b5d4ee97bd94921a4178772",
+    "semantic_hash": "d5f2f6990b5d4ee97bd94921a4178772"
+  },
+  "ts/car/brain/carBrainAdapter.ts": {
+    "mtime": 1783688773.1195161,
+    "ast_hash": "9a3957773f42fcd20c6c93efeddae20c",
+    "semantic_hash": "9a3957773f42fcd20c6c93efeddae20c"
+  },
+  "ts/car/car.ts": {
+    "mtime": 1783688773.1199534,
+    "ast_hash": "475200bf251a73e4428fd35f3e8f9ebc",
+    "semantic_hash": "475200bf251a73e4428fd35f3e8f9ebc"
+  },
+  "ts/car/carState.ts": {
+    "mtime": 1783350031.2128441,
+    "ast_hash": "c22ebff0489230ca2b16b0bd585e2e40",
+    "semantic_hash": "c22ebff0489230ca2b16b0bd585e2e40"
+  },
+  "ts/car/config.ts": {
+    "mtime": 1783346881.7485778,
+    "ast_hash": "5e6d146a4414a9b539addf261a5e3083",
+    "semantic_hash": "5e6d146a4414a9b539addf261a5e3083"
+  },
+  "ts/car/controls/cameraControls.ts": {
+    "mtime": 1783346881.749603,
+    "ast_hash": "202fcbee39d9a9769ecad074b322fe57",
+    "semantic_hash": "202fcbee39d9a9769ecad074b322fe57"
+  },
+  "ts/car/controls/controls.ts": {
+    "mtime": 1783346881.7502234,
+    "ast_hash": "69d65a781742eb786829ec0176f94d4d",
+    "semantic_hash": "69d65a781742eb786829ec0176f94d4d"
+  },
+  "ts/car/controls/markerDetector.ts": {
+    "mtime": 1783346881.7509582,
+    "ast_hash": "0aa8fdcf9faebe1a0209fa38cfe79c40",
+    "semantic_hash": "0aa8fdcf9faebe1a0209fa38cfe79c40"
+  },
+  "ts/car/controls/phoneControls.ts": {
+    "mtime": 1783346881.7517312,
+    "ast_hash": "1e1bd7d204f0cf83dc76075ff5e5bafc",
+    "semantic_hash": "1e1bd7d204f0cf83dc76075ff5e5bafc"
+  },
+  "ts/car/loader/carLoader.ts": {
+    "mtime": 1783688773.1203766,
+    "ast_hash": "12a48ef150a0ca62f759925359d20629",
+    "semantic_hash": "12a48ef150a0ca62f759925359d20629"
+  },
+  "ts/car/physics/carPhysics.ts": {
+    "mtime": 1783350292.0634272,
+    "ast_hash": "40fa71f088235a18b735990eb6f8450f",
+    "semantic_hash": "40fa71f088235a18b735990eb6f8450f"
+  },
+  "ts/car/physics/sensorRaycaster.ts": {
+    "mtime": 1783688773.120919,
+    "ast_hash": "c5a196d127fe2e1bbc75253ac826c947",
+    "semantic_hash": "c5a196d127fe2e1bbc75253ac826c947"
+  },
+  "ts/car/rendering/carRenderer.ts": {
+    "mtime": 1783346881.7547824,
+    "ast_hash": "bdee9b3f838aed6b866ad4ae04f5b6da",
+    "semantic_hash": "bdee9b3f838aed6b866ad4ae04f5b6da"
+  },
+  "ts/car/sensors/sensor.ts": {
+    "mtime": 1783688773.1215346,
+    "ast_hash": "3ed4560d7c507f1888566be82963ac14",
+    "semantic_hash": "3ed4560d7c507f1888566be82963ac14"
+  },
+  "ts/car/sensors/sensorReading.ts": {
+    "mtime": 1783688773.122052,
+    "ast_hash": "23959e7408c541e3ee3292e5de70e0eb",
+    "semantic_hash": "23959e7408c541e3ee3292e5de70e0eb"
+  },
+  "ts/math/collision.ts": {
+    "mtime": 1783350032.7614002,
+    "ast_hash": "32ef416aed7a80932ca647ed3d5d3b3f",
+    "semantic_hash": "32ef416aed7a80932ca647ed3d5d3b3f"
+  },
+  "ts/math/color.ts": {
+    "mtime": 1783350033.7296867,
+    "ast_hash": "70e7ac712539af7c33265c6667b777d8",
+    "semantic_hash": "70e7ac712539af7c33265c6667b777d8"
+  },
+  "ts/math/graph/graph.ts": {
+    "mtime": 1783346881.756409,
+    "ast_hash": "815038362c4ef999d1eb79752d52fcf5",
+    "semantic_hash": "815038362c4ef999d1eb79752d52fcf5"
+  },
+  "ts/math/heatmapGrid.ts": {
+    "mtime": 1783368909.4158225,
+    "ast_hash": "25e68a952f850844a2137810fae628a0",
+    "semantic_hash": "25e68a952f850844a2137810fae628a0"
+  },
+  "ts/math/osm-importer/osm.ts": {
+    "mtime": 1783346881.7571685,
+    "ast_hash": "f12023dceaaf7e46ab2b5e015d52228b",
+    "semantic_hash": "f12023dceaaf7e46ab2b5e015d52228b"
+  },
+  "ts/math/primitives/envelope.ts": {
+    "mtime": 1783346881.7578683,
+    "ast_hash": "e988f58407f46280ae7ddc45c6e455f7",
+    "semantic_hash": "e988f58407f46280ae7ddc45c6e455f7"
+  },
+  "ts/math/primitives/point.ts": {
+    "mtime": 1783346881.7585459,
+    "ast_hash": "7f234e4202f99b8700e4a133b0b23dc3",
+    "semantic_hash": "7f234e4202f99b8700e4a133b0b23dc3"
+  },
+  "ts/math/primitives/polygon.ts": {
+    "mtime": 1783346881.7592952,
+    "ast_hash": "0bdfa5a4fa04e285de76bb793f54af55",
+    "semantic_hash": "0bdfa5a4fa04e285de76bb793f54af55"
+  },
+  "ts/math/primitives/segment.ts": {
+    "mtime": 1783346881.7598705,
+    "ast_hash": "1fa958b1fc00013786f0a5be00554352",
+    "semantic_hash": "1fa958b1fc00013786f0a5be00554352"
+  },
+  "ts/math/spatialGrid.ts": {
+    "mtime": 1783346881.7606902,
+    "ast_hash": "99782d03875f1cfb8743a987b4f67449",
+    "semantic_hash": "99782d03875f1cfb8743a987b4f67449"
+  },
+  "ts/math/trafficControlGrid.ts": {
+    "mtime": 1783419465.5682042,
+    "ast_hash": "dd0f1f088764dc6620590b9da1a56736",
+    "semantic_hash": "dd0f1f088764dc6620590b9da1a56736"
+  },
+  "ts/math/utils.ts": {
+    "mtime": 1783346881.7615142,
+    "ast_hash": "356dc21a61cbfdbc20943ca937786610",
+    "semantic_hash": "356dc21a61cbfdbc20943ca937786610"
+  },
+  "ts/mini-map/miniMap.ts": {
+    "mtime": 1783346881.762173,
+    "ast_hash": "ffb325328d66a2901ef0ccf461513a2b",
+    "semantic_hash": "ffb325328d66a2901ef0ccf461513a2b"
+  },
+  "ts/neural-network/network.ts": {
+    "mtime": 1783449790.0781767,
+    "ast_hash": "6dc3b5e4242ff45c8881578d192012a2",
+    "semantic_hash": "6dc3b5e4242ff45c8881578d192012a2"
+  },
+  "ts/neural-network/visualizer.ts": {
+    "mtime": 1783692537.6320658,
+    "ast_hash": "1a37d7054c350ca68e99b9788d66c514",
+    "semantic_hash": "1a37d7054c350ca68e99b9788d66c514"
+  },
+  "ts/panels/assetSelectors.ts": {
+    "mtime": 1783350135.5203085,
+    "ast_hash": "df7afb52b39d64c3797eedc2277650ef",
+    "semantic_hash": "df7afb52b39d64c3797eedc2277650ef"
+  },
+  "ts/panels/modeControls.ts": {
+    "mtime": 1783346881.765533,
+    "ast_hash": "7537e7f9a56a51b51b7e88d3ebf0c168",
+    "semantic_hash": "7537e7f9a56a51b51b7e88d3ebf0c168"
+  },
+  "ts/panels/shortcutsToolbar.ts": {
+    "mtime": 1783346881.766346,
+    "ast_hash": "a2c8b5c7017384d082d35091efa181d0",
+    "semantic_hash": "a2c8b5c7017384d082d35091efa181d0"
+  },
+  "ts/panels/templates/shortcutsToolbarTemplate.ts": {
+    "mtime": 1783346881.766991,
+    "ast_hash": "308d978d384fae45ca064a1285aed65a",
+    "semantic_hash": "308d978d384fae45ca064a1285aed65a"
+  },
+  "ts/panels/templates/worldLayersToolbarTemplate.ts": {
+    "mtime": 1783346881.7675881,
+    "ast_hash": "796ba7ff1589b6f49d803d7e6fbec286",
+    "semantic_hash": "796ba7ff1589b6f49d803d7e6fbec286"
+  },
+  "ts/panels/templates/worldToolbarTemplate.ts": {
+    "mtime": 1783346881.768268,
+    "ast_hash": "ff52112e56b37620551aeaba94410469",
+    "semantic_hash": "ff52112e56b37620551aeaba94410469"
+  },
+  "ts/panels/worldLayersToolbar.ts": {
+    "mtime": 1783371728.3993044,
+    "ast_hash": "9c355c505aa0f46f5dc4674e5c8578e2",
+    "semantic_hash": "9c355c505aa0f46f5dc4674e5c8578e2"
+  },
+  "ts/panels/worldToolbar.ts": {
+    "mtime": 1783689614.4396353,
+    "ast_hash": "d12ac797fa40d01ebb8743d86695a9b5",
+    "semantic_hash": "d12ac797fa40d01ebb8743d86695a9b5"
+  },
+  "ts/race/entry.ts": {
+    "mtime": 1783346881.770342,
+    "ast_hash": "238544dd0b5e3b726bd623f42682dda6",
+    "semantic_hash": "238544dd0b5e3b726bd623f42682dda6"
+  },
+  "ts/rendering/envelopeRenderer.ts": {
+    "mtime": 1783346881.7709908,
+    "ast_hash": "7956d00ede55132bb1529fbe590283f2",
+    "semantic_hash": "7956d00ede55132bb1529fbe590283f2"
+  },
+  "ts/rendering/heatmapRenderer.ts": {
+    "mtime": 1783368958.3586717,
+    "ast_hash": "75f3fd6ba460f53b4be7ee0878d8bc95",
+    "semantic_hash": "75f3fd6ba460f53b4be7ee0878d8bc95"
+  },
+  "ts/rendering/pointRenderer.ts": {
+    "mtime": 1783346881.7715476,
+    "ast_hash": "c16a31de85a20f0a876c23de28dd3fd1",
+    "semantic_hash": "c16a31de85a20f0a876c23de28dd3fd1"
+  },
+  "ts/rendering/polygonRenderer.ts": {
+    "mtime": 1783346881.7721436,
+    "ast_hash": "a4250bc83b252c38a62d37cd893866cb",
+    "semantic_hash": "a4250bc83b252c38a62d37cd893866cb"
+  },
+  "ts/rendering/segmentRenderer.ts": {
+    "mtime": 1783346881.772712,
+    "ast_hash": "67d3c32e01ef22ecb9705d4ad2a006dd",
+    "semantic_hash": "67d3c32e01ef22ecb9705d4ad2a006dd"
+  },
+  "ts/simulator/core/simulatorShell.ts": {
+    "mtime": 1783691635.6121762,
+    "ast_hash": "485f6e1741de2f788f1a2b845532f0e1",
+    "semantic_hash": "485f6e1741de2f788f1a2b845532f0e1"
+  },
+  "ts/simulator/entry.ts": {
+    "mtime": 1783353424.4821486,
+    "ast_hash": "2a96a307cb46375687548d5f91e86778",
+    "semantic_hash": "2a96a307cb46375687548d5f91e86778"
+  },
+  "ts/simulator/panels/animationLoopToolbar.ts": {
+    "mtime": 1783689545.292232,
+    "ast_hash": "34c5fcca503d0312477c785d6f4e91e1",
+    "semantic_hash": "34c5fcca503d0312477c785d6f4e91e1"
+  },
+  "ts/simulator/panels/layoutToolbar.ts": {
+    "mtime": 1783689579.936738,
+    "ast_hash": "3759e1df8725fabae840ea8d1581d196",
+    "semantic_hash": "3759e1df8725fabae840ea8d1581d196"
+  },
+  "ts/simulator/panels/templates/animationLoopToolbarTemplate.ts": {
+    "mtime": 1783346881.776006,
+    "ast_hash": "87107e09b4d7ac98f15ae13d5dc06ebd",
+    "semantic_hash": "87107e09b4d7ac98f15ae13d5dc06ebd"
+  },
+  "ts/simulator/panels/templates/layoutToolbarTemplate.ts": {
+    "mtime": 1783371732.4801805,
+    "ast_hash": "9bfa28065983ddfa8e43553393b34f2d",
+    "semantic_hash": "9bfa28065983ddfa8e43553393b34f2d"
+  },
+  "ts/simulator/racing/racePanel.ts": {
+    "mtime": 1783346881.7774363,
+    "ast_hash": "1cb6289eaa740154463657efd8b0e650",
+    "semantic_hash": "1cb6289eaa740154463657efd8b0e650"
+  },
+  "ts/simulator/racing/raceSimulator.ts": {
+    "mtime": 1783688773.1228266,
+    "ast_hash": "2b3e31effa5c640abe608f74b0ed8695",
+    "semantic_hash": "2b3e31effa5c640abe608f74b0ed8695"
+  },
+  "ts/simulator/rendering/layoutManager.ts": {
+    "mtime": 1783689605.1741822,
+    "ast_hash": "a1ceaef9353f4f0ff07642ef704d5e8e",
+    "semantic_hash": "a1ceaef9353f4f0ff07642ef704d5e8e"
+  },
+  "ts/simulator/spatialGridUtils.ts": {
+    "mtime": 1783353439.298832,
+    "ast_hash": "7173d5c531e8ab868d642391e8c70244",
+    "semantic_hash": "7173d5c531e8ab868d642391e8c70244"
+  },
+  "ts/simulator/traffic/templates/trafficPanelTemplate.ts": {
+    "mtime": 1783346881.7791867,
+    "ast_hash": "8de07d2575a8b4305d5752bcbbdb0b97",
+    "semantic_hash": "8de07d2575a8b4305d5752bcbbdb0b97"
+  },
+  "ts/simulator/traffic/trafficPanel.ts": {
+    "mtime": 1783346881.7800362,
+    "ast_hash": "176842d5bd75440eee8adb3877c27849",
+    "semantic_hash": "176842d5bd75440eee8adb3877c27849"
+  },
+  "ts/simulator/traffic/trafficSimulator.ts": {
+    "mtime": 1783691648.7072155,
+    "ast_hash": "720fa824f08b9ba50eb50a86bbdc0d4a",
+    "semantic_hash": "720fa824f08b9ba50eb50a86bbdc0d4a"
+  },
+  "ts/simulator/trafficControlUtils.ts": {
+    "mtime": 1783419465.5715582,
+    "ast_hash": "c73836bc4fa8fc1aa0c02b3d25bdc335",
+    "semantic_hash": "c73836bc4fa8fc1aa0c02b3d25bdc335"
+  },
+  "ts/simulator/training/genetics/poolManager.ts": {
+    "mtime": 1783688773.124478,
+    "ast_hash": "734c2f4555bc4a96f9e411a27137e887",
+    "semantic_hash": "734c2f4555bc4a96f9e411a27137e887"
+  },
+  "ts/simulator/training/genetics/storageManager.ts": {
+    "mtime": 1783350115.9773726,
+    "ast_hash": "e73139614b3d0b162299dca6813ca6d7",
+    "semantic_hash": "e73139614b3d0b162299dca6813ca6d7"
+  },
+  "ts/simulator/training/modes/borderCollision.ts": {
+    "mtime": 1783346881.7831504,
+    "ast_hash": "24e47d26ca234483f0439d8c333c2eb6",
+    "semantic_hash": "24e47d26ca234483f0439d8c333c2eb6"
+  },
+  "ts/simulator/training/modes/simpleModeBehavior.ts": {
+    "mtime": 1783691645.2752926,
+    "ast_hash": "697b839648adf04cde87886a41b6a735",
+    "semantic_hash": "697b839648adf04cde87886a41b6a735"
+  },
+  "ts/simulator/training/modes/trafficFactory.ts": {
+    "mtime": 1783353437.5335863,
+    "ast_hash": "c8e09bfe1e9425b3f7e901ee6fd22d9a",
+    "semantic_hash": "c8e09bfe1e9425b3f7e901ee6fd22d9a"
+  },
+  "ts/simulator/training/modes/worldModeBehavior.ts": {
+    "mtime": 1783691639.1238697,
+    "ast_hash": "626fef0fc04d374f5cc2c53ea5556431",
+    "semantic_hash": "626fef0fc04d374f5cc2c53ea5556431"
+  },
+  "ts/simulator/training/rendering/carRenderer.ts": {
+    "mtime": 1783419465.5730026,
+    "ast_hash": "f9bac394a093dd3bed2ba32742b4af94",
+    "semantic_hash": "f9bac394a093dd3bed2ba32742b4af94"
+  },
+  "ts/simulator/training/rendering/layoutManager.ts": {
+    "mtime": 1783346881.7863562,
+    "ast_hash": "7993acf9d9998514a68478c32834b691",
+    "semantic_hash": "7993acf9d9998514a68478c32834b691"
+  },
+  "ts/simulator/training/templates/trainingInitModalTemplate.ts": {
+    "mtime": 1783688773.1265454,
+    "ast_hash": "4fcc73ff17f3e96c0d292f4ce2448554",
+    "semantic_hash": "4fcc73ff17f3e96c0d292f4ce2448554"
+  },
+  "ts/simulator/training/templates/trainingPanelTemplate.ts": {
+    "mtime": 1783688773.127229,
+    "ast_hash": "61b4e84ab09a46782322563d59db11eb",
+    "semantic_hash": "61b4e84ab09a46782322563d59db11eb"
+  },
+  "ts/simulator/training/trainingInitModal.ts": {
+    "mtime": 1783688773.1278522,
+    "ast_hash": "116a661e038f040089437147b81db850",
+    "semantic_hash": "116a661e038f040089437147b81db850"
+  },
+  "ts/simulator/training/trainingPanel.ts": {
+    "mtime": 1783689647.7715743,
+    "ast_hash": "83495729b7515a5cf04e9ca685ec2f14",
+    "semantic_hash": "83495729b7515a5cf04e9ca685ec2f14"
+  },
+  "ts/simulator/training/trainingSimulator.ts": {
+    "mtime": 1783427809.15605,
+    "ast_hash": "5d9ebbaa3be54540a37a9a65938fcf6e",
+    "semantic_hash": "5d9ebbaa3be54540a37a9a65938fcf6e"
+  },
+  "ts/simulator/views/simulatorPageHost.ts": {
+    "mtime": 1783346881.7900581,
+    "ast_hash": "c7a16c481a293052b0241fd0193432e6",
+    "semantic_hash": "c7a16c481a293052b0241fd0193432e6"
+  },
+  "ts/store/entry.ts": {
+    "mtime": 1783346881.7903254,
+    "ast_hash": "62f071ac592b89e7100897dc49a944f9",
+    "semantic_hash": "62f071ac592b89e7100897dc49a944f9"
+  },
+  "ts/store/serialization.ts": {
+    "mtime": 1783350034.572393,
+    "ast_hash": "09d6ab9573b3c0f5e0b07c6377802b80",
+    "semantic_hash": "09d6ab9573b3c0f5e0b07c6377802b80"
+  },
+  "ts/store/storeManager.ts": {
+    "mtime": 1783350134.4830532,
+    "ast_hash": "bece1e27779c5ccd56be43e3a9ed30da",
+    "semantic_hash": "bece1e27779c5ccd56be43e3a9ed30da"
+  },
+  "ts/store/storePanel.ts": {
+    "mtime": 1783350279.2540414,
+    "ast_hash": "466f8a7bfebb0d8886d37d3c0f5af78f",
+    "semantic_hash": "466f8a7bfebb0d8886d37d3c0f5af78f"
+  },
+  "ts/store/templates/storePanelTemplate.ts": {
+    "mtime": 1783346881.792163,
+    "ast_hash": "5ea56a86535298e80f59a9d30a5a5897",
+    "semantic_hash": "5ea56a86535298e80f59a9d30a5a5897"
+  },
+  "ts/store/types.ts": {
+    "mtime": 1783346881.7926803,
+    "ast_hash": "3e913137f4985729e9de4517726a9297",
+    "semantic_hash": "3e913137f4985729e9de4517726a9297"
+  },
+  "ts/traffic/entry.ts": {
+    "mtime": 1783353423.9678886,
+    "ast_hash": "63575248cd40260e107104fd26845f7a",
+    "semantic_hash": "63575248cd40260e107104fd26845f7a"
+  },
+  "ts/utils.ts": {
+    "mtime": 1783350143.7339714,
+    "ast_hash": "ebd594997ea481136d4ae058d4f5854a",
+    "semantic_hash": "ebd594997ea481136d4ae058d4f5854a"
+  },
+  "ts/viewport/scaleIndicator.ts": {
+    "mtime": 1783346881.7942228,
+    "ast_hash": "6579225112a37f7962415157c0a0608c",
+    "semantic_hash": "6579225112a37f7962415157c0a0608c"
+  },
+  "ts/viewport/viewport.ts": {
+    "mtime": 1783346881.7949,
+    "ast_hash": "2d6e930402ef627ea0bb699b71063d69",
+    "semantic_hash": "2d6e930402ef627ea0bb699b71063d69"
+  },
+  "ts/world/corridor.ts": {
+    "mtime": 1783346881.7955916,
+    "ast_hash": "696401c838da3bd4a44b40ce97f06785",
+    "semantic_hash": "696401c838da3bd4a44b40ce97f06785"
+  },
+  "ts/world/editors/corridorEditor.ts": {
+    "mtime": 1783346881.7962196,
+    "ast_hash": "313e40b5df0f6bacd97b3ce9bfbd30f6",
+    "semantic_hash": "313e40b5df0f6bacd97b3ce9bfbd30f6"
+  },
+  "ts/world/editors/crossingEditor.ts": {
+    "mtime": 1783346881.7967901,
+    "ast_hash": "b3d74b4a6b50199e76bffe3e70b3fa48",
+    "semantic_hash": "b3d74b4a6b50199e76bffe3e70b3fa48"
+  },
+  "ts/world/editors/graphEditor.ts": {
+    "mtime": 1783346881.797409,
+    "ast_hash": "195589f269f536d35f9b243b523afc58",
+    "semantic_hash": "195589f269f536d35f9b243b523afc58"
+  },
+  "ts/world/editors/lightEditor.ts": {
+    "mtime": 1783427809.156527,
+    "ast_hash": "781a353f712cc16e2db2d2e076a772e7",
+    "semantic_hash": "781a353f712cc16e2db2d2e076a772e7"
+  },
+  "ts/world/editors/markingEditor.ts": {
+    "mtime": 1783346881.7985764,
+    "ast_hash": "c063e88dfac230508c0df4227db333fd",
+    "semantic_hash": "c063e88dfac230508c0df4227db333fd"
+  },
+  "ts/world/editors/parkingEditor.ts": {
+    "mtime": 1783346881.799092,
+    "ast_hash": "0f1075e5da817bc96f9ce3cdd6d1b538",
+    "semantic_hash": "0f1075e5da817bc96f9ce3cdd6d1b538"
+  },
+  "ts/world/editors/startEditor.ts": {
+    "mtime": 1783346881.7995224,
+    "ast_hash": "4e187cb2c6b71125249e0d07e0d34770",
+    "semantic_hash": "4e187cb2c6b71125249e0d07e0d34770"
+  },
+  "ts/world/editors/stopEditor.ts": {
+    "mtime": 1783346881.8000522,
+    "ast_hash": "4627eb1e1e919852ea43b8428c8ce24f",
+    "semantic_hash": "4627eb1e1e919852ea43b8428c8ce24f"
+  },
+  "ts/world/editors/targetEditor.ts": {
+    "mtime": 1783346881.800575,
+    "ast_hash": "0706a67121b835a85f19d1d535947093",
+    "semantic_hash": "0706a67121b835a85f19d1d535947093"
+  },
+  "ts/world/editors/worldEditor.ts": {
+    "mtime": 1783371791.9487472,
+    "ast_hash": "d1944cf16b1bc3dec29637477b3913a8",
+    "semantic_hash": "d1944cf16b1bc3dec29637477b3913a8"
+  },
+  "ts/world/editors/yieldEditor.ts": {
+    "mtime": 1783346881.8018827,
+    "ast_hash": "a846ca990d194c7aef08bdda0e5cc449",
+    "semantic_hash": "a846ca990d194c7aef08bdda0e5cc449"
+  },
+  "ts/world/entry.ts": {
+    "mtime": 1783346881.8022625,
+    "ast_hash": "fa365e02f65f2e6706244b4cc83bf585",
+    "semantic_hash": "fa365e02f65f2e6706244b4cc83bf585"
+  },
+  "ts/world/generation/worldGenerator.ts": {
+    "mtime": 1783346881.8029263,
+    "ast_hash": "baa73db7958661abf78fc7210f510ec9",
+    "semantic_hash": "baa73db7958661abf78fc7210f510ec9"
+  },
+  "ts/world/items/building.ts": {
+    "mtime": 1783346881.8036191,
+    "ast_hash": "3718ca3abd1773f6bf2203b2f8e27246",
+    "semantic_hash": "3718ca3abd1773f6bf2203b2f8e27246"
+  },
+  "ts/world/items/tree.ts": {
+    "mtime": 1783346881.8053944,
+    "ast_hash": "a2a8ad5dc27dfc8ab505977d31ab6272",
+    "semantic_hash": "a2a8ad5dc27dfc8ab505977d31ab6272"
+  },
+  "ts/world/loader/worldLoader.ts": {
+    "mtime": 1783346881.8061395,
+    "ast_hash": "1d3517ef21d8092de9d54f03360d61c0",
+    "semantic_hash": "1d3517ef21d8092de9d54f03360d61c0"
+  },
+  "ts/world/markings/crossing.ts": {
+    "mtime": 1783346881.806697,
+    "ast_hash": "4f7dce3edce977b1f6d0c2d2d3eb9f4f",
+    "semantic_hash": "4f7dce3edce977b1f6d0c2d2d3eb9f4f"
+  },
+  "ts/world/markings/light.ts": {
+    "mtime": 1783427809.1568952,
+    "ast_hash": "26899519e2e75853d17350d5f6c91913",
+    "semantic_hash": "26899519e2e75853d17350d5f6c91913"
+  },
+  "ts/world/markings/marking.ts": {
+    "mtime": 1783346881.8077412,
+    "ast_hash": "bff14b7dc1a0c607482afea057e0b36c",
+    "semantic_hash": "bff14b7dc1a0c607482afea057e0b36c"
+  },
+  "ts/world/markings/markingLoader.ts": {
+    "mtime": 1783346881.8081,
+    "ast_hash": "9935df2b74e63cbd6f13feb8ee80a968",
+    "semantic_hash": "9935df2b74e63cbd6f13feb8ee80a968"
+  },
+  "ts/world/markings/parking.ts": {
+    "mtime": 1783346881.8086174,
+    "ast_hash": "d4c08592e06516051e1de6de67dd41f7",
+    "semantic_hash": "d4c08592e06516051e1de6de67dd41f7"
+  },
+  "ts/world/markings/start.ts": {
+    "mtime": 1783346881.8091242,
+    "ast_hash": "7644983b1ec1d6d1b9eccbd7c606cd09",
+    "semantic_hash": "7644983b1ec1d6d1b9eccbd7c606cd09"
+  },
+  "ts/world/markings/stop.ts": {
+    "mtime": 1783346881.8096223,
+    "ast_hash": "daacf112413d9b1ab8f05b0210ca8130",
+    "semantic_hash": "daacf112413d9b1ab8f05b0210ca8130"
+  },
+  "ts/world/markings/target.ts": {
+    "mtime": 1783346881.8101168,
+    "ast_hash": "155983d2350e0979f5c3ac7368df2ebf",
+    "semantic_hash": "155983d2350e0979f5c3ac7368df2ebf"
+  },
+  "ts/world/markings/yield.ts": {
+    "mtime": 1783346881.8106444,
+    "ast_hash": "ff4f79d2802e6b63bfb931ce39463fdb",
+    "semantic_hash": "ff4f79d2802e6b63bfb931ce39463fdb"
+  },
+  "ts/world/simple/simpleWorld.ts": {
+    "mtime": 1783346881.8112721,
+    "ast_hash": "4a18c519492e3757896402f2f71f09d1",
+    "semantic_hash": "4a18c519492e3757896402f2f71f09d1"
+  },
+  "ts/world/trafficManager.ts": {
+    "mtime": 1783427809.1573105,
+    "ast_hash": "8d2d269d77c669e40974c2166d606e37",
+    "semantic_hash": "8d2d269d77c669e40974c2166d606e37"
+  },
+  "ts/world/types.ts": {
+    "mtime": 1783353426.281232,
+    "ast_hash": "058b3184cb301880957c35e4d633e346",
+    "semantic_hash": "058b3184cb301880957c35e4d633e346"
+  },
+  "ts/world/world.ts": {
+    "mtime": 1783346881.8130283,
+    "ast_hash": "c104e62accc25e7c0ee4fa92ad218bad",
+    "semantic_hash": "c104e62accc25e7c0ee4fa92ad218bad"
+  },
+  "tsconfig.json": {
+    "mtime": 1783346881.8136177,
+    "ast_hash": "6789fd82ff9d297fa9df3ca1264155ff",
+    "semantic_hash": "6789fd82ff9d297fa9df3ca1264155ff"
+  }
+}

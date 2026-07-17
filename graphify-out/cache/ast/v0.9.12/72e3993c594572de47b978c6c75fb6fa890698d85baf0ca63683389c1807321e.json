@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_md",
+      "label": "remove-unsafe-mutatefrompool.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remove_unsafe_neuralnetwork_mutatefrompool_completed",
+      "label": "~~Remove unsafe NeuralNetwork.mutateFromPool()~~ **COMPLETED**",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_problem",
+      "label": "Problem",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_impact",
+      "label": "Impact",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remediation",
+      "label": "Remediation",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L15"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_resolution",
+      "label": "Resolution",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L21"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remove_unsafe_neuralnetwork_mutatefrompool_completed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remove_unsafe_neuralnetwork_mutatefrompool_completed",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_problem",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remove_unsafe_neuralnetwork_mutatefrompool_completed",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_impact",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remove_unsafe_neuralnetwork_mutatefrompool_completed",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remediation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_remove_unsafe_neuralnetwork_mutatefrompool_completed",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_remove_unsafe_mutation_remove_unsafe_mutatefrompool_resolution",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-remove-unsafe-mutation/remove-unsafe-mutatefrompool.md",
+      "source_location": "L21",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

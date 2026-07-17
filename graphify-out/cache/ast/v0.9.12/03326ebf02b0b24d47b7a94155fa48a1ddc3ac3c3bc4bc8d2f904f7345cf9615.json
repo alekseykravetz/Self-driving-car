@@ -1,0 +1,159 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_md",
+      "label": "Sound.md",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_sound_system",
+      "label": "Sound System",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_architecture",
+      "label": "Architecture",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_available_sound_functions",
+      "label": "Available Sound Functions",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L22"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_beep_frequency_wavetype",
+      "label": "`beep(frequency, waveType?)`",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L24"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_tadaa",
+      "label": "`taDaa()`",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L55"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_explode",
+      "label": "`explode()`",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L78"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_web_audio_api_pattern",
+      "label": "Web Audio API Pattern",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L123"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_usage_in_race_mode",
+      "label": "Usage in Race Mode",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L162"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_sound_browser_compatibility",
+      "label": "Browser Compatibility",
+      "file_type": "document",
+      "source_file": "docs/Sound.md",
+      "source_location": "L194"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_md",
+      "target": "users_alex_code_self_driving_car_docs_sound_sound_system",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_sound_system",
+      "target": "users_alex_code_self_driving_car_docs_sound_architecture",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_sound_system",
+      "target": "users_alex_code_self_driving_car_docs_sound_available_sound_functions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_available_sound_functions",
+      "target": "users_alex_code_self_driving_car_docs_sound_beep_frequency_wavetype",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_available_sound_functions",
+      "target": "users_alex_code_self_driving_car_docs_sound_tadaa",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_available_sound_functions",
+      "target": "users_alex_code_self_driving_car_docs_sound_explode",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L78",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_sound_system",
+      "target": "users_alex_code_self_driving_car_docs_sound_web_audio_api_pattern",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_sound_system",
+      "target": "users_alex_code_self_driving_car_docs_sound_usage_in_race_mode",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L162",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_sound_sound_system",
+      "target": "users_alex_code_self_driving_car_docs_sound_browser_compatibility",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/Sound.md",
+      "source_location": "L194",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

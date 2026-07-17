@@ -1,0 +1,591 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_md",
+      "label": "ai_architect_audit.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "label": "Architectural Violations & Concerns",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_1_ts_games_race_ts_template_method_pattern_violation_high_severity",
+      "label": "1. ts/games/race.ts \u2014 Template Method Pattern Violation (High Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_2_ts_math_primitives_point_ts_domain_leakage_medium_severity",
+      "label": "2. ts/math/primitives/point.ts \u2014 Domain Leakage (Medium Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L13"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_3_ts_math_utils_ts_domain_knowledge_leakage_medium_severity",
+      "label": "3. ts/math/utils.ts \u2014 Domain Knowledge Leakage (Medium Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L23"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_4_ts_car_physics_carphysics_ts_spatial_grid_not_used_for_collision_high_severity",
+      "label": "4. ts/car/physics/carPhysics.ts \u2014 Spatial Grid Not Used for Collision (High Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L33"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_5_ts_car_physics_carphysics_ts_magic_numbers_medium_severity",
+      "label": "5. ts/car/physics/carPhysics.ts \u2014 Magic Numbers (Medium Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L43"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_6_ts_simulator_training_trainingsimulator_ts_god_file_medium_severity",
+      "label": "6. ts/simulator/training/trainingSimulator.ts \u2014 God File (Medium Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L53"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_7_ts_neural_network_network_ts_mutatefrompool_mutates_pool_references_medium_severity_resolved",
+      "label": "~~7. ts/neural-network/network.ts \u2014 `mutateFromPool()` Mutates Pool References (Medium Severity)~~ **RESOLVED**",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L63"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_8_ts_simulator_training_modes_bordercollision_ts_magic_number_low_severity",
+      "label": "8. ts/simulator/training/modes/borderCollision.ts \u2014 Magic Number (Low Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L73"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_9_html_simulator_html_neuralnetwork_loaded_after_car_low_severity",
+      "label": "9. html/simulator.html \u2014 NeuralNetwork Loaded After Car (Low Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L83"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_10_html_world_html_missing_spatialgrid_low_severity",
+      "label": "10. html/world.html \u2014 Missing SpatialGrid (Low Severity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L93"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "label": "Commendable Implementations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L103"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_1_ts_math_spatialgrid_ts_excellent_spatial_index_implementation",
+      "label": "1. ts/math/spatialGrid.ts \u2014 Excellent Spatial Index Implementation",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L105"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_2_ts_car_rendering_carrenderer_ts_well_executed_flyweight_pattern",
+      "label": "2. ts/car/rendering/carRenderer.ts \u2014 Well-Executed Flyweight Pattern",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L113"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_3_ts_car_car_ts_factory_serialization_pattern",
+      "label": "3. ts/car/car.ts \u2014 Factory/Serialization Pattern",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L122"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_4_ts_simulator_core_simulatorshell_ts_template_method_pattern",
+      "label": "4. ts/simulator/core/simulatorShell.ts \u2014 Template Method Pattern",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L131"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_5_ts_simulator_training_genetics_poolmanager_ts_optimized_selection",
+      "label": "5. ts/simulator/training/genetics/poolManager.ts \u2014 Optimized Selection",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L141"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_6_ts_car_physics_sensorraycaster_ts_allocation_free_hot_path",
+      "label": "6. ts/car/physics/sensorRaycaster.ts \u2014 Allocation-Free Hot Path",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L149"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_7_ts_store_storemanager_ts_robust_singleton_with_legacy_migration",
+      "label": "7. ts/store/storeManager.ts \u2014 Robust Singleton with Legacy Migration",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L156"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_8_html_simulator_html_html_traffic_html_html_race_html_global_restriction_compliance",
+      "label": "8. html/simulator.html, html/traffic.html, html/race.html \u2014 Global Restriction Compliance",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L166"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_structural_reorganization_recommendations",
+      "label": "Structural Reorganization Recommendations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L175"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_1_high_priority_correct_architectural_violations",
+      "label": "Tier 1 (High Priority) \u2014 Correct Architectural Violations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L177"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_1_refactor_race_to_extend_simulatorshell",
+      "label": "1. Refactor Race to extend SimulatorShell",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L179"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_2_extract_draw_methods_from_math_primitives",
+      "label": "2. Extract draw methods from math primitives",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L186"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_3_move_default_car_config_from_ts_math_utils_ts_to_ts_car_config_ts",
+      "label": "3. Move DEFAULT_CAR_CONFIG from ts/math/utils.ts to ts/car/config.ts",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L191"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_2_medium_priority_improve_encapsulation_boundaries",
+      "label": "Tier 2 (Medium Priority) \u2014 Improve Encapsulation & Boundaries",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L196"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_4_integrate_spatial_grid_into_carphysics_assessdamage",
+      "label": "4. Integrate spatial grid into CarPhysics.assessDamage()",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L198"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_5_split_trainingsimulator_714_lines",
+      "label": "5. Split TrainingSimulator (714 lines)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L203"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_6_remove_neuralnetwork_mutatefrompool_retain_only_the_safe_neuralnetwork_tomutatedfrompool_renamed_done",
+      "label": "~~6. Remove NeuralNetwork.mutateFromPool(), retain only the safe NeuralNetwork.toMutatedFromPool() (renamed)~~ **DONE**",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L208"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_3_low_priority_polish_consistency",
+      "label": "Tier 3 (Low Priority) \u2014 Polish & Consistency",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L210"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_7_extract_magic_numbers_in_carphysics_ts_bordercollision_ts_simplemodebehavior_ts_trafficsimulator_ts_into_named_constants",
+      "label": "7. Extract magic numbers in carPhysics.ts, borderCollision.ts, simpleModeBehavior.ts, trafficSimulator.ts into named constants",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L212"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_8_fix_script_tag_ordering_move_neural_network_network_js_and_neural_network_visualizer_js_before_car_car_js_in_all_4_html_files_cosmetic_fix_for_declared_layer_purity",
+      "label": "8. Fix script tag ordering \u2014 move neural-network/network.js and neural-network/visualizer.js before car/car.js in all 4 HTML files (cosmetic fix for declared layer purity)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L214"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_9_consider_upgrading_mathprimitives_to_use_es2022_private_fields_where_appropriate_e_g_point_s_internal_z_and_intersection_could_stay_public_since_they_re_data",
+      "label": "9. Consider upgrading MathPrimitives to use ES2022 private # fields where appropriate (e.g., Point's internal z and intersection could stay public since they're data)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L216"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_10_normalize_private_keyword_usage_to_private_fields_for_any_class_that_doesn_t_need_subclass_access_e_g_trainingsimulator_s_private_mode_could_be_mode",
+      "label": "10. Normalize private keyword usage to # private fields for any class that doesn't need subclass access (e.g., TrainingSimulator's private mode could be #mode)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L218"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_proposed_directory_evolution_feature_sliced_design",
+      "label": "Proposed Directory Evolution (Feature-Sliced Design)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L222"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tasks",
+      "label": "tasks",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L319"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_1_ts_games_race_ts_template_method_pattern_violation_high_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_2_ts_math_primitives_point_ts_domain_leakage_medium_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_3_ts_math_utils_ts_domain_knowledge_leakage_medium_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_4_ts_car_physics_carphysics_ts_spatial_grid_not_used_for_collision_high_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_5_ts_car_physics_carphysics_ts_magic_numbers_medium_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_6_ts_simulator_training_trainingsimulator_ts_god_file_medium_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_7_ts_neural_network_network_ts_mutatefrompool_mutates_pool_references_medium_severity_resolved",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_8_ts_simulator_training_modes_bordercollision_ts_magic_number_low_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_9_html_simulator_html_neuralnetwork_loaded_after_car_low_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_architectural_violations_concerns",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_10_html_world_html_missing_spatialgrid_low_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L93",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L103",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_1_ts_math_spatialgrid_ts_excellent_spatial_index_implementation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_2_ts_car_rendering_carrenderer_ts_well_executed_flyweight_pattern",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L113",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_3_ts_car_car_ts_factory_serialization_pattern",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L122",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_4_ts_simulator_core_simulatorshell_ts_template_method_pattern",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_5_ts_simulator_training_genetics_poolmanager_ts_optimized_selection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L141",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_6_ts_car_physics_sensorraycaster_ts_allocation_free_hot_path",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L149",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_7_ts_store_storemanager_ts_robust_singleton_with_legacy_migration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L156",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_commendable_implementations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_8_html_simulator_html_html_traffic_html_html_race_html_global_restriction_compliance",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_structural_reorganization_recommendations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_1_high_priority_correct_architectural_violations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L177",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_1_high_priority_correct_architectural_violations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_1_refactor_race_to_extend_simulatorshell",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L179",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_1_high_priority_correct_architectural_violations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_2_extract_draw_methods_from_math_primitives",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L186",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_1_high_priority_correct_architectural_violations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_3_move_default_car_config_from_ts_math_utils_ts_to_ts_car_config_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_2_medium_priority_improve_encapsulation_boundaries",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L196",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_2_medium_priority_improve_encapsulation_boundaries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_4_integrate_spatial_grid_into_carphysics_assessdamage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L198",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_2_medium_priority_improve_encapsulation_boundaries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_5_split_trainingsimulator_714_lines",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L203",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_2_medium_priority_improve_encapsulation_boundaries",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_6_remove_neuralnetwork_mutatefrompool_retain_only_the_safe_neuralnetwork_tomutatedfrompool_renamed_done",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L208",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_structural_reorganization_recommendations",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_3_low_priority_polish_consistency",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L210",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_3_low_priority_polish_consistency",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_7_extract_magic_numbers_in_carphysics_ts_bordercollision_ts_simplemodebehavior_ts_trafficsimulator_ts_into_named_constants",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L212",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_3_low_priority_polish_consistency",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_8_fix_script_tag_ordering_move_neural_network_network_js_and_neural_network_visualizer_js_before_car_car_js_in_all_4_html_files_cosmetic_fix_for_declared_layer_purity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L214",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_3_low_priority_polish_consistency",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_9_consider_upgrading_mathprimitives_to_use_es2022_private_fields_where_appropriate_e_g_point_s_internal_z_and_intersection_could_stay_public_since_they_re_data",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L216",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tier_3_low_priority_polish_consistency",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_10_normalize_private_keyword_usage_to_private_fields_for_any_class_that_doesn_t_need_subclass_access_e_g_trainingsimulator_s_private_mode_could_be_mode",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L218",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_proposed_directory_evolution_feature_sliced_design",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L222",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260706_final_architect_audit_task_normalize_private_fields_ai_architect_audit_tasks",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260706-final-architect-audit-task-normalize-private-fields/ai_architect_audit.md",
+      "source_location": "L319",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

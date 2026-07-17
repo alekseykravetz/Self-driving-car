@@ -1,0 +1,488 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_md",
+      "label": "ai-feature-recommendation-report.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "label": "AI Product Architect \u2014 Feature Recommendation Report",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_overview",
+      "label": "Overview",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_recommendation_priority_matrix",
+      "label": "Recommendation Priority Matrix",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_1_feature_c1_spatial_congestion_heatmap",
+      "label": "Priority 1 \u2014 Feature C1: Spatial Congestion Heatmap",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L19"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept",
+      "label": "Core Concept",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L21"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer",
+      "label": "Target Layer",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L25"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it",
+      "label": "Why Build It",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L29"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy",
+      "label": "Architectural Implementation Strategy",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L33"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_2_feature_a1_traffic_light_perception_for_ai_cars",
+      "label": "Priority 2 \u2014 Feature A1: Traffic Light Perception for AI Cars",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L58"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_60",
+      "label": "Core Concept",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L60"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_64",
+      "label": "Target Layer",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L64"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_68",
+      "label": "Why Build It",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L68"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_72",
+      "label": "Architectural Implementation Strategy",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L72"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_3_feature_d2_traffic_control_override",
+      "label": "Priority 3 \u2014 Feature D2: Traffic Control Override",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L93"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_95",
+      "label": "Core Concept",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L95"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_99",
+      "label": "Target Layer",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L99"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_103",
+      "label": "Why Build It",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L103"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_107",
+      "label": "Architectural Implementation Strategy",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L107"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_4_feature_d1_human_in_the_loop_training",
+      "label": "Priority 4 \u2014 Feature D1: Human-in-the-Loop Training",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L130"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_132",
+      "label": "Core Concept",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L132"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_136",
+      "label": "Target Layer",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L136"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_140",
+      "label": "Why Build It",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L140"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_144",
+      "label": "Architectural Implementation Strategy",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L144"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_5_feature_b1_multi_class_sensor_readings",
+      "label": "Priority 5 \u2014 Feature B1: Multi-Class Sensor Readings",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L169"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_171",
+      "label": "Core Concept",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L171"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_175",
+      "label": "Target Layer",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L175"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_179",
+      "label": "Why Build It",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L179"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_183",
+      "label": "Architectural Implementation Strategy",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L183"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_appendix_feature_delivery_order",
+      "label": "Appendix: Feature Delivery Order",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L217"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_overview",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_roadmap_md",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_recommendation_priority_matrix",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_1_feature_c1_spatial_congestion_heatmap",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_1_feature_c1_spatial_congestion_heatmap",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_1_feature_c1_spatial_congestion_heatmap",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_1_feature_c1_spatial_congestion_heatmap",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_1_feature_c1_spatial_congestion_heatmap",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_2_feature_a1_traffic_light_perception_for_ai_cars",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_2_feature_a1_traffic_light_perception_for_ai_cars",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_60",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_2_feature_a1_traffic_light_perception_for_ai_cars",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_64",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_2_feature_a1_traffic_light_perception_for_ai_cars",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_68",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_2_feature_a1_traffic_light_perception_for_ai_cars",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_72",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L72",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_3_feature_d2_traffic_control_override",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L93",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_3_feature_d2_traffic_control_override",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_95",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_3_feature_d2_traffic_control_override",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_99",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_3_feature_d2_traffic_control_override",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_103",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L103",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_3_feature_d2_traffic_control_override",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_107",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_4_feature_d1_human_in_the_loop_training",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_4_feature_d1_human_in_the_loop_training",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_132",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L132",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_4_feature_d1_human_in_the_loop_training",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_136",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_4_feature_d1_human_in_the_loop_training",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_140",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L140",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_4_feature_d1_human_in_the_loop_training",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_144",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_5_feature_b1_multi_class_sensor_readings",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L169",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_5_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_core_concept_171",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L171",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_5_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_target_layer_175",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_5_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_why_build_it_179",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L179",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_priority_5_feature_b1_multi_class_sensor_readings",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_architectural_implementation_strategy_183",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L183",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_ai_product_architect_feature_recommendation_report",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260710_sensors_classified_ai_feature_recommendation_report_appendix_feature_delivery_order",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260710-sensors-classified/ai-feature-recommendation-report.md",
+      "source_location": "L217",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

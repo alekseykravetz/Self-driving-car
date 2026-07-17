@@ -1,0 +1,255 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_md",
+      "label": "SKILL.md",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "label": "Task Planning Workflow",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L6"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_1_capture_the_raw_request",
+      "label": "Step 1 \u2014 Capture the raw request",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L10"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_2_interview_hybrid_question_tool_first_free_form_after",
+      "label": "Step 2 \u2014 Interview (hybrid: question tool first, free-form after)",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L23"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_3_write_the_plan_to_tasks_slug_md",
+      "label": "Step 3 \u2014 Write the plan to `tasks/<slug>.md`",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L38"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_required_sections",
+      "label": "Required sections",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L44"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_writing_rules",
+      "label": "Writing rules",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L101"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_4_stop_for_review",
+      "label": "Step 4 \u2014 STOP for review",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L110"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_5_hand_off_to_build_only_after_user_says_proceed",
+      "label": "Step 5 \u2014 Hand off to build (only after user says proceed)",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L118"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_6_reviewer_loop_catches_incomplete_implementation",
+      "label": "Step 6 \u2014 Reviewer loop (catches incomplete implementation)",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L139"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_reviewer_verdict_handling",
+      "label": "Reviewer verdict handling",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L157"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_7_docs_sync_planner_does_this_not_build",
+      "label": "Step 7 \u2014 Docs sync (planner does this, NOT build)",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L183"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_8_reviewer_docs_check_light",
+      "label": "Step 8 \u2014 Reviewer docs check (light)",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L196"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_9_archive",
+      "label": "Step 9 \u2014 Archive",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L215"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_when_not_to_run_this_workflow",
+      "label": "When NOT to run this workflow",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L226"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_cost_model_summary",
+      "label": "Cost model summary",
+      "file_type": "document",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L235"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_md",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_1_capture_the_raw_request",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_2_interview_hybrid_question_tool_first_free_form_after",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_3_write_the_plan_to_tasks_slug_md",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_3_write_the_plan_to_tasks_slug_md",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_required_sections",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_3_write_the_plan_to_tasks_slug_md",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_writing_rules",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_4_stop_for_review",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L110",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_5_hand_off_to_build_only_after_user_says_proceed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L118",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_6_reviewer_loop_catches_incomplete_implementation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L139",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_6_reviewer_loop_catches_incomplete_implementation",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_reviewer_verdict_handling",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L157",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_7_docs_sync_planner_does_this_not_build",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L183",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_8_reviewer_docs_check_light",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L196",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_step_9_archive",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L215",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_when_not_to_run_this_workflow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L226",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_task_planning_workflow",
+      "target": "users_alex_code_self_driving_car_opencode_skills_task_planning_skill_cost_model_summary",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/skills/task-planning/SKILL.md",
+      "source_location": "L235",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

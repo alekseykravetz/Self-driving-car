@@ -1,0 +1,127 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_md",
+      "label": "07-god-classes.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "label": "Task 07 \u2014 Split god classes",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_problem",
+      "label": "Problem",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L5"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_goal",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L17"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_suggested_approach_incremental_one_file_at_a_time",
+      "label": "Suggested approach (incremental, one file at a time)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L21"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_acceptance_criteria",
+      "label": "Acceptance criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L32"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_notes",
+      "label": "Notes",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L38"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_resolution",
+      "label": "Resolution",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L44"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_problem",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_goal",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_suggested_approach_incremental_one_file_at_a_time",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_acceptance_criteria",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_notes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_task_07_split_god_classes",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_07_god_classes_resolution",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/07-god-classes.md",
+      "source_location": "L44",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

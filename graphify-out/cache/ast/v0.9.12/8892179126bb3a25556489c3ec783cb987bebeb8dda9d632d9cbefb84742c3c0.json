@@ -1,0 +1,593 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_md",
+      "label": "SaveLoad.md",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "label": "Save & Load System",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_localstorage_persistence",
+      "label": "LocalStorage Persistence",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_current_storage_schema",
+      "label": "Current Storage Schema",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L9"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_bestpool_format",
+      "label": "`bestPool` Format",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L38"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_legacy_migration",
+      "label": "Legacy Migration",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L83"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_legacy_keys",
+      "label": "Legacy Keys",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L87"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_migration_logic_storagemanager_ts",
+      "label": "Migration Logic (`storageManager.ts`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L95"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_file_formats",
+      "label": "File Formats",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L136"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_world_files_world",
+      "label": "World Files (`.world`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L138"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_v2_lean_current",
+      "label": "v2 (lean) \u2014 current",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L142"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_v1_legacy_still_loadable",
+      "label": "v1 (legacy) \u2014 still loadable",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L182"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_migration_script",
+      "label": "Migration script",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L191"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_car_files_car",
+      "label": "Car Files (`.car`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L208"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_osm_data_files_json",
+      "label": "OSM Data Files (`.json`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L227"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_worldloader_ts_world_loader_worldloader_ts",
+      "label": "WorldLoader (`ts/world/loader/worldLoader.ts`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L242"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_responsibilities",
+      "label": "Responsibilities",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L244"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_usage",
+      "label": "Usage",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L251"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_integration",
+      "label": "Integration",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L260"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_carloader_ts_car_loader_carloader_ts",
+      "label": "CarLoader (`ts/car/loader/carLoader.ts`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L266"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_responsibilities_268",
+      "label": "Responsibilities",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L268"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_usage_276",
+      "label": "Usage",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L276"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_static_helpers",
+      "label": "Static Helpers",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L298"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_save_operations",
+      "label": "Save Operations",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L320"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_training_manager_save_button",
+      "label": "Training Manager \u2192 Save (\ud83d\udcbe button)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L322"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_training_manager_save_car_to_file",
+      "label": "Training Manager \u2192 Save Car to File",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L334"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_world_editor_save",
+      "label": "World Editor \u2192 Save",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L347"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_discard_button",
+      "label": "Discard (\ud83d\uddd1\ufe0f button)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L355"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_race_cars_racecars",
+      "label": "Race Cars (`raceCars`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L366"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_status_indicators",
+      "label": "Status Indicators",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L381"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_storage_status",
+      "label": "Storage Status",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L385"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_pool_status",
+      "label": "Pool Status",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L392"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_car_config_status",
+      "label": "Car Config Status",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L400"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_data_flow_summary",
+      "label": "Data Flow Summary",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L410"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_saved_files_reference_saves",
+      "label": "Saved Files Reference (`saves/`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L436"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_docs_saveload_store_system_store",
+      "label": "Store System (`store/`)",
+      "file_type": "document",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L458"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_md",
+      "target": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_localstorage_persistence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_localstorage_persistence",
+      "target": "users_alex_code_self_driving_car_docs_saveload_current_storage_schema",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_localstorage_persistence",
+      "target": "users_alex_code_self_driving_car_docs_saveload_bestpool_format",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_md",
+      "target": "users_alex_code_self_driving_car_docs_physics_md",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_legacy_migration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_legacy_migration",
+      "target": "users_alex_code_self_driving_car_docs_saveload_legacy_keys",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_legacy_migration",
+      "target": "users_alex_code_self_driving_car_docs_saveload_migration_logic_storagemanager_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_file_formats",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_file_formats",
+      "target": "users_alex_code_self_driving_car_docs_saveload_world_files_world",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_world_files_world",
+      "target": "users_alex_code_self_driving_car_docs_saveload_v2_lean_current",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_world_files_world",
+      "target": "users_alex_code_self_driving_car_docs_saveload_v1_legacy_still_loadable",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L182",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_world_files_world",
+      "target": "users_alex_code_self_driving_car_docs_saveload_migration_script",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_file_formats",
+      "target": "users_alex_code_self_driving_car_docs_saveload_car_files_car",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L208",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_file_formats",
+      "target": "users_alex_code_self_driving_car_docs_saveload_osm_data_files_json",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L227",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_worldloader_ts_world_loader_worldloader_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L242",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_worldloader_ts_world_loader_worldloader_ts",
+      "target": "users_alex_code_self_driving_car_docs_saveload_responsibilities",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L244",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_worldloader_ts_world_loader_worldloader_ts",
+      "target": "users_alex_code_self_driving_car_docs_saveload_usage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L251",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_worldloader_ts_world_loader_worldloader_ts",
+      "target": "users_alex_code_self_driving_car_docs_saveload_integration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L260",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_carloader_ts_car_loader_carloader_ts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L266",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_carloader_ts_car_loader_carloader_ts",
+      "target": "users_alex_code_self_driving_car_docs_saveload_responsibilities_268",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L268",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_carloader_ts_car_loader_carloader_ts",
+      "target": "users_alex_code_self_driving_car_docs_saveload_usage_276",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L276",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_carloader_ts_car_loader_carloader_ts",
+      "target": "users_alex_code_self_driving_car_docs_saveload_static_helpers",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L298",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_save_operations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L320",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_operations",
+      "target": "users_alex_code_self_driving_car_docs_saveload_training_manager_save_button",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L322",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_operations",
+      "target": "users_alex_code_self_driving_car_docs_saveload_training_manager_save_car_to_file",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L334",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_operations",
+      "target": "users_alex_code_self_driving_car_docs_saveload_world_editor_save",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L347",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_operations",
+      "target": "users_alex_code_self_driving_car_docs_saveload_discard_button",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L355",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_operations",
+      "target": "users_alex_code_self_driving_car_docs_saveload_race_cars_racecars",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L366",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_status_indicators",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L381",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_status_indicators",
+      "target": "users_alex_code_self_driving_car_docs_saveload_storage_status",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L385",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_status_indicators",
+      "target": "users_alex_code_self_driving_car_docs_saveload_pool_status",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L392",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_status_indicators",
+      "target": "users_alex_code_self_driving_car_docs_saveload_car_config_status",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L400",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_data_flow_summary",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L410",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_saved_files_reference_saves",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L436",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_save_load_system",
+      "target": "users_alex_code_self_driving_car_docs_saveload_store_system_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L458",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_docs_saveload_md",
+      "target": "users_alex_code_self_driving_car_docs_store_md",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SaveLoad.md",
+      "source_location": "L460",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

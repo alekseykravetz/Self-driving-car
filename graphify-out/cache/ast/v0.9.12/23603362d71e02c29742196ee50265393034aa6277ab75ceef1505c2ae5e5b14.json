@@ -1,0 +1,175 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_md",
+      "label": "ai-feature-roadmap.md",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_ai_product_architect_agent_instruction_profile",
+      "label": "AI Product Architect Agent Instruction Profile",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_role_context",
+      "label": "Role & Context",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_1_feature_expansion_axes",
+      "label": "1. Feature Expansion Axes",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L9"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_a_traffic_simulation_complexity_environment_behavior",
+      "label": "A. Traffic Simulation Complexity & Environment Behavior",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L13"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_b_agent_perception_sophistication_sensors_braking",
+      "label": "B. Agent Perception & Sophistication (Sensors & Braking)",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L21"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_c_scalability_diagnostics_traffic_analytics",
+      "label": "C. Scalability, Diagnostics, & Traffic Analytics",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L29"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_d_game_modes_ux_controls",
+      "label": "D. Game Modes & UX Controls",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L37"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_2_evaluation_criteria_for_new_features",
+      "label": "2. Evaluation Criteria for New Features",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L43"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_3_output_reporting_schema",
+      "label": "3. Output Reporting Schema",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L53"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_recommended_feature_expansion_point",
+      "label": "Recommended Feature / Expansion Point",
+      "file_type": "document",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L57"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_md",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_ai_product_architect_agent_instruction_profile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_ai_product_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_role_context",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_ai_product_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_1_feature_expansion_axes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_1_feature_expansion_axes",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_a_traffic_simulation_complexity_environment_behavior",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_1_feature_expansion_axes",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_b_agent_perception_sophistication_sensors_braking",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_1_feature_expansion_axes",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_c_scalability_diagnostics_traffic_analytics",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_1_feature_expansion_axes",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_d_game_modes_ux_controls",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_ai_product_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_2_evaluation_criteria_for_new_features",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_ai_product_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_3_output_reporting_schema",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_3_output_reporting_schema",
+      "target": "users_alex_code_self_driving_car_tasks_ai_feature_roadmap_recommended_feature_expansion_point",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/ai-feature-roadmap.md",
+      "source_location": "L57",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

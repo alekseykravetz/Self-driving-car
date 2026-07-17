@@ -1,0 +1,239 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_md",
+      "label": "ai_architect_agent_instruction.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "label": "AI Architect Agent Instruction Profile",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_role_context",
+      "label": "Role & Context",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_1_core_architectural_constraints_to_enforce",
+      "label": "1. Core Architectural Constraints to Enforce",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_2_structural_folder_boundary_auditing_fsd_atomic_design",
+      "label": "2. Structural & Folder Boundary Auditing (FSD & Atomic Design)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L23"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_feature_sliced_design_fsd_domain_boundaries",
+      "label": "Feature-Sliced Design (FSD) & Domain Boundaries",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L27"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_atomic_design_applicability",
+      "label": "Atomic Design Applicability",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L35"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_3_design_pattern_evaluation_good_vs_bad",
+      "label": "3. Design Pattern Evaluation (Good vs. Bad)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L44"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_desired_patterns_good",
+      "label": "Desired Patterns (Good)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L48"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_anti_patterns_to_flag_bad",
+      "label": "Anti-Patterns to Flag (Bad)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L55"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_4_code_standards_style_adherence",
+      "label": "4. Code Standards & Style Adherence",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L61"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_5_output_reporting_schema",
+      "label": "5. Output Reporting Schema",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L69"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_architectural_violations_concerns",
+      "label": "\ud83d\udea8 Architectural Violations & Concerns",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L73"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_commendable_implementations",
+      "label": "\ud83c\udf1f Commendable Implementations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L80"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_structural_reorganization_recommendations",
+      "label": "\ud83d\uddfa\ufe0f Structural Reorganization Recommendations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L84"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_role_context",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_1_core_architectural_constraints_to_enforce",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_2_structural_folder_boundary_auditing_fsd_atomic_design",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_2_structural_folder_boundary_auditing_fsd_atomic_design",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_feature_sliced_design_fsd_domain_boundaries",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_2_structural_folder_boundary_auditing_fsd_atomic_design",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_atomic_design_applicability",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_3_design_pattern_evaluation_good_vs_bad",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_3_design_pattern_evaluation_good_vs_bad",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_desired_patterns_good",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_3_design_pattern_evaluation_good_vs_bad",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_anti_patterns_to_flag_bad",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_4_code_standards_style_adherence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_ai_architect_agent_instruction_profile",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_5_output_reporting_schema",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_5_output_reporting_schema",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_architectural_violations_concerns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_5_output_reporting_schema",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_commendable_implementations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_5_output_reporting_schema",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260703_ai_architect_audit_ai_architect_agent_instruction_structural_reorganization_recommendations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260703-ai-architect-audit/ai_architect_agent_instruction.md",
+      "source_location": "L84",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

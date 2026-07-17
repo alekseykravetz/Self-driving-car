@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_planner_md",
+      "label": "planner.md",
+      "file_type": "document",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_planner_agents_at_your_disposal",
+      "label": "Agents at your disposal",
+      "file_type": "document",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L30"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_planner_always_load_these_skills_before_acting",
+      "label": "Always load these skills before acting",
+      "file_type": "document",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L40"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_planner_repo_facts_do_not_re_derive",
+      "label": "Repo facts (do not re-derive)",
+      "file_type": "document",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L47"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_planner_decision_rule_for_incoming_requests",
+      "label": "Decision rule for incoming requests",
+      "file_type": "document",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L55"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_opencode_agents_planner_temperature",
+      "label": "Temperature",
+      "file_type": "document",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L65"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_planner_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_planner_agents_at_your_disposal",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_planner_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_planner_always_load_these_skills_before_acting",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_planner_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_planner_repo_facts_do_not_re_derive",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_planner_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_planner_decision_rule_for_incoming_requests",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_opencode_agents_planner_md",
+      "target": "users_alex_code_self_driving_car_opencode_agents_planner_temperature",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".opencode/agents/planner.md",
+      "source_location": "L65",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

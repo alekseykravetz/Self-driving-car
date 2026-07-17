@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_md",
+      "label": "06-legacy-formats.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_task_06_migrate_legacy_save_formats",
+      "label": "Task 06 \u2014 Migrate legacy save formats",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_problem",
+      "label": "Problem",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L5"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_goal",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_steps",
+      "label": "Steps",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L15"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_acceptance_criteria",
+      "label": "Acceptance criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L25"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_notes",
+      "label": "Notes",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L31"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_task_06_migrate_legacy_save_formats",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_task_06_migrate_legacy_save_formats",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_problem",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_task_06_migrate_legacy_save_formats",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_goal",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_task_06_migrate_legacy_save_formats",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_steps",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_task_06_migrate_legacy_save_formats",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_acceptance_criteria",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_task_06_migrate_legacy_save_formats",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260611_codebase_analysis_06_legacy_formats_notes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260611-codebase-analysis/06-legacy-formats.md",
+      "source_location": "L31",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
