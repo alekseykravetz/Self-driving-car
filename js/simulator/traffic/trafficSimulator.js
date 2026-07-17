@@ -217,6 +217,7 @@ export class TrafficSimulator extends SimulatorShell {
         car.name = `Car ${++this.#spawnCount}`;
         this.#cars.push(car);
         this.#statsPanel.setCars(this.#cars);
+        this.#statsPanel.selectCar(car);
     }
     /** Angle that faces the nearest road segment to `point` (start convention). */
     #headingAt(point) {

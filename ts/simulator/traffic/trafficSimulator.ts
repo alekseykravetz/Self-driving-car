@@ -283,6 +283,7 @@ export class TrafficSimulator extends SimulatorShell {
 
     this.#cars.push(car);
     this.#statsPanel.setCars(this.#cars);
+    this.#statsPanel.selectCar(car);
   }
 
   /** Angle that faces the nearest road segment to `point` (start convention). */

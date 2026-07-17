@@ -74,6 +74,9 @@ export class TrafficPanelElement extends HTMLElement {
         }
         return this.#selected;
     }
+    selectCar(car) {
+        this.#select(car);
+    }
     setSelectListener(listener) {
         this.#onSelect = listener;
     }
