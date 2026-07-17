@@ -2904,7 +2904,19 @@
       "children": [
         {
           "type": "frame",
-          "id": "b9aQF",
+          "id": "s8gUW0",
+          "x": 1180,
+          "y": 680,
+          "name": "MiniMapCanvas",
+          "width": 200,
+          "height": 200,
+          "fill": "#2a5",
+          "stroke": "#000000",
+          "strokeWidth": 2
+        },
+        {
+          "type": "frame",
+          "id": "V8HEYm",
           "x": 0,
           "y": 0,
           "name": "WorldCanvas",
@@ -2914,16 +2926,17 @@
         },
         {
           "type": "frame",
-          "id": "FMbVa",
+          "id": "Y6uvc",
           "x": 10,
           "y": 10,
           "name": "SimulatorToolbar",
           "fill": "#00000000",
+          "layout": "vertical",
           "gap": 10,
           "children": [
             {
               "type": "frame",
-              "id": "p2VSH",
+              "id": "Nq2P3",
               "name": "WorldToolbar",
               "fill": "#00000099",
               "cornerRadius": 8,
@@ -2937,216 +2950,154 @@
               "children": [
                 {
                   "type": "frame",
-                  "id": "B7rm6",
-                  "name": "WorldGroup",
+                  "id": "Yljpo",
+                  "name": "StorageGroup",
                   "layout": "vertical",
                   "gap": 3,
-                  "alignItems": "center",
                   "children": [
                     {
-                      "id": "l013Dt",
+                      "id": "o7Ko1V",
                       "type": "ref",
                       "ref": "pAUCr",
-                      "name": "Label",
-                      "content": "WORLD"
+                      "name": "StorageLabel"
                     },
                     {
-                      "id": "bvreA",
-                      "type": "ref",
-                      "ref": "S517Eu",
-                      "name": "WorldBtn",
-                      "descendants": {
-                        "v2Ocy": {
-                          "content": "🌍"
+                      "type": "frame",
+                      "id": "kSsPx",
+                      "name": "StorageBtns",
+                      "height": 32,
+                      "gap": 2,
+                      "children": [
+                        {
+                          "id": "Ac3Yn",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "SaveBtn"
+                        },
+                        {
+                          "id": "j48Rxw",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "ClearBtn"
                         }
-                      }
+                      ]
                     }
                   ]
                 },
                 {
-                  "id": "rOLRH",
+                  "id": "xugwp",
                   "type": "ref",
                   "ref": "HSjxq",
                   "name": "Sep1"
                 },
                 {
                   "type": "frame",
-                  "id": "DIuLi",
-                  "name": "BordersGroup",
+                  "id": "w3WaR",
+                  "name": "WorldGroup",
                   "layout": "vertical",
                   "gap": 3,
-                  "alignItems": "center",
                   "children": [
                     {
-                      "id": "K1dMw",
+                      "id": "aCk6h",
                       "type": "ref",
                       "ref": "pAUCr",
-                      "name": "Label",
-                      "content": "BORDERS"
+                      "name": "WorldLabel"
                     },
                     {
                       "type": "frame",
-                      "id": "D2xQhV",
-                      "name": "BtnRow",
+                      "id": "Frvws",
+                      "name": "WorldBtns",
                       "height": 32,
                       "gap": 2,
-                      "alignItems": "center",
                       "children": [
                         {
-                          "id": "bQNrt",
+                          "id": "WZB0p",
                           "type": "ref",
                           "ref": "S517Eu",
-                          "name": "BtnNone",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "🚫"
-                            }
-                          }
+                          "name": "LoadBtn"
                         },
                         {
-                          "id": "WhpgN",
+                          "id": "G7WvJ",
                           "type": "ref",
                           "ref": "S517Eu",
-                          "name": "BtnDmg",
-                          "fill": "rgba(255,255,255,0.2)",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "💀"
-                            }
-                          }
-                        },
-                        {
-                          "id": "ua3KN",
-                          "type": "ref",
-                          "ref": "S517Eu",
-                          "name": "BtnColl",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "🛡️"
-                            }
-                          }
+                          "name": "OsmBtn"
                         }
                       ]
                     }
                   ]
                 },
                 {
-                  "id": "A7jE58",
+                  "id": "chWlJ",
                   "type": "ref",
                   "ref": "HSjxq",
                   "name": "Sep2"
                 },
                 {
                   "type": "frame",
-                  "id": "bgBWh",
-                  "name": "TrackingGroup",
+                  "id": "Dd451",
+                  "name": "SelectedGroup",
                   "layout": "vertical",
                   "gap": 3,
-                  "alignItems": "center",
                   "children": [
                     {
-                      "id": "ImMn9",
+                      "id": "V6NSTA",
                       "type": "ref",
                       "ref": "pAUCr",
-                      "name": "Label",
-                      "content": "TRACKING"
+                      "name": "SelectedLabel"
                     },
                     {
-                      "type": "frame",
-                      "id": "N64XkG",
-                      "name": "BtnRow",
-                      "height": 32,
-                      "gap": 2,
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "id": "fsILS",
-                          "type": "ref",
-                          "ref": "S517Eu",
-                          "name": "BtnNone",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "✋"
-                            }
-                          }
+                      "id": "QbeCQ",
+                      "type": "ref",
+                      "ref": "kiYqs",
+                      "name": "SelectedInfo",
+                      "descendants": {
+                        "v22oQs": {
+                          "content": "City Map"
                         },
-                        {
-                          "id": "W0I70M",
-                          "type": "ref",
-                          "ref": "S517Eu",
-                          "name": "BtnBest",
-                          "fill": "rgba(255,255,255,0.2)",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "🏆"
-                            }
-                          }
-                        },
-                        {
-                          "id": "sEGrO",
-                          "type": "ref",
-                          "ref": "S517Eu",
-                          "name": "BtnKeys",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "🎮"
-                            }
-                          }
+                        "V3u4OY": {
+                          "content": "—"
                         }
-                      ]
+                      }
                     }
                   ]
                 },
                 {
-                  "id": "h7YFpI",
+                  "id": "BphU0",
                   "type": "ref",
                   "ref": "HSjxq",
                   "name": "Sep3"
                 },
                 {
                   "type": "frame",
-                  "id": "KQw0o",
-                  "name": "StorageGroup",
+                  "id": "y4i8W",
+                  "name": "ViewportGroup",
                   "layout": "vertical",
                   "gap": 3,
-                  "alignItems": "center",
                   "children": [
                     {
-                      "id": "Nu3cN",
+                      "id": "n9RRX",
                       "type": "ref",
                       "ref": "pAUCr",
-                      "name": "Label",
-                      "content": "STORAGE"
+                      "name": "ViewportLabel"
                     },
                     {
                       "type": "frame",
-                      "id": "U2MeVI",
-                      "name": "BtnRow",
+                      "id": "Gyxis",
+                      "name": "ViewportBtns",
                       "height": 32,
                       "gap": 2,
-                      "alignItems": "center",
                       "children": [
                         {
-                          "id": "LJ5TT",
+                          "id": "r80ghO",
                           "type": "ref",
                           "ref": "S517Eu",
-                          "name": "SaveBtn",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "💾"
-                            }
-                          }
+                          "name": "MouseBtn"
                         },
                         {
-                          "id": "nC7Ed",
+                          "id": "CjRDw",
                           "type": "ref",
                           "ref": "S517Eu",
-                          "name": "ClearBtn",
-                          "descendants": {
-                            "v2Ocy": {
-                              "content": "❌"
-                            }
-                          }
+                          "name": "TouchpadBtn"
                         }
                       ]
                     }
@@ -3156,7 +3107,7 @@
             },
             {
               "type": "frame",
-              "id": "UXqVo",
+              "id": "HB1ck",
               "name": "ShortcutsToolbar",
               "fill": "#00000099",
               "cornerRadius": 8,
@@ -3169,10 +3120,206 @@
               ],
               "children": [
                 {
-                  "id": "ybnY3",
+                  "type": "frame",
+                  "id": "yjXx8",
+                  "name": "ViewGroup",
+                  "layout": "vertical",
+                  "gap": 3,
+                  "children": [
+                    {
+                      "id": "GRC1V",
+                      "type": "ref",
+                      "ref": "pAUCr",
+                      "name": "ViewLabel"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "augGW",
+                      "name": "ViewKeys",
+                      "height": 32,
+                      "gap": 2,
+                      "children": [
+                        {
+                          "id": "LdGuX",
+                          "type": "ref",
+                          "ref": "Z7U14E",
+                          "name": "KeyCtrl"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "Cot8c",
                   "type": "ref",
-                  "ref": "ldFmX",
-                  "name": "Keys"
+                  "ref": "HSjxq",
+                  "name": "Sep1"
+                },
+                {
+                  "type": "frame",
+                  "id": "fzHBV",
+                  "name": "GraphGroup",
+                  "layout": "vertical",
+                  "gap": 3,
+                  "children": [
+                    {
+                      "id": "CRN3P",
+                      "type": "ref",
+                      "ref": "pAUCr",
+                      "name": "GraphLabel"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EzFdr",
+                      "name": "GraphKeys",
+                      "height": 32,
+                      "gap": 4,
+                      "children": [
+                        {
+                          "id": "DLRkQ",
+                          "type": "ref",
+                          "ref": "Z7U14E",
+                          "name": "KeyS"
+                        },
+                        {
+                          "id": "Vobip",
+                          "type": "ref",
+                          "ref": "Z7U14E",
+                          "name": "KeyE"
+                        },
+                        {
+                          "id": "s8nW34",
+                          "type": "ref",
+                          "ref": "Z7U14E",
+                          "name": "KeyC"
+                        },
+                        {
+                          "id": "Nkcdb",
+                          "type": "ref",
+                          "ref": "Z7U14E",
+                          "name": "KeyO"
+                        },
+                        {
+                          "id": "wCJay",
+                          "type": "ref",
+                          "ref": "Z7U14E",
+                          "name": "KeyH"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wY5AR",
+              "name": "WorldLayersToolbar",
+              "fill": "#00000099",
+              "cornerRadius": 8,
+              "stroke": "#ffffff26",
+              "strokeWidth": 1,
+              "gap": 6,
+              "padding": [
+                6,
+                10
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "QnHL0",
+                  "name": "LayersGroup",
+                  "layout": "vertical",
+                  "gap": 3,
+                  "children": [
+                    {
+                      "id": "j7BFeX",
+                      "type": "ref",
+                      "ref": "pAUCr",
+                      "name": "LayersLabel"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bBXKj",
+                      "name": "LayersBtns",
+                      "height": 32,
+                      "gap": 2,
+                      "children": [
+                        {
+                          "id": "FpRMt",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "LayerBtn"
+                        },
+                        {
+                          "id": "Nlg6V",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "LayerBtn"
+                        },
+                        {
+                          "id": "bI9N8",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "LayerBtn"
+                        },
+                        {
+                          "id": "cOT0d",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "LayerBtn"
+                        },
+                        {
+                          "id": "Lxayg",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "LayerBtn"
+                        },
+                        {
+                          "id": "abG0O",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "LayerBtn"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "j9NtT",
+                  "type": "ref",
+                  "ref": "HSjxq",
+                  "name": "Sep1"
+                },
+                {
+                  "type": "frame",
+                  "id": "UusN1",
+                  "name": "ItemsGroup",
+                  "layout": "vertical",
+                  "gap": 3,
+                  "children": [
+                    {
+                      "id": "XtEY7",
+                      "type": "ref",
+                      "ref": "pAUCr",
+                      "name": "ItemsLabel"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "h6SIP",
+                      "name": "ItemsBtns",
+                      "height": 32,
+                      "gap": 2,
+                      "children": [
+                        {
+                          "id": "Fbs5x",
+                          "type": "ref",
+                          "ref": "S517Eu",
+                          "name": "RegenBtn"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -3180,130 +3327,102 @@
         },
         {
           "type": "frame",
-          "id": "s8gUW0",
-          "x": 1180,
-          "y": 680,
-          "name": "MiniMapCanvas",
-          "width": 200,
-          "height": 200,
-          "fill": "#2a5",
-          "stroke": "#000000",
-          "strokeWidth": 2
-        },
-        {
-          "type": "frame",
-          "id": "MpiKP",
-          "x": 400,
-          "y": 860,
+          "id": "P8XijQ",
+          "x": 370,
+          "y": 850,
           "name": "EditorToolbar",
           "fill": "#00000080",
           "cornerRadius": 8,
           "stroke": "#000000",
           "strokeWidth": 2,
-          "gap": 10,
           "padding": [
             8,
             12
           ],
-          "alignItems": "center",
           "children": [
             {
               "type": "frame",
-              "id": "vWq8o",
+              "id": "VI73s",
               "name": "GraphGroup",
               "gap": 4,
-              "alignItems": "center",
               "children": [
                 {
-                  "id": "jWT5v",
+                  "id": "kcoTV",
                   "type": "ref",
                   "ref": "UTEsu",
-                  "name": "Select",
-                  "fill": "#ffffff"
+                  "name": "GraphBtn"
                 },
                 {
-                  "id": "krJo6",
+                  "id": "j3i6Vk",
                   "type": "ref",
                   "ref": "UTEsu",
-                  "name": "Pan"
-                },
-                {
-                  "id": "Fqdyi",
-                  "type": "ref",
-                  "ref": "UTEsu",
-                  "name": "Node"
-                },
-                {
-                  "type": "frame",
-                  "id": "FGHaz",
-                  "name": "Divider",
-                  "width": 1,
-                  "height": 28,
-                  "fill": "#ffffff4d"
-                },
-                {
-                  "id": "N0I8ag",
-                  "type": "ref",
-                  "ref": "UTEsu",
-                  "name": "Road"
-                },
-                {
-                  "id": "mXVhM",
-                  "type": "ref",
-                  "ref": "UTEsu",
-                  "name": "Crosswalk"
-                },
-                {
-                  "id": "hCG8J",
-                  "type": "ref",
-                  "ref": "UTEsu",
-                  "name": "Stop"
-                },
-                {
-                  "id": "W0YIGM",
-                  "type": "ref",
-                  "ref": "UTEsu",
-                  "name": "Tree"
-                },
-                {
-                  "id": "HGg1m",
-                  "type": "ref",
-                  "ref": "UTEsu",
-                  "name": "Building"
-                },
-                {
-                  "id": "vVbm8",
-                  "type": "ref",
-                  "ref": "UTEsu",
-                  "name": "Corridor"
+                  "name": "MarkingBtn"
                 }
               ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "g4hZr",
-          "x": 1280,
-          "y": 10,
-          "name": "Editor Badge",
-          "width": 100,
-          "height": 24,
-          "fill": "#df7ddf",
-          "cornerRadius": 4,
-          "children": [
+            },
             {
-              "type": "text",
-              "id": "IjWWD",
-              "name": "Badge Text",
-              "fill": "#000000",
-              "textGrowth": "fixed-width",
-              "width": "fill_container",
-              "content": "WORLD EDITOR",
-              "textAlign": "center",
-              "fontFamily": "Inter",
-              "fontSize": 11,
-              "fontWeight": "700"
+              "type": "frame",
+              "id": "iaGor",
+              "name": "Divider",
+              "width": 1,
+              "height": 28,
+              "fill": "#ffffff4d"
+            },
+            {
+              "type": "frame",
+              "id": "jHelo",
+              "name": "MarkingGroup",
+              "gap": 4,
+              "children": [
+                {
+                  "id": "ibyUh",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "StartBtn"
+                },
+                {
+                  "id": "XygPR",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "TargetBtn"
+                },
+                {
+                  "id": "Fo3Xh",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "StopBtn"
+                },
+                {
+                  "id": "uBjZK",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "CrossingBtn"
+                },
+                {
+                  "id": "jt46y",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "YieldBtn"
+                },
+                {
+                  "id": "KPHvi",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "ParkingBtn"
+                },
+                {
+                  "id": "q6mnUF",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "LightBtn"
+                },
+                {
+                  "id": "slSmK",
+                  "type": "ref",
+                  "ref": "UTEsu",
+                  "name": "CorridorBtn"
+                }
+              ]
             }
           ]
         }
