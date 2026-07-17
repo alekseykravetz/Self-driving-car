@@ -56,6 +56,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
         this.#wirePanel();
         this.#initPauseToggleClicks();
         this.#initKeyboardManager();
+        this.#configModal.setKeyboardManager(this.#keyboardManager);
         this.#openConfigModal('entry');
         window.addEventListener('beforeunload', () => this.#saveCar());
         this.animate(0);
@@ -576,6 +577,17 @@ export class HumanBackpropSimulator extends SimulatorShell {
                 group: 'View',
                 kind: 'display',
                 keys: ['Control'],
+            },
+            {
+                id: 'visDensity',
+                key: 'v',
+                label: 'V',
+                title: 'V \u2014 Toggle network visualizer density (show all values)',
+                group: 'Visualizer',
+                kind: 'momentary',
+                handler: {
+                    onKeyDown: () => this.networkVisualizer.toggleDensity(),
+                },
             },
         ]);
     }

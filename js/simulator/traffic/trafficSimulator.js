@@ -125,6 +125,17 @@ export class TrafficSimulator extends SimulatorShell {
                     kind: 'display',
                     keys: ['Control'],
                 },
+                {
+                    id: 'visDensity',
+                    key: 'v',
+                    label: 'V',
+                    title: 'V — Toggle network visualizer density (show all values)',
+                    group: 'Visualizer',
+                    kind: 'momentary',
+                    handler: {
+                        onKeyDown: () => this.networkVisualizer.toggleDensity(),
+                    },
+                },
             ]);
         }
         // Single-select car: the chosen car is painted on the next road click.

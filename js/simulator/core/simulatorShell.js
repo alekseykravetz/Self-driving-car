@@ -137,16 +137,9 @@ export class SimulatorShell {
             const { x, y } = toCanvasCoords(e);
             this.networkVisualizer.handleClick(x, y);
         });
-        // `v` toggles the always-show-values density mode (ignored while typing).
-        window.addEventListener('keydown', (e) => {
-            const target = e.target;
-            const typing = target?.tagName === 'INPUT' ||
-                target?.tagName === 'TEXTAREA' ||
-                target?.isContentEditable;
-            if (!typing && (e.key === 'v' || e.key === 'V')) {
-                this.networkVisualizer.toggleDensity();
-            }
-        });
+        // `v` toggles the always-show-values density mode.
+        // Routed through KeyboardManager in each subclass's #initKeyboardManager().
+        // (The raw listener was removed when centralising key routing.)
     }
     /**
      * Resize the multi-panel canvas layout to the current window/panel state.

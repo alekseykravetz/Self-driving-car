@@ -2,6 +2,7 @@ import { HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE } from './templates/humanTrainingC
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { inferHiddenLayers } from '../training/genetics/poolManager.js';
+import type { KeyboardManager } from '../../panels/keyboardManager.js';
 
 export interface HumanTrainingConfigResult {
   carConfig: CarInfo;
@@ -16,6 +17,7 @@ export interface HumanTrainingConfigOpenOptions {
 
 export class HumanTrainingConfigModalElement extends HTMLElement {
   #options: HumanTrainingConfigOpenOptions | null = null;
+  #keyboardManager: KeyboardManager | null = null;
 
   constructor() {
     super();
@@ -38,7 +40,25 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
       this.#setConfigLocked(false);
       if (note) note.textContent = '';
     }
+    this.#keyboardManager?.pushBindings([
+      {
+        id: 'modalCancel',
+        key: 'Escape',
+        label: 'Esc',
+        title: 'Esc \u2014 Cancel',
+        group: 'Modal',
+        kind: 'momentary',
+        handler: {
+          onKeyDown: () => this.#cancel(),
+        },
+      },
+    ]);
     this.classList.add('open');
+  }
+
+  /** Connect the KeyboardManager for Escape key routing. */
+  setKeyboardManager(km: KeyboardManager | null): void {
+    this.#keyboardManager = km;
   }
 
   #bindEvents(): void {
@@ -58,11 +78,6 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
         }
       },
     );
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.classList.contains('open')) {
-        this.#cancel();
-      }
-    });
   }
 
   #fillCarConfig(c: CarInfo): void {
@@ -146,6 +161,7 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
     if (!options) return;
     const carConfig = this.#readCarConfig();
     this.classList.remove('open');
+    this.#keyboardManager?.popBindings();
     this.#options = null;
     options.onStart({ carConfig });
   }
@@ -154,6 +170,7 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
     const options = this.#options;
     if (!options) return;
     this.classList.remove('open');
+    this.#keyboardManager?.popBindings();
     this.#options = null;
     options.onCancel();
   }

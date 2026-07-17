@@ -15,6 +15,7 @@ export class TrainingInitModalElement extends HTMLElement {
     #options = null;
     #storedPool = [];
     #selectedCars = [];
+    #keyboardManager = null;
     constructor() {
         super();
         this.id = 'trainingInitModal';
@@ -41,7 +42,24 @@ export class TrainingInitModalElement extends HTMLElement {
         this.#fillTrainingParams(options.defaults);
         this.#fillCarConfig(options.defaults.carConfig);
         this.#refreshSources();
+        this.#keyboardManager?.pushBindings([
+            {
+                id: 'modalCancel',
+                key: 'Escape',
+                label: 'Esc',
+                title: 'Esc \u2014 Cancel',
+                group: 'Modal',
+                kind: 'momentary',
+                handler: {
+                    onKeyDown: () => this.#cancel(),
+                },
+            },
+        ]);
         this.classList.add('open');
+    }
+    /** Connect the KeyboardManager for Escape key routing. */
+    setKeyboardManager(km) {
+        this.#keyboardManager = km;
     }
     #bindEvents() {
         this.querySelector('#tiStartBtn')?.addEventListener('click', () => this.#start());
@@ -49,12 +67,6 @@ export class TrainingInitModalElement extends HTMLElement {
         // Click on the dimmed backdrop (but not the dialog) cancels.
         this.querySelector('.ti-overlay')?.addEventListener('click', (e) => {
             if (e.target.classList.contains('ti-overlay')) {
-                this.#cancel();
-            }
-        });
-        // Esc cancels while the modal is open.
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.classList.contains('open')) {
                 this.#cancel();
             }
         });
@@ -200,6 +212,7 @@ export class TrainingInitModalElement extends HTMLElement {
             brainSource: source,
         };
         this.classList.remove('open');
+        this.#keyboardManager?.popBindings();
         this.#options = null;
         options.onStart(result);
     }
@@ -208,6 +221,7 @@ export class TrainingInitModalElement extends HTMLElement {
         if (!options)
             return;
         this.classList.remove('open');
+        this.#keyboardManager?.popBindings();
         this.#options = null;
         options.onCancel();
     }

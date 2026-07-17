@@ -35,6 +35,7 @@ export class TrainingSimulator extends SimulatorShell {
         this.trainingManager.setNewTrainingHandler(() => this.openInitModal('new'));
         this.#initPauseToggleClicks();
         this.#initKeyboardManager();
+        this.initModal?.setKeyboardManager(this.#keyboardManager);
         this.animate(0);
     }
     #initPauseToggleClicks() {
@@ -108,6 +109,17 @@ export class TrainingSimulator extends SimulatorShell {
                 group: 'View',
                 kind: 'display',
                 keys: ['Control'],
+            },
+            {
+                id: 'visDensity',
+                key: 'v',
+                label: 'V',
+                title: 'V \u2014 Toggle network visualizer density (show all values)',
+                group: 'Visualizer',
+                kind: 'momentary',
+                handler: {
+                    onKeyDown: () => this.networkVisualizer.toggleDensity(),
+                },
             },
         ]);
     }
