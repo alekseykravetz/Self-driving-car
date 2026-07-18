@@ -444,20 +444,10 @@
       "norm_label": "lint:watch"
     },
     {
-      "label": "graphify",
-      "file_type": "code",
-      "source_file": "package.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "id": "package_scripts_graphify",
-      "community": 10,
-      "norm_label": "graphify"
-    },
-    {
       "label": "keywords",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "package_keywords",
       "community": 10,
@@ -467,7 +457,7 @@
       "label": "author",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "package_author",
       "community": 10,
@@ -477,7 +467,7 @@
       "label": "license",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "package_license",
       "community": 10,
@@ -487,7 +477,7 @@
       "label": "description",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "package_description",
       "community": 10,
@@ -497,7 +487,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "package_devdependencies",
       "community": 10,
@@ -507,7 +497,7 @@
       "label": "@eslint/js",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "package_devdependencies_eslint_js",
       "community": 10,
@@ -517,7 +507,7 @@
       "label": "@eslint/js",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "eslint_js",
       "community": 10,
@@ -527,7 +517,7 @@
       "label": "@typescript-eslint/eslint-plugin",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L25",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "package_devdependencies_typescript_eslint_eslint_plugin",
       "community": 10,
@@ -537,7 +527,7 @@
       "label": "@typescript-eslint/eslint-plugin",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L25",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "typescript_eslint_eslint_plugin",
       "community": 10,
@@ -547,7 +537,7 @@
       "label": "@typescript-eslint/parser",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L26",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "package_devdependencies_typescript_eslint_parser",
       "community": 10,
@@ -557,7 +547,7 @@
       "label": "@typescript-eslint/parser",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L26",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "typescript_eslint_parser",
       "community": 10,
@@ -567,7 +557,7 @@
       "label": "concurrently",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L27",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "package_devdependencies_concurrently",
       "community": 10,
@@ -577,7 +567,7 @@
       "label": "concurrently",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L27",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "concurrently",
       "community": 10,
@@ -587,7 +577,7 @@
       "label": "eslint",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L28",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "package_devdependencies_eslint",
       "community": 10,
@@ -597,7 +587,7 @@
       "label": "eslint",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L28",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "eslint",
       "community": 10,
@@ -607,7 +597,7 @@
       "label": "eslint-config-prettier",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L29",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "package_devdependencies_eslint_config_prettier",
       "community": 10,
@@ -617,7 +607,7 @@
       "label": "eslint-config-prettier",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L29",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "eslint_config_prettier",
       "community": 10,
@@ -627,7 +617,7 @@
       "label": "eslint-plugin-prettier",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "package_devdependencies_eslint_plugin_prettier",
       "community": 10,
@@ -637,7 +627,7 @@
       "label": "eslint-plugin-prettier",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "eslint_plugin_prettier",
       "community": 10,
@@ -647,7 +637,7 @@
       "label": "globals",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "package_devdependencies_globals",
       "community": 10,
@@ -657,7 +647,7 @@
       "label": "globals",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "globals",
       "community": 10,
@@ -667,7 +657,7 @@
       "label": "onchange",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "package_devdependencies_onchange",
       "community": 10,
@@ -677,7 +667,7 @@
       "label": "onchange",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L31",
       "_origin": "ast",
       "id": "onchange",
       "community": 10,
@@ -687,7 +677,7 @@
       "label": "playwright",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "package_devdependencies_playwright",
       "community": 10,
@@ -697,7 +687,7 @@
       "label": "playwright",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "playwright",
       "community": 10,
@@ -707,7 +697,7 @@
       "label": "prettier",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "package_devdependencies_prettier",
       "community": 10,
@@ -717,7 +707,7 @@
       "label": "prettier",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "prettier",
       "community": 10,
@@ -727,7 +717,7 @@
       "label": "serve",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "package_devdependencies_serve",
       "community": 10,
@@ -737,7 +727,7 @@
       "label": "serve",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "serve",
       "community": 10,
@@ -747,7 +737,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "package_devdependencies_typescript",
       "community": 10,
@@ -757,7 +747,7 @@
       "label": "typescript",
       "file_type": "concept",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "typescript",
       "community": 10,
@@ -1108,7 +1098,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_audio_sound",
-      "community": 1,
+      "community": 30,
       "norm_label": "sound.ts"
     },
     {
@@ -1258,7 +1248,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "ts_camera_camera_camera_projectpoint",
-      "community": 18,
+      "community": 7,
       "norm_label": ".#projectpoint()"
     },
     {
@@ -1268,7 +1258,7 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "ts_camera_camera_camera_filter",
-      "community": 4,
+      "community": 18,
       "norm_label": ".#filter()"
     },
     {
@@ -1298,7 +1288,7 @@
       "source_location": "L315",
       "_origin": "ast",
       "id": "ts_camera_camera_camera_draw",
-      "community": 0,
+      "community": 18,
       "norm_label": ".draw()"
     },
     {
@@ -1408,7 +1398,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_brain_carbrainadapter",
-      "community": 1,
+      "community": 31,
       "norm_label": "carbrainadapter.ts"
     },
     {
@@ -1418,7 +1408,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "ts_car_brain_carbrainadapter_brain",
-      "community": 1,
+      "community": 31,
       "norm_label": "brain"
     },
     {
@@ -1428,7 +1418,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_car_brain_carbrainadapter_braincontroloutput",
-      "community": 1,
+      "community": 31,
       "norm_label": "braincontroloutput"
     },
     {
@@ -1458,7 +1448,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "ts_car_brain_carbrainadapter_carbrainadapter_serialize",
-      "community": 15,
+      "community": 11,
       "norm_label": ".serialize()"
     },
     {
@@ -1528,7 +1518,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_car",
-      "community": 1,
+      "community": 3,
       "norm_label": "car.ts"
     },
     {
@@ -1538,7 +1528,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_car_car_carcontrols",
-      "community": 1,
+      "community": 37,
       "norm_label": "carcontrols"
     },
     {
@@ -1558,7 +1548,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "ts_car_car_caroptions",
-      "community": 1,
+      "community": 3,
       "norm_label": "caroptions"
     },
     {
@@ -1568,7 +1558,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "ts_car_car_carcallbacks",
-      "community": 1,
+      "community": 3,
       "norm_label": "carcallbacks"
     },
     {
@@ -1598,7 +1588,7 @@
       "source_location": "L172",
       "_origin": "ast",
       "id": "ts_car_car_car_frominfo",
-      "community": 30,
+      "community": 38,
       "norm_label": ".frominfo()"
     },
     {
@@ -1618,7 +1608,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "ts_car_car_car_toinfo",
-      "community": 15,
+      "community": 17,
       "norm_label": ".toinfo()"
     },
     {
@@ -1688,7 +1678,7 @@
       "source_location": "L505",
       "_origin": "ast",
       "id": "ts_car_car_car_todrawdata",
-      "community": 87,
+      "community": 48,
       "norm_label": ".todrawdata()"
     },
     {
@@ -1698,7 +1688,7 @@
       "source_location": "L520",
       "_origin": "ast",
       "id": "ts_car_car_car_draw",
-      "community": 87,
+      "community": 48,
       "norm_label": ".draw()"
     },
     {
@@ -1808,7 +1798,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_carstate",
-      "community": 12,
+      "community": 77,
       "norm_label": "carstate.ts"
     },
     {
@@ -1818,7 +1808,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ts_car_carstate_controlsstate",
-      "community": 12,
+      "community": 77,
       "norm_label": "controlsstate"
     },
     {
@@ -1828,7 +1818,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "ts_car_carstate_carstate",
-      "community": 12,
+      "community": 77,
       "norm_label": "carstate"
     },
     {
@@ -1838,7 +1828,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_config",
-      "community": 1,
+      "community": 3,
       "norm_label": "config.ts"
     },
     {
@@ -1848,7 +1838,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "ts_car_config_default_hidden_layers",
-      "community": 1,
+      "community": 3,
       "norm_label": "default_hidden_layers"
     },
     {
@@ -1868,7 +1858,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_controls_cameracontrols",
-      "community": 12,
+      "community": 64,
       "norm_label": "cameracontrols.ts"
     },
     {
@@ -1998,7 +1988,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_controls_markerdetector",
-      "community": 12,
+      "community": 64,
       "norm_label": "markerdetector.ts"
     },
     {
@@ -2008,7 +1998,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "ts_car_controls_markerdetector_pointwithblueness",
-      "community": 12,
+      "community": 64,
       "norm_label": "pointwithblueness"
     },
     {
@@ -2018,7 +2008,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "ts_car_controls_markerdetector_marker",
-      "community": 12,
+      "community": 64,
       "norm_label": "marker"
     },
     {
@@ -2078,7 +2068,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_controls_phonecontrols",
-      "community": 1,
+      "community": 40,
       "norm_label": "phonecontrols.ts"
     },
     {
@@ -2118,7 +2108,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_loader_carloader",
-      "community": 1,
+      "community": 142,
       "norm_label": "carloader.ts"
     },
     {
@@ -2128,7 +2118,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "ts_car_loader_carloader_parsecarfilecontent",
-      "community": 8,
+      "community": 142,
       "norm_label": "parsecarfilecontent()"
     },
     {
@@ -2158,7 +2148,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "ts_car_loader_carloader_carloader",
-      "community": 1,
+      "community": 142,
       "norm_label": "carloader"
     },
     {
@@ -2188,7 +2178,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "ts_car_loader_carloader_carloader_handlefileschange",
-      "community": 8,
+      "community": 142,
       "norm_label": ".#handlefileschange()"
     },
     {
@@ -2198,7 +2188,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "ts_car_loader_carloader_carloader_parsecarfile",
-      "community": 8,
+      "community": 142,
       "norm_label": ".parsecarfile()"
     },
     {
@@ -2208,7 +2198,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "ts_car_loader_carloader_carloader_comparecarparams",
-      "community": 142,
+      "community": 17,
       "norm_label": ".comparecarparams()"
     },
     {
@@ -2228,7 +2218,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_car_physics_carphysics",
-      "community": 12,
+      "community": 77,
       "norm_label": "carphysics.ts"
     },
     {
@@ -2238,7 +2228,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "ts_car_physics_carphysics_carphysics",
-      "community": 12,
+      "community": 77,
       "norm_label": "carphysics"
     },
     {
@@ -2248,7 +2238,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_car_physics_carphysics_carphysics_update",
-      "community": 12,
+      "community": 77,
       "norm_label": ".update()"
     },
     {
@@ -2258,7 +2248,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "ts_car_physics_carphysics_carphysics_move",
-      "community": 12,
+      "community": 77,
       "norm_label": ".#move()"
     },
     {
@@ -2268,7 +2258,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "ts_car_physics_carphysics_carphysics_createpolygon",
-      "community": 12,
+      "community": 77,
       "norm_label": ".createpolygon()"
     },
     {
@@ -2278,7 +2268,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "ts_car_physics_carphysics_carphysics_assessdamage",
-      "community": 12,
+      "community": 77,
       "norm_label": ".assessdamage()"
     },
     {
@@ -2328,7 +2318,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "ts_car_physics_sensorraycaster_sensorraycaster_castrays",
-      "community": 12,
+      "community": 31,
       "norm_label": ".castrays()"
     },
     {
@@ -2378,7 +2368,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "ts_car_rendering_carrenderer_cardrawdata",
-      "community": 1,
+      "community": 48,
       "norm_label": "cardrawdata"
     },
     {
@@ -2388,7 +2378,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "ts_car_rendering_carrenderer_cardrawoptions",
-      "community": 1,
+      "community": 48,
       "norm_label": "cardrawoptions"
     },
     {
@@ -2498,7 +2488,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "ts_car_sensors_sensor_sensor_update",
-      "community": 12,
+      "community": 31,
       "norm_label": ".update()"
     },
     {
@@ -2598,7 +2588,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "ts_math_collision_polysintersect",
-      "community": 12,
+      "community": 9,
       "norm_label": "polysintersect()"
     },
     {
@@ -2638,7 +2628,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_math_graph_graph",
-      "community": 9,
+      "community": 1,
       "norm_label": "graph.ts"
     },
     {
@@ -2648,7 +2638,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "ts_math_graph_graph_shortestpathpoint",
-      "community": 9,
+      "community": 1,
       "norm_label": "shortestpathpoint"
     },
     {
@@ -2678,7 +2668,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "ts_math_graph_graph_graph_load",
-      "community": 12,
+      "community": 0,
       "norm_label": ".load()"
     },
     {
@@ -2758,7 +2748,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "ts_math_graph_graph_graph_addsegment",
-      "community": 14,
+      "community": 12,
       "norm_label": ".addsegment()"
     },
     {
@@ -2768,7 +2758,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "ts_math_graph_graph_graph_containssegment",
-      "community": 14,
+      "community": 12,
       "norm_label": ".containssegment()"
     },
     {
@@ -2778,7 +2768,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "ts_math_graph_graph_graph_tryaddsegment",
-      "community": 14,
+      "community": 12,
       "norm_label": ".tryaddsegment()"
     },
     {
@@ -3028,7 +3018,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_math_primitives_envelope",
-      "community": 7,
+      "community": 0,
       "norm_label": "envelope.ts"
     },
     {
@@ -3038,7 +3028,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "ts_math_primitives_envelope_envelope",
-      "community": 4,
+      "community": 0,
       "norm_label": "envelope"
     },
     {
@@ -3048,7 +3038,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "ts_math_primitives_envelope_envelope_constructor",
-      "community": 4,
+      "community": 18,
       "norm_label": ".constructor()"
     },
     {
@@ -3058,7 +3048,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "ts_math_primitives_envelope_envelope_load",
-      "community": 4,
+      "community": 0,
       "norm_label": ".load()"
     },
     {
@@ -3068,7 +3058,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "ts_math_primitives_envelope_envelope_generatepolygon",
-      "community": 4,
+      "community": 18,
       "norm_label": ".#generatepolygon()"
     },
     {
@@ -3078,7 +3068,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_math_primitives_point",
-      "community": 9,
+      "community": 1,
       "norm_label": "point.ts"
     },
     {
@@ -3118,7 +3108,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon",
-      "community": 4,
+      "community": 0,
       "norm_label": "polygon.ts"
     },
     {
@@ -3128,7 +3118,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygonbounds",
-      "community": 4,
+      "community": 0,
       "norm_label": "polygonbounds"
     },
     {
@@ -3138,7 +3128,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_computepolygonbounds",
-      "community": 4,
+      "community": 18,
       "norm_label": "computepolygonbounds()"
     },
     {
@@ -3148,7 +3138,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_boundsoverlap",
-      "community": 4,
+      "community": 18,
       "norm_label": "boundsoverlap()"
     },
     {
@@ -3158,7 +3148,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon",
-      "community": 4,
+      "community": 18,
       "norm_label": "polygon"
     },
     {
@@ -3168,7 +3158,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_constructor",
-      "community": 12,
+      "community": 18,
       "norm_label": ".constructor()"
     },
     {
@@ -3178,7 +3168,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_load",
-      "community": 4,
+      "community": 0,
       "norm_label": ".load()"
     },
     {
@@ -3188,7 +3178,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_union",
-      "community": 79,
+      "community": 18,
       "norm_label": ".union()"
     },
     {
@@ -3198,7 +3188,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_multibreak",
-      "community": 4,
+      "community": 18,
       "norm_label": ".multibreak()"
     },
     {
@@ -3208,7 +3198,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_break",
-      "community": 4,
+      "community": 18,
       "norm_label": ".break()"
     },
     {
@@ -3218,7 +3208,7 @@
       "source_location": "L136",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_distancetopoint",
-      "community": 4,
+      "community": 18,
       "norm_label": ".distancetopoint()"
     },
     {
@@ -3228,7 +3218,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_distancetopolygon",
-      "community": 4,
+      "community": 18,
       "norm_label": ".distancetopolygon()"
     },
     {
@@ -3238,7 +3228,7 @@
       "source_location": "L144",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_intersectspolygon",
-      "community": 4,
+      "community": 18,
       "norm_label": ".intersectspolygon()"
     },
     {
@@ -3248,7 +3238,7 @@
       "source_location": "L155",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_containspolygon",
-      "community": 4,
+      "community": 18,
       "norm_label": ".containspolygon()"
     },
     {
@@ -3258,7 +3248,7 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_containssegment",
-      "community": 4,
+      "community": 18,
       "norm_label": ".containssegment()"
     },
     {
@@ -3268,7 +3258,7 @@
       "source_location": "L164",
       "_origin": "ast",
       "id": "ts_math_primitives_polygon_polygon_containspoint",
-      "community": 4,
+      "community": 18,
       "norm_label": ".containspoint()"
     },
     {
@@ -3288,7 +3278,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "ts_math_primitives_segment_segment",
-      "community": 14,
+      "community": 12,
       "norm_label": "segment"
     },
     {
@@ -3308,7 +3298,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "ts_math_primitives_segment_segment_length",
-      "community": 79,
+      "community": 7,
       "norm_label": ".length()"
     },
     {
@@ -3328,7 +3318,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "ts_math_primitives_segment_segment_equals",
-      "community": 30,
+      "community": 37,
       "norm_label": ".equals()"
     },
     {
@@ -3348,7 +3338,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "ts_math_primitives_segment_segment_distancetopoint",
-      "community": 79,
+      "community": 7,
       "norm_label": ".distancetopoint()"
     },
     {
@@ -3368,7 +3358,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_math_spatialgrid",
-      "community": 9,
+      "community": 1,
       "norm_label": "spatialgrid.ts"
     },
     {
@@ -3378,7 +3368,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "ts_math_spatialgrid_gridsegment",
-      "community": 9,
+      "community": 1,
       "norm_label": "gridsegment"
     },
     {
@@ -3498,7 +3488,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "ts_math_trafficcontrolgrid_trafficcontrolhit",
-      "community": 12,
+      "community": 9,
       "norm_label": "trafficcontrolhit"
     },
     {
@@ -3608,7 +3598,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_math_utils_getnearestsegment",
-      "community": 9,
+      "community": 7,
       "norm_label": "getnearestsegment()"
     },
     {
@@ -3618,7 +3608,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "ts_math_utils_distance",
-      "community": 79,
+      "community": 7,
       "norm_label": "distance()"
     },
     {
@@ -3648,7 +3638,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "ts_math_utils_average",
-      "community": 4,
+      "community": 0,
       "norm_label": "average()"
     },
     {
@@ -3668,7 +3658,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "ts_math_utils_cross",
-      "community": 18,
+      "community": 7,
       "norm_label": "cross()"
     },
     {
@@ -3748,7 +3738,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "ts_math_utils_angle",
-      "community": 14,
+      "community": 12,
       "norm_label": "angle()"
     },
     {
@@ -3758,7 +3748,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "ts_math_utils_getintersection",
-      "community": 4,
+      "community": 18,
       "norm_label": "getintersection()"
     },
     {
@@ -3788,7 +3778,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "ts_math_utils_mulberry32",
-      "community": 79,
+      "community": 0,
       "norm_label": "mulberry32()"
     },
     {
@@ -3798,7 +3788,7 @@
       "source_location": "L179",
       "_origin": "ast",
       "id": "ts_math_utils_lerp2d",
-      "community": 0,
+      "community": 7,
       "norm_label": "lerp2d()"
     },
     {
@@ -3838,7 +3828,7 @@
       "source_location": "L197",
       "_origin": "ast",
       "id": "ts_math_utils_getfake3dpoint",
-      "community": 0,
+      "community": 7,
       "norm_label": "getfake3dpoint()"
     },
     {
@@ -3938,7 +3928,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_mini_map_minimap",
-      "community": 2,
+      "community": 1,
       "norm_label": "minimap.ts"
     },
     {
@@ -3948,7 +3938,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "ts_mini_map_minimap_iminimapcar",
-      "community": 2,
+      "community": 0,
       "norm_label": "iminimapcar"
     },
     {
@@ -3958,7 +3948,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "ts_mini_map_minimap_minimapdrawoptions",
-      "community": 2,
+      "community": 12,
       "norm_label": "minimapdrawoptions"
     },
     {
@@ -3968,7 +3958,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "ts_mini_map_minimap_minimap",
-      "community": 9,
+      "community": 1,
       "norm_label": "minimap"
     },
     {
@@ -4008,7 +3998,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork",
-      "community": 15,
+      "community": 11,
       "norm_label": "neuralnetwork"
     },
     {
@@ -4018,7 +4008,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork_constructor",
-      "community": 15,
+      "community": 11,
       "norm_label": ".constructor()"
     },
     {
@@ -4028,7 +4018,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork_feedforward",
-      "community": 58,
+      "community": 11,
       "norm_label": ".feedforward()"
     },
     {
@@ -4038,7 +4028,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork_mutate",
-      "community": 15,
+      "community": 11,
       "norm_label": ".mutate()"
     },
     {
@@ -4048,7 +4038,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork_crossover",
-      "community": 15,
+      "community": 11,
       "norm_label": ".crossover()"
     },
     {
@@ -4058,7 +4048,7 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork_deserialize",
-      "community": 38,
+      "community": 11,
       "norm_label": ".deserialize()"
     },
     {
@@ -4068,7 +4058,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork_clone",
-      "community": 15,
+      "community": 11,
       "norm_label": ".clone()"
     },
     {
@@ -4088,7 +4078,7 @@
       "source_location": "L269",
       "_origin": "ast",
       "id": "ts_neural_network_network_neuralnetwork_mutatefrompool",
-      "community": 15,
+      "community": 11,
       "norm_label": ".mutatefrompool()"
     },
     {
@@ -4098,7 +4088,7 @@
       "source_location": "L287",
       "_origin": "ast",
       "id": "ts_neural_network_network_level",
-      "community": 58,
+      "community": 11,
       "norm_label": "level"
     },
     {
@@ -4108,7 +4098,7 @@
       "source_location": "L293",
       "_origin": "ast",
       "id": "ts_neural_network_network_level_constructor",
-      "community": 58,
+      "community": 11,
       "norm_label": ".constructor()"
     },
     {
@@ -4118,7 +4108,7 @@
       "source_location": "L306",
       "_origin": "ast",
       "id": "ts_neural_network_network_level_randomize",
-      "community": 58,
+      "community": 11,
       "norm_label": ".#randomize()"
     },
     {
@@ -4128,7 +4118,7 @@
       "source_location": "L320",
       "_origin": "ast",
       "id": "ts_neural_network_network_level_feedforward",
-      "community": 58,
+      "community": 11,
       "norm_label": ".feedforward()"
     },
     {
@@ -4478,7 +4468,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_assetselectors",
-      "community": 1,
+      "community": 8,
       "norm_label": "assetselectors.ts"
     },
     {
@@ -4488,7 +4478,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors",
-      "community": 8,
+      "community": 4,
       "norm_label": "toolbarassetselectors"
     },
     {
@@ -4498,7 +4488,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_constructor",
-      "community": 8,
+      "community": 4,
       "norm_label": ".constructor()"
     },
     {
@@ -4508,7 +4498,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_configureselectors",
-      "community": 8,
+      "community": 4,
       "norm_label": ".configureselectors()"
     },
     {
@@ -4518,7 +4508,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_setcarselectormode",
-      "community": 8,
+      "community": 4,
       "norm_label": ".setcarselectormode()"
     },
     {
@@ -4538,7 +4528,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_refreshworldlist",
-      "community": 8,
+      "community": 4,
       "norm_label": ".refreshworldlist()"
     },
     {
@@ -4548,7 +4538,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_refreshcarlist",
-      "community": 8,
+      "community": 4,
       "norm_label": ".refreshcarlist()"
     },
     {
@@ -4558,7 +4548,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_selectworld",
-      "community": 8,
+      "community": 4,
       "norm_label": ".#selectworld()"
     },
     {
@@ -4568,7 +4558,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_oncarinputchange",
-      "community": 8,
+      "community": 4,
       "norm_label": ".#oncarinputchange()"
     },
     {
@@ -4578,7 +4568,7 @@
       "source_location": "L139",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_updateselecteddisplay",
-      "community": 8,
+      "community": 4,
       "norm_label": ".#updateselecteddisplay()"
     },
     {
@@ -4588,7 +4578,7 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_bindpicker",
-      "community": 8,
+      "community": 4,
       "norm_label": ".#bindpicker()"
     },
     {
@@ -4598,7 +4588,7 @@
       "source_location": "L185",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_bindworldfileinput",
-      "community": 8,
+      "community": 4,
       "norm_label": ".#bindworldfileinput()"
     },
     {
@@ -4608,7 +4598,7 @@
       "source_location": "L214",
       "_origin": "ast",
       "id": "ts_panels_assetselectors_toolbarassetselectors_bindcarfileinput",
-      "community": 8,
+      "community": 4,
       "norm_label": ".#bindcarfileinput()"
     },
     {
@@ -4618,7 +4608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_editortoolbar",
-      "community": 2,
+      "community": 174,
       "norm_label": "editortoolbar.ts"
     },
     {
@@ -4688,7 +4678,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_keyboardmanager",
-      "community": 47,
+      "community": 160,
       "norm_label": "keyboardmanager.ts"
     },
     {
@@ -4758,7 +4748,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "ts_panels_keyboardmanager_keyboardmanager_settoggleactive",
-      "community": 47,
+      "community": 145,
       "norm_label": ".settoggleactive()"
     },
     {
@@ -4818,7 +4808,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle",
-      "community": 47,
+      "community": 160,
       "norm_label": "latchedtoggle.ts"
     },
     {
@@ -4828,7 +4818,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle_latchedtoggle",
-      "community": 47,
+      "community": 145,
       "norm_label": "latchedtoggle"
     },
     {
@@ -4838,7 +4828,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle_latchedtoggle_active",
-      "community": 47,
+      "community": 145,
       "norm_label": ".active()"
     },
     {
@@ -4848,7 +4838,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle_latchedtoggle_setonchange",
-      "community": 47,
+      "community": 145,
       "norm_label": ".setonchange()"
     },
     {
@@ -4858,7 +4848,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle_latchedtoggle_setphysicalhold",
-      "community": 47,
+      "community": 145,
       "norm_label": ".setphysicalhold()"
     },
     {
@@ -4868,7 +4858,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle_latchedtoggle_togglelatch",
-      "community": 47,
+      "community": 145,
       "norm_label": ".togglelatch()"
     },
     {
@@ -4878,7 +4868,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle_latchedtoggle_reset",
-      "community": 47,
+      "community": 145,
       "norm_label": ".reset()"
     },
     {
@@ -4888,7 +4878,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "ts_panels_latchedtoggle_latchedtoggle_notify",
-      "community": 47,
+      "community": 145,
       "norm_label": ".#notify()"
     },
     {
@@ -5078,7 +5068,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "ts_panels_shortcutstoolbar_shortcutdef",
-      "community": 47,
+      "community": 160,
       "norm_label": "shortcutdef"
     },
     {
@@ -5168,7 +5158,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_templates_editortoolbartemplate",
-      "community": 2,
+      "community": 174,
       "norm_label": "editortoolbartemplate.ts"
     },
     {
@@ -5188,7 +5178,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_templates_worldlayerstoolbartemplate",
-      "community": 2,
+      "community": 1,
       "norm_label": "worldlayerstoolbartemplate.ts"
     },
     {
@@ -5208,7 +5198,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_worldlayerstoolbar",
-      "community": 2,
+      "community": 1,
       "norm_label": "worldlayerstoolbar.ts"
     },
     {
@@ -5218,7 +5208,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_panels_worldlayerstoolbar_world_layer_buttons",
-      "community": 2,
+      "community": 1,
       "norm_label": "world_layer_buttons"
     },
     {
@@ -5408,7 +5398,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_panels_worldtoolbar",
-      "community": 1,
+      "community": 8,
       "norm_label": "worldtoolbar.ts"
     },
     {
@@ -5548,7 +5538,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "ts_panels_worldtoolbar_worldtoolbarelement_configureselectors",
-      "community": 16,
+      "community": 8,
       "norm_label": ".configureselectors()"
     },
     {
@@ -5618,7 +5608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_rendering_enveloperenderer",
-      "community": 1,
+      "community": 0,
       "norm_label": "enveloperenderer.ts"
     },
     {
@@ -5738,7 +5728,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_rendering_polygonrenderer",
-      "community": 1,
+      "community": 0,
       "norm_label": "polygonrenderer.ts"
     },
     {
@@ -5748,7 +5738,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ts_rendering_polygonrenderer_polygondrawoptions",
-      "community": 1,
+      "community": 0,
       "norm_label": "polygondrawoptions"
     },
     {
@@ -5768,7 +5758,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_rendering_segmentrenderer",
-      "community": 14,
+      "community": 12,
       "norm_label": "segmentrenderer.ts"
     },
     {
@@ -5778,7 +5768,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ts_rendering_segmentrenderer_segmentdrawoptions",
-      "community": 14,
+      "community": 12,
       "norm_label": "segmentdrawoptions"
     },
     {
@@ -5788,7 +5778,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "ts_rendering_segmentrenderer_drawsegment",
-      "community": 7,
+      "community": 12,
       "norm_label": "drawsegment()"
     },
     {
@@ -5958,7 +5948,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_humanbackpropsimulator",
-      "community": 9,
+      "community": 1,
       "norm_label": "humanbackpropsimulator.ts"
     },
     {
@@ -6078,7 +6068,7 @@
       "source_location": "L316",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_humanbackpropsimulator_humanbackpropsimulator_rebuildgrid",
-      "community": 53,
+      "community": 43,
       "norm_label": ".#rebuildgrid()"
     },
     {
@@ -6228,7 +6218,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_humantrainingconfigmodal",
-      "community": 136,
+      "community": 3,
       "norm_label": "humantrainingconfigmodal.ts"
     },
     {
@@ -6238,7 +6228,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_humantrainingconfigmodal_humantrainingconfigresult",
-      "community": 136,
+      "community": 142,
       "norm_label": "humantrainingconfigresult"
     },
     {
@@ -6298,7 +6288,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_humantrainingconfigmodal_humantrainingconfigmodalelement_setkeyboardmanager",
-      "community": 136,
+      "community": 145,
       "norm_label": ".setkeyboardmanager()"
     },
     {
@@ -6398,7 +6388,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_humantrainingpanel",
-      "community": 1,
+      "community": 115,
       "norm_label": "humantrainingpanel.ts"
     },
     {
@@ -6618,7 +6608,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_templates_humantrainingconfigmodaltemplate",
-      "community": 136,
+      "community": 3,
       "norm_label": "humantrainingconfigmodaltemplate.ts"
     },
     {
@@ -6628,7 +6618,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_humantraining_templates_humantrainingpaneltemplate",
-      "community": 1,
+      "community": 115,
       "norm_label": "humantrainingpaneltemplate.ts"
     },
     {
@@ -6978,7 +6968,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_racing_racepanel",
-      "community": 1,
+      "community": 8,
       "norm_label": "racepanel.ts"
     },
     {
@@ -7098,7 +7088,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator",
-      "community": 9,
+      "community": 1,
       "norm_label": "racesimulator.ts"
     },
     {
@@ -7108,7 +7098,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator",
-      "community": 30,
+      "community": 37,
       "norm_label": "racesimulator"
     },
     {
@@ -7118,7 +7108,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator_constructor",
-      "community": 30,
+      "community": 37,
       "norm_label": ".constructor()"
     },
     {
@@ -7128,7 +7118,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator_generatecars",
-      "community": 30,
+      "community": 142,
       "norm_label": ".#generatecars()"
     },
     {
@@ -7148,7 +7138,7 @@
       "source_location": "L224",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator_updatecarprogress",
-      "community": 30,
+      "community": 37,
       "norm_label": ".#updatecarprogress()"
     },
     {
@@ -7158,7 +7148,7 @@
       "source_location": "L266",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator_handlecollisionwithroadborders",
-      "community": 30,
+      "community": 37,
       "norm_label": ".#handlecollisionwithroadborders()"
     },
     {
@@ -7168,7 +7158,7 @@
       "source_location": "L273",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator_update",
-      "community": 30,
+      "community": 37,
       "norm_label": ".update()"
     },
     {
@@ -7178,7 +7168,7 @@
       "source_location": "L325",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator_draw",
-      "community": 30,
+      "community": 37,
       "norm_label": ".draw()"
     },
     {
@@ -7188,7 +7178,7 @@
       "source_location": "L365",
       "_origin": "ast",
       "id": "ts_simulator_racing_racesimulator_racesimulator_gettracktarget",
-      "community": 30,
+      "community": 37,
       "norm_label": ".#gettracktarget()"
     },
     {
@@ -7238,7 +7228,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "ts_simulator_rendering_layoutmanager_resizesimulatorlayout",
-      "community": 1,
+      "community": 71,
       "norm_label": "resizesimulatorlayout()"
     },
     {
@@ -7248,7 +7238,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_spatialgridutils",
-      "community": 9,
+      "community": 1,
       "norm_label": "spatialgridutils.ts"
     },
     {
@@ -7258,7 +7248,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "ts_simulator_spatialgridutils_buildroadborders",
-      "community": 9,
+      "community": 30,
       "norm_label": "buildroadborders()"
     },
     {
@@ -7268,7 +7258,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "ts_simulator_spatialgridutils_querybordersnearcar",
-      "community": 9,
+      "community": 1,
       "norm_label": "querybordersnearcar()"
     },
     {
@@ -7278,7 +7268,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "ts_simulator_spatialgridutils_pointtosegmentdistancesq",
-      "community": 9,
+      "community": 1,
       "norm_label": "pointtosegmentdistancesq()"
     },
     {
@@ -7308,7 +7298,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_tpconfightml",
-      "community": 5,
+      "community": 87,
       "norm_label": "tpconfightml()"
     },
     {
@@ -7318,7 +7308,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement",
-      "community": 37,
+      "community": 87,
       "norm_label": "trafficpanelelement"
     },
     {
@@ -7328,7 +7318,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_constructor",
-      "community": 37,
+      "community": 87,
       "norm_label": ".constructor()"
     },
     {
@@ -7338,7 +7328,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_connectedcallback",
-      "community": 37,
+      "community": 87,
       "norm_label": ".connectedcallback()"
     },
     {
@@ -7348,7 +7338,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_getselectedcar",
-      "community": 37,
+      "community": 87,
       "norm_label": ".getselectedcar()"
     },
     {
@@ -7358,7 +7348,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_selectcar",
-      "community": 37,
+      "community": 87,
       "norm_label": ".selectcar()"
     },
     {
@@ -7368,7 +7358,7 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_setselectlistener",
-      "community": 37,
+      "community": 87,
       "norm_label": ".setselectlistener()"
     },
     {
@@ -7378,7 +7368,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_setremovelistener",
-      "community": 37,
+      "community": 87,
       "norm_label": ".setremovelistener()"
     },
     {
@@ -7388,7 +7378,7 @@
       "source_location": "L117",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_setclearlistener",
-      "community": 37,
+      "community": 87,
       "norm_label": ".setclearlistener()"
     },
     {
@@ -7398,7 +7388,7 @@
       "source_location": "L121",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_setdeletedamagedlistener",
-      "community": 37,
+      "community": 87,
       "norm_label": ".setdeletedamagedlistener()"
     },
     {
@@ -7408,7 +7398,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_setcars",
-      "community": 37,
+      "community": 87,
       "norm_label": ".setcars()"
     },
     {
@@ -7418,7 +7408,7 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_refresh",
-      "community": 37,
+      "community": 5,
       "norm_label": ".refresh()"
     },
     {
@@ -7428,7 +7418,7 @@
       "source_location": "L184",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_buildrow",
-      "community": 37,
+      "community": 87,
       "norm_label": ".#buildrow()"
     },
     {
@@ -7438,7 +7428,7 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficpanel_trafficpanelelement_select",
-      "community": 37,
+      "community": 87,
       "norm_label": ".#select()"
     },
     {
@@ -7448,7 +7438,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficsimulator",
-      "community": 9,
+      "community": 1,
       "norm_label": "trafficsimulator.ts"
     },
     {
@@ -7558,7 +7548,7 @@
       "source_location": "L308",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficsimulator_trafficsimulator_update",
-      "community": 12,
+      "community": 6,
       "norm_label": ".update()"
     },
     {
@@ -7568,7 +7558,7 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficsimulator_trafficsimulator_collectborders",
-      "community": 12,
+      "community": 6,
       "norm_label": ".#collectborders()"
     },
     {
@@ -7578,7 +7568,7 @@
       "source_location": "L352",
       "_origin": "ast",
       "id": "ts_simulator_traffic_trafficsimulator_trafficsimulator_collectcarobstacles",
-      "community": 12,
+      "community": 6,
       "norm_label": ".#collectcarobstacles()"
     },
     {
@@ -7638,7 +7628,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "ts_simulator_trafficcontrolutils_buildtrafficcontrols",
-      "community": 9,
+      "community": 43,
       "norm_label": "buildtrafficcontrols()"
     },
     {
@@ -7648,7 +7638,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "ts_simulator_trafficcontrolutils_querytrafficcontrolsnearcar",
-      "community": 9,
+      "community": 37,
       "norm_label": "querytrafficcontrolsnearcar()"
     },
     {
@@ -7658,7 +7648,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager",
-      "community": 15,
+      "community": 3,
       "norm_label": "poolmanager.ts"
     },
     {
@@ -7668,7 +7658,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager_createcarsfortraining",
-      "community": 142,
+      "community": 3,
       "norm_label": "createcarsfortraining()"
     },
     {
@@ -7678,7 +7668,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager_brainscompatible",
-      "community": 15,
+      "community": 17,
       "norm_label": "brainscompatible()"
     },
     {
@@ -7688,7 +7678,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager_inferhiddenlayers",
-      "community": 136,
+      "community": 3,
       "norm_label": "inferhiddenlayers()"
     },
     {
@@ -7698,7 +7688,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager_applypooltocars",
-      "community": 15,
+      "community": 17,
       "norm_label": "applypooltocars()"
     },
     {
@@ -7708,7 +7698,7 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager_getsortedaicars",
-      "community": 15,
+      "community": 3,
       "norm_label": "getsortedaicars()"
     },
     {
@@ -7718,7 +7708,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager_gettopaicars",
-      "community": 15,
+      "community": 3,
       "norm_label": "gettopaicars()"
     },
     {
@@ -7728,7 +7718,7 @@
       "source_location": "L133",
       "_origin": "ast",
       "id": "ts_simulator_training_genetics_poolmanager_gettopcarinfopool",
-      "community": 15,
+      "community": 3,
       "norm_label": "gettopcarinfopool()"
     },
     {
@@ -7818,7 +7808,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_bordercollision_handlecollisionwithroadborders",
-      "community": 9,
+      "community": 7,
       "norm_label": "handlecollisionwithroadborders()"
     },
     {
@@ -7828,7 +7818,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_simplemodebehavior",
-      "community": 32,
+      "community": 1,
       "norm_label": "simplemodebehavior.ts"
     },
     {
@@ -7838,7 +7828,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_simplemodebehavior_simple_mode_config",
-      "community": 32,
+      "community": 1,
       "norm_label": "simple_mode_config"
     },
     {
@@ -7848,7 +7838,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_simplemodebehavior_simplesimstate",
-      "community": 43,
+      "community": 36,
       "norm_label": "simplesimstate"
     },
     {
@@ -7858,7 +7848,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_simplemodebehavior_simplesimstate_reset",
-      "community": 43,
+      "community": 36,
       "norm_label": ".reset()"
     },
     {
@@ -7928,7 +7918,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_simplemodebehavior_simpletrainingstrategy_draw",
-      "community": 43,
+      "community": 36,
       "norm_label": ".draw()"
     },
     {
@@ -7978,7 +7968,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_worldmodebehavior",
-      "community": 9,
+      "community": 1,
       "norm_label": "worldmodebehavior.ts"
     },
     {
@@ -7988,7 +7978,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "ts_simulator_training_modes_worldmodebehavior_updateworldcars",
-      "community": 9,
+      "community": 1,
       "norm_label": "updateworldcars()"
     },
     {
@@ -8078,7 +8068,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "ts_simulator_training_rendering_carrenderer_drawsimulatorcars",
-      "community": 43,
+      "community": 1,
       "norm_label": "drawsimulatorcars()"
     },
     {
@@ -8088,7 +8078,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_training_templates_traininginitmodaltemplate",
-      "community": 1,
+      "community": 3,
       "norm_label": "traininginitmodaltemplate.ts"
     },
     {
@@ -8108,7 +8098,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_training_traininginitmodal",
-      "community": 1,
+      "community": 3,
       "norm_label": "traininginitmodal.ts"
     },
     {
@@ -8128,7 +8118,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "ts_simulator_training_traininginitmodal_traininginitresult",
-      "community": 1,
+      "community": 3,
       "norm_label": "traininginitresult"
     },
     {
@@ -8338,7 +8328,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "ts_simulator_training_trainingpanel_trainingmanageroptions",
-      "community": 3,
+      "community": 87,
       "norm_label": "trainingmanageroptions"
     },
     {
@@ -8358,7 +8348,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "ts_simulator_training_trainingpanel_trainingpanelelement_evaluatefitness",
-      "community": 5,
+      "community": 17,
       "norm_label": ".#evaluatefitness()"
     },
     {
@@ -8368,7 +8358,7 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "ts_simulator_training_trainingpanel_trainingpanelelement_getstartinfo",
-      "community": 142,
+      "community": 17,
       "norm_label": ".#getstartinfo()"
     },
     {
@@ -8598,7 +8588,7 @@
       "source_location": "L530",
       "_origin": "ast",
       "id": "ts_simulator_training_trainingpanel_trainingpanelelement_generatecars",
-      "community": 142,
+      "community": 17,
       "norm_label": ".#generatecars()"
     },
     {
@@ -8688,7 +8678,7 @@
       "source_location": "L659",
       "_origin": "ast",
       "id": "ts_simulator_training_trainingpanel_trainingpanelelement_updatepooltable",
-      "community": 5,
+      "community": 17,
       "norm_label": ".#updatepooltable()"
     },
     {
@@ -8708,7 +8698,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_simulator_training_trainingsimulator",
-      "community": 1,
+      "community": 3,
       "norm_label": "trainingsimulator.ts"
     },
     {
@@ -8808,7 +8798,7 @@
       "source_location": "L249",
       "_origin": "ast",
       "id": "ts_simulator_training_trainingsimulator_trainingsimulator_updateroadborders",
-      "community": 36,
+      "community": 30,
       "norm_label": ".updateroadborders()"
     },
     {
@@ -8928,7 +8918,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_store_entry",
-      "community": 1,
+      "community": 8,
       "norm_label": "entry.ts"
     },
     {
@@ -8938,7 +8928,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_store_serialization",
-      "community": 1,
+      "community": 3,
       "norm_label": "serialization.ts"
     },
     {
@@ -8958,7 +8948,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "ts_store_serialization_stripfileextension",
-      "community": 8,
+      "community": 4,
       "norm_label": "stripfileextension()"
     },
     {
@@ -8968,7 +8958,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_store_storemanager",
-      "community": 1,
+      "community": 8,
       "norm_label": "storemanager.ts"
     },
     {
@@ -9028,7 +9018,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "ts_store_storemanager_smnormalizeworldid",
-      "community": 8,
+      "community": 4,
       "norm_label": "smnormalizeworldid()"
     },
     {
@@ -9038,7 +9028,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "ts_store_storemanager_smreadactivecarids",
-      "community": 8,
+      "community": 3,
       "norm_label": "smreadactivecarids()"
     },
     {
@@ -9148,7 +9138,7 @@
       "source_location": "L267",
       "_origin": "ast",
       "id": "ts_store_storemanager_storemanager_geteditorworld",
-      "community": 30,
+      "community": 37,
       "norm_label": ".geteditorworld()"
     },
     {
@@ -9168,7 +9158,7 @@
       "source_location": "L294",
       "_origin": "ast",
       "id": "ts_store_storemanager_storemanager_getallworlds",
-      "community": 8,
+      "community": 4,
       "norm_label": ".getallworlds()"
     },
     {
@@ -9188,7 +9178,7 @@
       "source_location": "L351",
       "_origin": "ast",
       "id": "ts_store_storemanager_storemanager_getactiveworldid",
-      "community": 8,
+      "community": 4,
       "norm_label": ".getactiveworldid()"
     },
     {
@@ -9208,7 +9198,7 @@
       "source_location": "L361",
       "_origin": "ast",
       "id": "ts_store_storemanager_storemanager_getactiveworld",
-      "community": 8,
+      "community": 4,
       "norm_label": ".getactiveworld()"
     },
     {
@@ -9218,7 +9208,7 @@
       "source_location": "L368",
       "_origin": "ast",
       "id": "ts_store_storemanager_storemanager_getactiveworldname",
-      "community": 8,
+      "community": 4,
       "norm_label": ".getactiveworldname()"
     },
     {
@@ -9318,7 +9308,7 @@
       "source_location": "L476",
       "_origin": "ast",
       "id": "ts_store_storemanager_storemanager_gettrackedkeycount",
-      "community": 8,
+      "community": 14,
       "norm_label": ".gettrackedkeycount()"
     },
     {
@@ -9348,7 +9338,7 @@
       "source_location": "L507",
       "_origin": "ast",
       "id": "ts_store_storemanager_storemanager_getinstance",
-      "community": 8,
+      "community": 4,
       "norm_label": ".getinstance()"
     },
     {
@@ -9368,7 +9358,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "ts_store_storepanel_spformathiddenlayers",
-      "community": 8,
+      "community": 14,
       "norm_label": "spformathiddenlayers()"
     },
     {
@@ -9378,7 +9368,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "ts_store_storepanel_spformatsize",
-      "community": 8,
+      "community": 14,
       "norm_label": "spformatsize()"
     },
     {
@@ -9388,7 +9378,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement",
-      "community": 8,
+      "community": 14,
       "norm_label": "storepanelelement"
     },
     {
@@ -9398,7 +9388,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_constructor",
-      "community": 8,
+      "community": 14,
       "norm_label": ".constructor()"
     },
     {
@@ -9408,7 +9398,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_connectedcallback",
-      "community": 8,
+      "community": 14,
       "norm_label": ".connectedcallback()"
     },
     {
@@ -9418,7 +9408,7 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_loaddata",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#loaddata()"
     },
     {
@@ -9428,7 +9418,7 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_inittabs",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#inittabs()"
     },
     {
@@ -9438,7 +9428,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_initsorting",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#initsorting()"
     },
     {
@@ -9448,7 +9438,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_updatesortindicators",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#updatesortindicators()"
     },
     {
@@ -9458,7 +9448,7 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_applysort",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#applysort()"
     },
     {
@@ -9468,7 +9458,7 @@
       "source_location": "L169",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_renderworlds",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#renderworlds()"
     },
     {
@@ -9478,7 +9468,7 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_rendercars",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#rendercars()"
     },
     {
@@ -9488,7 +9478,7 @@
       "source_location": "L280",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_renderlocalstorage",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#renderlocalstorage()"
     },
     {
@@ -9498,7 +9488,7 @@
       "source_location": "L348",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_updatetabcounts",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#updatetabcounts()"
     },
     {
@@ -9508,7 +9498,7 @@
       "source_location": "L368",
       "_origin": "ast",
       "id": "ts_store_storepanel_storepanelelement_settabcount",
-      "community": 8,
+      "community": 14,
       "norm_label": ".#settabcount()"
     },
     {
@@ -9528,7 +9518,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_store_types",
-      "community": 1,
+      "community": 8,
       "norm_label": "types.ts"
     },
     {
@@ -9538,7 +9528,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ts_store_types_storemanifest",
-      "community": 1,
+      "community": 8,
       "norm_label": "storemanifest"
     },
     {
@@ -9568,7 +9558,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "ts_store_types_localstorageentry",
-      "community": 1,
+      "community": 8,
       "norm_label": "localstorageentry"
     },
     {
@@ -9578,7 +9568,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "ts_store_types_assetsource",
-      "community": 1,
+      "community": 8,
       "norm_label": "assetsource"
     },
     {
@@ -9608,7 +9598,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "ts_store_types_unifiedworldentry",
-      "community": 1,
+      "community": 8,
       "norm_label": "unifiedworldentry"
     },
     {
@@ -9618,7 +9608,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "ts_store_types_unifiedcarentry",
-      "community": 1,
+      "community": 8,
       "norm_label": "unifiedcarentry"
     },
     {
@@ -9638,7 +9628,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_viewport_scaleindicator",
-      "community": 2,
+      "community": 1,
       "norm_label": "scaleindicator.ts"
     },
     {
@@ -9648,7 +9638,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "ts_viewport_scaleindicator_scaleindicatoroptions",
-      "community": 2,
+      "community": 1,
       "norm_label": "scaleindicatoroptions"
     },
     {
@@ -9888,7 +9878,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_corridor",
-      "community": 7,
+      "community": 0,
       "norm_label": "corridor.ts"
     },
     {
@@ -9898,7 +9888,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "ts_world_corridor_corridorbuildoptions",
-      "community": 7,
+      "community": 0,
       "norm_label": "corridorbuildoptions"
     },
     {
@@ -9908,7 +9898,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_world_corridor_corridordrawoptions",
-      "community": 7,
+      "community": 0,
       "norm_label": "corridordrawoptions"
     },
     {
@@ -9928,7 +9918,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "ts_world_corridor_corridor",
-      "community": 57,
+      "community": 0,
       "norm_label": "corridor"
     },
     {
@@ -9938,7 +9928,7 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "ts_world_corridor_corridor_constructor",
-      "community": 57,
+      "community": 0,
       "norm_label": ".constructor()"
     },
     {
@@ -9958,7 +9948,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "ts_world_corridor_corridor_load",
-      "community": 57,
+      "community": 0,
       "norm_label": ".load()"
     },
     {
@@ -9968,7 +9958,7 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "ts_world_corridor_corridor_draw",
-      "community": 57,
+      "community": 0,
       "norm_label": ".draw()"
     },
     {
@@ -9978,7 +9968,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_editors_corridoreditor",
-      "community": 7,
+      "community": 2,
       "norm_label": "corridoreditor.ts"
     },
     {
@@ -10098,7 +10088,7 @@
       "source_location": "L168",
       "_origin": "ast",
       "id": "ts_world_editors_corridoreditor_corridoreditor_display",
-      "community": 7,
+      "community": 160,
       "norm_label": ".display()"
     },
     {
@@ -10368,7 +10358,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "ts_world_editors_lighteditor_lighteditor_constructor",
-      "community": 2,
+      "community": 29,
       "norm_label": ".constructor()"
     },
     {
@@ -10628,7 +10618,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "ts_world_editors_starteditor_starteditor_createmarking",
-      "community": 9,
+      "community": 12,
       "norm_label": ".createmarking()"
     },
     {
@@ -11038,7 +11028,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_generation_worldgenerator",
-      "community": 79,
+      "community": 0,
       "norm_label": "worldgenerator.ts"
     },
     {
@@ -11088,7 +11078,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "ts_world_generation_worldgenerator_wggeneratetrees",
-      "community": 79,
+      "community": 0,
       "norm_label": "wggeneratetrees()"
     },
     {
@@ -11098,7 +11088,7 @@
       "source_location": "L227",
       "_origin": "ast",
       "id": "ts_world_generation_worldgenerator_wgpicktreetype",
-      "community": 79,
+      "community": 0,
       "norm_label": "wgpicktreetype()"
     },
     {
@@ -11158,7 +11148,7 @@
       "source_location": "L293",
       "_origin": "ast",
       "id": "ts_world_generation_worldgenerator_worldgenerator_generatecorridor",
-      "community": 12,
+      "community": 79,
       "norm_label": ".generatecorridor()"
     },
     {
@@ -11178,7 +11168,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_items_building",
-      "community": 4,
+      "community": 0,
       "norm_label": "building.ts"
     },
     {
@@ -11188,7 +11178,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_world_items_building_building",
-      "community": 4,
+      "community": 0,
       "norm_label": "building"
     },
     {
@@ -11198,7 +11188,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "ts_world_items_building_building_constructor",
-      "community": 4,
+      "community": 18,
       "norm_label": ".constructor()"
     },
     {
@@ -11208,7 +11198,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "ts_world_items_building_building_load",
-      "community": 4,
+      "community": 0,
       "norm_label": ".load()"
     },
     {
@@ -11218,7 +11208,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "ts_world_items_building_building_loadfootprint",
-      "community": 4,
+      "community": 0,
       "norm_label": ".loadfootprint()"
     },
     {
@@ -11228,7 +11218,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "ts_world_items_building_building_tofootprint",
-      "community": 4,
+      "community": 0,
       "norm_label": ".tofootprint()"
     },
     {
@@ -11238,7 +11228,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "ts_world_items_building_building_draw",
-      "community": 4,
+      "community": 0,
       "norm_label": ".draw()"
     },
     {
@@ -11278,7 +11268,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "ts_world_items_tree_buildtreeprototypes",
-      "community": 79,
+      "community": 0,
       "norm_label": "buildtreeprototypes()"
     },
     {
@@ -11368,7 +11358,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_loader_worldloader",
-      "community": 1,
+      "community": 8,
       "norm_label": "worldloader.ts"
     },
     {
@@ -11438,7 +11428,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_crossing",
-      "community": 14,
+      "community": 12,
       "norm_label": "crossing.ts"
     },
     {
@@ -11448,7 +11438,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_world_markings_crossing_crossing",
-      "community": 14,
+      "community": 12,
       "norm_label": "crossing"
     },
     {
@@ -11468,7 +11458,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_world_markings_crossing_crossing_rebuildgeometry",
-      "community": 14,
+      "community": 12,
       "norm_label": ".rebuildgeometry()"
     },
     {
@@ -11488,7 +11478,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_light",
-      "community": 7,
+      "community": 12,
       "norm_label": "light.ts"
     },
     {
@@ -11578,7 +11568,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_marking",
-      "community": 14,
+      "community": 12,
       "norm_label": "marking.ts"
     },
     {
@@ -11588,7 +11578,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "ts_world_markings_marking_markingtype",
-      "community": 14,
+      "community": 12,
       "norm_label": "markingtype"
     },
     {
@@ -11608,7 +11598,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "ts_world_markings_marking_findanchorsegment",
-      "community": 7,
+      "community": 12,
       "norm_label": "findanchorsegment()"
     },
     {
@@ -11618,7 +11608,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "ts_world_markings_marking_marking",
-      "community": 14,
+      "community": 12,
       "norm_label": "marking"
     },
     {
@@ -11628,7 +11618,7 @@
       "source_location": "L78",
       "_origin": "ast",
       "id": "ts_world_markings_marking_marking_constructor",
-      "community": 14,
+      "community": 12,
       "norm_label": ".constructor()"
     },
     {
@@ -11658,7 +11648,7 @@
       "source_location": "L146",
       "_origin": "ast",
       "id": "ts_world_markings_marking_marking_rebuildgeometry",
-      "community": 14,
+      "community": 12,
       "norm_label": ".rebuildgeometry()"
     },
     {
@@ -11668,7 +11658,7 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "ts_world_markings_marking_marking_draw",
-      "community": 0,
+      "community": 12,
       "norm_label": ".draw()"
     },
     {
@@ -11678,7 +11668,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_markingloader",
-      "community": 14,
+      "community": 12,
       "norm_label": "markingloader.ts"
     },
     {
@@ -11688,7 +11678,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "ts_world_markings_markingloader_loadmarking",
-      "community": 79,
+      "community": 0,
       "norm_label": "loadmarking()"
     },
     {
@@ -11698,7 +11688,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_parking",
-      "community": 14,
+      "community": 12,
       "norm_label": "parking.ts"
     },
     {
@@ -11708,7 +11698,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_world_markings_parking_parking",
-      "community": 14,
+      "community": 12,
       "norm_label": "parking"
     },
     {
@@ -11728,7 +11718,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_world_markings_parking_parking_rebuildgeometry",
-      "community": 14,
+      "community": 12,
       "norm_label": ".rebuildgeometry()"
     },
     {
@@ -11738,7 +11728,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "ts_world_markings_parking_parking_draw",
-      "community": 14,
+      "community": 12,
       "norm_label": ".draw()"
     },
     {
@@ -11748,7 +11738,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_start",
-      "community": 9,
+      "community": 1,
       "norm_label": "start.ts"
     },
     {
@@ -11758,7 +11748,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "ts_world_markings_start_start",
-      "community": 9,
+      "community": 12,
       "norm_label": "start"
     },
     {
@@ -11768,7 +11758,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "ts_world_markings_start_start_constructor",
-      "community": 9,
+      "community": 12,
       "norm_label": ".constructor()"
     },
     {
@@ -11778,7 +11768,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "ts_world_markings_start_start_draw",
-      "community": 9,
+      "community": 12,
       "norm_label": ".draw()"
     },
     {
@@ -11788,7 +11778,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_stop",
-      "community": 14,
+      "community": 12,
       "norm_label": "stop.ts"
     },
     {
@@ -11798,7 +11788,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_world_markings_stop_stop",
-      "community": 14,
+      "community": 12,
       "norm_label": "stop"
     },
     {
@@ -11818,7 +11808,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "ts_world_markings_stop_stop_rebuildgeometry",
-      "community": 14,
+      "community": 12,
       "norm_label": ".rebuildgeometry()"
     },
     {
@@ -11828,7 +11818,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "ts_world_markings_stop_stop_draw",
-      "community": 14,
+      "community": 12,
       "norm_label": ".draw()"
     },
     {
@@ -11868,7 +11858,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "ts_world_markings_target_target_draw",
-      "community": 12,
+      "community": 7,
       "norm_label": ".draw()"
     },
     {
@@ -11878,7 +11868,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_markings_yield",
-      "community": 14,
+      "community": 12,
       "norm_label": "yield.ts"
     },
     {
@@ -11888,7 +11878,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ts_world_markings_yield_yield",
-      "community": 14,
+      "community": 12,
       "norm_label": "yield"
     },
     {
@@ -11908,7 +11898,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ts_world_markings_yield_yield_rebuildgeometry",
-      "community": 14,
+      "community": 12,
       "norm_label": ".rebuildgeometry()"
     },
     {
@@ -11918,7 +11908,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "ts_world_markings_yield_yield_draw",
-      "community": 14,
+      "community": 12,
       "norm_label": ".draw()"
     },
     {
@@ -11938,7 +11928,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "ts_world_simple_simpleworld_simpleworld",
-      "community": 32,
+      "community": 0,
       "norm_label": "simpleworld"
     },
     {
@@ -11988,7 +11978,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "ts_world_simple_simpleworld_simpleworld_generatecorridor",
-      "community": 32,
+      "community": 0,
       "norm_label": ".generatecorridor()"
     },
     {
@@ -12008,7 +11998,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_trafficmanager",
-      "community": 12,
+      "community": 1,
       "norm_label": "trafficmanager.ts"
     },
     {
@@ -12018,7 +12008,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "ts_world_trafficmanager_lightcontrolcenterpoint",
-      "community": 12,
+      "community": 1,
       "norm_label": "lightcontrolcenterpoint"
     },
     {
@@ -12108,7 +12098,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ts_world_types",
-      "community": 2,
+      "community": 0,
       "norm_label": "types.ts"
     },
     {
@@ -12118,7 +12108,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "ts_world_types_cardrawoptions",
-      "community": 2,
+      "community": 0,
       "norm_label": "cardrawoptions"
     },
     {
@@ -12128,7 +12118,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "ts_world_types_buildingdrawoptions",
-      "community": 4,
+      "community": 0,
       "norm_label": "buildingdrawoptions"
     },
     {
@@ -12138,7 +12128,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "ts_world_types_buildingfootprint",
-      "community": 4,
+      "community": 0,
       "norm_label": "buildingfootprint"
     },
     {
@@ -12168,7 +12158,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "ts_world_types_minimapdrawoptions",
-      "community": 2,
+      "community": 0,
       "norm_label": "minimapdrawoptions"
     },
     {
@@ -12178,7 +12168,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "ts_world_types_iworld",
-      "community": 18,
+      "community": 0,
       "norm_label": "iworld"
     },
     {
@@ -12188,7 +12178,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "ts_world_types_iworld_generatecorridor",
-      "community": 18,
+      "community": 0,
       "norm_label": ".generatecorridor()"
     },
     {
@@ -12198,7 +12188,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "ts_world_types_iworld_draw",
-      "community": 18,
+      "community": 0,
       "norm_label": ".draw()"
     },
     {
@@ -12208,7 +12198,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "ts_world_types_worldlayerid",
-      "community": 2,
+      "community": 0,
       "norm_label": "worldlayerid"
     },
     {
@@ -12228,7 +12218,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "ts_world_types_default_layer_visibility",
-      "community": 2,
+      "community": 0,
       "norm_label": "default_layer_visibility"
     },
     {
@@ -12268,7 +12258,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "ts_world_world_loadworldcorridors",
-      "community": 57,
+      "community": 0,
       "norm_label": "loadworldcorridors()"
     },
     {
@@ -12278,7 +12268,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "ts_world_world_loadtreeinstance",
-      "community": 79,
+      "community": 0,
       "norm_label": "loadtreeinstance()"
     },
     {
@@ -12298,7 +12288,7 @@
       "source_location": "L102",
       "_origin": "ast",
       "id": "ts_world_world_world_constructor",
-      "community": 12,
+      "community": 2,
       "norm_label": ".constructor()"
     },
     {
@@ -12308,7 +12298,7 @@
       "source_location": "L132",
       "_origin": "ast",
       "id": "ts_world_world_world_load",
-      "community": 79,
+      "community": 0,
       "norm_label": ".load()"
     },
     {
@@ -12328,7 +12318,7 @@
       "source_location": "L237",
       "_origin": "ast",
       "id": "ts_world_world_world_generate",
-      "community": 12,
+      "community": 2,
       "norm_label": ".generate()"
     },
     {
@@ -12338,7 +12328,7 @@
       "source_location": "L246",
       "_origin": "ast",
       "id": "ts_world_world_world_corridor",
-      "community": 57,
+      "community": 0,
       "norm_label": ".corridor()"
     },
     {
@@ -12348,7 +12338,7 @@
       "source_location": "L255",
       "_origin": "ast",
       "id": "ts_world_world_world_generatecorridor",
-      "community": 12,
+      "community": 79,
       "norm_label": ".generatecorridor()"
     },
     {
@@ -12358,7 +12348,7 @@
       "source_location": "L260",
       "_origin": "ast",
       "id": "ts_world_world_world_addcorridor",
-      "community": 57,
+      "community": 0,
       "norm_label": ".addcorridor()"
     },
     {
@@ -12368,7 +12358,7 @@
       "source_location": "L268",
       "_origin": "ast",
       "id": "ts_world_world_world_getcollisionborders",
-      "community": 14,
+      "community": 12,
       "norm_label": ".getcollisionborders()"
     },
     {
@@ -14478,7 +14468,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "docs_controls_keyboard_gesture_shortcuts_quick_reference",
-      "community": 52,
+      "community": 72,
       "norm_label": "keyboard & gesture shortcuts (quick reference)"
     },
     {
@@ -14488,7 +14478,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "docs_controls_viewport_navigation_all_pages",
-      "community": 52,
+      "community": 72,
       "norm_label": "viewport navigation (all pages)"
     },
     {
@@ -14498,7 +14488,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "docs_controls_car_driving_race_simulator_keys_mode",
-      "community": 52,
+      "community": 72,
       "norm_label": "car driving (race / simulator \u2014 keys mode)"
     },
     {
@@ -14508,7 +14498,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "docs_controls_graph_editor_world_editor_page",
-      "community": 52,
+      "community": 72,
       "norm_label": "graph editor (world editor page)"
     },
     {
@@ -14518,7 +14508,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "docs_controls_live_traffic_jam_traffic_page",
-      "community": 52,
+      "community": 72,
       "norm_label": "live traffic jam (traffic page)"
     },
     {
@@ -14528,7 +14518,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "docs_controls_training_simulator_world_mode",
-      "community": 52,
+      "community": 72,
       "norm_label": "training simulator (world mode)"
     },
     {
@@ -14538,7 +14528,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "docs_controls_human_backpropagation_training_html_human_training_html",
-      "community": 52,
+      "community": 72,
       "norm_label": "human backpropagation training (`html/human-training.html`)"
     },
     {
@@ -14628,7 +14618,7 @@
       "source_location": "L190",
       "_origin": "ast",
       "id": "docs_controls_phone_controls_ts_car_controls_phonecontrols_ts",
-      "community": 48,
+      "community": 72,
       "norm_label": "phone controls (`ts/car/controls/phonecontrols.ts`)"
     },
     {
@@ -14638,7 +14628,7 @@
       "source_location": "L192",
       "_origin": "ast",
       "id": "docs_controls_purpose",
-      "community": 48,
+      "community": 72,
       "norm_label": "purpose"
     },
     {
@@ -14648,7 +14638,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "docs_controls_class_structure_196",
-      "community": 48,
+      "community": 72,
       "norm_label": "class structure"
     },
     {
@@ -14658,7 +14648,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "docs_controls_tilt_detection_steering",
-      "community": 48,
+      "community": 72,
       "norm_label": "tilt detection (steering)"
     },
     {
@@ -14668,7 +14658,7 @@
       "source_location": "L223",
       "_origin": "ast",
       "id": "docs_controls_canvas_rotation_immersive_feedback",
-      "community": 48,
+      "community": 72,
       "norm_label": "canvas rotation (immersive feedback)"
     },
     {
@@ -14678,7 +14668,7 @@
       "source_location": "L235",
       "_origin": "ast",
       "id": "docs_controls_touch_controls_acceleration",
-      "community": 48,
+      "community": 72,
       "norm_label": "touch controls (acceleration)"
     },
     {
@@ -14688,7 +14678,7 @@
       "source_location": "L251",
       "_origin": "ast",
       "id": "docs_controls_integration_with_car",
-      "community": 48,
+      "community": 72,
       "norm_label": "integration with car"
     },
     {
@@ -14698,7 +14688,7 @@
       "source_location": "L264",
       "_origin": "ast",
       "id": "docs_controls_activation",
-      "community": 48,
+      "community": 72,
       "norm_label": "activation"
     },
     {
@@ -15918,7 +15908,7 @@
       "source_location": "L422",
       "_origin": "ast",
       "id": "docs_physics_sensor_system_ts_car_sensors_sensor_ts",
-      "community": 56,
+      "community": 23,
       "norm_label": "sensor system (`ts/car/sensors/sensor.ts`)"
     },
     {
@@ -15928,7 +15918,7 @@
       "source_location": "L424",
       "_origin": "ast",
       "id": "docs_physics_class_structure_424",
-      "community": 56,
+      "community": 23,
       "norm_label": "class structure"
     },
     {
@@ -15938,7 +15928,7 @@
       "source_location": "L448",
       "_origin": "ast",
       "id": "docs_physics_ray_casting_castrays",
-      "community": 56,
+      "community": 23,
       "norm_label": "ray casting (`#castrays`)"
     },
     {
@@ -15948,7 +15938,7 @@
       "source_location": "L481",
       "_origin": "ast",
       "id": "docs_physics_reading_detection_getreading",
-      "community": 56,
+      "community": 23,
       "norm_label": "reading detection (`#getreading`)"
     },
     {
@@ -15958,7 +15948,7 @@
       "source_location": "L506",
       "_origin": "ast",
       "id": "docs_physics_default_sensor_configuration",
-      "community": 56,
+      "community": 23,
       "norm_label": "default sensor configuration"
     },
     {
@@ -15968,7 +15958,7 @@
       "source_location": "L516",
       "_origin": "ast",
       "id": "docs_physics_traffic_light_perception",
-      "community": 56,
+      "community": 23,
       "norm_label": "traffic-light perception"
     },
     {
@@ -15978,7 +15968,7 @@
       "source_location": "L530",
       "_origin": "ast",
       "id": "docs_physics_sensor_visualization",
-      "community": 56,
+      "community": 23,
       "norm_label": "sensor visualization"
     },
     {
@@ -15998,7 +15988,7 @@
       "source_location": "L580",
       "_origin": "ast",
       "id": "docs_physics_serialization",
-      "community": 23,
+      "community": 47,
       "norm_label": "serialization"
     },
     {
@@ -16008,7 +15998,7 @@
       "source_location": "L582",
       "_origin": "ast",
       "id": "docs_physics_car_toinfo_carinfo",
-      "community": 23,
+      "community": 47,
       "norm_label": "`car.toinfo(): carinfo`"
     },
     {
@@ -16018,7 +16008,7 @@
       "source_location": "L607",
       "_origin": "ast",
       "id": "docs_physics_car_frominfo_opts_info_preferred",
-      "community": 23,
+      "community": 47,
       "norm_label": "`car.frominfo(opts, info?)` (preferred)"
     },
     {
@@ -16028,7 +16018,7 @@
       "source_location": "L616",
       "_origin": "ast",
       "id": "docs_physics_car_load_info_carinfo_legacy",
-      "community": 23,
+      "community": 47,
       "norm_label": "`car.load(info: carinfo)` (legacy)"
     },
     {
@@ -16038,7 +16028,7 @@
       "source_location": "L626",
       "_origin": "ast",
       "id": "docs_physics_file_format_car_files",
-      "community": 23,
+      "community": 47,
       "norm_label": "file format (`.car` files)"
     },
     {
@@ -18198,7 +18188,7 @@
       "source_location": "L239",
       "_origin": "ast",
       "id": "docs_viewport_mini_map_ts_mini_map_minimap_ts",
-      "community": 98,
+      "community": 15,
       "norm_label": "mini-map (`ts/mini-map/minimap.ts`)"
     },
     {
@@ -18208,7 +18198,7 @@
       "source_location": "L241",
       "_origin": "ast",
       "id": "docs_viewport_class_structure_241",
-      "community": 98,
+      "community": 15,
       "norm_label": "class structure"
     },
     {
@@ -18218,7 +18208,7 @@
       "source_location": "L278",
       "_origin": "ast",
       "id": "docs_viewport_rendering",
-      "community": 98,
+      "community": 15,
       "norm_label": "rendering"
     },
     {
@@ -18228,7 +18218,7 @@
       "source_location": "L314",
       "_origin": "ast",
       "id": "docs_viewport_usage_in_simulator",
-      "community": 98,
+      "community": 15,
       "norm_label": "usage in simulator"
     },
     {
@@ -18238,7 +18228,7 @@
       "source_location": "L323",
       "_origin": "ast",
       "id": "docs_viewport_usage_in_race",
-      "community": 98,
+      "community": 15,
       "norm_label": "usage in race"
     },
     {
@@ -26943,7 +26933,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L19",
       "weight": 1.0,
       "source": "package",
       "target": "package_author",
@@ -26953,7 +26943,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "package",
       "target": "package_description",
@@ -26963,7 +26953,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "package",
       "target": "package_devdependencies",
@@ -26973,7 +26963,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "package",
       "target": "package_keywords",
@@ -26983,7 +26973,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "package",
       "target": "package_license",
@@ -27057,16 +27047,6 @@
       "weight": 1.0,
       "source": "package_scripts",
       "target": "package_scripts_format",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "package.json",
-      "source_location": "L17",
-      "weight": 1.0,
-      "source": "package_scripts",
-      "target": "package_scripts_graphify",
       "confidence_score": 1.0
     },
     {
@@ -27153,7 +27133,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L27",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_concurrently",
@@ -27163,7 +27143,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L28",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_eslint",
@@ -27173,7 +27153,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L29",
+      "source_location": "L28",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_eslint_config_prettier",
@@ -27183,7 +27163,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_eslint_js",
@@ -27193,7 +27173,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_eslint_plugin_prettier",
@@ -27203,7 +27183,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_globals",
@@ -27213,7 +27193,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L31",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_onchange",
@@ -27223,7 +27203,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L32",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_playwright",
@@ -27233,7 +27213,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L33",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_prettier",
@@ -27243,7 +27223,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L34",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_serve",
@@ -27253,7 +27233,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L35",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_typescript",
@@ -27263,7 +27243,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L25",
+      "source_location": "L24",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_typescript_eslint_eslint_plugin",
@@ -27273,7 +27253,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L26",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_typescript_eslint_parser",
@@ -27283,7 +27263,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L23",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_eslint_js",
@@ -27294,7 +27274,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L25",
+      "source_location": "L24",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_typescript_eslint_eslint_plugin",
@@ -27305,7 +27285,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L26",
+      "source_location": "L25",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_typescript_eslint_parser",
@@ -27316,7 +27296,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L27",
+      "source_location": "L26",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_concurrently",
@@ -27327,7 +27307,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L28",
+      "source_location": "L27",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_eslint",
@@ -27338,7 +27318,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L29",
+      "source_location": "L28",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_eslint_config_prettier",
@@ -27349,7 +27329,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L29",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_eslint_plugin_prettier",
@@ -27360,7 +27340,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L30",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_globals",
@@ -27371,7 +27351,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L31",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_onchange",
@@ -27382,7 +27362,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L32",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_playwright",
@@ -27393,7 +27373,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L33",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_prettier",
@@ -27404,7 +27384,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L34",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_serve",
@@ -27415,7 +27395,7 @@
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L35",
       "weight": 1.0,
       "context": "import",
       "source": "package_devdependencies_typescript",

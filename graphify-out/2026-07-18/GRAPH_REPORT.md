@@ -1,11 +1,11 @@
 # Graph Report - Self-driving-car  (2026-07-18)
 
 ## Corpus Check
-- 210 files · ~212,218 words
+- 210 files · ~212,212 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2668 nodes · 5410 edges · 167 communities (136 shown, 31 thin omitted)
+- 2667 nodes · 5409 edges · 164 communities (140 shown, 24 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 16 edges (avg confidence: 0.57)
 - Token cost: 0 input · 0 output
 
@@ -67,13 +67,9 @@
 - Architectural Violations & Concerns
 - Controls
 - LayoutToolbarElement
-- Keyboard & Gesture Shortcuts (Quick Reference)
 - utils.ts
 - HeatmapGrid
 - AnimationLoopToolbarElement
-- Sensor System (`ts/car/sensors/sensor.ts`)
-- Corridor
-- Level
 - CameraControls
 - osm.ts
 - layoutManager.ts
@@ -81,6 +77,7 @@
 - migrate-worlds.mjs
 - SimulatorShell
 - WorldTrainingStrategy
+- carPhysics.ts
 - simulatorShell.ts
 - WorldGenerator
 - CameraControls
@@ -196,83 +193,87 @@
 ## Surprising Connections (you probably didn't know these)
 - `migrate()` --indirect_call--> `scale()`  [INFERRED]
   scripts/migrate-worlds.mjs → ts/math/utils.ts
-- `HumanTrainingConfigResult` --references--> `CarInfo`  [EXTRACTED]
-  ts/simulator/humanTraining/humanTrainingConfigModal.ts → ts/car/car.ts
-- `TrainingManagerOptions` --references--> `Car`  [EXTRACTED]
-  ts/simulator/training/trainingPanel.ts → ts/car/car.ts
+- `PointWithBlueness` --inherits--> `Point`  [EXTRACTED]
+  ts/car/controls/markerDetector.ts → ts/math/primitives/point.ts
+- `TrafficControlHit` --references--> `Point`  [EXTRACTED]
+  ts/math/trafficControlGrid.ts → ts/math/primitives/point.ts
 - `Camera` --references--> `Point`  [EXTRACTED]
   ts/camera/camera.ts → ts/math/primitives/point.ts
-- `Camera` --references--> `Polygon`  [EXTRACTED]
-  ts/camera/camera.ts → ts/math/primitives/polygon.ts
+- `SimulatorShell` --references--> `Camera`  [EXTRACTED]
+  ts/simulator/core/simulatorShell.ts → ts/camera/camera.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (167 total, 31 thin omitted)
+## Communities (164 total, 24 thin omitted)
 
 ### Community 0 - "entry.js"
-Cohesion: 0.18
-Nodes (14): getFake3dPoint(), lerp(), lerp2D(), translate(), drawEnvelope(), drawPolygon(), WorldGeneratable, Tree (+6 more)
+Cohesion: 0.08
+Nodes (36): Envelope, PolygonBounds, average(), lerp(), mulberry32(), translate(), IMiniMapCar, drawEnvelope() (+28 more)
 
 ### Community 1 - "entry.ts"
-Cohesion: 0.11
-Nodes (24): Brain, BrainControlOutput, CarCallbacks, CarControls, CarOptions, DEFAULT_HIDDEN_LAYERS, ControlType, CarLoader (+16 more)
+Cohesion: 0.15
+Nodes (18): ControlType, ShortestPathPoint, GridSegment, MiniMap, WORLD_LAYER_BUTTONS, PointDrawOptions, LayoutMode, CachedLayout (+10 more)
 
 ### Community 2 - "world.ts"
-Cohesion: 0.07
-Nodes (20): IMiniMapCar, MiniMapDrawOptions, WORLD_LAYER_BUTTONS, ScaleIndicator, ScaleIndicatorOptions, Viewport, ViewportMode, CrossingEditor (+12 more)
+Cohesion: 0.09
+Nodes (12): ScaleIndicator, Viewport, ViewportMode, CrossingEditor, MarkingEditor, ParkingEditor, StartEditor, StopEditor (+4 more)
 
 ### Community 3 - "raceSimulator.js"
-Cohesion: 0.22
-Nodes (10): DEFAULT_CAR_CONFIG, loadSimLayerVisibility(), discardStoredPool(), downloadCarFiles(), loadPoolFromStorage(), loadRaceCars(), savePoolToStorage(), TrainingManagerOptions (+2 more)
+Cohesion: 0.14
+Nodes (19): CarCallbacks, CarOptions, DEFAULT_CAR_CONFIG, DEFAULT_HIDDEN_LAYERS, loadSimLayerVisibility(), createCarsForTraining(), getSortedAICars(), getTopAICars() (+11 more)
 
 ### Community 4 - "utils.js"
-Cohesion: 0.13
-Nodes (10): Envelope, boundsOverlap(), computePolygonBounds(), Polygon, PolygonBounds, average(), getIntersection(), Building (+2 more)
+Cohesion: 0.24
+Nodes (3): ToolbarAssetSelectors, stripFileExtension(), smNormalizeWorldId()
 
 ### Community 5 - "Car"
-Cohesion: 0.20
-Nodes (7): formatElapsedTime(), formatKmhFromPxPerFrame(), formatMetersFromWorldPixels(), framesToSeconds(), pxPerFrameToKmh(), worldPixelsToMeters(), tpConfigHtml()
+Cohesion: 0.24
+Nodes (6): formatElapsedTime(), formatKmhFromPxPerFrame(), formatMetersFromWorldPixels(), framesToSeconds(), pxPerFrameToKmh(), worldPixelsToMeters()
 
 ### Community 7 - "Point"
-Cohesion: 0.14
-Nodes (18): add(), dot(), formatDegrees(), getNearestPoint(), magnitude(), normalize(), perpendicular(), radiansToDegrees() (+10 more)
+Cohesion: 0.13
+Nodes (20): add(), cross(), distance(), dot(), formatDegrees(), getFake3dPoint(), getNearestPoint(), getNearestSegment() (+12 more)
 
 ### Community 8 - "StoreManager"
-Cohesion: 0.05
-Nodes (21): parseCarFileContent(), ToolbarAssetSelectors, stripFileExtension(), SM_ARRAY_LS_KEYS, SM_TRACKED_LS_KEYS, smCountItems(), smGenId(), smNormalizeWorldId() (+13 more)
+Cohesion: 0.08
+Nodes (18): SM_ARRAY_LS_KEYS, SM_TRACKED_LS_KEYS, smCountItems(), smGenId(), smPersist(), smWorldMarkers(), StoreManager, AssetSource (+10 more)
 
 ### Community 9 - "point.js"
-Cohesion: 0.16
-Nodes (19): SensorRaycaster, TaggedHit, SensorTrafficControl, nearestEdgeOffset(), ShortestPathPoint, GridSegment, TrafficControlEntry, TrafficControlState (+11 more)
+Cohesion: 0.25
+Nodes (9): SensorRaycaster, TaggedHit, SensorTrafficControl, nearestEdgeOffset(), polysIntersect(), TrafficControlEntry, TrafficControlHit, TrafficControlState (+1 more)
 
 ### Community 10 - "devDependencies"
 Cohesion: 0.04
-Nodes (47): concurrently, eslint, eslint-config-prettier, @eslint/js, eslint-plugin-prettier, globals, onchange, author (+39 more)
+Nodes (46): concurrently, eslint, eslint-config-prettier, @eslint/js, eslint-plugin-prettier, globals, onchange, author (+38 more)
 
 ### Community 11 - "NetworkVisualizer"
-Cohesion: 0.11
-Nodes (6): ArrowDir, ConnectionEdge, Hover, NetworkLayout, NetworkVisualizer, NeuronNode
+Cohesion: 0.07
+Nodes (8): Level, NeuralNetwork, ArrowDir, ConnectionEdge, Hover, NetworkLayout, NetworkVisualizer, NeuronNode
 
 ### Community 12 - "Segment"
-Cohesion: 0.06
-Nodes (14): CarState, ControlsState, Marker, PointWithBlueness, CarPhysics, polysIntersect(), Graph, Point (+6 more)
+Cohesion: 0.07
+Nodes (19): Graph, Point, Segment, angle(), MiniMapDrawOptions, drawSegment(), SegmentDrawOptions, DragState (+11 more)
 
 ### Community 14 - "TrainingPanelElement"
-Cohesion: 0.17
-Nodes (9): Segment, angle(), SegmentDrawOptions, Crossing, Marking, MarkingType, Parking, Stop (+1 more)
+Cohesion: 0.29
+Nodes (3): spFormatHiddenLayers(), spFormatSize(), StorePanelElement
 
 ### Community 15 - "StoreManager"
-Cohesion: 0.23
-Nodes (6): NeuralNetwork, applyPoolToCars(), brainsCompatible(), getSortedAICars(), getTopAICars(), getTopCarInfoPool()
+Cohesion: 0.40
+Nodes (5): Class Structure, Mini-Map (`ts/mini-map/miniMap.ts`), Rendering, Usage in Race, Usage in Simulator
 
 ### Community 16 - "WorldToolbarElement"
 Cohesion: 0.06
 Nodes (6): BorderMode, ToolbarModeControls, ToolbarViewportMode, TrackingMode, WorldToolbarElement, RacePanel
 
+### Community 17 - "TrainingPanelElement"
+Cohesion: 0.11
+Nodes (3): applyPoolToCars(), brainsCompatible(), TrainingPanelElement
+
 ### Community 18 - "worldGenerator.ts"
-Cohesion: 0.19
-Nodes (11): Camera, extrudeCarShape(), extrudePolygons(), extrudeTreeShapes(), getCentroid(), movePointsInward(), ICameraPoint, ICameraRenderOptions (+3 more)
+Cohesion: 0.12
+Nodes (13): Camera, extrudeCarShape(), extrudePolygons(), extrudeTreeShapes(), getCentroid(), movePointsInward(), ICameraPoint, ICameraRenderOptions (+5 more)
 
 ### Community 19 - "Consolidate Keyboard Routing into KeyboardManager"
 Cohesion: 0.15
@@ -291,8 +292,8 @@ Cohesion: 0.17
 Nodes (11): 1. `ts/store/storeManager.ts`, 2. `ts/neural-network/visualizer.ts`, Acceptance criteria, Brain / persistence considerations, Context (read first), Docs to update, Goal, Implementation (+3 more)
 
 ### Community 23 - "types.ts"
-Cohesion: 0.12
-Nodes (17): AI Integration, Car Drawing (`draw`), `Car.fromInfo(opts, info?)` (preferred), `Car.load(info: CarInfo)` (legacy), Car Physics & Perception, `Car.toInfo(): CarInfo`, Collision Detection, Collision Response (`handleCollisionWithRoadBorders`) (+9 more)
+Cohesion: 0.11
+Nodes (19): AI Integration, Car Drawing (`draw`), Car Physics & Perception, Class Structure, Collision Detection, Collision Response (`handleCollisionWithRoadBorders`), Damage Assessment (`#assessDamage`), Default Sensor Configuration (+11 more)
 
 ### Community 24 - "worldEditor.js"
 Cohesion: 0.05
@@ -319,16 +320,16 @@ Cohesion: 0.13
 Nodes (4): CYCLE_ORDER, LightEditor, Light, TrafficManager
 
 ### Community 30 - "RaceSimulator"
-Cohesion: 0.14
-Nodes (5): beep(), explode(), SoundEngine, taDaa(), RaceSimulator
+Cohesion: 0.22
+Nodes (5): beep(), explode(), SoundEngine, taDaa(), buildRoadBorders()
 
 ### Community 31 - "carBrainAdapter.ts"
-Cohesion: 0.24
-Nodes (5): IntersectionPoint, encodeTrafficState(), Sensor, ObstacleType, SensorReading
+Cohesion: 0.18
+Nodes (7): Brain, BrainControlOutput, IntersectionPoint, encodeTrafficState(), Sensor, ObstacleType, SensorReading
 
 ### Community 32 - "CarInfo"
 Cohesion: 0.19
-Nodes (8): getRandomColor(), SIMPLE_MODE_CONFIG, updateSimpleCars(), updateSimpleTraffic(), generateInitialTraffic(), generateTrafficRow(), trafficCarOptions(), SimpleWorld
+Nodes (6): getRandomColor(), updateSimpleCars(), updateSimpleTraffic(), generateInitialTraffic(), generateTrafficRow(), trafficCarOptions()
 
 ### Community 33 - "Fix Layer Violation: Extract `CarBrainAdapter.trainStep()`"
 Cohesion: 0.18
@@ -342,37 +343,37 @@ Nodes (19): ashkelon-kohav-hazafon.world, barnea.world, best-1_b6_s3.5_rc5_rl150
 Cohesion: 0.18
 Nodes (10): 1. Delete `ts/utils.ts`, 2. Update `AGENTS.md`, Acceptance criteria, Brain / persistence considerations, Context (read first), Docs to update, Goal, Implementation (+2 more)
 
+### Community 36 - "TrainingSimulator"
+Cohesion: 0.13
+Nodes (3): SimpleSimState, SimpleTrainingStrategy, TrainingSimulator
+
+### Community 37 - "RaceSimulator"
+Cohesion: 0.27
+Nodes (3): CarControls, RaceSimulator, queryTrafficControlsNearCar()
+
 ### Community 39 - "compilerOptions"
 Cohesion: 0.11
 Nodes (17): eslint.config.mjs, compilerOptions, allowJs, esModuleInterop, forceConsistentCasingInFileNames, importHelpers, module, moduleResolution (+9 more)
-
-### Community 43 - "WorldTrainingStrategy"
-Cohesion: 0.24
-Nodes (3): SimpleSimState, WorldTrainingStrategy, drawSimulatorCars()
 
 ### Community 46 - "Car Class (`ts/car/car.ts`)"
 Cohesion: 0.29
 Nodes (7): Car Class (`ts/car/car.ts`), Class Structure, Human Backpropagation Fields, Learning toggle (L key), Panel info displays, Rolling-window accuracy, `trainStep` return value
 
-### Community 48 - "CarDrawData"
-Cohesion: 0.25
-Nodes (8): Activation, Canvas Rotation (Immersive Feedback), Class Structure, Integration with Car, Phone Controls (`ts/car/controls/phoneControls.ts`), Purpose, Tilt Detection (Steering), Touch Controls (Acceleration)
+### Community 47 - "Serialization"
+Cohesion: 0.40
+Nodes (5): `Car.fromInfo(opts, info?)` (preferred), `Car.load(info: CarInfo)` (legacy), `Car.toInfo(): CarInfo`, File Format (`.car` files), Serialization
 
 ### Community 49 - "Architectural Violations & Concerns"
 Cohesion: 0.05
 Nodes (35): 10. html/world.html — Missing SpatialGrid (Low Severity), 10. Normalize private keyword usage to # private fields for any class that doesn't need subclass access (e.g., TrainingSimulator's private mode could be #mode), 1. Refactor Race to extend SimulatorShell, 1. ts/games/race.ts — Template Method Pattern Violation (High Severity), 1. ts/math/spatialGrid.ts — Excellent Spatial Index Implementation, 2. Extract draw methods from math primitives, 2. ts/car/rendering/carRenderer.ts — Well-Executed Flyweight Pattern, 2. ts/math/primitives/point.ts — Domain Leakage (Medium Severity) (+27 more)
 
-### Community 52 - "Keyboard & Gesture Shortcuts (Quick Reference)"
-Cohesion: 0.29
-Nodes (7): Car Driving (Race / Simulator — KEYS mode), Graph Editor (World Editor page), Human Backpropagation Training (`html/human-training.html`), Keyboard & Gesture Shortcuts (Quick Reference), Live Traffic Jam (Traffic page), Training Simulator (world mode), Viewport Navigation (all pages)
-
 ### Community 54 - "HeatmapGrid"
 Cohesion: 0.14
 Nodes (6): HeatmapCell, HeatmapGrid, VehiclePosition, HeatmapRenderer, occupancyColor(), VisibleWorldRect
 
-### Community 56 - "Sensor System (`ts/car/sensors/sensor.ts`)"
-Cohesion: 0.29
-Nodes (7): Class Structure, Default Sensor Configuration, Ray Casting (`#castRays`), Reading Detection (`#getReading`), Sensor System (`ts/car/sensors/sensor.ts`), Sensor Visualization, Traffic-Light Perception
+### Community 64 - "CameraControls"
+Cohesion: 0.20
+Nodes (4): CameraControls, Marker, MarkerDetector, PointWithBlueness
 
 ### Community 65 - "osm.ts"
 Cohesion: 0.20
@@ -390,17 +391,29 @@ Nodes (35): `bestPool` Format, Car Config Status, Car Files (`.car`), CarLoader 
 Cohesion: 0.31
 Nodes (10): __dirname, isV2(), lerp(), main(), migrate(), mulberry32(), r1(), r2() (+2 more)
 
+### Community 71 - "SimulatorShell"
+Cohesion: 0.21
+Nodes (3): saveSimLayerVisibility(), SimulatorShell, resizeSimulatorLayout()
+
 ### Community 72 - "WorldTrainingStrategy"
-Cohesion: 0.11
-Nodes (17): Activation, AI Mode — Neural network control, Architecture, Camera Controls (`ts/car/controls/cameraControls.ts`), Class Structure, Control Interface, Control Mode Selection (Race), Control Systems (+9 more)
+Cohesion: 0.06
+Nodes (32): Activation, Activation, AI Mode — Neural network control, Architecture, Camera Controls (`ts/car/controls/cameraControls.ts`), Canvas Rotation (Immersive Feedback), Car Driving (Race / Simulator — KEYS mode), Class Structure (+24 more)
+
+### Community 77 - "carPhysics.ts"
+Cohesion: 0.50
+Nodes (3): CarState, ControlsState, CarPhysics
 
 ### Community 78 - "simulatorShell.ts"
 Cohesion: 0.07
 Nodes (29): AI Product Architect — Feature Recommendation Report, Appendix: Feature Delivery Order, Architectural Implementation Strategy, Architectural Implementation Strategy, Architectural Implementation Strategy, Architectural Implementation Strategy, Architectural Implementation Strategy, Core Concept (+21 more)
 
 ### Community 79 - "WorldGenerator"
-Cohesion: 0.18
-Nodes (10): distance(), mulberry32(), wgGenerateLaneGuides(), wgGenerateSeparatorBorders(), wgGenerateTrees(), wgPickTreeType(), WorldGenerator, buildTreePrototypes() (+2 more)
+Cohesion: 0.29
+Nodes (3): wgGenerateLaneGuides(), wgGenerateSeparatorBorders(), WorldGenerator
+
+### Community 87 - "CameraControls"
+Cohesion: 0.09
+Nodes (4): Car, tpConfigHtml(), TrafficPanelElement, TrainingManagerOptions
 
 ### Community 95 - "controls.ts"
 Cohesion: 0.07
@@ -411,8 +424,8 @@ Cohesion: 0.07
 Nodes (26): 📊 10. Summary Statistics, 🧭 11. Improvement Opportunities (Quick Wins), 📦 1. Project Overview, 🧰 2. Technology Stack, 3.1 Plain Classes vs Custom Elements vs Free Functions, 3.2 Recurring Design Patterns, 3.3 Class Size & Complexity, 🧱 3. Class & Module Patterns (+18 more)
 
 ### Community 98 - "Viewport System"
-Cohesion: 0.08
-Nodes (25): Class Structure, Class Structure, Class Structure, Coordinate System, Display Modes, Event Listener Setup, Integration, Mini-Map (`ts/mini-map/miniMap.ts`) (+17 more)
+Cohesion: 0.10
+Nodes (20): Class Structure, Class Structure, Coordinate System, Display Modes, Event Listener Setup, Integration, Mouse Down (initiate pan), Mouse Move (update offset during drag) (+12 more)
 
 ### Community 106 - "ES Modules Refactoring — `module: "none"` → `module: "nodenext"`"
 Cohesion: 0.08
@@ -518,10 +531,6 @@ Nodes (13): 1. `<world-layers-toolbar>` — Button becomes a toggle, 2. `WorldEd
 Cohesion: 0.14
 Nodes (13): 1. Create `HeatmapGrid` data structure (new file: `ts/math/heatmapGrid.ts`), 2. Create `HeatmapRenderer` (new file: `ts/rendering/heatmapRenderer.ts`), 3. Wire into simulators, 4. Add toggle UI, 5. Persistence, Acceptance Criteria, Core Concept, Feature C1: Spatial Congestion Heatmap (+5 more)
 
-### Community 136 - "HumanTrainingConfigModalElement"
-Cohesion: 0.18
-Nodes (4): HumanTrainingConfigModalElement, HumanTrainingConfigOpenOptions, HumanTrainingConfigResult, inferHiddenLayers()
-
 ### Community 138 - "Keyboard Architecture"
 Cohesion: 0.15
 Nodes (12): Architecture rules, Files, Human Backpropagation Simulator (static set), Keyboard Architecture, LatchedToggle (`ts/panels/latchedToggle.ts`), Lifecycle, Overview, ShortcutBinding (+4 more)
@@ -535,8 +544,8 @@ Cohesion: 0.15
 Nodes (12): 1. Core Architectural Constraints to Enforce, 2. Structural & Folder Boundary Auditing (FSD & Atomic Design), 3. Design Pattern Evaluation, 4. Code Standards & Style Adherence, 5. Output Reporting Schema, Anti-Patterns to Flag (Bad), Architectural Violations & Concerns, Commendable Implementations (+4 more)
 
 ### Community 142 - "CarInfo"
-Cohesion: 0.18
-Nodes (5): CarInfo, compareCarInfoParams(), normalizeStateAware(), createCarsForTraining(), TrainingInitDefaults
+Cohesion: 0.20
+Nodes (7): CarInfo, CarLoader, compareCarInfoParams(), normalizeStateAware(), parseCarFileContent(), HumanTrainingConfigResult, TrainingInitDefaults
 
 ### Community 143 - "Ray/Rendering/Data Model per Sophistication Mode"
 Cohesion: 0.17
@@ -581,6 +590,10 @@ Nodes (9): Access, Architecture, Car lifecycle, Differences from the training si
 ### Community 158 - "Simulators & Training Environments"
 Cohesion: 0.22
 Nodes (9): Animation loop contract, Animation Loop Toolbar (`ts/simulator/panels/animationLoopToolbar.ts`), Car Renderer (`ts/simulator/training/rendering/carRenderer.ts`), `drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor, prevPoolCars, prevPoolColor, viewportLeft, viewportRight, keysShowSensor)`, Rendering performance: cached mask sprites, Responsibilities split, Simulator Shell (`ts/simulator/core/simulatorShell.ts`), Simulators & Training Environments (+1 more)
+
+### Community 160 - "CorridorEditor"
+Cohesion: 0.18
+Nodes (3): ShortcutBinding, ShortcutDef, CorridorEditor
 
 ### Community 162 - "reviewer.md"
 Cohesion: 0.25
@@ -747,24 +760,24 @@ Cohesion: 0.67
 Nodes (3): 3a. Polygon not regenerated after dimension change, 3b. Brain deserialization can silently fail, Issue 3 — Traffic simulator doesn't use right brain/size for classified cars
 
 ## Knowledge Gaps
-- **1203 isolated node(s):** `$schema`, `default_agent`, `.opencode/skills`, `model`, `type` (+1198 more)
+- **1202 isolated node(s):** `$schema`, `default_agent`, `.opencode/skills`, `model`, `type` (+1197 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Point` connect `Segment` to `entry.js`, `entry.ts`, `world.ts`, `utils.js`, `world.js`, `Point`, `point.js`, `GraphEditor`, `TrainingPanelElement`, `worldGenerator.ts`, `Light`, `RaceSimulator`, `carBrainAdapter.ts`, `CarInfo`, `CorridorEditor`, `TrainingSimulator`, `utils.ts`, `CameraControls`, `osm.ts`, `WorldGenerator`, `CameraControls`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
-- **Why does `StoreManager` connect `StoreManager` to `entry.ts`, `world.ts`, `raceSimulator.js`, `point.js`, `CarInfo`, `RaceSimulator`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **Why does `Car` connect `CameraControls` to `entry.js`, `entry.ts`, `world.ts`, `raceSimulator.js`, `Car`, `world.js`, `Point`, `point.js`, `Segment`, `CarInfo`, `StoreManager`, `WorldToolbarElement`, `TrainingPanelElement`, `worldGenerator.ts`, `RaceSimulator`, `carBrainAdapter.ts`, `CarInfo`, `TrainingSimulator`, `RaceSimulator`, `CarBrainAdapter`, `WorldTrainingStrategy`, `utils.ts`, `SimulatorShell`, `CarRenderer`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `Point` connect `Segment` to `entry.js`, `entry.ts`, `world.ts`, `raceSimulator.js`, `world.js`, `Point`, `point.js`, `GraphEditor`, `worldGenerator.ts`, `Light`, `carBrainAdapter.ts`, `CorridorEditor`, `TrainingSimulator`, `RaceSimulator`, `CarDrawData`, `utils.ts`, `CameraControls`, `osm.ts`, `carPhysics.ts`, `WorldGenerator`, `CameraControls`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `StoreManager` connect `StoreManager` to `entry.ts`, `world.ts`, `raceSimulator.js`, `utils.js`, `RaceSimulator`, `CarInfo`, `TrainingPanelElement`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `TrainingSimulator` connect `TrainingSimulator` to `entry.js`, `entry.ts`, `raceSimulator.js`, `SimulatorShell`, `TrainingInitModalElement`, `WorldTrainingStrategy`, `Segment`, `KeyboardManager`, `TrainingPanelElement`, `RaceSimulator`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **What connects `$schema`, `default_agent`, `.opencode/skills` to the rest of the system?**
-  _1204 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `entry.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.1080958842152872 - nodes in this community are weakly interconnected._
+  _1203 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `entry.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.07565392354124749 - nodes in this community are weakly interconnected._
 - **Should `world.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07404426559356136 - nodes in this community are weakly interconnected._
-- **Should `utils.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.12873563218390804 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09134906231094979 - nodes in this community are weakly interconnected._
+- **Should `raceSimulator.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.13825757575757575 - nodes in this community are weakly interconnected._

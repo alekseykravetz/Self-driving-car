@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "lint": "eslint --fix",
     "lint:log": "eslint",
-    "lint:watch": "node --watch --watch-path=ts node_modules/eslint/bin/eslint.js ts/**/*.ts --fix"
+    "lint:watch": "node --watch --watch-path=ts node_modules/eslint/bin/eslint.js ts/**/*.ts --fix",
+    "graphify": "python3 -m graphify update ."
   },
   "keywords": [],
   "author": "",
