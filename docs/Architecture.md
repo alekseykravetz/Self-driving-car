@@ -27,6 +27,27 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 - `serve -p 9090` serves the root directory as static files
 - Each HTML page loads exactly one `<script type="module" src="/js/path/to/entry.js">`
 - The browser resolves the import graph at runtime — no manual dependency ordering needed
+- `npm test` runs all unit tests via vitest (single run)
+- `npm run test:watch` runs tests in watch mode (TDD)
+- `npm run test:coverage` runs tests with coverage report in `coverage/`
+
+### Test Pipeline
+
+```
+┌──────────────┐     ┌─────────┐     ┌────────────────────┐
+│  ts/*.ts     │     │ vitest  │     │ Test results       │
+│  tests/**/*  │────▶│ (vitest)│────▶│ (stdout + coverage)│
+│  .test.ts    │     │ runner  │     │ coverage/          │
+└──────────────┘     └─────────┘     └────────────────────┘
+```
+
+- Tests are authored in TypeScript (`tests/**/*.test.ts`) and executed directly by vitest (no pre-compilation needed).
+- `vitest.config.ts` includes all `tests/**/*.test.ts` files.
+- Test files mirror the `ts/` directory structure under `tests/unit/`.
+- `tests/helpers/` contains shared test utilities (e.g. `makeKnownNetwork` for constructing deterministic neural networks).
+- Vitest `^4.1.10` is a dev dependency in `package.json`.
+- Test files are excluded from the main `tsconfig.json` compilation (`"exclude": ["tests/**/*.ts"]`).
+- ESLint config (`eslint.config.mjs`) has a separate rule block for `tests/**/*.ts` with `globals: { ...globals.node }` (Node globals like `describe`, `it`, `expect`).
 
 ### Import Path Convention
 
