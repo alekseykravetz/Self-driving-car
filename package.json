@@ -14,7 +14,10 @@
     "lint": "eslint --fix",
     "lint:log": "eslint",
     "lint:watch": "node --watch --watch-path=ts node_modules/eslint/bin/eslint.js ts/**/*.ts --fix",
-    "graphify": "python3 -m graphify update ."
+    "graphify": "python3 -m graphify update .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +27,7 @@
     "@eslint/js": "^9.23.0",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "concurrently": "^9.1.2",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
@@ -33,6 +37,7 @@
     "playwright": "^1.61.1",
     "prettier": "3.5.3",
     "serve": "^14.2.4",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^4.1.10"
   }
 }

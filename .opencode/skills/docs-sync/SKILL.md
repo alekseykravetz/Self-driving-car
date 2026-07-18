@@ -5,7 +5,7 @@ description: Use after implementing a change, to keep documentation in sync. Ens
 
 # Docs Sync Workflow
 
-This repo has no automated tests — documentation IS the regression surface. Every behavioral or architectural change must be reflected in `docs/` and `AGENTS.md` before the task is archived.
+Tests live in `tests/unit/`. Documentation is still the regression surface for behavioral/architectural changes, but now `npm test` (vitest) covers the math, neural-network, physics, and brain-adapter modules. Every behavioral or architectural change must still be reflected in `docs/` and `AGENTS.md`, AND must not break existing tests.
 
 **You (the planner agent, running on glm-5.2) write the docs yourself.** Do NOT delegate docs to the build agent — build runs on a cheaper model and is not suited for the judgment calls required here (matching tone, deciding new docs, AGENTS.md convention decisions). The build agent implements code only; you handle docs.
 

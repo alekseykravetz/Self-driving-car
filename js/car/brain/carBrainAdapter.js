@@ -21,6 +21,8 @@ export class CarBrainAdapter {
         return stateAware ? rayCount * 2 + 1 : rayCount + 1;
     }
     static brainsCompatible(brain, rayCount, stateAware) {
+        if (!brain)
+            return false;
         const nn = brain;
         if (!nn.levels || nn.levels.length === 0)
             return false;
