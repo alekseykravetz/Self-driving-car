@@ -37,7 +37,7 @@ export default defineConfig([
       parser: tsParser,
       sourceType: 'module',
       parserOptions: { project: null },
-      globals: { ...globals.node },
+      globals: { ...globals.node, ...globals.browser },
     },
     plugins: {
       prettier: eslintPluginPrettier,
