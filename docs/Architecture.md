@@ -27,11 +27,23 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 - `serve -p 9090` serves the root directory as static files
 - Each HTML page loads exactly one `<script type="module" src="/js/path/to/entry.js">`
 - The browser resolves the import graph at runtime — no manual dependency ordering needed
-- `npm test` runs all unit tests via vitest (single run)
+- `npm test` runs all unit tests via vitest (single run; 48 files, 684 tests)
+- `npm run test:fast` / `npm run test:changed` runs tests for changed files only
 - `npm run test:watch` runs tests in watch mode (TDD)
 - `npm run test:coverage` runs tests with coverage report in `coverage/`
+- `npm run test:visual` runs Playwright visual regression tests (5 spec files, Chromium)
 
 ### Test Pipeline
+
+**Three test directories** serve different testing needs:
+
+| Directory        | Purpose                                                            | Framework  |
+| ---------------- | ------------------------------------------------------------------ | ---------- |
+| `tests/unit/`    | Pure-logic and integration unit tests (48 files, 684 tests)        | vitest     |
+| `tests/visual/`  | Playwright visual regression tests (5 spec files, Chromium)        | Playwright |
+| `tests/helpers/` | Shared test utilities (`makeKnownNetwork`, `setupImageMock`, etc.) | —          |
+
+**Unit tests** (vitest):
 
 ```
 ┌──────────────┐     ┌─────────┐     ┌────────────────────┐
@@ -44,11 +56,30 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 - Tests are authored in TypeScript (`tests/**/*.test.ts`) and executed directly by vitest (no pre-compilation needed).
 - `vitest.config.ts` includes all `tests/**/*.test.ts` files (excluding `tests/visual/`).
 - Test files mirror the `ts/` directory structure under `tests/unit/`.
-- `tests/helpers/` contains shared test utilities (e.g. `makeKnownNetwork` for constructing deterministic neural networks; `setupImageMock` for enabling Car construction in Node; `makeCar`, `makeWorld`, `makeGraph`, etc.).
+- `tests/helpers/` contains shared test utilities (e.g. `makeKnownNetwork` for constructing deterministic neural networks; `setupImageMock` for enabling Car construction in Node; `makeCar`, `makeWorld`, `makeGraph`, `makePoint`, `makeSegment`, `mockCanvas2D`, etc.).
 - Vitest `^4.1.10` is a dev dependency in `package.json`.
 - Coverage thresholds are enforced in `vitest.config.ts`: statements ≥58%, branches ≥55%, functions ≥68%, lines ≥58%.
+- The vitest config uses `forks` pool with `singleFork: false` for parallel test execution and `isolate: false` for ~10% overhead reduction.
 - Test files are excluded from the main `tsconfig.json` compilation (`"exclude": ["tests/**/*.ts"]`).
 - ESLint config (`eslint.config.mjs`) has a separate rule block for `tests/**/*.ts` with `globals: { ...globals.node }` (Node globals like `describe`, `it`, `expect`).
+
+**Visual regression tests** (Playwright):
+
+```
+┌──────────────┐     ┌──────────────┐     ┌────────────────────┐
+│  serve:9090  │     │  Playwright  │     │ Screenshots +      │
+│  (webServer) │────▶│  Chromium    │────▶│ report:            │
+│              │     │  headless    │     │ playwright-report/ │
+└──────────────┘     └──────────────┘     │ test-results/      │
+                                          └────────────────────┘
+```
+
+- 5 spec files cover the main entry points: `human-training`, `race`, `simulator`, `traffic`, `world`.
+- Playwright auto-starts the static server (`npx serve -p 9090`) via `webServer` config.
+- Baselines stored in `tests/visual/baselines/` — committed to the repo.
+- **Single worker** and **`forbidOnly`** in CI; retries 2× on failure in CI mode.
+- `npm run test:visual:update` regenerates baselines (set `PLAYWRIGHT_UPDATE_SNAPSHOTS=1`).
+- Allowed to fail in CI (`continue-on-error: true`); failure screenshots uploaded as artifacts.
 
 ### Import Path Convention
 

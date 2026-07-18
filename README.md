@@ -1,5 +1,7 @@
 # Self-Driving Car Simulator
 
+[![Test](https://github.com/{{owner}}/{{repo}}/actions/workflows/test.yml/badge.svg)](https://github.com/{{owner}}/{{repo}}/actions/workflows/test.yml)
+
 A browser-based autonomous vehicle simulation platform that uses **neural networks** and **genetic algorithms** to evolve self-driving agents. Built entirely with TypeScript — no bundlers, no frameworks, no runtime dependencies.
 
 Cars learn to navigate procedurally-generated worlds through evolutionary selection: sensors perceive the environment, a feedforward neural network decides steering, and the fittest brains survive to the next generation.
@@ -71,6 +73,7 @@ Open [http://localhost:9090](http://localhost:9090) in your browser to see the l
 | `npm test`                   | Run all unit tests                                         |
 | `npm run test:watch`         | Run tests in watch mode (TDD)                              |
 | `npm run test:fast`          | Run tests for changed files only                           |
+| `npm run test:changed`       | Run tests for changed files only (alias for test:fast)     |
 | `npm run test:dev`           | Watch mode with verbose output for changed files           |
 | `npm run test:coverage`      | Run tests with coverage report (output in `coverage/`)     |
 | `npm run test:visual`        | Run Playwright visual regression tests                     |
@@ -422,12 +425,15 @@ Detailed technical documentation is maintained in the `docs/` directory:
 ## Contributing
 
 1. Write all logic in TypeScript (`ts/` directory)
-2. Write/update unit tests in `tests/unit/` mirroring the `ts/` structure
-3. Run `npm test` to verify all tests pass
-4. Run `npm run fix:all` (format + lint) before committing
-5. Test changes visually in the relevant simulator HTML page
-6. Update documentation in `docs/` for any significant changes
-7. Do not introduce bundlers or runtime dependencies
+2. Write/update unit tests in `tests/unit/` mirroring the `ts/` structure; use helpers from `tests/helpers/`
+3. Run `npm test` to verify all tests pass (or `npm run test:fast` for changed files)
+4. Run `npm run test:coverage` to check coverage thresholds (58% statements, 55% branches, 68% functions)
+5. Run `npm run fix:all` (format + lint) before committing
+6. For UI changes, add/update visual regression tests in `tests/visual/` and run `npm run test:visual`
+7. Test changes visually in the relevant simulator HTML page
+8. Update documentation in `docs/` for any significant changes
+9. Do not introduce bundlers or runtime dependencies
+10. CI runs on push/PR to `main`/`master`/`develop` with lint, typecheck, unit tests (Node 18/20/22), and visual tests
 
 ---
 

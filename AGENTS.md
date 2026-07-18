@@ -103,23 +103,32 @@
 
 ## Testing
 
-- **Unit tests** live in `tests/unit/`, mirroring the `ts/` structure.
-- **Test helpers** in `tests/helpers/` — `makeKnownNetwork`, `setupImageMock`, `mockCanvas2D`, `makeCar`, `makeWorld`, `p`, `seg`, etc.
-- **Vitest config** in `vitest.config.ts` includes all `tests/**/*.test.ts` files; tests are excluded from the main `tsconfig.json` compilation.
+The project has a **multi-phase test suite**: **48 test files, 684 tests** (~75% statement coverage) across math, neural-network, car, world, simulator, panels, viewport, and store modules. Tests live in three directories:
+
+| Directory        | Purpose                                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `tests/unit/`    | Pure-logic and integration unit tests (vitest, no browser APIs)                                                         |
+| `tests/visual/`  | Playwright visual regression tests (Chromium, full-page screenshots)                                                    |
+| `tests/helpers/` | Shared test utilities (`makeKnownNetwork`, `setupImageMock`, `mockCanvas2D`, `makeCar`, `makeWorld`, `makeGraph`, etc.) |
+
+- **Vitest config** in `vitest.config.ts` includes all `tests/**/*.test.ts` files (excluding `tests/visual/`); tests are excluded from the main `tsconfig.json` compilation.
 - **ESLint treats test files as Node** — `eslint.config.mjs` has a separate rule block for `tests/**/*.ts` with `globals: { ...globals.node }`.
-- Run `npm test` (vitest) to execute all unit tests.
+- Run `npm test` (vitest) for a full single run.
+- Run `npm run test:fast` or `npm run test:changed` to run only tests for changed files.
+- Run `npm run test:dev` for watch mode with verbose output (changed files only).
 - Run `npm run test:watch` during development for TDD.
 - Run `npm run test:coverage` to view coverage (report in `coverage/`).
 - **No DOM/canvas in unit tests** — tests for pure-math, neural-network, physics, and brain-adapter modules must not depend on browser APIs.
 - **Deterministic tests** — seed PRNGs where possible; avoid `Math.random` in test assertions.
 - **Import paths use `.js` extension** — match the production code convention even though files are `.ts`.
 - **Format + lint** — `npm run fix:all` before commit covers all files including tests.
-- **Visual regression** tests live in `tests/visual/` using Playwright.
+- **Visual regression** tests live in `tests/visual/` using Playwright (5 spec files: human-training, race, simulator, traffic, world).
 - Run `npm run test:visual` to execute visual tests.
 - Run `npm run test:visual:update` to update baseline screenshots.
 - Baselines are stored in `tests/visual/baselines/` and must be committed.
-- Visual tests start a local server on `:9090` automatically.
+- Visual tests start a local server on `:9090` automatically (Playwright webServer config).
 - **Chromium only** — no cross-browser visual testing yet.
+- **Config:** `tests/visual/playwright.config.ts` — single-worker, retries 2 in CI, snapshot path template.
 - **Phase 1 (pure-logic) test modules** now cover:
   - `ts/car/physics/sensorRaycaster.ts` — ray-casting math (castRays, getReading, getReadings, getTaggedReadings)
   - `ts/panels/latchedToggle.ts` — held/latched state machine (setPhysicalHold, toggleLatch, reset, onChange)
