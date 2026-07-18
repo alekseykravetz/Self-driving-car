@@ -8,6 +8,7 @@ import {
   smCountItems,
   StoreManager,
 } from '../../../ts/store/storeManager.js';
+import type { CarInfo } from '../../../ts/car/car.js';
 
 // Shared localStorage mock for tests that need it
 const store: Record<string, string> = {};
@@ -233,5 +234,262 @@ describe('StoreManager class', () => {
     const loadedEntries = worlds.filter((w) => w.source === 'loaded');
     expect(loadedEntries.length).toBeGreaterThanOrEqual(1);
     expect(loadedEntries[0].name).toBe('test');
+  });
+
+  it('getAllWorlds includes editor world when set', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    mgr.setEditorWorld({ markings: ['target'] });
+    const worlds = mgr.getAllWorlds();
+    const editorEntry = worlds.find((w) => w.source === 'editor');
+    expect(editorEntry).toBeDefined();
+    expect(editorEntry!.name).toBe('Editor World');
+  });
+
+  it('getWorlds returns empty when no store assets loaded', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getWorlds()).toEqual([]);
+  });
+
+  it('getCars returns empty when no store assets loaded', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getCars()).toEqual([]);
+  });
+
+  it('getLoadedWorlds returns empty initially', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getLoadedWorlds()).toEqual([]);
+  });
+
+  it('getLoadedCars returns empty initially', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getLoadedCars()).toEqual([]);
+  });
+
+  it('getEditorWorld returns null when not set', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getEditorWorld()).toBeNull();
+  });
+
+  it('setEditorWorld stores data and returns true', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const data = { foo: 'bar' };
+    const result = mgr.setEditorWorld(data);
+    expect(result).toBe(true);
+    expect(mgr.getEditorWorld()).toEqual(data);
+    // Should also be persisted to localStorage
+    expect(JSON.parse(store['editorWorld'])).toEqual(data);
+  });
+
+  it('getActiveWorld returns the currently active world data', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    mgr.addLoadedWorld('test', { markings: ['start'] });
+    // The loaded world gets an id like 'loaded:xxxxx'
+    const worlds = mgr.getAllWorlds();
+    const loadedWorld = worlds.find((w) => w.source === 'loaded')!;
+    mgr.setActiveWorldId(loadedWorld.id);
+    const active = mgr.getActiveWorld();
+    expect(active).toEqual({ markings: ['start'] });
+  });
+
+  it('getActiveWorldName returns the active world display name', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    mgr.addLoadedWorld('test-name', { markings: ['start'] });
+    const worlds = mgr.getAllWorlds();
+    const loadedWorld = worlds.find((w) => w.source === 'loaded')!;
+    mgr.setActiveWorldId(loadedWorld.id);
+    expect(mgr.getActiveWorldName()).toBe('test-name');
+  });
+
+  it('getActiveWorld returns null when no active world', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getActiveWorld()).toBeNull();
+  });
+
+  it('getActiveWorldName returns null when no active world', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getActiveWorldName()).toBeNull();
+  });
+
+  it('setActiveCarIds persists ids to localStorage', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    mgr.setActiveCarIds(['store:car1', 'loaded:car2']);
+    expect(mgr.getActiveCarIds()).toEqual(['store:car1', 'loaded:car2']);
+  });
+
+  it('getActiveCars returns active car data objects', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const carData = { brain: [], controls: [] };
+    mgr.addLoadedCar('test-car', carData as CarInfo);
+    const cars = mgr.getAllCars();
+    const loadedCar = cars.find((c) => c.source === 'loaded')!;
+    mgr.setActiveCarIds([loadedCar.id]);
+    const activeCars = mgr.getActiveCars();
+    expect(activeCars).toHaveLength(1);
+    expect(activeCars[0]).toEqual(carData);
+  });
+
+  it('getActiveCar returns first active car', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const carData = { brain: [], controls: [] };
+    mgr.addLoadedCar('test-car', carData as CarInfo);
+    const cars = mgr.getAllCars();
+    const loadedCar = cars.find((c) => c.source === 'loaded')!;
+    mgr.setActiveCarIds([loadedCar.id]);
+    expect(mgr.getActiveCar()).toEqual(carData);
+  });
+
+  it('getActiveCar returns null when no active car', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getActiveCar()).toBeNull();
+  });
+
+  it('getActiveCarNames returns display names in order', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    mgr.addLoadedCar('car-a', { brain: [], controls: [] } as CarInfo);
+    mgr.addLoadedCar('car-b', { brain: [], controls: [] } as CarInfo);
+    const cars = mgr.getAllCars();
+    const loadedCars = cars.filter((c) => c.source === 'loaded');
+    mgr.setActiveCarIds([loadedCars[0].id, loadedCars[1].id]);
+    const names = mgr.getActiveCarNames();
+    expect(names).toHaveLength(2);
+    expect(names[0]).toBe('car-a');
+    expect(names[1]).toBe('car-b');
+  });
+
+  it('getAllCars returns loaded and store cars', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const carData = { brain: [], controls: [] };
+    mgr.addLoadedCar('test-car', carData as CarInfo);
+    const allCars = mgr.getAllCars();
+    const loadedEntry = allCars.find((c) => c.source === 'loaded')!;
+    expect(loadedEntry.name).toBe('test-car');
+    expect(loadedEntry.data).toEqual(carData);
+  });
+
+  it('getAllCars returns empty when no cars', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    expect(mgr.getAllCars()).toEqual([]);
+  });
+
+  it('addLoadedCar adds and returns UnifiedCarEntry', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const carData = { brain: [], controls: [] } as CarInfo;
+    const entry = mgr.addLoadedCar('my-car', carData);
+    expect(entry.name).toBe('my-car');
+    expect(entry.source).toBe('loaded');
+    expect(entry.data).toEqual(carData);
+    expect(entry.id).toMatch(/^loaded:/);
+    // Should appear in getLoadedCars
+    expect(mgr.getLoadedCars()).toHaveLength(1);
+    expect(mgr.getLoadedCars()[0].name).toBe('my-car');
+  });
+
+  it('setEditorWorld returns false on localStorage quota error', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const origSetItem = globalThis.localStorage.setItem;
+    globalThis.localStorage.setItem = vi.fn(() => {
+      const err = new Error('QuotaExceeded');
+      (err as Error & { code?: string }).code = 'QuotaExceededError';
+      (err as Error & { name: string }).name = 'QuotaExceededError';
+      throw err;
+    });
+
+    const result = mgr.setEditorWorld({ some: 'data' });
+    expect(result).toBe(false);
+    // In-memory copy should still be updated
+    expect(mgr.getEditorWorld()).toEqual({ some: 'data' });
+
+    globalThis.localStorage.setItem = origSetItem;
+  });
+
+  it('deleteLocalStorageKey removes tracked key from localStorage', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    store['bestPool'] = JSON.stringify([1, 2, 3]);
+    mgr.deleteLocalStorageKey('bestPool');
+    expect('bestPool' in store).toBe(false);
+  });
+
+  it('deleteLocalStorageKey ignores untracked keys', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    store['someRandomKey'] = 'value';
+    mgr.deleteLocalStorageKey('someRandomKey');
+    // Should still exist because it's not tracked
+    expect(store['someRandomKey']).toBe('value');
+  });
+});
+
+describe('StoreManager static methods', () => {
+  beforeEach(() => {
+    for (const k in store) delete store[k];
+  });
+
+  it('getInstance returns null before init', () => {
+    expect(StoreManager.getInstance()).toBeNull();
+  });
+
+  it('static getActiveWorld returns null before init', () => {
+    expect(StoreManager.getActiveWorld()).toBeNull();
+  });
+
+  it('static getEditorWorld returns null before init', () => {
+    expect(StoreManager.getEditorWorld()).toBeNull();
+  });
+
+  it('static getActiveWorldName returns null before init', () => {
+    expect(StoreManager.getActiveWorldName()).toBeNull();
+  });
+
+  it('static getActiveCarNames returns [] before init', () => {
+    expect(StoreManager.getActiveCarNames()).toEqual([]);
+  });
+
+  it('static getCars returns [] before init', () => {
+    expect(StoreManager.getCars()).toEqual([]);
+  });
+
+  it('static getActiveCar returns null before init', () => {
+    expect(StoreManager.getActiveCar()).toBeNull();
+  });
+
+  it('static getActiveCars returns [] before init', () => {
+    expect(StoreManager.getActiveCars()).toEqual([]);
+  });
+
+  it('static getAllWorlds returns [] before init', () => {
+    expect(StoreManager.getAllWorlds()).toEqual([]);
+  });
+
+  it('static getAllCars returns [] before init', () => {
+    expect(StoreManager.getAllCars()).toEqual([]);
+  });
+
+  it('static getActiveWorldId returns null before init', () => {
+    expect(StoreManager.getActiveWorldId()).toBeNull();
+  });
+
+  it('static getActiveCarIds returns [] before init', () => {
+    expect(StoreManager.getActiveCarIds()).toEqual([]);
   });
 });
