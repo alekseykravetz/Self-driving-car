@@ -11,6 +11,7 @@
     "watch:fix": "onchange -i \"ts/**/*.ts\" \"html/**/*.html\" \"styles/**/*.css\" -- npm run fix:all",
     "fix:all": "npm run format && npm run lint",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "eslint --fix",
     "lint:log": "eslint",
     "lint:watch": "node --watch --watch-path=ts node_modules/eslint/bin/eslint.js ts/**/*.ts --fix",

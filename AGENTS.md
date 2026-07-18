@@ -76,6 +76,17 @@
 | `npm run test:coverage` | Run tests with coverage report                |
 | `npm run publish:site`  | Deploy via here.now (scripts/publish-site.sh) |
 
+## CI (GitHub Actions)
+
+- **Workflow file:** `.github/workflows/test.yml`
+- **Triggers:** push / pull-request to `main`, `master`, or `develop`
+- **Three jobs:**
+  1. **Lint & Typecheck** — `prettier --check`, `eslint --fix`, `tsc --noEmit` (Node 22, fast fail)
+  2. **Unit Tests** — `vitest run` + coverage across Node 18/20/22 matrix (coverage uploaded as artifact)
+  3. **Visual Tests** — Playwright Chromium (allowed to fail; report + screenshots uploaded)
+- **Concurrency:** cancels in-progress runs on new pushes to the same branch.
+- **CI status badge:** (add after initial run — URL: `https://github.com/{{owner}}/{{repo}}/actions/workflows/test.yml/badge.svg`)
+
 ## Entry points
 
 - `html/simulator.html` — Training (world mode by default, `?mode=simple` for simple road)
