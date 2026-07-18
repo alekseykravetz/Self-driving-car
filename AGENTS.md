@@ -98,7 +98,7 @@
 ## Testing
 
 - **Unit tests** live in `tests/unit/`, mirroring the `ts/` structure.
-- **Test helpers** live in `tests/helpers/` (e.g. `makeKnownNetwork` for constructing deterministic neural networks with known weights/biases).
+- **Test helpers** in `tests/helpers/` — `makeKnownNetwork`, `setupImageMock`, `mockCanvas2D`, `makeCar`, `makeWorld`, `p`, `seg`, etc.
 - **Vitest config** in `vitest.config.ts` includes all `tests/**/*.test.ts` files; tests are excluded from the main `tsconfig.json` compilation.
 - **ESLint treats test files as Node** — `eslint.config.mjs` has a separate rule block for `tests/**/*.ts` with `globals: { ...globals.node }`.
 - Run `npm test` (vitest) to execute all unit tests.
