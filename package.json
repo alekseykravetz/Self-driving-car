@@ -17,7 +17,9 @@
     "graphify": "python3 -m graphify update .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:visual": "playwright test --config=tests/visual/playwright.config.ts",
+    "test:visual:update": "PLAYWRIGHT_UPDATE_SNAPSHOTS=1 playwright test --config=tests/visual/playwright.config.ts"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +27,7 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+    "@playwright/test": "^1.61.1",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",
     "@vitest/coverage-v8": "^4.1.10",

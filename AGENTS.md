@@ -97,7 +97,12 @@
 - **Deterministic tests** — seed PRNGs where possible; avoid `Math.random` in test assertions.
 - **Import paths use `.js` extension** — match the production code convention even though files are `.ts`.
 - **Format + lint** — `npm run fix:all` before commit covers all files including tests.
-- **Visual regression** (Playwright) tests are deferred — see follow-up plan.
+- **Visual regression** tests live in `tests/visual/` using Playwright.
+- Run `npm run test:visual` to execute visual tests.
+- Run `npm run test:visual:update` to update baseline screenshots.
+- Baselines are stored in `tests/visual/baselines/` and must be committed.
+- Visual tests start a local server on `:9090` automatically.
+- **Chromium only** — no cross-browser visual testing yet.
 - **Phase 1 (pure-logic) test modules** now cover:
   - `ts/car/physics/sensorRaycaster.ts` — ray-casting math (castRays, getReading, getReadings, getTaggedReadings)
   - `ts/panels/latchedToggle.ts` — held/latched state machine (setPhysicalHold, toggleLatch, reset, onChange)

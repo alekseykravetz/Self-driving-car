@@ -6,3 +6,5 @@ vitest.config.js
 store/world/_v1_backup/
 graphify-out/
 coverage/
+test-results/
+playwright-report/
