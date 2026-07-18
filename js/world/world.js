@@ -13,8 +13,9 @@ import { drawEnvelope } from '../rendering/envelopeRenderer.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPolygon } from '../rendering/polygonRenderer.js';
 /** Reconstructs corridors from a saved world, accepting both the new
- * `corridors` array and the legacy single `corridor` field. */
-function loadWorldCorridors(info) {
+ * `corridors` array and the legacy single `corridor` field.
+ * @internal Exported for testing only. */
+export function loadWorldCorridors(info) {
     const legacy = info;
     if (legacy.corridors) {
         return legacy.corridors.map((c) => Corridor.load(c));
@@ -24,8 +25,9 @@ function loadWorldCorridors(info) {
     }
     return [];
 }
-/** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes. */
-function loadTreeInstance(inst, world) {
+/** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes.
+ * @internal Exported for testing only. */
+export function loadTreeInstance(inst, world) {
     const p = inst.p ?? 0;
     const prototype = world.treePrototypes[p] ?? world.treePrototypes[0];
     return new Tree(new Point(inst.x, inst.y), world.treeSize, prototype, p, inst.t ?? 0, inst.s ?? 1);

@@ -111,13 +111,21 @@
   - `ts/car/car.ts` — construction, toInfo/toDrawData, load (+brain desync guard), setAutopilot, setCallbacks, respawn, update pipeline (DUMMY + AI), steering, learningRate, edge cases
   - `ts/car/sensors/sensor.ts` — constructor, update (border/no-border/stateAware/trafficControl/other cars), encodeTrafficState
   - `ts/helpers/setupImageMock.ts` — shared Image mock enabling Car construction in Node
+- **Phase 3 (World + marking) test modules** now cover:
+  - `ts/world/corridor.ts` — fromPath (open/close ends, extend), load round-trip
+  - `ts/world/trafficManager.ts` — crossroad detection, control centers, light cycling, override/release
+  - `ts/world/markings/marking.ts` — constructor, setAnchor, reanchor, rebuildGeometry
+  - `ts/world/markings/light.ts` — override/releaseOverride, state transitions
+  - `ts/world/markings/stop|target|start|crossing|parking|yield` — constructors, type, borders, rebuildGeometry
+  - `ts/world/items/building.ts` — load, loadFootprint, toFootprint serialization
+  - `ts/world/items/tree.ts` — buildTreePrototypes (deterministic), constructor
+  - `ts/world/world.ts` — helper functions (loadWorldCorridors, loadTreeInstance)
 - **Test files known to skip due to DOM dependencies:**
   - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
   - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
-  - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
-  - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
   - `Car` constructor (`new Image()` in CarRenderer) — `createCarsForTraining` deferred to Phase 2
-- **Current coverage:** ~75% statements, ~58% branches (Phase 2 added ~16.4% statements, ~10% branches)
+  - All `draw()` methods across all classes (Canvas-dependent — visual/Playwright tests deferred)
+- **Current coverage:** ~64% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~62% branches (Phase 3 added ~199 statements to instrumented total)
 - World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
 
 ## Persistence

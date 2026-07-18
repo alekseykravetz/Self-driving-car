@@ -39,8 +39,9 @@ import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPolygon } from '../rendering/polygonRenderer.js';
 
 /** Reconstructs corridors from a saved world, accepting both the new
- * `corridors` array and the legacy single `corridor` field. */
-function loadWorldCorridors(info: World): Corridor[] {
+ * `corridors` array and the legacy single `corridor` field.
+ * @internal Exported for testing only. */
+export function loadWorldCorridors(info: World): Corridor[] {
   const legacy = info as unknown as {
     corridors?: Corridor[];
     corridor?: Corridor | null;
@@ -54,8 +55,9 @@ function loadWorldCorridors(info: World): Corridor[] {
   return [];
 }
 
-/** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes. */
-function loadTreeInstance(inst: TreeInstance, world: World): Tree {
+/** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes.
+ * @internal Exported for testing only. */
+export function loadTreeInstance(inst: TreeInstance, world: World): Tree {
   const p = inst.p ?? 0;
   const prototype = world.treePrototypes[p] ?? world.treePrototypes[0];
   return new Tree(
