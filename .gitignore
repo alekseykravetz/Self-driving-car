@@ -5,3 +5,4 @@ vitest.config.js
 .herenow/
 store/world/_v1_backup/
 graphify-out/
+coverage/
