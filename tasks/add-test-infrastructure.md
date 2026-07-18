@@ -293,7 +293,7 @@ Each test file must use proper `.js` import extensions (project convention). Exa
 
 #### `tests/unit/car/carBrainAdapter.test.ts`
 
-- `inputLayerSize()` — stateAware=false: rayCount+1; stateAware=true: rayCount*2+1
+- `inputLayerSize()` — stateAware=false: rayCount+1; stateAware=true: rayCount\*2+1
 - `buildInput()` — legacy mode: `readings.map(1-offset) + [speed/maxSpeed]`
 - `buildInput()` — stateAware mode: `[...ray,distance,state,...] + [speed/maxSpeed]`
 - `buildInput()` — null reading → 0 for distance, 0 for state
@@ -360,9 +360,9 @@ Add a new section at the end (before the Key commands table or after it):
 #### Also add a "Testing" section to the Key commands table
 
 ```markdown
-| `npm test`              | Run all unit tests                     |
-| `npm run test:watch`    | Run tests in watch mode (TDD)          |
-| `npm run test:coverage` | Run tests with coverage report         |
+| `npm test` | Run all unit tests |
+| `npm run test:watch` | Run tests in watch mode (TDD) |
+| `npm run test:coverage` | Run tests with coverage report |
 ```
 
 ## Brain / persistence considerations

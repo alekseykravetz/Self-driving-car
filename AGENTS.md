@@ -63,15 +63,18 @@
 
 ## Key commands
 
-| Command                | Purpose                                       |
-| ---------------------- | --------------------------------------------- |
-| `npm start`            | Full dev: tsc watch + server + lint/format    |
-| `npm run tsc:watch`    | Compile TS on save only                       |
-| `npm run serve`        | Static server on :9090                        |
-| `npm run lint`         | ESLint auto-fix                               |
-| `npm run format`       | Prettier (singleQuote: true)                  |
-| `npm run fix:all`      | format + lint                                 |
-| `npm run publish:site` | Deploy via here.now (scripts/publish-site.sh) |
+| Command                 | Purpose                                       |
+| ----------------------- | --------------------------------------------- |
+| `npm start`             | Full dev: tsc watch + server + lint/format    |
+| `npm run tsc:watch`     | Compile TS on save only                       |
+| `npm run serve`         | Static server on :9090                        |
+| `npm run lint`          | ESLint auto-fix                               |
+| `npm run format`        | Prettier (singleQuote: true)                  |
+| `npm run fix:all`       | format + lint                                 |
+| `npm test`              | Run all unit tests                            |
+| `npm run test:watch`    | Run tests in watch mode (TDD)                 |
+| `npm run test:coverage` | Run tests with coverage report                |
+| `npm run publish:site`  | Deploy via here.now (scripts/publish-site.sh) |
 
 ## Entry points
 
@@ -83,7 +86,15 @@
 
 ## Testing
 
-- No automated tests — validation is visual. Open the relevant HTML page in a browser.
+- **Unit tests** live in `tests/unit/`, mirroring the `ts/` structure.
+- Run `npm test` (vitest) to execute all unit tests.
+- Run `npm run test:watch` during development for TDD.
+- Run `npm run test:coverage` to view coverage (report in `coverage/`).
+- **No DOM/canvas in unit tests** — tests for pure-math, neural-network, physics, and brain-adapter modules must not depend on browser APIs.
+- **Deterministic tests** — seed PRNGs where possible; avoid `Math.random` in test assertions.
+- **Import paths use `.js` extension** — match the production code convention even though files are `.ts`.
+- **Format + lint** — `npm run fix:all` before commit covers all files including tests.
+- **Visual regression** (Playwright) tests are deferred — see follow-up plan.
 - World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
 
 ## Persistence

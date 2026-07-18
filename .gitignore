@@ -1,4 +1,6 @@
 node_modules/
 saves/*.world
+tests/**/*.js
+vitest.config.js
 .herenow/
 store/world/_v1_backup/

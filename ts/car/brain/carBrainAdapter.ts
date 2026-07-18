@@ -40,6 +40,7 @@ export class CarBrainAdapter {
     rayCount: number,
     stateAware: boolean,
   ): boolean {
+    if (!brain) return false;
     const nn = brain as NeuralNetwork;
     if (!nn.levels || nn.levels.length === 0) return false;
     const expectedInput = CarBrainAdapter.inputLayerSize(rayCount, stateAware);

@@ -32,7 +32,26 @@ export default defineConfig([
     },
   },
   {
+    files: ['tests/**/*.ts', 'vitest.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      sourceType: 'module',
+      parserOptions: { project: null },
+      globals: { ...globals.node },
+    },
+    plugins: {
+      prettier: eslintPluginPrettier,
+      '@typescript-eslint': ts,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...ts.configs.recommended.rules,
+      'prettier/prettier': 'error',
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['tests/**/*.ts', 'vitest.config.ts'],
     languageOptions: {
       parser: tsParser,
       sourceType: 'module',
