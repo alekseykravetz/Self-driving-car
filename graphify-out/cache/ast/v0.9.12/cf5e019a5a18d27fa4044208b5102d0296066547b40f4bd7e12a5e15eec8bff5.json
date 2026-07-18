@@ -1,1 +1,207 @@
-{"nodes": [{"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_md", "label": "20260717-consolidate-keyboard-routing.md", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L1"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "label": "Consolidate Keyboard Routing into KeyboardManager", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L1"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_goal", "label": "Goal", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L9"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_context_read_first", "label": "Context (read first)", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L20"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_scope", "label": "Scope", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L31"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation", "label": "Implementation", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L43"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_1_ts_simulator_core_simulatorshell_ts_move_v_key_to_keyboardmanager", "label": "1. `ts/simulator/core/simulatorShell.ts` \u2014 move `v` key to KeyboardManager", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L45"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_2_ts_simulator_training_traininginitmodal_ts_escape_via_keyboardmanager_push_pop", "label": "2. `ts/simulator/training/trainingInitModal.ts` \u2014 Escape via KeyboardManager push/pop", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L83"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_3_ts_simulator_humantraining_humantrainingconfigmodal_ts_same_push_pop_pattern", "label": "3. `ts/simulator/humanTraining/humanTrainingConfigModal.ts` \u2014 same push/pop pattern", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L136"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_4_ts_car_controls_controls_ts_route_keys_controls_through_keyboardmanager", "label": "4. `ts/car/controls/controls.ts` \u2014 route KEYS controls through KeyboardManager", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L147"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_brain_persistence_considerations", "label": "Brain / persistence considerations", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L230"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_acceptance_criteria", "label": "Acceptance criteria", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L234"}, {"id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_docs_to_update", "label": "Docs to update", "file_type": "document", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L245"}], "edges": [{"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_md", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L1", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_goal", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L9", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_context_read_first", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L20", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_scope", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L31", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L43", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_1_ts_simulator_core_simulatorshell_ts_move_v_key_to_keyboardmanager", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L45", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_2_ts_simulator_training_traininginitmodal_ts_escape_via_keyboardmanager_push_pop", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L83", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_3_ts_simulator_humantraining_humantrainingconfigmodal_ts_same_push_pop_pattern", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L136", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_4_ts_car_controls_controls_ts_route_keys_controls_through_keyboardmanager", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L147", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_brain_persistence_considerations", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L230", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_acceptance_criteria", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L234", "weight": 1.0}, {"source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager", "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_docs_to_update", "relation": "contains", "confidence": "EXTRACTED", "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md", "source_location": "L245", "weight": 1.0}], "input_tokens": 0, "output_tokens": 0}
+{
+  "nodes": [
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_md",
+      "label": "20260717-consolidate-keyboard-routing.md",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "label": "Consolidate Keyboard Routing into KeyboardManager",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_goal",
+      "label": "Goal",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L9"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_context_read_first",
+      "label": "Context (read first)",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L20"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_scope",
+      "label": "Scope",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L31"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation",
+      "label": "Implementation",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L43"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_1_ts_simulator_core_simulatorshell_ts_move_v_key_to_keyboardmanager",
+      "label": "1. `ts/simulator/core/simulatorShell.ts` \u2014 move `v` key to KeyboardManager",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L45"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_2_ts_simulator_training_traininginitmodal_ts_escape_via_keyboardmanager_push_pop",
+      "label": "2. `ts/simulator/training/trainingInitModal.ts` \u2014 Escape via KeyboardManager push/pop",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L83"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_3_ts_simulator_humantraining_humantrainingconfigmodal_ts_same_push_pop_pattern",
+      "label": "3. `ts/simulator/humanTraining/humanTrainingConfigModal.ts` \u2014 same push/pop pattern",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L136"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_4_ts_car_controls_controls_ts_route_keys_controls_through_keyboardmanager",
+      "label": "4. `ts/car/controls/controls.ts` \u2014 route KEYS controls through KeyboardManager",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L147"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_brain_persistence_considerations",
+      "label": "Brain / persistence considerations",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L230"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_acceptance_criteria",
+      "label": "Acceptance criteria",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L234"
+    },
+    {
+      "id": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_docs_to_update",
+      "label": "Docs to update",
+      "file_type": "document",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L245"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_md",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_goal",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_context_read_first",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_scope",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_1_ts_simulator_core_simulatorshell_ts_move_v_key_to_keyboardmanager",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_2_ts_simulator_training_traininginitmodal_ts_escape_via_keyboardmanager_push_pop",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_3_ts_simulator_humantraining_humantrainingconfigmodal_ts_same_push_pop_pattern",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_implementation",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_4_ts_car_controls_controls_ts_route_keys_controls_through_keyboardmanager",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L147",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_brain_persistence_considerations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L230",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_acceptance_criteria",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L234",
+      "weight": 1.0
+    },
+    {
+      "source": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_consolidate_keyboard_routing_into_keyboardmanager",
+      "target": "users_alex_code_self_driving_car_tasks_archive_20260717_consolidate_keyboard_routing_20260717_consolidate_keyboard_routing_docs_to_update",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tasks/archive/20260717-consolidate-keyboard-routing/20260717-consolidate-keyboard-routing.md",
+      "source_location": "L245",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
