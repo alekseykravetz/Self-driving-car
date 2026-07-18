@@ -12,25 +12,26 @@ Expand test coverage for the `world/`, `world/items/`, `world/markings/`, and `s
 
 Current coverage in these areas:
 
-| Module | Current % Stmts | Target | Uncovered lines |
-|--------|----------------|--------|----------------|
-| `world/world.ts` | 7% | 80% | 84-441 |
-| `world/items/building.ts` | 25% | 80% | 46-134 |
-| `world/items/tree.ts` | 34% | 80% | 145-257 |
-| `world/markings/crossing.ts` | 63% | 80% | 27-32 |
-| `world/markings/light.ts` | 30% | 80% | 52-103 |
-| `world/markings/parking.ts` | 29% | 80% | 27-40 |
-| `world/markings/start.ts` | 42% | 80% | 29-63 |
-| `world/markings/stop.ts` | 29% | 80% | 28-40 |
-| `world/markings/target.ts` | 40% | 80% | 18-20 |
-| `world/markings/yield.ts` | 29% | 80% | 27-40 |
-| `store/storeManager.ts` | 34% | 80% | 236-443, 479-556 |
+| Module                       | Current % Stmts | Target | Uncovered lines  |
+| ---------------------------- | --------------- | ------ | ---------------- |
+| `world/world.ts`             | 7%              | 80%    | 84-441           |
+| `world/items/building.ts`    | 25%             | 80%    | 46-134           |
+| `world/items/tree.ts`        | 34%             | 80%    | 145-257          |
+| `world/markings/crossing.ts` | 63%             | 80%    | 27-32            |
+| `world/markings/light.ts`    | 30%             | 80%    | 52-103           |
+| `world/markings/parking.ts`  | 29%             | 80%    | 27-40            |
+| `world/markings/start.ts`    | 42%             | 80%    | 29-63            |
+| `world/markings/stop.ts`     | 29%             | 80%    | 28-40            |
+| `world/markings/target.ts`   | 40%             | 80%    | 18-20            |
+| `world/markings/yield.ts`    | 29%             | 80%    | 27-40            |
+| `store/storeManager.ts`      | 34%             | 80%    | 236-443, 479-556 |
 
 ## Context (read first)
 
 - `AGENTS.md` — project conventions, architecture rules.
 - `vitest.config.ts` — Vitest v4, coverage with v8 provider.
 - Existing test files for reference:
+
   - `tests/unit/world/world.test.ts` — helper functions tested, class methods missing
   - `tests/unit/world/items/building.test.ts` — existing building tests
   - `tests/unit/world/items/tree.test.ts` — existing tree tests
@@ -121,7 +122,9 @@ describe('World', () => {
       const { World } = await import('../../../ts/world/world.js');
       const { Graph } = await import('../../../ts/math/graph/graph.js');
       const { Point } = await import('../../../ts/math/primitives/point.js');
-      const { Segment } = await import('../../../ts/math/primitives/segment.js');
+      const { Segment } = await import(
+        '../../../ts/math/primitives/segment.js'
+      );
 
       // Create a world with some content
       const graph = new Graph();
@@ -161,6 +164,7 @@ describe('World', () => {
 ```
 
 **Important:** Verify the actual API:
+
 - `World` constructor may take additional parameters (markings, corridor, etc.)
 - `World.save()` — check return type
 - `World.load()` — may be async, may be static
@@ -174,7 +178,9 @@ import { describe, it, expect } from 'vitest';
 describe('Building', () => {
   describe('serialization', () => {
     it('load() creates Building from valid data', async () => {
-      const { Building } = await import('../../../../ts/world/items/building.js');
+      const { Building } = await import(
+        '../../../../ts/world/items/building.js'
+      );
       // Check Building.load() signature — may take world reference
       // ...
     });
@@ -223,7 +229,9 @@ describe('Marking subtypes', () => {
 
   describe('Crossing', () => {
     it('constructor creates Crossing with correct type', async () => {
-      const { Crossing } = await import('../../../../ts/world/markings/crossing.js');
+      const { Crossing } = await import(
+        '../../../../ts/world/markings/crossing.js'
+      );
       const crossing = new Crossing({ x: 0, y: 0 }, { x: 1, y: 0 }, 3, 3);
       expect(crossing.type).toBe('crossing');
       expect(crossing.center).toEqual({ x: 0, y: 0 });
@@ -236,7 +244,9 @@ describe('Marking subtypes', () => {
 
   describe('Parking', () => {
     it('constructor creates Parking with correct type', async () => {
-      const { Parking } = await import('../../../../ts/world/markings/parking.js');
+      const { Parking } = await import(
+        '../../../../ts/world/markings/parking.js'
+      );
       const parking = new Parking({ x: 0, y: 0 }, { x: 1, y: 0 }, 3, 3);
       expect(parking.type).toBe('parking');
     });
@@ -260,7 +270,9 @@ describe('Marking subtypes', () => {
 
   describe('Target', () => {
     it('constructor creates Target with correct type', async () => {
-      const { Target } = await import('../../../../ts/world/markings/target.js');
+      const { Target } = await import(
+        '../../../../ts/world/markings/target.js'
+      );
       // Target may have different constructor signature
       // ...
       expect(target.type).toBe('target');
@@ -294,9 +306,15 @@ describe('StoreManager class', () => {
     const store: Record<string, string> = {};
     globalThis.localStorage = {
       getItem: vi.fn((key: string) => store[key] ?? null),
-      setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
-      removeItem: vi.fn((key: string) => { delete store[key]; }),
-      clear: vi.fn(() => { Object.keys(store).forEach(k => delete store[k]); }),
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = value;
+      }),
+      removeItem: vi.fn((key: string) => {
+        delete store[key];
+      }),
+      clear: vi.fn(() => {
+        Object.keys(store).forEach((k) => delete store[k]);
+      }),
       length: 0,
       key: vi.fn(() => null),
     } as unknown as Storage;
@@ -310,7 +328,7 @@ describe('StoreManager class', () => {
       const worlds = storeManager.getAllWorlds();
       expect(Array.isArray(worlds)).toBe(true);
       // Each world source has an id and name
-      worlds.forEach(w => {
+      worlds.forEach((w) => {
         expect(typeof w.id).toBe('string');
         expect(typeof w.name).toBe('string');
       });

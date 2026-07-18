@@ -109,7 +109,7 @@ jobs:
     name: Visual Regression Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true  # Allow failures until baselines stabilize
+    continue-on-error: true # Allow failures until baselines stabilize
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

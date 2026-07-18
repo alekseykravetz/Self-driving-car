@@ -11,6 +11,7 @@
 Create reusable test helpers that reduce boilerplate across the test suite and make it easier to write new tests.
 
 Current helpers:
+
 - `makeKnownNetwork.ts` — constructs a `NeuralNetwork` with known weights/biases (useful for NN and brain adapter tests).
 - `setupImageMock.ts` — mocks `HTMLImageElement` for `CarRenderer` construction in Node.
 - `mockCanvas2D.ts` — should be created by the zero-coverage modules plan (if that plan runs first, this one can reuse it; otherwise create it here).
@@ -79,7 +80,12 @@ import { p, type Point } from './makePoint.js';
 export type SegmentData = { p1: Point; p2: Point };
 
 /** Creates a segment from two points. */
-export function seg(x1: number, y1: number, x2: number, y2: number): SegmentData {
+export function seg(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): SegmentData {
   return { p1: p(x1, y1), p2: p(x2, y2) };
 }
 
@@ -208,18 +214,23 @@ export function makeCanvasMock(): CanvasMock {
 
     beginPath: () => calls.push({ method: 'beginPath', args: [] }),
     closePath: () => calls.push({ method: 'closePath', args: [] }),
-    moveTo: (x: number, y: number) => calls.push({ method: 'moveTo', args: [x, y] }),
-    lineTo: (x: number, y: number) => calls.push({ method: 'lineTo', args: [x, y] }),
+    moveTo: (x: number, y: number) =>
+      calls.push({ method: 'moveTo', args: [x, y] }),
+    lineTo: (x: number, y: number) =>
+      calls.push({ method: 'lineTo', args: [x, y] }),
     fill: () => calls.push({ method: 'fill', args: [] }),
     stroke: () => calls.push({ method: 'stroke', args: [] }),
     arc: (x: number, y: number, r: number, a0: number, a1: number) =>
       calls.push({ method: 'arc', args: [x, y, r, a0, a1] }),
     save: () => calls.push({ method: 'save', args: [] }),
     restore: () => calls.push({ method: 'restore', args: [] }),
-    translate: (x: number, y: number) => calls.push({ method: 'translate', args: [x, y] }),
+    translate: (x: number, y: number) =>
+      calls.push({ method: 'translate', args: [x, y] }),
     rotate: (a: number) => calls.push({ method: 'rotate', args: [a] }),
-    scale: (x: number, y: number) => calls.push({ method: 'scale', args: [x, y] }),
-    setTransform: (...a: number[]) => calls.push({ method: 'setTransform', args: a }),
+    scale: (x: number, y: number) =>
+      calls.push({ method: 'scale', args: [x, y] }),
+    setTransform: (...a: number[]) =>
+      calls.push({ method: 'setTransform', args: a }),
     fillRect: (x: number, y: number, w: number, h: number) =>
       calls.push({ method: 'fillRect', args: [x, y, w, h] }),
     strokeRect: (x: number, y: number, w: number, h: number) =>
@@ -234,7 +245,9 @@ export function makeCanvasMock(): CanvasMock {
   return {
     ctx,
     calls,
-    reset() { calls.length = 0; },
+    reset() {
+      calls.length = 0;
+    },
   };
 }
 ```
@@ -294,6 +307,7 @@ npm test
 ```
 
 If the helpers have import issues, check:
+
 - Import paths use `.js` extension.
 - `Point`, `Segment`, `Graph` classes are imported from correct paths.
 - `setupImageMock()` is called before any `Car` import.

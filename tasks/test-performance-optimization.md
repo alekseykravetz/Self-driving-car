@@ -82,6 +82,7 @@ export default defineConfig({
 ```
 
 **Key decisions:**
+
 - `singleFork: false` — use multiple workers (files are independent).
 - `isolate: false` — workers share module cache after first file (safe because tests don't mutate modules).
 - `cache.dir` — enables Vitest's built-in cache. Second run (with no file changes) will be faster.
@@ -162,10 +163,10 @@ echo "Before vs After: check 'real' time in the time output"
 
 ## Expected improvement
 
-| Metric | Before | After (estimate) |
-|--------|--------|-----------------|
-| Cold run (no cache) | 10-12s | 8-10s (pool opt) |
-| Warm run (with cache) | 10-12s | 3-5s (cache hit) |
+| Metric                      | Before | After (estimate)    |
+| --------------------------- | ------ | ------------------- |
+| Cold run (no cache)         | 10-12s | 8-10s (pool opt)    |
+| Warm run (with cache)       | 10-12s | 3-5s (cache hit)    |
 | Incremental (1 file change) | 10-12s | 1-3s (changed only) |
 
 ## Gotchas

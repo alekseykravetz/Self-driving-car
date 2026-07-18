@@ -144,6 +144,7 @@ test.describe('Simulator page', () => {
 ### 4. Create `tests/visual/traffic.spec.ts`
 
 Same structure as simulator, but:
+
 - URL: `/html/traffic.html`
 - Wait for canvas
 - Screenshot named `traffic.png`
@@ -152,6 +153,7 @@ Same structure as simulator, but:
 ### 5. Create `tests/visual/race.spec.ts`
 
 Same structure, but test **two modes** in separate tests:
+
 - `/html/race.html?mode=camera`
 - `/html/race.html?mode=phone`
 - Wait for canvas

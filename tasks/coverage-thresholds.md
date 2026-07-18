@@ -65,10 +65,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['ts/**'],
-      exclude: [
-        'ts/utils.ts',
-        'ts/**/*.d.ts',
-      ],
+      exclude: ['ts/utils.ts', 'ts/**/*.d.ts'],
       thresholds: {
         // Global thresholds — slightly below current to avoid flaky failures
         statements: 58,

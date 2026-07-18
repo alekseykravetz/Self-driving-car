@@ -124,7 +124,9 @@ describe('Car.update() integration', () => {
   describe('AI car with known brain', () => {
     it('brain produces controls that move the car', async () => {
       const { Car } = await import('../../../ts/car/car.js');
-      const { NeuralNetwork } = await import('../../../ts/neural-network/network.js');
+      const { NeuralNetwork } = await import(
+        '../../../ts/neural-network/network.js'
+      );
 
       // Create a brain that always outputs "forward" (index 0 = forward)
       // Network: rayCount=5 (legacy mode → 6 inputs) + speed → 6 + 1 = 7 inputs
@@ -145,7 +147,10 @@ describe('Car.update() integration', () => {
         onEngineUpdate: () => {},
       });
 
-      const roadBorders: { p1: { x: number; y: number }; p2: { x: number; y: number } }[] = [];
+      const roadBorders: {
+        p1: { x: number; y: number };
+        p2: { x: number; y: number };
+      }[] = [];
       car.update(roadBorders, []);
 
       // Car should have moved forward
@@ -156,7 +161,9 @@ describe('Car.update() integration', () => {
 
     it('stops moving when damaged (collision with road border)', async () => {
       const { Car } = await import('../../../ts/car/car.js');
-      const { NeuralNetwork } = await import('../../../ts/neural-network/network.js');
+      const { NeuralNetwork } = await import(
+        '../../../ts/neural-network/network.js'
+      );
 
       const brain = new NeuralNetwork([7, 6, 4]);
       brain.levels[brain.levels.length - 1].biases[0] = -1; // Always forward
@@ -191,7 +198,9 @@ describe('Car.update() integration', () => {
 
     it('sensor readings affect brain inputs', async () => {
       const { Car } = await import('../../../ts/car/car.js');
-      const { NeuralNetwork } = await import('../../../ts/neural-network/network.js');
+      const { NeuralNetwork } = await import(
+        '../../../ts/neural-network/network.js'
+      );
       const { CarBrainAdapter } = await import(
         '../../../ts/car/brain/carBrainAdapter.js'
       );
@@ -215,7 +224,7 @@ describe('Car.update() integration', () => {
       );
 
       // At least some readings should be non-zero (wall is detected)
-      const hasDetections = sensorReadings.slice(0, -1).some(r => r < 1);
+      const hasDetections = sensorReadings.slice(0, -1).some((r) => r < 1);
       // (slice off speed reading at the end)
       expect(hasDetections).toBe(true);
     });

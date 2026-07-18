@@ -113,15 +113,19 @@ export function mockCanvas2D(): CanvasMockContext {
     translate: (...a: number[]) => calls.push({ method: 'translate', args: a }),
     rotate: (...a: number[]) => calls.push({ method: 'rotate', args: a }),
     scale: (...a: number[]) => calls.push({ method: 'scale', args: a }),
-    setTransform: (...a: number[]) => calls.push({ method: 'setTransform', args: a }),
+    setTransform: (...a: number[]) =>
+      calls.push({ method: 'setTransform', args: a }),
     fillRect: (...a: number[]) => calls.push({ method: 'fillRect', args: a }),
-    strokeRect: (...a: number[]) => calls.push({ method: 'strokeRect', args: a }),
+    strokeRect: (...a: number[]) =>
+      calls.push({ method: 'strokeRect', args: a }),
     clearRect: (...a: number[]) => calls.push({ method: 'clearRect', args: a }),
     measureText: () => ({ width: 0 }),
     fillText: (...a: unknown[]) => calls.push({ method: 'fillText', args: a }),
   } as unknown as CanvasRenderingContext2D;
 
-  const reset = () => { calls.length = 0; };
+  const reset = () => {
+    calls.length = 0;
+  };
 
   return { ctx: dummyCtx, calls, reset };
 }
@@ -152,7 +156,11 @@ describe('CarRenderer', () => {
     );
     // Create CarDrawData with a simple triangular polygon
     const drawData = {
-      polygon: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 5, y: 10 }],
+      polygon: [
+        { x: 0, y: 0 },
+        { x: 10, y: 0 },
+        { x: 5, y: 10 },
+      ],
       color: 'red',
       sensor: null,
       damaged: false,
@@ -161,8 +169,12 @@ describe('CarRenderer', () => {
     };
     CarRenderer.draw(mockCanvas.ctx, drawData);
     // Should have at least one beginPath, moveTo, lineTo sequence
-    expect(mockCanvas.calls.filter(c => c.method === 'beginPath').length).toBeGreaterThanOrEqual(1);
-    expect(mockCanvas.calls.filter(c => c.method === 'lineTo').length).toBeGreaterThanOrEqual(2);
+    expect(
+      mockCanvas.calls.filter((c) => c.method === 'beginPath').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      mockCanvas.calls.filter((c) => c.method === 'lineTo').length,
+    ).toBeGreaterThanOrEqual(2);
   });
 
   it('draw() sets fillStyle from drawData.color', async () => {
@@ -170,7 +182,11 @@ describe('CarRenderer', () => {
       '../../../../ts/car/rendering/carRenderer.js'
     );
     const drawData = {
-      polygon: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 5, y: 10 }],
+      polygon: [
+        { x: 0, y: 0 },
+        { x: 10, y: 0 },
+        { x: 5, y: 10 },
+      ],
       color: 'blue',
       sensor: null,
       damaged: false,
@@ -193,18 +209,26 @@ import { mockCanvas2D } from '../../helpers/mockCanvas2D.js';
 
 describe('shapeRenderer', () => {
   it('drawPoint calls arc', async () => {
-    const { drawPoint } = await import('../../../ts/rendering/pointRenderer.js');
+    const { drawPoint } = await import(
+      '../../../ts/rendering/pointRenderer.js'
+    );
     const mock = mockCanvas2D();
     drawPoint(mock.ctx, { x: 5, y: 10 }, 3, 'red');
-    expect(mock.calls.filter(c => c.method === 'arc').length).toBe(1);
+    expect(mock.calls.filter((c) => c.method === 'arc').length).toBe(1);
   });
 
   it('drawSegment calls moveTo and lineTo', async () => {
-    const { drawSegment } = await import('../../../ts/rendering/segmentRenderer.js');
+    const { drawSegment } = await import(
+      '../../../ts/rendering/segmentRenderer.js'
+    );
     const mock = mockCanvas2D();
-    drawSegment(mock.ctx, { p1: { x: 0, y: 0 }, p2: { x: 10, y: 10 } }, { color: 'black', width: 2 });
-    expect(mock.calls.filter(c => c.method === 'moveTo').length).toBe(1);
-    expect(mock.calls.filter(c => c.method === 'lineTo').length).toBe(1);
+    drawSegment(
+      mock.ctx,
+      { p1: { x: 0, y: 0 }, p2: { x: 10, y: 10 } },
+      { color: 'black', width: 2 },
+    );
+    expect(mock.calls.filter((c) => c.method === 'moveTo').length).toBe(1);
+    expect(mock.calls.filter((c) => c.method === 'lineTo').length).toBe(1);
   });
 });
 ```
@@ -218,7 +242,9 @@ import { describe, it, expect } from 'vitest';
 
 describe('WorldLoader', () => {
   it('load() parses valid world data into world object', async () => {
-    const { WorldLoader } = await import('../../../../ts/world/loader/worldLoader.js');
+    const { WorldLoader } = await import(
+      '../../../../ts/world/loader/worldLoader.js'
+    );
     const data = {
       version: 2,
       graph: { points: [], segments: [] },
@@ -232,7 +258,9 @@ describe('WorldLoader', () => {
   });
 
   it('load() with v1 data upgrades to v2', async () => {
-    const { WorldLoader } = await import('../../../../ts/world/loader/worldLoader.js');
+    const { WorldLoader } = await import(
+      '../../../../ts/world/loader/worldLoader.js'
+    );
     const v1Data = {
       graph: { points: [], segments: [] },
       markings: [],
@@ -244,7 +272,9 @@ describe('WorldLoader', () => {
   });
 
   it('load() with invalid data throws', async () => {
-    const { WorldLoader } = await import('../../../../ts/world/loader/worldLoader.js');
+    const { WorldLoader } = await import(
+      '../../../../ts/world/loader/worldLoader.js'
+    );
     expect(() => WorldLoader.load(null)).toThrow();
     expect(() => WorldLoader.load({})).toThrow();
   });
@@ -296,7 +326,7 @@ describe('MarkingLoader', () => {
         directionVector: { x: 1, y: 0 },
         width: 3,
         height: 3,
-      })
+      }),
     ).toBeNull();
   });
 });
