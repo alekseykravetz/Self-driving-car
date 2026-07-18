@@ -72,6 +72,9 @@
 | `npm run format`        | Prettier (singleQuote: true)                  |
 | `npm run fix:all`       | format + lint                                 |
 | `npm test`              | Run all unit tests                            |
+| `npm run test:fast`     | Run tests for changed files only              |
+| `npm run test:changed`  | Run tests for changed files only              |
+| `npm run test:dev`      | Watch mode with fast initial run              |
 | `npm run test:watch`    | Run tests in watch mode (TDD)                 |
 | `npm run test:coverage` | Run tests with coverage report                |
 | `npm run publish:site`  | Deploy via here.now (scripts/publish-site.sh) |
