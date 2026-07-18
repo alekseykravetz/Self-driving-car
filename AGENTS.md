@@ -120,12 +120,17 @@
   - `ts/world/items/building.ts` — load, loadFootprint, toFootprint serialization
   - `ts/world/items/tree.ts` — buildTreePrototypes (deterministic), constructor
   - `ts/world/world.ts` — helper functions (loadWorldCorridors, loadTreeInstance)
+- **Phase 4 (remaining pure-logic) test modules** now cover:
+  - `ts/simulator/spatialGridUtils.ts` — buildRoadBorders, queryBordersNearCar, pointToSegmentDistanceSq
+  - `ts/store/storeManager.ts` — 6 exported helper functions with localStorage mock (smGenId, smWorldMarkers, smPersist, smNormalizeWorldId, smReadActiveCarIds, smCountItems)
+  - `ts/viewport/scaleIndicator.ts` — constructor defaults, update() with viewport mock
+  - `ts/simulator/training/modes/borderCollision.ts` — handleCollisionWithRoadBorders with Car (Image mock)
 - **Test files known to skip due to DOM dependencies:**
   - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
   - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
   - `Car` constructor (`new Image()` in CarRenderer) — `createCarsForTraining` deferred to Phase 2
   - All `draw()` methods across all classes (Canvas-dependent — visual/Playwright tests deferred)
-- **Current coverage:** ~64% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~62% branches (Phase 3 added ~199 statements to instrumented total)
+- **Current coverage:** ~60% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~59% branches (Phase 4 added 4 modules: spatialGridUtils 100%, borderCollision 85%, scaleIndicator 27% update/ctor, storeManager 18% helpers)
 - World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
 
 ## Persistence

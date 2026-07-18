@@ -40,13 +40,13 @@ const SM_TRACKED_LS_KEYS = [
 ];
 const SM_ARRAY_LS_KEYS = ['bestPool', 'raceCars', 'loadedWorlds', 'loadedCars'];
 
-/** Generate a short, unique id for a user-loaded asset. */
-function smGenId(): string {
+/** @internal Exported for testing only. */
+export function smGenId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-/** Detect start/target markers in a world data object. */
-function smWorldMarkers(data: object): {
+/** @internal Exported for testing only. */
+export function smWorldMarkers(data: object): {
   hasStartMarker: boolean;
   hasEndMarker: boolean;
 } {
@@ -58,11 +58,8 @@ function smWorldMarkers(data: object): {
   };
 }
 
-/**
- * Persist a value to localStorage. On QuotaExceededError, warn and keep the
- * in-memory copy so oversized files still work for the current session.
- */
-function smPersist(key: string, value: unknown, name: string): void {
+/** @internal Exported for testing only. */
+export function smPersist(key: string, value: unknown, name: string): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (e) {
@@ -74,8 +71,8 @@ function smPersist(key: string, value: unknown, name: string): void {
   }
 }
 
-/** Normalize a stored world id, mapping legacy bare filenames to `store:`. */
-function smNormalizeWorldId(raw: string): string {
+/** @internal Exported for testing only. */
+export function smNormalizeWorldId(raw: string): string {
   if (
     raw === SM_EDITOR_WORLD_ID ||
     raw.startsWith('store:') ||
@@ -86,8 +83,8 @@ function smNormalizeWorldId(raw: string): string {
   return `store:${raw}`; // legacy bare filename
 }
 
-/** Read & normalize the active-car ids from localStorage. */
-function smReadActiveCarIds(): string[] {
+/** @internal Exported for testing only. */
+export function smReadActiveCarIds(): string[] {
   const raw = localStorage.getItem(SM_ACTIVE_CAR_KEY);
   if (!raw) return [];
   const parsed = safeJsonParse<string[]>(raw);
@@ -99,12 +96,8 @@ function smReadActiveCarIds(): string[] {
   );
 }
 
-/**
- * Item count for array-backed tracked keys (bestPool, raceCars, loadedWorlds,
- * loadedCars). Returns null for non-array keys (e.g. 'editorWorld') or
- * unparseable values.
- */
-function smCountItems(key: string, value: string): number | null {
+/** @internal Exported for testing only. */
+export function smCountItems(key: string, value: string): number | null {
   if (!SM_ARRAY_LS_KEYS.includes(key)) return null;
   const parsed = safeJsonParse<unknown[]>(value);
   return Array.isArray(parsed) ? parsed.length : null;

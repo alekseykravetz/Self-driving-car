@@ -27,23 +27,20 @@ const SM_TRACKED_LS_KEYS = [
     'loadedCars',
 ];
 const SM_ARRAY_LS_KEYS = ['bestPool', 'raceCars', 'loadedWorlds', 'loadedCars'];
-/** Generate a short, unique id for a user-loaded asset. */
-function smGenId() {
+/** @internal Exported for testing only. */
+export function smGenId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
-/** Detect start/target markers in a world data object. */
-function smWorldMarkers(data) {
+/** @internal Exported for testing only. */
+export function smWorldMarkers(data) {
     const markings = data.markings || [];
     return {
         hasStartMarker: markings.some((m) => m.type === 'start'),
         hasEndMarker: markings.some((m) => m.type === 'target'),
     };
 }
-/**
- * Persist a value to localStorage. On QuotaExceededError, warn and keep the
- * in-memory copy so oversized files still work for the current session.
- */
-function smPersist(key, value, name) {
+/** @internal Exported for testing only. */
+export function smPersist(key, value, name) {
     try {
         localStorage.setItem(key, JSON.stringify(value));
     }
@@ -52,8 +49,8 @@ function smPersist(key, value, name) {
             'only (will be lost on refresh).', e);
     }
 }
-/** Normalize a stored world id, mapping legacy bare filenames to `store:`. */
-function smNormalizeWorldId(raw) {
+/** @internal Exported for testing only. */
+export function smNormalizeWorldId(raw) {
     if (raw === SM_EDITOR_WORLD_ID ||
         raw.startsWith('store:') ||
         raw.startsWith('loaded:')) {
@@ -61,8 +58,8 @@ function smNormalizeWorldId(raw) {
     }
     return `store:${raw}`; // legacy bare filename
 }
-/** Read & normalize the active-car ids from localStorage. */
-function smReadActiveCarIds() {
+/** @internal Exported for testing only. */
+export function smReadActiveCarIds() {
     const raw = localStorage.getItem(SM_ACTIVE_CAR_KEY);
     if (!raw)
         return [];
@@ -72,12 +69,8 @@ function smReadActiveCarIds() {
         : [raw]; // legacy single plain-string filename
     return list.map((id) => id.startsWith('store:') || id.startsWith('loaded:') ? id : `store:${id}`);
 }
-/**
- * Item count for array-backed tracked keys (bestPool, raceCars, loadedWorlds,
- * loadedCars). Returns null for non-array keys (e.g. 'editorWorld') or
- * unparseable values.
- */
-function smCountItems(key, value) {
+/** @internal Exported for testing only. */
+export function smCountItems(key, value) {
     if (!SM_ARRAY_LS_KEYS.includes(key))
         return null;
     const parsed = safeJsonParse(value);
