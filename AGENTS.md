@@ -98,6 +98,20 @@
 - **Import paths use `.js` extension** — match the production code convention even though files are `.ts`.
 - **Format + lint** — `npm run fix:all` before commit covers all files including tests.
 - **Visual regression** (Playwright) tests are deferred — see follow-up plan.
+- **Phase 1 (pure-logic) test modules** now cover:
+  - `ts/car/physics/sensorRaycaster.ts` — ray-casting math (castRays, getReading, getReadings, getTaggedReadings)
+  - `ts/panels/latchedToggle.ts` — held/latched state machine (setPhysicalHold, toggleLatch, reset, onChange)
+  - `ts/car/controls/controls.ts` — static initialization (DUMMY/AI types, frozen flag)
+  - `ts/car/loader/carLoader.ts` — pure functions (parseCarFileContent, compareCarInfoParams, allParamsMatch)
+  - `ts/simulator/trafficControlUtils.ts` — buildTrafficControls, queryTrafficControlsNearCar
+  - `ts/math/osm-importer/osm.ts` — OSM road data parsing (one-way, lane count, roundabout detection)
+  - `ts/simulator/training/genetics/poolManager.ts` — additional edge coverage (getSortedAICars, applyPoolToCars)
+  - `ts/math/worldUnits.ts` — remaining gap coverage (metersToWorldPixels, worldPixelsToMeters)
+- **Test files known to skip due to DOM dependencies:**
+  - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
+  - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
+  - `Car` constructor (`new Image()` in CarRenderer) — `createCarsForTraining` deferred to Phase 2
+- **Current coverage:** ~58.6% statements, ~47.8% branches (Phase 1 added ~2.3% statements, ~5.1% branches)
 - World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
 
 ## Persistence
