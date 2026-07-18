@@ -54,4 +54,40 @@ describe('Controls', () => {
   it('KEYS type throws in Node (document is not defined) — validates DOM dependency', () => {
     expect(() => new Controls('KEYS')).toThrow();
   });
+
+  it('frozen flag persists after being set', () => {
+    const ctrl = new Controls('AI');
+    ctrl.frozen = true;
+    expect(ctrl.frozen).toBe(true);
+    expect(ctrl.frozen).toBe(true);
+    ctrl.forward = true;
+    expect(ctrl.frozen).toBe(true);
+  });
+
+  it('frozen flag can be toggled back to false', () => {
+    const ctrl = new Controls('AI');
+    ctrl.frozen = true;
+    expect(ctrl.frozen).toBe(true);
+    ctrl.frozen = false;
+    expect(ctrl.frozen).toBe(false);
+  });
+
+  it('unknown control type string defaults to all false', () => {
+    const ctrl = new Controls('UNKNOWN');
+    expect(ctrl.forward).toBe(false);
+    expect(ctrl.left).toBe(false);
+    expect(ctrl.right).toBe(false);
+    expect(ctrl.reverse).toBe(false);
+    expect(ctrl.frozen).toBe(false);
+  });
+
+  it('individual properties remain set after assignment', () => {
+    const ctrl = new Controls('AI');
+    ctrl.forward = true;
+    ctrl.reverse = true;
+    expect(ctrl.forward).toBe(true);
+    expect(ctrl.reverse).toBe(true);
+    expect(ctrl.left).toBe(false);
+    expect(ctrl.right).toBe(false);
+  });
 });

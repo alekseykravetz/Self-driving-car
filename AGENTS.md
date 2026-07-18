@@ -107,11 +107,17 @@
   - `ts/math/osm-importer/osm.ts` — OSM road data parsing (one-way, lane count, roundabout detection)
   - `ts/simulator/training/genetics/poolManager.ts` — additional edge coverage (getSortedAICars, applyPoolToCars)
   - `ts/math/worldUnits.ts` — remaining gap coverage (metersToWorldPixels, worldPixelsToMeters)
+- **Phase 2 (Car integration) test modules** now cover:
+  - `ts/car/car.ts` — construction, toInfo/toDrawData, load (+brain desync guard), setAutopilot, setCallbacks, respawn, update pipeline (DUMMY + AI), steering, learningRate, edge cases
+  - `ts/car/sensors/sensor.ts` — constructor, update (border/no-border/stateAware/trafficControl/other cars), encodeTrafficState
+  - `ts/helpers/setupImageMock.ts` — shared Image mock enabling Car construction in Node
 - **Test files known to skip due to DOM dependencies:**
   - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
   - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
+  - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
+  - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
   - `Car` constructor (`new Image()` in CarRenderer) — `createCarsForTraining` deferred to Phase 2
-- **Current coverage:** ~58.6% statements, ~47.8% branches (Phase 1 added ~2.3% statements, ~5.1% branches)
+- **Current coverage:** ~75% statements, ~58% branches (Phase 2 added ~16.4% statements, ~10% branches)
 - World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
 
 ## Persistence
