@@ -17,5 +17,6 @@
       "env": {}
     }
   },
-  "plugin": [".opencode/plugins/graphify.js"]
+  "plugin": [".opencode/plugins/graphify.js"],
+  "permission": "allow"
 }
