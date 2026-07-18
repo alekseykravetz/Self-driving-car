@@ -88,8 +88,9 @@ If none, write "None.">
 
 - <Concrete, checkable bullet. e.g. "Opening simulator.html and enabling
   state-aware mode renders a colored dot at each traffic-light ray endpoint.">
-- <Each criterion must be verifiable by opening an HTML page — there are no
-  automated tests in this repo.>
+- <Each criterion must be verifiable by opening an HTML page, OR by an existing
+  unit test in `tests/` that covers the change. Run `npm test` to confirm all
+  existing tests still pass.>
 
 ## Docs to update
 
@@ -106,6 +107,7 @@ If none, write "None.">
 - If the change touches the layer hierarchy, draw the before/after import edges explicitly.
 - One plan MD per task. If the request decomposes into independent sub-features, write one MD per sub-feature with a `01-`, `02-` prefix (mirrors the existing `tasks/archive/20260710-sensors-classified/` layout).
 - Run `npm run fix:all` is NOT your job — that's the build agent's. But list it in Acceptance criteria.
+- Run `npm test` (vitest) is the build agent's job — list it in Acceptance criteria so the build agent runs tests before reporting done.
 
 ## Step 4 — STOP for review
 

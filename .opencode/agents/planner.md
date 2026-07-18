@@ -48,7 +48,7 @@ If a skill is not already loaded in this session, use the `skill` tool to load i
 
 - Source of truth: `ts/` (compiled to `js/` — never edit `js/`).
 - Conventions: read `AGENTS.md` at the project root before any planning.
-- No automated tests — validation is visual via the HTML pages in `html/`.
+- Tests live in `tests/` — run `npm test` (vitest) for unit tests. Always verify tests pass before archiving.
 - Knowledge graph: `graphify-out/` exists; use `graphify query "<question>"` for codebase understanding before reading files.
 - Task plans live in `tasks/<slug>.md`; completed plans move to `tasks/archive/YYYYMMDD-<slug>/`.
 

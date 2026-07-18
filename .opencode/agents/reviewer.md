@@ -15,6 +15,7 @@ permission:
     'npx tsc --noEmit *': allow
     'npm run lint:log': allow
     'npx prettier --check *': allow
+    'npm test': allow
     'git status': allow
     'git diff*': allow
     'git diff --stat*': allow
@@ -49,6 +50,7 @@ When called, the planner gives you:
 3. **Run objective checks** (these are your most reliable signals):
 
    - `npx tsc --noEmit` — must pass with zero errors. If it fails, list the errors.
+   - `npm test` — must pass with zero failing tests. If it fails, list the failing tests and their error output.
    - `npm run lint:log` — must pass with zero errors. Warnings are OK. If it fails, list the errors.
    - `npx prettier --check ts/ html/ styles/` — must pass. If it fails, list the unformatted files.
 
@@ -95,6 +97,7 @@ Return your report as plain text in this exact format:
 
 ### Objective Checks
 - [✅/❌] tsc --noEmit: <pass | N errors>
+- [✅/❌] npm test: <pass | N failing tests>
 - [✅/❌] lint:log: <pass | N errors>
 - [✅/❌] prettier --check: <pass | N files unformatted>
 - [✅/❌] fix:all was run: <yes | no — prettier/lint violations found>
