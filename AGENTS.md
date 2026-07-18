@@ -63,21 +63,24 @@
 
 ## Key commands
 
-| Command                 | Purpose                                       |
-| ----------------------- | --------------------------------------------- |
-| `npm start`             | Full dev: tsc watch + server + lint/format    |
-| `npm run tsc:watch`     | Compile TS on save only                       |
-| `npm run serve`         | Static server on :9090                        |
-| `npm run lint`          | ESLint auto-fix                               |
-| `npm run format`        | Prettier (singleQuote: true)                  |
-| `npm run fix:all`       | format + lint                                 |
-| `npm test`              | Run all unit tests                            |
-| `npm run test:fast`     | Run tests for changed files only              |
-| `npm run test:changed`  | Run tests for changed files only              |
-| `npm run test:dev`      | Watch mode with fast initial run              |
-| `npm run test:watch`    | Run tests in watch mode (TDD)                 |
-| `npm run test:coverage` | Run tests with coverage report                |
-| `npm run publish:site`  | Deploy via here.now (scripts/publish-site.sh) |
+| Command                      | Purpose                                       |
+| ---------------------------- | --------------------------------------------- |
+| `npm start`                  | Full dev: tsc watch + server + lint/format    |
+| `npm run tsc:watch`          | Compile TS on save only                       |
+| `npm run serve`              | Static server on :9090                        |
+| `npm run lint`               | ESLint auto-fix                               |
+| `npm run format`             | Prettier (singleQuote: true)                  |
+| `npm run format:check`       | Prettier check only (no write)                |
+| `npm run fix:all`            | format + lint                                 |
+| `npm test`                   | Run all unit tests                            |
+| `npm run test:fast`          | Run tests for changed files only              |
+| `npm run test:changed`       | Run tests for changed files only              |
+| `npm run test:dev`           | Watch mode with fast initial run              |
+| `npm run test:watch`         | Run tests in watch mode (TDD)                 |
+| `npm run test:coverage`      | Run tests with coverage report                |
+| `npm run test:visual`        | Run Playwright visual regression tests        |
+| `npm run test:visual:update` | Update Playwright visual baselines            |
+| `npm run publish:site`       | Deploy via here.now (scripts/publish-site.sh) |
 
 ## CI (GitHub Actions)
 
@@ -147,9 +150,8 @@
 - **Test files known to skip due to DOM dependencies:**
   - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
   - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
-  - `Car` constructor (`new Image()` in CarRenderer) — `createCarsForTraining` deferred to Phase 2
   - All `draw()` methods across all classes (Canvas-dependent — visual/Playwright tests deferred)
-- **Current coverage:** ~60% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~59% branches (Phase 4 added 4 modules: spatialGridUtils 100%, borderCollision 85%, scaleIndicator 27% update/ctor, storeManager 18% helpers)
+- **Current coverage:** ~75% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~74% branches (Phase 4 added 4 modules: spatialGridUtils 100%, borderCollision 85%, scaleIndicator 27% update/ctor, storeManager 18% helpers), ~83% functions
 - World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
 
 ## Persistence

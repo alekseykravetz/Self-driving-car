@@ -57,17 +57,25 @@ Open [http://localhost:9090](http://localhost:9090) in your browser to see the l
 
 ## Available Commands
 
-| Command                | Description                                                |
-| ---------------------- | ---------------------------------------------------------- |
-| `npm start`            | Full dev environment (compile + serve + lint/format watch) |
-| `npm run tsc:watch`    | TypeScript compiler in watch mode only                     |
-| `npm run serve`        | Static file server on port 9090                            |
-| `npm run watch:fix`    | Auto-format + lint on file change                          |
-| `npm run format`       | Format all files with Prettier                             |
-| `npm run lint`         | Lint and auto-fix with ESLint                              |
-| `npm run fix:all`      | Format + lint combined                                     |
-| `npm run lint:watch`   | Watch mode linter (on changed files only)                  |
-| `npm run publish:site` | Deploy via here.now (`scripts/publish-site.sh`)            |
+| Command                      | Description                                                |
+| ---------------------------- | ---------------------------------------------------------- |
+| `npm start`                  | Full dev environment (compile + serve + lint/format watch) |
+| `npm run tsc:watch`          | TypeScript compiler in watch mode only                     |
+| `npm run serve`              | Static file server on port 9090                            |
+| `npm run watch:fix`          | Auto-format + lint on file change                          |
+| `npm run format`             | Format all files with Prettier                             |
+| `npm run format:check`       | Prettier check only (no write)                             |
+| `npm run lint`               | Lint and auto-fix with ESLint                              |
+| `npm run fix:all`            | Format + lint combined                                     |
+| `npm run lint:watch`         | Watch mode linter (on changed files only)                  |
+| `npm test`                   | Run all unit tests                                         |
+| `npm run test:watch`         | Run tests in watch mode (TDD)                              |
+| `npm run test:fast`          | Run tests for changed files only                           |
+| `npm run test:dev`           | Watch mode with verbose output for changed files           |
+| `npm run test:coverage`      | Run tests with coverage report (output in `coverage/`)     |
+| `npm run test:visual`        | Run Playwright visual regression tests                     |
+| `npm run test:visual:update` | Update Playwright visual baselines                         |
+| `npm run publish:site`       | Deploy via here.now (`scripts/publish-site.sh`)            |
 
 ---
 
@@ -414,10 +422,12 @@ Detailed technical documentation is maintained in the `docs/` directory:
 ## Contributing
 
 1. Write all logic in TypeScript (`ts/` directory)
-2. Run `npm run lint` before committing (auto-fixes formatting)
-3. Test changes visually in the relevant simulator HTML page
-4. Update documentation in `docs/` for any significant changes
-5. Do not introduce bundlers or runtime dependencies
+2. Write/update unit tests in `tests/unit/` mirroring the `ts/` structure
+3. Run `npm test` to verify all tests pass
+4. Run `npm run fix:all` (format + lint) before committing
+5. Test changes visually in the relevant simulator HTML page
+6. Update documentation in `docs/` for any significant changes
+7. Do not introduce bundlers or runtime dependencies
 
 ---
 

@@ -42,10 +42,11 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 ```
 
 - Tests are authored in TypeScript (`tests/**/*.test.ts`) and executed directly by vitest (no pre-compilation needed).
-- `vitest.config.ts` includes all `tests/**/*.test.ts` files.
+- `vitest.config.ts` includes all `tests/**/*.test.ts` files (excluding `tests/visual/`).
 - Test files mirror the `ts/` directory structure under `tests/unit/`.
-- `tests/helpers/` contains shared test utilities (e.g. `makeKnownNetwork` for constructing deterministic neural networks).
+- `tests/helpers/` contains shared test utilities (e.g. `makeKnownNetwork` for constructing deterministic neural networks; `setupImageMock` for enabling Car construction in Node; `makeCar`, `makeWorld`, `makeGraph`, etc.).
 - Vitest `^4.1.10` is a dev dependency in `package.json`.
+- Coverage thresholds are enforced in `vitest.config.ts`: statements ≥58%, branches ≥55%, functions ≥68%, lines ≥58%.
 - Test files are excluded from the main `tsconfig.json` compilation (`"exclude": ["tests/**/*.ts"]`).
 - ESLint config (`eslint.config.mjs`) has a separate rule block for `tests/**/*.ts` with `globals: { ...globals.node }` (Node globals like `describe`, `it`, `expect`).
 
