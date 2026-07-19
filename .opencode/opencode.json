@@ -1,6 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "default_agent": "planner",
+  "instructions": ["AGENTS.md"],
+  "snapshot": true,
   "skills": {
     "paths": [".opencode/skills"]
   },
@@ -20,5 +22,19 @@
   "plugin": [".opencode/plugins/graphify.js"],
   "permission": {
     "bash": "allow"
+  },
+  "command": {
+    "test": {
+      "description": "Run all vitest unit tests",
+      "agent": "build"
+    },
+    "fix": {
+      "description": "Format + lint fix the entire codebase",
+      "agent": "build"
+    },
+    "start": {
+      "description": "Start dev server (tsc watch + serve + lint/format watcher)",
+      "agent": "build"
+    }
   }
 }

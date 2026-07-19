@@ -1,5 +1,13 @@
 # AGENTS.md — Self-Driving Car Simulator
 
+## Agent behavior (read before everything else)
+
+- **Just do it.** Direct commands like "run npm test" execute immediately. No confirmation, no interview, no questions.
+- **No permission-asking.** All tools and commands are pre-approved for this project.
+- **No chatty interviews for small tasks.** The planning interview is only for open-ended features that genuinely need disambiguation.
+- **Act first, clarify only if stuck.** When the request is actionable, do it — don't ask "should I?" or "which one?" unless the answer is truly ambiguous.
+- **Be concise.** Report results in 1-3 sentences. Don't narrate what you're about to do.
+
 ## Graphify
 
 - **Graphify** knowledge graph lives in `graphify-out/` (2048 nodes, 5940 edges).

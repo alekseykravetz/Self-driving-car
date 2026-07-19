@@ -9,14 +9,7 @@ permission:
   edit: allow
   glob: allow
   grep: allow
-  bash:
-    '*': ask
-    'npm run fix:all': allow
-    'npm run tsc:watch': allow
-    'graphify *': allow
-    'git status': allow
-    'git diff*': allow
-    'git log*': allow
+  bash: allow
   task: allow
   webfetch: allow
   websearch: allow
