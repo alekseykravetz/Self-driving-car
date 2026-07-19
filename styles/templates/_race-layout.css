@@ -1,3 +1,33 @@
+#gameCanvas {
+  background: var(--color-bg-canvas);
+  display: block;
+}
+
+#cameraCanvas {
+  background-image: linear-gradient(#8cf, white 70%);
+  display: block;
+  flex-shrink: 0;
+}
+
+#networkCanvas {
+  background: var(--color-bg-dark);
+  display: block;
+}
+
+#miniMapCanvas {
+  background: var(--color-bg-dark);
+  display: block;
+}
+
+.miniMap {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  border-radius: 50%;
+  opacity: 50%;
+  background: var(--color-bg-dark);
+}
+
 #racePanel {
   display: flex;
   align-items: center;
@@ -28,14 +58,6 @@
 
 .race-panel-btn:hover {
   background: var(--color-border-default);
-}
-
-.miniMap {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  border-radius: 50%;
-  opacity: 50%;
 }
 
 #statistics {

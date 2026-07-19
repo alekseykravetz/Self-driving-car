@@ -45,8 +45,10 @@ editor-toolbar {
   gap: var(--space-1);
 }
 
+#editorToolbar .controls-group,
 editor-toolbar .controls-group {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: var(--space-1);
 }

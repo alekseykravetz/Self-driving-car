@@ -7,6 +7,9 @@
   --color-bg-surface-raised: rgba(255, 255, 255, 0.04);
   --color-bg-hover: rgba(255, 255, 255, 0.08);
   --color-bg-active: rgba(255, 255, 255, 0.12);
+  --color-bg-hover-strong: rgba(255, 255, 255, 0.22);
+  --color-bg-active-strong: rgba(255, 255, 255, 0.2);
+  --color-bg-active-outline: rgba(255, 255, 255, 0.45);
   --color-bg-overlay: rgba(0, 0, 0, 0.6);
   --color-bg-toolbar: rgba(0, 0, 0, 0.6);
   --color-bg-dark: #000;

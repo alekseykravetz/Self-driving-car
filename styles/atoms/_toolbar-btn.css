@@ -20,12 +20,12 @@
 }
 
 .toolbar-btn:hover {
-  background: var(--color-bg-active);
+  background: var(--color-bg-hover-strong);
 }
 
 .toolbar-btn.active {
-  background: var(--color-border-strong);
-  outline: 2px solid var(--color-border-strong);
+  background: var(--color-bg-active-strong);
+  outline: 2px solid var(--color-bg-active-outline);
 }
 
 .toolbar-btn:disabled {
