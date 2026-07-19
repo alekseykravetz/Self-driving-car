@@ -80,7 +80,9 @@ export class Graph {
         return false;
     }
     removeSegment(segment) {
-        this.segments.splice(this.segments.indexOf(segment), 1);
+        const idx = this.segments.indexOf(segment);
+        if (idx >= 0)
+            this.segments.splice(idx, 1);
     }
     getShortestPath(start, end) {
         const startSeg = getNearestSegment(start, this.segments);

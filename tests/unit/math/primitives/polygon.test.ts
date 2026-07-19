@@ -147,5 +147,38 @@ describe('Polygon', () => {
       const segments = Polygon.union([a, b]);
       expect(segments.length).toBeGreaterThan(0);
     });
+
+    it('union of disjoint polygons returns boundary segments', () => {
+      const a = makeSquare(0, 0, 10);
+      const b = makeSquare(100, 100, 10);
+      const segments = Polygon.union([a, b]);
+      expect(segments.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe('Polygon edge cases', () => {
+  it('containsPoint on polygon vertex', () => {
+    const poly = makeSquare(0, 0, 10);
+    const vertex = new Point(0, 0);
+    // Ray-casting through a vertex may count 2 intersections (even → false)
+    expect(poly.containsPoint(vertex)).toBe(false);
+  });
+
+  it('containsPoint on polygon edge', () => {
+    const poly = makeSquare(0, 0, 10);
+    const edgeMid = new Point(5, 0);
+    expect(poly.containsPoint(edgeMid)).toBe(true);
+  });
+
+  it('degenerate triangle (collinear points) does not crash', () => {
+    const poly = new Polygon([
+      new Point(0, 0),
+      new Point(5, 0),
+      new Point(10, 0),
+    ]);
+    expect(poly.points.length).toBe(3);
+    expect(poly.segments.length).toBe(3);
+    expect(() => poly.containsPoint(new Point(3, 1))).not.toThrow();
   });
 });

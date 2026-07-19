@@ -124,3 +124,23 @@ describe('polysIntersect', () => {
     expect(polysIntersect(line1, line2)).toBe(false);
   });
 });
+
+describe('Collision edge cases', () => {
+  it('nearestEdgeOffset with zero-length segment returns null', () => {
+    const ray = [new Point(5, 5), new Point(5, 5)];
+    const poly = [
+      new Point(0, 0),
+      new Point(10, 0),
+      new Point(10, 10),
+      new Point(0, 10),
+    ];
+    const offset = nearestEdgeOffset(ray, poly);
+    expect(offset).toBeNull();
+  });
+
+  it('polysIntersect with empty arrays returns false', () => {
+    expect(polysIntersect([], [new Point(0, 0), new Point(10, 0)])).toBe(false);
+    expect(polysIntersect([new Point(0, 0), new Point(10, 0)], [])).toBe(false);
+    expect(polysIntersect([], [])).toBe(false);
+  });
+});
