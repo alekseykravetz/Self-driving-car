@@ -140,3 +140,35 @@ describe('TrafficManager', () => {
     expect(manager.frameCount).toBe(2);
   });
 });
+
+describe('TrafficManager edge cases', () => {
+  it('cycle with no lights does not throw', () => {
+    const graph = makeCrossroadGraph();
+    const manager = new TrafficManager(graph, []);
+    expect(() => manager.update()).not.toThrow();
+  });
+
+  it('override all lights then release all restores cycling', () => {
+    const graph = makeCrossroadGraph();
+    const light = makeLightAtCrossroad();
+    const manager = new TrafficManager(graph, [light]);
+    manager.overrideLight(light, 'red');
+    expect(light.overridden).toBe(true);
+
+    manager.releaseAllOverrides();
+    expect(light.overridden).toBe(false);
+
+    manager.frameCount = 0;
+    manager.update();
+    expect(light.state).toBe('green');
+  });
+
+  it('crossroad detection with no intersections returns empty', () => {
+    const p1 = new Point(0, 0);
+    const p2 = new Point(100, 0);
+    const graph = new Graph([p1, p2], [new Segment(p1, p2)]);
+    const light = new Light(new Point(50, 0), new Point(1, 0), 50);
+    const manager = new TrafficManager(graph, [light]);
+    expect(manager.controlCenters).toHaveLength(0);
+  });
+});

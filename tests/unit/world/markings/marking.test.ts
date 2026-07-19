@@ -115,3 +115,37 @@ describe('Marking', () => {
     expect(m.polygon.points.length).toBeGreaterThanOrEqual(4);
   });
 });
+
+describe('Marking edge cases', () => {
+  it('reanchor with same anchor is a no-op', () => {
+    const center = new Point(100, 100);
+    const dir = new Point(1, 0);
+    const m = new Marking(center, dir, 50, 30);
+    const p1 = new Point(0, 100);
+    const p2 = new Point(200, 100);
+    const graph = new Graph([p1, p2], [new Segment(p1, p2)]);
+    m.setAnchor(graph);
+    const beforePoints = m.polygon.points.map((p) => ({ x: p.x, y: p.y }));
+    m.reanchor(graph);
+    const afterPoints = m.polygon.points.map((p) => ({ x: p.x, y: p.y }));
+    expect(afterPoints).toEqual(beforePoints);
+  });
+
+  it('rebuildGeometry after polygon modified recovers', () => {
+    const m = makeMarking();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (m.polygon as any).points = [new Point(0, 0)];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (m as any).rebuildGeometry();
+    expect(m.polygon.points.length).toBeGreaterThanOrEqual(4);
+    expect(m.polygon.segments.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('constructor with zero width/height creates degenerate polygon', () => {
+    const center = new Point(0, 0);
+    const dir = new Point(1, 0);
+    const m = new Marking(center, dir, 0, 0);
+    expect(m.polygon.points.length).toBeGreaterThanOrEqual(1);
+    expect(m.support).toBeDefined();
+  });
+});

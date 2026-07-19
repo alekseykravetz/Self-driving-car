@@ -317,3 +317,38 @@ describe('NeuralNetwork', () => {
     });
   });
 });
+
+describe('NeuralNetwork edge cases', () => {
+  it('feedForward with all-zero weights returns zeros', () => {
+    const nn = makeKnownNetwork([2, 1], [[[0], [0]]], [[0]]);
+    const result = NeuralNetwork.feedForward([1, 1], nn);
+    expect(result[0]).toBe(0);
+  });
+
+  it('trainStep with NaN learning rate does not crash', () => {
+    const nn = makeKnownNetwork([2, 1], [[[0.1], [0.1]]], [[0.0]]);
+    expect(() => NeuralNetwork.trainStep(nn, [1, 0], [1], NaN)).not.toThrow();
+  });
+
+  it('trainStep with mismatched targets length returns false', () => {
+    const nn = makeKnownNetwork(
+      [2, 2],
+      [
+        [
+          [0.1, 0.2],
+          [0.3, 0.4],
+        ],
+      ],
+      [[0.0, 0.0]],
+    );
+    const result = NeuralNetwork.trainStep(nn, [1, 0], [], 0.5);
+    expect(result).toBe(false);
+  });
+
+  it('constructor with 0 hidden layers creates single-layer network', () => {
+    const nn = new NeuralNetwork([2, 4]);
+    expect(nn.levels.length).toBe(1);
+    expect(nn.levels[0].inputs.length).toBe(2);
+    expect(nn.levels[0].outputs.length).toBe(4);
+  });
+});

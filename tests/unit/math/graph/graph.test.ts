@@ -171,3 +171,35 @@ describe('Graph', () => {
     });
   });
 });
+
+describe('Graph edge cases', () => {
+  it('load with duplicate points preserves duplicates', () => {
+    const info = new Graph(
+      [new Point(0, 0), new Point(100, 0), new Point(0, 0)],
+      [],
+    );
+    const loaded = Graph.load(info);
+    expect(loaded.points.length).toBe(3);
+  });
+
+  it('tryAddSegment with matching coordinates returns false', () => {
+    const g = makeSimpleGraph();
+    const seg = new Segment(new Point(0, 0), new Point(100, 0));
+    expect(g.tryAddSegment(seg)).toBe(false);
+  });
+
+  it('removeSegment that does not exist is no-op', () => {
+    const g = makeSimpleGraph();
+    const initialCount = g.segments.length;
+    const nonExistent = new Segment(new Point(999, 999), new Point(1000, 1000));
+    g.removeSegment(nonExistent);
+    expect(g.segments.length).toBe(initialCount);
+  });
+
+  it('load null/undefined data throws', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => Graph.load(null as any)).toThrow();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => Graph.load(undefined as any)).toThrow();
+  });
+});

@@ -110,7 +110,8 @@ export class Graph {
   }
 
   removeSegment(segment: Segment): void {
-    this.segments.splice(this.segments.indexOf(segment), 1);
+    const idx = this.segments.indexOf(segment);
+    if (idx >= 0) this.segments.splice(idx, 1);
   }
 
   getShortestPath(start: Point, end: Point): Segment[] {

@@ -592,3 +592,70 @@ describe('Edge cases', () => {
     }
   });
 });
+
+describe('Car edge cases', () => {
+  it('update with null brain does not crash AI car', () => {
+    const car = new Car({ x: 0, y: 0, controlType: 'AI' });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (car as any).brain = null;
+    expect(() => car.update([], [], [])).not.toThrow();
+  });
+
+  it('load with malformed CarInfo recovers gracefully', () => {
+    const car = new Car(defaultOpts);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const badInfo: any = {
+      maxSpeed: 5,
+      friction: 0.01,
+      acceleration: 0.05,
+    };
+    expect(() => car.load(badInfo)).not.toThrow();
+    expect(car.maxSpeed).toBe(5);
+  });
+
+  it('respawn after collision resets speed and damage', () => {
+    const car = new Car(defaultOpts);
+    const wall = makeWallY(-5, 5);
+    car.update([wall]);
+    expect(car.damaged).toBe(true);
+    expect(car.speed).toBe(0);
+    car.respawn({ x: 0, y: 0, angle: 0 });
+    expect(car.damaged).toBe(false);
+    expect(car.speed).toBe(0);
+  });
+
+  it('setAutopilot on then off clears controls and unfreezes', () => {
+    const car = new Car({ x: 0, y: 0, controlType: 'AI' });
+    car.setAutopilot(true);
+    expect(car.controls.frozen).toBe(true);
+    car.setAutopilot(false);
+    expect(car.controls.forward).toBe(false);
+    expect(car.controls.left).toBe(false);
+    expect(car.controls.right).toBe(false);
+    expect(car.controls.reverse).toBe(false);
+    expect(car.controls.frozen).toBe(false);
+  });
+
+  it('multiple setCallbacks calls only fire latest', () => {
+    const car = new Car(defaultOpts);
+    const first = vi.fn();
+    const second = vi.fn();
+    car.setCallbacks({ onDamaged: first });
+    car.setCallbacks({ onDamaged: second });
+    const wall = makeWallY(-5, 5);
+    car.update([wall]);
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalled();
+  });
+
+  it('car with zero width/height does not crash update', () => {
+    const car = new Car({
+      x: 0,
+      y: 0,
+      controlType: 'DUMMY',
+      width: 0,
+      height: 0,
+    });
+    expect(() => car.update([], [], [])).not.toThrow();
+  });
+});
