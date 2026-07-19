@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { EditorToolbarElement } from '../../../ts/panels/editorToolbar.js';
+import { EditorToolbarElement } from '../../../ts/ui/molecules/editorToolbar.js';
 import type { EditorType } from '../../../ts/world/types.js';
 
 function createElement(): EditorToolbarElement {

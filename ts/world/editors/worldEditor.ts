@@ -20,11 +20,11 @@ import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Osm, OsmData } from '../../math/osm-importer/osm.js';
 import { StoreManager } from '../../store/storeManager.js';
-import { WorldToolbarElement } from '../../panels/worldToolbar.js';
-import { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
-import { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
-import { EditorToolbarElement } from '../../panels/editorToolbar.js';
-import { KeyboardManager } from '../../panels/keyboardManager.js';
+import { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
+import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
+import { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
+import { EditorToolbarElement } from '../../ui/molecules/editorToolbar.js';
+import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
 

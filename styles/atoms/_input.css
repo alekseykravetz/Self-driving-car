@@ -1,0 +1,111 @@
+/* ── Number / text inputs (training panel) ──────────────────────── */
+
+#trainingManagerPanel input[type='number'],
+#trainingManagerPanel input[type='text'] {
+  width: 100%;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  padding: 5px 6px;
+  font-size: var(--text-md);
+  text-align: center;
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  cursor: text;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+#trainingManagerPanel input[type='number']:focus,
+#trainingManagerPanel input[type='text']:focus {
+  outline: none;
+  border-color: var(--color-border-input-focus);
+  background: var(--color-bg-active);
+}
+
+#trainingManagerPanel input[type='checkbox'] {
+  width: var(--size-checkbox-lg);
+  height: var(--size-checkbox-lg);
+  cursor: pointer;
+  margin: 0;
+  accent-color: var(--color-accent-green-strong);
+}
+
+/* ── Custom number input row ───────────────────────────────────── */
+
+.num-input-row input[type='number'] {
+  flex: 1;
+  min-width: 0;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.num-input-row input[type='number']::-webkit-inner-spin-button,
+.num-input-row input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.num-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  cursor: pointer;
+  background: var(--color-bg-active);
+  font-size: var(--text-sm);
+  line-height: 1;
+  flex-shrink: 0;
+  flex-grow: 0;
+  transition: background var(--transition-fast);
+}
+.num-btn:hover {
+  background: var(--color-bg-active);
+}
+
+/* ── Compact number input row ──────────────────────────────────── */
+
+.num-input-row-sm input[type='number'] {
+  width: 48px;
+  flex: 0 0 auto;
+  padding: 2px var(--space-1);
+  font-size: var(--text-base);
+}
+.num-input-row-sm .num-btn {
+  width: var(--size-checkbox-lg);
+  min-width: var(--size-checkbox-lg);
+  max-width: var(--size-checkbox-lg);
+  height: var(--size-checkbox-lg);
+  font-size: var(--text-xs);
+}
+
+/* ── Checkbox controls ─────────────────────────────────────────── */
+
+.ctrl-checkbox input[type='checkbox'] {
+  width: var(--size-checkbox);
+  height: var(--size-checkbox);
+  cursor: pointer;
+  accent-color: var(--color-accent-green-strong);
+}
+
+.view-toggle-label input[type='checkbox'] {
+  width: var(--size-checkbox);
+  height: var(--size-checkbox);
+  cursor: pointer;
+  margin: 0;
+  accent-color: var(--color-accent-green-strong);
+}
+
+/* ── Store radio ───────────────────────────────────────────────── */
+
+.store-table input[type='radio'] {
+  accent-color: var(--color-accent-indigo);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}

@@ -1,6 +1,9 @@
-import type { WorldToolbarElement } from '../../panels/worldToolbar.js';
+import type { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
 import type { UnifiedWorldEntry } from '../../store/types.js';
-import type { BorderMode, TrackingMode } from '../../panels/modeControls.js';
+import type {
+  BorderMode,
+  TrackingMode,
+} from '../../ui/molecules/modeControls.js';
 import type { Car } from '../../car/car.js';
 import { beep } from '../../audio/sound.js';
 

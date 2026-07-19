@@ -1,0 +1,71 @@
+.param-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.car-config-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+}
+
+.car-config-grid .ctrl-wide {
+  grid-column: 1 / -1;
+}
+
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+}
+
+.ti-param-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.ti-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ti-source {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: var(--space-2) 10px;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+}
+
+.ti-source:hover {
+  background: var(--color-bg-surface-raised);
+}
+
+.ti-source.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ti-source input {
+  margin-top: 3px;
+}
+
+.ti-source-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ti-source-name {
+  font-size: 0.9rem;
+}
+
+.ti-source-desc {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}

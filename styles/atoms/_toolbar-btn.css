@@ -1,0 +1,106 @@
+/* ── Toolbar button ────────────────────────────────────────────── */
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-input);
+  font-size: var(--text-2xl);
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  position: relative;
+  transition:
+    background 0.15s,
+    outline-color 0.15s;
+}
+
+.toolbar-btn:hover {
+  background: var(--color-bg-active);
+}
+
+.toolbar-btn.active {
+  background: var(--color-border-strong);
+  outline: 2px solid var(--color-border-strong);
+}
+
+.toolbar-btn:disabled {
+  cursor: not-allowed;
+  background: var(--color-bg-surface-raised);
+}
+
+.toolbar-btn[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  transform: none;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-ui);
+  font-weight: normal;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: normal;
+  max-width: 280px;
+  width: max-content;
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* ── Editor mode button (world editor) ─────────────────────────── */
+
+.editor-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-text-secondary);
+  filter: grayscale(100%);
+  font-size: 20px;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-md);
+  text-shadow: 1px 1px black;
+  cursor: pointer;
+  position: relative;
+  transition:
+    background-color 0.15s,
+    filter 0.15s,
+    box-shadow 0.15s;
+}
+
+.editor-mode-btn:hover {
+  box-shadow: 0 0 6px var(--color-text-dim);
+}
+
+.editor-mode-btn.active {
+  background-color: var(--color-text-primary);
+  filter: none;
+}
+
+.editor-mode-btn[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-ui);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: normal;
+  max-width: 280px;
+  width: max-content;
+  text-align: center;
+  pointer-events: none;
+  z-index: 200;
+  text-shadow: none;
+  line-height: 1.3;
+}

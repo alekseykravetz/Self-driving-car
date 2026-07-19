@@ -1,0 +1,145 @@
+.controls-group,
+#topControls .controls-group,
+#shortcutsToolbar .controls-group,
+#worldLayersToolbar .controls-group,
+#layoutToolbar .controls-group,
+#animationLoopToolbar .controls-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+  flex: 0 1 auto;
+}
+
+editor-toolbar .controls-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.controls-group-label,
+#topControls .controls-group-label,
+#shortcutsToolbar .controls-group-label,
+#worldLayersToolbar .controls-group-label,
+#layoutToolbar .controls-group-label,
+#animationLoopToolbar .controls-group-label {
+  font-size: var(--text-xs);
+  font-family: var(--font-ui);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  line-height: 1;
+  flex: 0 0 auto;
+  height: 11px;
+}
+
+.controls-separator,
+#topControls .controls-separator,
+#shortcutsToolbar .controls-separator,
+#worldLayersToolbar .controls-separator,
+#layoutToolbar .controls-separator,
+#animationLoopToolbar .controls-separator {
+  width: 1px;
+  align-self: stretch;
+  background: var(--color-border-strong);
+  margin: 0 var(--space-1);
+}
+
+.border-mode-group,
+#topControls .border-mode-group,
+#shortcutsToolbar .border-mode-group,
+#worldLayersToolbar .border-mode-group,
+#layoutToolbar .border-mode-group,
+#animationLoopToolbar .border-mode-group {
+  display: flex;
+  gap: 2px;
+  flex: 0 0 auto;
+  height: 32px;
+  align-items: center;
+}
+
+.time-display-group {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+}
+
+.elapsed-time {
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  min-width: 45px;
+  text-align: center;
+}
+
+.reset-time-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-active);
+  color: var(--color-text-dim);
+  font-size: var(--text-base);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast) ease;
+}
+
+.reset-time-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary);
+}
+
+.reset-time-btn:active {
+  background: var(--color-border-strong);
+}
+
+.fps-display {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  min-width: 45px;
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.spawn-car-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.spawn-car-select {
+  height: 32px;
+  max-width: 140px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-active);
+  color: var(--color-text-primary);
+  font-size: var(--text-md);
+  padding: 0 6px;
+  cursor: pointer;
+}
+
+.spawn-car-select option {
+  color: #000;
+}
+
+.controls-divider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--color-border-default);
+  margin: 0 6px;
+}

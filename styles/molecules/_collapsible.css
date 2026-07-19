@@ -1,0 +1,30 @@
+.section-title-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapse-caret {
+  display: inline-block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  transition: transform var(--transition-fast);
+  transform: rotate(90deg);
+}
+
+.car-config-section.collapsed .collapse-caret {
+  transform: rotate(0deg);
+}
+
+.car-config-section.collapsed .car-config-grid {
+  display: none;
+}
+
+.car-config-section:not(.collapsed) .car-config-summary {
+  display: none;
+}
+
+.car-config-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}

@@ -1,0 +1,145 @@
+/* ── Training init modal ──────────────────────────────── */
+training-init-modal {
+  display: none;
+}
+
+training-init-modal.open {
+  display: block;
+}
+
+/* ── Human training config modal ──────────────────────── */
+human-training-config-modal {
+  display: none;
+}
+
+human-training-config-modal.open {
+  display: block;
+}
+
+/* ── Modal overlay & dialog ───────────────────────────── */
+.ti-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(2px);
+  padding: var(--space-4);
+}
+
+.ti-dialog {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: var(--color-bg-app);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  padding: var(--space-5);
+}
+
+.ti-header {
+  margin-bottom: var(--space-3);
+}
+
+.ti-title {
+  margin: 0 0 var(--space-1);
+  font-size: 1.1rem;
+}
+
+.ti-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-dim);
+}
+
+.ti-section {
+  margin-top: var(--space-4);
+}
+
+.ti-section-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.ti-config-note {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-left: 6px;
+}
+
+.ti-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ti-source {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: var(--space-2) 10px;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+}
+
+.ti-source:hover {
+  background: var(--color-bg-surface-raised);
+}
+
+.ti-source.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ti-source input {
+  margin-top: 3px;
+}
+
+.ti-source-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ti-source-name {
+  font-size: 0.9rem;
+}
+
+.ti-source-desc {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.ti-param-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.ti-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: var(--space-5);
+}
+
+/* ── OSM import panel (world editor) ──────────────────── */
+#osmPanel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--color-bg-overlay);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  z-index: 200;
+}

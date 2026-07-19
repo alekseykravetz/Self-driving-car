@@ -1,4 +1,4 @@
-import { TRAINING_PANEL_TEMPLATE } from './templates/trainingPanelTemplate.js';
+import { TRAINING_PANEL_TEMPLATE } from '../../ui/organisms/trainingPanelTemplate.js';
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { Car } from '../../car/car.js';

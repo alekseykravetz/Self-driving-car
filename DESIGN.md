@@ -1,5 +1,7 @@
 # Design System — Self-Driving Car Simulator
 
+> **Token system**: All visual properties below are available as CSS custom properties in `styles/tokens.css`. Every raw value referenced here maps to a `var(--token-name)` in the codebase. When adding new UI, prefer `var(--color-*)`, `var(--space-*)`, `var(--text-*)`, `var(--radius-*)`, and `var(--size-*)` over hardcoded values.
+
 ## 1. Visual Theme & Atmosphere
 
 A dark, data-dense simulator environment that prioritizes clarity and legibility above decorative flourish. The interface is built for prolonged staring — an educational sandbox where neural networks train in real time against a top-down road canvas. Backgrounds are near-black (`#0f0f14`), panels use semi-transparent overlays (`rgba(0,0,0,0.6)`) so the simulation remains visible through all chrome, and every pixel of UI exists only to serve the training loop.
@@ -368,6 +370,30 @@ Depth is communicated through background opacity and thin white borders rather t
 - Store tables sacrifice columns rather than rows
 
 ## 9. Agent Prompt Guide
+
+### CSS Token Quick Reference
+
+All values are defined in `styles/tokens.css`. When implementing, use `var(--token-name)` instead of raw values.
+
+| Token                         | Value                      | Usage                            |
+| ----------------------------- | -------------------------- | -------------------------------- |
+| `--color-bg-app`              | `#0f0f14`                  | Main app background              |
+| `--color-bg-surface`          | `rgba(15,15,20,0.92)`      | Panel surfaces                   |
+| `--color-bg-overlay`          | `rgba(0,0,0,0.6)`          | Floating toolbars, overlays      |
+| `--color-bg-canvas`           | `#2a5`                     | Road/game canvas                 |
+| `--color-text-primary`        | `#e8e8e8`                  | Primary text                     |
+| `--color-text-secondary`      | `#888`                     | Muted labels                     |
+| `--color-accent-green`        | `#7ddf7d`                  | Primary actions, positive states |
+| `--color-accent-green-strong` | `#5cb85c`                  | Status green, active indicators  |
+| `--color-accent-red`          | `#d9534f`                  | Danger states                    |
+| `--color-accent-yellow`       | `#f0ad4e`                  | Warning states                   |
+| `--font-ui`                   | `Arial, sans-serif`        | UI labels                        |
+| `--font-mono`                 | `'Courier New', monospace` | Numeric data                     |
+| `--space-1`                   | `4px`                      | Minimum gap/padding              |
+| `--space-2`                   | `8px`                      | Standard gap                     |
+| `--radius-sm`                 | `3px`                      | Key indicators                   |
+| `--radius-md`                 | `5px`                      | Toolbar buttons                  |
+| `--radius-lg`                 | `8px`                      | Toolbar panels                   |
 
 ### Quick Color Reference
 

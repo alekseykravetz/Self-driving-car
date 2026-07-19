@@ -1,0 +1,67 @@
+.num-input-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.num-input-row input[type='number'] {
+  flex: 1;
+  min-width: 0;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.num-input-row input[type='number']::-webkit-inner-spin-button,
+.num-input-row input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.num-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  cursor: pointer;
+  background: var(--color-bg-active);
+  font-size: var(--text-sm);
+  line-height: 1;
+  flex-shrink: 0;
+  flex-grow: 0;
+  transition: background var(--transition-fast);
+}
+
+.num-btn:hover {
+  background: var(--color-bg-active);
+}
+
+.num-input-row-sm {
+  gap: 2px;
+}
+
+.num-input-row-sm input[type='number'] {
+  width: 48px;
+  flex: 0 0 auto;
+  padding: 2px var(--space-1);
+  font-size: var(--text-base);
+}
+
+.num-input-row-sm .num-btn {
+  width: var(--size-checkbox-lg);
+  min-width: var(--size-checkbox-lg);
+  max-width: var(--size-checkbox-lg);
+  height: var(--size-checkbox-lg);
+  font-size: var(--text-xs);
+}
+
+.idle-range-wrap {
+  margin-top: 2px;
+  display: flex;
+  justify-content: center;
+}

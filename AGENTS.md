@@ -22,6 +22,52 @@
 - **Never edit `js/` directly.** Source of truth is `ts/`.
 - **Always run `npm run fix:all` (format + lint) before committing.**
 
+## UI Architecture — Atomic Design
+
+The project follows **Atomic Design** (Brad Frost methodology) for both CSS and TypeScript custom elements:
+
+### CSS Hierarchy (`styles/`)
+
+```
+styles/
+  index.css              ← page-specific entry point (e.g. simulator.css @import 'index.css')
+  tokens.css              ← design tokens (CSS custom properties for colors, spacing, typography, radii, shadows)
+  atoms/                  ← smallest reusable: _base.css, _button.css, _input.css, _label.css, _badge.css,
+  │                          _key-indicator.css, _toolbar-btn.css
+  molecules/              ← compound groups: _stat-row.css, _toggle-row.css, _num-input-row.css, _btn-group.css,
+  │                          _param-grid.css, _controls-group.css, _asset-picker.css, _collapsible.css,
+  │                          _view-toggles.css, _shortcuts-keys.css, _world-layers-keys.css
+  organisms/              ← full feature panels: _toolbar-panel.css, _modals.css, _training-panel.css,
+  │                          _traffic-panel.css, _store-panel.css, _human-training.css, _world-layers.css
+  templates/              ← page layouts: _simulator-layout.css, _landing-page.css, _race-layout.css, _world-editor.css
+  pages/                  ← page-specific overrides: _mobile.css, _world.css
+  simulator.css           ← simulator entry (training, traffic, human-training)
+  landing.css             ← landing page entry (index.html)
+  race.css                ← race page entry
+  world.css               ← world editor entry
+```
+
+- **Never use raw hex/rgba values** — use `var(--color-*)` tokens from `tokens.css`
+- **Never use raw px for spacing/fonts/radii** — use `var(--space-*)`, `var(--text-*)`, `var(--radius-*)` tokens
+- Each HTML page loads its page-specific CSS entry (`/styles/simulator.css`, `/styles/landing.css`, etc.)
+
+### TS Component Hierarchy (`ts/ui/`)
+
+```
+ts/
+  ui/
+    atoms/                ← smallest building blocks: keyboardManager.ts, latchedToggle.ts
+    molecules/            ← compound components: shortcutsToolbar, worldLayersToolbar, worldToolbar,
+    │                         editorToolbar, layoutToolbar, animationLoopToolbar, assetSelectors, modeControls
+    organisms/            ← full feature panels: trainingPanel, trainingInitModal, humanTrainingPanel,
+                             humanTrainingConfigModal, trafficPanel, storePanel
+```
+
+- **Atoms**: Singleton utilities, base classes — no UI of their own
+- **Molecules**: Single-purpose compound UI components (custom elements with templates)
+- **Organisms**: Complex feature panels (custom elements with state, side-effects, and 5+ children)
+- All custom elements are defined in `ts/ui/`; non-UI logic stays in domain directories (`ts/simulator/`, `ts/store/`, etc.)
+
 ## Architecture rules
 
 - **No runtime dependencies.** Everything (NN, physics, geometry, rendering) is hand-rolled. Don't add npm packages.
@@ -43,14 +89,14 @@
 - **Unified state-aware sensor:** `Sensor.stateAware: boolean` replaces the old `sophistication` enum. When `stateAware=true`, each ray produces two brain inputs: `[1-distance, state]` where state encodes how blocking the nearest obstacle is (0=clear, 0.5=caution, 1=stop). Legacy mode (`stateAware=false`) uses `[1-distance]` per ray. Total input layer: `stateAware ? rayCount*2+1 : rayCount+1` (the +1 is self-speed). `brainsCompatible()` validates layer dimensions to reject cross-mode swaps.
 - **Traffic control override:** `Light` has `#overridden` flag + `override(state)`/`releaseOverride()` methods. `TrafficManager.update()` skips overridden lights (pauses automatic cycling). Left-click a placed light in the world editor: first click pauses cycling (state='off'), then cycles off→green→yellow→red→release (back to regular cycling). Press `G` in the traffic simulator or training simulator (world mode) to force all lights green / restore normal cycling. Override state is ephemeral (not persisted). `LightEditor` uses `stopImmediatePropagation()` on mousedown to intercept clicks on existing lights before the base `MarkingEditor` places a new one.
 - **Human Backpropagation mode:** `html/human-training.html` is a standalone single-car simulator (`HumanBackpropSimulator extends SimulatorShell`) with no AI population/gene pool. The KEYS car's brain is trained online each frame via `NeuralNetwork.trainStep(network, inputs, targets, lr)` (sigmoid-relaxation backprop, returns `boolean` indicating weight changes) to imitate human keypresses; `Car.#autopilot` toggles brain-driven driving (pauses learning, sets `Controls.frozen = true` so keyboard listeners can't overwrite brain controls; disengaging resets all controls to `false` so the car stops immediately); `Car.#lastBrainOutput` exposes the brain's prediction for accuracy display; `Car.#brainChangedThisFrame` exposes whether weights changed for the panel's brain-activity dot. Learning is ON by default; press **L** to toggle learning on/off (wired via `KeyboardManager` toggle binding with `latchOnly: true` for press-to-toggle behavior + `KeyboardManager.setToggleActive` for initial state). The network visualizer draws green/red match rings on output neurons via the optional `match` parameter to `NetworkVisualizer.draw()` / `SimulatorShell.drawNetworkVisualizer()`. Accuracy uses a rolling 120-frame window with per-channel % (not cumulative); idle frames (no drive keys held) are skipped so the % freezes rather than decaying to 0 when you stop driving (accuracy compares the brain's output against the keys currently pressed, independent of the L learning toggle). The panel includes a brain inspector showing live weights/biases per layer. Brain persists to localStorage key `humanTrainedCar`. Car config is set via `<human-training-config-modal>` (locked to saved brain topology when a save exists).
-- **Centralised keyboard manager:** `KeyboardManager` (`ts/panels/keyboardManager.ts`) owns ALL key routing. No module registers `window` keydown/keyup directly — they call `km.setBindings()`, `km.pushBindings()`, or `km.popBindings()` instead. The manager auto-syncs `ShortcutsToolbarElement` (flash for momentary, setActive for toggle/display). Display keys (Ctrl, arrows) have `kind: 'display'` + `keys[]`; the manager lights the indicator while the physical key is held. Toggle bindings support `latchOnly: true` for press-to-toggle (keydown calls `toggleLatch()`, keyup is a no-op); default is held/latched (keydown sets physical hold, keyup releases).
+- **Centralised keyboard manager:** `KeyboardManager` (`ts/ui/atoms/keyboardManager.ts`) owns ALL key routing. No module registers `window` keydown/keyup directly — they call `km.setBindings()`, `km.pushBindings()`, or `km.popBindings()` instead. The manager auto-syncs `ShortcutsToolbarElement` (flash for momentary, setActive for toggle/display). Display keys (Ctrl, arrows) have `kind: 'display'` + `keys[]`; the manager lights the indicator while the physical key is held. Toggle bindings support `latchOnly: true` for press-to-toggle (keydown calls `toggleLatch()`, keyup is a no-op); default is held/latched (keydown sets physical hold, keyup releases).
   - `simulatorShell.ts` no longer registers a raw `v` key listener — the network-visualizer density toggle (`visDensity`) is a `momentary` binding in each subclass's KeyboardManager setup (`TrainingSimulator`, `HumanBackpropSimulator`, `TrafficSimulator`). `RaceSimulator` lacks a KeyboardManager and does not expose the binding.
   - Modal dialogs (`TrainingInitModalElement`, `HumanTrainingConfigModalElement`) use `pushBindings`/`popBindings` for the Escape key: pushed when the modal opens, popped when it closes via `#start()` or `#cancel()`. The modal receives a `KeyboardManager` reference via a `setKeyboardManager()` setter.
 - **`trainStep` per-output LR:** `NeuralNetwork.trainStep` accepts `lr: number | number[]`. When an array `[f, l, r, rev]`, per-neuron LR applies **only to the last (output) level** — hidden levels always use `lr[0]` as a single scalar to avoid out-of-bounds `undefined` → `NaN`.
 - **`trainStep` safety guards:** All weight/bias updates have `!isFinite(delta)` and `!isFinite(effectiveLR)` guards to skip corrupted values, and every updated weight/bias is clamped to `[-1, 1]` (the genetic cars' range) so backprop brains stay scale-consistent with evolved ones — the visualizer/inspector need no special handling.
 - **Experience replay in `Car`:** `Car` owns a ring buffer `#replayBuffer` (max 4096 entries) storing `{inputs, targets, isTurn}` for human-backprop training. `#trainBatch(lr)` samples a **balanced** 50/50 batch of turn vs straight entries (size `#batchSize = 16`). `#prevControlState` tracks previous frame's keys for decision-point detection — when control state changes, the frame is trained 3 extra iterations.
 - **`CarBrainAdapter.buildInput()` extracted:** A static method returning the raw input vector (offsets array) without running inference. Used by the replay buffer to store inputs. `computeControls()` delegates to it internally.
-- **Held/latched toggle extracted:** `LatchedToggle` (`ts/panels/latchedToggle.ts`) replaces 4 copies of the held/latched state machine. Toggle bindings in `KeyboardManager` create a `LatchedToggle` internally; the binding's `toggle.onActivate`/`onDeactivate` fire when the effective state changes. Click-to-latch on the toolbar is wired automatically. `latchOnly` bindings call `toggleLatch()` on keydown only (no physical hold).
+- **Held/latched toggle extracted:** `LatchedToggle` (`ts/ui/atoms/latchedToggle.ts`) replaces 4 copies of the held/latched state machine. Toggle bindings in `KeyboardManager` create a `LatchedToggle` internally; the binding's `toggle.onActivate`/`onDeactivate` fire when the effective state changes. Click-to-latch on the toolbar is wired automatically. `latchOnly` bindings call `toggleLatch()` on keydown only (no physical hold).
 - **Editors use push/pop lifecycle:** `GraphEditor` and `CorridorEditor` call `km.pushBindings(bindings)` in `enable()` and `km.popBindings()` in `disable()`. World sets root bindings (Ctrl display) via `km.setBindings()` — editor shortcuts are registered only while active. No raw `window.addEventListener` anywhere (with one exception documented below).
 - **Known exception — keyboard controls in `Controls`:** `ts/car/controls/controls.ts` retains direct `document` keydown/keyup listeners for the KEYS car's WASD/arrow controls. This is the last remaining site bypassing `KeyboardManager` — it was deferred because routing 8 keys through the manager would require either multi-key bindings (not supported by `ShortcutBinding`) or 8 separate bindings. The `Controls.frozen` flag bridges this gap for autopilot mode. Do not add new raw listeners; route new keys through `KeyboardManager`.
 
@@ -139,7 +185,7 @@ The project has a **multi-phase test suite**: **48 test files, 684 tests** (~75%
 - **Config:** `tests/visual/playwright.config.ts` — single-worker, retries 2 in CI, snapshot path template.
 - **Phase 1 (pure-logic) test modules** now cover:
   - `ts/car/physics/sensorRaycaster.ts` — ray-casting math (castRays, getReading, getReadings, getTaggedReadings)
-  - `ts/panels/latchedToggle.ts` — held/latched state machine (setPhysicalHold, toggleLatch, reset, onChange)
+  - `ts/ui/atoms/latchedToggle.ts` — held/latched state machine (setPhysicalHold, toggleLatch, reset, onChange)
   - `ts/car/controls/controls.ts` — static initialization (DUMMY/AI types, frozen flag)
   - `ts/car/loader/carLoader.ts` — pure functions (parseCarFileContent, compareCarInfoParams, allParamsMatch)
   - `ts/simulator/trafficControlUtils.ts` — buildTrafficControls, queryTrafficControlsNearCar

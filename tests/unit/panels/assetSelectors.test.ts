@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ToolbarAssetSelectors } from '../../../ts/panels/assetSelectors.js';
+import { ToolbarAssetSelectors } from '../../../ts/ui/molecules/assetSelectors.js';
 import { StoreManager } from '../../../ts/store/storeManager.js';
 import type {
   UnifiedWorldEntry,

@@ -2,7 +2,7 @@ import type { TrainingSimulator } from '../trainingSimulator.js';
 import { SpatialHashGrid } from '../../../math/spatialGrid.js';
 import type { GridSegment } from '../../../math/spatialGrid.js';
 import { TrafficControlGrid } from '../../../math/trafficControlGrid.js';
-import type { BorderMode } from '../../../panels/modeControls.js';
+import type { BorderMode } from '../../../ui/molecules/modeControls.js';
 import type { Car } from '../../../car/car.js';
 import type { SensorTrafficControl } from '../../../car/sensors/sensor.js';
 import type { Segment } from '../../../math/primitives/segment.js';

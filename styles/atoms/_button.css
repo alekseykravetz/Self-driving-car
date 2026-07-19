@@ -1,0 +1,243 @@
+/* ── Button groups ─────────────────────────────────────────────── */
+
+.btn-group-large {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-row {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+}
+.btn-row:last-child {
+  margin-bottom: 0;
+}
+.btn-row > * {
+  flex: 1;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: 6px;
+}
+.btn-group:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Large action buttons ──────────────────────────────────────── */
+
+.btn-lg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: var(--size-btn-lg);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 0 var(--space-3);
+  cursor: pointer;
+  background: var(--color-bg-active);
+  color: var(--color-text-primary);
+  font-size: var(--text-lg);
+  font-family: var(--font-ui);
+  font-weight: var(--weight-semibold);
+  transition:
+    background 0.15s,
+    transform 0.1s;
+  box-sizing: border-box;
+}
+.btn-lg:hover {
+  background: var(--color-bg-active);
+  transform: scale(1.02);
+}
+.btn-lg:active {
+  transform: scale(0.98);
+}
+.btn-lg.btn-primary {
+  background: rgba(80, 180, 80, 0.25);
+  color: var(--color-accent-green);
+  border: 1px solid var(--color-accent-green-border);
+}
+.btn-lg.btn-primary:hover {
+  background: rgba(80, 180, 80, 0.4);
+}
+.btn-lg.btn-danger {
+  background: var(--color-accent-red-bg);
+  color: var(--color-accent-red);
+  border: 1px solid var(--color-accent-red-border-strong);
+}
+.btn-lg.btn-danger:hover {
+  background: rgba(200, 60, 60, 0.35);
+}
+
+/* ── Small buttons ─────────────────────────────────────────────── */
+
+.btn-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-2);
+  cursor: pointer;
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  font-family: var(--font-ui);
+  font-weight: var(--weight-medium);
+  transition: background var(--transition-fast);
+  box-sizing: border-box;
+}
+.btn-sm:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary);
+}
+.btn-sm.btn-danger-outline {
+  border: 1px solid var(--color-accent-red-border);
+  color: var(--color-accent-red);
+}
+.btn-sm.btn-danger-outline:hover {
+  background: var(--color-accent-red-bg);
+  color: var(--color-accent-red);
+}
+.btn-sm.btn-warning-outline {
+  border: 1px solid var(--color-accent-yellow-border);
+  color: var(--color-accent-yellow);
+}
+.btn-sm.btn-warning-outline:hover {
+  background: var(--color-accent-yellow-bg);
+  color: var(--color-accent-yellow);
+}
+.btn-sm.btn-success-outline {
+  border: 1px solid var(--color-accent-green-border);
+  color: var(--color-accent-green-strong);
+}
+.btn-sm.btn-success-outline:hover {
+  background: var(--color-accent-green-bg);
+  color: var(--color-accent-green-strong);
+}
+
+/* ── Race panel button ─────────────────────────────────────────── */
+
+.race-panel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary);
+  font-size: var(--text-md);
+  font-family: var(--font-ui);
+  font-weight: var(--weight-semibold);
+  padding: 0 10px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.race-panel-btn:hover {
+  background: var(--color-border-default);
+}
+
+/* ── Store action buttons ──────────────────────────────────────── */
+
+.store-action-btn {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
+}
+.store-action-btn:hover {
+  background: var(--color-bg-hover);
+}
+.store-delete-btn:hover {
+  background: var(--color-accent-red-bg);
+  border-color: var(--color-accent-red-border-strong);
+}
+.store-export-btn:hover {
+  background: var(--color-accent-green-bg);
+  border-color: var(--color-accent-green-border);
+}
+
+/* ── Asset load button ─────────────────────────────────────────── */
+
+.asset-load-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-active);
+  color: var(--color-text-primary);
+  font-size: var(--text-md);
+  cursor: pointer;
+}
+.asset-load-btn:hover {
+  background: var(--color-border-strong);
+}
+
+/* ── Panel file-input-label (training manager) ─────────────────── */
+
+#trainingManagerPanel .file-input-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 30px;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-2);
+  cursor: pointer;
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  font-family: var(--font-ui);
+  font-weight: var(--weight-medium);
+  margin: 0;
+  transition: background var(--transition-fast);
+  box-sizing: border-box;
+}
+#trainingManagerPanel .file-input-label:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary);
+}
+
+/* ── World editor buttons ──────────────────────────────────────── */
+
+button,
+.file-input-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-text-primary);
+  font-size: 20px;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-md);
+  text-shadow: 1px 1px black;
+  cursor: pointer;
+  position: relative;
+  transition:
+    background-color 0.15s,
+    filter 0.15s,
+    box-shadow 0.15s;
+}
+
+button:hover,
+.file-input-label:hover {
+  box-shadow: 0 0 6px var(--color-text-dim);
+}

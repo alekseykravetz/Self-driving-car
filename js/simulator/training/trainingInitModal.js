@@ -1,4 +1,4 @@
-import { TRAINING_INIT_MODAL_TEMPLATE } from './templates/trainingInitModalTemplate.js';
+import { TRAINING_INIT_MODAL_TEMPLATE } from '../../ui/organisms/trainingInitModalTemplate.js';
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';

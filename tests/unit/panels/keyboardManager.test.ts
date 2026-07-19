@@ -3,11 +3,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   KeyboardManager,
   ShortcutBinding,
-} from '../../../ts/panels/keyboardManager.js';
+} from '../../../ts/ui/atoms/keyboardManager.js';
 import {
   ShortcutDef,
   ShortcutsToolbarElement,
-} from '../../../ts/panels/shortcutsToolbar.js';
+} from '../../../ts/ui/molecules/shortcutsToolbar.js';
 
 function createToolbarMock() {
   return {

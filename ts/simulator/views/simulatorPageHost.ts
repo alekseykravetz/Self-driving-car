@@ -1,7 +1,7 @@
-import type { WorldToolbarElement } from '../../panels/worldToolbar.js';
-import type { LayoutToolbarElement } from '../panels/layoutToolbar.js';
-import type { AnimationLoopToolbarElement } from '../panels/animationLoopToolbar.js';
-import type { WorldLayersToolbarElement } from '../../panels/worldLayersToolbar.js';
+import type { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
+import type { LayoutToolbarElement } from '../../ui/molecules/layoutToolbar.js';
+import type { AnimationLoopToolbarElement } from '../../ui/molecules/animationLoopToolbar.js';
+import type { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
 
 /**
  * SimulatorPageHost — lightweight configuration object that carries the

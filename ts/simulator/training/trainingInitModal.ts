@@ -1,11 +1,11 @@
-import { TRAINING_INIT_MODAL_TEMPLATE } from './templates/trainingInitModalTemplate.js';
+import { TRAINING_INIT_MODAL_TEMPLATE } from '../../ui/organisms/trainingInitModalTemplate.js';
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { inferHiddenLayers } from './genetics/poolManager.js';
-import type { KeyboardManager } from '../../panels/keyboardManager.js';
+import type { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
 
 export interface TrainingInitDefaults {
   carCount: number;
