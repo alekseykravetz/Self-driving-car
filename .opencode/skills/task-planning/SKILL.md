@@ -105,7 +105,8 @@ If none, write "None.">
 - Reference real symbol names — grep first if you are not sure of the exact name.
 - Pull architecture constraints from `AGENTS.md` by name ("see AGENTS.md § Sensor decoupled"), do not paraphrase them.
 - If the change touches the layer hierarchy, draw the before/after import edges explicitly.
-- One plan MD per task. If the request decomposes into independent sub-features, write one MD per sub-feature with a `01-`, `02-` prefix (mirrors the existing `tasks/archive/20260710-sensors-classified/` layout).
+- One plan MD per task. If the request decomposes into independent sub-features or multiple implementation phases, write one MD per phase with a `01-`, `02-` prefix showing implementation order (mirrors the existing `tasks/archive/20260710-sensors-classified/` layout). The prefix numbers reflect the order the build agent should execute them — don't reorder later.
+- If a single plan MD has multiple numbered `## Implementation` sections (e.g. `### Phase 1`, `### Phase 2`), the plan filename itself gets the first phase's prefix: `tasks/01-<slug>.md`.
 - Run `npm run fix:all` is NOT your job — that's the build agent's. But list it in Acceptance criteria.
 - Run `npm test` (vitest) is the build agent's job — list it in Acceptance criteria so the build agent runs tests before reporting done.
 
