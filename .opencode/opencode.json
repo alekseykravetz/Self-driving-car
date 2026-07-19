@@ -25,14 +25,17 @@
   },
   "command": {
     "test": {
+      "template": "Run the vitest unit tests with `npm test`. Report the results, including any failures or errors.",
       "description": "Run all vitest unit tests",
       "agent": "build"
     },
     "fix": {
+      "template": "Format and lint the entire codebase by running `npm run fix:all`. Run `git diff` afterward to confirm changes.",
       "description": "Format + lint fix the entire codebase",
       "agent": "build"
     },
     "start": {
+      "template": "Start the dev server by running `npm start`. This runs tsc --watch, serve on port 9090, and the format/lint watcher concurrently.",
       "description": "Start dev server (tsc watch + serve + lint/format watcher)",
       "agent": "build"
     }
