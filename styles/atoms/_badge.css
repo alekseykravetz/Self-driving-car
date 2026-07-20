@@ -78,6 +78,13 @@
 
 /* ── Selected info ─────────────────────────────────────────────── */
 
+.selected-row {
+  height: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .selected-tag {
   font-size: var(--text-base);
 }
