@@ -79,7 +79,7 @@ on render frames. The shared `isPaused()` reads the play/pause toggle owned by
 instead of `update()`. Subclasses call `this.animate(0)` once at the end of their
 constructor to start the loop.
 
-### Animation Loop Toolbar (`ts/simulator/panels/animationLoopToolbar.ts`)
+### Animation Loop Toolbar (`ts/ui/molecules/animationLoopToolbar.ts`)
 
 The `<animation-loop-toolbar>` custom element provides real-time controls and monitoring:
 
@@ -156,7 +156,7 @@ The central training orchestrator — a custom HTML element that owns both the U
 | `ShortcutsToolbarElement`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary + click-latch toggles) |
 
 > `AnimationLoopToolbarElement`, `WorldToolbarElement`, and `ShortcutsToolbarElement`
-> live in the shared `ts/panels/` directory (not the simulator domain) and are reused
+> live in the shared `ts/ui/molecules/` directory (not the simulator domain) and are reused
 > across the simulator, race, Live Traffic Jam, and World Editor pages.
 
 Each element:

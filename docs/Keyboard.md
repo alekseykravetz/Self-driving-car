@@ -11,7 +11,7 @@ calls across editors and simulators.
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                    KeyboardManager                            │
-│  (ts/panels/keyboardManager.ts)                               │
+│  (ts/ui/atoms/keyboardManager.ts)                            │
 │                                                               │
 │  - Single window keydown/keyup listener pair                  │
 │  - Registry: ShortcutBinding[] (root + pushed contexts)       │
@@ -23,7 +23,7 @@ calls across editors and simulators.
                        ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                 ShortcutsToolbarElement                       │
-│  (ts/panels/shortcutsToolbar.ts)                              │
+│  (ts/ui/molecules/shortcutsToolbar.ts)                        │
 │                                                               │
 │  - Purely presentational (renders key-cap indicators)         │
 │  - No key listeners of its own                                │
@@ -97,7 +97,7 @@ Example — a toggle key:
 
 ---
 
-## LatchedToggle (`ts/panels/latchedToggle.ts`)
+## LatchedToggle (`ts/ui/atoms/latchedToggle.ts`)
 
 A reusable state machine that replaces four copies of identical held/latched
 boilerplate (previously in `GraphEditor`, `CorridorEditor`, and `TrafficSimulator`).
@@ -170,10 +170,10 @@ HumanBackpropSimulator.#initToolbar():
 
 | File                                                   | Role                                                                                          |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `ts/panels/keyboardManager.ts`                         | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync |
-| `ts/panels/latchedToggle.ts`                           | Held/latched state machine (extracted from 4 prior copies)                                    |
-| `ts/panels/shortcutsToolbar.ts`                        | `<shortcuts-toolbar>` custom element — purely presentational rendering of key indicators      |
-| `ts/panels/templates/shortcutsToolbarTemplate.ts`      | Static HTML template for the toolbar                                                          |
+| `ts/ui/atoms/keyboardManager.ts`                       | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync |
+| `ts/ui/atoms/latchedToggle.ts`                         | Held/latched state machine (extracted from 4 prior copies)                                    |
+| `ts/ui/molecules/shortcutsToolbar.ts`                  | `<shortcuts-toolbar>` custom element — purely presentational rendering of key indicators      |
+| `ts/ui/molecules/shortcutsToolbarTemplate.ts`          | Static HTML template for the toolbar                                                          |
 | `ts/world/editors/worldEditor.ts`                      | Creates `KeyboardManager`, sets root bindings, passes to editors                              |
 | `ts/world/editors/graphEditor.ts`                      | Defines shortcut bindings for S/E/C/O/H keys, calls `pushBindings`/`popBindings`              |
 | `ts/world/editors/corridorEditor.ts`                   | Defines shortcut bindings for T key, calls `pushBindings`/`popBindings`                       |

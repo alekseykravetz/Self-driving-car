@@ -123,7 +123,7 @@ math/primitives (Point, Segment, Polygon, Envelope)
   → car/car, car/loader
   → neural-network
   → store
-  → panels: templates, custom elements (world-toolbar, layout-toolbar, etc.)
+  → ui: molecules + organisms (world-toolbar, layout-toolbar, training-panel, etc.)
   → simulator: spatialGridUtils, training modes, genetics, panels
   → simulator/core (SimulatorShell)
   → simulator/training/trainingSimulator
@@ -357,33 +357,67 @@ These are importable by any file that needs them (World, editors, markings) via
 | `store/serialization.ts`            | `safeJsonParse`, `stripFileExtension` (moved from utils.ts)                                            |
 | `types.ts`                          | Global type/interface declarations                                                                     |
 
-### 9. UI Panels (`ts/panels/` + `ts/simulator/panels/`)
+### 9. UI Components (`ts/ui/` — Atomic Design)
 
-The `<world-toolbar>` custom element was decomposed into smaller helper classes
-for clarity — the main element remains as a composition root.
+All UI components follow **Atomic Design** (Brad Frost methodology), organized
+into three layers under `ts/ui/`:
 
-| Module                    | Tag                        | Responsibility                                                                |
-| ------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
-| `worldToolbar.ts`         | `<world-toolbar>`          | Composition root: file I/O, border/tracking mode, camera debug toggle         |
-| `modeControls.ts`         | —                          | `ToolbarModeControls` — border/tracking/viewport mode button wiring           |
-| `assetSelectors.ts`       | —                          | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding      |
-| `worldLayersToolbar.ts`   | `<world-layers-toolbar>`   | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle      |
-| `layoutToolbar.ts`        | `<layout-toolbar>`         | Layout toggle, camera/network/minimap visibility                              |
-| `animationLoopToolbar.ts` | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control)                         |
-| `shortcutsToolbar.ts`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |
+| Layer         | Directory          | Description                                                                     |
+| ------------- | ------------------ | ------------------------------------------------------------------------------- |
+| **Atoms**     | `ts/ui/atoms/`     | Singleton utilities, base classes — no UI of their own                          |
+| **Molecules** | `ts/ui/molecules/` | Single-purpose compound UI components (custom elements with templates)          |
+| **Organisms** | `ts/ui/organisms/` | Complex feature panels (custom elements with state, side-effects, and children) |
 
-> `worldToolbar.ts` lives in the shared `ts/panels/` directory (not the
-> simulator domain) because it is reused by the simulator, race, Live Traffic
-> Jam, and World Editor pages. Its World group exposes editor-only Save /
-> Dispose / OSM-Import buttons (revealed via `showWorldEditorActions()`), and
+**Atom-level files:**
+
+| Module               | Responsibility                                                             |
+| -------------------- | -------------------------------------------------------------------------- |
+| `keyboardManager.ts` | Central keyboard router: owns window listeners, `LatchedToggle` management |
+| `latchedToggle.ts`   | Held/latched state machine (replaces 4 prior copies)                       |
+
+**Molecule-level components:**
+
+| Module                            | Tag                        | Responsibility                                                                |
+| --------------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
+| `worldToolbar.ts`                 | `<world-toolbar>`          | Composition root: file I/O, border/tracking mode, camera debug toggle         |
+| `worldToolbarTemplate.ts`         | —                          | HTML template for the toolbar                                                 |
+| `modeControls.ts`                 | —                          | `ToolbarModeControls` — border/tracking/viewport mode button wiring           |
+| `assetSelectors.ts`               | —                          | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding      |
+| `worldLayersToolbar.ts`           | `<world-layers-toolbar>`   | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle      |
+| `worldLayersToolbarTemplate.ts`   | —                          | HTML template for the layers toolbar                                          |
+| `layoutToolbar.ts`                | `<layout-toolbar>`         | Layout toggle, camera/network/minimap visibility                              |
+| `layoutToolbarTemplate.ts`        | —                          | HTML template for the layout toolbar                                          |
+| `animationLoopToolbar.ts`         | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control)                         |
+| `animationLoopToolbarTemplate.ts` | —                          | HTML template for the animation loop toolbar                                  |
+| `shortcutsToolbar.ts`             | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |
+| `shortcutsToolbarTemplate.ts`     | —                          | HTML template for the shortcuts toolbar                                       |
+| `editorToolbar.ts`                | `<editor-toolbar>`         | Editor-mode buttons (Graph, Marking, Stop, Start, Light, etc.)                |
+| `editorToolbarTemplate.ts`        | —                          | HTML template for the editor toolbar                                          |
+
+**Organism-level panels:**
+
+| Module                         | Tag                             | Responsibility                                            |
+| ------------------------------ | ------------------------------- | --------------------------------------------------------- |
+| `trainingPanel.ts`             | `<training-panel>`              | Training UI + genetic algorithm + car generation          |
+| `trainingPanelTemplate.ts`     | —                               | HTML template for the training panel                      |
+| `trainingInitModal.ts`         | `<training-init-modal>`         | Training init modal (params + car config + brain source)  |
+| `trainingInitModalTemplate.ts` | —                               | HTML template for the init modal                          |
+| `humanTrainingPanel.ts`        | `<human-training-panel>`        | Human backpropagation training info display               |
+| `humanTrainingConfigModal.ts`  | `<human-training-config-modal>` | Car config modal for human backprop mode                  |
+| `trafficPanel.ts`              | `<traffic-panel>`               | Live Traffic Jam: per-car list, select/remove/clear/pause |
+| `storePanel.ts`                | `<store-panel>`                 | Landing-page read-only viewer/manager                     |
+| `storePanelTemplate.ts`        | —                               | HTML template for the store panel                         |
+
+> All UI components live under `ts/ui/` following Atomic Design. `worldToolbar.ts`
+> is a **molecule** reused by the simulator, race, Live Traffic Jam, and
+> World Editor pages. Its World group exposes editor-only Save / Dispose /
+> OSM-Import buttons (revealed via `showWorldEditorActions()`), and
 > simulator-only groups (Car, Borders, Tracking, Debug) are hidden in the editor
-> via `hideGroups(...)`. `layoutToolbar.ts` and `animationLoopToolbar.ts` remain
-> in `ts/simulator/panels/`. `shortcutsToolbar.ts` also lives in the shared
-> `ts/panels/` directory and is used by the World Editor, Live Traffic Jam, and
-> Training Simulator pages; each page calls `setShortcuts(defs)` with only the
-> keys it uses. Toggle indicators (`O` one-way, `R` reverse heading) are
-> click-latchable; the owner keeps the latch state (effective = latched OR
-> key-held).
+> via `hideGroups(...)`. `shortcutsToolbar.ts` (molecule) is used by the World
+> Editor, Live Traffic Jam, and Training Simulator pages; each page calls
+> `setShortcuts(defs)` with only the keys it uses. Toggle indicators (`O`
+> one-way, `R` reverse heading) are click-latchable; the owner keeps the latch
+> state (effective = latched OR key-held).
 
 > All three floating toolbars are grouped inside the `#simulatorToolbar` flex
 > container (top of the page, panels left-to-right with a gap). The pause state
@@ -565,6 +599,26 @@ class Corridor {
 | **Spatial filtering**      | Binary-search or Manhattan-distance to reduce per-car collision checks                                   |
 | **Strategy pattern**       | `TrainingSimulator` delegates `update()`/`draw()` to `SimpleTrainingStrategy` or `WorldTrainingStrategy` |
 | **Pure functions**         | `poolManager.ts`, `trafficFactory.ts` — stateless logic extracted from UI components                     |
+
+---
+
+## Design System
+
+The project uses an **Atomic Design** CSS architecture with design tokens,
+documented fully in [DesignSystem.md](DesignSystem.md). Key rules:
+
+- **Design tokens** (`styles/tokens.css`) are the single source of truth for
+  colors, typography, spacing, radii, shadows, transitions, and sizing.
+- **Never use raw values** — always reference `var(--color-*)`, `var(--space-*)`,
+  `var(--text-*)`, `var(--radius-*)` tokens.
+- **CSS follows the same Atomic Design hierarchy** as the TS components:
+  atoms → molecules → organisms → templates → pages.
+- **Each page loads one entry CSS** (`simulator.css`, `landing.css`, etc.) that
+  imports the shared `index.css` (tokens + atoms + molecules + organisms) plus
+  its template.
+
+See [DesignSystem.md](DesignSystem.md) for the full token reference, file
+inventory, and usage rules.
 
 ---
 
