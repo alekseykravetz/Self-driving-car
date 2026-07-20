@@ -1,7 +1,7 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
-import { KeyboardManager } from '../../panels/keyboardManager.js';
-import type { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
+import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { Point } from '../../math/primitives/point.js';
 import type { CarInfo } from '../../car/car.js';
@@ -41,8 +41,8 @@ import { downloadCarFiles } from '../training/genetics/storageManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { pxPerFrameToKmh } from '../../math/worldUnits.js';
 import type { IWorld } from '../../world/types.js';
-import type { HumanTrainingPanelElement } from './humanTrainingPanel.js';
-import type { HumanTrainingConfigModalElement } from './humanTrainingConfigModal.js';
+import type { HumanTrainingPanelElement } from '../../ui/organisms/humanTrainingPanel.js';
+import type { HumanTrainingConfigModalElement } from '../../ui/organisms/humanTrainingConfigModal.js';
 
 export class HumanBackpropSimulator extends SimulatorShell {
   #mode: 'simple' | 'world';

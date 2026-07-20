@@ -31,7 +31,7 @@ From the just-complemented change, list every area touched:
 | `ts/car/` (physics, sensors, controls, brain)   | `docs/Physics.md`, `docs/NeuralNetwork.md` |
 | `ts/world/`, markings, lights                   | `docs/WorldEditor.md`                      |
 | `ts/simulator/`, training, race, traffic shells | `docs/Simulators.md`, `docs/Race.md`       |
-| `ts/panels/`, keyboard manager, toolbars        | `docs/Keyboard.md`, `docs/Controls.md`     |
+| `ts/ui/`, keyboard manager, toolbars            | `docs/Keyboard.md`, `docs/Controls.md`     |
 | `ts/rendering/`, viewport, camera               | `docs/Viewport.md`, `docs/Camera.md`       |
 | `ts/store/`, serialization, save files          | `docs/SaveLoad.md`, `docs/Store.md`        |
 | `ts/math/`, primitives, grids, heatmaps         | `docs/Math.md`, `docs/Units.md`            |

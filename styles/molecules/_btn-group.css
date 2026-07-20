@@ -1,0 +1,30 @@
+.btn-group-large {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-row {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+}
+
+.btn-row:last-child {
+  margin-bottom: 0;
+}
+
+.btn-row > * {
+  flex: 1;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: 6px;
+}
+
+.btn-group:last-child {
+  margin-bottom: 0;
+}

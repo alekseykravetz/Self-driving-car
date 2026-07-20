@@ -1,0 +1,211 @@
+/* ── Store Panel custom element ────────────────────────────────────── */
+store-panel {
+  display: block;
+  grid-column: span 3;
+  min-width: 0;
+}
+
+.store-panel {
+  background: var(--color-bg-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) 28px;
+  max-height: 500px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.store-panel:hover {
+  border-color: var(--color-border-default);
+  transform: translateY(-2px);
+}
+
+.store-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.store-panel-title {
+  font-size: 1.5rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ── Tabs ──────────────────────────────────────────────────────────── */
+.store-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.store-tab {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--color-text-dim);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.store-tab:hover {
+  background: var(--color-bg-surface-raised);
+  color: var(--color-text-primary);
+}
+
+.store-tab.active {
+  background: var(--color-accent-indigo-bg);
+  border-color: var(--color-accent-indigo-border);
+  color: var(--color-text-primary);
+}
+
+.store-tab-count {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: var(--weight-semibold);
+}
+
+.store-tab.active .store-tab-count {
+  color: var(--color-text-muted);
+}
+
+/* ── Tab content ───────────────────────────────────────────────────── */
+.store-tab-content {
+  display: none;
+}
+
+.store-tab-content.active {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* ── Table ─────────────────────────────────────────────────────────── */
+.store-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.store-table th {
+  text-align: left;
+  padding: var(--space-2) 10px;
+  color: var(--color-text-muted);
+  font-weight: var(--weight-semibold);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  border-bottom: 1px solid var(--color-border-subtle);
+  position: sticky;
+  top: 0;
+  background: var(--color-bg-app);
+  z-index: 1;
+}
+
+.store-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.store-table th.sortable:hover {
+  color: var(--color-text-muted);
+}
+
+.store-table th.sortable::after {
+  content: '';
+  display: inline-block;
+  margin-left: var(--space-1);
+  opacity: 0.4;
+}
+
+.store-table th.sortable.sort-asc::after {
+  content: '\25B2';
+  opacity: 0.9;
+}
+
+.store-table th.sortable.sort-desc::after {
+  content: '\25BC';
+  opacity: 0.9;
+}
+
+.store-table td {
+  padding: var(--space-2) 10px;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.store-table tr:last-child td {
+  border-bottom: none;
+}
+
+.store-row-active {
+  background: var(--color-accent-indigo-bg);
+}
+
+.store-marker {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.store-source {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-text-muted);
+}
+
+.store-empty {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--color-text-dim);
+  font-style: italic;
+}
+
+/* ── Actions ───────────────────────────────────────────────────────── */
+.store-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.store-action-btn {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
+}
+
+.store-action-btn:hover {
+  background: var(--color-bg-hover);
+}
+
+.store-delete-btn:hover {
+  background: var(--color-accent-red-bg);
+  border-color: var(--color-accent-red-border-strong);
+}
+
+.store-export-btn:hover {
+  background: var(--color-accent-green-bg);
+  border-color: var(--color-accent-green-border);
+}
+
+.store-table input[type='radio'] {
+  accent-color: var(--color-accent-indigo);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}

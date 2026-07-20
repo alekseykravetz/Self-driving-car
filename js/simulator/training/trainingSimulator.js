@@ -1,7 +1,7 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import { SimpleTrainingStrategy } from './modes/simpleModeBehavior.js';
 import { WorldTrainingStrategy } from './modes/worldModeBehavior.js';
-import { KeyboardManager } from '../../panels/keyboardManager.js';
+import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
 import { discardStoredPool, savePoolToStorage, } from './genetics/storageManager.js';

@@ -1,0 +1,56 @@
+#simulatorLayout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  gap: 0;
+}
+
+#simulatorLayout canvas {
+  display: block;
+}
+
+#rightPanel {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  order: 10;
+}
+
+#rightPanel.hidden {
+  display: none;
+}
+
+#gameCanvas {
+  background: var(--color-bg-canvas);
+  display: block;
+}
+
+#networkCanvas {
+  background: var(--color-bg-dark);
+  display: block;
+}
+
+#miniMapCanvas {
+  background: var(--color-bg-dark);
+  display: block;
+}
+
+#miniMapCanvas.floating {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 5;
+  outline: 2px solid var(--color-bg-dark);
+}
+
+#cameraCanvas {
+  background-image: linear-gradient(#8cf, white 70%);
+  display: block;
+  flex-shrink: 0;
+}
+
+#topControls .file-input-label {
+  position: static;
+  margin: 0;
+}

@@ -4,7 +4,7 @@
  * Allows selecting active world/car for use by simulator, race, and world editor.
  */
 import { StoreManager } from './storeManager.js';
-import { STORE_PANEL_TEMPLATE } from './templates/storePanelTemplate.js';
+import { STORE_PANEL_TEMPLATE } from '../ui/organisms/storePanelTemplate.js';
 import { stripFileExtension } from './serialization.js';
 // File-scope helpers.
 /** Format a car's hidden-layer pattern, e.g. "6" or "16,16". */

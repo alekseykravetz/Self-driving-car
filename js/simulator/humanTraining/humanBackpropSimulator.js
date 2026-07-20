@@ -1,5 +1,5 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
-import { KeyboardManager } from '../../panels/keyboardManager.js';
+import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { Point } from '../../math/primitives/point.js';
 import { Car as CarClass } from '../../car/car.js';

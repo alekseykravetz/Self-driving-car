@@ -36,45 +36,45 @@ Read each one. Note:
 
 Read the project's CSS files (usually `styles/style.css`). Extract all design tokens as Pencil variables:
 
-| CSS concept | Pencil equivalent |
-|---|---|
-| `background: #0f0f14` | `fill: "#0f0f14"` or `$bg` variable |
-| `color: #e8e8e8` | `fill: "#e8e8e8"` for text |
-| `font-family: 'Inter', sans-serif` | `fontFamily: "Inter"` |
-| `font-size: 13px` | `fontSize: 13` |
-| `font-weight: 600` | `fontWeight: "600"` |
-| `border-radius: 8px` | `cornerRadius: 8` |
-| `gap: 8px` | `gap: 8` |
-| `padding: 12px` | `padding: 12` |
-| `opacity: 0.6` | `opacity: 0.6` |
+| CSS concept                        | Pencil equivalent                   |
+| ---------------------------------- | ----------------------------------- |
+| `background: #0f0f14`              | `fill: "#0f0f14"` or `$bg` variable |
+| `color: #e8e8e8`                   | `fill: "#e8e8e8"` for text          |
+| `font-family: 'Inter', sans-serif` | `fontFamily: "Inter"`               |
+| `font-size: 13px`                  | `fontSize: 13`                      |
+| `font-weight: 600`                 | `fontWeight: "600"`                 |
+| `border-radius: 8px`               | `cornerRadius: 8`                   |
+| `gap: 8px`                         | `gap: 8`                            |
+| `padding: 12px`                    | `padding: 12`                       |
+| `opacity: 0.6`                     | `opacity: 0.6`                      |
 
 For design tokens, set Pencil variables via `SetVariables()`:
 
 ```js
 SetVariables({
-  "bg-app": {type:"color",value:"#0f0f14"},
-  "bg-panel": {type:"color",value:"#0f0f14eb"},
-  "bg-toolbar": {type:"color",value:"#00000099"},
-  "bg-canvas": {type:"color",value:"#2a5"},
-  "bg-card": {type:"color",value:"rgba(255,255,255,0.04)"},
-  "text-primary": {type:"color",value:"#e8e8e8"},
-  "text-secondary": {type:"color",value:"#888888"},
-  "text-muted": {type:"color",value:"rgba(255,255,255,0.5)"},
-  "border-subtle": {type:"color",value:"rgba(255,255,255,0.08)"},
-  "border-toolbar": {type:"color",value:"#ffffff26"},
-  "accent-green": {type:"color",value:"#7ddf7d"},
-  "accent-blue": {type:"color",value:"#5cb8ff"},
-  "accent-yellow": {type:"color",value:"#ffcc44"},
-  "font-body": {type:"string",value:"Inter"},
-  "font-mono": {type:"string",value:"JetBrains Mono"},
-  "radius-sm": {type:"number",value:6},
-  "radius-md": {type:"number",value:8},
-  "radius-lg": {type:"number",value:12},
-  "gap-xs": {type:"number",value:4},
-  "gap-sm": {type:"number",value:6},
-  "gap-md": {type:"number",value:10},
-  "gap-lg": {type:"number",value:16},
-})
+  'bg-app': { type: 'color', value: '#0f0f14' },
+  'bg-panel': { type: 'color', value: '#0f0f14eb' },
+  'bg-toolbar': { type: 'color', value: '#00000099' },
+  'bg-canvas': { type: 'color', value: '#2a5' },
+  'bg-card': { type: 'color', value: 'rgba(255,255,255,0.04)' },
+  'text-primary': { type: 'color', value: '#e8e8e8' },
+  'text-secondary': { type: 'color', value: '#888888' },
+  'text-muted': { type: 'color', value: 'rgba(255,255,255,0.5)' },
+  'border-subtle': { type: 'color', value: 'rgba(255,255,255,0.08)' },
+  'border-toolbar': { type: 'color', value: '#ffffff26' },
+  'accent-green': { type: 'color', value: '#7ddf7d' },
+  'accent-blue': { type: 'color', value: '#5cb8ff' },
+  'accent-yellow': { type: 'color', value: '#ffcc44' },
+  'font-body': { type: 'string', value: 'Inter' },
+  'font-mono': { type: 'string', value: 'JetBrains Mono' },
+  'radius-sm': { type: 'number', value: 6 },
+  'radius-md': { type: 'number', value: 8 },
+  'radius-lg': { type: 'number', value: 12 },
+  'gap-xs': { type: 'number', value: 4 },
+  'gap-sm': { type: 'number', value: 6 },
+  'gap-md': { type: 'number', value: 10 },
+  'gap-lg': { type: 'number', value: 16 },
+});
 ```
 
 ### Step 3 — Capture visual reference with Playwright
@@ -84,7 +84,11 @@ Use Playwright to take screenshots of every page. Even for canvas-heavy apps, sc
 ```js
 // Start a browser, navigate, screenshot each page
 await page.goto('http://localhost:9090/');
-await page.screenshot({ path: 'screenshot-landing.png', fullPage: true, type: 'png' });
+await page.screenshot({
+  path: 'screenshot-landing.png',
+  fullPage: true,
+  type: 'png',
+});
 
 await page.goto('http://localhost:9090/html/simulator.html');
 await page.screenshot({ path: 'screenshot-simulator.png', type: 'png' });
@@ -128,6 +132,7 @@ document
 ```
 
 **Rules:**
+
 - Each screen is a top-level frame (1400×900 for standard, proportional for landing).
 - Use `clip: true` on screen frames to prevent overflow.
 - Keep only 1-2 component frames with reusable components needed by the screens.
@@ -219,18 +224,30 @@ Extract repeated UI patterns into reusable components:
 ```js
 // Toolbar button (32×32, dark bg, rounded)
 ToolbarBtn = Insert(componentsFrame, {
-  type: "frame", name: "ToolbarBtn", reusable: true,
-  width: 32, height: 32,
-  fill: "#ffffff12", cornerRadius: 5,
-  justifyContent: "center", alignItems: "center",
-  children: [{
-    type: "text", name: "Icon", fill: "#ffffff",
-    content: "🔘", fontFamily: "Inter", fontSize: 16
-  }]
+  type: 'frame',
+  name: 'ToolbarBtn',
+  reusable: true,
+  width: 32,
+  height: 32,
+  fill: '#ffffff12',
+  cornerRadius: 5,
+  justifyContent: 'center',
+  alignItems: 'center',
+  children: [
+    {
+      type: 'text',
+      name: 'Icon',
+      fill: '#ffffff',
+      content: '🔘',
+      fontFamily: 'Inter',
+      fontSize: 16,
+    },
+  ],
 });
 ```
 
 Common components to extract:
+
 - **ToolbarBtn** — 32×32 icon button for toolbar
 - **BtnLg** — full-width action button (38px height, 8px radius)
 - **StatRow** — emoji + label + value in a row
@@ -251,29 +268,29 @@ After building screens, verify each one:
 
 ### CSS → Pencil property mapping reference
 
-| HTML/CSS | Pencil |
-|---|---|
-| `display: flex; flex-direction: column;` | `layout: "vertical"` |
-| `display: flex; flex-direction: row;` | `layout: "horizontal"` (default) |
-| `gap: 8px` | `gap: 8` |
-| `padding: 8px` | `padding: 8` |
-| `padding: 4px 12px` | `padding: [4, 12]` |
-| `padding: 4px 8px 4px 12px` | `padding: [4, 12, 4, 8]` |
-| `justify-content: center` | `justifyContent: "center"` |
-| `justify-content: space-between` | `justifyContent: "space_between"` |
-| `align-items: center` | `alignItems: "center"` |
-| `flex: 1` | `width: "fill_container"` |
-| `border-radius: 8px` | `cornerRadius: 8` |
-| `border: 1px solid rgba(...)` | `stroke: "rgba(...)", strokeWidth: 1` |
-| `overflow: hidden` | `clip: true` |
-| `font-family: 'Inter'` | `fontFamily: "Inter"` |
-| `font-size: 13px` | `fontSize: 13` |
-| `font-weight: 700` | `fontWeight: "700"` |
-| `letter-spacing: 1px` | `letterSpacing: 1` |
-| `color: #e8e8e8` | `fill: "#e8e8e8"` |
-| `text-transform: uppercase` | just use uppercase in `content` |
-| `background: rgba(0,0,0,0.6)` | `fill: "#00000099"` (hex with alpha) |
-| `box-shadow` | `effect: { type: "shadow", ... }` |
+| HTML/CSS                                 | Pencil                                |
+| ---------------------------------------- | ------------------------------------- |
+| `display: flex; flex-direction: column;` | `layout: "vertical"`                  |
+| `display: flex; flex-direction: row;`    | `layout: "horizontal"` (default)      |
+| `gap: 8px`                               | `gap: 8`                              |
+| `padding: 8px`                           | `padding: 8`                          |
+| `padding: 4px 12px`                      | `padding: [4, 12]`                    |
+| `padding: 4px 8px 4px 12px`              | `padding: [4, 12, 4, 8]`              |
+| `justify-content: center`                | `justifyContent: "center"`            |
+| `justify-content: space-between`         | `justifyContent: "space_between"`     |
+| `align-items: center`                    | `alignItems: "center"`                |
+| `flex: 1`                                | `width: "fill_container"`             |
+| `border-radius: 8px`                     | `cornerRadius: 8`                     |
+| `border: 1px solid rgba(...)`            | `stroke: "rgba(...)", strokeWidth: 1` |
+| `overflow: hidden`                       | `clip: true`                          |
+| `font-family: 'Inter'`                   | `fontFamily: "Inter"`                 |
+| `font-size: 13px`                        | `fontSize: 13`                        |
+| `font-weight: 700`                       | `fontWeight: "700"`                   |
+| `letter-spacing: 1px`                    | `letterSpacing: 1`                    |
+| `color: #e8e8e8`                         | `fill: "#e8e8e8"`                     |
+| `text-transform: uppercase`              | just use uppercase in `content`       |
+| `background: rgba(0,0,0,0.6)`            | `fill: "#00000099"` (hex with alpha)  |
+| `box-shadow`                             | `effect: { type: "shadow", ... }`     |
 
 ### Important constraints
 

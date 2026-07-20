@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LatchedToggle } from '../../../ts/panels/latchedToggle.js';
+import { LatchedToggle } from '../../../ts/ui/atoms/latchedToggle.js';
 
 describe('LatchedToggle', () => {
   it('initial state is inactive', () => {

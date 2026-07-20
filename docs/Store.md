@@ -15,12 +15,12 @@ store/
 
 ### Components
 
-| File                                       | Role                                                                                                                                                                      |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ts/store/types.ts`                        | Type definitions (`StoreManifest`, `StoreWorldEntry`, `StoreCarEntry`, `LocalStorageEntry`, `LoadedWorldEntry`, `LoadedCarEntry`, `UnifiedWorldEntry`, `UnifiedCarEntry`) |
-| `ts/store/storeManager.ts`                 | Singleton: fetches manifest + all assets, holds user-loaded assets + editor world, manages active selection by id                                                         |
-| `ts/store/storePanel.ts`                   | `<store-panel>` custom element — read-only viewer/manager for the landing page                                                                                            |
-| `ts/store/templates/storePanelTemplate.ts` | HTML template for the panel                                                                                                                                               |
+| File                                    | Role                                                                                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ts/store/types.ts`                     | Type definitions (`StoreManifest`, `StoreWorldEntry`, `StoreCarEntry`, `LocalStorageEntry`, `LoadedWorldEntry`, `LoadedCarEntry`, `UnifiedWorldEntry`, `UnifiedCarEntry`) |
+| `ts/store/storeManager.ts`              | Singleton: fetches manifest + all assets, holds user-loaded assets + editor world, manages active selection by id                                                         |
+| `ts/ui/organisms/storePanel.ts`         | `<store-panel>` custom element — read-only viewer/manager for the landing page                                                                                            |
+| `ts/ui/organisms/storePanelTemplate.ts` | HTML template for the panel                                                                                                                                               |
 
 ### Asset sources
 

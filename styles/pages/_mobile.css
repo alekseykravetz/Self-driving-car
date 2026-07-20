@@ -1,0 +1,94 @@
+@media (max-width: 768px) {
+  .landing-header {
+    padding: var(--space-8) var(--space-4) var(--space-4);
+  }
+  .landing-header h1 {
+    font-size: 1.6rem;
+  }
+  .landing-logo {
+    width: 40px;
+    height: 40px;
+  }
+  .landing-header .subtitle {
+    font-size: 0.95rem;
+  }
+  .landing-sections {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+  .landing-card {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  store-panel {
+    grid-column: span 1;
+  }
+  .store-panel {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .store-tab-content[data-content='worlds'] .store-table th:nth-child(n + 3),
+  .store-tab-content[data-content='worlds'] .store-table td:nth-child(n + 3),
+  .store-tab-content[data-content='cars'] .store-table th:nth-child(n + 3),
+  .store-tab-content[data-content='cars'] .store-table td:nth-child(n + 3) {
+    display: none;
+  }
+
+  .store-tab-content[data-content='localStorage'] .store-table th:nth-child(2),
+  .store-tab-content[data-content='localStorage'] .store-table td:nth-child(2) {
+    display: none;
+  }
+
+  #topControls [data-group='viewport'],
+  #topControls [data-group='viewport-sep'],
+  #topControls [data-group='borders'],
+  #topControls [data-group='borders-sep'] {
+    display: none;
+  }
+
+  .landing-card a[href='html/race.html'],
+  .landing-card a[href='html/race.html?mode=camera'] {
+    display: none;
+  }
+
+  #layoutToolbar {
+    display: none;
+  }
+
+  #trainingManagerPanel {
+    min-width: 140px;
+    max-width: 140px;
+    width: 140px;
+  }
+  #trainingManagerPanel .panel-section {
+    padding: var(--space-2) 6px;
+  }
+  #trainingManagerPanel .section-title {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wide);
+  }
+  #trainingManagerPanel input[type='number'],
+  #trainingManagerPanel input[type='text'] {
+    font-size: var(--text-base);
+    padding: var(--space-1) var(--space-1);
+  }
+
+  #topControls {
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: var(--space-1) 6px;
+    max-width: calc(100vw - 20px);
+  }
+
+  html,
+  body {
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  editor-toolbar {
+    display: none;
+  }
+}

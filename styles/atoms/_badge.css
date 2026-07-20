@@ -1,0 +1,107 @@
+/* ── Status dots ───────────────────────────────────────────────── */
+
+.status-dot {
+  display: inline-block;
+  width: var(--size-dot);
+  height: var(--size-dot);
+  border-radius: 50%;
+  margin-left: auto;
+  vertical-align: middle;
+  background: #555;
+}
+.status-dot.green {
+  background: #5cb85c;
+  box-shadow: var(--shadow-sm);
+}
+.status-dot.red {
+  background: #d9534f;
+  box-shadow: 0 0 3px rgba(217, 83, 79, 0.6);
+}
+.status-dot.orange {
+  background: #f0ad4e;
+  box-shadow: 0 0 3px rgba(240, 173, 78, 0.6);
+}
+
+/* ── Config chips ──────────────────────────────────────────────── */
+
+.cfg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 5px;
+  background: var(--color-bg-surface-raised);
+  border-radius: var(--radius-md);
+}
+.cfg-chip-emoji {
+  font-size: var(--text-base);
+  line-height: 1;
+}
+.cfg-chip-value {
+  font-size: var(--text-base);
+  font-family: monospace;
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+/* ── Store tab count ───────────────────────────────────────────── */
+
+.store-tab-count {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: var(--weight-semibold);
+}
+
+.store-tab.active .store-tab-count {
+  color: var(--color-text-muted);
+}
+
+/* ── Store source / marker ─────────────────────────────────────── */
+
+.store-source {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-text-muted);
+}
+
+.store-marker {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.store-empty {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--color-text-dim);
+  font-style: italic;
+}
+
+/* ── Selected info ─────────────────────────────────────────────── */
+
+.selected-tag {
+  font-size: var(--text-base);
+}
+
+.selected-name {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Traffic badge ─────────────────────────────────────────────── */
+
+.traffic-count {
+  margin-top: 6px;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.traffic-empty {
+  font-size: var(--text-base);
+  color: var(--color-text-dim);
+  line-height: 1.4;
+  padding: var(--space-1) 0;
+}

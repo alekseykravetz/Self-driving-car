@@ -16,7 +16,7 @@ import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Osm } from '../../math/osm-importer/osm.js';
 import { StoreManager } from '../../store/storeManager.js';
-import { KeyboardManager } from '../../panels/keyboardManager.js';
+import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
 /** localStorage key for the editor's per-layer visibility preference. */

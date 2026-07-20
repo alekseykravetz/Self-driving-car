@@ -58,7 +58,7 @@ The project supports multiple input methods for controlling cars. All control sy
 
 ## Shortcuts Toolbar (`<shortcuts-toolbar>`)
 
-A shared floating toolbar (`ts/panels/shortcutsToolbar.ts`, tag
+A shared floating toolbar (`ts/ui/molecules/shortcutsToolbar.ts`, tag
 `<shortcuts-toolbar>`) visualizes the keyboard shortcuts available on the current
 page. It sits inside the `#simulatorToolbar` flex container next to the other
 toolbar panels and is reused by the **World Editor**, **Live Traffic Jam**, and

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { WorldLayersToolbarElement } from '../../../ts/panels/worldLayersToolbar.js';
+import { WorldLayersToolbarElement } from '../../../ts/ui/molecules/worldLayersToolbar.js';
 import { DEFAULT_LAYER_VISIBILITY } from '../../../ts/world/types.js';
 
 function createElement(): WorldLayersToolbarElement {

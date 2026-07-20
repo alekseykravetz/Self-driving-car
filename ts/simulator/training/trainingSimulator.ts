@@ -2,13 +2,13 @@ import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { SimpleTrainingStrategy } from './modes/simpleModeBehavior.js';
 import { WorldTrainingStrategy } from './modes/worldModeBehavior.js';
-import type { TrainingPanelElement } from './trainingPanel.js';
+import type { TrainingPanelElement } from '../../ui/organisms/trainingPanel.js';
 import type {
   TrainingInitModalElement,
   TrainingInitResult,
-} from './trainingInitModal.js';
-import { KeyboardManager } from '../../panels/keyboardManager.js';
-import type { ShortcutsToolbarElement } from '../../panels/shortcutsToolbar.js';
+} from '../../ui/organisms/trainingInitModal.js';
+import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
+import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
 import {

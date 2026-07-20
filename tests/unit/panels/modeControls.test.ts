@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
-import { ToolbarModeControls } from '../../../ts/panels/modeControls.js';
+import { ToolbarModeControls } from '../../../ts/ui/molecules/modeControls.js';
 
 function createMockHost(): HTMLDivElement {
   const host = document.createElement('div');

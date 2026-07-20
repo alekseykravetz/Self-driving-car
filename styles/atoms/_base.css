@@ -1,0 +1,73 @@
+/* ── Global reset & base elements ──────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Global custom scrollbar ───────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body:not(.main-page) {
+  background: var(--color-body-bg);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body:has(#simulatorLayout) {
+  display: block;
+}
+
+body.main-page {
+  background: var(--color-bg-app);
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+label {
+  display: flex;
+  justify-content: center;
+}
+
+input[type='file'] {
+  display: none;
+}
+
+button,
+.file-input-label {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 5px;
+  margin: 2px;
+  cursor: pointer;
+  background-color: lightgray;
+}
+
+button:hover,
+.file-input-label:hover {
+  background: white;
+}

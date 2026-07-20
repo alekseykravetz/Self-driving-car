@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ShortcutsToolbarElement } from '../../../ts/panels/shortcutsToolbar.js';
-import type { ShortcutDef } from '../../../ts/panels/shortcutsToolbar.js';
+import { ShortcutsToolbarElement } from '../../../ts/ui/molecules/shortcutsToolbar.js';
+import type { ShortcutDef } from '../../../ts/ui/molecules/shortcutsToolbar.js';
 
 function createElement(): ShortcutsToolbarElement {
   const el = new ShortcutsToolbarElement();

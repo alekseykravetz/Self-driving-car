@@ -1,4 +1,4 @@
-import { TRAINING_PANEL_TEMPLATE } from './templates/trainingPanelTemplate.js';
+import { TRAINING_PANEL_TEMPLATE } from '../../ui/organisms/trainingPanelTemplate.js';
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
 import { StoreManager } from '../../store/storeManager.js';

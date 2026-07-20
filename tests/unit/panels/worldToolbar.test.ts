@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { WorldToolbarElement } from '../../../ts/panels/worldToolbar.js';
+import { WorldToolbarElement } from '../../../ts/ui/molecules/worldToolbar.js';
 
 function createElement(): WorldToolbarElement {
   const el = new WorldToolbarElement();

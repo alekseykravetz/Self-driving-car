@@ -2,7 +2,7 @@ import { HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE } from './templates/humanTrainingC
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { inferHiddenLayers } from '../training/genetics/poolManager.js';
-import type { KeyboardManager } from '../../panels/keyboardManager.js';
+import type { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
 
 export interface HumanTrainingConfigResult {
   carConfig: CarInfo;

@@ -1,0 +1,126 @@
+/* ── Traffic Stats Panel ───────────────────────────────────────────── */
+#trafficStatsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: var(--color-bg-surface);
+  min-width: 180px;
+  max-width: 200px;
+  width: 200px;
+  flex-shrink: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  order: 20;
+}
+
+.traffic-count {
+  margin-top: 6px;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.traffic-empty {
+  font-size: var(--text-base);
+  color: var(--color-text-dim);
+  line-height: 1.4;
+  padding: var(--space-1) 0;
+}
+
+.traffic-cars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.traffic-car-row {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 5px 6px;
+  background: var(--color-bg-surface-raised);
+  cursor: pointer;
+}
+
+.traffic-car-row.selected {
+  border-color: var(--color-accent-gold);
+  background: var(--color-accent-gold-bg);
+}
+
+.traffic-car-row.crashed {
+  opacity: 0.65;
+}
+
+.traffic-car-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.traffic-car-swatch {
+  width: var(--size-swatch);
+  height: var(--size-swatch);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.traffic-car-name {
+  flex: 1;
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.traffic-car-status {
+  font-size: var(--text-md);
+}
+
+.traffic-car-remove {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--text-md);
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.traffic-car-remove:hover {
+  color: var(--color-accent-red);
+}
+
+.traffic-car-metrics {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.traffic-car-config {
+  display: none;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.traffic-car-row.expanded .traffic-car-config {
+  display: block;
+}
+
+.traffic-car-config .cfg-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-dim);
+  padding: 1px 0;
+}
+
+.traffic-car-config .cfg-row b {
+  color: var(--color-text-primary);
+}

@@ -88,7 +88,7 @@ tinted ("stale") until rebuilt.
 ## World Layers toolbar (`<world-layers-toolbar>`)
 
 The editor's bottom "Generate" checkbox has been replaced by a floating
-`<world-layers-toolbar>` (`ts/panels/worldLayersToolbar.ts` +
+`<world-layers-toolbar>` (`ts/ui/molecules/worldLayersToolbar.ts` +
 `templates/worldLayersToolbarTemplate.ts`). It gives independent **visibility**
 control over each world layer via emoji toggles, plus the ♻️ Regenerate action:
 
@@ -773,18 +773,18 @@ The `WorldLoader` utility handles file parsing:
 The world editor page provides a complete UI for map creation, split across two
 panels:
 
-- **Shared `<world-toolbar>`** (top-left, from `ts/panels/`): the **World** group
+- **Shared `<world-toolbar>`** (top-left, from `ts/ui/molecules/`): the **World** group
   (Load 🌍 / OSM Import 🗺️) and a **Storage** group (Save 💾 / Clear ❌), plus
   the **Viewport** mode toggle (mouse 🖱️ vs. touchpad ☝️). The editor-only OSM,
   Storage group and separator are revealed via `showWorldEditorActions()`, while
   the simulator-only groups (Car, Borders, Tracking, Debug) are hidden via
   `hideGroups(...)`. Toolbar order in editor mode: World → OSM → (separator) →
   Storage → Car → Selected → Viewport → Debug.
-- **Shared `<shortcuts-toolbar>`** (top-left, from `ts/panels/`): visualizes the
+- **Shared `<shortcuts-toolbar>`** (top-left, from `ts/ui/molecules/`): visualizes the
   graph-editor keys (`S` / `E` / `C` / `O`) plus the `Ctrl` zoom modifier. The
   `O` one-way indicator is click-latchable. Replaces the old inline
   `#keyIndicators` block that used to live in the bottom controls panel.
-- **`<editor-toolbar>`** (bottom-center, from `ts/panels/editorToolbar.ts`): custom element
+- **`<editor-toolbar>`** (bottom-center, from `ts/ui/molecules/editorToolbar.ts`): custom element
   wrapping the editor-mode buttons (Graph, Marking, Stop, Start,
   Light, Crossing, Target, Parking, Yield, Corridor). Replaces the old
 
