@@ -8,3 +8,5 @@ graphify-out/
 coverage/
 test-results/
 playwright-report/
+.DS_Store
+.playwright-mcp/

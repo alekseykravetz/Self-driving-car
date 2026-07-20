@@ -47,6 +47,7 @@ You are auditing a browser-based autonomous vehicle simulation platform built wi
 - **`ts/panels/` vs. `ts/simulator/panels/`** — Generic panels live in `ts/panels/`. Simulator-specific panels live in `ts/simulator/panels/`. Verify clean split.
 - **Barrel file discipline** — The project deliberately avoids barrel (`index.ts`) re-exports. Flag any introduced barrel files.
 - **Atomic Design** — Evaluate custom elements against Atomic Design: atoms (templates), molecules (simple combinations), organisms (complex components like `world-toolbar`), templates/pages (application shells).
+- **Design tokens** — Verify all CSS uses `var(--color-*)` / `var(--space-*)` / `var(--text-*)` / `var(--radius-*)` from `styles/tokens.css`. Flag raw hex, `rgba()`, or `px` literals in `styles/` (except inside `tokens.css` itself, which defines the values). The `styles/` folder follows the same atoms→molecules→organisms→templates→pages hierarchy as `ts/ui/`.
 
 ## 3. Design Pattern Evaluation
 

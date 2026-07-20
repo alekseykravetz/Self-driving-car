@@ -64,6 +64,8 @@ When called, the planner gives you:
 
 6. **Check no out-of-scope changes** — run `git diff --stat`. Compare changed files against the plan's scope. Flag any file changed that is not in the plan's scope or not in `docs/`.
 
+7. **Check Atomic Design conventions** (only if the plan touches `styles/` or `ts/ui/`): grep changed CSS files for raw hex (`#xxx`) or raw `rgba()` — flag any not using `var(--color-*)` / `var(--space-*)` / `var(--text-*)` / `var(--radius-*)` tokens. Grep for raw `px` in spacing/font/radius contexts. These violate AGENTS.md § UI Architecture.
+
 ### Phase: docs
 
 1. **Read the plan's `## Docs to update` section.** Extract every doc file listed and what should be updated.

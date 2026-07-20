@@ -41,6 +41,7 @@ If a skill is not already loaded in this session, use the `skill` tool to load i
 
 - Source of truth: `ts/` (compiled to `js/` — never edit `js/`).
 - Conventions: read `AGENTS.md` at the project root before any planning.
+- Design system: `styles/` uses Atomic Design (tokens.css + atoms/molecules/organisms/templates/pages); see AGENTS.md § UI Architecture. Design brief in `DESIGN.md` (root); canonical token reference in `docs/DesignSystem.md`.
 - Tests live in `tests/` — run `npm test` (vitest) for unit tests. Always verify tests pass before archiving.
 - Knowledge graph: `graphify-out/` exists; use `graphify query "<question>"` for codebase understanding before reading files.
 - Task plans live in `tasks/<slug>.md`; completed plans move to `tasks/archive/YYYYMMDD-<slug>/`.
@@ -51,6 +52,7 @@ If a skill is not already loaded in this session, use the `skill` tool to load i
 - **Single factual question** ("where is X?", "what does Y do?") → answer directly, no plan.
 - **Trivial one-line edit** ("rename this", "delete that line") → just do it, no plan.
 - **Audit request** ("review the architecture", "check for circular deps") → delegate to the `architect` subagent via `task`.
+- **Design-system / CSS / token change** → run the full `task-planning` workflow; the docs-sync step must update `docs/DesignSystem.md` for any token or `styles/` structural change.
 - **Direct command invocation** → run the command, skip the workflow.
 
 When unsure, default to running the full workflow — the interview is cheap and the plan is useful even for small changes.

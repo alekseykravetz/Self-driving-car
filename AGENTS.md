@@ -117,24 +117,38 @@ ts/
 
 ## Key commands
 
-| Command                      | Purpose                                       |
-| ---------------------------- | --------------------------------------------- |
-| `npm start`                  | Full dev: tsc watch + server + lint/format    |
-| `npm run tsc:watch`          | Compile TS on save only                       |
-| `npm run serve`              | Static server on :9090                        |
-| `npm run lint`               | ESLint auto-fix                               |
-| `npm run format`             | Prettier (singleQuote: true)                  |
-| `npm run format:check`       | Prettier check only (no write)                |
-| `npm run fix:all`            | format + lint                                 |
-| `npm test`                   | Run all unit tests                            |
-| `npm run test:fast`          | Run tests for changed files only              |
-| `npm run test:changed`       | Run tests for changed files only              |
-| `npm run test:dev`           | Watch mode with fast initial run              |
-| `npm run test:watch`         | Run tests in watch mode (TDD)                 |
-| `npm run test:coverage`      | Run tests with coverage report                |
-| `npm run test:visual`        | Run Playwright visual regression tests        |
-| `npm run test:visual:update` | Update Playwright visual baselines            |
-| `npm run publish:site`       | Deploy via here.now (scripts/publish-site.sh) |
+| Command                      | Purpose                                              |
+| ---------------------------- | ---------------------------------------------------- |
+| `npm start`                  | Full dev: tsc watch + server + lint/format           |
+| `npm run tsc:watch`          | Compile TS on save only                              |
+| `npm run serve`              | Static server on :9090                               |
+| `npm run lint`               | ESLint auto-fix                                      |
+| `npm run format`             | Prettier (singleQuote: true)                         |
+| `npm run format:check`       | Prettier check only (no write)                       |
+| `npm run fix:all`            | format + lint                                        |
+| `npm test`                   | Run all unit tests                                   |
+| `npm run test:fast`          | Run tests for changed files only                     |
+| `npm run test:changed`       | Run tests for changed files only                     |
+| `npm run test:dev`           | Watch mode with fast initial run                     |
+| `npm run test:watch`         | Run tests in watch mode (TDD)                        |
+| `npm run test:coverage`      | Run tests with coverage report                       |
+| `npm run test:visual`        | Run Playwright visual regression tests               |
+| `npm run test:visual:update` | Update Playwright visual baselines                   |
+| `npm run publish:site`       | Deploy via here.now (scripts/publish-site.sh)        |
+| `graphify update .`          | Rebuild graphify knowledge graph (also: `/graphify`) |
+
+## Harness layout (`.opencode/`)
+
+The agent harness lives in `.opencode/` and is part of this repo (tracked in git):
+
+- `opencode.json` — agent models, MCP servers (playwright), plugins (graphify), commands, skills paths.
+- `agents/` — `planner.md` (primary, glm-5.2), `build.md` (primary, deepseek-v4-flash-free), `reviewer.md` + `architect.md` (subagents).
+- `commands/` — slash commands: `/test`, `/fix`, `/start`, `/graphify`.
+- `skills/` — `task-planning` (full task lifecycle), `docs-sync` (doc-update protocol), `code-to-pen` (reverse-engineer code → .pen).
+- `plugins/graphify.js` — injects a graphify-reminder before the first bash call when `graphify-out/graph.json` exists.
+- MCP: `playwright` (local, via `npx -y @playwright/mcp`).
+
+The task lifecycle (task-planning skill) refreshes the graphify knowledge graph after the reviewer confirms code is complete and before docs sync. Run `/graphify` for ad-hoc refresh.
 
 ## CI (GitHub Actions)
 

@@ -1,5 +1,7 @@
 # Design System — Self-Driving Car Simulator
 
+> **Role of this document**: high-level design brief and atmosphere. For the canonical token reference (exact values, CSS custom properties, Atomic Design CSS architecture), see `docs/DesignSystem.md`.
+
 > **Token system**: All visual properties below are available as CSS custom properties in `styles/tokens.css`. Every raw value referenced here maps to a `var(--token-name)` in the codebase. When adding new UI, prefer `var(--color-*)`, `var(--space-*)`, `var(--text-*)`, `var(--radius-*)`, and `var(--size-*)` over hardcoded values.
 
 ## 1. Visual Theme & Atmosphere
@@ -25,114 +27,100 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 
 ## 2. Color Palette & Roles
 
+> Canonical token values: see `docs/DesignSystem.md § Design Tokens`. The roles below describe intent, not exact values.
+
 ### Background & Surface
 
-- **Void Black** (`#000000`): World editor body, network canvas, mini-map canvas — the deepest background layer
-- **Dark Void** (`#0f0f14`): Landing page body, training panel, traffic stats panel — main UI surface
-- **Panel Glass** (`rgba(15, 15, 20, 0.92)`): Training manager panel, traffic stats panel
-- **Overlay Smoke** (`rgba(0, 0, 0, 0.6)`): Floating toolbars — allows canvas content to show through
-- **Heavy Overlay** (`rgba(0, 0, 0, 0.7)`): OSM import panel, modal backdrops
-- **Grass Canvas** (`#2a5`): Top-down road surface — the bright green game canvas
-- **Sky Gradient** (`linear-gradient(#8cf, white 70%)`): 3D camera view background
-- **Modal Surface** (`#1b1d24`): Training init modal dialog — slightly lighter than dark void
-- **Card Base** (`rgba(255, 255, 255, 0.04)`): Landing page cards, store panels
-- **Tooltip Base** (`rgba(10, 10, 15, 0.9)`): Label chips and tooltips
+- **Void Black**: World editor body, network canvas, mini-map canvas — the deepest background layer
+- **Dark Void**: Landing page body, training panel, traffic stats panel — main UI surface
+- **Panel Glass**: Training manager panel, traffic stats panel
+- **Overlay Smoke**: Floating toolbars — allows canvas content to show through
+- **Heavy Overlay**: OSM import panel, modal backdrops
+- **Grass Canvas**: Top-down road surface — the bright green game canvas
+- **Sky Gradient**: 3D camera view background
+- **Modal Surface**: Training init modal dialog — slightly lighter than dark void
+- **Card Base**: Landing page cards, store panels
+- **Tooltip Base**: Label chips and tooltips
 
 ### Text
 
-- **Bright Silver** (`#e8e8e8`): Main body text
-- **Pure White** (`#ffffff`): Headings, selected pool rows, store titles
-- **Light Grey** (`#ccc` to `#e0e0e0`): Buttons, stat values, table rows
-- **Muted Grey** (`#888` / `#999`): Subtitles, stat labels, control labels
-- **Dim Grey** (`#777` to `#888`): Small descriptions, secondary labels
-- **Faint White** (`rgba(255,255,255,0.4-0.6)`): Control group labels, section titles, empty states
+- **Bright Silver**: Main body text
+- **Pure White**: Headings, selected pool rows, store titles
+- **Light Grey**: Buttons, stat values, table rows
+- **Muted Grey**: Subtitles, stat labels, control labels
+- **Dim Grey**: Small descriptions, secondary labels
+- **Faint White**: Control group labels, section titles, empty states
 
 ### Accent
 
-- **Mono Green** (`#7ddf7d`): Primary action text, landing page title gradient, positive states
-- **Teal** (`#4ecdc4`): Landing page title gradient companion
-- **Indigo** (`#6366f1`): Store panel active tab, radio buttons
-- **Blue** (`#42a5f5`): Pool table selection, secondary accent
-- **Gold** (`gold`): Best AI car highlight in training simulator
-- **Cyan** (`deepskyblue` / `#0FF`): Previous pool car indicator, light override indicator
+- **Mono Green**: Primary action text, landing page title gradient, positive states
+- **Teal**: Landing page title gradient companion
+- **Indigo**: Store panel active tab, radio buttons
+- **Blue**: Pool table selection, secondary accent
+- **Gold**: Best AI car highlight in training simulator
+- **Cyan**: Previous pool car indicator, light override indicator
 
 ### Semantic / Status
 
-- **Status Green** (`#5cb85c`): Active/healthy status dot with `rgba(92,184,92,0.6)` glow
-- **Status Red** (`#d9534f`): Error/damaged status dot with `rgba(217,83,79,0.6)` glow
-- **Status Orange** (`#f0ad4e`): Warning status dot with `rgba(240,173,78,0.6)` glow
-- **Key Active** (`#2a8a2a` bg, `#4cdf4c` border): Active keyboard shortcut indicator
-- **Key Flash** (`#c08020` bg, `#ffb040` border): Momentary flash on key press
+- **Status Green**: Active/healthy status dot with green glow
+- **Status Red**: Error/damaged status dot with red glow
+- **Status Orange**: Warning status dot with orange glow
+- **Key Active**: Active keyboard shortcut indicator
+- **Key Flash**: Momentary flash on key press
 
 ### Button Variants
 
-- **Primary Button**: bg `rgba(80,180,80,0.25)`, text `#7ddf7d`, border `rgba(80,180,80,0.3)`
-- **Danger Button**: bg `rgba(200,60,60,0.2)`, text `#e88`, border `rgba(200,60,60,0.25)`
-- **Warning Outline**: bg transparent, border `rgba(200,150,40,0.3)`, text `#f5a623`
-- **Success Outline**: bg transparent, border `rgba(60,200,60,0.3)`, text `#5cb85c`
+- **Primary Button**: green-tinted action, green text
+- **Danger Button**: red-tinted action, red text
+- **Warning Outline**: transparent, amber border and text
+- **Success Outline**: transparent, green border and text
 
 ### Border
 
-- **Subtle Border** (`rgba(255, 255, 255, 0.08)`): Cards, panel sections, table rows
-- **Visible Border** (`rgba(255, 255, 255, 0.12-0.15)`): Modals, popovers, toolbar outlines
-- **Strong Border** (`rgba(255, 255, 255, 0.3)`): Key indicators, control separators
+- **Subtle Border**: Cards, panel sections, table rows
+- **Visible Border**: Modals, popovers, toolbar outlines
+- **Strong Border**: Key indicators, control separators
 
 ### Input
 
-- **Input BG** (`rgba(255, 255, 255, 0.07)`): Text/number input backgrounds
-- **Input Border** (`rgba(255, 255, 255, 0.1)`): Default input border
-- **Input Focus** (`rgba(255, 200, 50, 0.6)`): Golden focus ring
-- **Checkbox Accent** (`#4caf50` / `#5cb85c`): Green checkbox accent
+- **Input BG**: Text/number input backgrounds
+- **Input Border**: Default input border
+- **Input Focus**: Golden focus ring
+- **Checkbox Accent**: Green checkbox accent
 
 ### Canvas Rendering
 
-- **Road Fill** (`#BBB`): Road surface color
-- **Road Border** (`white`): 4px road edge strokes
-- **Lane Dash** (`white`): Dashed center lines (`dash [15, 25]`, width 4)
-- **Crosswalk** (`white`): Dashed stripes (`dash [11, 11]`)
-- **Traffic Light Off** (`#060` / `#660` / `#600`): Dark circles for inactive lights
-- **Traffic Light On** (`#0F0` / `#FF0` / `#F00`): Bright circles for active lights
-- **Building Walls** (`white`), **Roof** (`#D44`): Pseudo-3D building rendering
-- **Tree Canopy** (`rgb(30, 50-200, 70)`): Green gradient for tree foliage
-- **Target Marker** (`red` / `white` / `red`): Concentric circles (30/20/10px)
-- **Corridor Walls** (`red`, width 4): Collision corridor borders
+- **Road Fill**: Road surface color
+- **Road Border**: Road edge strokes
+- **Lane Dash**: Dashed center lines
+- **Crosswalk**: Dashed stripes
+- **Traffic Light Off**: Dark circles for inactive lights
+- **Traffic Light On**: Bright circles for active lights
+- **Building Walls, Roof**: Pseudo-3D building rendering
+- **Tree Canopy**: Green gradient for tree foliage
+- **Target Marker**: Concentric circles
+- **Corridor Walls**: Collision corridor borders
 
 ### Neural Network Visualizer
 
-- **Positive Weight** (`#FFB000` to `#FFE44D`): Amber range for positive activations
-- **Negative Weight** (pale cyan to `#00E5FF`): Cyan range for negative activations
-- **Zero/Neutral** (`rgba(40,40,40,1)`): Midpoint of legend gradient
-- **Neuron Disc** (`rgba(0,0,0,alpha)`): Dark neuron body
-- **Highlight Ring** (`rgba(255,255,255,0.9)`): Hovered neuron outline
-- **Connection Dim** (same color, alpha 0.08): Unfocused edges
-- **Signal Particles** (same color, alpha 0.6-1.0): Animated dots on active connections
+- **Positive Weight**: Amber range for positive activations
+- **Negative Weight**: Cyan range for negative activations
+- **Zero/Neutral**: Midpoint of legend gradient
+- **Neuron Disc**: Dark neuron body
+- **Highlight Ring**: Hovered neuron outline
+- **Connection Dim**: Unfocused edges
+- **Signal Particles**: Animated dots on active connections
 
 ## 3. Typography Rules
 
+> See `docs/DesignSystem.md § Typography` for the full hierarchy table and exact sizes. The principles below describe intent.
+
 ### Font Families
 
-- **UI Labels**: `Arial, sans-serif` — all UI chrome, buttons, panels, section titles, controls
-- **Monospace Data**: `'Courier New', monospace` / `monospace` — elapsed time, FPS, stat values, car name labels
-- **Landing Page**: `'Inter', sans-serif` — body text on the main page only
-- **Canvas Text**: `Arial` — legacy in-world labels (STOP, YIELD, P markings)
-
-### Hierarchy
-
-| Role            | Size              | Weight | Line Height   | Letter Spacing | Family    |
-| --------------- | ----------------- | ------ | ------------- | -------------- | --------- |
-| Landing Heading | 32px (2rem)       | 800    | normal        | normal         | Inter     |
-| Card Heading    | 24px (1.5rem)     | 700    | normal        | normal         | Arial     |
-| Modal Title     | 17.6px (1.1rem)   | 700    | normal        | normal         | Arial     |
-| Stat Value      | 12px              | 700    | normal        | normal         | monospace |
-| Section Title   | 10px              | 700    | 1px uppercase | 1px            | Arial     |
-| Button Large    | 13px              | 600    | normal        | normal         | Arial     |
-| Button Small    | 11px              | 500    | normal        | normal         | Arial     |
-| Body Text       | 0.85rem (~13.5px) | 400    | normal        | normal         | Arial     |
-| Stat Label      | 10px              | 600    | 1px uppercase | 0.4px          | Arial     |
-| Control Label   | 10px              | 400    | 1px uppercase | 0.6px          | Arial     |
-| Car Name        | 13px              | 700    | normal        | normal         | monospace |
-| Key Indicator   | 13px              | 700    | normal        | normal         | monospace |
-| Tooltip         | 11px              | 400    | normal        | normal         | Arial     |
+- **UI Labels**: Arial, sans-serif — all UI chrome, buttons, panels, section titles, controls
+- **Monospace Data**: Courier New, monospace — elapsed time, FPS, stat values, car name labels
+- **Landing Page**: Inter, sans-serif — body text on the main page only
+- **Canvas Text**: Arial — legacy in-world labels (STOP, YIELD, P markings)
 
 ### Principles
 
@@ -144,111 +132,53 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 
 ## 4. Component Stylings
 
+> See `docs/DesignSystem.md` and the corresponding `styles/atoms/*.css` / `styles/molecules/*.css` files for exact values. The entries below are role descriptions only.
+
 ### Buttons
 
-**Large Button (`.btn-lg`):**
-
-- Default: height 38px, full width, padding 0 12px, borderRadius 8px, bg `rgba(255,255,255,0.1)`, text `#e0e0e0`, fontSize 13px, fontWeight 600, fontFamily Arial
-- Hover: bg `rgba(255,255,255,0.18)`, transform `scale(1.02)`
-- Active: transform `scale(0.98)`
-- `.btn-primary`: bg `rgba(80,180,80,0.25)`, text `#7ddf7d`, border `rgba(80,180,80,0.3)`
-- `.btn-danger`: bg `rgba(200,60,60,0.2)`, text `#e88`, border `rgba(200,60,60,0.25)`
-
-**Small Button (`.btn-sm`):**
-
-- Default: height 32px, full width, padding 0 8px, borderRadius 6px, bg `rgba(255,255,255,0.08)`, text `#ccc`, fontSize 11px, fontWeight 500
-- Hover: bg `rgba(255,255,255,0.15)`, text `#fff`
-- Variants: `.btn-danger-outline` (red border), `.btn-warning-outline` (amber), `.btn-success-outline` (green)
-
-**Toolbar Button (`.toolbar-btn`):**
-
-- Size: 32x32px, no padding, borderRadius 5px
-- Font: 16px (emoji)
-- Default: bg `rgba(255,255,255,0.1)`, opacity 0.7
-- Hover: bg `rgba(255,255,255,0.22)`, opacity 0.9
-- `.active`: bg `rgba(255,255,255,0.18-0.2)`, outline `2px solid rgba(255,255,255,0.4-0.45)`, opacity 1
-- Disabled: opacity 0.25, cursor `not-allowed`
+- **Large button**: Full-width action, green-tinted for primary
+- **Small button**: Compact action, red/amber/green outline variants
+- **Toolbar button**: 32×32px emoji icon, semi-transparent dark bg, active state with outline
 
 ### Input Controls
 
-**Number/Text Input:**
-
-- Size: border `1px solid rgba(255,255,255,0.1)`, borderRadius 6px, padding 5px 6px
-- Font: fontSize 12px, textAlign center
-- Default: bg `rgba(255,255,255,0.07)`, text `#e0e0e0`
-- Focus: borderColor `rgba(255,200,50,0.6)`, bg `rgba(255,255,255,0.12)`, outline `none`
-- Number spin buttons hidden (custom inc/dec via `.num-btn`)
-
-**Checkbox:**
-
-- Size: 14x14px (18x18px in training panel)
-- Accent: `#4caf50` / `#5cb85c`
-
-**Radio Button:**
-
-- Accent: `#6366f1` (indigo)
-
-**Number Input Row (`.num-input-row`):**
-
-- Flex layout with `.num-btn`: 22x22px, borderRadius 4px, bg `rgba(255,255,255,0.1)`
-
-**Spawn Car Select:**
-
-- Size: height 32px, max-width 140px
-- Default: bg `rgba(255,255,255,0.1)`, text `#fff`, fontSize 12px
+- **Number/text input**: Dark field, subtle border, golden focus ring, spinner hidden
+- **Checkbox**: Green accent, compact
+- **Radio**: Indigo accent
+- **Number input row**: Increment/decrement buttons
 
 ### Panels & Sections
 
-**Panel Section (`.panel-section`):**
-
-- Padding: 10px, bottomBorder: `1px solid rgba(255,255,255,0.08)`
-
-**Section Title (`.section-title`):**
-
-- Font: 10px Arial 700, uppercase, letterSpacing 1px, color `rgba(255,255,255,0.4)`
-- BottomBorder: `1px solid rgba(255,255,255,0.06)`
-
-**Stat Row (`.stat-row`):**
-
-- Padding: 3px 6px, borderRadius 6px, bg `rgba(255,255,255,0.04)`
-- Label: 10px Arial, uppercase, color `#888`
-- Value: 12px monospace, weight 700, color `#e8e8e8`
+- **Panel section**: Padded rows with subtle dividers
+- **Section title**: 10px uppercase label with letter-spacing
+- **Stat row**: Compact row with uppercase label and monospace value
 
 ### Floating Toolbar
 
-- Position: absolute, top 10px, left 10px, z-index 10
-- Size: padding 6px 10px, borderRadius 8px
-- Background: `rgba(0,0,0,0.6)`
-- Outline: `1px solid rgba(255,255,255,0.15)`
+- Semi-transparent dark background, subtle white outline, rounded corners, absolute positioned
 
 ### Modal / Dialog
 
-- Overlay: `rgba(0,0,0,0.6)`, `backdrop-filter: blur(2px)`
-- Dialog: bg `#1b1d24`, border `1px solid rgba(255,255,255,0.12)`, borderRadius 12px
-- BoxShadow: `0 18px 50px rgba(0,0,0,0.55)`
-- Width: `min(560px, 100%)`
+- Blurred backdrop overlay, dark dialog surface, prominent shadow
 
 ### Card / Popover
 
-- **Landing Card**: bg `rgba(255,255,255,0.04)`, border `1px solid rgba(255,255,255,0.08)`, borderRadius 16px, padding 32px 28px, hover borderColor `rgba(255,255,255,0.15)`, translateY -2px
-- **Asset Popover**: bg `rgba(20,20,25,0.97)`, border `1px solid rgba(255,255,255,0.15)`, borderRadius 8px, boxShadow `0 6px 18px rgba(0,0,0,0.5)`
+- **Landing card**: Translucent, rounded, lift-on-hover
+- **Asset popover**: Near-opaque dark surface, sharp shadow
 
 ### Tooltip
 
-- **CSS (HTML)**: bg `rgba(0,0,0,0.9)`, text `white`, fontSize 11px Arial, borderRadius 4px, padding 6px 10px
-- **Canvas (NN)**: bg `rgba(10,10,15,0.85)`, text `rgba(240,240,240,0.95)`, fontSize 11px monospace, border `1px solid rgba(255,255,255,0.35)`, borderRadius 6px
+- **CSS (HTML)**: Dark bg, white text
+- **Canvas (NN)**: Dark bg, monospace data, border
 
 ### Key Indicator (Shortcut Keys)
 
-- Size: min-width 32px, height 32px, borderRadius 4px
-- Default: bg `#333`, border `1px solid #555`, text `#888`, fontSize 13px monospace 700
-- Active: bg `#2a8a2a`, border `#4cdf4c`, green glow
-- Flash: bg `#c08020`, border `#ffb040`, amber glow
+- Dark default, green active, amber flash
 
 ### Tables
 
-- **Pool Table**: font 10px Arial (headers), 11px monospace (values); header uppercase `#888`; row hover `rgba(255,255,255,0.08)`; selected: bg `rgba(66,165,245,0.25)`, outline `1px solid rgba(66,165,245,0.5)`
-- **Store Table**: font 0.85rem; header `rgba(255,255,255,0.5)` uppercase; cell `rgba(255,255,255,0.85)`; sticky header bg `#16161c`
+- **Pool table**: Compact, mono values, hover highlight, blue selection
+- **Store table**: Sticky header, uppercase labels
 
 ## 5. Layout Principles
 

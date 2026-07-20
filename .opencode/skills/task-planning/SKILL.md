@@ -159,7 +159,7 @@ any out-of-scope changes. Return your structured gap report.
 
 ### Reviewer verdict handling
 
-- **PASS** → proceed to Step 7 (docs sync).
+- **PASS** → proceed to Step 7 (graph refresh).
 - **GAPS_FOUND** → extract the gap list from the reviewer's report and send build back via `task` with a targeted fix prompt:
 
   ```
@@ -183,9 +183,18 @@ any out-of-scope changes. Return your structured gap report.
 
   Wait for the user's decision. Do not loop further.
 
-## Step 7 — Docs sync (planner does this, NOT build)
+## Step 7 — Refresh the knowledge graph (planner does this)
 
-After the reviewer confirms code is complete (PASS), load the `docs-sync` skill and write the docs yourself. You run on glm-5.2 — docs are this repo's regression surface (no automated tests), so doc quality and AGENTS.md convention decisions need the smart model.
+After the reviewer returns PASS on the code, run `graphify update .` from the project root to rebuild the `graphify-out/` knowledge graph with the new code. This MUST happen before docs sync (Step 8) because docs-sync may use `graphify query` to locate affected modules, and the architect/reviewer rely on a current graph.
+
+- If `graphify update .` fails (e.g. graphify CLI not installed), note it and continue — docs sync can still proceed by reading files directly. Do not block the task on a graph rebuild failure.
+- For docs-only or harness-only changes (no `ts/` edits), skip this step — the graph only tracks code.
+
+The manual ad-hoc refresh command is `/graphify` (see `.opencode/commands/graphify.md`).
+
+## Step 8 — Docs sync (planner does this, NOT build)
+
+After the graph refresh (or if skipped), load the `docs-sync` skill and write the docs yourself. You run on glm-5.2 — docs are this repo's regression surface (no automated tests), so doc quality and AGENTS.md convention decisions need the smart model.
 
 Follow the `docs-sync` skill's protocol:
 
@@ -196,7 +205,7 @@ Follow the `docs-sync` skill's protocol:
 
 Build does NOT touch docs. The plan's `## Docs to update` section tells YOU what to write — build implements code only.
 
-## Step 8 — Reviewer docs check (light)
+## Step 9 — Reviewer docs check (light)
 
 After you finish writing docs, call the reviewer one more time with phase `docs`:
 
@@ -212,10 +221,10 @@ AGENTS.md has any new conventions the plan specified, and no stale
 content was left behind. Return your structured gap report.
 ```
 
-- **PASS** → proceed to Step 9 (archive).
+- **PASS** → proceed to Step 10 (archive).
 - **GAPS_FOUND** → fix the docs yourself (you're the smart model, no need to delegate) and re-run the reviewer. Max 1 docs review round — if still gaps, report to user.
 
-## Step 9 — Archive
+## Step 10 — Archive
 
 When the user confirms the work is complete:
 
@@ -237,13 +246,14 @@ If unsure whether a request warrants the full flow, default to running it — th
 
 ## Cost model summary
 
-| Step                     | Agent    | Model                          | Why                                     |
-| ------------------------ | -------- | ------------------------------ | --------------------------------------- |
-| Interview + plan writing | planner  | glm-5.2 (smart)                | Judgment, ambiguity resolution          |
-| Code implementation      | build    | deepseek-v4-flash-free (cheap) | Mechanical execution from detailed plan |
-| Code review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification, tsc/lint        |
-| Docs writing             | planner  | glm-5.2 (smart)                | Doc quality is the regression surface   |
-| Docs review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification                  |
-| Archive                  | planner  | glm-5.2 (smart)                | Trivial, just file moves                |
+| Step                     | Agent    | Model                          | Why                                             |
+| ------------------------ | -------- | ------------------------------ | ----------------------------------------------- |
+| Interview + plan writing | planner  | glm-5.2 (smart)                | Judgment, ambiguity resolution                  |
+| Code implementation      | build    | deepseek-v4-flash-free (cheap) | Mechanical execution from detailed plan         |
+| Code review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification, tsc/lint                |
+| Graph refresh            | planner  | glm-5.2 (smart)                | Trivial command, but planner owns the lifecycle |
+| Docs writing             | planner  | glm-5.2 (smart)                | Doc quality is the regression surface           |
+| Docs review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification                          |
+| Archive                  | planner  | glm-5.2 (smart)                | Trivial, just file moves                        |
 
 The expensive judgment work (planning, docs) stays on the smart model. The token-heavy mechanical work (implementation, review) runs on the cheap model. The plan MD is the bridge that makes this safe — it's detailed enough that a cheap model can execute without judgment.

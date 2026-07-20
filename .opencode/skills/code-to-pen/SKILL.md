@@ -34,7 +34,7 @@ Read each one. Note:
 
 ### Step 2 — Extract CSS design tokens
 
-Read the project's CSS files (usually `styles/style.css`). Extract all design tokens as Pencil variables:
+Read the project's CSS entry points: `styles/tokens.css` (design tokens — the single source of truth), `styles/index.css` (shared core), and the page entries `styles/simulator.css`, `styles/landing.css`, `styles/race.css`, `styles/world.css`. The `styles/` folder follows Atomic Design: `atoms/` → `molecules/` → `organisms/` → `templates/` → `pages/`. Extract all design tokens as Pencil variables:
 
 | CSS concept                        | Pencil equivalent                   |
 | ---------------------------------- | ----------------------------------- |
@@ -53,29 +53,32 @@ For design tokens, set Pencil variables via `SetVariables()`:
 ```js
 SetVariables({
   'bg-app': { type: 'color', value: '#0f0f14' },
-  'bg-panel': { type: 'color', value: '#0f0f14eb' },
-  'bg-toolbar': { type: 'color', value: '#00000099' },
+  'bg-surface': { type: 'color', value: 'rgba(15,15,20,0.92)' },
+  'bg-overlay': { type: 'color', value: '#00000099' },
   'bg-canvas': { type: 'color', value: '#2a5' },
   'bg-card': { type: 'color', value: 'rgba(255,255,255,0.04)' },
   'text-primary': { type: 'color', value: '#e8e8e8' },
   'text-secondary': { type: 'color', value: '#888888' },
   'text-muted': { type: 'color', value: 'rgba(255,255,255,0.5)' },
   'border-subtle': { type: 'color', value: 'rgba(255,255,255,0.08)' },
-  'border-toolbar': { type: 'color', value: '#ffffff26' },
+  'border-visible': { type: 'color', value: '#ffffff26' },
   'accent-green': { type: 'color', value: '#7ddf7d' },
   'accent-blue': { type: 'color', value: '#5cb8ff' },
   'accent-yellow': { type: 'color', value: '#ffcc44' },
-  'font-body': { type: 'string', value: 'Inter' },
-  'font-mono': { type: 'string', value: 'JetBrains Mono' },
-  'radius-sm': { type: 'number', value: 6 },
-  'radius-md': { type: 'number', value: 8 },
-  'radius-lg': { type: 'number', value: 12 },
-  'gap-xs': { type: 'number', value: 4 },
-  'gap-sm': { type: 'number', value: 6 },
-  'gap-md': { type: 'number', value: 10 },
-  'gap-lg': { type: 'number', value: 16 },
+  'font-ui': { type: 'string', value: 'Arial' },
+  'font-mono': { type: 'string', value: "'Courier New', monospace" },
+  'space-1': { type: 'number', value: 4 },
+  'space-2': { type: 'number', value: 8 },
+  'space-3': { type: 'number', value: 12 },
+  'space-4': { type: 'number', value: 16 },
+  'radius-sm': { type: 'number', value: 3 },
+  'radius-md': { type: 'number', value: 5 },
+  'radius-lg': { type: 'number', value: 8 },
+  'radius-xl': { type: 'number', value: 12 },
 });
 ```
+
+Token names in `styles/tokens.css` already follow the `--color-*`, `--space-*`, `--text-*`, `--radius-*` convention; map each to a Pencil variable by dropping the leading `--` (the category prefix is optional).
 
 ### Step 3 — Capture visual reference with Playwright
 

@@ -38,6 +38,11 @@
       "template": "Start the dev server by running `npm start`. This runs tsc --watch, serve on port 9090, and the format/lint watcher concurrently.",
       "description": "Start dev server (tsc watch + serve + lint/format watcher)",
       "agent": "build"
+    },
+    "graphify": {
+      "template": "Run `graphify update .` from the project root to rebuild the graphify-out/ knowledge graph. Report whether it succeeded.",
+      "description": "Rebuild graphify knowledge graph",
+      "agent": "build"
     }
   }
 }

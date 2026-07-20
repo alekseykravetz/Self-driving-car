@@ -14,7 +14,8 @@ The reviewer agent (cheap model) will verify your docs work afterward via a chec
 ## Existing docs (as of this writing)
 
 ```
-docs/Architecture.md   docs/Camera.md       docs/Controls.md   docs/Keyboard.md
+docs/Architecture.md   docs/Camera.md       docs/Controls.md   docs/DesignSystem.md
+docs/Keyboard.md
 docs/Math.md           docs/NeuralNetwork.md docs/Physics.md   docs/ProjectGoal.md
 docs/Race.md           docs/SaveLoad.md     docs/Simulators.md docs/Sound.md
 docs/Store.md          docs/Units.md        docs/Viewport.md   docs/WorldEditor.md
@@ -26,17 +27,18 @@ Read `docs/Architecture.md` first to understand the doc house style (heading dep
 
 From the just-complemented change, list every area touched:
 
-| Code area                                       | Doc(s) to check                            |
-| ----------------------------------------------- | ------------------------------------------ |
-| `ts/car/` (physics, sensors, controls, brain)   | `docs/Physics.md`, `docs/NeuralNetwork.md` |
-| `ts/world/`, markings, lights                   | `docs/WorldEditor.md`                      |
-| `ts/simulator/`, training, race, traffic shells | `docs/Simulators.md`, `docs/Race.md`       |
-| `ts/ui/`, keyboard manager, toolbars            | `docs/Keyboard.md`, `docs/Controls.md`     |
-| `ts/rendering/`, viewport, camera               | `docs/Viewport.md`, `docs/Camera.md`       |
-| `ts/store/`, serialization, save files          | `docs/SaveLoad.md`, `docs/Store.md`        |
-| `ts/math/`, primitives, grids, heatmaps         | `docs/Math.md`, `docs/Units.md`            |
-| Audio / sound engine                            | `docs/Sound.md`                            |
-| New project-wide convention                     | `AGENTS.md` (append to relevant section)   |
+| Code area                                       | Doc(s) to check                                  |
+| ----------------------------------------------- | ------------------------------------------------ |
+| `ts/car/` (physics, sensors, controls, brain)   | `docs/Physics.md`, `docs/NeuralNetwork.md`       |
+| `ts/world/`, markings, lights                   | `docs/WorldEditor.md`                            |
+| `ts/simulator/`, training, race, traffic shells | `docs/Simulators.md`, `docs/Race.md`             |
+| `ts/ui/`, keyboard manager, toolbars            | `docs/Keyboard.md`, `docs/Controls.md`           |
+| `styles/`, tokens, CSS structure                | `docs/DesignSystem.md`, `DESIGN.md` (root brief) |
+| `ts/rendering/`, viewport, camera               | `docs/Viewport.md`, `docs/Camera.md`             |
+| `ts/store/`, serialization, save files          | `docs/SaveLoad.md`, `docs/Store.md`              |
+| `ts/math/`, primitives, grids, heatmaps         | `docs/Math.md`, `docs/Units.md`                  |
+| Audio / sound engine                            | `docs/Sound.md`                                  |
+| New project-wide convention                     | `AGENTS.md` (append to relevant section)         |
 
 ## Step 2 — Update each touched doc
 
