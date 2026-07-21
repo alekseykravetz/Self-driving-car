@@ -16,7 +16,7 @@
 }
 
 .traffic-count {
-  margin-top: 6px;
+  margin-top: var(--space-1\.5);
   font-size: var(--text-base);
   color: var(--color-text-muted);
   text-align: center;
@@ -32,13 +32,13 @@
 .traffic-cars-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
 
 .traffic-car-row {
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
-  padding: 5px 6px;
+  padding: var(--radius-md) var(--space-1\.5);
   background: var(--color-bg-surface-raised);
   cursor: pointer;
 }
@@ -55,7 +55,7 @@
 .traffic-car-head {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--radius-md);
 }
 
 .traffic-car-swatch {
@@ -86,7 +86,7 @@
   color: var(--color-text-muted);
   cursor: pointer;
   font-size: var(--text-md);
-  padding: 0 2px;
+  padding: 0 var(--space-0\.5);
   line-height: 1;
 }
 
@@ -104,8 +104,8 @@
 
 .traffic-car-config {
   display: none;
-  margin-top: 6px;
-  padding-top: 6px;
+  margin-top: var(--space-1\.5);
+  padding-top: var(--space-1\.5);
   border-top: 1px solid var(--color-border-subtle);
 }
 

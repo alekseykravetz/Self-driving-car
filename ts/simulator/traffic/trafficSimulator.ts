@@ -4,7 +4,7 @@ import { SpatialHashGrid } from '../../math/spatialGrid.js';
 import type { GridSegment } from '../../math/spatialGrid.js';
 import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import type { TrafficPanelElement } from '../../ui/organisms/trafficPanel.js';
-import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
+import { KeyboardManager } from '../../input/keyboardManager.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
@@ -23,7 +23,7 @@ import {
 } from '../trafficControlUtils.js';
 import { getNearestSegment, scale, angle } from '../../math/utils.js';
 import { Point } from '../../math/primitives/point.js';
-import type { BorderMode } from '../../ui/molecules/modeControls.js';
+import type { BorderMode } from '../types.js';
 import { BODY_MARGIN_RATIO } from '../../car/config.js';
 import { Light } from '../../world/markings/light.js';
 import { Start } from '../../world/markings/start.js';

@@ -17,7 +17,7 @@ import { drawSegment } from '../../rendering/segmentRenderer.js';
 import {
   KeyboardManager,
   ShortcutBinding,
-} from '../../ui/atoms/keyboardManager.js';
+} from '../../input/keyboardManager.js';
 
 export class GraphEditor {
   #viewport: Viewport;

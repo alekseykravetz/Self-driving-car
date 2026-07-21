@@ -4,8 +4,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--space-8);
+  height: var(--space-8);
   border: none;
   border-radius: var(--radius-md);
   background: var(--color-bg-input);
@@ -25,7 +25,7 @@
 
 .toolbar-btn.active {
   background: var(--color-bg-active-strong);
-  outline: 2px solid var(--color-bg-active-outline);
+  outline: var(--space-0\.5) solid var(--color-bg-active-outline);
 }
 
 .toolbar-btn:disabled {
@@ -36,7 +36,7 @@
 .toolbar-btn[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--space-2));
   left: 0;
   transform: none;
   background-color: var(--color-bg-dark);
@@ -61,7 +61,7 @@
   justify-content: center;
   background-color: var(--color-text-secondary);
   filter: grayscale(100%);
-  font-size: 20px;
+  font-size: 20px; /* TODO: add token */
   padding: var(--space-1) var(--space-2);
   border: none;
   border-radius: var(--radius-md);
@@ -86,7 +86,7 @@
 .editor-mode-btn[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + var(--space-2));
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--color-bg-dark);

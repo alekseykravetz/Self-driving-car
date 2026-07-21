@@ -53,7 +53,7 @@
 .view-toggle-label {
   display: flex;
   align-items: center;
-  height: 32px;
+  height: var(--space-8);
   gap: var(--space-1);
   cursor: pointer;
   font-size: var(--text-sm);
@@ -101,7 +101,7 @@
   letter-spacing: 0;
   font-size: 0.75rem;
   color: var(--color-text-muted);
-  margin-left: 6px;
+  margin-left: var(--space-1\.5);
 }
 
 /* ── World editor ──────────────────────────────────────────────── */

@@ -45,19 +45,18 @@ import './editors/worldEditor.js';
 import '../viewport/scaleIndicator.js';
 import '../viewport/viewport.js';
 import '../mini-map/miniMap.js';
-import '../utils.js';
 import '../car/loader/carLoader.js';
 import '../store/types.js';
 import '../store/storeManager.js';
-import '../panels/templates/worldToolbarTemplate.js';
-import '../panels/templates/shortcutsToolbarTemplate.js';
-import '../panels/templates/worldLayersToolbarTemplate.js';
-import '../panels/modeControls.js';
-import '../panels/assetSelectors.js';
-import '../panels/worldToolbar.js';
-import '../panels/shortcutsToolbar.js';
-import '../panels/worldLayersToolbar.js';
-import '../panels/editorToolbar.js';
+import '../ui/molecules/worldToolbarTemplate.js';
+import '../ui/molecules/shortcutsToolbarTemplate.js';
+import '../ui/molecules/worldLayersToolbarTemplate.js';
+import '../ui/molecules/modeControls.js';
+import '../ui/molecules/assetSelectors.js';
+import '../ui/molecules/worldToolbar.js';
+import '../ui/molecules/shortcutsToolbar.js';
+import '../ui/molecules/worldLayersToolbar.js';
+import '../ui/molecules/editorToolbar.js';
 
 (async () => {
   await StoreManager.init();

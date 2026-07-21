@@ -12,8 +12,8 @@
   scrollbar-color: var(--color-scrollbar) transparent;
 }
 *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: var(--space-1\.5);
+  height: var(--space-1\.5);
 }
 *::-webkit-scrollbar-thumb {
   background: var(--color-border-strong);
@@ -61,8 +61,8 @@ button,
 .file-input-label {
   border: none;
   border-radius: var(--radius-md);
-  padding: 5px;
-  margin: 2px;
+  padding: var(--radius-md);
+  margin: var(--space-0\.5);
   cursor: pointer;
   background-color: lightgray;
 }

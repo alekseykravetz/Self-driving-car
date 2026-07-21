@@ -1,9 +1,6 @@
+import type { BorderMode } from '../../simulator/types.js';
 import { ToolbarModeControls } from './modeControls.js';
-import type {
-  BorderMode,
-  TrackingMode,
-  ToolbarViewportMode,
-} from './modeControls.js';
+import type { TrackingMode, ToolbarViewportMode } from './modeControls.js';
 import { ToolbarAssetSelectors } from './assetSelectors.js';
 import type { UnifiedWorldEntry } from '../../store/types.js';
 import type { CarInfo } from '../../car/car.js';

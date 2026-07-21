@@ -1,7 +1,7 @@
 .btn-group-large {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
 
 .btn-row {
@@ -22,7 +22,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  margin-bottom: 6px;
+  margin-bottom: var(--space-1\.5);
 }
 
 .btn-group:last-child {

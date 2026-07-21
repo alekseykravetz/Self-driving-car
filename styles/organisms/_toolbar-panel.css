@@ -7,7 +7,7 @@
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 10px; /* TODO: add token */
   max-width: 60%;
 }
 
@@ -20,9 +20,9 @@
 #worldLayersToolbar {
   display: flex;
   align-items: stretch;
-  gap: 6px;
+  gap: var(--space-1\.5);
   background-color: var(--color-bg-toolbar);
-  padding: 6px 10px;
+  padding: var(--space-1\.5) 10px; /* TODO: add token for 10px */
   border-radius: var(--radius-lg);
   outline: 1px solid var(--color-border-default);
 }
@@ -42,7 +42,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 3px;
+  gap: 3px; /* TODO: add token */
   flex: 0 1 auto;
 }
 
@@ -52,9 +52,9 @@
 #layoutToolbar .border-mode-group,
 #animationLoopToolbar .border-mode-group {
   display: flex;
-  gap: 2px;
+  gap: var(--space-0\.5);
   flex: 0 0 auto;
-  height: 32px;
+  height: var(--space-8);
   align-items: center;
 }
 
@@ -65,7 +65,7 @@
 #animationLoopToolbar .view-toggle-label {
   display: flex;
   align-items: center;
-  height: 32px;
+  height: var(--space-8);
   gap: var(--space-1);
   cursor: pointer;
   font-size: var(--text-sm);
@@ -120,20 +120,19 @@
 #shortcutsToolbar .shortcuts-groups {
   display: flex;
   align-items: stretch;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
 
 #worldLayersToolbar .world-layers-groups {
   display: flex;
   align-items: stretch;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
-
 #worldLayersToolbar .world-layers-keys {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  height: 32px;
+  height: var(--space-8);
   flex: 0 0 auto;
 }
 

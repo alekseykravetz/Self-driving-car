@@ -1,6 +1,6 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
-import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
+import { KeyboardManager } from '../../input/keyboardManager.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { Point } from '../../math/primitives/point.js';

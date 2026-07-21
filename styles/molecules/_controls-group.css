@@ -8,7 +8,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 3px;
+  gap: 3px; /* TODO: add token */
   flex: 0 1 auto;
 }
 
@@ -54,14 +54,14 @@ editor-toolbar .controls-group {
 #layoutToolbar .border-mode-group,
 #animationLoopToolbar .border-mode-group {
   display: flex;
-  gap: 2px;
+  gap: var(--space-0\.5);
   flex: 0 0 auto;
-  height: 32px;
+  height: var(--space-8);
   align-items: center;
 }
 
 .time-display-group {
-  height: 32px;
+  height: var(--space-8);
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -73,13 +73,13 @@ editor-toolbar .controls-group {
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   color: var(--color-text-muted);
-  min-width: 45px;
+  min-width: 45px; /* TODO: add token */
   text-align: center;
 }
 
 .reset-time-btn {
-  width: 24px;
-  height: 24px;
+  width: var(--space-6);
+  height: var(--space-6);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   background: var(--color-bg-active);
@@ -93,7 +93,7 @@ editor-toolbar .controls-group {
 }
 
 .reset-time-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
   color: var(--color-text-primary);
 }
 
@@ -102,7 +102,7 @@ editor-toolbar .controls-group {
 }
 
 .fps-display {
-  height: 32px;
+  height: var(--space-8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,7 +110,7 @@ editor-toolbar .controls-group {
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   color: var(--color-text-muted);
-  min-width: 45px;
+  min-width: 45px; /* TODO: add token */
   text-align: center;
   flex: 0 0 auto;
 }
@@ -122,24 +122,24 @@ editor-toolbar .controls-group {
 }
 
 .spawn-car-select {
-  height: 32px;
+  height: var(--space-8);
   max-width: 140px;
   border: none;
   border-radius: var(--radius-md);
   background: var(--color-bg-active);
   color: var(--color-text-primary);
   font-size: var(--text-md);
-  padding: 0 6px;
+  padding: 0 var(--space-1\.5);
   cursor: pointer;
 }
 
 .spawn-car-select option {
-  color: #000;
+  color: var(--color-text-inverse);
 }
 
 .controls-divider {
   width: 1px;
-  height: 28px;
+  height: 28px; /* TODO: add token */
   background-color: var(--color-border-default);
-  margin: 0 6px;
+  margin: 0 var(--space-1\.5);
 }

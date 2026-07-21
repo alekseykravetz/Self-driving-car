@@ -55,8 +55,9 @@ styles/
 
 ```
 ts/
+  input/                ← cross-cutting input handling: keyboardManager.ts (decoupled via ToolbarUpdater)
   ui/
-    atoms/                ← smallest building blocks: keyboardManager.ts, latchedToggle.ts
+    atoms/                ← smallest building blocks: latchedToggle.ts
     molecules/            ← compound components: shortcutsToolbar, worldLayersToolbar, worldToolbar,
     │                         editorToolbar, layoutToolbar, animationLoopToolbar, assetSelectors, modeControls
     organisms/            ← full feature panels: trainingPanel, trainingInitModal, humanTrainingPanel,
@@ -83,13 +84,14 @@ ts/
 - **`Brain = unknown` opaque type:** Car stores brain as opaque type. Consumers cast `as NeuralNetwork` when they need network API.
 - **Config constants centralised:** `ts/car/config.ts` holds `NN_OUTPUT_COUNT` (4), `DEFAULT_HIDDEN_LAYERS` ([6]), and `DEFAULT_CAR_CONFIG`. Magic numbers in sensor/physics files use named constants (e.g. `TRAFFIC_STATE_RED_THRESHOLD`, `BASIC_RAY_DOT_RADIUS`).
 - **Math-layer type isolation:** `ts/math/heatmapGrid.ts` defines a local `VehiclePosition` interface instead of importing the `Car` type. Pure-math files must not import from `car/`, `rendering/`, or `neural-network/`.
+- **Domain types isolation:** `BorderMode` and `LayoutMode` types are defined in `ts/simulator/types.ts` (shared domain types file). UI molecules (`modeControls.ts`, `layoutToolbar.ts`) import these types rather than defining them, preventing upward FSD imports from domain logic to UI molecules. Add new shared domain types here, not in UI files.
 - **`Car.update()` decomposed:** Steering, physics, brain inference, and engine-sync are split into `#applySteering()`, `this.physics.update()`, `#processBrain(polygons, trafficControls, otherCars)`, and `#syncEngine()` — no constructor calls `this.update()`.
 - **Brain desync guard in `load()`:** After deserialization, `Car.load()` checks `brainsCompatible(brain, rayCount, stateAware)` and clears the brain if dimensions don't match the current sensor config.
 - **Traffic-light perception:** `TrafficControlGrid` (`ts/math/trafficControlGrid.ts`) indexes `Light` polygons (150px cells, mirrors `SpatialHashGrid`); rebuilt only when world markings change, light _state_ read live at query time via a `getState` closure. `ts/simulator/trafficControlUtils.ts` exposes `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)`.
 - **Unified state-aware sensor:** `Sensor.stateAware: boolean` replaces the old `sophistication` enum. When `stateAware=true`, each ray produces two brain inputs: `[1-distance, state]` where state encodes how blocking the nearest obstacle is (0=clear, 0.5=caution, 1=stop). Legacy mode (`stateAware=false`) uses `[1-distance]` per ray. Total input layer: `stateAware ? rayCount*2+1 : rayCount+1` (the +1 is self-speed). `brainsCompatible()` validates layer dimensions to reject cross-mode swaps.
 - **Traffic control override:** `Light` has `#overridden` flag + `override(state)`/`releaseOverride()` methods. `TrafficManager.update()` skips overridden lights (pauses automatic cycling). Left-click a placed light in the world editor: first click pauses cycling (state='off'), then cycles off→green→yellow→red→release (back to regular cycling). Press `G` in the traffic simulator or training simulator (world mode) to force all lights green / restore normal cycling. Override state is ephemeral (not persisted). `LightEditor` uses `stopImmediatePropagation()` on mousedown to intercept clicks on existing lights before the base `MarkingEditor` places a new one.
 - **Human Backpropagation mode:** `html/human-training.html` is a standalone single-car simulator (`HumanBackpropSimulator extends SimulatorShell`) with no AI population/gene pool. The KEYS car's brain is trained online each frame via `NeuralNetwork.trainStep(network, inputs, targets, lr)` (sigmoid-relaxation backprop, returns `boolean` indicating weight changes) to imitate human keypresses; `Car.#autopilot` toggles brain-driven driving (pauses learning, sets `Controls.frozen = true` so keyboard listeners can't overwrite brain controls; disengaging resets all controls to `false` so the car stops immediately); `Car.#lastBrainOutput` exposes the brain's prediction for accuracy display; `Car.#brainChangedThisFrame` exposes whether weights changed for the panel's brain-activity dot. Learning is ON by default; press **L** to toggle learning on/off (wired via `KeyboardManager` toggle binding with `latchOnly: true` for press-to-toggle behavior + `KeyboardManager.setToggleActive` for initial state). The network visualizer draws green/red match rings on output neurons via the optional `match` parameter to `NetworkVisualizer.draw()` / `SimulatorShell.drawNetworkVisualizer()`. Accuracy uses a rolling 120-frame window with per-channel % (not cumulative); idle frames (no drive keys held) are skipped so the % freezes rather than decaying to 0 when you stop driving (accuracy compares the brain's output against the keys currently pressed, independent of the L learning toggle). The panel includes a brain inspector showing live weights/biases per layer. Brain persists to localStorage key `humanTrainedCar`. Car config is set via `<human-training-config-modal>` (locked to saved brain topology when a save exists).
-- **Centralised keyboard manager:** `KeyboardManager` (`ts/ui/atoms/keyboardManager.ts`) owns ALL key routing. No module registers `window` keydown/keyup directly — they call `km.setBindings()`, `km.pushBindings()`, or `km.popBindings()` instead. The manager auto-syncs `ShortcutsToolbarElement` (flash for momentary, setActive for toggle/display). Display keys (Ctrl, arrows) have `kind: 'display'` + `keys[]`; the manager lights the indicator while the physical key is held. Toggle bindings support `latchOnly: true` for press-to-toggle (keydown calls `toggleLatch()`, keyup is a no-op); default is held/latched (keydown sets physical hold, keyup releases).
+- **Centralised keyboard manager:** `KeyboardManager` (`ts/input/keyboardManager.ts`) owns ALL key routing. No module registers `window` keydown/keyup directly — they call `km.setBindings()`, `km.pushBindings()`, or `km.popBindings()` instead. The manager syncs toolbar state via the `ToolbarUpdater` interface (decoupling the atom from the concrete molecule): `flash()` for momentary, `setActive()` for toggle/display. Display keys (Ctrl, arrows) have `kind: 'display'` + `keys[]`; the manager lights the indicator while the physical key is held. Toggle bindings support `latchOnly: true` for press-to-toggle (keydown calls `toggleLatch()`, keyup is a no-op); default is held/latched (keydown sets physical hold, keyup releases).
   - `simulatorShell.ts` no longer registers a raw `v` key listener — the network-visualizer density toggle (`visDensity`) is a `momentary` binding in each subclass's KeyboardManager setup (`TrainingSimulator`, `HumanBackpropSimulator`, `TrafficSimulator`). `RaceSimulator` lacks a KeyboardManager and does not expose the binding.
   - Modal dialogs (`TrainingInitModalElement`, `HumanTrainingConfigModalElement`) use `pushBindings`/`popBindings` for the Escape key: pushed when the modal opens, popped when it closes via `#start()` or `#cancel()`. The modal receives a `KeyboardManager` reference via a `setKeyboardManager()` setter.
 - **`trainStep` per-output LR:** `NeuralNetwork.trainStep` accepts `lr: number | number[]`. When an array `[f, l, r, rev]`, per-neuron LR applies **only to the last (output) level** — hidden levels always use `lr[0]` as a single scalar to avoid out-of-bounds `undefined` → `NaN`.
@@ -117,25 +119,27 @@ ts/
 
 ## Key commands
 
-| Command                      | Purpose                                              |
-| ---------------------------- | ---------------------------------------------------- |
-| `npm start`                  | Full dev: tsc watch + server + lint/format           |
-| `npm run tsc:watch`          | Compile TS on save only                              |
-| `npm run serve`              | Static server on :9090                               |
-| `npm run lint`               | ESLint auto-fix                                      |
-| `npm run format`             | Prettier (singleQuote: true)                         |
-| `npm run format:check`       | Prettier check only (no write)                       |
-| `npm run fix:all`            | format + lint                                        |
-| `npm test`                   | Run all unit tests                                   |
-| `npm run test:fast`          | Run tests for changed files only                     |
-| `npm run test:changed`       | Run tests for changed files only                     |
-| `npm run test:dev`           | Watch mode with fast initial run                     |
-| `npm run test:watch`         | Run tests in watch mode (TDD)                        |
-| `npm run test:coverage`      | Run tests with coverage report                       |
-| `npm run test:visual`        | Run Playwright visual regression tests               |
-| `npm run test:visual:update` | Update Playwright visual baselines                   |
-| `npm run publish:site`       | Deploy via here.now (scripts/publish-site.sh)        |
-| `graphify update .`          | Rebuild graphify knowledge graph (also: `/graphify`) |
+| Command                      | Purpose                                                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `npm start`                  | Full dev: tsc watch + server + lint/format                                                                 |
+| `npm run tsc:watch`          | Compile TS on save only                                                                                    |
+| `npm run clean`              | Delete the generated `js/` folder                                                                          |
+| `npm run rebuild`            | `clean` + `tsc` — full fresh recompile of ts/ → js/ (fixes stale orphaned .js files after renames/deletes) |
+| `npm run serve`              | Static server on :9090                                                                                     |
+| `npm run lint`               | ESLint auto-fix                                                                                            |
+| `npm run format`             | Prettier (singleQuote: true)                                                                               |
+| `npm run format:check`       | Prettier check only (no write)                                                                             |
+| `npm run fix:all`            | format + lint                                                                                              |
+| `npm test`                   | Run all unit tests                                                                                         |
+| `npm run test:fast`          | Run tests for changed files only                                                                           |
+| `npm run test:changed`       | Run tests for changed files only                                                                           |
+| `npm run test:dev`           | Watch mode with fast initial run                                                                           |
+| `npm run test:watch`         | Run tests in watch mode (TDD)                                                                              |
+| `npm run test:coverage`      | Run tests with coverage report                                                                             |
+| `npm run test:visual`        | Run Playwright visual regression tests                                                                     |
+| `npm run test:visual:update` | Update Playwright visual baselines                                                                         |
+| `npm run publish:site`       | Deploy via here.now (scripts/publish-site.sh)                                                              |
+| `graphify update .`          | Rebuild graphify knowledge graph (also: `/graphify`)                                                       |
 
 ## Harness layout (`.opencode/`)
 

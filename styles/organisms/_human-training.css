@@ -3,8 +3,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 28px; /* TODO: add token */
+  height: 28px; /* TODO: add token */
   font-family: monospace;
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
@@ -70,7 +70,7 @@
   background: var(--color-accent-blue-bg);
   border: 1px solid var(--color-accent-blue-border);
   color: var(--color-accent-blue);
-  padding: 6px var(--space-2);
+  padding: var(--space-1\.5) var(--space-2);
   border-radius: var(--radius-sm);
   font-size: var(--text-base);
   font-weight: var(--weight-bold);
@@ -90,26 +90,26 @@
 .ht-learning-state.learning {
   color: var(--color-accent-green-strong);
   background: var(--color-accent-green-bg);
-  border: 1px solid rgba(92, 184, 92, 0.3);
+  border: 1px solid rgba(92, 184, 92, 0.3); /* TODO: replace with token */
 }
 
 .ht-learning-state.paused {
   color: var(--color-accent-yellow);
   background: var(--color-accent-yellow-bg);
-  border: 1px solid rgba(240, 173, 78, 0.3);
+  border: 1px solid rgba(240, 173, 78, 0.3); /* TODO: replace with token */
 }
 
 .ht-hint {
   font-size: var(--text-sm);
   color: var(--color-text-dim);
   text-align: center;
-  margin-top: 2px;
+  margin-top: var(--space-0\.5);
 }
 
 .ht-checkbox-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1\.5);
   cursor: pointer;
   font-size: var(--text-md);
   color: var(--color-text-secondary);
@@ -119,7 +119,7 @@
   display: flex;
   justify-content: space-between;
   font-size: var(--text-base);
-  padding: 2px 0;
+  padding: var(--space-0\.5) 0;
 }
 
 .ht-info-label {
@@ -143,7 +143,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-0\.5);
 }
 
 .ht-key-pct {
@@ -157,19 +157,19 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
   transition: all 0.1s;
 }
 
 .ht-weight-dot.pulse {
-  background: #5cb85c;
-  box-shadow: 0 0 6px rgba(92, 184, 92, 0.6);
+  background: var(--color-accent-green-strong);
+  box-shadow: 0 0 6px rgba(92, 184, 92, 0.6); /* TODO: replace with token */
 }
 
 .ht-slider-label {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 3px; /* TODO: add token */
   font-size: var(--text-base);
   color: var(--color-text-secondary);
 }
@@ -177,7 +177,7 @@
 .ht-slider-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
 
 .ht-status {
@@ -195,7 +195,7 @@
 }
 
 .ht-brain-layer {
-  margin-bottom: 6px;
+  margin-bottom: var(--space-1\.5);
   padding-bottom: var(--space-1);
   border-bottom: 1px solid var(--color-border-subtle);
 }
@@ -204,14 +204,14 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   color: var(--color-accent-blue);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-0\.5);
 }
 
 .ht-brain-row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-1);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-0\.5);
   flex-wrap: wrap;
 }
 
@@ -222,29 +222,29 @@
 
 .ht-brain-weights {
   margin-left: var(--space-2);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-0\.5);
 }
 
 .ht-brain-weight-row {
   display: flex;
-  gap: 2px;
+  gap: var(--space-0\.5);
   margin-bottom: 1px;
 }
 
 .ht-brain-val {
   display: inline-block;
-  min-width: 32px;
+  min-width: var(--space-8);
   text-align: right;
-  padding: 0 2px;
-  border-radius: 2px;
+  padding: 0 var(--space-0\.5);
+  border-radius: 2px; /* TODO: add token */
 }
 
 .ht-brain-val.pos {
   color: var(--color-accent-green-strong);
-  background: rgba(92, 184, 92, 0.08);
+  background: rgba(92, 184, 92, 0.08); /* TODO: replace with token */
 }
 
 .ht-brain-val.neg {
   color: var(--color-accent-red);
-  background: rgba(217, 83, 79, 0.08);
+  background: rgba(217, 83, 79, 0.08); /* TODO: replace with token */
 }

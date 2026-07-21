@@ -27,7 +27,7 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 - `serve -p 9090` serves the root directory as static files
 - Each HTML page loads exactly one `<script type="module" src="/js/path/to/entry.js">`
 - The browser resolves the import graph at runtime — no manual dependency ordering needed
-- `npm test` runs all unit tests via vitest (single run; 48 files, 684 tests)
+- `npm test` runs all unit tests via vitest (single run; 81 files, 1113 tests)
 - `npm run test:fast` / `npm run test:changed` runs tests for changed files only
 - `npm run test:watch` runs tests in watch mode (TDD)
 - `npm run test:coverage` runs tests with coverage report in `coverage/`
@@ -39,7 +39,7 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 
 | Directory        | Purpose                                                            | Framework  |
 | ---------------- | ------------------------------------------------------------------ | ---------- |
-| `tests/unit/`    | Pure-logic and integration unit tests (48 files, 684 tests)        | vitest     |
+| `tests/unit/`    | Pure-logic and integration unit tests (81 files, 1113 tests)       | vitest     |
 | `tests/visual/`  | Playwright visual regression tests (5 spec files, Chromium)        | Playwright |
 | `tests/helpers/` | Shared test utilities (`makeKnownNetwork`, `setupImageMock`, etc.) | —          |
 
@@ -280,7 +280,8 @@ Training environments and genetic algorithm orchestration.
 Functions shared by all canvas-based simulators (TrainingSimulator, TrafficSimulator, RaceSimulator).
 
 | Module                       | Responsibility                                                                                           |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `types.ts`                   | Shared domain types: `BorderMode` ('none'                                                                | 'damage' | 'collision'), `LayoutMode` ('topview-big' \| 'camera-big') — extracted from UI molecules to prevent upward FSD imports |
 | `spatialGridUtils.ts`        | `buildRoadBorders()`, `queryBordersNearCar()`, `pointToSegmentDistanceSq()`                              |
 | `trafficControlUtils.ts`     | `buildTrafficControls(world)` + `queryTrafficControlsNearCar(grid, car)` for AI traffic-light perception |
 | `rendering/layoutManager.ts` | Canvas resize logic for multi-panel layout                                                               |
@@ -370,10 +371,11 @@ into three layers under `ts/ui/`:
 
 **Atom-level files:**
 
-| Module               | Responsibility                                                             |
-| -------------------- | -------------------------------------------------------------------------- |
-| `keyboardManager.ts` | Central keyboard router: owns window listeners, `LatchedToggle` management |
-| `latchedToggle.ts`   | Held/latched state machine (replaces 4 prior copies)                       |
+| Module             | Responsibility                                       |
+| ------------------ | ---------------------------------------------------- |
+| `latchedToggle.ts` | Held/latched state machine (replaces 4 prior copies) |
+
+> `KeyboardManager` lives in `ts/input/keyboardManager.ts` — it is a cross-cutting singleton outside the Atomic Design tree (used by both UI molecules and domain logic). See [Keyboard.md](Keyboard.md) for details.
 
 **Molecule-level components:**
 

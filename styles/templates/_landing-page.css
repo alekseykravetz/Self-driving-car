@@ -6,8 +6,12 @@
 .landing-header h1 {
   font-size: 2rem;
   font-weight: var(--weight-extrabold);
-  margin: 0 0 6px;
-  background: linear-gradient(135deg, #7ddf7d, #4ecdc4);
+  margin: 0 0 var(--space-1\.5);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green),
+    #4ecdc4
+  ); /* TODO: add token for #4ecdc4 */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -18,15 +22,17 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 14px; /* TODO: add token */
   max-width: 100%;
 }
 
 .landing-logo {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  filter: drop-shadow(0 2px 8px rgba(78, 205, 196, 0.35));
+  width: 56px; /* TODO: add token */
+  height: 56px; /* TODO: add token */
+  filter: drop-shadow(
+    0 2px 8px rgba(78, 205, 196, 0.35)
+  ); /* TODO: replace with token */
 }
 
 .landing-header .subtitle {
@@ -48,7 +54,7 @@
   background: var(--color-bg-surface-raised);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8) 28px;
+  padding: var(--space-8) 28px; /* TODO: add token */
   text-align: left;
   min-width: 0;
   max-height: 500px;
@@ -61,7 +67,7 @@
 
 .landing-card:hover {
   border-color: var(--color-border-default);
-  transform: translateY(-2px);
+  transform: translateY(calc(-1 * var(--space-0\.5)));
 }
 
 .card-icon {
@@ -92,8 +98,8 @@
 .card-btn {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
+  gap: 14px; /* TODO: add token */
+  padding: 14px 18px; /* TODO: add token */
   background: var(--color-bg-surface-raised);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xl);
@@ -108,7 +114,7 @@
 .card-btn:hover {
   background: var(--color-bg-active);
   border-color: var(--color-accent-green-border);
-  transform: translateX(4px);
+  transform: translateX(var(--space-1));
 }
 
 .card-btn .btn-icon {
@@ -130,5 +136,5 @@
 .card-btn small {
   font-size: 0.78rem;
   color: var(--color-text-dim);
-  margin-top: 2px;
+  margin-top: var(--space-0\.5);
 }

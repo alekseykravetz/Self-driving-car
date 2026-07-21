@@ -11,15 +11,15 @@ calls across editors and simulators.
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                    KeyboardManager                            │
-│  (ts/ui/atoms/keyboardManager.ts)                            │
+│  (ts/input/keyboardManager.ts)                               │
 │                                                               │
 │  - Single window keydown/keyup listener pair                  │
 │  - Registry: ShortcutBinding[] (root + pushed contexts)       │
 │  - LatchedToggle state machines for toggle shortcuts          │
-│  - Automatic flash/setActive on ShortcutsToolbarElement       │
+│  - Communicates via ToolbarUpdater interface                  │
 │  - Context stack via pushBindings / popBindings               │
 └──────────────────────┬───────────────────────────────────────┘
-                       │ delegates to
+                       │ delegates to (via ToolbarUpdater)
                        ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                 ShortcutsToolbarElement                       │
@@ -27,6 +27,7 @@ calls across editors and simulators.
 │                                                               │
 │  - Purely presentational (renders key-cap indicators)         │
 │  - No key listeners of its own                                │
+│  - Implements ToolbarUpdater interface                        │
 │  - Receives state updates from KeyboardManager                │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -170,7 +171,7 @@ HumanBackpropSimulator.#initToolbar():
 
 | File                                                   | Role                                                                                          |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `ts/ui/atoms/keyboardManager.ts`                       | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync |
+| `ts/input/keyboardManager.ts`                          | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync |
 | `ts/ui/atoms/latchedToggle.ts`                         | Held/latched state machine (extracted from 4 prior copies)                                    |
 | `ts/ui/molecules/shortcutsToolbar.ts`                  | `<shortcuts-toolbar>` custom element — purely presentational rendering of key indicators      |
 | `ts/ui/molecules/shortcutsToolbarTemplate.ts`          | Static HTML template for the toolbar                                                          |

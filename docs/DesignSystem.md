@@ -116,16 +116,18 @@ Letter-spacing: `--tracking-wide` (0.5px), `--tracking-wider` (1px),
 
 4px base unit:
 
-| Token        | Value |
-| ------------ | ----- |
-| `--space-1`  | 4px   |
-| `--space-2`  | 8px   |
-| `--space-3`  | 12px  |
-| `--space-4`  | 16px  |
-| `--space-5`  | 20px  |
-| `--space-6`  | 24px  |
-| `--space-8`  | 32px  |
-| `--space-12` | 40px  |
+| Token          | Value |
+| -------------- | ----- |
+| `--space-0\.5` | 2px   |
+| `--space-1`    | 4px   |
+| `--space-1\.5` | 6px   |
+| `--space-2`    | 8px   |
+| `--space-3`    | 12px  |
+| `--space-4`    | 16px  |
+| `--space-5`    | 20px  |
+| `--space-6`    | 24px  |
+| `--space-8`    | 32px  |
+| `--space-12`   | 40px  |
 
 ### Border Radius
 

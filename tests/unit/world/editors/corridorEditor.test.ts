@@ -6,7 +6,7 @@ import { Viewport } from '../../../../ts/viewport/viewport.js';
 import { World } from '../../../../ts/world/world.js';
 import { Corridor } from '../../../../ts/world/corridor.js';
 import { CorridorEditor } from '../../../../ts/world/editors/corridorEditor.js';
-import { KeyboardManager } from '../../../../ts/panels/keyboardManager.js';
+import { KeyboardManager } from '../../../../ts/input/keyboardManager.js';
 import { setupImageMock } from '../../../helpers/setupImageMock.js';
 
 setupImageMock();

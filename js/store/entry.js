@@ -1,4 +1,3 @@
-import '../utils.js';
 import '../car/config.js';
 import '../car/loader/carLoader.js';
 import '../world/loader/worldLoader.js';

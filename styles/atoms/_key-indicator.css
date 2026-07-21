@@ -4,14 +4,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 5px;
+  min-width: var(--space-8);
+  height: var(--space-8);
+  padding: 0 var(--radius-md);
   font-family: monospace;
   font-size: var(--text-lg);
   font-weight: bold;
   color: var(--color-text-secondary);
-  background-color: #333;
+  background-color: #333; /* TODO: add token — no matching var */
   border: 1px solid var(--color-text-secondary);
   border-radius: var(--radius-sm);
   cursor: default;
@@ -45,7 +45,7 @@
 .key-indicator[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--space-2));
   left: 0;
   transform: none;
   background-color: var(--color-bg-dark);
