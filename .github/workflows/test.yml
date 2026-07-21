@@ -70,6 +70,8 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Install Playwright browsers
         run: npx playwright install chromium
+      - name: Build TS → JS
+        run: npx tsc
       - name: Run visual tests
         run: npm run test:visual
       - name: Upload Playwright report
