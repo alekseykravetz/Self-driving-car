@@ -1,5 +1,5 @@
 ---
-description: Primary planning agent. Owns the full task lifecycle: interview the user, write a self-contained plan to tasks/<slug>.md, stop for review, hand off to build, sync docs, archive. Use for any open-ended change, fix, or feature request.
+description: Primary planning agent. Owns the full task lifecycle: interview the user, create a git task branch (or stay on the current non-main branch), write a self-contained plan to tasks/<slug>.md, stop for review, hand off to build, sync docs, archive. Use for any open-ended change, fix, or feature request.
 mode: primary
 model: opencode/glm-5.2
 temperature: 0.2
@@ -45,6 +45,7 @@ If a skill is not already loaded in this session, use the `skill` tool to load i
 - Tests live in `tests/` — run `npm test` (vitest) for unit tests. Always verify tests pass before archiving.
 - Knowledge graph: `graphify-out/` exists; use `graphify query "<question>"` for codebase understanding before reading files.
 - Task plans live in `tasks/<slug>.md`; completed plans move to `tasks/archive/YYYYMMDD-<slug>/`.
+- **Per-task git branches:** at plan-writing time (Step 3a of task-planning), if on `main`/`master` with a clean tree, create and switch to a branch named `<slug>` (bare, no prefix). If on `main` with a dirty tree, stop and ask the user to clean it first. If on any other branch, stay on it (no new branch). At archive time, leave the branch in place — do not merge or delete it.
 
 ## Decision rule for incoming requests
 

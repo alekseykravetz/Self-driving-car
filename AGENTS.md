@@ -154,6 +154,13 @@ The agent harness lives in `.opencode/` and is part of this repo (tracked in git
 
 The task lifecycle (task-planning skill) refreshes the graphify knowledge graph after the reviewer confirms code is complete and before docs sync. Run `/graphify` for ad-hoc refresh.
 
+### Per-task git branches
+
+The task-planning workflow creates a git branch per task to isolate work:
+
+- **At plan-writing time (Step 3a):** if the current branch is `main`/`master` and the working tree is clean, the planner runs `git checkout -b <slug>` (bare slug, no prefix — matches the `tasks/<slug>.md` filename). If the working tree on `main` is dirty, the planner stops and asks the user to commit/stash/discard before proceeding. If the current branch is anything other than `main`/`master`, the planner stays on it (no new branch — supports stacked tasks and release branches). If a branch named `<slug>` already exists, it switches to it (resume scenario).
+- **At archive time (Step 10):** the task branch is left in place — the planner does NOT merge or delete it. The user merges, opens a PR, or deletes it manually. The archive commit (moving the plan MD into `tasks/archive/`) is made on the task branch.
+
 ## CI (GitHub Actions)
 
 - **Workflow file:** `.github/workflows/test.yml`

@@ -35,7 +35,39 @@ Rules:
 - Never ask a question whose answer is already in `AGENTS.md`, `docs/`, or the existing task MD files.
 - Prefer options that reference real files/symbols in this repo over generic phrasing.
 
-## Step 3 — Write the plan to `tasks/<slug>.md`
+## Step 3 — Git branch setup + write the plan
+
+### 3a — Git branch setup
+
+Before writing the plan MD, isolate the work on its own branch so the working tree stays clean during the plan-review wait and the implementation is contained.
+
+Determine the current state:
+
+```bash
+git rev-parse --abbrev-ref HEAD    # current branch name
+git status --porcelain             # empty output = clean working tree
+```
+
+Branch decision (the slug is the kebab-case name from 3b below — decide it first, then branch):
+
+- **On `main` (or `master`) with a clean tree** → create and switch to a new branch named `<slug>`:
+  ```bash
+  git checkout -b <slug>
+  ```
+- **On `main` (or `master`) with a dirty tree** → STOP. Tell the user:
+  > Your working tree on `main` has uncommitted changes. Please commit, stash, or discard them before I create a task branch, then reply to continue.
+  > Do NOT proceed, do NOT write the plan, do NOT create a branch. Re-check cleanliness with `git status --porcelain` when the user replies before creating the branch.
+- **On any branch other than `main`/`master`** → stay on it. Do not create a new branch. The task is developed on the current branch (this supports stacked tasks and release branches). Mention to the user which branch you're staying on.
+
+If a branch named `<slug>` already exists (resume scenario), switch to it instead of creating a new one:
+
+```bash
+git checkout <slug>
+```
+
+After branch setup, the plan MD in 3b is written on this branch. The plan-review wait (Step 4) and the build handoff (Step 5) all happen on this branch.
+
+### 3b — Write the plan to `tasks/<slug>.md`
 
 The slug is kebab-case, 2-6 words, derived from the request. Examples: `traffic-light-override`, `extract-magic-numbers`, `fix-script-ordering`.
 
@@ -112,9 +144,9 @@ If none, write "None.">
 
 ## Step 4 — STOP for review
 
-After writing `tasks/<slug>.md`, output:
+After writing `tasks/<slug>.md` (and creating/switching to the task branch per 3a), output:
 
-> Plan written to `tasks/<slug>.md`. Review it and reply `proceed` to hand off to the build agent, or tell me what to change.
+> Plan written to `tasks/<slug>.md` on branch `<branch-name>`. Review it and reply `proceed` to hand off to the build agent, or tell me what to change.
 
 Then stop. Do NOT call the build agent. Do NOT edit source. Wait for the user.
 
@@ -234,7 +266,9 @@ When the user confirms the work is complete:
 1. Create `tasks/archive/YYYYMMDD-<slug>/` (use today's date, the same date as the plan's `**Date:**` field when possible).
 2. Move `tasks/<slug>.md` (and any `01-`, `02-` sibling plan files) into that archive folder.
 3. If the plan generated sub-feature MDs, move all of them together.
-4. Confirm the archive path to the user.
+4. Commit the archive move on the current branch: `git add tasks/archive/YYYYMMDD-<slug>/ tasks/<slug>.md && git commit -m "archive: <slug>"` (only if the plan MD was tracked by git).
+5. **Do NOT merge or delete the task branch.** The branch is left in place for the user to merge, open a PR, or delete manually. Mention the branch name to the user so they know what to merge.
+6. Confirm the archive path and branch name to the user.
 
 Do NOT archive until the user explicitly confirms completion. "Looks good" or "works" counts as confirmation; "I'll test later" does not.
 
