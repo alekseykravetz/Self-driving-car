@@ -3,6 +3,11 @@ import type { Car } from '../../../car/car.js';
 /**
  * Draws the simulator cars (regular AI cars, pool cars, prev pool cars, and KEYS car) on the game canvas.
  *
+ * Architecture note (Issue 5a): This function currently takes `Car[]` directly.
+ * Per architecture rules, `Car` is a domain type and this is a rendering context.
+ * In the future, migrate to `CarDrawData[]` — for now the full `Car` type is
+ * retained because `CarDrawData` doesn't expose pool membership or type checking.
+ *
  * @param ctx - The canvas rendering context.
  * @param cars - The complete array of cars in the simulation.
  * @param bestPool - The pool of top-performing cars (current generation).

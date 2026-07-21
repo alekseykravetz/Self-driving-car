@@ -8,6 +8,7 @@ import type { TrafficControlState } from '../../math/trafficControlGrid.js';
 import { lerp } from '../../math/utils.js';
 import { nearestEdgeOffset } from '../../math/collision.js';
 import type { SensorReading } from './sensorReading.js';
+import { SensorRenderer } from '../../rendering/sensorRenderer.js';
 
 export type { SensorReading } from './sensorReading.js';
 
@@ -16,10 +17,10 @@ export interface SensorTrafficControl {
   state: TrafficControlState;
 }
 
-const TRAFFIC_STATE_RED_THRESHOLD = 0.9;
-const TRAFFIC_STATE_YELLOW_THRESHOLD = 0.4;
-const BASIC_RAY_DOT_RADIUS = 3;
-const TRAFFIC_RAY_DOT_RADIUS = 4;
+export const TRAFFIC_STATE_RED_THRESHOLD = 0.9;
+export const TRAFFIC_STATE_YELLOW_THRESHOLD = 0.4;
+export const BASIC_RAY_DOT_RADIUS = 3;
+export const TRAFFIC_RAY_DOT_RADIUS = 4;
 
 export function encodeTrafficState(state: TrafficControlState | null): number {
   switch (state) {
@@ -155,109 +156,6 @@ export class Sensor {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    if (this.stateAware) {
-      this.#drawStateAware(ctx);
-    } else {
-      this.#drawBasic(ctx);
-    }
-  }
-
-  #drawBasic(ctx: CanvasRenderingContext2D): void {
-    for (let i = 0; i < this.rays.length; i++) {
-      const reading = this.readings[i];
-
-      if (reading) {
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'yellow';
-        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
-        ctx.lineTo(reading.x, reading.y);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.fillStyle = 'yellow';
-        ctx.arc(reading.x, reading.y, BASIC_RAY_DOT_RADIUS, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        ctx.save();
-        ctx.globalAlpha = 0.2;
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'yellow';
-        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
-        ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-  }
-
-  #drawStateAware(ctx: CanvasRenderingContext2D): void {
-    for (let i = 0; i < this.rays.length; i++) {
-      const sr = this.sensorReadings[i];
-
-      if (!sr || sr.type === 'none') {
-        ctx.save();
-        ctx.globalAlpha = 0.2;
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'yellow';
-        ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
-        ctx.lineTo(this.rays[i][1].x, this.rays[i][1].y);
-        ctx.stroke();
-        ctx.restore();
-        continue;
-      }
-
-      let rayColor: string;
-      let dotRadius: number;
-
-      switch (sr.type) {
-        case 'border':
-          rayColor = 'yellow';
-          dotRadius = BASIC_RAY_DOT_RADIUS;
-          break;
-        case 'car':
-          rayColor = '#F00';
-          dotRadius = BASIC_RAY_DOT_RADIUS;
-          break;
-        case 'trafficControl':
-          rayColor =
-            sr.state >= TRAFFIC_STATE_RED_THRESHOLD
-              ? '#F00'
-              : sr.state >= TRAFFIC_STATE_YELLOW_THRESHOLD
-                ? '#FF0'
-                : '#0F0';
-          dotRadius = TRAFFIC_RAY_DOT_RADIUS;
-          break;
-        default:
-          rayColor = 'yellow';
-          dotRadius = BASIC_RAY_DOT_RADIUS;
-      }
-
-      ctx.beginPath();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = rayColor;
-      ctx.moveTo(this.rays[i][0].x, this.rays[i][0].y);
-      ctx.lineTo(sr.x, sr.y);
-      ctx.stroke();
-
-      if (sr.type === 'trafficControl') {
-        ctx.beginPath();
-        ctx.arc(sr.x, sr.y, dotRadius, 0, Math.PI * 2);
-        ctx.fillStyle = rayColor;
-        ctx.fill();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      } else {
-        ctx.beginPath();
-        ctx.fillStyle = rayColor;
-        ctx.arc(sr.x, sr.y, dotRadius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // No continuation ray — the brain only sees the nearest obstacle.
-    }
+    SensorRenderer.draw(ctx, this);
   }
 }

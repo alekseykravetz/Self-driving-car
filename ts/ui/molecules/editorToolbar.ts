@@ -1,4 +1,4 @@
-import type { EditorType } from '../../world/types.js';
+import type { EditorType } from '../../simulator/types.js';
 import { EDITOR_TOOLBAR_TEMPLATE } from './editorToolbarTemplate.js';
 
 export class EditorToolbarElement extends HTMLElement {

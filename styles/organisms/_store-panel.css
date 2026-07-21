@@ -9,7 +9,7 @@ store-panel {
   background: var(--color-bg-surface-raised);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8) 28px; /* TODO: add token */
+  padding: var(--space-8) var(--space-7);
   max-height: 500px;
   min-width: 0;
   display: flex;
@@ -47,7 +47,7 @@ store-panel {
 }
 
 .store-tab {
-  padding: var(--space-1\.5) 14px; /* TODO: add token for 14px */
+  padding: var(--space-1\.5) var(--space-3\.5);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-lg);
   background: transparent;
@@ -101,7 +101,7 @@ store-panel {
 
 .store-table th {
   text-align: left;
-  padding: var(--space-2) 10px;
+  padding: var(--space-2) var(--space-2\.5);
   color: var(--color-text-muted);
   font-weight: var(--weight-semibold);
   font-size: 0.78rem;
@@ -141,7 +141,7 @@ store-panel {
 }
 
 .store-table td {
-  padding: var(--space-2) 10px;
+  padding: var(--space-2) var(--space-2\.5);
   color: var(--color-text-primary);
   border-bottom: 1px solid var(--color-border-subtle);
 }

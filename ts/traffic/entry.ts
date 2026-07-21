@@ -70,7 +70,7 @@ import '../ui/molecules/shortcutsToolbarTemplate.js';
 import '../ui/molecules/worldLayersToolbarTemplate.js';
 import '../simulator/traffic/templates/trafficPanelTemplate.js';
 import '../ui/molecules/modeControls.js';
-import '../ui/molecules/assetSelectors.js';
+import '../ui/organisms/assetSelectors.js';
 import '../ui/molecules/worldToolbar.js';
 import '../ui/molecules/layoutToolbar.js';
 import '../ui/molecules/animationLoopToolbar.js';

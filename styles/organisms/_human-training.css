@@ -3,8 +3,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px; /* TODO: add token */
-  height: 28px; /* TODO: add token */
+  width: var(--space-7);
+  height: var(--space-7);
   font-family: monospace;
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
@@ -90,13 +90,13 @@
 .ht-learning-state.learning {
   color: var(--color-accent-green-strong);
   background: var(--color-accent-green-bg);
-  border: 1px solid rgba(92, 184, 92, 0.3); /* TODO: replace with token */
+  border: 1px solid var(--color-bg-green-border);
 }
 
 .ht-learning-state.paused {
   color: var(--color-accent-yellow);
   background: var(--color-accent-yellow-bg);
-  border: 1px solid rgba(240, 173, 78, 0.3); /* TODO: replace with token */
+  border: 1px solid var(--color-bg-yellow-border);
 }
 
 .ht-hint {
@@ -157,19 +157,19 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
+  background: var(--color-bg-hover-subtle);
   transition: all 0.1s;
 }
 
 .ht-weight-dot.pulse {
   background: var(--color-accent-green-strong);
-  box-shadow: 0 0 6px rgba(92, 184, 92, 0.6); /* TODO: replace with token */
+  box-shadow: var(--shadow-green);
 }
 
 .ht-slider-label {
   display: flex;
   flex-direction: column;
-  gap: 3px; /* TODO: add token */
+  gap: var(--space-0\.5);
   font-size: var(--text-base);
   color: var(--color-text-secondary);
 }
@@ -236,15 +236,15 @@
   min-width: var(--space-8);
   text-align: right;
   padding: 0 var(--space-0\.5);
-  border-radius: 2px; /* TODO: add token */
+  border-radius: var(--radius-sm);
 }
 
 .ht-brain-val.pos {
   color: var(--color-accent-green-strong);
-  background: rgba(92, 184, 92, 0.08); /* TODO: replace with token */
+  background: var(--color-bg-green-subtle);
 }
 
 .ht-brain-val.neg {
   color: var(--color-accent-red);
-  background: rgba(217, 83, 79, 0.08); /* TODO: replace with token */
+  background: var(--color-bg-red-subtle);
 }

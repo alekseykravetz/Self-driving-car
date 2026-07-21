@@ -8,7 +8,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 3px; /* TODO: add token */
+  gap: var(--space-0\.5);
   flex: 0 1 auto;
 }
 
@@ -73,7 +73,7 @@ editor-toolbar .controls-group {
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   color: var(--color-text-muted);
-  min-width: 45px; /* TODO: add token */
+  min-width: var(--space-11);
   text-align: center;
 }
 
@@ -93,7 +93,7 @@ editor-toolbar .controls-group {
 }
 
 .reset-time-btn:hover {
-  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
+  background: var(--color-bg-hover-subtle);
   color: var(--color-text-primary);
 }
 
@@ -110,7 +110,7 @@ editor-toolbar .controls-group {
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   color: var(--color-text-muted);
-  min-width: 45px; /* TODO: add token */
+  min-width: var(--space-11);
   text-align: center;
   flex: 0 0 auto;
 }
@@ -139,7 +139,7 @@ editor-toolbar .controls-group {
 
 .controls-divider {
   width: 1px;
-  height: 28px; /* TODO: add token */
+  height: var(--space-7);
   background-color: var(--color-border-default);
   margin: 0 var(--space-1\.5);
 }

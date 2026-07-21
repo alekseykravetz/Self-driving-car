@@ -49,10 +49,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px; /* TODO: add token */
-  min-width: 22px; /* TODO: add token */
-  max-width: 22px; /* TODO: add token */
-  height: 22px; /* TODO: add token */
+  width: var(--size-btn-num);
+  min-width: var(--size-btn-num);
+  max-width: var(--size-btn-num);
+  height: var(--size-btn-num);
   border: none;
   border-radius: var(--radius-sm);
   padding: 0;
@@ -71,7 +71,7 @@
 /* ── Compact number input row ──────────────────────────────────── */
 
 .num-input-row-sm input[type='number'] {
-  width: 48px; /* TODO: add token */
+  width: var(--space-12);
   flex: 0 0 auto;
   padding: var(--space-0\.5) var(--space-1);
   font-size: var(--text-base);

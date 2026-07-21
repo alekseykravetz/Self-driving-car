@@ -406,7 +406,7 @@ vi.mock('../../../../ts/math/osm-importer/osm.js', () => ({
 
 import { WorldEditor } from '../../../../ts/world/editors/worldEditor.js';
 import { DEFAULT_LAYER_VISIBILITY } from '../../../../ts/world/types.js';
-import type { EditorType } from '../../../../ts/world/types.js';
+import type { EditorType } from '../../../../ts/simulator/types.js';
 
 // ── Helpers ───────────────────────────────────────────────
 

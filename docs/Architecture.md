@@ -325,13 +325,14 @@ Pure renderer functions extracted from math primitives to break the cross-cuttin
 dependency on Canvas 2D APIs. Each function accepts a primitive as data and an
 options interface for style control.
 
-| Module                | Responsibility                                                                    |
-| --------------------- | --------------------------------------------------------------------------------- |
-| `pointRenderer.ts`    | Draws `Point` as filled/outlined circles                                          |
-| `segmentRenderer.ts`  | Draws `Segment` as styled lines with optional dash/cap                            |
-| `polygonRenderer.ts`  | Draws `Polygon` as filled and stroked closed shapes                               |
-| `envelopeRenderer.ts` | Draws `Envelope` by delegating to `drawPolygon`                                   |
-| `heatmapRenderer.ts`  | Paints a `HeatmapGrid` as a viewport-culled colour overlay (blue→cyan→yellow→red) |
+| Module                | Responsibility                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| `pointRenderer.ts`    | Draws `Point` as filled/outlined circles                                                     |
+| `segmentRenderer.ts`  | Draws `Segment` as styled lines with optional dash/cap                                       |
+| `polygonRenderer.ts`  | Draws `Polygon` as filled and stroked closed shapes                                          |
+| `envelopeRenderer.ts` | Draws `Envelope` by delegating to `drawPolygon`                                              |
+| `heatmapRenderer.ts`  | Paints a `HeatmapGrid` as a viewport-culled colour overlay (blue→cyan→yellow→red)            |
+| `sensorRenderer.ts`   | Draws `Sensor` rays and hit-point dots (extracted from `Sensor` class to `rendering/` layer) |
 
 These are importable by any file that needs them (World, editors, markings) via
 `import { drawPoint } from '../rendering/pointRenderer.js'`.
@@ -379,36 +380,39 @@ into three layers under `ts/ui/`:
 
 **Molecule-level components:**
 
-| Module                            | Tag                        | Responsibility                                                                |
-| --------------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
-| `worldToolbar.ts`                 | `<world-toolbar>`          | Composition root: file I/O, border/tracking mode, camera debug toggle         |
-| `worldToolbarTemplate.ts`         | —                          | HTML template for the toolbar                                                 |
-| `modeControls.ts`                 | —                          | `ToolbarModeControls` — border/tracking/viewport mode button wiring           |
-| `assetSelectors.ts`               | —                          | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding      |
-| `worldLayersToolbar.ts`           | `<world-layers-toolbar>`   | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle      |
-| `worldLayersToolbarTemplate.ts`   | —                          | HTML template for the layers toolbar                                          |
-| `layoutToolbar.ts`                | `<layout-toolbar>`         | Layout toggle, camera/network/minimap visibility                              |
-| `layoutToolbarTemplate.ts`        | —                          | HTML template for the layout toolbar                                          |
-| `animationLoopToolbar.ts`         | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control)                         |
-| `animationLoopToolbarTemplate.ts` | —                          | HTML template for the animation loop toolbar                                  |
-| `shortcutsToolbar.ts`             | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |
-| `shortcutsToolbarTemplate.ts`     | —                          | HTML template for the shortcuts toolbar                                       |
-| `editorToolbar.ts`                | `<editor-toolbar>`         | Editor-mode buttons (Graph, Marking, Stop, Start, Light, etc.)                |
-| `editorToolbarTemplate.ts`        | —                          | HTML template for the editor toolbar                                          |
+| Module                    | Tag               | Responsibility                                                        |
+| ------------------------- | ----------------- | --------------------------------------------------------------------- |
+| `worldToolbar.ts`         | `<world-toolbar>` | Composition root: file I/O, border/tracking mode, camera debug toggle |
+| `worldToolbarTemplate.ts` | —                 | HTML template for the toolbar                                         |
+| `modeControls.ts`         | —                 | `ToolbarModeControls` — border/tracking/viewport mode button wiring   |
+
+<!-- assetSelectors.ts moved to organisms -->
+
+| `worldLayersToolbar.ts` | `<world-layers-toolbar>` | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle |
+| `worldLayersToolbarTemplate.ts` | — | HTML template for the layers toolbar |
+| `layoutToolbar.ts` | `<layout-toolbar>` | Layout toggle, camera/network/minimap visibility |
+| `layoutToolbarTemplate.ts` | — | HTML template for the layout toolbar |
+| `animationLoopToolbar.ts` | `<animation-loop-toolbar>` | Play/pause + render-interval (animation loop control) |
+| `animationLoopToolbarTemplate.ts` | — | HTML template for the animation loop toolbar |
+| `shortcutsToolbar.ts` | `<shortcuts-toolbar>` | Per-page keyboard-shortcut indicators (momentary flash + click-latch toggles) |
+| `shortcutsToolbarTemplate.ts` | — | HTML template for the shortcuts toolbar |
+| `editorToolbar.ts` | `<editor-toolbar>` | Editor-mode buttons (Graph, Marking, Stop, Start, Light, etc.) |
+| `editorToolbarTemplate.ts` | — | HTML template for the editor toolbar |
 
 **Organism-level panels:**
 
-| Module                         | Tag                             | Responsibility                                            |
-| ------------------------------ | ------------------------------- | --------------------------------------------------------- |
-| `trainingPanel.ts`             | `<training-panel>`              | Training UI + genetic algorithm + car generation          |
-| `trainingPanelTemplate.ts`     | —                               | HTML template for the training panel                      |
-| `trainingInitModal.ts`         | `<training-init-modal>`         | Training init modal (params + car config + brain source)  |
-| `trainingInitModalTemplate.ts` | —                               | HTML template for the init modal                          |
-| `humanTrainingPanel.ts`        | `<human-training-panel>`        | Human backpropagation training info display               |
-| `humanTrainingConfigModal.ts`  | `<human-training-config-modal>` | Car config modal for human backprop mode                  |
-| `trafficPanel.ts`              | `<traffic-panel>`               | Live Traffic Jam: per-car list, select/remove/clear/pause |
-| `storePanel.ts`                | `<store-panel>`                 | Landing-page read-only viewer/manager                     |
-| `storePanelTemplate.ts`        | —                               | HTML template for the store panel                         |
+| Module                         | Tag                             | Responsibility                                                           |
+| ------------------------------ | ------------------------------- | ------------------------------------------------------------------------ |
+| `trainingPanel.ts`             | `<training-panel>`              | Training UI + genetic algorithm + car generation                         |
+| `trainingPanelTemplate.ts`     | —                               | HTML template for the training panel                                     |
+| `trainingInitModal.ts`         | `<training-init-modal>`         | Training init modal (params + car config + brain source)                 |
+| `trainingInitModalTemplate.ts` | —                               | HTML template for the init modal                                         |
+| `humanTrainingPanel.ts`        | `<human-training-panel>`        | Human backpropagation training info display                              |
+| `humanTrainingConfigModal.ts`  | `<human-training-config-modal>` | Car config modal for human backprop mode                                 |
+| `trafficPanel.ts`              | `<traffic-panel>`               | Live Traffic Jam: per-car list, select/remove/clear/pause                |
+| `storePanel.ts`                | `<store-panel>`                 | Landing-page read-only viewer/manager                                    |
+| `storePanelTemplate.ts`        | —                               | HTML template for the store panel                                        |
+| `assetSelectors.ts`            | —                               | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding |
 
 > All UI components live under `ts/ui/` following Atomic Design. `worldToolbar.ts`
 > is a **molecule** reused by the simulator, race, Live Traffic Jam, and
