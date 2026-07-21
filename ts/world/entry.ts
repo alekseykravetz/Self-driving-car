@@ -45,7 +45,6 @@ import './editors/worldEditor.js';
 import '../viewport/scaleIndicator.js';
 import '../viewport/viewport.js';
 import '../mini-map/miniMap.js';
-import '../utils.js';
 import '../car/loader/carLoader.js';
 import '../store/types.js';
 import '../store/storeManager.js';

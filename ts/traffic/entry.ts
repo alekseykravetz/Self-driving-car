@@ -52,7 +52,6 @@ import '../mini-map/miniMap.js';
 import '../audio/sound.js';
 import '../neural-network/visualizer.js';
 import '../neural-network/network.js';
-import '../utils.js';
 import '../car/config.js';
 import '../car/physics/sensorRaycaster.js';
 import '../car/sensors/sensor.js';
