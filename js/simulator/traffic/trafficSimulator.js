@@ -1,7 +1,7 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import { SpatialHashGrid } from '../../math/spatialGrid.js';
 import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
-import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
+import { KeyboardManager } from '../../input/keyboardManager.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
 import { Car } from '../../car/car.js';

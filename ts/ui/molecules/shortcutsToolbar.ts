@@ -1,3 +1,4 @@
+import type { ToolbarUpdater } from '../../input/keyboardManager.js';
 import { SHORTCUTS_TOOLBAR_TEMPLATE } from './shortcutsToolbarTemplate.js';
 
 /**
@@ -41,7 +42,10 @@ export interface ShortcutDef {
   keys?: string[];
 }
 
-export class ShortcutsToolbarElement extends HTMLElement {
+export class ShortcutsToolbarElement
+  extends HTMLElement
+  implements ToolbarUpdater
+{
   #onToggle: ((id: string) => void) | null = null;
 
   constructor() {

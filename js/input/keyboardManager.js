@@ -1,4 +1,4 @@
-import { LatchedToggle } from './latchedToggle.js';
+import { LatchedToggle } from '../ui/atoms/latchedToggle.js';
 /**
  * KeyboardManager — central orchestrator for all keyboard shortcuts.
  *

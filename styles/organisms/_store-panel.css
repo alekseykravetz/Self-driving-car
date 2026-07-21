@@ -9,7 +9,7 @@ store-panel {
   background: var(--color-bg-surface-raised);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8) 28px;
+  padding: var(--space-8) 28px; /* TODO: add token */
   max-height: 500px;
   min-width: 0;
   display: flex;
@@ -21,7 +21,7 @@ store-panel {
 
 .store-panel:hover {
   border-color: var(--color-border-default);
-  transform: translateY(-2px);
+  transform: translateY(calc(-1 * var(--space-0\.5)));
 }
 
 .store-panel-header {
@@ -43,11 +43,11 @@ store-panel {
 /* ── Tabs ──────────────────────────────────────────────────────────── */
 .store-tabs {
   display: flex;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
 
 .store-tab {
-  padding: 6px 14px;
+  padding: var(--space-1\.5) 14px; /* TODO: add token for 14px */
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-lg);
   background: transparent;
@@ -176,7 +176,7 @@ store-panel {
 /* ── Actions ───────────────────────────────────────────────────────── */
 .store-actions {
   display: flex;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
 
 .store-action-btn {
@@ -205,7 +205,7 @@ store-panel {
 
 .store-table input[type='radio'] {
   accent-color: var(--color-accent-indigo);
-  width: 16px;
-  height: 16px;
+  width: var(--space-4);
+  height: var(--space-4);
   cursor: pointer;
 }

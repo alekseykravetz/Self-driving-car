@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   KeyboardManager,
   ShortcutBinding,
-} from '../../../ts/ui/atoms/keyboardManager.js';
+} from '../../../ts/input/keyboardManager.js';
 import {
   ShortcutDef,
   ShortcutsToolbarElement,

@@ -9,7 +9,7 @@ import { drawSegment } from '../../rendering/segmentRenderer.js';
 import {
   KeyboardManager,
   ShortcutBinding,
-} from '../../ui/atoms/keyboardManager.js';
+} from '../../input/keyboardManager.js';
 
 /**
  * Authoring tool for {@link Corridor} world objects.

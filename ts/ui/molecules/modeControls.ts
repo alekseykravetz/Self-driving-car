@@ -1,4 +1,5 @@
-export type BorderMode = 'none' | 'damage' | 'collision';
+import type { BorderMode } from '../../simulator/types.js';
+
 export type TrackingMode = 'none' | 'best' | 'keys';
 export type ToolbarViewportMode = 'mouse' | 'touchpad';
 

@@ -3,7 +3,7 @@
 .btn-group-large {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-1\.5);
 }
 
 .btn-row {
@@ -22,7 +22,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  margin-bottom: 6px;
+  margin-bottom: var(--space-1\.5);
+  margin-bottom: 0;
+}
+.btn-row > * {
+  flex: 1;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1\.5);
 }
 .btn-group:last-child {
   margin-bottom: 0;
@@ -34,7 +45,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--space-1\.5);
   width: 100%;
   height: var(--size-btn-lg);
   border: none;
@@ -59,12 +70,12 @@
   transform: scale(0.98);
 }
 .btn-lg.btn-primary {
-  background: rgba(80, 180, 80, 0.25);
+  background: var(--color-accent-green-border-strong);
   color: var(--color-accent-green);
   border: 1px solid var(--color-accent-green-border);
 }
 .btn-lg.btn-primary:hover {
-  background: rgba(80, 180, 80, 0.4);
+  background: rgba(80, 180, 80, 0.4); /* TODO: replace with token */
 }
 .btn-lg.btn-danger {
   background: var(--color-accent-red-bg);
@@ -72,7 +83,7 @@
   border: 1px solid var(--color-accent-red-border-strong);
 }
 .btn-lg.btn-danger:hover {
-  background: rgba(200, 60, 60, 0.35);
+  background: rgba(200, 60, 60, 0.35); /* TODO: replace with token */
 }
 
 /* ── Small buttons ─────────────────────────────────────────────── */
@@ -81,9 +92,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: var(--radius-md);
   width: 100%;
-  height: 32px;
+  height: var(--space-8);
   border: none;
   border-radius: var(--radius-md);
   padding: 0 var(--space-2);
@@ -97,7 +108,7 @@
   box-sizing: border-box;
 }
 .btn-sm:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
   color: var(--color-text-primary);
 }
 .btn-sm.btn-danger-outline {
@@ -132,10 +143,10 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  height: 32px;
+  height: var(--space-8);
   border: none;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
   color: var(--color-text-primary);
   font-size: var(--text-md);
   font-family: var(--font-ui);
@@ -177,8 +188,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 30px;
+  gap: var(--space-1\.5);
+  height: 30px; /* TODO: add token */
   border-radius: var(--radius-md);
   background: var(--color-bg-active);
   color: var(--color-text-primary);
@@ -195,9 +206,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: var(--radius-md);
   width: 100%;
-  height: 30px;
+  height: 30px; /* TODO: add token */
   border: none;
   border-radius: var(--radius-md);
   padding: 0 var(--space-2);
@@ -212,7 +223,7 @@
   box-sizing: border-box;
 }
 #trainingManagerPanel .file-input-label:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
   color: var(--color-text-primary);
 }
 
@@ -224,7 +235,7 @@ button,
   align-items: center;
   justify-content: center;
   background-color: var(--color-text-primary);
-  font-size: 20px;
+  font-size: 20px; /* TODO: add token */
   padding: var(--space-1) var(--space-2);
   border: none;
   border-radius: var(--radius-md);

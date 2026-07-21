@@ -1,6 +1,5 @@
+import type { LayoutMode } from '../../simulator/types.js';
 import { LAYOUT_TOOLBAR_TEMPLATE } from './layoutToolbarTemplate.js';
-
-export type LayoutMode = 'topview-big' | 'camera-big';
 
 export class LayoutToolbarElement extends HTMLElement {
   #_layoutMode: LayoutMode = 'topview-big';

@@ -24,7 +24,7 @@ import { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
 import { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { EditorToolbarElement } from '../../ui/molecules/editorToolbar.js';
-import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
+import { KeyboardManager } from '../../input/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
 

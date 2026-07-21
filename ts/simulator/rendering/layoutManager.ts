@@ -1,4 +1,4 @@
-import type { LayoutMode } from '../../ui/molecules/layoutToolbar.js';
+import type { LayoutMode } from '../types.js';
 import type { Viewport } from '../../viewport/viewport.js';
 import { Point } from '../../math/primitives/point.js';
 

@@ -7,7 +7,7 @@ import type {
   TrainingInitModalElement,
   TrainingInitResult,
 } from '../../ui/organisms/trainingInitModal.js';
-import { KeyboardManager } from '../../ui/atoms/keyboardManager.js';
+import { KeyboardManager } from '../../input/keyboardManager.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';

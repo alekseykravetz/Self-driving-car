@@ -4,7 +4,7 @@ import { Segment } from '../../../../ts/math/primitives/segment.js';
 import { Graph } from '../../../../ts/math/graph/graph.js';
 import { Viewport } from '../../../../ts/viewport/viewport.js';
 import { GraphEditor } from '../../../../ts/world/editors/graphEditor.js';
-import { KeyboardManager } from '../../../../ts/panels/keyboardManager.js';
+import { KeyboardManager } from '../../../../ts/input/keyboardManager.js';
 
 function createMockCanvas(): {
   canvas: HTMLCanvasElement;

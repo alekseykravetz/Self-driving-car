@@ -12,9 +12,9 @@
 .ctrl-checkbox label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1\.5);
   cursor: pointer;
-  padding: 2px 0;
+  padding: var(--space-0\.5) 0;
 }
 
 .ctrl-checkbox input[type='checkbox'] {
@@ -27,7 +27,7 @@
 .ht-checkbox-label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-1\.5);
   cursor: pointer;
   font-size: var(--text-md);
   color: var(--color-text-secondary);
@@ -47,7 +47,7 @@
 .view-toggle-label {
   display: flex;
   align-items: center;
-  height: 32px;
+  height: var(--space-8);
   gap: var(--space-1);
   cursor: pointer;
   font-size: var(--text-sm);

@@ -1,8 +1,16 @@
-import {
-  ShortcutsToolbarElement,
-  ShortcutDef,
-} from '../molecules/shortcutsToolbar.js';
-import { LatchedToggle } from './latchedToggle.js';
+import type { ShortcutDef } from '../ui/molecules/shortcutsToolbar.js';
+import { LatchedToggle } from '../ui/atoms/latchedToggle.js';
+
+/**
+ * Interface that KeyboardManager uses to update the toolbar's visual state.
+ * Decouples the atom from the concrete molecule class.
+ */
+export interface ToolbarUpdater {
+  flash(key: string): void;
+  setActive(key: string, active: boolean): void;
+  setShortcuts(defs: ShortcutDef[]): void;
+  setToggleHandler(handler: (id: string) => void): void;
+}
 
 /**
  * A binding extends the visual {@link ShortcutDef} with the physical key
@@ -50,7 +58,7 @@ export interface ShortcutBinding extends ShortcutDef {
  * ```
  */
 export class KeyboardManager {
-  #toolbar: ShortcutsToolbarElement;
+  #toolbar: ToolbarUpdater;
   #rootBindings: ShortcutBinding[] = [];
   #pushedBindings: ShortcutBinding[] = [];
   #allBindings: ShortcutBinding[] = [];
@@ -58,7 +66,7 @@ export class KeyboardManager {
   #boundKeyDown: (e: KeyboardEvent) => void;
   #boundKeyUp: (e: KeyboardEvent) => void;
 
-  constructor(toolbar: ShortcutsToolbarElement) {
+  constructor(toolbar: ToolbarUpdater) {
     this.#toolbar = toolbar;
     this.#boundKeyDown = this.#handleKeyDown.bind(this);
     this.#boundKeyUp = this.#handleKeyUp.bind(this);

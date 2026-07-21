@@ -5,7 +5,7 @@ import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { inferHiddenLayers } from '../../simulator/training/genetics/poolManager.js';
-import type { KeyboardManager } from '../atoms/keyboardManager.js';
+import type { KeyboardManager } from '../../input/keyboardManager.js';
 
 export interface TrainingInitDefaults {
   carCount: number;

@@ -7,19 +7,19 @@
   border-radius: 50%;
   margin-left: auto;
   vertical-align: middle;
-  background: #555;
+  background: #555; /* TODO: add token */
 }
 .status-dot.green {
-  background: #5cb85c;
+  background: var(--color-accent-green-strong);
   box-shadow: var(--shadow-sm);
 }
 .status-dot.red {
-  background: #d9534f;
-  box-shadow: 0 0 3px rgba(217, 83, 79, 0.6);
+  background: var(--color-accent-red);
+  box-shadow: 0 0 3px rgba(217, 83, 79, 0.6); /* TODO: replace with token */
 }
 .status-dot.orange {
-  background: #f0ad4e;
-  box-shadow: 0 0 3px rgba(240, 173, 78, 0.6);
+  background: var(--color-accent-yellow);
+  box-shadow: 0 0 3px rgba(240, 173, 78, 0.6); /* TODO: replace with token */
 }
 
 /* ── Config chips ──────────────────────────────────────────────── */
@@ -27,8 +27,8 @@
 .cfg-chip {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 2px 5px;
+  gap: 3px; /* TODO: add token */
+  padding: var(--space-0\.5) var(--radius-md);
   background: var(--color-bg-surface-raised);
   border-radius: var(--radius-md);
 }
@@ -79,10 +79,10 @@
 /* ── Selected info ─────────────────────────────────────────────── */
 
 .selected-row {
-  height: 16px;
+  height: var(--space-4);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .selected-tag {
@@ -100,7 +100,7 @@
 /* ── Traffic badge ─────────────────────────────────────────────── */
 
 .traffic-count {
-  margin-top: 6px;
+  margin-top: var(--space-1\.5);
   font-size: var(--text-base);
   color: var(--color-text-muted);
   text-align: center;
