@@ -1,51 +1,29 @@
 import type { Car } from '../../../car/car.js';
 import type { Segment } from '../../../math/primitives/segment.js';
-import { Point } from '../../../math/primitives/point.js';
-import {
-  getNearestSegment,
-  subtract,
-  magnitude,
-  normalize,
-} from '../../../math/utils.js';
 import { COLLISION_ANGLE_CORRECTION } from '../../../car/config.js';
 
 /**
- * Handles collision with road borders by pushing the car back onto the road.
- * Finds the nearest skeleton/border segment and corrects the car's position and angle.
+ * Handles collision with road borders by bumping the car back along its
+ * angle of travel (opposite to movement direction) and setting speed to 0.
+ * This lets the car continue driving after a collision instead of getting stuck.
  */
 export function handleCollisionWithRoadBorders(
   car: Car,
-  bordersToCheck: Segment[],
+  _bordersToCheck: Segment[],
 ): void {
-  if (bordersToCheck.length === 0) return;
+  // Push the car back along its angle (opposite to movement direction).
+  // The movement direction is: x -= sin(angle)*speed, y -= cos(angle)*speed.
+  // Bumping back reverses that: x += sin(angle)*push, y += cos(angle)*push.
+  const pushDistance = Math.hypot(car.width, car.height) / 2;
+  car.x += Math.sin(car.angle) * pushDistance;
+  car.y += Math.cos(car.angle) * pushDistance;
 
-  const segment = getNearestSegment(new Point(car.x, car.y), bordersToCheck);
-  if (!segment) return;
+  // Stop the car so it doesn't immediately re-collide.
+  car.speed = 0;
 
-  const correctors = car.polygon.map((p: Point) => {
-    const proj = segment.projectPoint(p);
-    const projPoint = proj.offset > 1 ? segment.p2 : proj.point;
-    return subtract(projPoint, p);
-  });
+  // Angle correction prevents the car from re-entering the wall immediately.
+  car.angle += COLLISION_ANGLE_CORRECTION;
 
-  if (correctors.length === 0) return;
-
-  const magnitudes = correctors.map((p: Point) => magnitude(p));
-  const maxMagnitude = Math.max(...magnitudes);
-
-  const correctorIndex = magnitudes.findIndex((mag) => mag === maxMagnitude);
-  if (correctorIndex === -1) return;
-
-  const corrector = correctors[correctorIndex];
-  const normalizedCorrector = normalize(corrector);
-
-  if (correctorIndex === 0 || correctorIndex === 3) {
-    car.angle += COLLISION_ANGLE_CORRECTION;
-  } else {
-    car.angle -= COLLISION_ANGLE_CORRECTION;
-  }
-
-  car.x += normalizedCorrector.x;
-  car.y += normalizedCorrector.y;
+  // Clear damaged flag so the car can keep driving.
   car.damaged = false;
 }
