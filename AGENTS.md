@@ -182,7 +182,7 @@ The task-planning workflow creates a git branch per task to isolate work:
 
 ## Testing
 
-The project has a **multi-phase test suite**: **48 test files, 684 tests** (~75% statement coverage) across math, neural-network, car, world, simulator, panels, viewport, and store modules. Tests live in three directories:
+The project has a **multi-phase test suite**: **81 test files, 1115 tests** (~70% statement coverage) across math, neural-network, car, world, simulator, panels, viewport, and store modules. Tests live in three directories:
 
 | Directory        | Purpose                                                                                                                 |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -240,7 +240,7 @@ The project has a **multi-phase test suite**: **48 test files, 684 tests** (~75%
   - `CarLoader` class (constructor creates DOM elements) — only pure functions tested
   - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
   - All `draw()` methods across all classes (Canvas-dependent — visual/Playwright tests deferred)
-- **Current coverage:** ~75% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~74% branches (Phase 4 added 4 modules: spatialGridUtils 100%, borderCollision 85%, scaleIndicator 27% update/ctor, storeManager 18% helpers), ~83% functions
+- **Current coverage:** ~70% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~61% branches, ~77% functions
 - World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
 
 ## Persistence

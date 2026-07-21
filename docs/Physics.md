@@ -376,44 +376,48 @@ If any intersection found: `damaged = true`, car stops updating its position.
 
 ### Collision Response (`handleCollisionWithRoadBorders`)
 
-Located in `ts/simulator/training/modes/borderCollision.ts`. An alternative to the default "stop on damage" behavior — pushes the car back onto the road:
+Located in `ts/simulator/training/modes/borderCollision.ts`. An alternative to the default "stop on damage" behavior — bumps the car back the way it came and clears the damaged flag so it can keep driving:
 
 ```typescript
 function handleCollisionWithRoadBorders(
   car: Car,
-  bordersToCheck: Segment[],
+  _bordersToCheck: Segment[],
 ): void {
-  // 1. Find the nearest road skeleton/border segment to the car's position
-  const segment = getNearestSegment(new Point(car.x, car.y), bordersToCheck);
+  const pushDistance = Math.hypot(car.width, car.height) / 2;
 
-  // 2. Project each polygon corner onto that segment
-  const correctors = car.polygon.map((p: Point) => {
-    const proj = segment.projectPoint(p);
-    const projPoint = proj.offset > 1 ? segment.p2 : proj.point;
-    return subtract(projPoint, p);
-  });
-
-  // 3. Find the corner with the maximum correction magnitude
-  const magnitudes = correctors.map((p: Point) => magnitude(p));
-  const maxMagnitude = Math.max(...magnitudes);
-  const correctorIndex = magnitudes.findIndex((mag) => mag === maxMagnitude);
-
-  // 4. Adjust angle based on which side was hit
-  if (correctorIndex === 0 || correctorIndex === 3) {
-    car.angle += 0.1; // Right-side hit → steer left
+  // Determine the actual movement direction from the car's controls.
+  // The physics engine moves the car by:
+  //   x -= sin(angle)*speed, y -= cos(angle)*speed  (forward)
+  // The opposite of forward movement is (sin, cos).
+  // When reversing, the speed is negative so the actual movement flips,
+  // and the bump-back direction flips accordingly.
+  const reversing = car.controls.reverse;
+  if (reversing) {
+    // Car was moving in reverse (rear hit the wall) — bump forward.
+    car.x -= Math.sin(car.angle) * pushDistance;
+    car.y -= Math.cos(car.angle) * pushDistance;
   } else {
-    car.angle -= 0.1; // Left-side hit → steer right
+    // Car was moving forward (front hit the wall) — bump backward.
+    car.x += Math.sin(car.angle) * pushDistance;
+    car.y += Math.cos(car.angle) * pushDistance;
   }
 
-  // 5. Move car by normalized correction vector
-  const normalizedCorrector = normalize(correctors[correctorIndex]);
-  car.x += normalizedCorrector.x;
-  car.y += normalizedCorrector.y;
+  // Stop the car so it doesn't immediately re-collide.
+  car.speed = 0;
 
-  // 6. Car lives on
+  // Angle correction prevents the car from re-entering the wall immediately.
+  car.angle += COLLISION_ANGLE_CORRECTION;
+
+  // Clear damaged flag so the car can keep driving.
   car.damaged = false;
 }
 ```
+
+The bump direction depends on travel direction:
+- **Forward** (the front of the car hit the wall): push back — `x += sin(angle), y += cos(angle)`
+- **Reverse** (the rear hit the wall): push forward — `x -= sin(angle), y -= cos(angle)`
+
+The `pushDistance` is half the car's diagonal (`hypot(width, height) / 2`), so the center moves clear of the wall. The `COLLISION_ANGLE_CORRECTION` constant (from `ts/car/config.ts`) rotates the car slightly to prevent it from immediately re-entering the collision.
 
 This enables "bouncing off walls" behavior instead of instant death on collision.
 
