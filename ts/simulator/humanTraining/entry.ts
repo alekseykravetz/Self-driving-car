@@ -94,11 +94,15 @@ import './humanBackpropSimulator.js';
 (async () => {
   await StoreManager.init();
   const host = new SimulatorPageHost();
-  new HumanBackpropSimulator(
+  const sim = new HumanBackpropSimulator(
     gameCanvas,
     networkCanvas,
     miniMapCanvas,
     cameraCanvas,
     host,
   );
+  (window as unknown as { __sim: unknown }).__sim = sim;
+  if (new URLSearchParams(window.location.search).has('paused')) {
+    (sim as unknown as { pause: () => void }).pause?.();
+  }
 })();

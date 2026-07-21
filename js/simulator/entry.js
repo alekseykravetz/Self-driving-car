@@ -90,5 +90,9 @@ import './training/trainingSimulator.js';
 (async () => {
     await StoreManager.init();
     const host = new SimulatorPageHost();
-    new TrainingSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+    const sim = new TrainingSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+    window.__sim = sim;
+    if (new URLSearchParams(window.location.search).has('paused')) {
+        sim.pause?.();
+    }
 })();

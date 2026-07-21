@@ -78,4 +78,8 @@ import '../ui/molecules/editorToolbar.js';
   });
 
   worldEditor.animate();
+  (window as unknown as { __sim: unknown }).__sim = worldEditor;
+  if (new URLSearchParams(window.location.search).has('paused')) {
+    worldEditor.pause?.();
+  }
 })();

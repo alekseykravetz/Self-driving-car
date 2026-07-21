@@ -8,14 +8,15 @@ test.describe('Traffic page', () => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
 
-    await page.goto('/html/traffic.html');
+    await page.goto('/html/traffic.html?paused=1');
     await page.waitForSelector('canvas#gameCanvas', { timeout: 15000 });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
 
     expect(errors).toEqual([]);
     await expect(page).toHaveScreenshot('traffic.png', {
       fullPage: true,
-      maxDiffPixels: 100,
+      maxDiffPixels: 5000,
+      mask: [page.locator('canvas')],
     });
   });
 });

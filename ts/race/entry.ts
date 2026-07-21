@@ -130,7 +130,7 @@ import '../simulator/racing/racePanel.js';
   statistics!.style.width = `${rightPanelWidth}px`;
   statistics!.style.height = `${window.innerHeight - 60 - rightPanelWidth}px`;
 
-  new RaceSimulator(
+  const sim = new RaceSimulator(
     gameCanvas,
     networkCanvas,
     miniMapCanvas,
@@ -138,4 +138,8 @@ import '../simulator/racing/racePanel.js';
     host,
     controls,
   );
+  (window as unknown as { __sim: unknown }).__sim = sim;
+  if (params.has('paused')) {
+    (sim as unknown as { pause: () => void }).pause?.();
+  }
 })();

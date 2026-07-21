@@ -87,5 +87,9 @@ import './humanBackpropSimulator.js';
 (async () => {
     await StoreManager.init();
     const host = new SimulatorPageHost();
-    new HumanBackpropSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+    const sim = new HumanBackpropSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+    window.__sim = sim;
+    if (new URLSearchParams(window.location.search).has('paused')) {
+        sim.pause?.();
+    }
 })();

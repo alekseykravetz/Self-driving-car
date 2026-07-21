@@ -78,5 +78,9 @@ import '../simulator/core/simulatorShell.js';
 (async () => {
     await StoreManager.init();
     const host = new SimulatorPageHost();
-    new TrafficSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+    const sim = new TrafficSimulator(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+    window.__sim = sim;
+    if (new URLSearchParams(window.location.search).has('paused')) {
+        sim.pause?.();
+    }
 })();

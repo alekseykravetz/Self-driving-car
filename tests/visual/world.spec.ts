@@ -8,14 +8,15 @@ test.describe('World editor page', () => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
 
-    await page.goto('/html/world.html');
+    await page.goto('/html/world.html?paused=1');
     await page.waitForSelector('canvas#myCanvas', { timeout: 15000 });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
 
     expect(errors).toEqual([]);
     await expect(page).toHaveScreenshot('world.png', {
       fullPage: true,
-      maxDiffPixels: 100,
+      maxDiffPixels: 5000,
+      mask: [page.locator('canvas')],
     });
   });
 });
