@@ -10,3 +10,7 @@ test-results/
 playwright-report/
 .DS_Store
 .playwright-mcp/
+
+# Compiled TS output — source of truth is ts/, rebuilt via `npm run rebuild`.
+# Publishing uses scripts/publish-site.sh which stages js/ from the local build.
+js/
