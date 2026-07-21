@@ -119,27 +119,27 @@ ts/
 
 ## Key commands
 
-| Command                      | Purpose                                              |
-| ---------------------------- | ---------------------------------------------------- |
-| `npm start`                  | Full dev: tsc watch + server + lint/format           |
-| `npm run tsc:watch`          | Compile TS on save only                              |
-| `npm run clean`              | Delete the generated `js/` folder                    |
+| Command                      | Purpose                                                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `npm start`                  | Full dev: tsc watch + server + lint/format                                                                 |
+| `npm run tsc:watch`          | Compile TS on save only                                                                                    |
+| `npm run clean`              | Delete the generated `js/` folder                                                                          |
 | `npm run rebuild`            | `clean` + `tsc` — full fresh recompile of ts/ → js/ (fixes stale orphaned .js files after renames/deletes) |
-| `npm run serve`              | Static server on :9090                               |
-| `npm run lint`               | ESLint auto-fix                                      |
-| `npm run format`             | Prettier (singleQuote: true)                         |
-| `npm run format:check`       | Prettier check only (no write)                       |
-| `npm run fix:all`            | format + lint                                        |
-| `npm test`                   | Run all unit tests                                   |
-| `npm run test:fast`          | Run tests for changed files only                     |
-| `npm run test:changed`       | Run tests for changed files only                     |
-| `npm run test:dev`           | Watch mode with fast initial run                     |
-| `npm run test:watch`         | Run tests in watch mode (TDD)                        |
-| `npm run test:coverage`      | Run tests with coverage report                       |
-| `npm run test:visual`        | Run Playwright visual regression tests               |
-| `npm run test:visual:update` | Update Playwright visual baselines                   |
-| `npm run publish:site`       | Deploy via here.now (scripts/publish-site.sh)        |
-| `graphify update .`          | Rebuild graphify knowledge graph (also: `/graphify`) |
+| `npm run serve`              | Static server on :9090                                                                                     |
+| `npm run lint`               | ESLint auto-fix                                                                                            |
+| `npm run format`             | Prettier (singleQuote: true)                                                                               |
+| `npm run format:check`       | Prettier check only (no write)                                                                             |
+| `npm run fix:all`            | format + lint                                                                                              |
+| `npm test`                   | Run all unit tests                                                                                         |
+| `npm run test:fast`          | Run tests for changed files only                                                                           |
+| `npm run test:changed`       | Run tests for changed files only                                                                           |
+| `npm run test:dev`           | Watch mode with fast initial run                                                                           |
+| `npm run test:watch`         | Run tests in watch mode (TDD)                                                                              |
+| `npm run test:coverage`      | Run tests with coverage report                                                                             |
+| `npm run test:visual`        | Run Playwright visual regression tests                                                                     |
+| `npm run test:visual:update` | Update Playwright visual baselines                                                                         |
+| `npm run publish:site`       | Deploy via here.now (scripts/publish-site.sh)                                                              |
+| `graphify update .`          | Rebuild graphify knowledge graph (also: `/graphify`)                                                       |
 
 ## Harness layout (`.opencode/`)
 
