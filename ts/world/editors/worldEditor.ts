@@ -1,8 +1,5 @@
-import {
-  WorldLayerVisibility,
-  DEFAULT_LAYER_VISIBILITY,
-  EditorType,
-} from '../types.js';
+import { WorldLayerVisibility, DEFAULT_LAYER_VISIBILITY } from '../types.js';
+import { EditorType } from '../../simulator/types.js';
 import { World } from '../world.js';
 import { WorldGenerator } from '../generation/worldGenerator.js';
 import { GraphEditor } from './graphEditor.js';

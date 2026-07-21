@@ -45,10 +45,7 @@
 }
 
 #cameraCanvas {
-  background-image: linear-gradient(
-    #8cf,
-    white 70%
-  ); /* TODO: add token for #8cf */
+  background-image: linear-gradient(var(--color-accent-sky), white 70%);
   display: block;
   flex-shrink: 0;
 }

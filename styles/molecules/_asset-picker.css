@@ -34,7 +34,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1\.5);
-  height: 30px; /* TODO: add token */
+  height: var(--space-7\.5);
   border-radius: var(--radius-md);
   background: var(--color-bg-active);
   color: var(--color-text-primary);

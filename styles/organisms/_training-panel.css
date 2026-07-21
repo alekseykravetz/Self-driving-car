@@ -18,7 +18,7 @@
 
 /* ── Panel sections ────────────────────────────────────────────────── */
 .panel-section {
-  padding: 10px 10px; /* TODO: add token */
+  padding: var(--space-2\.5);
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
@@ -61,7 +61,7 @@
   font-weight: var(--weight-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
-  padding: 3px var(--space-1); /* TODO: add token for 3px */
+  padding: var(--space-0\.5) var(--space-1);
   border-bottom: 1px solid var(--color-border-input);
   text-align: left;
 }
@@ -104,7 +104,7 @@
 #trainingManagerPanel button:not(.btn-lg):not(.btn-sm):not(.num-btn) {
   border: none;
   border-radius: var(--radius-md);
-  padding: var(--space-1\.5) 10px; /* TODO: add token for 10px */
+  padding: var(--space-1\.5) var(--space-2\.5);
   cursor: pointer;
   background: var(--color-bg-active);
   color: var(--color-text-secondary);
@@ -158,7 +158,7 @@
   justify-content: center;
   gap: var(--radius-md);
   width: 100%;
-  height: 30px; /* TODO: add token */
+  height: var(--space-7\.5);
   border: none;
   border-radius: var(--radius-md);
   padding: 0 var(--space-2);
@@ -174,7 +174,7 @@
 }
 
 #trainingManagerPanel .file-input-label:hover {
-  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
+  background: var(--color-bg-hover-subtle);
   color: var(--color-text-primary);
 }
 
@@ -183,7 +183,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 3px; /* TODO: add token */
+  gap: var(--space-0\.5);
 }
 
 /* ── human-training-panel ──────────────────────────────────────────── */

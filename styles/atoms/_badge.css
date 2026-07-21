@@ -7,7 +7,7 @@
   border-radius: 50%;
   margin-left: auto;
   vertical-align: middle;
-  background: #555; /* TODO: add token */
+  background: var(--color-bg-medium);
 }
 .status-dot.green {
   background: var(--color-accent-green-strong);
@@ -15,11 +15,11 @@
 }
 .status-dot.red {
   background: var(--color-accent-red);
-  box-shadow: 0 0 3px rgba(217, 83, 79, 0.6); /* TODO: replace with token */
+  box-shadow: var(--shadow-red);
 }
 .status-dot.orange {
   background: var(--color-accent-yellow);
-  box-shadow: 0 0 3px rgba(240, 173, 78, 0.6); /* TODO: replace with token */
+  box-shadow: var(--shadow-orange);
 }
 
 /* ── Config chips ──────────────────────────────────────────────── */
@@ -27,7 +27,7 @@
 .cfg-chip {
   display: inline-flex;
   align-items: center;
-  gap: 3px; /* TODO: add token */
+  gap: var(--space-0\.5);
   padding: var(--space-0\.5) var(--radius-md);
   background: var(--color-bg-surface-raised);
   border-radius: var(--radius-md);

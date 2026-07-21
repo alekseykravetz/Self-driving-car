@@ -64,7 +64,7 @@ button,
   padding: var(--radius-md);
   margin: var(--space-0\.5);
   cursor: pointer;
-  background-color: lightgray;
+  background-color: var(--color-bg-hover);
 }
 
 button:hover,

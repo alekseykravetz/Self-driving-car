@@ -4,10 +4,7 @@
 }
 
 #cameraCanvas {
-  background-image: linear-gradient(
-    #8cf,
-    white 70%
-  ); /* TODO: add token for #8cf */
+  background-image: linear-gradient(var(--color-accent-sky), white 70%);
   display: block;
   flex-shrink: 0;
 }
@@ -34,9 +31,9 @@
 #racePanel {
   display: flex;
   align-items: center;
-  gap: 10px; /* TODO: add token */
+  gap: var(--space-2\.5);
   background-color: var(--color-bg-toolbar);
-  padding: var(--space-1\.5) 14px; /* TODO: add token for 14px */
+  padding: var(--space-1\.5) var(--space-3\.5);
   border-radius: var(--radius-lg);
   outline: 1px solid var(--color-border-default);
 }
@@ -49,12 +46,12 @@
   height: var(--space-8);
   border: none;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
+  background: var(--color-bg-hover-subtle);
   color: var(--color-text-primary);
   font-size: var(--text-md);
   font-family: var(--font-ui);
   font-weight: var(--weight-semibold);
-  padding: 0 10px; /* TODO: add token */
+  padding: 0 var(--space-2\.5);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
@@ -75,8 +72,8 @@
 
 .stat {
   font-size: xx-large;
-  font-family: Ariel;
-  padding: 10px; /* TODO: add token */
+  font-family: var(--font-ui);
+  padding: var(--space-2\.5);
 }
 
 #counter {

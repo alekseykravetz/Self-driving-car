@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-1\.5);
-  padding: 3px var(--space-1\.5); /* TODO: add token for 3px */
+  padding: var(--space-0\.5) var(--space-1\.5);
   background: var(--color-bg-surface-raised);
   border-radius: var(--radius-md);
 }
@@ -43,7 +43,7 @@
   font-family: monospace;
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
-  min-width: 28px; /* TODO: add token */
+  min-width: var(--space-7);
   text-align: right;
 }
 

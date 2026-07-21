@@ -14,6 +14,15 @@
   --color-bg-toolbar: rgba(0, 0, 0, 0.6);
   --color-bg-dark: #000;
   --color-bg-canvas: #2a5;
+  --color-bg-hover-subtle: rgba(255, 255, 255, 0.15);
+  --color-bg-green-hover: rgba(80, 180, 80, 0.4);
+  --color-bg-red-hover: rgba(200, 60, 60, 0.35);
+  --color-bg-green-subtle: rgba(92, 184, 92, 0.08);
+  --color-bg-red-subtle: rgba(217, 83, 79, 0.08);
+  --color-bg-green-border: rgba(92, 184, 92, 0.3);
+  --color-bg-yellow-border: rgba(240, 173, 78, 0.3);
+  --color-bg-medium: #555;
+  --color-bg-dark-kbd: #333;
   --color-bg-input: rgba(255, 255, 255, 0.07);
   --color-bg-input-focus: rgba(255, 255, 255, 0.12);
 
@@ -48,6 +57,10 @@
   --color-accent-orange: #f5a623;
   --color-accent-orange-bg: rgba(245, 166, 35, 0.4);
   --color-accent-orange-active: rgba(245, 166, 35, 0.9);
+  --color-accent-cyan: #4ecdc4;
+  --color-accent-cyan-bg: rgba(78, 205, 196, 0.08);
+  --color-accent-cyan-shadow: 0 2px 8px rgba(78, 205, 196, 0.35);
+  --color-accent-sky: #8cf;
 
   /* Colors — Borders */
   --color-border-subtle: rgba(255, 255, 255, 0.08);
@@ -58,6 +71,8 @@
 
   /* Colors — Misc */
   --color-body-bg: darkgray;
+  --color-body-bg-landing: #4ecdc4;
+  --color-black: #000;
   --color-scrollbar: rgba(255, 255, 255, 0.2);
 
   /* ══════════════════════════════════════════════
@@ -76,6 +91,9 @@
   --text-2xl: 16px;
   --text-3xl: 24px;
   --text-4xl: 40vmin;
+  --text-landing-title: 2rem;
+  --text-landing-subtitle: 1rem;
+  --text-landing-h2: 1.5rem;
 
   --weight-normal: 400;
   --weight-medium: 500;
@@ -94,12 +112,21 @@
   --space-1: 4px;
   --space-1\.5: 6px;
   --space-2: 8px;
+  --space-2\.5: 10px;
   --space-3: 12px;
+  --space-3\.5: 14px;
   --space-4: 16px;
+  --space-4\.5: 18px;
   --space-5: 20px;
+  --space-7: 28px;
+  --space-7\.5: 30px;
   --space-6: 24px;
   --space-8: 32px;
-  --space-12: 40px;
+  --space-10: 40px;
+  --space-11: 45px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-20: 80px;
 
   /* ══════════════════════════════════════════════
      Border Radius
@@ -117,6 +144,9 @@
   --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
   --shadow-green: 0 0 6px rgba(76, 223, 76, 0.6);
   --shadow-amber: 0 0 6px rgba(255, 176, 64, 0.6);
+  --shadow-red: 0 0 3px rgba(217, 83, 79, 0.6);
+  --shadow-orange: 0 0 3px rgba(240, 173, 78, 0.6);
+  --shadow-modal: 0 18px 50px rgba(0, 0, 0, 0.55);
 
   /* ══════════════════════════════════════════════
      Transitions
@@ -127,6 +157,8 @@
   /* ══════════════════════════════════════════════
      Sizing
      ══════════════════════════════════════════════ */
+  --size-btn-num: 22px;
+  --size-btn-icon-sm: 28px;
   --size-btn-lg: 38px;
   --size-btn-sm: 32px;
   --size-btn-icon: 32px;

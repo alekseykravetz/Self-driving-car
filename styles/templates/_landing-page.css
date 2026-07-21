@@ -10,8 +10,8 @@
   background: linear-gradient(
     135deg,
     var(--color-accent-green),
-    #4ecdc4
-  ); /* TODO: add token for #4ecdc4 */
+    var(--color-accent-cyan)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -22,17 +22,15 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 14px; /* TODO: add token */
+  gap: var(--space-3\.5);
   max-width: 100%;
 }
 
 .landing-logo {
   flex-shrink: 0;
-  width: 56px; /* TODO: add token */
-  height: 56px; /* TODO: add token */
-  filter: drop-shadow(
-    0 2px 8px rgba(78, 205, 196, 0.35)
-  ); /* TODO: replace with token */
+  width: var(--space-14);
+  height: var(--space-14);
+  filter: drop-shadow(var(--color-accent-cyan-shadow));
 }
 
 .landing-header .subtitle {
@@ -54,7 +52,7 @@
   background: var(--color-bg-surface-raised);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8) 28px; /* TODO: add token */
+  padding: var(--space-8) var(--space-7);
   text-align: left;
   min-width: 0;
   max-height: 500px;
@@ -78,7 +76,7 @@
 .landing-card h2 {
   font-size: 1.5rem;
   font-weight: var(--weight-bold);
-  margin: 0 0 10px;
+  margin: 0 0 var(--space-2\.5);
   color: var(--color-text-primary);
 }
 
@@ -92,14 +90,14 @@
 .card-links {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-2\.5);
 }
 
 .card-btn {
   display: flex;
   align-items: center;
-  gap: 14px; /* TODO: add token */
-  padding: 14px 18px; /* TODO: add token */
+  gap: var(--space-3\.5);
+  padding: var(--space-3\.5) var(--space-4\.5);
   background: var(--color-bg-surface-raised);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xl);

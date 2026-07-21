@@ -16,7 +16,7 @@ h1 {
   color: var(--color-text-primary);
   font-family: Arial;
   position: absolute;
-  top: 10px;
+  top: var(--space-2\.5);
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -30,9 +30,17 @@ h1 {
   height: 100vh;
 }
 
+#miniMapCanvas {
+  position: absolute;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  background-color: var(--color-bg-canvas);
+  outline: 2px solid var(--color-black);
+}
+
 editor-toolbar {
   position: absolute;
-  bottom: 20px;
+  bottom: var(--space-5);
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -76,7 +84,7 @@ editor-toolbar .controls-group {
 
 .controls-divider {
   width: 1px;
-  height: 28px; /* TODO: add token */
+  height: var(--space-7);
   background-color: var(--color-border-default);
   margin: 0 var(--space-1\.5);
 }
@@ -87,7 +95,7 @@ editor-toolbar .controls-group {
   justify-content: center;
   background-color: var(--color-text-secondary);
   filter: grayscale(100%);
-  font-size: 20px; /* TODO: add token */
+  font-size: var(--text-2xl);
   padding: var(--space-1) var(--space-2);
   border: none;
   border-radius: var(--radius-md);
@@ -119,7 +127,7 @@ editor-toolbar .controls-group {
   color: var(--color-text-primary);
   font-size: var(--text-base);
   font-family: var(--font-ui);
-  padding: var(--space-1\.5) 10px; /* TODO: add token for 10px */
+  padding: var(--space-1\.5) var(--space-2\.5);
   border-radius: var(--radius-sm);
   white-space: normal;
   max-width: 280px;

@@ -75,7 +75,7 @@
   border: 1px solid var(--color-accent-green-border);
 }
 .btn-lg.btn-primary:hover {
-  background: rgba(80, 180, 80, 0.4); /* TODO: replace with token */
+  background: var(--color-bg-green-hover);
 }
 .btn-lg.btn-danger {
   background: var(--color-accent-red-bg);
@@ -83,7 +83,7 @@
   border: 1px solid var(--color-accent-red-border-strong);
 }
 .btn-lg.btn-danger:hover {
-  background: rgba(200, 60, 60, 0.35); /* TODO: replace with token */
+  background: var(--color-bg-red-hover);
 }
 
 /* ── Small buttons ─────────────────────────────────────────────── */
@@ -108,7 +108,7 @@
   box-sizing: border-box;
 }
 .btn-sm:hover {
-  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
+  background: var(--color-bg-hover-subtle);
   color: var(--color-text-primary);
 }
 .btn-sm.btn-danger-outline {
@@ -146,12 +146,12 @@
   height: var(--space-8);
   border: none;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
+  background: var(--color-bg-hover-subtle);
   color: var(--color-text-primary);
   font-size: var(--text-md);
   font-family: var(--font-ui);
   font-weight: var(--weight-semibold);
-  padding: 0 10px;
+  padding: 0 var(--space-2\.5);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
@@ -189,7 +189,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1\.5);
-  height: 30px; /* TODO: add token */
+  height: var(--space-7\.5);
   border-radius: var(--radius-md);
   background: var(--color-bg-active);
   color: var(--color-text-primary);
@@ -208,7 +208,7 @@
   justify-content: center;
   gap: var(--radius-md);
   width: 100%;
-  height: 30px; /* TODO: add token */
+  height: var(--space-7\.5);
   border: none;
   border-radius: var(--radius-md);
   padding: 0 var(--space-2);
@@ -223,7 +223,7 @@
   box-sizing: border-box;
 }
 #trainingManagerPanel .file-input-label:hover {
-  background: rgba(255, 255, 255, 0.15); /* TODO: replace with token */
+  background: var(--color-bg-hover-subtle);
   color: var(--color-text-primary);
 }
 
@@ -235,11 +235,11 @@ button,
   align-items: center;
   justify-content: center;
   background-color: var(--color-text-primary);
-  font-size: 20px; /* TODO: add token */
+  font-size: var(--text-2xl);
   padding: var(--space-1) var(--space-2);
   border: none;
   border-radius: var(--radius-md);
-  text-shadow: 1px 1px black;
+  text-shadow: 1px 1px var(--color-black);
   cursor: pointer;
   position: relative;
   transition:

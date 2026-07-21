@@ -59,9 +59,9 @@ ts/
   ui/
     atoms/                ← smallest building blocks: latchedToggle.ts
     molecules/            ← compound components: shortcutsToolbar, worldLayersToolbar, worldToolbar,
-    │                         editorToolbar, layoutToolbar, animationLoopToolbar, assetSelectors, modeControls
+    │                         editorToolbar, layoutToolbar, animationLoopToolbar, modeControls
     organisms/            ← full feature panels: trainingPanel, trainingInitModal, humanTrainingPanel,
-                             humanTrainingConfigModal, trafficPanel, storePanel
+                             humanTrainingConfigModal, trafficPanel, storePanel, assetSelectors
 ```
 
 - **Atoms**: Singleton utilities, base classes — no UI of their own

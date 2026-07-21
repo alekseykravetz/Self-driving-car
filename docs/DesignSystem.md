@@ -48,6 +48,16 @@ properties on `:root` — never use raw hex, px, or literal values elsewhere.
 | `--color-bg-dark`           | `#000`                   | Dark surfaces                    |
 | `--color-bg-canvas`         | `#2a5`                   | Simulation canvas (CSS fallback) |
 | `--color-bg-input`          | `rgba(255,255,255,0.07)` | Input field backgrounds          |
+| `--color-bg-hover-strong`   | `rgba(255,255,255,0.22)` | Strong hover state               |
+| `--color-bg-hover-subtle`   | `rgba(255,255,255,0.15)` | Subtle hover state               |
+| `--color-bg-medium`         | `#555`                   | Medium-dark neutral background   |
+| `--color-bg-dark-kbd`       | `#333`                   | Keyboard indicator background    |
+| `--color-bg-green-hover`    | `rgba(80,180,80,0.4)`    | Green button hover               |
+| `--color-bg-red-hover`      | `rgba(200,60,60,0.35)`   | Red button hover                 |
+| `--color-bg-green-subtle`   | `rgba(92,184,92,0.08)`   | Subtle green background          |
+| `--color-bg-red-subtle`     | `rgba(217,83,79,0.08)`   | Subtle red background            |
+| `--color-bg-green-border`   | `rgba(92,184,92,0.3)`    | Green border fill                |
+| `--color-bg-yellow-border`  | `rgba(240,173,78,0.3)`   | Yellow border fill               |
 
 ### Colors — Text
 
@@ -63,21 +73,30 @@ properties on `:root` — never use raw hex, px, or literal values elsewhere.
 
 Semantic accent colors with background and border variants for each:
 
-| Token                          | Value                   | Meaning       |
-| ------------------------------ | ----------------------- | ------------- |
-| `--color-accent-green`         | `#7ddf7d`               | Success / OK  |
-| `--color-accent-green-bg`      | `rgba(92,184,92,0.12)`  |               |
-| `--color-accent-green-border`  | `rgba(80,180,80,0.3)`   |               |
-| `--color-accent-red`           | `#d9534f`               | Error / crash |
-| `--color-accent-red-bg`        | `rgba(217,83,79,0.12)`  |               |
-| `--color-accent-red-border`    | `rgba(200,60,60,0.3)`   |               |
-| `--color-accent-yellow`        | `#f0ad4e`               | Warning       |
-| `--color-accent-yellow-bg`     | `rgba(240,173,78,0.12)` |               |
-| `--color-accent-yellow-border` | `rgba(200,150,40,0.3)`  |               |
-| `--color-accent-blue`          | `#5cb8ff`               | Info / link   |
-| `--color-accent-indigo`        | `#6366f1`               | Selection     |
-| `--color-accent-gold`          | `rgba(255,215,0,0.7)`   | Highlight     |
-| `--color-accent-orange`        | `#f5a623`               | Stale state   |
+| Token                          | Value                   | Meaning              |
+| ------------------------------ | ----------------------- | -------------------- |
+| `--color-accent-green`         | `#7ddf7d`               | Success / OK         |
+| `--color-accent-green-bg`      | `rgba(92,184,92,0.12)`  |                      |
+| `--color-accent-green-border`  | `rgba(80,180,80,0.3)`   |                      |
+| `--color-accent-red`           | `#d9534f`               | Error / crash        |
+| `--color-accent-red-bg`        | `rgba(217,83,79,0.12)`  |                      |
+| `--color-accent-red-border`    | `rgba(200,60,60,0.3)`   |                      |
+| `--color-accent-yellow`        | `#f0ad4e`               | Warning              |
+| `--color-accent-yellow-bg`     | `rgba(240,173,78,0.12)` |                      |
+| `--color-accent-yellow-border` | `rgba(200,150,40,0.3)`  |                      |
+| `--color-accent-blue`          | `#5cb8ff`               | Info / link          |
+| `--color-accent-indigo`        | `#6366f1`               | Selection            |
+| `--color-accent-gold`          | `rgba(255,215,0,0.7)`   | Highlight            |
+| `--color-accent-orange`        | `#f5a623`               | Stale state          |
+| `--color-accent-cyan`          | `#4ecdc4`               | Landing page accent  |
+| `--color-accent-cyan-bg`       | `rgba(78,205,196,0.08)` | Cyan background      |
+| `--color-accent-sky`           | `#8cf`                  | Sky/camera canvas bg |
+
+### Colors — Misc
+
+| Token           | Value  | Usage          |
+| --------------- | ------ | -------------- |
+| `--color-black` | `#000` | Black outlines |
 
 ### Colors — Borders
 
@@ -124,10 +143,20 @@ Letter-spacing: `--tracking-wide` (0.5px), `--tracking-wider` (1px),
 | `--space-2`    | 8px   |
 | `--space-3`    | 12px  |
 | `--space-4`    | 16px  |
+| `--space-2\.5` | 10px  |
+| `--space-3`    | 12px  |
+| `--space-3\.5` | 14px  |
+| `--space-4`    | 16px  |
+| `--space-4\.5` | 18px  |
 | `--space-5`    | 20px  |
 | `--space-6`    | 24px  |
+| `--space-7`    | 28px  |
+| `--space-7\.5` | 30px  |
 | `--space-8`    | 32px  |
-| `--space-12`   | 40px  |
+| `--space-10`   | 40px  |
+| `--space-11`   | 45px  |
+| `--space-12`   | 48px  |
+| `--space-14`   | 56px  |
 
 ### Border Radius
 
@@ -141,12 +170,16 @@ Letter-spacing: `--tracking-wide` (0.5px), `--tracking-wider` (1px),
 
 ### Shadows
 
-| Token            | Value                          |
-| ---------------- | ------------------------------ |
-| `--shadow-sm`    | `0 0 3px rgba(92,184,92,0.6)`  |
-| `--shadow-md`    | `0 6px 18px rgba(0,0,0,0.5)`   |
-| `--shadow-green` | `0 0 6px rgba(76,223,76,0.6)`  |
-| `--shadow-amber` | `0 0 6px rgba(255,176,64,0.6)` |
+| Token                        | Value                             |
+| ---------------------------- | --------------------------------- |
+| `--shadow-sm`                | `0 0 3px rgba(92,184,92,0.6)`     |
+| `--shadow-md`                | `0 6px 18px rgba(0,0,0,0.5)`      |
+| `--shadow-green`             | `0 0 6px rgba(76,223,76,0.6)`     |
+| `--shadow-amber`             | `0 0 6px rgba(255,176,64,0.6)`    |
+| `--shadow-modal`             | `0 18px 50px rgba(0,0,0,0.55)`    |
+| `--shadow-red`               | `0 0 3px rgba(217,83,79,0.6)`     |
+| `--shadow-orange`            | `0 0 3px rgba(240,173,78,0.6)`    |
+| `--color-accent-cyan-shadow` | `0 2px 8px rgba(78,205,196,0.35)` |
 
 ### Transitions
 
@@ -169,6 +202,7 @@ Letter-spacing: `--tracking-wide` (0.5px), `--tracking-wider` (1px),
 | `--size-checkbox`     | 14px  |
 | `--size-checkbox-lg`  | 18px  |
 | `--size-input-height` | 32px  |
+| `--size-btn-num`      | 22px  |
 
 ---
 

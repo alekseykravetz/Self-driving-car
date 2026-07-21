@@ -1,13 +1,13 @@
 /* ── SimulatorToolbar (positioned, top-left) ─────────────────────── */
 #simulatorToolbar {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: var(--space-2\.5);
+  left: var(--space-2\.5);
   z-index: 10;
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 10px; /* TODO: add token */
+  gap: var(--space-2\.5);
   max-width: 60%;
 }
 
@@ -22,7 +22,7 @@
   align-items: stretch;
   gap: var(--space-1\.5);
   background-color: var(--color-bg-toolbar);
-  padding: var(--space-1\.5) 10px; /* TODO: add token for 10px */
+  padding: var(--space-1\.5) var(--space-2\.5);
   border-radius: var(--radius-lg);
   outline: 1px solid var(--color-border-default);
 }
@@ -42,7 +42,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 3px; /* TODO: add token */
+  gap: var(--space-0\.5);
   flex: 0 1 auto;
 }
 

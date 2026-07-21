@@ -88,17 +88,7 @@ export const DEFAULT_LAYER_VISIBILITY: WorldLayerVisibility = {
   buildings: true,
 };
 
-export type EditorType =
-  | 'graph'
-  | 'marking'
-  | 'stop'
-  | 'crossing'
-  | 'start'
-  | 'parking'
-  | 'light'
-  | 'target'
-  | 'corridor'
-  | 'yield';
+export type { EditorType } from '../simulator/types.js';
 
 export interface WorldDrawOptions {
   viewPoint: Point;

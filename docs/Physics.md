@@ -527,6 +527,10 @@ The traffic-control set is built per frame by the simulator via `buildTrafficCon
 
 > Lights still update via `TrafficManager` inside `World.draw()`, so perception reads the previous frame's light state — a one-frame lag, which is acceptable.
 
+### Sensor Rendering (SensorRenderer)
+
+Rendering of sensor rays is handled by `SensorRenderer` (`ts/rendering/sensorRenderer.ts`), extracted from the `Sensor` class to keep domain logic free of Canvas 2D dependencies. `Sensor.draw(ctx)` delegates to `SensorRenderer.draw(ctx, this)` — the public API is unchanged.
+
 ### Sensor Visualization
 
 When `drawSensor` is true, rays are rendered on the canvas. The per-ray rules depend on whether a road-border hit and/or a traffic-light detection exists:
