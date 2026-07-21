@@ -7,6 +7,10 @@ export class Envelope {
   #skeleton: Segment;
   public polygon: Polygon;
 
+  get skeleton(): Segment {
+    return this.#skeleton;
+  }
+
   constructor(
     skeleton: Segment,
     width: number = 10,

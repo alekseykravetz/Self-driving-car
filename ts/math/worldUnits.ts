@@ -38,3 +38,6 @@ export function formatElapsedTime(frames: number): string {
   const pad = (num: number) => String(num).padStart(2, '0');
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
+
+/** Pixels per lane for road width calculation in OSM import. */
+export const LANE_WIDTH_PX = 50;

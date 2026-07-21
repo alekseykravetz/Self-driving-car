@@ -20,6 +20,7 @@ import { Tree, TreePrototype, buildTreePrototypes } from '../items/tree.js';
 import { Marking } from '../markings/marking.js';
 import { Corridor } from '../corridor.js';
 import { add, scale, lerp, distance, mulberry32 } from '../../math/utils.js';
+import { LANE_WIDTH_PX } from '../../math/worldUnits.js';
 
 export interface WorldGeneratable {
   graph: Graph;
@@ -42,6 +43,11 @@ export interface WorldGeneratable {
   corridors: Corridor[];
 }
 
+/** Compute road width for a segment based on its lane count. */
+function getSegmentRoadWidth(segment: Segment): number {
+  return (segment.lanes ?? 2) * LANE_WIDTH_PX;
+}
+
 /** Center-lane guidance lines (half-width envelope union) for marking placement. */
 function wgGenerateLaneGuides(
   graph: Graph,
@@ -50,7 +56,9 @@ function wgGenerateLaneGuides(
 ): Segment[] {
   const tempEnvelopes: Envelope[] = [];
   for (const segment of graph.segments) {
-    tempEnvelopes.push(new Envelope(segment, roadWidth / 2, roadRoundness));
+    tempEnvelopes.push(
+      new Envelope(segment, getSegmentRoadWidth(segment) / 2, roadRoundness),
+    );
   }
   return Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
 }
@@ -78,10 +86,11 @@ function wgGenerateSeparatorBorders(graph: Graph): Segment[] {
 function wgGenerateBuildings(world: WorldGeneratable): Building[] {
   const tempEnvelopes: Envelope[] = [];
   for (const seg of world.graph.segments) {
+    const segWidth = getSegmentRoadWidth(seg);
     tempEnvelopes.push(
       new Envelope(
         seg,
-        world.roadWidth + world.buildingWidth + world.spacing * 2,
+        segWidth + world.buildingWidth + world.spacing * 2,
         world.roadRoundness,
       ),
     );
@@ -243,7 +252,11 @@ export class WorldGenerator {
 
     for (const segment of world.graph.segments) {
       world.envelopes.push(
-        new Envelope(segment, world.roadWidth, world.roadRoundness),
+        new Envelope(
+          segment,
+          getSegmentRoadWidth(segment),
+          world.roadRoundness,
+        ),
       );
     }
 

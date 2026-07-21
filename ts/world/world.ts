@@ -37,6 +37,7 @@ import {
 import { drawEnvelope } from '../rendering/envelopeRenderer.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPolygon } from '../rendering/polygonRenderer.js';
+import { LANE_WIDTH_PX } from '../math/worldUnits.js';
 
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field.
@@ -53,6 +54,28 @@ export function loadWorldCorridors(info: World): Corridor[] {
     return [Corridor.load(legacy.corridor)];
   }
   return [];
+}
+
+/** Returns the fill color for a road envelope based on its highway type. */
+function getRoadFillColor(seg: Segment): string {
+  switch (seg.highwayType) {
+    case 'motorway':
+      return '#999';
+    case 'trunk':
+      return '#AA9966';
+    case 'primary':
+      return '#DD8833';
+    case 'secondary':
+      return '#EECC55';
+    case 'tertiary':
+      return '#CCC';
+    case 'service':
+      return '#AAA';
+    case 'living_street':
+      return '#AAA';
+    default:
+      return '#BBB';
+  }
 }
 
 /** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes.
@@ -298,7 +321,9 @@ export class World implements IWorld {
     if (layers.roads) {
       // Draw road envelopes (asphalt style, more wider then road borders itself)
       for (const env of this.envelopes) {
-        drawEnvelope(ctx, env, { fill: '#BBB', stroke: '#BBB', lineWidth: 15 });
+        const seg = env.skeleton;
+        const fill = getRoadFillColor(seg);
+        drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
       }
 
       // Draw road borders (solid white lines)
@@ -308,6 +333,9 @@ export class World implements IWorld {
 
       // Draw lane separators or direction arrows
       this.#drawLaneMarkings(ctx);
+
+      // Draw road name labels
+      this.#drawRoadNames(ctx);
     }
 
     // Draw road markings (yield, stop, start, crosswalks, lights)
@@ -377,73 +405,173 @@ export class World implements IWorld {
   /** Draws one-way arrows, hard-separation center lines, and dashed dividers. */
   #drawLaneMarkings(ctx: CanvasRenderingContext2D): void {
     for (const seg of this.graph.segments) {
-      if (seg.oneWay) {
-        // Draw direction arrows for one-way roads
-        const arrowSpacing = 200;
-        const arrowLength = 20;
-        const arrowAngle = Math.PI / 8;
+      const laneCount = seg.lanes ?? (seg.oneWay ? 1 : 2);
+      const roadWidth = laneCount * LANE_WIDTH_PX;
 
-        const len = seg.length();
-        if (len < arrowLength * 2) continue;
-
-        const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
-
-        const dirVector = seg.directionVector();
-        const dir =
-          magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
-
-        // Store original context state
-        const originalLineCap = ctx.lineCap;
-        const originalLineWidth = ctx.lineWidth;
-
-        // Set arrow style
-        ctx.strokeStyle = 'white';
-        ctx.fillStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'butt';
-
-        for (let i = 0; i < numArrows; i++) {
-          const t = (i + 0.5) / numArrows;
-          const clampedT = Math.max(0, Math.min(1, t));
-          const tip = lerp2D(seg.p1, seg.p2, clampedT);
-
-          const arrowBaseDir = scale(dir, -1);
-          const start1 = add(
-            tip,
-            scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
-          );
-          const start2 = add(
-            tip,
-            scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
-          );
-
-          // Draw arrow (start1 to tip and tip to start2)
-          ctx.beginPath();
-          ctx.moveTo(start1.x, start1.y);
-          ctx.lineTo(tip.x, tip.y);
-          ctx.lineTo(start2.x, start2.y);
-          ctx.closePath();
-          ctx.stroke();
-          ctx.fill();
-        }
-
-        // Restore original context state
-        ctx.lineCap = originalLineCap;
-        ctx.lineWidth = originalLineWidth;
-      } else if (seg.separated) {
-        // Hard separation: solid white center line (also a collision border)
-        drawSegment(ctx, seg, {
-          color: 'white',
-          width: 4,
-        });
+      if (laneCount > 2) {
+        this.#drawMultiLaneDividers(ctx, seg, laneCount, roadWidth);
       } else {
-        // Draw dashed lines for two-way roads
-        drawSegment(ctx, seg, {
+        this.#drawSimpleLaneMarkings(ctx, seg, laneCount);
+      }
+    }
+  }
+
+  #drawSimpleLaneMarkings(
+    ctx: CanvasRenderingContext2D,
+    seg: Segment,
+    _laneCount: number,
+  ): void {
+    if (seg.oneWay) {
+      const arrowSpacing = 200;
+      const arrowLength = 20;
+      const arrowAngle = Math.PI / 8;
+      const len = seg.length();
+      if (len < arrowLength * 2) return;
+      const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
+      const dirVector = seg.directionVector();
+      const dir =
+        magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
+      const originalLineCap = ctx.lineCap;
+      const originalLineWidth = ctx.lineWidth;
+      ctx.strokeStyle = 'white';
+      ctx.fillStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'butt';
+      for (let i = 0; i < numArrows; i++) {
+        const t = (i + 0.5) / numArrows;
+        const clampedT = Math.max(0, Math.min(1, t));
+        const tip = lerp2D(seg.p1, seg.p2, clampedT);
+        const arrowBaseDir = scale(dir, -1);
+        const start1 = add(
+          tip,
+          scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
+        );
+        const start2 = add(
+          tip,
+          scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
+        );
+        ctx.beginPath();
+        ctx.moveTo(start1.x, start1.y);
+        ctx.lineTo(tip.x, tip.y);
+        ctx.lineTo(start2.x, start2.y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+      }
+      ctx.lineCap = originalLineCap;
+      ctx.lineWidth = originalLineWidth;
+    } else if (seg.separated) {
+      drawSegment(ctx, seg, { color: 'white', width: 4 });
+    } else {
+      drawSegment(ctx, seg, { color: 'white', width: 4, dash: [15, 25] });
+    }
+  }
+
+  #drawMultiLaneDividers(
+    ctx: CanvasRenderingContext2D,
+    seg: Segment,
+    laneCount: number,
+    roadWidth: number,
+  ): void {
+    const dir = seg.directionVector();
+    const perpDir = normalize(new Point(-dir.y, dir.x));
+    const laneWidth = roadWidth / laneCount;
+
+    for (let i = 0; i < laneCount - 1; i++) {
+      const offset = (i + 1 - laneCount / 2) * laneWidth;
+      if (Math.abs(offset) >= roadWidth / 2 - 1) continue;
+      const distFromCenter = Math.abs(offset);
+      const isCenterDivider = distFromCenter < laneWidth * 0.6;
+      const p1 = add(seg.p1, scale(perpDir, offset));
+      const p2 = add(seg.p2, scale(perpDir, offset));
+      const dividerSeg = new Segment(p1, p2);
+
+      if (seg.oneWay) {
+        drawSegment(ctx, dividerSeg, {
+          color: 'white',
+          width: 2,
+          dash: [8, 16],
+        });
+      } else if (seg.separated && isCenterDivider) {
+        drawSegment(ctx, dividerSeg, { color: 'white', width: 4 });
+      } else if (isCenterDivider) {
+        drawSegment(ctx, dividerSeg, {
           color: 'white',
           width: 4,
           dash: [15, 25],
         });
+      } else {
+        drawSegment(ctx, dividerSeg, {
+          color: 'white',
+          width: 2,
+          dash: [8, 16],
+        });
       }
+    }
+
+    if (seg.oneWay) {
+      const arrowSpacing = 200;
+      const arrowLength = 20;
+      const arrowAngle = Math.PI / 8;
+      const len = seg.length();
+      if (len < arrowLength * 2) return;
+      const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
+      const dirVector = seg.directionVector();
+      const direction =
+        magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
+      ctx.strokeStyle = 'white';
+      ctx.fillStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'butt';
+      for (let i = 0; i < numArrows; i++) {
+        const t = (i + 0.5) / numArrows;
+        const clampedT = Math.max(0, Math.min(1, t));
+        const tip = lerp2D(seg.p1, seg.p2, clampedT);
+        const arrowBaseDir = scale(direction, -1);
+        const start1 = add(
+          tip,
+          scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
+        );
+        const start2 = add(
+          tip,
+          scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
+        );
+        ctx.beginPath();
+        ctx.moveTo(start1.x, start1.y);
+        ctx.lineTo(tip.x, tip.y);
+        ctx.lineTo(start2.x, start2.y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+      }
+    }
+  }
+
+  #drawRoadNames(ctx: CanvasRenderingContext2D): void {
+    if (!this.zoom || this.zoom < 0.4) return;
+
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (const seg of this.graph.segments) {
+      if (!seg.name || seg.length() < 100) continue;
+
+      const mid = lerp2D(seg.p1, seg.p2, 0.5);
+      const dir = seg.directionVector();
+      const angle = Math.atan2(dir.y, dir.x);
+
+      ctx.save();
+      ctx.translate(mid.x, mid.y);
+      ctx.rotate(angle);
+
+      const textWidth = ctx.measureText(seg.name).width;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(-textWidth / 2 - 4, -10, textWidth + 8, 20);
+
+      ctx.fillStyle = 'white';
+      ctx.fillText(seg.name, 0, 0);
+      ctx.restore();
     }
   }
 }
