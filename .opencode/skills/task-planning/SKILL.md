@@ -126,7 +126,7 @@ The `task` prompt to build:
 
 1. Names the plan MD by absolute path.
 2. Tells build to read it fully before doing anything.
-3. Asks build to follow the plan exactly, implement every bullet in `## Implementation`, run `npm run fix:all` when done, and report back which files it changed.
+3. Asks build to follow the plan exactly, implement every bullet in `## Implementation`, run `npm run rebuild` (wipes `js/` and recompiles from `ts/` — eliminates stale compiled files from renamed/deleted sources) then `npm run fix:all`, and report back which files it changed.
 4. Does NOT restate the plan — the MD is the source of truth.
 
 Example handoff prompt:
@@ -134,8 +134,9 @@ Example handoff prompt:
 ```
 Read /Users/alex/Code/Self-driving-car/tasks/<slug>.md fully and implement it.
 Follow the plan exactly. Implement every bullet in the ## Implementation section.
-When done, run `npm run fix:all`. Report back: (1) which files you changed,
-(2) which bullets you completed, (3) anything you skipped or couldn't do.
+When done, run `npm run rebuild` (wipes js/ and recompiles from ts/ so no stale
+compiled files remain), then `npm run fix:all`. Report back: (1) which files you
+changed, (2) which bullets you completed, (3) anything you skipped or couldn't do.
 Do not deviate from the plan without flagging it first.
 ```
 
@@ -152,9 +153,11 @@ Phase: code.
 Build reported these changes:
 <paste build's report here>
 
-Verify every bullet in ## Implementation was done, run tsc --noEmit and
-npm run lint:log, check acceptance criteria at the code level, and flag
-any out-of-scope changes. Return your structured gap report.
+   Verify every bullet in ## Implementation was done, run `npm run rebuild`
+   (wipes js/ and recompiles from ts/ — catches stale compiled files), then
+   `npx tsc --noEmit` and `npm run lint:log`, check acceptance criteria at the
+   code level, and flag any out-of-scope changes. Return your structured gap
+   report.
 ```
 
 ### Reviewer verdict handling

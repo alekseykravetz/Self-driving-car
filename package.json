@@ -8,6 +8,8 @@
     "serve": "serve -p 9090",
     "publish:site": "bash scripts/publish-site.sh",
     "tsc:watch": "tsc --watch",
+    "clean": "rm -rf js",
+    "rebuild": "npm run clean && tsc",
     "watch:fix": "onchange -i \"ts/**/*.ts\" \"html/**/*.html\" \"styles/**/*.css\" -- npm run fix:all",
     "fix:all": "npm run format && npm run lint",
     "format": "prettier --write .",

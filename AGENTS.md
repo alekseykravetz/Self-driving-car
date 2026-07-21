@@ -123,6 +123,8 @@ ts/
 | ---------------------------- | ---------------------------------------------------- |
 | `npm start`                  | Full dev: tsc watch + server + lint/format           |
 | `npm run tsc:watch`          | Compile TS on save only                              |
+| `npm run clean`              | Delete the generated `js/` folder                    |
+| `npm run rebuild`            | `clean` + `tsc` — full fresh recompile of ts/ → js/ (fixes stale orphaned .js files after renames/deletes) |
 | `npm run serve`              | Static server on :9090                               |
 | `npm run lint`               | ESLint auto-fix                                      |
 | `npm run format`             | Prettier (singleQuote: true)                         |
