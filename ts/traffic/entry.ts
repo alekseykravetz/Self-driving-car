@@ -85,11 +85,15 @@ import '../simulator/core/simulatorShell.js';
 (async () => {
   await StoreManager.init();
   const host = new SimulatorPageHost();
-  new TrafficSimulator(
+  const sim = new TrafficSimulator(
     gameCanvas,
     networkCanvas,
     miniMapCanvas,
     cameraCanvas,
     host,
   );
+  (window as unknown as { __sim: unknown }).__sim = sim;
+  if (new URLSearchParams(window.location.search).has('paused')) {
+    (sim as unknown as { pause: () => void }).pause?.();
+  }
 })();

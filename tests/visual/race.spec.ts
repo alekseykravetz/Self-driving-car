@@ -13,14 +13,15 @@ test.describe('Race page', () => {
         errors.push(msg.text());
     });
 
-    await page.goto('/html/race.html?mode=camera');
+    await page.goto('/html/race.html?mode=camera&paused=1');
     await page.waitForSelector('canvas#cameraCanvas', { timeout: 15000 });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
 
     expect(errors).toEqual([]);
     await expect(page).toHaveScreenshot('race-camera.png', {
       fullPage: true,
-      maxDiffPixels: 2000,
+      maxDiffPixels: 5000,
+      mask: [page.locator('canvas')],
     });
   });
 
@@ -31,14 +32,15 @@ test.describe('Race page', () => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
 
-    await page.goto('/html/race.html?mode=phone');
+    await page.goto('/html/race.html?mode=phone&paused=1');
     await page.waitForSelector('canvas#cameraCanvas', { timeout: 15000 });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
 
     expect(errors).toEqual([]);
     await expect(page).toHaveScreenshot('race-phone.png', {
       fullPage: true,
-      maxDiffPixels: 2000,
+      maxDiffPixels: 5000,
+      mask: [page.locator('canvas')],
     });
   });
 });

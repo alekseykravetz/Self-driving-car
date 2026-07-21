@@ -43,6 +43,7 @@ export class WorldEditor {
     #viewportMode = 'mouse';
     #oldGraphHash = null;
     #autoRegen = false;
+    #animationFrameId = -1;
     // Per-layer visibility (local editor preference, persisted to localStorage —
     // never saved into the world file).
     #layerVisibility = loadLayerVisibility();
@@ -325,6 +326,13 @@ export class WorldEditor {
     /* Animation loop using requestAnimationFrame. */
     animate() {
         this.draw();
-        requestAnimationFrame(this.animate.bind(this));
+        this.#animationFrameId = requestAnimationFrame(this.animate.bind(this));
+    }
+    pause() {
+        if (this.#animationFrameId !== -1) {
+            cancelAnimationFrame(this.#animationFrameId);
+            this.#animationFrameId = -1;
+        }
+        this.draw();
     }
 }

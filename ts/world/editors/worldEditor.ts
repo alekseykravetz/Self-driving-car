@@ -69,6 +69,7 @@ export class WorldEditor {
   #viewportMode: 'mouse' | 'touchpad' = 'mouse';
   #oldGraphHash: string | null = null;
   #autoRegen: boolean = false;
+  #animationFrameId: number = -1;
 
   // Per-layer visibility (local editor preference, persisted to localStorage —
   // never saved into the world file).
@@ -437,6 +438,14 @@ export class WorldEditor {
   /* Animation loop using requestAnimationFrame. */
   animate(): void {
     this.draw();
-    requestAnimationFrame(this.animate.bind(this));
+    this.#animationFrameId = requestAnimationFrame(this.animate.bind(this));
+  }
+
+  pause(): void {
+    if (this.#animationFrameId !== -1) {
+      cancelAnimationFrame(this.#animationFrameId);
+      this.#animationFrameId = -1;
+    }
+    this.draw();
   }
 }

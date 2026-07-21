@@ -229,4 +229,11 @@ export class SimulatorShell {
         this.animationLoopToolbar.recordFrame(render);
         this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
     }
+    pause() {
+        if (this.animationFrameId !== -1) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = -1;
+        }
+        this.draw(0);
+    }
 }

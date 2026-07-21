@@ -208,6 +208,7 @@ The project has a **multi-phase test suite**: **48 test files, 684 tests** (~75%
 - Visual tests start a local server on `:9090` automatically (Playwright webServer config).
 - **Chromium only** — no cross-browser visual testing yet.
 - **Config:** `tests/visual/playwright.config.ts` — single-worker, retries 2 in CI, snapshot path template.
+- **Test hook:** Append `?paused=1` to the URL to freeze the animation loop for deterministic screenshots. All spec files use this and mask all `<canvas>` elements via `page.locator('canvas')` so the pixel comparison covers only the stable HTML/CSS UI chrome. `maxDiffPixels: 5000` absorbs cross-OS font anti-aliasing differences.
 - **Phase 1 (pure-logic) test modules** now cover:
   - `ts/car/physics/sensorRaycaster.ts` — ray-casting math (castRays, getReading, getReadings, getTaggedReadings)
   - `ts/ui/atoms/latchedToggle.ts` — held/latched state machine (setPhysicalHold, toggleLatch, reset, onChange)

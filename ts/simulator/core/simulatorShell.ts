@@ -306,4 +306,12 @@ export abstract class SimulatorShell {
 
     this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
   }
+
+  pause(): void {
+    if (this.animationFrameId !== -1) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = -1;
+    }
+    this.draw(0);
+  }
 }
