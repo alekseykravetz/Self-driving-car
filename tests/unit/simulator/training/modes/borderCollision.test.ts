@@ -59,4 +59,18 @@ describe('handleCollisionWithRoadBorders', () => {
     expect(car.x).toBeCloseTo(10, 5);
     expect(car.y).toBeCloseTo(20 + pushDistance, 0.001);
   });
+
+  it('flips bump direction when reversing', () => {
+    // AI car with reverse=true — car was backing up.
+    // Angle = 0 (facing up), reversing:
+    //   movement direction = +sin, +cos = (0, 1) → moving DOWN
+    //   bump forward = -sin, -cos = (0, -1) → pushes UP
+    const car = new Car({ x: 10, y: 20, controlType: 'AI', angle: 0 });
+    car.controls.forward = false;
+    car.controls.reverse = true;
+    const pushDistance = Math.hypot(car.width, car.height) / 2;
+    handleCollisionWithRoadBorders(car, []);
+    expect(car.x).toBeCloseTo(10, 5);
+    expect(car.y).toBeCloseTo(20 - pushDistance, 0.001);
+  });
 });
