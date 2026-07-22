@@ -161,5 +161,137 @@ describe('Osm', () => {
       expect(result.points.length).toBe(3);
       expect(result.segments.length).toBe(2);
     });
+
+    it('stores highway type on segment', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          { type: 'way', id: 101, nodes: [1, 2], tags: { highway: 'primary' } },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].highwayType).toBe('primary');
+    });
+
+    it('stores road name on segment', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'residential', name: 'Main St' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].name).toBe('Main St');
+    });
+
+    it('uses explicit lanes tag', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'residential', lanes: '3' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].lanes).toBe(3);
+    });
+
+    it('defaults motorway to 4 lanes', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'motorway' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].lanes).toBe(4);
+    });
+
+    it('defaults residential to 2 lanes', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'residential' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].lanes).toBe(2);
+    });
+
+    it('stores surface type on segment', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'residential', surface: 'paving_stones' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].surface).toBe('paving_stones');
+    });
+
+    it('parses maxspeed as number', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'residential', maxspeed: '50' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].maxSpeed).toBe(50);
+    });
+
+    it('oneway with lanes tag still sets oneWay flag', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'residential', oneway: 'yes', lanes: '2' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      expect(result.segments[0].oneWay).toBe(true);
+      expect(result.segments[0].lanes).toBe(2);
+    });
   });
 });

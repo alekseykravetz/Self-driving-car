@@ -6,11 +6,12 @@ This document is the single reference for project units, conversion constants, a
 
 ## Core Constants
 
-Defined in `ts/math/utils.ts`:
+Defined in `ts/math/worldUnits.ts`:
 
 - `WORLD_PIXELS_PER_METER = 14`
 - `SIMULATION_FPS = 60`
 - `METERS_PER_DEGREE_LATITUDE = 111000` (for OSM projection)
+- `LANE_WIDTH_PX = 50` (pixels per lane — drives per-segment road width from OSM lane count)
 
 ---
 
@@ -33,6 +34,26 @@ Examples:
 - `7.0 m two-lane road -> 98 px`
 - `7.5 m two-lane road -> 105 px`
 - `100 px road envelope -> 100 / 14 = 7.14 m` (close to typical urban two-lane width)
+
+---
+
+## Lane Width & Per-Segment Road Width
+
+`LANE_WIDTH_PX = 50` (in `ts/math/worldUnits.ts`) defines the pixel width of a
+single road lane. At 14px/m, 50px ≈ 3.57m — matching real-world lane widths
+(~3.5-3.7m). `WorldGenerator` sizes each road envelope as
+`segment.lanes * LANE_WIDTH_PX`:
+
+| Lanes | Road width (px) | Real width (m) | Example highway type           |
+| ----- | --------------- | -------------- | ------------------------------ |
+| 1     | 50              | 3.57           | service, living_street         |
+| 2     | 100             | 7.14           | residential, primary (default) |
+| 3     | 150             | 10.71          | (explicit lanes tag)           |
+| 4     | 200             | 14.29          | motorway, trunk                |
+| 6     | 300             | 21.43          | (explicit lanes tag)           |
+
+Segments without OSM metadata (hand-drawn or legacy worlds) default to 2 lanes
+→ 100px, preserving the original `world.roadWidth = 100` behavior.
 
 ---
 

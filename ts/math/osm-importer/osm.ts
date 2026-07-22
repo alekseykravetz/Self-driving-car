@@ -17,7 +17,11 @@ interface OsmNodeElement {
 interface OsmWayTags {
   oneway: string; // e.g., "yes", "no", "-1"
   lanes: string;
-  // Include other tags you might need, e.g., 'highway', 'name'
+  highway: string;
+  name: string;
+  surface: string;
+  maxspeed: string;
+  junction: string;
   [key: string]: string; // Allow for other unspecified tags
 }
 
@@ -66,6 +70,34 @@ export class Osm {
       console.warn('No nodes found in OSM data.');
       return { points: [], segments: [] };
     }
+
+    const defaultLaneCount = (
+      highwayType: string | undefined,
+      oneWay: boolean,
+    ): number => {
+      switch (highwayType) {
+        case 'motorway':
+          return 4;
+        case 'trunk':
+          return 4;
+        case 'primary':
+          return 2;
+        case 'secondary':
+          return 2;
+        case 'tertiary':
+          return 2;
+        case 'residential':
+          return 2;
+        case 'service':
+          return 1;
+        case 'living_street':
+          return 1;
+        case 'track':
+          return 1;
+        default:
+          return oneWay ? 1 : 2;
+      }
+    };
 
     // Extract latitudes and longitudes for bounding box calculation
     const latitudes = nodes.map((node) => node.lat);
@@ -138,8 +170,31 @@ export class Osm {
           const isOneWay =
             oneWayTag === 'yes' || lanesTag === '1' || isRoundabout;
 
+          const highwayType = way.tags.highway;
+          const name = way.tags.name;
+          const surface = way.tags.surface;
+          const speedStr = way.tags.maxspeed;
+          let maxSpeed: number | undefined;
+          if (speedStr) {
+            const num = parseFloat(speedStr);
+            if (!isNaN(num)) maxSpeed = num;
+          }
+          const lanesParsed = lanesTag ? parseInt(lanesTag, 10) : undefined;
+          const laneCount =
+            lanesParsed && lanesParsed > 0
+              ? lanesParsed
+              : defaultLaneCount(highwayType, isOneWay);
+
           // Create and add the new Segment
-          segments.push(new Segment(prevPoint, currentPoint, isOneWay));
+          segments.push(
+            new Segment(prevPoint, currentPoint, isOneWay, false, {
+              highwayType,
+              name,
+              lanes: laneCount,
+              surface,
+              maxSpeed,
+            }),
+          );
         } else {
           // Log a warning if points referenced by a way were not found (e.g., filtered out or missing)
           console.warn(

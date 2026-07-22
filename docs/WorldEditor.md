@@ -144,10 +144,10 @@ compact `{ x, y, p, s, t }` form (see SaveLoad.md).
 ## Road Generation Pipeline
 
 ```
-Graph segments
+Graph segments (each carries optional lanes / highwayType / name metadata)
     │
-    ▼ (wrap each in Envelope with roadWidth + roadRoundness)
-Envelopes[] (rounded rectangles around each road segment)
+    ▼ (wrap each in Envelope with per-segment width = lanes × LANE_WIDTH_PX)
+Envelopes[] (rounded rectangles around each road segment, variable width)
     │
     ▼ (Polygon.union — merge overlapping shapes)
 roadBorders[] (clean outer edges only — no internal boundaries)
@@ -156,14 +156,30 @@ roadBorders[] (clean outer edges only — no internal boundaries)
 laneGuides[] (center-lane markers for marking placement)
 ```
 
+### Per-segment road width
+
+Each segment's envelope width is computed from its lane count:
+
+```typescript
+const LANE_WIDTH_PX = 50; // ts/math/worldUnits.ts
+function getSegmentRoadWidth(segment: Segment): number {
+  return (segment.lanes ?? 2) * LANE_WIDTH_PX;
+}
+```
+
+Segments without OSM metadata (hand-drawn or legacy worlds) default to 2 lanes
+→ 100px, matching the original `world.roadWidth`. OSM-imported motorways (4
+lanes) render at 200px, service roads (1 lane) at 50px. Building setback uses
+the same per-segment width so wider roads get more clearance.
+
 ### Step 1: Envelope Creation
 
-Each graph segment is wrapped in an Envelope with the configured `roadWidth` and `roadRoundness`:
+Each graph segment is wrapped in an Envelope with its per-segment width and the configured `roadRoundness`:
 
 ```typescript
 for (const segment of this.graph.segments) {
   this.envelopes.push(
-    new Envelope(segment, this.roadWidth, this.roadRoundness),
+    new Envelope(segment, getSegmentRoadWidth(segment), this.roadRoundness),
   );
 }
 ```
@@ -182,12 +198,12 @@ This removes internal edges between overlapping roads, producing clean outer roa
 
 ### Step 3: Lane Guides
 
-Smaller envelopes (half width) generate lane center lines:
+Smaller envelopes (half the per-segment width) generate lane center lines:
 
 ```typescript
 for (const segment of this.graph.segments) {
   laneGuides.push(
-    new Envelope(segment, this.roadWidth / 2, this.roadRoundness),
+    new Envelope(segment, getSegmentRoadWidth(segment) / 2, this.roadRoundness),
   );
 }
 ```
@@ -319,20 +335,117 @@ center line that cars cannot cross), modelled like the existing one-way flag:
 
 ---
 
+## OSM Import & Lane Metadata
+
+The OSM importer (`ts/math/osm-importer/osm.ts`) converts raw OpenStreetMap JSON
+(from [Overpass Turbo](https://overpass-turbo.eu/)) into the project's
+`Point`/`Segment` graph. In addition to the road geometry, it now extracts and
+stores **per-way metadata** on each `Segment`:
+
+| Tag        | Segment field  | Notes                                                 |
+| ---------- | -------------- | ----------------------------------------------------- |
+| `highway`  | `highwayType`  | Road classification — drives envelope fill color      |
+| `name`     | `name`         | Rendered as a label on the map at zoom > 0.4          |
+| `lanes`    | `lanes`        | Total lane count — drives per-segment road width      |
+| `surface`  | `surface`      | Surface material (stored, not yet used for rendering) |
+| `maxspeed` | `maxSpeed`     | Parsed to a number (km/h); stored, not yet used       |
+| `oneway`   | `oneWay`       | `yes` / `lanes=1` / `junction=roundabout` → one-way   |
+| `junction` | (oneWay logic) | `roundabout` implies one-way                          |
+
+### Lane count defaults
+
+When a way has no explicit `lanes` tag, the importer infers a default from the
+`highway` type:
+
+| Highway type                                      | Default lanes  |
+| ------------------------------------------------- | -------------- |
+| `motorway`, `trunk`                               | 4              |
+| `primary`, `secondary`, `tertiary`, `residential` | 2              |
+| `service`, `living_street`, `track`               | 1              |
+| unknown                                           | oneWay ? 1 : 2 |
+
+### Per-segment road width
+
+`WorldGenerator.generateRoads` sizes each envelope as
+`segment.lanes * LANE_WIDTH_PX` (where `LANE_WIDTH_PX = 50`, defined in
+`ts/math/worldUnits.ts`). At 14px/m, 50px ≈ 3.57m — matching real-world lane
+widths. Hand-drawn segments and legacy worlds without metadata default to 2
+lanes (100px), preserving the original `world.roadWidth` look.
+
+### Multi-lane rendering
+
+Roads with 3+ lanes draw N-1 internal lane dividers (parallel lines offset from
+the segment centerline at each lane boundary):
+
+- **One-way roads**: all dividers are thin dashed lines; direction arrows are
+  also drawn.
+- **Two-way roads**: the center-most divider follows the existing convention
+  (solid if `separated`, dashed otherwise); other dividers are thin dashed
+  same-direction lines.
+
+Roads with 1-2 lanes use the original center-line logic (arrows / solid /
+dashed) unchanged.
+
+### Highway-type coloring
+
+Road envelope fill color varies by `highwayType`:
+
+| Highway type        | Fill color |
+| ------------------- | ---------- |
+| `motorway`          | `#888`     |
+| `trunk`             | `#998877`  |
+| `primary`           | `#B5774A`  |
+| `secondary`         | `#B0A060`  |
+| `tertiary`          | `#CCC`     |
+| `service`           | `#AAA`     |
+| `living_street`     | `#AAA`     |
+| other / residential | `#BBB`     |
+
+### Road name labels
+
+When the viewport zoom is > 0.4, each named segment (length > 150px) renders
+its `name` at the midpoint, rotated to align with the road direction. A
+semi-transparent black background improves readability over asphalt.
+
+### Serialization
+
+All metadata fields are optional and serialized automatically via
+`JSON.stringify` (they are enumerable properties on `Segment`). `Graph.load()`
+restores them after reconstructing the segment endpoints. `Graph.hash()`
+includes the lane count in its mix so metadata changes trigger road
+regeneration in the editor. Legacy worlds without metadata load and render
+with the original 2-lane defaults.
+
+---
+
 ## Drawing Order (Painter's Algorithm)
 
 The world draws in this order to ensure proper visual layering:
 
 ```
-1. Road envelopes (gray fill) — flat road surface
+1. Road envelopes (highway-type-colored fill) — flat road surface
 2. Road borders (white lines) — road edges
-3. Lane markings (dashed center lines) — lane separators
-4. Markings (traffic lights, stop signs, crossings)
-5. Buildings (3D perspective via getFake3dPoint)
+3. Lane markings:
+   a. One-way arrows (for one-way segments)
+   b. Solid center line (for hard-separated two-way segments)
+   c. Dashed center line (for regular two-way segments)
+   d. Multi-lane dividers (for 3+ lane roads — N-1 dividers, dashed same-direction, solid/dashed center)
+4. Road name labels (OSM name tag, rendered at zoom > 0.4, rotated to road direction)
+5. Markings (traffic lights, stop signs, crossings)
+6. Buildings (3D perspective via getFake3dPoint)
    → Sorted by distance to viewPoint (far first)
-6. Trees (3D perspective via getFake3dPoint)
+7. Trees (3D perspective via getFake3dPoint)
    → Sorted by distance to viewPoint (far first)
 ```
+
+Road envelope fill color varies by `highwayType` (motorway=#888, primary=#B5774A,
+secondary=#B0A060, tertiary=#CCC, residential/service=default #BBB). Multi-lane
+dividers are drawn as parallel lines offset from the segment centerline at each
+lane boundary; the center-most divider follows the same solid/dashed convention
+as single-lane roads, while same-direction dividers use a thinner dashed style.
+One-way roads with 2+ lanes also draw a dashed center divider. Speed limit signs
+(red-ringed circles with the number) are drawn at regular intervals on segments
+that have a `maxSpeed` value.
 
 Buildings and trees are sorted by distance to the viewport center so that closer objects are drawn on top of farther ones (correct depth ordering in the top-down pseudo-3D view).
 

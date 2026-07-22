@@ -28,6 +28,13 @@ export class Graph {
           i.separated,
         ),
     );
+    info.segments.forEach((s, idx) => {
+      segments[idx].highwayType = s.highwayType;
+      segments[idx].name = s.name;
+      segments[idx].lanes = s.lanes;
+      segments[idx].surface = s.surface;
+      segments[idx].maxSpeed = s.maxSpeed;
+    });
     return new Graph(points, segments);
   }
 
@@ -54,7 +61,9 @@ export class Graph {
       mix(s.p1.y * 1000);
       mix(s.p2.x * 1000);
       mix(s.p2.y * 1000);
-      mix((s.oneWay ? 1 : 0) | (s.separated ? 2 : 0));
+      const hFlags =
+        (s.oneWay ? 1 : 0) | (s.separated ? 2 : 0) | ((s.lanes ?? 2) << 2);
+      mix(hFlags);
     }
     return (h >>> 0).toString(36);
   }

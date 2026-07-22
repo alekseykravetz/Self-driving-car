@@ -14,12 +14,36 @@ export class Segment {
   p2: Point;
   oneWay: boolean;
   separated: boolean;
+  highwayType?: string;
+  name?: string;
+  lanes?: number;
+  surface?: string;
+  maxSpeed?: number;
 
-  constructor(p1: Point, p2: Point, oneWay = false, separated = false) {
+  constructor(
+    p1: Point,
+    p2: Point,
+    oneWay = false,
+    separated = false,
+    metadata?: {
+      highwayType?: string;
+      name?: string;
+      lanes?: number;
+      surface?: string;
+      maxSpeed?: number;
+    },
+  ) {
     this.p1 = p1;
     this.p2 = p2;
     this.oneWay = oneWay;
     this.separated = separated;
+    if (metadata) {
+      this.highwayType = metadata.highwayType;
+      this.name = metadata.name;
+      this.lanes = metadata.lanes;
+      this.surface = metadata.surface;
+      this.maxSpeed = metadata.maxSpeed;
+    }
   }
 
   length(): number {

@@ -414,6 +414,7 @@ function handleCollisionWithRoadBorders(
 ```
 
 The bump direction depends on travel direction:
+
 - **Forward** (the front of the car hit the wall): push back — `x += sin(angle), y += cos(angle)`
 - **Reverse** (the rear hit the wall): push forward — `x -= sin(angle), y -= cos(angle)`
 

@@ -36,6 +36,27 @@ class Segment {
   p1: Point; // Start point
   p2: Point; // End point
   oneWay: boolean; // Directed edge flag (for one-way roads)
+  separated: boolean; // Hard-separation flag (solid center line, collision border)
+  // Optional OSM metadata (populated by Osm.parseRoads, preserved by Graph.load)
+  highwayType?: string; // e.g. 'motorway', 'primary', 'residential'
+  name?: string; // Road name (rendered as label when zoomed in)
+  lanes?: number; // Total lane count (drives per-segment road width)
+  surface?: string; // e.g. 'asphalt', 'paving_stones'
+  maxSpeed?: number; // Parsed from maxspeed tag (km/h)
+
+  constructor(
+    p1: Point,
+    p2: Point,
+    oneWay = false,
+    separated = false,
+    metadata?: {
+      highwayType?: string;
+      name?: string;
+      lanes?: number;
+      surface?: string;
+      maxSpeed?: number;
+    },
+  );
 
   length(): number;
   directionVector(): Point; // Normalized p1→p2 direction
@@ -45,6 +66,12 @@ class Segment {
   projectPoint(point: Point): { point: Point; offset: number };
 }
 ```
+
+The optional OSM metadata fields are `undefined` for hand-drawn graph segments
+and for legacy saved worlds that predate the OSM lane import. Road generation
+defaults to 2 lanes when `lanes` is `undefined`, preserving the original
+`world.roadWidth = 100` behavior. See [World Editor → OSM Import](WorldEditor.md#osm-import--lane-metadata)
+for how lane count drives per-segment road width.
 
 > Drawing is done via `drawSegment(ctx, segment, options?)` from `ts/rendering/segmentRenderer.ts`.
 
@@ -178,7 +205,8 @@ Generates a rounded rectangular polygon around a line segment. This is how road 
 
 ```typescript
 class Envelope {
-  skeleton: Segment; // The central axis (road center line)
+  #skeleton: Segment; // The central axis (road center line) — private
+  readonly skeleton: Segment; // Public getter for #skeleton (used by renderer)
   polygon: Polygon; // The generated shape (road surface)
 
   constructor(
@@ -557,9 +585,13 @@ interface OsmWayElement {
   nodes: number[]; // Array of node IDs forming the road
   tags: {
     oneway?: string; // "yes", "no", "-1"
-    lanes?: string; // Number of lanes
-    junction?: string; // "roundabout"
-    highway?: string; // Road classification
+    lanes?: string; // Total lane count (string, parsed to int)
+    junction?: string; // "roundabout" → implies one-way
+    highway?: string; // Road classification (motorway, primary, residential, …)
+    name?: string; // Road name (rendered as label on the map)
+    surface?: string; // Surface material (asphalt, paving_stones, …)
+    maxspeed?: string; // Speed limit (parsed to number, km/h)
+    [key: string]: string; // Allow other unspecified tags
   };
 }
 
@@ -599,7 +631,11 @@ class Osm {
      Connect consecutive nodes as Segments
      Detect one-way: tags.oneway === 'yes' OR tags.lanes === '1' OR tags.junction === 'roundabout'
      Set segment.oneWay = true for one-way roads
-     Handle reverse one-way (tags.oneway === '-1'): swap p1/p2
+     Parse metadata: highway, name, surface, maxspeed, lanes
+     Lane count: explicit lanes tag → use it; otherwise default by highway type:
+       motorway/trunk → 4, primary/secondary/tertiary/residential → 2,
+       service/living_street/track → 1, unknown → oneWay ? 1 : 2
+     Store metadata on Segment (highwayType, name, lanes, surface, maxSpeed)
 
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)
@@ -607,11 +643,12 @@ class Osm {
 
 ### Real-World Scale
 
-The OSM importer uses the shared project scale from `ts/math/utils.ts`:
+The OSM importer uses the shared project scale from `ts/math/worldUnits.ts`:
 
 ```typescript
 const WORLD_PIXELS_PER_METER = 14;
 const METERS_PER_DEGREE_LATITUDE = 111000;
+const LANE_WIDTH_PX = 50; // pixels per lane — drives per-segment road width
 ```
 
 That gives:
@@ -632,6 +669,12 @@ because one degree of longitude is shorter away from the equator:
 ```
 width = height * (deltaLon / deltaLat) * cos(avgLatitude)
 ```
+
+`LANE_WIDTH_PX = 50` matches the real-world lane width (~3.57m at 14px/m). The
+OSM importer stores a `lanes` count on each `Segment`; `WorldGenerator` then
+sizes each road envelope as `lanes * LANE_WIDTH_PX`, so a 4-lane motorway
+renders at 200px and a 1-lane service road at 50px. Hand-drawn segments without
+metadata default to 2 lanes (100px), preserving the original look.
 
 ### Example Workflow
 
