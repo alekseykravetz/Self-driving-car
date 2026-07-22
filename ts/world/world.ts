@@ -60,13 +60,13 @@ export function loadWorldCorridors(info: World): Corridor[] {
 function getRoadFillColor(seg: Segment): string {
   switch (seg.highwayType) {
     case 'motorway':
-      return '#999';
+      return '#888';
     case 'trunk':
-      return '#AA9966';
+      return '#998877';
     case 'primary':
-      return '#DD8833';
+      return '#B5774A';
     case 'secondary':
-      return '#EECC55';
+      return '#B0A060';
     case 'tertiary':
       return '#CCC';
     case 'service':
@@ -336,6 +336,9 @@ export class World implements IWorld {
 
       // Draw road name labels
       this.#drawRoadNames(ctx);
+
+      // Draw speed limit signs
+      this.#drawSpeedLimits(ctx);
     }
 
     // Draw road markings (yield, stop, start, crosswalks, lights)
@@ -419,14 +422,19 @@ export class World implements IWorld {
   #drawSimpleLaneMarkings(
     ctx: CanvasRenderingContext2D,
     seg: Segment,
-    _laneCount: number,
+    laneCount: number,
   ): void {
     if (seg.oneWay) {
+      // For 2+ lane one-way roads, draw a dashed center divider between lanes
+      if (laneCount >= 2) {
+        drawSegment(ctx, seg, { color: 'white', width: 3, dash: [10, 20] });
+      }
+      // Draw direction arrows for one-way roads
       const arrowSpacing = 200;
       const arrowLength = 20;
       const arrowAngle = Math.PI / 8;
       const len = seg.length();
-      if (len < arrowLength * 2) return;
+      if (len < 80) return; // Skip arrows on very short segments (roundabouts, etc.)
       const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
       const dirVector = seg.directionVector();
       const dir =
@@ -514,7 +522,7 @@ export class World implements IWorld {
       const arrowLength = 20;
       const arrowAngle = Math.PI / 8;
       const len = seg.length();
-      if (len < arrowLength * 2) return;
+      if (len < 80) return; // Skip arrows on very short segments
       const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
       const dirVector = seg.directionVector();
       const direction =
@@ -555,7 +563,7 @@ export class World implements IWorld {
     ctx.textBaseline = 'middle';
 
     for (const seg of this.graph.segments) {
-      if (!seg.name || seg.length() < 100) continue;
+      if (!seg.name || seg.length() < 150) continue; // Skip short segments
 
       const mid = lerp2D(seg.p1, seg.p2, 0.5);
       const dir = seg.directionVector();
@@ -572,6 +580,42 @@ export class World implements IWorld {
       ctx.fillStyle = 'white';
       ctx.fillText(seg.name, 0, 0);
       ctx.restore();
+    }
+  }
+
+  /** Draws speed limit signs (red-ringed circle with number) along roads. */
+  #drawSpeedLimits(ctx: CanvasRenderingContext2D): void {
+    if (!this.zoom || this.zoom < 0.4) return;
+
+    const signRadius = 16;
+    const signSpacing = 600; // px between signs on the same segment
+
+    for (const seg of this.graph.segments) {
+      if (!seg.maxSpeed || seg.length() < 150) continue;
+
+      const len = seg.length();
+      const numSigns = Math.max(1, Math.floor(len / signSpacing));
+
+      for (let i = 0; i < numSigns; i++) {
+        const t = (i + 0.5) / numSigns;
+        const center = lerp2D(seg.p1, seg.p2, t);
+
+        // Draw red ring
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, signRadius, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.strokeStyle = '#D4242B';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw speed number
+        ctx.fillStyle = '#222';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(seg.maxSpeed), center.x, center.y);
+      }
     }
   }
 }

@@ -404,6 +404,9 @@ export class WorldEditor {
       }
     }
 
+    // Sync viewport zoom so world.draw can use it for road name visibility.
+    this.#world.zoom = this.#viewport.zoom;
+
     // Get the current viewpoint based on viewport offset
     const viewPoint = scale(this.#viewport.getOffset(), -1);
 

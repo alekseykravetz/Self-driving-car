@@ -392,10 +392,10 @@ Road envelope fill color varies by `highwayType`:
 
 | Highway type        | Fill color |
 | ------------------- | ---------- |
-| `motorway`          | `#999`     |
-| `trunk`             | `#AA9966`  |
-| `primary`           | `#DD8833`  |
-| `secondary`         | `#EECC55`  |
+| `motorway`          | `#888`     |
+| `trunk`             | `#998877`  |
+| `primary`           | `#B5774A`  |
+| `secondary`         | `#B0A060`  |
 | `tertiary`          | `#CCC`     |
 | `service`           | `#AAA`     |
 | `living_street`     | `#AAA`     |
@@ -403,7 +403,7 @@ Road envelope fill color varies by `highwayType`:
 
 ### Road name labels
 
-When the viewport zoom is > 0.4, each named segment (length > 100px) renders
+When the viewport zoom is > 0.4, each named segment (length > 150px) renders
 its `name` at the midpoint, rotated to align with the road direction. A
 semi-transparent black background improves readability over asphalt.
 
@@ -438,11 +438,14 @@ The world draws in this order to ensure proper visual layering:
    → Sorted by distance to viewPoint (far first)
 ```
 
-Road envelope fill color varies by `highwayType` (motorway=#999, primary=#DD8833,
-secondary=#EECC55, tertiary=#CCC, residential/service=default #BBB). Multi-lane
+Road envelope fill color varies by `highwayType` (motorway=#888, primary=#B5774A,
+secondary=#B0A060, tertiary=#CCC, residential/service=default #BBB). Multi-lane
 dividers are drawn as parallel lines offset from the segment centerline at each
 lane boundary; the center-most divider follows the same solid/dashed convention
 as single-lane roads, while same-direction dividers use a thinner dashed style.
+One-way roads with 2+ lanes also draw a dashed center divider. Speed limit signs
+(red-ringed circles with the number) are drawn at regular intervals on segments
+that have a `maxSpeed` value.
 
 Buildings and trees are sorted by distance to the viewport center so that closer objects are drawn on top of farther ones (correct depth ordering in the top-down pseudo-3D view).
 
