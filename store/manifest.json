@@ -6,7 +6,8 @@
     "mirror_corridor.world",
     "ashkelon-kohav-hazafon.world",
     "barnea.world",
-    "ir-hyain.world"
+    "ir-hyain.world",
+    "new-osm-data.world"
   ],
   "cars": [
     "best_b6_s3_rc5_rl150.car",
