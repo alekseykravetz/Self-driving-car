@@ -19,7 +19,14 @@ import { Building } from '../items/building.js';
 import { Tree, TreePrototype, buildTreePrototypes } from '../items/tree.js';
 import { Marking } from '../markings/marking.js';
 import { Corridor } from '../corridor.js';
-import { add, scale, lerp, distance, mulberry32 } from '../../math/utils.js';
+import {
+  add,
+  scale,
+  lerp,
+  distance,
+  normalize,
+  mulberry32,
+} from '../../math/utils.js';
 import { LANE_WIDTH_PX } from '../../math/worldUnits.js';
 
 export interface WorldGeneratable {
@@ -48,19 +55,51 @@ function getSegmentRoadWidth(segment: Segment): number {
   return (segment.lanes ?? 2) * LANE_WIDTH_PX;
 }
 
-/** Center-lane guidance lines (half-width envelope union) for marking placement. */
-function wgGenerateLaneGuides(
-  graph: Graph,
-  roadWidth: number,
-  roadRoundness: number,
-): Segment[] {
-  const tempEnvelopes: Envelope[] = [];
+/** Per-lane guidance lines for marking placement.
+ *
+ * Generates one guide per lane at the center of each lane. This replaces the
+ * old half-width envelope union which only placed guides at ±¼-road-width —
+ * correct only for 2-lane roads. Per-lane guides work for all lane counts.
+ *
+ * Direction convention (matches the `-angle(dv) + π/2` heading formula which
+ * makes cars face OPPOSITE to dv):
+ *   - Two-way roads: even-indexed lanes (from the left) point p1→p2
+ *     (car goes backward), odd-indexed lanes point p2→p1 (car goes forward).
+ *     This preserves the original 2-lane behavior where the right lane goes
+ *     forward and the left lane goes backward.
+ *   - One-way roads: ALL lanes point p2→p1 (opposite to traffic flow),
+ *     so cars face forward (in the p1→p2 traffic direction).
+ */
+function wgGenerateLaneGuides(graph: Graph): Segment[] {
+  const guides: Segment[] = [];
   for (const segment of graph.segments) {
-    tempEnvelopes.push(
-      new Envelope(segment, getSegmentRoadWidth(segment) / 2, roadRoundness),
-    );
+    const laneCount = segment.lanes ?? (segment.oneWay ? 1 : 2);
+    const dir = segment.directionVector();
+    const perpDir = normalize(new Point(-dir.y, dir.x));
+    const laneWidth = LANE_WIDTH_PX;
+    const halfRoadWidth = (laneCount * laneWidth) / 2;
+
+    for (let k = 0; k < laneCount; k++) {
+      // Lane center offset from road center (leftmost lane = most negative)
+      const offset = (k + 0.5) * laneWidth - halfRoadWidth;
+      const p1 = add(segment.p1, scale(perpDir, offset));
+      const p2 = add(segment.p2, scale(perpDir, offset));
+
+      if (segment.oneWay) {
+        // All lanes point p2→p1 (opposite to traffic flow) so that
+        // the car heading formula produces forward-facing cars.
+        guides.push(new Segment(p2, p1));
+      } else {
+        // Two-way: even k = forward (p1→p2), odd k = backward (p2→p1)
+        if (k % 2 === 0) {
+          guides.push(new Segment(p1, p2));
+        } else {
+          guides.push(new Segment(p2, p1));
+        }
+      }
+    }
   }
-  return Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
+  return guides;
 }
 
 /**
@@ -262,13 +301,7 @@ export class WorldGenerator {
 
     const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
     world.roadBorders.push(...Polygon.union(roadPolygons));
-    world.laneGuides.push(
-      ...wgGenerateLaneGuides(
-        world.graph,
-        world.roadWidth,
-        world.roadRoundness,
-      ),
-    );
+    world.laneGuides.push(...wgGenerateLaneGuides(world.graph));
     world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
   }
 

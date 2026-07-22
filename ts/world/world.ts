@@ -424,55 +424,67 @@ export class World implements IWorld {
     seg: Segment,
     laneCount: number,
   ): void {
+    // Single-lane roads have no center line to draw.
+    if (laneCount <= 1) {
+      if (seg.oneWay) {
+        this.#drawOneWayArrows(ctx, seg);
+      }
+      return;
+    }
+
     if (seg.oneWay) {
       // For 2+ lane one-way roads, draw a dashed center divider between lanes
       if (laneCount >= 2) {
         drawSegment(ctx, seg, { color: 'white', width: 3, dash: [10, 20] });
       }
-      // Draw direction arrows for one-way roads
-      const arrowSpacing = 200;
-      const arrowLength = 20;
-      const arrowAngle = Math.PI / 8;
-      const len = seg.length();
-      if (len < 80) return; // Skip arrows on very short segments (roundabouts, etc.)
-      const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
-      const dirVector = seg.directionVector();
-      const dir =
-        magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
-      const originalLineCap = ctx.lineCap;
-      const originalLineWidth = ctx.lineWidth;
-      ctx.strokeStyle = 'white';
-      ctx.fillStyle = 'white';
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'butt';
-      for (let i = 0; i < numArrows; i++) {
-        const t = (i + 0.5) / numArrows;
-        const clampedT = Math.max(0, Math.min(1, t));
-        const tip = lerp2D(seg.p1, seg.p2, clampedT);
-        const arrowBaseDir = scale(dir, -1);
-        const start1 = add(
-          tip,
-          scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
-        );
-        const start2 = add(
-          tip,
-          scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
-        );
-        ctx.beginPath();
-        ctx.moveTo(start1.x, start1.y);
-        ctx.lineTo(tip.x, tip.y);
-        ctx.lineTo(start2.x, start2.y);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.fill();
-      }
-      ctx.lineCap = originalLineCap;
-      ctx.lineWidth = originalLineWidth;
+      this.#drawOneWayArrows(ctx, seg);
     } else if (seg.separated) {
       drawSegment(ctx, seg, { color: 'white', width: 4 });
     } else {
       drawSegment(ctx, seg, { color: 'white', width: 4, dash: [15, 25] });
     }
+  }
+
+  /** Draw one-way direction arrows along a segment. */
+  #drawOneWayArrows(ctx: CanvasRenderingContext2D, seg: Segment): void {
+    const arrowSpacing = 200;
+    const arrowLength = 20;
+    const arrowAngle = Math.PI / 8;
+    const len = seg.length();
+    if (len < 80) return; // Skip arrows on very short segments (roundabouts, etc.)
+    const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
+    const dirVector = seg.directionVector();
+    const dir =
+      magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
+    const originalLineCap = ctx.lineCap;
+    const originalLineWidth = ctx.lineWidth;
+    ctx.strokeStyle = 'white';
+    ctx.fillStyle = 'white';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'butt';
+    for (let i = 0; i < numArrows; i++) {
+      const t = (i + 0.5) / numArrows;
+      const clampedT = Math.max(0, Math.min(1, t));
+      const tip = lerp2D(seg.p1, seg.p2, clampedT);
+      const arrowBaseDir = scale(dir, -1);
+      const start1 = add(
+        tip,
+        scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
+      );
+      const start2 = add(
+        tip,
+        scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
+      );
+      ctx.beginPath();
+      ctx.moveTo(start1.x, start1.y);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.lineTo(start2.x, start2.y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
+    }
+    ctx.lineCap = originalLineCap;
+    ctx.lineWidth = originalLineWidth;
   }
 
   #drawMultiLaneDividers(
@@ -518,40 +530,7 @@ export class World implements IWorld {
     }
 
     if (seg.oneWay) {
-      const arrowSpacing = 200;
-      const arrowLength = 20;
-      const arrowAngle = Math.PI / 8;
-      const len = seg.length();
-      if (len < 80) return; // Skip arrows on very short segments
-      const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
-      const dirVector = seg.directionVector();
-      const direction =
-        magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
-      ctx.strokeStyle = 'white';
-      ctx.fillStyle = 'white';
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'butt';
-      for (let i = 0; i < numArrows; i++) {
-        const t = (i + 0.5) / numArrows;
-        const clampedT = Math.max(0, Math.min(1, t));
-        const tip = lerp2D(seg.p1, seg.p2, clampedT);
-        const arrowBaseDir = scale(direction, -1);
-        const start1 = add(
-          tip,
-          scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
-        );
-        const start2 = add(
-          tip,
-          scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
-        );
-        ctx.beginPath();
-        ctx.moveTo(start1.x, start1.y);
-        ctx.lineTo(tip.x, tip.y);
-        ctx.lineTo(start2.x, start2.y);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.fill();
-      }
+      this.#drawOneWayArrows(ctx, seg);
     }
   }
 
