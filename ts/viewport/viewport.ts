@@ -34,10 +34,6 @@ export class Viewport {
     active: false, // Is a drag currently in progress?
   };
 
-  // Timer used to commit a touchpad pan once two-finger scrolling stops,
-  // mirroring the way a mouse drag commits on mouseup.
-  #wheelPanCommitTimer: ReturnType<typeof setTimeout> | null = null;
-
   #boundHandleMouseWheel: (e: WheelEvent) => void;
   #boundHandleMouseDown: (e: MouseEvent) => void;
   #boundHandleMouseMove: (e: MouseEvent) => void;
@@ -229,35 +225,11 @@ export class Viewport {
       this.zoom -= direction * step;
       this.zoom = Math.max(1, Math.min(5, this.zoom));
     } else {
-      // Two-finger scroll on trackpad → pan.
-      // Accumulate the pan into the temporary drag offset (the same layer the
-      // mouse middle-drag uses) so it stays visible even while an external
-      // owner — e.g. car tracking — keeps overwriting the permanent offset.
-      this.#drag.active = true;
-      this.#drag.offset = add(
-        this.#drag.offset,
+      // Two-finger scroll on trackpad → pan directly.
+      this.offset = add(
+        this.offset,
         new Point(-e.deltaX * this.zoom, -e.deltaY * this.zoom),
       );
-      // Commit the accumulated pan once scrolling pauses, like a mouseup.
-      this.#scheduleWheelPanCommit();
     }
-  }
-
-  /**
-   * Commits the accumulated touchpad pan from the temporary drag offset into
-   * the permanent offset after two-finger scrolling stops. This mirrors the
-   * mouseup behaviour: on free-panning pages the pan persists, while on
-   * tracking pages the permanent offset is overwritten next frame so the view
-   * snaps back to the tracked target.
-   */
-  #scheduleWheelPanCommit(): void {
-    if (this.#wheelPanCommitTimer !== null) {
-      clearTimeout(this.#wheelPanCommitTimer);
-    }
-    this.#wheelPanCommitTimer = setTimeout(() => {
-      this.offset = add(this.offset, this.#drag.offset);
-      this.#resetDrag();
-      this.#wheelPanCommitTimer = null;
-    }, 150);
   }
 }
