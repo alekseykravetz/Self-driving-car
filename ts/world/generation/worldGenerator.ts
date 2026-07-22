@@ -48,7 +48,15 @@ function getSegmentRoadWidth(segment: Segment): number {
   return (segment.lanes ?? 2) * LANE_WIDTH_PX;
 }
 
-/** Center-lane guidance lines (half-width envelope union) for marking placement. */
+/** Center-lane guidance lines for marking placement.
+ *
+ * Generates half-width envelope unions for road-spanning markings (stop lines,
+ * crossings, lights, etc.) then post-processes to fix direction for one-way
+ * roads (Polygon.union preserves envelope winding, not skeleton direction).
+ *
+ * Multi-lane roads keep the center guide — ideal for road-spanning markings
+ * that need to snap at the road center.
+ */
 function wgGenerateLaneGuides(
   graph: Graph,
   roadWidth: number,
@@ -60,7 +68,41 @@ function wgGenerateLaneGuides(
       new Envelope(segment, getSegmentRoadWidth(segment) / 2, roadRoundness),
     );
   }
-  return Polygon.union(tempEnvelopes.map((envelope) => envelope.polygon));
+  const guides = Polygon.union(
+    tempEnvelopes.map((envelope) => envelope.polygon),
+  );
+
+  // Post-process: fix direction for one-way road segments. The union preserves
+  // envelope-polygon edge direction (clockwise from the skeleton's left side),
+  // which may not match the skeleton's oneWay direction. Swap p1/p2 when the
+  // guide direction opposes its nearest one-way graph segment.
+  const maxMatchDist = LANE_WIDTH_PX * 3;
+  for (const guide of guides) {
+    const mx = (guide.p1.x + guide.p2.x) / 2;
+    const my = (guide.p1.y + guide.p2.y) / 2;
+    let nearestSeg: Segment | null = null;
+    let nearestDist = Infinity;
+    for (const seg of graph.segments) {
+      const d = seg.distanceToPoint(new Point(mx, my));
+      if (d < nearestDist) {
+        nearestDist = d;
+        nearestSeg = seg;
+      }
+    }
+    if (nearestSeg && nearestSeg.oneWay && nearestDist < maxMatchDist) {
+      const gdx = guide.p2.x - guide.p1.x;
+      const gdy = guide.p2.y - guide.p1.y;
+      const sdx = nearestSeg.p2.x - nearestSeg.p1.x;
+      const sdy = nearestSeg.p2.y - nearestSeg.p1.y;
+      if (gdx * sdx + gdy * sdy < 0) {
+        const temp = guide.p1;
+        guide.p1 = guide.p2;
+        guide.p2 = temp;
+      }
+    }
+  }
+
+  return guides;
 }
 
 /**

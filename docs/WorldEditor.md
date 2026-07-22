@@ -208,6 +208,25 @@ for (const segment of this.graph.segments) {
 }
 ```
 
+The half-width envelopes are merged via `Polygon.union()`, which preserves
+envelope-polygon winding (clockwise from the skeleton's left side) but **not**
+the skeleton's `p1 → p2` direction. On one-way roads this can produce guide
+segments that point the wrong way, causing markings (stop signs, lights) to face
+the wrong direction.
+
+To fix this, `wgGenerateLaneGuides` post-processes each guide segment after the
+union:
+
+1. Compute the guide's midpoint.
+2. Find the nearest graph segment (by `distanceToPoint`).
+3. If that segment is `oneWay` and within `LANE_WIDTH_PX × 3` of the midpoint,
+   take the dot product of the guide direction and the segment direction.
+4. If the dot product is negative (opposing directions), swap the guide's
+   `p1`/`p2` so it matches the one-way flow.
+
+Multi-lane roads keep the center guide — it is the correct position for
+road-spanning markings (stop lines, crossings) regardless of lane count.
+
 These guide segments are used for:
 
 - Marking placement (stop signs, traffic lights snap to lane guides)

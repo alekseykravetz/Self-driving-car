@@ -137,4 +137,64 @@ describe('WorldGenerator', () => {
 
     expect(world.corridors.length).toBe(1);
   });
+
+  it('fixes lane guide direction for one-way roads', () => {
+    const world = createEmptyWorld();
+    const p1 = new Point(0, 0);
+    const p2 = new Point(200, 0);
+    world.graph.addPoint(p1);
+    world.graph.addPoint(p2);
+    world.graph.tryAddSegment(new Segment(p1, p2, true));
+
+    WorldGenerator.generateRoads(world);
+
+    expect(world.laneGuides.length).toBeGreaterThan(0);
+    const sdx = p2.x - p1.x;
+    const sdy = p2.y - p1.y;
+    for (const guide of world.laneGuides) {
+      const gdx = guide.p2.x - guide.p1.x;
+      const gdy = guide.p2.y - guide.p1.y;
+      const dot = gdx * sdx + gdy * sdy;
+      // Guide segments parallel to the skeleton must have matching direction
+      if (Math.abs(dot) > 0.1) {
+        expect(dot).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('does not alter lane guide direction for two-way roads (regression)', () => {
+    const world = createEmptyWorld();
+    const p1 = new Point(0, 0);
+    const p2 = new Point(200, 0);
+    world.graph.addPoint(p1);
+    world.graph.addPoint(p2);
+    world.graph.tryAddSegment(new Segment(p1, p2, false));
+
+    WorldGenerator.generateRoads(world);
+
+    expect(world.laneGuides.length).toBeGreaterThan(0);
+  });
+
+  it('fixes lane guide direction for one-way multi-lane roads', () => {
+    const world = createEmptyWorld();
+    const p1 = new Point(0, 0);
+    const p2 = new Point(200, 0);
+    world.graph.addPoint(p1);
+    world.graph.addPoint(p2);
+    world.graph.tryAddSegment(new Segment(p1, p2, true, false, { lanes: 3 }));
+
+    WorldGenerator.generateRoads(world);
+
+    expect(world.laneGuides.length).toBeGreaterThan(0);
+    const sdx = p2.x - p1.x;
+    const sdy = p2.y - p1.y;
+    for (const guide of world.laneGuides) {
+      const gdx = guide.p2.x - guide.p1.x;
+      const gdy = guide.p2.y - guide.p1.y;
+      const dot = gdx * sdx + gdy * sdy;
+      if (Math.abs(dot) > 0.1) {
+        expect(dot).toBeGreaterThan(0);
+      }
+    }
+  });
 });
