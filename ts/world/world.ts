@@ -38,6 +38,15 @@ import { drawEnvelope } from '../rendering/envelopeRenderer.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPolygon } from '../rendering/polygonRenderer.js';
 import { LANE_WIDTH_PX } from '../math/worldUnits.js';
+import {
+  computeSpeedSignPlacements,
+  computeStreetLabelPlacements,
+  MIN_SIGNAGE_ZOOM,
+} from './roadSignage.js';
+import type {
+  StreetLabelPlacement,
+  SpeedSignPlacement,
+} from './roadSignage.js';
 
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field.
@@ -123,6 +132,13 @@ export class World implements IWorld {
   // Viewport state
   zoom?: number;
   offset?: Point;
+
+  // Road signage placement cache, invalidated by Graph.hash() changes.
+  #signageCache: {
+    hash: string;
+    labels: StreetLabelPlacement[];
+    signs: SpeedSignPlacement[];
+  } | null = null;
 
   constructor(
     graph: Graph,
@@ -534,67 +550,69 @@ export class World implements IWorld {
     }
   }
 
+  /**
+   * Street-label and speed-sign placements, recomputed only when the graph
+   * (geometry or name/maxSpeed metadata) changes, as detected by its hash.
+   */
+  #getSignage(): {
+    labels: StreetLabelPlacement[];
+    signs: SpeedSignPlacement[];
+  } {
+    const hash = this.graph.hash();
+    if (!this.#signageCache || this.#signageCache.hash !== hash) {
+      const signs = computeSpeedSignPlacements(this.graph);
+      const labels = computeStreetLabelPlacements(this.graph.segments, {
+        avoid: signs,
+      });
+      this.#signageCache = { hash, labels, signs };
+    }
+    return this.#signageCache;
+  }
+
   #drawRoadNames(ctx: CanvasRenderingContext2D): void {
-    if (!this.zoom || this.zoom < 0.4) return;
+    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
 
     ctx.font = '14px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    for (const seg of this.graph.segments) {
-      if (!seg.name || seg.length() < 150) continue; // Skip short segments
-
-      const mid = lerp2D(seg.p1, seg.p2, 0.5);
-      const dir = seg.directionVector();
-      const angle = Math.atan2(dir.y, dir.x);
-
+    for (const label of this.#getSignage().labels) {
       ctx.save();
-      ctx.translate(mid.x, mid.y);
-      ctx.rotate(angle);
+      ctx.translate(label.x, label.y);
+      ctx.rotate(label.angle);
 
-      const textWidth = ctx.measureText(seg.name).width;
+      const textWidth = ctx.measureText(label.name).width;
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.fillRect(-textWidth / 2 - 4, -10, textWidth + 8, 20);
 
       ctx.fillStyle = 'white';
-      ctx.fillText(seg.name, 0, 0);
+      ctx.fillText(label.name, 0, 0);
       ctx.restore();
     }
   }
 
-  /** Draws speed limit signs (red-ringed circle with number) along roads. */
+  /** Draws speed limit signs (red-ringed circle with number) at changes. */
   #drawSpeedLimits(ctx: CanvasRenderingContext2D): void {
-    if (!this.zoom || this.zoom < 0.4) return;
+    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
 
     const signRadius = 16;
-    const signSpacing = 600; // px between signs on the same segment
 
-    for (const seg of this.graph.segments) {
-      if (!seg.maxSpeed || seg.length() < 150) continue;
+    for (const sign of this.#getSignage().signs) {
+      // Draw red ring
+      ctx.beginPath();
+      ctx.arc(sign.x, sign.y, signRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.strokeStyle = '#D4242B';
+      ctx.lineWidth = 3;
+      ctx.stroke();
 
-      const len = seg.length();
-      const numSigns = Math.max(1, Math.floor(len / signSpacing));
-
-      for (let i = 0; i < numSigns; i++) {
-        const t = (i + 0.5) / numSigns;
-        const center = lerp2D(seg.p1, seg.p2, t);
-
-        // Draw red ring
-        ctx.beginPath();
-        ctx.arc(center.x, center.y, signRadius, 0, Math.PI * 2);
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.strokeStyle = '#D4242B';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // Draw speed number
-        ctx.fillStyle = '#222';
-        ctx.font = 'bold 14px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(String(seg.maxSpeed), center.x, center.y);
-      }
+      // Draw speed number
+      ctx.fillStyle = '#222';
+      ctx.font = 'bold 14px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(sign.maxSpeed), sign.x, sign.y);
     }
   }
 }

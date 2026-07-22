@@ -422,19 +422,38 @@ Road envelope fill color varies by `highwayType`:
 | `living_street`     | `#AAA`     |
 | other / residential | `#BBB`     |
 
-### Road name labels
+### Road name labels & speed signs
 
-When the viewport zoom is > 0.4, each named segment (length > 150px) renders
-its `name` at the midpoint, rotated to align with the road direction. A
-semi-transparent black background improves readability over asphalt.
+On-road signage placement is computed by the pure module
+`ts/world/roadSignage.ts` (no canvas) and rendered by `World.draw()` when the
+viewport zoom is ≥ 0.4 (`MIN_SIGNAGE_ZOOM`). Placements are cached on `World`
+keyed by `Graph.hash()` and recomputed only when the graph changes.
+
+**Street-name labels** — connected segments sharing the same `name` are grouped
+into street polylines; each street gets `max(1, round(length /
+STREET_LABEL_SPACING_PX))` labels (spacing = 1000 px) evenly spaced along its
+full arc length, rotated to align with the road and normalized so text is never
+upside down. A semi-transparent black background improves readability over
+asphalt. A label landing within 100 px (`LABEL_SIGN_AVOID_RADIUS_PX`) of a
+speed sign is shifted ±150 px along the street, or skipped if both retries
+still collide.
+
+**Speed-limit signs** — drawn only where the limit changes: at each graph node
+whose incident segments have differing `maxSpeed` values (`undefined` counts as
+a distinct value), one sign per affected segment, offset 60 px
+(`SPEED_SIGN_NODE_OFFSET_PX`) into the segment from the node. A connected zone
+of equal-`maxSpeed` segments that never meets a different limit gets one
+fallback sign at the midpoint of its longest segment. Signs render as a
+red-ringed white circle with the limit number.
 
 ### Serialization
 
 All metadata fields are optional and serialized automatically via
 `JSON.stringify` (they are enumerable properties on `Segment`). `Graph.load()`
 restores them after reconstructing the segment endpoints. `Graph.hash()`
-includes the lane count in its mix so metadata changes trigger road
-regeneration in the editor. Legacy worlds without metadata load and render
+folds the lane count, `name`, and `maxSpeed` into its mix so metadata changes
+trigger road regeneration in the editor and invalidate the cached signage
+placements. Legacy worlds without metadata load and render
 with the original 2-lane defaults.
 
 ---
@@ -451,12 +470,13 @@ The world draws in this order to ensure proper visual layering:
    b. Solid center line (for hard-separated two-way segments)
    c. Dashed center line (for regular two-way segments)
    d. Multi-lane dividers (for 3+ lane roads — N-1 dividers, dashed same-direction, solid/dashed center)
-4. Road name labels (OSM name tag, rendered at zoom > 0.4, rotated to road direction)
-5. Markings (traffic lights, stop signs, crossings)
-6. Buildings (3D perspective via getFake3dPoint)
-   → Sorted by distance to viewPoint (far first)
-7. Trees (3D perspective via getFake3dPoint)
-   → Sorted by distance to viewPoint (far first)
+ 4. Road name labels (street-polyline placement, rendered at zoom ≥ 0.4, rotated to road direction, upright-normalized)
+ 5. Speed limit signs (at limit-change nodes + isolated-zone fallback, zoom ≥ 0.4)
+ 6. Markings (traffic lights, stop signs, crossings)
+ 7. Buildings (3D perspective via getFake3dPoint)
+    → Sorted by distance to viewPoint (far first)
+ 8. Trees (3D perspective via getFake3dPoint)
+    → Sorted by distance to viewPoint (far first)
 ```
 
 Road envelope fill color varies by `highwayType` (motorway=#888, primary=#B5774A,
@@ -465,8 +485,11 @@ dividers are drawn as parallel lines offset from the segment centerline at each
 lane boundary; the center-most divider follows the same solid/dashed convention
 as single-lane roads, while same-direction dividers use a thinner dashed style.
 One-way roads with 2+ lanes also draw a dashed center divider. Speed limit signs
-(red-ringed circles with the number) are drawn at regular intervals on segments
-that have a `maxSpeed` value.
+(red-ringed circles with the number) are drawn only where the limit changes —
+at graph nodes whose incident segments have differing `maxSpeed` values, one
+sign per affected segment offset 60 px into it from the node — plus one
+fallback sign per isolated uniform-limit zone (see
+[Road name labels & speed signs](#road-name-labels--speed-signs)).
 
 Buildings and trees are sorted by distance to the viewport center so that closer objects are drawn on top of farther ones (correct depth ordering in the top-down pseudo-3D view).
 
