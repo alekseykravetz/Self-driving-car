@@ -39,10 +39,12 @@ export class Graph {
   }
 
   /**
-   * Cheap change-detection signature. Folds point coordinates and segment
-   * endpoints/flags into a 32-bit hash (FNV-1a style). Runs every frame in the
-   * editor, so it deliberately avoids `JSON.stringify` — on large worlds that
-   * allocated a multi-megabyte string per frame and dominated the frame budget.
+   * Cheap change-detection signature. Folds point coordinates, segment
+   * endpoints/flags, and the `name`/`maxSpeed` OSM metadata into a 32-bit
+   * hash (FNV-1a style), so metadata edits also invalidate derived caches
+   * (e.g. road signage placement). Runs every frame in the editor, so it
+   * deliberately avoids `JSON.stringify` — on large worlds that allocated a
+   * multi-megabyte string per frame and dominated the frame budget.
    */
   hash(): string {
     let h = 2166136261;
@@ -64,6 +66,13 @@ export class Graph {
       const hFlags =
         (s.oneWay ? 1 : 0) | (s.separated ? 2 : 0) | ((s.lanes ?? 2) << 2);
       mix(hFlags);
+      // Metadata: maxSpeed scaled to preserve one decimal; name folded per
+      // char with a trailing 0 separating named/unnamed and delimiting names.
+      mix(((s.maxSpeed ?? 0) * 10) | 0);
+      if (s.name) {
+        for (let i = 0; i < s.name.length; i++) mix(s.name.charCodeAt(i));
+      }
+      mix(0);
     }
     return (h >>> 0).toString(36);
   }

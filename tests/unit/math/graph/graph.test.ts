@@ -57,6 +57,50 @@ describe('Graph', () => {
       const b = new Graph();
       expect(a.hash()).not.toBe(b.hash());
     });
+
+    it('changes when a segment maxSpeed changes (geometry unchanged)', () => {
+      const p1 = new Point(0, 0);
+      const p2 = new Point(100, 0);
+      const a = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { maxSpeed: 50 })],
+      );
+      const b = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { maxSpeed: 30 })],
+      );
+      expect(a.hash()).not.toBe(b.hash());
+    });
+
+    it('changes when a segment name changes (geometry unchanged)', () => {
+      const p1 = new Point(0, 0);
+      const p2 = new Point(100, 0);
+      const a = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { name: 'Main St' })],
+      );
+      const b = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { name: 'Oak Ave' })],
+      );
+      expect(a.hash()).not.toBe(b.hash());
+    });
+
+    it('changes when a segment gains or loses metadata', () => {
+      const p1 = new Point(0, 0);
+      const p2 = new Point(100, 0);
+      const plain = new Graph([p1, p2], [new Segment(p1, p2)]);
+      const named = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { name: 'Main St' })],
+      );
+      const limited = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { maxSpeed: 50 })],
+      );
+      expect(plain.hash()).not.toBe(named.hash());
+      expect(plain.hash()).not.toBe(limited.hash());
+    });
   });
 
   describe('point management', () => {

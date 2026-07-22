@@ -107,6 +107,7 @@ ts/
 - **One-way car heading in traffic simulator:** `TrafficSimulator.#headingAt()` uses the formula `-angle(dv) + π/2` (base heading, opposite to the segment's directionVector). For one-way segments, +π is added so the car faces IN the traffic-flow direction. This matches the car spawn to the one-way road's intended direction.
 - **Single-lane road markings:** `World.#drawSimpleLaneMarkings` skips all center-line drawing when `laneCount <= 1` (prevents a dashed center line from making a 1-lane road look like 2 lanes). One-way arrows are still drawn via `#drawOneWayArrows`.
 - **One-way arrows extracted:** `World.#drawOneWayArrows(ctx, seg)` is a shared helper replacing duplicate arrow-drawing code that was inline in both `#drawSimpleLaneMarkings` and `#drawMultiLaneDividers`.
+- **Road signage placement:** `ts/world/roadSignage.ts` is a pure-placement module (no canvas/DOM) that computes street-name labels (connected same-name segments grouped into street polylines, labels evenly spaced ~`STREET_LABEL_SPACING_PX` = 1000 px apart, min 1 per street, angles normalized upright, nudged/skipped within `LABEL_SIGN_AVOID_RADIUS_PX` = 100 px of a sign) and speed-limit signs (only at nodes where incident `maxSpeed` values change, offset `SPEED_SIGN_NODE_OFFSET_PX` = 60 px into each affected segment, plus one fallback sign per isolated uniform-limit zone). `World` caches placements in `#signageCache` keyed by `Graph.hash()`; `Graph.hash()` folds `Segment.name`/`maxSpeed` so metadata edits invalidate the signage cache.
 
 ## Key gotchas
 

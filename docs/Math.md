@@ -73,6 +73,11 @@ defaults to 2 lanes when `lanes` is `undefined`, preserving the original
 `world.roadWidth = 100` behavior. See [World Editor → OSM Import](WorldEditor.md#osm-import--lane-metadata)
 for how lane count drives per-segment road width.
 
+The `name` and `maxSpeed` fields also drive on-road signage placement (street
+labels and speed-limit signs) via the pure-placement module
+`ts/world/roadSignage.ts`, and both are folded into `Graph.hash()` so metadata
+edits invalidate the world's cached signage placements.
+
 > Drawing is done via `drawSegment(ctx, segment, options?)` from `ts/rendering/segmentRenderer.ts`.
 
 **Key methods:**
