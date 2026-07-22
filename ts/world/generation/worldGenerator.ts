@@ -19,7 +19,14 @@ import { Building } from '../items/building.js';
 import { Tree, TreePrototype, buildTreePrototypes } from '../items/tree.js';
 import { Marking } from '../markings/marking.js';
 import { Corridor } from '../corridor.js';
-import { add, scale, lerp, distance, mulberry32 } from '../../math/utils.js';
+import {
+  add,
+  scale,
+  lerp,
+  distance,
+  normalize,
+  mulberry32,
+} from '../../math/utils.js';
 import { LANE_WIDTH_PX } from '../../math/worldUnits.js';
 
 export interface WorldGeneratable {
@@ -48,22 +55,51 @@ function getSegmentRoadWidth(segment: Segment): number {
   return (segment.lanes ?? 2) * LANE_WIDTH_PX;
 }
 
-/** Center-line lane guides for marking placement.
+/** Per-lane guidance lines for marking placement.
  *
- * Each graph segment contributes its center line as a single lane guide.
- * This produces a guide at the road center for every lane count, which is
- * ideal for road-spanning markings (stop lines, crossings, lights, etc.)
- * that snap at the road center.
+ * Generates one guide per lane at the center of each lane. This replaces the
+ * old half-width envelope union which only placed guides at ±¼-road-width —
+ * correct only for 2-lane roads. Per-lane guides work for all lane counts.
  *
- * Previously this used half-width envelope unions, which placed guides at
- * ±quarter-road-width — only correct for 2-lane roads. The center-line
- * approach is correct for all lane counts (1, 2, 3, 4, ...).
- *
- * One-way direction is inherent in the graph segment's directionVector
- * (p1→p2), so no post-processing is needed.
+ * Direction convention (matches the `-angle(dv) + π/2` heading formula which
+ * makes cars face OPPOSITE to dv):
+ *   - Two-way roads: even-indexed lanes (from the left) point p1→p2
+ *     (car goes backward), odd-indexed lanes point p2→p1 (car goes forward).
+ *     This preserves the original 2-lane behavior where the right lane goes
+ *     forward and the left lane goes backward.
+ *   - One-way roads: ALL lanes point p2→p1 (opposite to traffic flow),
+ *     so cars face forward (in the p1→p2 traffic direction).
  */
 function wgGenerateLaneGuides(graph: Graph): Segment[] {
-  return graph.segments.map((seg) => new Segment(seg.p1, seg.p2));
+  const guides: Segment[] = [];
+  for (const segment of graph.segments) {
+    const laneCount = segment.lanes ?? (segment.oneWay ? 1 : 2);
+    const dir = segment.directionVector();
+    const perpDir = normalize(new Point(-dir.y, dir.x));
+    const laneWidth = LANE_WIDTH_PX;
+    const halfRoadWidth = (laneCount * laneWidth) / 2;
+
+    for (let k = 0; k < laneCount; k++) {
+      // Lane center offset from road center (leftmost lane = most negative)
+      const offset = (k + 0.5) * laneWidth - halfRoadWidth;
+      const p1 = add(segment.p1, scale(perpDir, offset));
+      const p2 = add(segment.p2, scale(perpDir, offset));
+
+      if (segment.oneWay) {
+        // All lanes point p2→p1 (opposite to traffic flow) so that
+        // the car heading formula produces forward-facing cars.
+        guides.push(new Segment(p2, p1));
+      } else {
+        // Two-way: even k = forward (p1→p2), odd k = backward (p2→p1)
+        if (k % 2 === 0) {
+          guides.push(new Segment(p1, p2));
+        } else {
+          guides.push(new Segment(p2, p1));
+        }
+      }
+    }
+  }
+  return guides;
 }
 
 /**

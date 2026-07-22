@@ -138,7 +138,10 @@ describe('WorldGenerator', () => {
     expect(world.corridors.length).toBe(1);
   });
 
-  it('fixes lane guide direction for one-way roads', () => {
+  it('one-way lane guides point opposite to segment direction (car heading convention)', () => {
+    // The car heading formula -angle(dv)+π/2 makes cars face OPPOSITE to dv.
+    // For one-way roads, ALL lane guides must point p2→p1 (opposite to the
+    // traffic flow) so that cars face forward (p1→p2, with traffic).
     const world = createEmptyWorld();
     const p1 = new Point(0, 0);
     const p2 = new Point(200, 0);
@@ -148,16 +151,16 @@ describe('WorldGenerator', () => {
 
     WorldGenerator.generateRoads(world);
 
-    expect(world.laneGuides.length).toBeGreaterThan(0);
+    expect(world.laneGuides.length).toBe(1);
     const sdx = p2.x - p1.x;
     const sdy = p2.y - p1.y;
     for (const guide of world.laneGuides) {
       const gdx = guide.p2.x - guide.p1.x;
       const gdy = guide.p2.y - guide.p1.y;
       const dot = gdx * sdx + gdy * sdy;
-      // Guide segments parallel to the skeleton must have matching direction
+      // Guide direction must be OPPOSITE to segment (p2→p1 vs p1→p2)
       if (Math.abs(dot) > 0.1) {
-        expect(dot).toBeGreaterThan(0);
+        expect(dot).toBeLessThan(0);
       }
     }
   });
@@ -172,10 +175,28 @@ describe('WorldGenerator', () => {
 
     WorldGenerator.generateRoads(world);
 
-    expect(world.laneGuides.length).toBeGreaterThan(0);
+    // 2-lane road: lane 0 (left, even) = forward (p1→p2), dot > 0
+    // lane 1 (right, odd) = backward (p2→p1), dot < 0
+    expect(world.laneGuides.length).toBe(2);
+    let hasForward = false;
+    let hasBackward = false;
+    const sdx = p2.x - p1.x;
+    const sdy = p2.y - p1.y;
+    for (const guide of world.laneGuides) {
+      const gdx = guide.p2.x - guide.p1.x;
+      const gdy = guide.p2.y - guide.p1.y;
+      const dot = gdx * sdx + gdy * sdy;
+      if (Math.abs(dot) > 0.1) {
+        if (dot > 0) hasForward = true;
+        else hasBackward = true;
+      }
+    }
+    // Two-way: one lane goes forward, one goes backward
+    expect(hasForward).toBe(true);
+    expect(hasBackward).toBe(true);
   });
 
-  it('fixes lane guide direction for one-way multi-lane roads', () => {
+  it('one-way multi-lane roads have all lanes pointing opposite to segment', () => {
     const world = createEmptyWorld();
     const p1 = new Point(0, 0);
     const p2 = new Point(200, 0);
@@ -185,15 +206,16 @@ describe('WorldGenerator', () => {
 
     WorldGenerator.generateRoads(world);
 
-    expect(world.laneGuides.length).toBeGreaterThan(0);
+    expect(world.laneGuides.length).toBe(3);
     const sdx = p2.x - p1.x;
     const sdy = p2.y - p1.y;
     for (const guide of world.laneGuides) {
       const gdx = guide.p2.x - guide.p1.x;
       const gdy = guide.p2.y - guide.p1.y;
       const dot = gdx * sdx + gdy * sdy;
+      // All one-way lanes point opposite to segment (p2→p1)
       if (Math.abs(dot) > 0.1) {
-        expect(dot).toBeGreaterThan(0);
+        expect(dot).toBeLessThan(0);
       }
     }
   });

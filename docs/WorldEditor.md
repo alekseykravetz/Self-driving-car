@@ -198,19 +198,36 @@ This removes internal edges between overlapping roads, producing clean outer roa
 
 ### Step 3: Lane Guides
 
-Each graph segment contributes its center line as a single lane guide:
+Each graph segment contributes one guide per lane, at each lane center:
 
 ```typescript
-// wgGenerateLaneGuides in worldGenerator.ts
-return graph.segments.map((seg) => new Segment(seg.p1, seg.p2));
+// Simplified from wgGenerateLaneGuides in worldGenerator.ts
+for each segment in graph.segments:
+  laneCount = segment.lanes ?? (segment.oneWay ? 1 : 2)
+  for k in 0..laneCount-1:
+    // Lane center offset from road center
+    offset = (k + 0.5) * LANE_WIDTH_PX - halfRoadWidth
+    p1 = segment.p1 + perpDir * offset
+    p2 = segment.p2 + perpDir * offset
+
+    if segment.oneWay:
+      guide = Segment(p2, p1)  // ALL lanes point opposite to traffic flow
+    else:
+      guide = even(k) ? Segment(p1, p2) : Segment(p2, p1)  // alternate
 ```
 
-Center-line guides are correct for all lane counts (1, 2, 3, 4, etc.). The old
-approach used half-width envelope unions, which placed guides at
-±¼-road-width — only correct for 2-lane roads.
+Direction convention matches the car heading formula `-angle(dv)+π/2` (cars face
+OPPOSITE to dv):
 
-One-way direction is inherent in the graph segment's `directionVector()`
-(p1→p2), so no post-processing is needed.
+- **Two-way roads**: even-indexed lanes (from the left) point p1→p2 (car goes
+  backward), odd-indexed lanes point p2→p1 (car goes forward). This preserves
+  the original 2-lane behavior where the right lane goes forward and the left
+  lane goes backward.
+- **One-way roads**: ALL lanes point p2→p1 (opposite to traffic flow), so cars
+  face forward (p1→p2, with traffic).
+
+The old half-width envelope union placed guides at ±¼-road-width — only correct
+for 2-lane roads.
 
 These guide segments are used for:
 
