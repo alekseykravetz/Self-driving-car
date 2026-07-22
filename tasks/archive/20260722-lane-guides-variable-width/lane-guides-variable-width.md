@@ -56,13 +56,13 @@ and `#drawMultiLaneDividers` into a shared `#drawOneWayArrows(ctx, seg)` method.
 
 ## Files changed
 
-| File                                               | Change                               |
-| -------------------------------------------------- | ------------------------------------ |
-| `ts/simulator/traffic/trafficSimulator.ts`          | `#headingAt`: +π for one-way roads   |
-| `ts/world/world.ts`                                 | `#drawSimpleLaneMarkings`: early return for `laneCount <= 1`; extracted `#drawOneWayArrows` |
-| `ts/world/generation/worldGenerator.ts`             | `wgGenerateLaneGuides`: graph segments as center-line guides |
-| `AGENTS.md`                                         | Updated rules for lane guides, one-way heading, single-lane markings, one-way arrows |
-| `docs/WorldEditor.md`                               | Step 3 rewritten for center-line guide approach |
+| File                                       | Change                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `ts/simulator/traffic/trafficSimulator.ts` | `#headingAt`: +π for one-way roads                                                          |
+| `ts/world/world.ts`                        | `#drawSimpleLaneMarkings`: early return for `laneCount <= 1`; extracted `#drawOneWayArrows` |
+| `ts/world/generation/worldGenerator.ts`    | `wgGenerateLaneGuides`: graph segments as center-line guides                                |
+| `AGENTS.md`                                | Updated rules for lane guides, one-way heading, single-lane markings, one-way arrows        |
+| `docs/WorldEditor.md`                      | Step 3 rewritten for center-line guide approach                                             |
 
 ## Verification
 
