@@ -198,34 +198,19 @@ This removes internal edges between overlapping roads, producing clean outer roa
 
 ### Step 3: Lane Guides
 
-Smaller envelopes (half the per-segment width) generate lane center lines:
+Each graph segment contributes its center line as a single lane guide:
 
 ```typescript
-for (const segment of this.graph.segments) {
-  laneGuides.push(
-    new Envelope(segment, getSegmentRoadWidth(segment) / 2, this.roadRoundness),
-  );
-}
+// wgGenerateLaneGuides in worldGenerator.ts
+return graph.segments.map((seg) => new Segment(seg.p1, seg.p2));
 ```
 
-The half-width envelopes are merged via `Polygon.union()`, which preserves
-envelope-polygon winding (clockwise from the skeleton's left side) but **not**
-the skeleton's `p1 → p2` direction. On one-way roads this can produce guide
-segments that point the wrong way, causing markings (stop signs, lights) to face
-the wrong direction.
+Center-line guides are correct for all lane counts (1, 2, 3, 4, etc.). The old
+approach used half-width envelope unions, which placed guides at
+±¼-road-width — only correct for 2-lane roads.
 
-To fix this, `wgGenerateLaneGuides` post-processes each guide segment after the
-union:
-
-1. Compute the guide's midpoint.
-2. Find the nearest graph segment (by `distanceToPoint`).
-3. If that segment is `oneWay` and within `LANE_WIDTH_PX × 3` of the midpoint,
-   take the dot product of the guide direction and the segment direction.
-4. If the dot product is negative (opposing directions), swap the guide's
-   `p1`/`p2` so it matches the one-way flow.
-
-Multi-lane roads keep the center guide — it is the correct position for
-road-spanning markings (stop lines, crossings) regardless of lane count.
+One-way direction is inherent in the graph segment's `directionVector()`
+(p1→p2), so no post-processing is needed.
 
 These guide segments are used for:
 

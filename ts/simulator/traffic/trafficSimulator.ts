@@ -286,7 +286,12 @@ export class TrafficSimulator extends SimulatorShell {
     this.#statsPanel.selectCar(car);
   }
 
-  /** Angle that faces the nearest road segment to `point` (start convention). */
+  /** Angle that faces the nearest road segment to `point` (start convention).
+   *
+   * For one-way roads the car faces in the direction of traffic flow (p1→p2).
+   * For two-way roads the car faces opposite to the segment's directionVector
+   * (the training convention — car travels from start toward target).
+   */
   #headingAt(point: Point): number {
     if (!this.#world) return 0;
     const segment = getNearestSegment(
@@ -295,7 +300,11 @@ export class TrafficSimulator extends SimulatorShell {
       SEGMENT_SEARCH_RADIUS,
     );
     if (!segment) return 0;
-    return -angle(segment.directionVector()) + Math.PI / 2;
+    // Base heading: opposite to the segment's directionVector.
+    let heading = -angle(segment.directionVector()) + Math.PI / 2;
+    // One-way roads: flip so the car faces IN the traffic-flow direction.
+    if (segment.oneWay) heading += Math.PI;
+    return heading;
   }
 
   /** Spawn heading at `point`, flipped 180° while 'r' is held. */

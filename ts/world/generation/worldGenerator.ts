@@ -48,61 +48,22 @@ function getSegmentRoadWidth(segment: Segment): number {
   return (segment.lanes ?? 2) * LANE_WIDTH_PX;
 }
 
-/** Center-lane guidance lines for marking placement.
+/** Center-line lane guides for marking placement.
  *
- * Generates half-width envelope unions for road-spanning markings (stop lines,
- * crossings, lights, etc.) then post-processes to fix direction for one-way
- * roads (Polygon.union preserves envelope winding, not skeleton direction).
+ * Each graph segment contributes its center line as a single lane guide.
+ * This produces a guide at the road center for every lane count, which is
+ * ideal for road-spanning markings (stop lines, crossings, lights, etc.)
+ * that snap at the road center.
  *
- * Multi-lane roads keep the center guide — ideal for road-spanning markings
- * that need to snap at the road center.
+ * Previously this used half-width envelope unions, which placed guides at
+ * ±quarter-road-width — only correct for 2-lane roads. The center-line
+ * approach is correct for all lane counts (1, 2, 3, 4, ...).
+ *
+ * One-way direction is inherent in the graph segment's directionVector
+ * (p1→p2), so no post-processing is needed.
  */
-function wgGenerateLaneGuides(
-  graph: Graph,
-  roadWidth: number,
-  roadRoundness: number,
-): Segment[] {
-  const tempEnvelopes: Envelope[] = [];
-  for (const segment of graph.segments) {
-    tempEnvelopes.push(
-      new Envelope(segment, getSegmentRoadWidth(segment) / 2, roadRoundness),
-    );
-  }
-  const guides = Polygon.union(
-    tempEnvelopes.map((envelope) => envelope.polygon),
-  );
-
-  // Post-process: fix direction for one-way road segments. The union preserves
-  // envelope-polygon edge direction (clockwise from the skeleton's left side),
-  // which may not match the skeleton's oneWay direction. Swap p1/p2 when the
-  // guide direction opposes its nearest one-way graph segment.
-  const maxMatchDist = LANE_WIDTH_PX * 3;
-  for (const guide of guides) {
-    const mx = (guide.p1.x + guide.p2.x) / 2;
-    const my = (guide.p1.y + guide.p2.y) / 2;
-    let nearestSeg: Segment | null = null;
-    let nearestDist = Infinity;
-    for (const seg of graph.segments) {
-      const d = seg.distanceToPoint(new Point(mx, my));
-      if (d < nearestDist) {
-        nearestDist = d;
-        nearestSeg = seg;
-      }
-    }
-    if (nearestSeg && nearestSeg.oneWay && nearestDist < maxMatchDist) {
-      const gdx = guide.p2.x - guide.p1.x;
-      const gdy = guide.p2.y - guide.p1.y;
-      const sdx = nearestSeg.p2.x - nearestSeg.p1.x;
-      const sdy = nearestSeg.p2.y - nearestSeg.p1.y;
-      if (gdx * sdx + gdy * sdy < 0) {
-        const temp = guide.p1;
-        guide.p1 = guide.p2;
-        guide.p2 = temp;
-      }
-    }
-  }
-
-  return guides;
+function wgGenerateLaneGuides(graph: Graph): Segment[] {
+  return graph.segments.map((seg) => new Segment(seg.p1, seg.p2));
 }
 
 /**
@@ -304,13 +265,7 @@ export class WorldGenerator {
 
     const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
     world.roadBorders.push(...Polygon.union(roadPolygons));
-    world.laneGuides.push(
-      ...wgGenerateLaneGuides(
-        world.graph,
-        world.roadWidth,
-        world.roadRoundness,
-      ),
-    );
+    world.laneGuides.push(...wgGenerateLaneGuides(world.graph));
     world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
   }
 
