@@ -117,6 +117,8 @@ registerDomElement('openOsmPanelBtn', makeMockElement());
 registerDomElement('osmPanel', makeMockElement({ style: { display: 'none' } }));
 registerDomElement('closeOsmPanelBtn', makeMockElement());
 registerDomElement('parseOsmDataBtn', makeMockElement());
+registerDomElement('openOverpassBtn', makeMockElement());
+registerDomElement('copyFilterBtn', makeMockElement());
 registerDomElement('osmDataContainer', osmDataContainer);
 
 const toolbarMocks = {

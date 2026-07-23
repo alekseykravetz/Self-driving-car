@@ -25,6 +25,18 @@ import { KeyboardManager } from '../../input/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
 
+/** Overpass QL filter used to query drivable roads from OpenStreetMap. */
+const OSM_FILTER = `[out:json];
+(
+  way['highway']
+  ['highway' !~'pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no']
+  ['access' !~'private']
+  ({{bbox}});
+);
+out body;
+>;
+out skel;`;
+
 /** localStorage key for the editor's per-layer visibility preference. */
 const EDITOR_LAYERS_KEY = 'editor:worldLayers';
 
@@ -82,6 +94,8 @@ export class WorldEditor {
   #closeOsmPanelBtn!: HTMLButtonElement;
   #parseOsmDataBtn!: HTMLButtonElement;
   #osmDataContainer!: HTMLTextAreaElement;
+  #openOverpassBtn!: HTMLButtonElement;
+  #copyFilterBtn!: HTMLButtonElement;
   #editorToolbar!: EditorToolbarElement;
   #worldToolbar!: WorldToolbarElement;
   #shortcutsToolbar!: ShortcutsToolbarElement;
@@ -125,6 +139,8 @@ export class WorldEditor {
     this.#parseOsmDataBtn = getElement<HTMLButtonElement>('parseOsmDataBtn');
     this.#osmDataContainer =
       getElement<HTMLTextAreaElement>('osmDataContainer');
+    this.#openOverpassBtn = getElement<HTMLButtonElement>('openOverpassBtn');
+    this.#copyFilterBtn = getElement<HTMLButtonElement>('copyFilterBtn');
     this.#editorToolbar = document.querySelector(
       'editor-toolbar',
     ) as EditorToolbarElement;
@@ -154,6 +170,14 @@ export class WorldEditor {
     this.#parseOsmDataBtn.addEventListener(
       'click',
       this.parseOsmData.bind(this),
+    );
+    this.#openOverpassBtn.addEventListener(
+      'click',
+      this.openOverpassTurbo.bind(this),
+    );
+    this.#copyFilterBtn.addEventListener(
+      'click',
+      this.copyOsmFilter.bind(this),
     );
 
     // Editor mode switching via the <editor-toolbar> custom element
@@ -372,6 +396,29 @@ export class WorldEditor {
       alert(`Error processing OSM data: ${error}`);
       console.error('Error processing OSM data:', error);
     }
+  }
+
+  /* Opens Overpass Turbo in a new tab with the filter query pre-filled. */
+  openOverpassTurbo(): void {
+    const url = `https://overpass-turbo.eu/#?q=${encodeURIComponent(OSM_FILTER)}`;
+    window.open(url, '_blank');
+  }
+
+  /* Copies the Overpass QL filter query to the clipboard. */
+  copyOsmFilter(): void {
+    navigator.clipboard.writeText(OSM_FILTER).then(
+      () => {
+        this.#copyFilterBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          this.#copyFilterBtn.textContent = 'Copy Filter';
+        }, 2000);
+      },
+      () => {
+        alert(
+          'Could not copy automatically. Select and copy the filter from saves/osm-data-loading-readme.txt',
+        );
+      },
+    );
   }
 
   /* Rebuilds the expensive item placement (buildings + trees) on demand. */

@@ -19,15 +19,69 @@
     <editor-toolbar></editor-toolbar>
 
     <div id="osmPanel" style="display: none">
-      <textarea
-        id="osmDataContainer"
-        rows="10"
-        cols="50"
-        placeholder="Paste OSM data here"
-      ></textarea>
-      <div>
-        <button id="parseOsmDataBtn">✔️</button>
-        <button id="closeOsmPanelBtn">❌</button>
+      <div class="ti-overlay">
+        <div class="ti-dialog osm-dialog">
+          <div class="ti-header">
+            <h2 class="ti-title">Import from OpenStreetMap</h2>
+            <p class="ti-subtitle">
+              Load real-world road data into the editor. Data sourced from
+              <a href="https://overpass-turbo.eu" target="_blank" rel="noopener"
+                >overpass-turbo.eu</a
+              >.
+            </p>
+          </div>
+
+          <div class="ti-section">
+            <div class="ti-section-title">How to get the data</div>
+            <ol class="osm-steps">
+              <li>
+                Click <strong>Open Overpass Turbo</strong> below &mdash; the
+                filter is pre-filled.
+              </li>
+              <li>
+                Pan/zoom to your area of interest on the map, then click
+                <strong>Run</strong>.
+              </li>
+              <li>
+                Click <strong>Export</strong> &rarr;
+                <strong>Copy raw OSM data</strong>.
+              </li>
+              <li>
+                Come back here and paste the raw JSON into the textarea below.
+              </li>
+              <li>Click <strong>Import Roads</strong>.</li>
+            </ol>
+          </div>
+
+          <div class="ti-section">
+            <div class="ti-section-title">Quick Actions</div>
+            <div class="osm-actions-row">
+              <button id="openOverpassBtn" class="osm-btn osm-btn-primary">
+                Open Overpass Turbo
+              </button>
+              <button id="copyFilterBtn" class="osm-btn osm-btn-secondary">
+                Copy Filter
+              </button>
+            </div>
+          </div>
+
+          <div class="ti-section">
+            <div class="ti-section-title">Paste OSM Data</div>
+            <textarea
+              id="osmDataContainer"
+              class="osm-textarea"
+              rows="8"
+              placeholder='Paste raw OSM JSON here, e.g. {"version": 0.6, "elements": [...]}'
+            ></textarea>
+          </div>
+
+          <div class="ti-actions">
+            <button id="closeOsmPanelBtn" class="osm-btn">Cancel</button>
+            <button id="parseOsmDataBtn" class="osm-btn osm-btn-primary">
+              Import Roads
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 

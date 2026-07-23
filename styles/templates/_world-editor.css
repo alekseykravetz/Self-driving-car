@@ -140,12 +140,97 @@ editor-toolbar .controls-group {
 }
 
 #osmPanel {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--color-bg-overlay);
-  padding: var(--space-5);
+  display: none;
+}
+
+.osm-dialog {
+  max-width: 520px;
+}
+
+.osm-steps {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1\.5);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.osm-steps li strong {
+  color: var(--color-accent-blue);
+}
+
+.osm-actions-row {
+  display: flex;
+  gap: var(--space-2\.5);
+  margin-top: var(--space-1);
+}
+
+.osm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1\.5);
+  padding: var(--space-1\.5) var(--space-3);
+  border: 1px solid var(--color-border-input);
   border-radius: var(--radius-lg);
-  z-index: 200;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+}
+
+.osm-btn:hover {
+  background: var(--color-bg-surface-raised);
+  border-color: var(--color-border-strong);
+}
+
+.osm-btn-primary {
+  background: var(--color-accent-blue-bg);
+  border-color: var(--color-accent-blue-border);
+  color: var(--color-accent-blue);
+}
+
+.osm-btn-primary:hover {
+  background: var(--color-accent-blue-bg);
+  border-color: var(--color-accent-blue);
+}
+
+.osm-btn-secondary {
+  border-color: var(--color-border-input);
+  color: var(--color-text-secondary);
+}
+
+.osm-btn-secondary:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.osm-textarea {
+  width: 100%;
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.osm-textarea:focus {
+  border-color: var(--color-border-input-focus);
+  background: var(--color-bg-input-focus);
 }
