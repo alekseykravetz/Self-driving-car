@@ -78,6 +78,12 @@ labels and speed-limit signs) via the pure-placement module
 `ts/world/roadSignage.ts`, and both are folded into `Graph.hash()` so metadata
 edits invalidate the world's cached signage placements.
 
+The `highwayType` field also drives asphalt envelope draw order via
+`ts/world/roadTiers.ts`: higher-class roads (motorway=9) draw on top of
+lower-class ones (track=1) at overlaps, with hand-drawn/untagged roads at the
+bottom (rank 0). This is a rendering-only tier sort — white borders, lane
+markings, arrows, and signage stay globally on top.
+
 > Drawing is done via `drawSegment(ctx, segment, options?)` from `ts/rendering/segmentRenderer.ts`.
 
 **Key methods:**
@@ -108,8 +114,7 @@ Used extensively for: car progress tracking along corridors, sensor ray starting
 Unit vector from p1 to p2. Used for:
 
 - Marking orientation (which way does the stop line face?)
-- One-way road arrows
-- Camera heading calculation
+- Car spawn heading calculation
 
 **Usage**: Road edges, sensor rays, graph connections, marking axes, corridor skeletons.
 

@@ -2,6 +2,12 @@ import { Graph } from '../math/graph/graph.js';
 import { Point } from '../math/primitives/point.js';
 import { Segment } from '../math/primitives/segment.js';
 import { add, subtract, scale, normalize, lerp2D } from '../math/utils.js';
+import {
+  WalkPiece,
+  sharesEndpoint,
+  buildConnectedComponents,
+  orderSegmentWalk,
+} from './streetWalk.js';
 
 /** Target spacing between street-name labels along a street, in px. */
 export const STREET_LABEL_SPACING_PX = 1000;
@@ -27,24 +33,8 @@ export interface SpeedSignPlacement {
   maxSpeed: number;
 }
 
-/** One oriented piece of a street walk (start → end along the street). */
-interface WalkPiece {
-  start: Point;
-  end: Point;
-  length: number;
-}
-
 function nodeKey(p: Point): string {
   return `${p.x},${p.y}`;
-}
-
-function sharesEndpoint(a: Segment, b: Segment): boolean {
-  return (
-    a.p1.equals(b.p1) ||
-    a.p1.equals(b.p2) ||
-    a.p2.equals(b.p1) ||
-    a.p2.equals(b.p2)
-  );
 }
 
 /**
@@ -150,99 +140,6 @@ export function computeSpeedSignPlacements(graph: Graph): SpeedSignPlacement[] {
   return signs;
 }
 
-/** Connected components within one name group (shared endpoints link up). */
-function buildStreetComponents(group: Segment[]): Segment[][] {
-  const remaining = new Set(group);
-  const components: Segment[][] = [];
-  while (remaining.size > 0) {
-    const seed = remaining.values().next().value!;
-    remaining.delete(seed);
-    const component = [seed];
-    let grew = true;
-    while (grew) {
-      grew = false;
-      for (const seg of [...remaining]) {
-        if (component.some((c) => sharesEndpoint(c, seg))) {
-          remaining.delete(seg);
-          component.push(seg);
-          grew = true;
-        }
-      }
-    }
-    components.push(component);
-  }
-  return components;
-}
-
-/**
- * Orders a street component into a walk: a list of oriented pieces chained
- * end-to-start. Starts from a segment with a free endpoint when one exists;
- * branched leftovers are appended as additional chains.
- */
-function orderStreetWalk(component: Segment[]): WalkPiece[] {
-  const unvisited = new Set(component);
-  const isFreeEndpoint = (p: Point, self: Segment): boolean => {
-    for (const s of component) {
-      if (s !== self && s.includes(p)) return false;
-    }
-    return true;
-  };
-
-  const walk: WalkPiece[] = [];
-  while (unvisited.size > 0) {
-    // Pick a chain start: a segment with a free endpoint, else any segment.
-    let startSeg: Segment | undefined;
-    let startFrom: Point | undefined;
-    for (const seg of unvisited) {
-      if (isFreeEndpoint(seg.p1, seg)) {
-        startSeg = seg;
-        startFrom = seg.p1;
-        break;
-      }
-      if (isFreeEndpoint(seg.p2, seg)) {
-        startSeg = seg;
-        startFrom = seg.p2;
-        break;
-      }
-    }
-    if (!startSeg || !startFrom) {
-      startSeg = unvisited.values().next().value!;
-      startFrom = startSeg.p1;
-    }
-    unvisited.delete(startSeg);
-
-    let currentEnd = startSeg.p1.equals(startFrom) ? startSeg.p2 : startSeg.p1;
-    walk.push({
-      start: startFrom,
-      end: currentEnd,
-      length: startSeg.length(),
-    });
-
-    // Extend the chain with an unvisited segment sharing the current end.
-    let extended = true;
-    while (extended) {
-      extended = false;
-      for (const seg of [...unvisited]) {
-        if (seg.p1.equals(currentEnd)) {
-          unvisited.delete(seg);
-          walk.push({ start: seg.p1, end: seg.p2, length: seg.length() });
-          currentEnd = seg.p2;
-          extended = true;
-          break;
-        }
-        if (seg.p2.equals(currentEnd)) {
-          unvisited.delete(seg);
-          walk.push({ start: seg.p2, end: seg.p1, length: seg.length() });
-          currentEnd = seg.p1;
-          extended = true;
-          break;
-        }
-      }
-    }
-  }
-  return walk;
-}
-
 /** Maps an arc-length position onto the walk → point + upright text angle. */
 function pointAtArc(
   walk: WalkPiece[],
@@ -309,8 +206,8 @@ export function computeStreetLabelPlacements(
 
   const labels: StreetLabelPlacement[] = [];
   for (const [name, group] of byName) {
-    for (const component of buildStreetComponents(group)) {
-      const walk = orderStreetWalk(component);
+    for (const component of buildConnectedComponents(group)) {
+      const walk = orderSegmentWalk(component);
       const totalLength = walk.reduce((sum, piece) => sum + piece.length, 0);
       const count = Math.max(1, Math.round(totalLength / spacing));
 

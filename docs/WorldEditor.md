@@ -232,12 +232,11 @@ for 2-lane roads.
 These guide segments are used for:
 
 - Marking placement (stop signs, traffic lights snap to lane guides)
-- One-way direction arrows
 - Lane marking rendering (dashed center lines)
 
 ### Step 4: One-Way Arrows
 
-For each one-way segment in the graph, a direction arrow marking is auto-generated at the segment's midpoint.
+One-way arrows use **chain-aware placement**: connected one-way segments are grouped into chains and arrows are evenly spaced (~200 px) along the total chain. On OSM-imported maps, this gives continuous arrow spacing across intersections instead of resetting per segment. Each arrow renders as a shaft line + filled triangular head, pointing in the segment's own p1→p2 traffic direction even when the placement walk traverses it backward. Placements are computed by `ts/world/oneWayArrows.ts` and cached in `World.#oneWayArrowCache` keyed by `Graph.hash()`.
 
 ---
 
@@ -464,19 +463,21 @@ The world draws in this order to ensure proper visual layering:
 
 ```
 1. Road envelopes (highway-type-colored fill) — flat road surface
+   → Tier-sorted by road class (hand-drawn/unknown first, motorway last)
+   → Higher-class roads paint on top at overlaps
 2. Road borders (white lines) — road edges
 3. Lane markings:
-   a. One-way arrows (for one-way segments)
-   b. Solid center line (for hard-separated two-way segments)
-   c. Dashed center line (for regular two-way segments)
-   d. Multi-lane dividers (for 3+ lane roads — N-1 dividers, dashed same-direction, solid/dashed center)
- 4. Road name labels (street-polyline placement, rendered at zoom ≥ 0.4, rotated to road direction, upright-normalized)
- 5. Speed limit signs (at limit-change nodes + isolated-zone fallback, zoom ≥ 0.4)
- 6. Markings (traffic lights, stop signs, crossings)
- 7. Buildings (3D perspective via getFake3dPoint)
-    → Sorted by distance to viewPoint (far first)
- 8. Trees (3D perspective via getFake3dPoint)
-    → Sorted by distance to viewPoint (far first)
+   a. Solid center line (for hard-separated two-way segments)
+   b. Dashed center line (for regular two-way segments)
+   c. Multi-lane dividers (for 3+ lane roads — N-1 dividers, dashed same-direction, solid/dashed center)
+4. One-way arrows (shaft + filled head, chain-aware placement, ~200px spacing)
+5. Road name labels (street-polyline placement, rendered at zoom ≥ 0.4, rotated to road direction, upright-normalized)
+6. Speed limit signs (at limit-change nodes + isolated-zone fallback, zoom ≥ 0.4)
+7. Markings (traffic lights, stop signs, crossings)
+8. Buildings (3D perspective via getFake3dPoint)
+   → Sorted by distance to viewPoint (far first)
+9. Trees (3D perspective via getFake3dPoint)
+   → Sorted by distance to viewPoint (far first)
 ```
 
 Road envelope fill color varies by `highwayType` (motorway=#888, primary=#B5774A,
@@ -772,7 +773,7 @@ belongs to the Corridor group and latches the open-ended (tunnel) corridor mode.
 - Selected point: distinct color (yellow)
 - Intent segment: when a point is selected, dragging/hovering to draw a new segment displays a floating measurement badge showing the segment's length in meters and its angle in degrees
 - Shortest path: drawn in red overlay
-- One-way segments: drawn with directional arrow at midpoint
+- One-way segments: drawn with chain-placed directional arrows (shaft + head, see [Step 4: One-Way Arrows](#step-4-one-way-arrows))
 - Hard-separated segments: drawn with a solid white center line
 
 ### Corridor Editor (`corridorEditor.ts`)
