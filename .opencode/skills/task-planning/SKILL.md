@@ -283,14 +283,14 @@ If unsure whether a request warrants the full flow, default to running it — th
 
 ## Cost model summary
 
-| Step                     | Agent    | Model                          | Why                                             |
-| ------------------------ | -------- | ------------------------------ | ----------------------------------------------- |
-| Interview + plan writing | planner  | glm-5.2 (smart)                | Judgment, ambiguity resolution                  |
+| Step                     | Agent    | Model                     | Why                                             |
+| ------------------------ | -------- | ------------------------- | ----------------------------------------------- |
+| Interview + plan writing | planner  | glm-5.2 (smart)           | Judgment, ambiguity resolution                  |
 | Code implementation      | build    | deepseek-v4-flash (cheap) | Mechanical execution from detailed plan         |
 | Code review              | reviewer | deepseek-v4-flash (cheap) | Checklist verification, tsc/lint                |
-| Graph refresh            | planner  | glm-5.2 (smart)                | Trivial command, but planner owns the lifecycle |
-| Docs writing             | planner  | glm-5.2 (smart)                | Doc quality is the regression surface           |
+| Graph refresh            | planner  | glm-5.2 (smart)           | Trivial command, but planner owns the lifecycle |
+| Docs writing             | planner  | glm-5.2 (smart)           | Doc quality is the regression surface           |
 | Docs review              | reviewer | deepseek-v4-flash (cheap) | Checklist verification                          |
-| Archive                  | planner  | glm-5.2 (smart)                | Trivial, just file moves                        |
+| Archive                  | planner  | glm-5.2 (smart)           | Trivial, just file moves                        |
 
 The expensive judgment work (planning, docs) stays on the smart model. The token-heavy mechanical work (implementation, review) runs on the cheap model. The plan MD is the bridge that makes this safe — it's detailed enough that a cheap model can execute without judgment.
