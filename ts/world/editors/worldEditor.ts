@@ -391,6 +391,37 @@ export class WorldEditor {
       this.#world.graph.points = result.points;
       this.#world.graph.segments = result.segments;
       this.#oldGraphHash = null; // Force regeneration on next draw
+
+      // Center viewport on the imported data
+      const pts = result.points;
+      if (pts.length > 0) {
+        let minX = Infinity,
+          maxX = -Infinity,
+          minY = Infinity,
+          maxY = -Infinity;
+        for (const p of pts) {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        }
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        this.#viewport.offset.x = -cx;
+        this.#viewport.offset.y = -cy;
+
+        const dataW = maxX - minX;
+        const dataH = maxY - minY;
+        if (dataW > 0 && dataH > 0) {
+          const pad = 0.8;
+          const fitZoom = Math.min(
+            (this.#canvas.width * pad) / dataW,
+            (this.#canvas.height * pad) / dataH,
+          );
+          this.#viewport.zoom = Math.max(0.1, Math.min(5, fitZoom));
+        }
+      }
+
       this.closeOsmPanel(); // Close panel on success
     } catch (error) {
       alert(`Error processing OSM data: ${error}`);
