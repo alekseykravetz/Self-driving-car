@@ -28,9 +28,9 @@ import { scale } from '../../math/utils.js';
 /** Overpass QL filter used to query drivable roads from OpenStreetMap. */
 const OSM_FILTER = `[out:json];
 (
-  way['highway']
-  ['highway' !~'pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no']
-  ['access' !~'private']
+  way["highway"]
+  ["highway" !~"pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no"]
+  ["access" !~"private"]
   ({{bbox}});
 );
 out body;
@@ -397,11 +397,9 @@ export class WorldEditor {
       console.error('Error processing OSM data:', error);
     }
   }
-
-  /* Opens Overpass Turbo in a new tab with the filter query pre-filled. */
+  /* Opens Overpass Turbo in a new tab. */
   openOverpassTurbo(): void {
-    const url = `https://overpass-turbo.eu/#?q=${encodeURIComponent(OSM_FILTER)}`;
-    window.open(url, '_blank');
+    window.open('https://overpass-turbo.eu/', '_blank');
   }
 
   /* Copies the Overpass QL filter query to the clipboard. */

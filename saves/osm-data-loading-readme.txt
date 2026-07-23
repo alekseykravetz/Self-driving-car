@@ -6,9 +6,9 @@ OSM FILTER:
 
 [out:json];
 (
-  way['highway']
-  ['highway' !~'pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no']
-  ['access' !~'private']
+  way["highway"]
+  ["highway" !~"pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no"]
+  ["access" !~"private"]
   ({{bbox}});
 );
 out body;
