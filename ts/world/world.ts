@@ -27,10 +27,8 @@ import {
 import {
   add,
   scale,
-  lerp2D,
   lerp,
   normalize,
-  magnitude,
   rotate,
   mulberry32,
 } from '../math/utils.js';
@@ -47,6 +45,14 @@ import type {
   StreetLabelPlacement,
   SpeedSignPlacement,
 } from './roadSignage.js';
+import {
+  computeOneWayArrowPlacements,
+  ONE_WAY_ARROW_SHAFT_PX,
+  ONE_WAY_ARROW_HEAD_PX,
+  ONE_WAY_ARROW_HEAD_ANGLE,
+} from './oneWayArrows.js';
+import type { OneWayArrowPlacement } from './oneWayArrows.js';
+import { sortEnvelopesByTier } from './roadTiers.js';
 
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field.
@@ -139,6 +145,9 @@ export class World implements IWorld {
     labels: StreetLabelPlacement[];
     signs: SpeedSignPlacement[];
   } | null = null;
+  #oneWayArrowCache: { hash: string; arrows: OneWayArrowPlacement[] } | null =
+    null;
+  #drawOrderCache: { hash: string; envelopes: Envelope[] } | null = null;
 
   constructor(
     graph: Graph,
@@ -280,6 +289,7 @@ export class World implements IWorld {
     buildings?: boolean;
     trees?: boolean;
   }): void {
+    this.#drawOrderCache = null;
     WorldGenerator.generate(this, opts);
   }
 
@@ -336,7 +346,8 @@ export class World implements IWorld {
 
     if (layers.roads) {
       // Draw road envelopes (asphalt style, more wider then road borders itself)
-      for (const env of this.envelopes) {
+      // Tier-sorted: higher-class roads paint on top of lower-class at overlaps.
+      for (const env of this.#getDrawOrderedEnvelopes()) {
         const seg = env.skeleton;
         const fill = getRoadFillColor(seg);
         drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
@@ -349,6 +360,9 @@ export class World implements IWorld {
 
       // Draw lane separators or direction arrows
       this.#drawLaneMarkings(ctx);
+
+      // Draw one-way arrows
+      this.#drawOneWayArrows(ctx);
 
       // Draw road name labels
       this.#drawRoadNames(ctx);
@@ -442,9 +456,6 @@ export class World implements IWorld {
   ): void {
     // Single-lane roads have no center line to draw.
     if (laneCount <= 1) {
-      if (seg.oneWay) {
-        this.#drawOneWayArrows(ctx, seg);
-      }
       return;
     }
 
@@ -453,7 +464,6 @@ export class World implements IWorld {
       if (laneCount >= 2) {
         drawSegment(ctx, seg, { color: 'white', width: 3, dash: [10, 20] });
       }
-      this.#drawOneWayArrows(ctx, seg);
     } else if (seg.separated) {
       drawSegment(ctx, seg, { color: 'white', width: 4 });
     } else {
@@ -461,42 +471,40 @@ export class World implements IWorld {
     }
   }
 
-  /** Draw one-way direction arrows along a segment. */
-  #drawOneWayArrows(ctx: CanvasRenderingContext2D, seg: Segment): void {
-    const arrowSpacing = 200;
-    const arrowLength = 20;
-    const arrowAngle = Math.PI / 8;
-    const len = seg.length();
-    if (len < 80) return; // Skip arrows on very short segments (roundabouts, etc.)
-    const numArrows = Math.max(1, Math.floor(len / arrowSpacing));
-    const dirVector = seg.directionVector();
-    const dir =
-      magnitude(dirVector) > 0.001 ? normalize(dirVector) : new Point(1, 0);
+  /** Draw one-way direction arrows from cached chain-aware placements. */
+  #drawOneWayArrows(ctx: CanvasRenderingContext2D): void {
+    const arrows = this.#getOneWayArrows();
+    const totalLen = ONE_WAY_ARROW_SHAFT_PX + ONE_WAY_ARROW_HEAD_PX;
     const originalLineCap = ctx.lineCap;
     const originalLineWidth = ctx.lineWidth;
     ctx.strokeStyle = 'white';
     ctx.fillStyle = 'white';
     ctx.lineWidth = 2;
     ctx.lineCap = 'butt';
-    for (let i = 0; i < numArrows; i++) {
-      const t = (i + 0.5) / numArrows;
-      const clampedT = Math.max(0, Math.min(1, t));
-      const tip = lerp2D(seg.p1, seg.p2, clampedT);
-      const arrowBaseDir = scale(dir, -1);
-      const start1 = add(
+    for (const arrow of arrows) {
+      const tip = new Point(arrow.x, arrow.y);
+      const back = new Point(-Math.cos(arrow.angle), -Math.sin(arrow.angle));
+      const shaftStart = add(tip, scale(back, totalLen));
+      const headBase = add(tip, scale(back, ONE_WAY_ARROW_HEAD_PX));
+      const wing1 = add(
         tip,
-        scale(rotate(arrowBaseDir, arrowAngle), arrowLength),
+        scale(rotate(back, ONE_WAY_ARROW_HEAD_ANGLE), ONE_WAY_ARROW_HEAD_PX),
       );
-      const start2 = add(
+      const wing2 = add(
         tip,
-        scale(rotate(arrowBaseDir, -arrowAngle), arrowLength),
+        scale(rotate(back, -ONE_WAY_ARROW_HEAD_ANGLE), ONE_WAY_ARROW_HEAD_PX),
       );
+      // Shaft
       ctx.beginPath();
-      ctx.moveTo(start1.x, start1.y);
-      ctx.lineTo(tip.x, tip.y);
-      ctx.lineTo(start2.x, start2.y);
-      ctx.closePath();
+      ctx.moveTo(shaftStart.x, shaftStart.y);
+      ctx.lineTo(headBase.x, headBase.y);
       ctx.stroke();
+      // Filled triangular head (same geometry as the old triangle)
+      ctx.beginPath();
+      ctx.moveTo(wing1.x, wing1.y);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.lineTo(wing2.x, wing2.y);
+      ctx.closePath();
       ctx.fill();
     }
     ctx.lineCap = originalLineCap;
@@ -544,10 +552,6 @@ export class World implements IWorld {
         });
       }
     }
-
-    if (seg.oneWay) {
-      this.#drawOneWayArrows(ctx, seg);
-    }
   }
 
   /**
@@ -567,6 +571,28 @@ export class World implements IWorld {
       this.#signageCache = { hash, labels, signs };
     }
     return this.#signageCache;
+  }
+
+  #getDrawOrderedEnvelopes(): Envelope[] {
+    const hash = this.graph.hash();
+    if (!this.#drawOrderCache || this.#drawOrderCache.hash !== hash) {
+      this.#drawOrderCache = {
+        hash,
+        envelopes: sortEnvelopesByTier(this.envelopes),
+      };
+    }
+    return this.#drawOrderCache.envelopes;
+  }
+
+  #getOneWayArrows(): OneWayArrowPlacement[] {
+    const hash = this.graph.hash();
+    if (!this.#oneWayArrowCache || this.#oneWayArrowCache.hash !== hash) {
+      this.#oneWayArrowCache = {
+        hash,
+        arrows: computeOneWayArrowPlacements(this.graph),
+      };
+    }
+    return this.#oneWayArrowCache.arrows;
   }
 
   #drawRoadNames(ctx: CanvasRenderingContext2D): void {
