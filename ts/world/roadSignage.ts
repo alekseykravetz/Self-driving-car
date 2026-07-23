@@ -8,6 +8,7 @@ import {
   buildConnectedComponents,
   orderSegmentWalk,
 } from './streetWalk.js';
+import { HIGHWAY_TIER_RANK } from './roadTiers.js';
 
 /** Target spacing between street-name labels along a street, in px. */
 export const STREET_LABEL_SPACING_PX = 1000;
@@ -19,6 +20,8 @@ export const LABEL_SIGN_AVOID_RADIUS_PX = 100;
 export const LABEL_SIGN_AVOID_SHIFT_PX = 150;
 /** Below this zoom level, road signage (names + speed signs) is hidden. */
 export const MIN_SIGNAGE_ZOOM = 0.4;
+/** Target spacing between road shield badges along a named route, in px. */
+export const ROAD_SHIELD_SPACING_PX = 2000;
 
 export interface StreetLabelPlacement {
   x: number;
@@ -31,6 +34,22 @@ export interface SpeedSignPlacement {
   x: number;
   y: number;
   maxSpeed: number;
+}
+
+export interface RoadShieldPlacement {
+  x: number;
+  y: number;
+  angle: number; // normalized so text is never upside down
+  ref: string;
+  highwayType?: string;
+}
+
+export interface ExitSignPlacement {
+  x: number;
+  y: number;
+  angle: number; // perpendicular to the segment, facing oncoming traffic
+  destination: string;
+  destinationRef?: string;
 }
 
 function nodeKey(p: Point): string {
@@ -196,12 +215,27 @@ export function computeStreetLabelPlacements(
   const avoid = opts?.avoid;
   const avoidRadius = opts?.avoidRadius ?? LABEL_SIGN_AVOID_RADIUS_PX;
 
+  // Group segments by a display name that falls back to `nameEn` when the
+  // primary `name` contains non-Latin characters (e.g. Hebrew/Arabic), so
+  // street labels render in a Latin script when an English name is
+  // available.
+  const isLatin = (s: string): boolean =>
+    // eslint-disable-next-line no-control-regex
+    /^[\x00-\x7F]*$/.test(s);
+  const displayNameOf = (seg: Segment): string | undefined => {
+    if (seg.name) {
+      return isLatin(seg.name) ? seg.name : (seg.nameEn ?? seg.name);
+    }
+    return seg.nameEn;
+  };
+
   const byName = new Map<string, Segment[]>();
   for (const seg of segments) {
-    if (!seg.name) continue;
-    const group = byName.get(seg.name) ?? [];
+    const displayName = displayNameOf(seg);
+    if (!displayName) continue;
+    const group = byName.get(displayName) ?? [];
     group.push(seg);
-    byName.set(seg.name, group);
+    byName.set(displayName, group);
   }
 
   const labels: StreetLabelPlacement[] = [];
@@ -232,4 +266,95 @@ export function computeStreetLabelPlacements(
     }
   }
   return labels;
+}
+
+/**
+ * Road-shield placement. Segments sharing a `ref` value are grouped into
+ * connected walks (same helpers as street labels) and one shield badge is
+ * placed per walk at the midpoint; longer routes get additional badges
+ * spaced ~`ROAD_SHIELD_SPACING_PX` apart. Angle is upright-normalized.
+ */
+export function computeRoadShieldPlacements(
+  graph: Graph,
+): RoadShieldPlacement[] {
+  const byRef = new Map<string, Segment[]>();
+  for (const seg of graph.segments) {
+    if (!seg.ref) continue;
+    const group = byRef.get(seg.ref) ?? [];
+    group.push(seg);
+    byRef.set(seg.ref, group);
+  }
+
+  const shields: RoadShieldPlacement[] = [];
+  for (const [ref, group] of byRef) {
+    for (const component of buildConnectedComponents(group)) {
+      const walk = orderSegmentWalk(component);
+      const totalLength = walk.reduce((sum, p) => sum + p.length, 0);
+      if (totalLength <= 0) continue;
+      const count = Math.max(
+        1,
+        Math.round(totalLength / ROAD_SHIELD_SPACING_PX),
+      );
+      for (let i = 0; i < count; i++) {
+        const arcPos = ((i + 0.5) * totalLength) / count;
+        const { point, angle } = pointAtArc(walk, arcPos);
+        shields.push({
+          x: point.x,
+          y: point.y,
+          angle,
+          ref,
+          highwayType: component[0]?.highwayType,
+        });
+      }
+    }
+  }
+  return shields;
+}
+
+/**
+ * Exit-sign placement: green gantry signs on `_link` roads that carry a
+ * `destination` tag. Exactly one sign per qualifying link, positioned at the
+ * endpoint of the link that connects to a higher-tier road (so it faces
+ * oncoming traffic entering the link). Angle is perpendicular to the
+ * segment direction.
+ */
+export function computeExitSignPlacements(graph: Graph): ExitSignPlacement[] {
+  const signs: ExitSignPlacement[] = [];
+
+  // Helper: count of incident segments at `point` whose tier is higher than
+  // `ownRank`. Higher-tier roads at one end identify the link's start (where
+  // traffic enters coming off the higher road).
+  const higherTierNeighbors = (point: Point, ownRank: number): Segment[] => {
+    const higher: Segment[] = [];
+    for (const seg of graph.getSegmentsWithPoint(point)) {
+      const rank = HIGHWAY_TIER_RANK[seg.highwayType ?? ''] ?? 0;
+      if (rank > ownRank) higher.push(seg);
+    }
+    return higher;
+  };
+
+  for (const seg of graph.segments) {
+    const type = seg.highwayType ?? '';
+    if (!type.endsWith('_link')) continue;
+    if (!seg.destination) continue;
+
+    const ownRank = HIGHWAY_TIER_RANK[type] ?? 0;
+    const higherAtP1 = higherTierNeighbors(seg.p1, ownRank);
+    const higherAtP2 = higherTierNeighbors(seg.p2, ownRank);
+    // The link "starts" at the end touching the higher-tier road.
+    const anchor = higherAtP1.length >= higherAtP2.length ? seg.p1 : seg.p2;
+
+    // Segment direction; rotate +90deg so the sign faces oncoming traffic.
+    const dirAngle = Math.atan2(seg.p2.y - seg.p1.y, seg.p2.x - seg.p1.x);
+    const angle = dirAngle + Math.PI / 2;
+
+    signs.push({
+      x: anchor.x,
+      y: anchor.y,
+      angle,
+      destination: seg.destination,
+      destinationRef: seg.destinationRef,
+    });
+  }
+  return signs;
 }

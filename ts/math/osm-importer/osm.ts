@@ -22,8 +22,29 @@ interface OsmWayTags {
   surface: string;
   maxspeed: string;
   junction: string;
+  // P1/P2 features — explicit entries for clarity (index signature covers
+  // the colon-bearing keys `name:en`, `destination:ref`, `maxspeed:type`).
+  ref: string;
+  destination: string;
+  bridge: string;
+  layer: string;
+  lane_markings: string;
+  'destination:ref': string;
+  'maxspeed:type': string;
+  'name:en': string;
   [key: string]: string; // Allow for other unspecified tags
 }
+
+/** Country-specific default speeds (km/h) inferred from `maxspeed:type`. */
+const MAXSPEED_TYPE_DEFAULTS: Record<string, number> = {
+  'IL:motorway': 110,
+  'IL:trunk': 90,
+  'IL:primary': 90,
+  'IL:secondary': 80,
+  'IL:tertiary': 80,
+  'IL:urban': 50,
+  'IL:rural': 80,
+};
 
 interface OsmWayElement {
   type: 'way';
@@ -78,15 +99,27 @@ export class Osm {
       switch (highwayType) {
         case 'motorway':
           return 4;
+        case 'motorway_link':
+          return 2;
         case 'trunk':
           return 4;
+        case 'trunk_link':
+          return 2;
         case 'primary':
           return 2;
+        case 'primary_link':
+          return 1;
         case 'secondary':
           return 2;
+        case 'secondary_link':
+          return 1;
         case 'tertiary':
           return 2;
+        case 'tertiary_link':
+          return 1;
         case 'residential':
+          return 2;
+        case 'unclassified':
           return 2;
         case 'service':
           return 1;
@@ -155,6 +188,51 @@ export class Osm {
     // Convert ways to Segment objects
     for (const way of ways) {
       const nodeIds = way.nodes;
+
+      // Way-level metadata (constant across all sub-segments of this way).
+      const oneWayTag = String(way.tags.oneway ?? 'no').toLowerCase(); // Default to 'no' if undefined
+      const isRoundabout = way.tags.junction === 'roundabout';
+      const lanesTag = way.tags.lanes;
+      // `oneway: "-1"` means the way is one-way flowing in REVERSE node
+      // order (p2 → p1). We treat that as one-way AND swap each segment's
+      // endpoints so the segment direction matches the traffic flow.
+      const isReverseOneWay = oneWayTag === '-1';
+      const isOneWay =
+        oneWayTag === 'yes' ||
+        isReverseOneWay ||
+        lanesTag === '1' ||
+        isRoundabout;
+
+      const highwayType = way.tags.highway;
+      const name = way.tags.name;
+      const surface = way.tags.surface;
+      const ref = way.tags.ref;
+      const destination = way.tags.destination;
+      const destinationRef = way.tags['destination:ref'];
+      const bridge = way.tags.bridge === 'yes';
+      const layerStr = way.tags.layer;
+      const layer = layerStr ? parseInt(layerStr, 10) : undefined;
+      const laneMarkings = way.tags.lane_markings === 'no' ? false : undefined;
+      const nameEn = way.tags['name:en'];
+      const maxspeedType = way.tags['maxspeed:type'];
+
+      const speedStr = way.tags.maxspeed;
+      let maxSpeed: number | undefined;
+      if (speedStr) {
+        const num = parseFloat(speedStr);
+        if (!isNaN(num)) maxSpeed = num;
+      }
+      // Infer `maxSpeed` from `maxspeed:type` when the explicit tag is absent.
+      if (maxSpeed === undefined && maxspeedType) {
+        maxSpeed = MAXSPEED_TYPE_DEFAULTS[maxspeedType];
+      }
+
+      const lanesParsed = lanesTag ? parseInt(lanesTag, 10) : undefined;
+      const laneCount =
+        lanesParsed && lanesParsed > 0
+          ? lanesParsed
+          : defaultLaneCount(highwayType, isOneWay);
+
       // Iterate through pairs of node IDs in the way
       for (let i = 1; i < nodeIds.length; i++) {
         // Find the corresponding Point objects using the map
@@ -163,36 +241,28 @@ export class Osm {
 
         // Only create a segment if both points were found in the data
         if (prevPoint && currentPoint) {
-          // Determine if the way is one-way based on tags
-          const oneWayTag = String(way.tags.oneway ?? 'no').toLowerCase(); // Default to 'no' if undefined
-          const isRoundabout = way.tags.junction === 'roundabout';
-          const lanesTag = way.tags.lanes;
-          const isOneWay =
-            oneWayTag === 'yes' || lanesTag === '1' || isRoundabout;
-
-          const highwayType = way.tags.highway;
-          const name = way.tags.name;
-          const surface = way.tags.surface;
-          const speedStr = way.tags.maxspeed;
-          let maxSpeed: number | undefined;
-          if (speedStr) {
-            const num = parseFloat(speedStr);
-            if (!isNaN(num)) maxSpeed = num;
-          }
-          const lanesParsed = lanesTag ? parseInt(lanesTag, 10) : undefined;
-          const laneCount =
-            lanesParsed && lanesParsed > 0
-              ? lanesParsed
-              : defaultLaneCount(highwayType, isOneWay);
+          // For reverse one-ways, swap endpoints so the segment's direction
+          // (p1 → p2) matches the oncoming traffic flow.
+          const p1 = isReverseOneWay ? currentPoint : prevPoint;
+          const p2 = isReverseOneWay ? prevPoint : currentPoint;
 
           // Create and add the new Segment
           segments.push(
-            new Segment(prevPoint, currentPoint, isOneWay, false, {
+            new Segment(p1, p2, isOneWay, false, {
               highwayType,
               name,
               lanes: laneCount,
               surface,
               maxSpeed,
+              ref,
+              destination,
+              destinationRef,
+              bridge,
+              layer,
+              laneMarkings,
+              roundabout: isRoundabout,
+              nameEn,
+              maxspeedType,
             }),
           );
         } else {

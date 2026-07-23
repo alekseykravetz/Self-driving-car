@@ -362,27 +362,37 @@ The OSM importer (`ts/math/osm-importer/osm.ts`) converts raw OpenStreetMap JSON
 `Point`/`Segment` graph. In addition to the road geometry, it now extracts and
 stores **per-way metadata** on each `Segment`:
 
-| Tag        | Segment field  | Notes                                                 |
-| ---------- | -------------- | ----------------------------------------------------- |
-| `highway`  | `highwayType`  | Road classification — drives envelope fill color      |
-| `name`     | `name`         | Rendered as a label on the map at zoom > 0.4          |
-| `lanes`    | `lanes`        | Total lane count — drives per-segment road width      |
-| `surface`  | `surface`      | Surface material (stored, not yet used for rendering) |
-| `maxspeed` | `maxSpeed`     | Parsed to a number (km/h); stored, not yet used       |
-| `oneway`   | `oneWay`       | `yes` / `lanes=1` / `junction=roundabout` → one-way   |
-| `junction` | (oneWay logic) | `roundabout` implies one-way                          |
+| Tag               | Segment field    | Notes                                                                                                                 |
+| ----------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `highway`         | `highwayType`    | Road classification — drives envelope fill color                                                                      |
+| `name`            | `name`           | Rendered as a label on the map at zoom > 0.4                                                                          |
+| `name:en`         | `nameEn`         | English name fallback when `name` has non-Latin characters                                                            |
+| `lanes`           | `lanes`          | Total lane count — drives per-segment road width                                                                      |
+| `surface`         | `surface`        | Surface material (stored, not yet used for rendering)                                                                 |
+| `maxspeed`        | `maxSpeed`       | Parsed to a number (km/h); drives speed-limit signs                                                                   |
+| `maxspeed:type`   | `maxspeedType`   | Speed-limit source; infers `maxSpeed` via lookup table                                                                |
+| `oneway`          | `oneWay`         | `yes` / `-1` (reverse) / `lanes=1` / `junction=roundabout`                                                            |
+| `junction`        | `roundabout`     | `roundabout` → one-way + stored as boolean flag                                                                       |
+| `ref`             | `ref`            | Road reference number — rendered as shield sign                                                                       |
+| `destination`     | `destination`    | Exit destination text — rendered as gantry sign on `_link`                                                            |
+| `destination:ref` | `destinationRef` | Exit destination ref — included in gantry sign                                                                        |
+| `bridge`          | `bridge`         | `yes` → bridge rendering: drop shadow, concrete deck overlay, parapet railings, guardrail posts, and expansion joints |
+| `layer`           | `layer`          | Elevation layer (parsed to int)                                                                                       |
+| `lane_markings`   | `laneMarkings`   | `no` → skips lane markings on that segment                                                                            |
 
 ### Lane count defaults
 
 When a way has no explicit `lanes` tag, the importer infers a default from the
 `highway` type:
 
-| Highway type                                      | Default lanes  |
-| ------------------------------------------------- | -------------- |
-| `motorway`, `trunk`                               | 4              |
-| `primary`, `secondary`, `tertiary`, `residential` | 2              |
-| `service`, `living_street`, `track`               | 1              |
-| unknown                                           | oneWay ? 1 : 2 |
+| Highway type                                                      | Default lanes  |
+| ----------------------------------------------------------------- | -------------- |
+| `motorway`, `trunk`                                               | 4              |
+| `motorway_link`, `trunk_link`                                     | 2              |
+| `primary`, `secondary`, `tertiary`, `residential`, `unclassified` | 2              |
+| `primary_link`, `secondary_link`, `tertiary_link`                 | 1              |
+| `service`, `living_street`, `track`                               | 1              |
+| unknown                                                           | oneWay ? 1 : 2 |
 
 ### Per-segment road width
 
@@ -413,12 +423,18 @@ Road envelope fill color varies by `highwayType`:
 | Highway type        | Fill color |
 | ------------------- | ---------- |
 | `motorway`          | `#888`     |
+| `motorway_link`     | `#888`     |
 | `trunk`             | `#998877`  |
+| `trunk_link`        | `#998877`  |
 | `primary`           | `#B5774A`  |
+| `primary_link`      | `#B5774A`  |
 | `secondary`         | `#B0A060`  |
+| `secondary_link`    | `#B0A060`  |
 | `tertiary`          | `#CCC`     |
+| `tertiary_link`     | `#CCC`     |
 | `service`           | `#AAA`     |
 | `living_street`     | `#AAA`     |
+| `unclassified`      | `#BBB`     |
 | other / residential | `#BBB`     |
 
 ### Road name labels & speed signs
@@ -428,14 +444,16 @@ On-road signage placement is computed by the pure module
 viewport zoom is ≥ 0.4 (`MIN_SIGNAGE_ZOOM`). Placements are cached on `World`
 keyed by `Graph.hash()` and recomputed only when the graph changes.
 
-**Street-name labels** — connected segments sharing the same `name` are grouped
-into street polylines; each street gets `max(1, round(length /
+**Street-name labels** — connected segments sharing the same display name are
+grouped into street polylines; each street gets `max(1, round(length /
 STREET_LABEL_SPACING_PX))` labels (spacing = 1000 px) evenly spaced along its
 full arc length, rotated to align with the road and normalized so text is never
 upside down. A semi-transparent black background improves readability over
 asphalt. A label landing within 100 px (`LABEL_SIGN_AVOID_RADIUS_PX`) of a
 speed sign is shifted ±150 px along the street, or skipped if both retries
-still collide.
+still collide. The display name falls back to `nameEn` when `name` contains
+non-Latin characters (e.g. Hebrew/Arabic), so English labels render
+automatically on OSM-imported maps that have a `name:en` tag.
 
 **Speed-limit signs** — drawn only where the limit changes: at each graph node
 whose incident segments have differing `maxSpeed` values (`undefined` counts as
@@ -443,17 +461,39 @@ a distinct value), one sign per affected segment, offset 60 px
 (`SPEED_SIGN_NODE_OFFSET_PX`) into the segment from the node. A connected zone
 of equal-`maxSpeed` segments that never meets a different limit gets one
 fallback sign at the midpoint of its longest segment. Signs render as a
-red-ringed white circle with the limit number.
+red-ringed white circle with the limit number. When `maxspeed` is absent but
+`maxspeed:type` is present, the importer infers `maxSpeed` from a
+`MAXSPEED_TYPE_DEFAULTS` lookup table (e.g. `IL:trunk` → 90, `IL:urban` → 50).
+
+**Road shield signs** — segments with a `ref` tag (e.g. "A1", "20") are grouped
+by `ref` value into connected walks; each walk gets shield badges spaced
+~2000 px apart (`ROAD_SHIELD_SPACING_PX`), placed at walk midpoints. Shield
+background color depends on `highwayType`: motorway/trunk and their `_link`
+variants get a blue background with white text; primary/secondary and their
+`_link` variants get a white background with black text and black border;
+others default to white background with black text. Computed by
+`computeRoadShieldPlacements()` in `roadSignage.ts`, cached in
+`World.#shieldCache` keyed by `Graph.hash()`.
+
+**Exit destination signs** — `_link` highway types (`motorway_link`,
+`trunk_link`, etc.) with a `destination` tag render as green gantry-style
+signs with white text, placed at the endpoint of the link segment that
+connects to the higher-tier road. If `destinationRef` exists, it renders as a
+smaller badge on the left side. Multiple destinations (semicolon-separated)
+stack vertically. Computed by `computeExitSignPlacements()` in
+`roadSignage.ts`, cached in `World.#exitSignCache` keyed by `Graph.hash()`.
 
 ### Serialization
 
 All metadata fields are optional and serialized automatically via
 `JSON.stringify` (they are enumerable properties on `Segment`). `Graph.load()`
 restores them after reconstructing the segment endpoints. `Graph.hash()`
-folds the lane count, `name`, and `maxSpeed` into its mix so metadata changes
-trigger road regeneration in the editor and invalidate the cached signage
-placements. Legacy worlds without metadata load and render
-with the original 2-lane defaults.
+folds the lane count, `name`, `maxSpeed`, `ref`, `destination`,
+`destinationRef`, `nameEn`, `maxspeedType`, and the `bridge`/`layer`/
+`laneMarkings`/`roundabout` flags into its mix so metadata changes
+trigger road regeneration in the editor and invalidate the cached signage,
+shield, and exit-sign placements. Legacy worlds without metadata load and
+render with the original 2-lane defaults.
 
 ---
 
@@ -465,19 +505,29 @@ The world draws in this order to ensure proper visual layering:
 1. Road envelopes (highway-type-colored fill) — flat road surface
    → Tier-sorted by road class (hand-drawn/unknown first, motorway last)
    → Higher-class roads paint on top at overlaps
-2. Road borders (white lines) — road edges
-3. Lane markings:
+2. Bridge shadow (envelope polygon offset [4,6]px, rgba(0,0,0,0.3) — first bridge pass, elevation effect for bridge=yes segments)
+3. Road borders (white lines) — road edges
+4. Lane markings:
    a. Solid center line (for hard-separated two-way segments)
    b. Dashed center line (for regular two-way segments)
    c. Multi-lane dividers (for 3+ lane roads — N-1 dividers, dashed same-direction, solid/dashed center)
-4. One-way arrows (shaft + filled head, chain-aware placement, ~200px spacing)
-5. Road name labels (street-polyline placement, rendered at zoom ≥ 0.4, rotated to road direction, upright-normalized)
-6. Speed limit signs (at limit-change nodes + isolated-zone fallback, zoom ≥ 0.4)
-7. Markings (traffic lights, stop signs, crossings)
-8. Buildings (3D perspective via getFake3dPoint)
-   → Sorted by distance to viewPoint (far first)
-9. Trees (3D perspective via getFake3dPoint)
-   → Sorted by distance to viewPoint (far first)
+   → Skipped entirely when segment.laneMarkings === false
+5. One-way arrows (shaft + filled head, chain-aware placement, ~200px spacing)
+6. Bridge deck details (for bridge=yes segments):
+   a. Concrete surface overlay — subtle light-gray tint (rgba(210,210,200,0.15))
+   b. Parapet railings — thick gray lines inset from road edges (#888, 6px wide)
+   c. Guardrail posts — small perpendicular tick marks every ~35px along both sides
+   d. Expansion joints — thin dark lines (rgba(0,0,0,0.12), 1.5px) spanning the full road width every ~120px
+7. Road name labels (street-polyline placement, rendered at zoom ≥ 0.4, rotated to road direction, upright-normalized)
+   → Falls back to nameEn when name has non-Latin characters
+7. Speed limit signs (at limit-change nodes + isolated-zone fallback, zoom ≥ 0.4)
+8. Road shield signs (ref-based badges, zoom ≥ 0.4, colored by highwayType)
+9. Exit destination signs (green gantry signs on _link roads with destination tag, zoom ≥ 0.4)
+10. Markings (traffic lights, stop signs, crossings)
+11. Buildings (3D perspective via getFake3dPoint)
+    → Sorted by distance to viewPoint (far first)
+12. Trees (3D perspective via getFake3dPoint)
+    → Sorted by distance to viewPoint (far first)
 ```
 
 Road envelope fill color varies by `highwayType` (motorway=#888, primary=#B5774A,

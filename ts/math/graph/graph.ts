@@ -34,6 +34,15 @@ export class Graph {
       segments[idx].lanes = s.lanes;
       segments[idx].surface = s.surface;
       segments[idx].maxSpeed = s.maxSpeed;
+      segments[idx].ref = s.ref;
+      segments[idx].destination = s.destination;
+      segments[idx].destinationRef = s.destinationRef;
+      segments[idx].bridge = s.bridge;
+      segments[idx].layer = s.layer;
+      segments[idx].laneMarkings = s.laneMarkings;
+      segments[idx].roundabout = s.roundabout;
+      segments[idx].nameEn = s.nameEn;
+      segments[idx].maxspeedType = s.maxspeedType;
     });
     return new Graph(points, segments);
   }
@@ -64,7 +73,13 @@ export class Graph {
       mix(s.p2.x * 1000);
       mix(s.p2.y * 1000);
       const hFlags =
-        (s.oneWay ? 1 : 0) | (s.separated ? 2 : 0) | ((s.lanes ?? 2) << 2);
+        (s.oneWay ? 1 : 0) |
+        (s.separated ? 2 : 0) |
+        ((s.lanes ?? 2) << 2) |
+        (s.bridge ? 64 : 0) |
+        ((s.layer ?? 0) << 7) |
+        (s.laneMarkings === false ? 4096 : 0) |
+        (s.roundabout ? 8192 : 0);
       mix(hFlags);
       // Metadata: maxSpeed scaled to preserve one decimal; name folded per
       // char with a trailing 0 separating named/unnamed and delimiting names.
@@ -73,6 +88,20 @@ export class Graph {
         for (let i = 0; i < s.name.length; i++) mix(s.name.charCodeAt(i));
       }
       mix(0);
+      // New OSM metadata: per-char folding of string fields (only when
+      // defined) so metadata edits invalidate derived signage caches.
+      for (const fld of [
+        s.ref,
+        s.destination,
+        s.destinationRef,
+        s.nameEn,
+        s.maxspeedType,
+      ]) {
+        if (fld) {
+          for (let i = 0; i < fld.length; i++) mix(fld.charCodeAt(i));
+        }
+        mix(0);
+      }
     }
     return (h >>> 0).toString(36);
   }

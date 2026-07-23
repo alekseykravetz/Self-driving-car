@@ -13,10 +13,15 @@ export const HIGHWAY_TIER_RANK: Record<string, number> = {
   residential: 4,
   unclassified: 4,
   tertiary: 5,
+  tertiary_link: 5,
   secondary: 6,
+  secondary_link: 6,
   primary: 7,
+  primary_link: 7,
   trunk: 8,
+  trunk_link: 8,
   motorway: 9,
+  motorway_link: 9,
 };
 
 /** Tier rank of a segment's road type; unknown/undefined → 0 (bottom). */

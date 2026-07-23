@@ -19,6 +19,15 @@ export class Segment {
   lanes?: number;
   surface?: string;
   maxSpeed?: number;
+  ref?: string;
+  destination?: string;
+  destinationRef?: string;
+  bridge?: boolean;
+  layer?: number;
+  laneMarkings?: boolean;
+  roundabout?: boolean;
+  nameEn?: string;
+  maxspeedType?: string;
 
   constructor(
     p1: Point,
@@ -31,6 +40,15 @@ export class Segment {
       lanes?: number;
       surface?: string;
       maxSpeed?: number;
+      ref?: string;
+      destination?: string;
+      destinationRef?: string;
+      bridge?: boolean;
+      layer?: number;
+      laneMarkings?: boolean;
+      roundabout?: boolean;
+      nameEn?: string;
+      maxspeedType?: string;
     },
   ) {
     this.p1 = p1;
@@ -43,6 +61,15 @@ export class Segment {
       this.lanes = metadata.lanes;
       this.surface = metadata.surface;
       this.maxSpeed = metadata.maxSpeed;
+      this.ref = metadata.ref;
+      this.destination = metadata.destination;
+      this.destinationRef = metadata.destinationRef;
+      this.bridge = metadata.bridge;
+      this.layer = metadata.layer;
+      this.laneMarkings = metadata.laneMarkings;
+      this.roundabout = metadata.roundabout;
+      this.nameEn = metadata.nameEn;
+      this.maxspeedType = metadata.maxspeedType;
     }
   }
 
