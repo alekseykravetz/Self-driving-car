@@ -362,23 +362,23 @@ The OSM importer (`ts/math/osm-importer/osm.ts`) converts raw OpenStreetMap JSON
 `Point`/`Segment` graph. In addition to the road geometry, it now extracts and
 stores **per-way metadata** on each `Segment`:
 
-| Tag               | Segment field    | Notes                                                      |
-| ----------------- | ---------------- | ---------------------------------------------------------- |
-| `highway`         | `highwayType`    | Road classification — drives envelope fill color           |
-| `name`            | `name`           | Rendered as a label on the map at zoom > 0.4               |
-| `name:en`         | `nameEn`         | English name fallback when `name` has non-Latin characters |
-| `lanes`           | `lanes`          | Total lane count — drives per-segment road width           |
-| `surface`         | `surface`        | Surface material (stored, not yet used for rendering)      |
-| `maxspeed`        | `maxSpeed`       | Parsed to a number (km/h); drives speed-limit signs        |
-| `maxspeed:type`   | `maxspeedType`   | Speed-limit source; infers `maxSpeed` via lookup table     |
-| `oneway`          | `oneWay`         | `yes` / `-1` (reverse) / `lanes=1` / `junction=roundabout` |
-| `junction`        | `roundabout`     | `roundabout` → one-way + stored as boolean flag            |
-| `ref`             | `ref`            | Road reference number — rendered as shield sign            |
-| `destination`     | `destination`    | Exit destination text — rendered as gantry sign on `_link` |
-| `destination:ref` | `destinationRef` | Exit destination ref — included in gantry sign             |
-| `bridge`          | `bridge`         | `yes` → renders drop shadow (elevation effect)             |
-| `layer`           | `layer`          | Elevation layer (parsed to int)                            |
-| `lane_markings`   | `laneMarkings`   | `no` → skips lane markings on that segment                 |
+| Tag               | Segment field    | Notes                                                                                                                 |
+| ----------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `highway`         | `highwayType`    | Road classification — drives envelope fill color                                                                      |
+| `name`            | `name`           | Rendered as a label on the map at zoom > 0.4                                                                          |
+| `name:en`         | `nameEn`         | English name fallback when `name` has non-Latin characters                                                            |
+| `lanes`           | `lanes`          | Total lane count — drives per-segment road width                                                                      |
+| `surface`         | `surface`        | Surface material (stored, not yet used for rendering)                                                                 |
+| `maxspeed`        | `maxSpeed`       | Parsed to a number (km/h); drives speed-limit signs                                                                   |
+| `maxspeed:type`   | `maxspeedType`   | Speed-limit source; infers `maxSpeed` via lookup table                                                                |
+| `oneway`          | `oneWay`         | `yes` / `-1` (reverse) / `lanes=1` / `junction=roundabout`                                                            |
+| `junction`        | `roundabout`     | `roundabout` → one-way + stored as boolean flag                                                                       |
+| `ref`             | `ref`            | Road reference number — rendered as shield sign                                                                       |
+| `destination`     | `destination`    | Exit destination text — rendered as gantry sign on `_link`                                                            |
+| `destination:ref` | `destinationRef` | Exit destination ref — included in gantry sign                                                                        |
+| `bridge`          | `bridge`         | `yes` → bridge rendering: drop shadow, concrete deck overlay, parapet railings, guardrail posts, and expansion joints |
+| `layer`           | `layer`          | Elevation layer (parsed to int)                                                                                       |
+| `lane_markings`   | `laneMarkings`   | `no` → skips lane markings on that segment                                                                            |
 
 ### Lane count defaults
 
@@ -505,7 +505,7 @@ The world draws in this order to ensure proper visual layering:
 1. Road envelopes (highway-type-colored fill) — flat road surface
    → Tier-sorted by road class (hand-drawn/unknown first, motorway last)
    → Higher-class roads paint on top at overlaps
-2. Bridge shadows (envelope polygon offset [4,6]px, rgba(0,0,0,0.3) — for bridge=yes segments)
+2. Bridge shadow (envelope polygon offset [4,6]px, rgba(0,0,0,0.3) — first bridge pass, elevation effect for bridge=yes segments)
 3. Road borders (white lines) — road edges
 4. Lane markings:
    a. Solid center line (for hard-separated two-way segments)
@@ -513,7 +513,12 @@ The world draws in this order to ensure proper visual layering:
    c. Multi-lane dividers (for 3+ lane roads — N-1 dividers, dashed same-direction, solid/dashed center)
    → Skipped entirely when segment.laneMarkings === false
 5. One-way arrows (shaft + filled head, chain-aware placement, ~200px spacing)
-6. Road name labels (street-polyline placement, rendered at zoom ≥ 0.4, rotated to road direction, upright-normalized)
+6. Bridge deck details (for bridge=yes segments):
+   a. Concrete surface overlay — subtle light-gray tint (rgba(210,210,200,0.15))
+   b. Parapet railings — thick gray lines inset from road edges (#888, 6px wide)
+   c. Guardrail posts — small perpendicular tick marks every ~35px along both sides
+   d. Expansion joints — thin dark lines (rgba(0,0,0,0.12), 1.5px) spanning the full road width every ~120px
+7. Road name labels (street-polyline placement, rendered at zoom ≥ 0.4, rotated to road direction, upright-normalized)
    → Falls back to nameEn when name has non-Latin characters
 7. Speed limit signs (at limit-change nodes + isolated-zone fallback, zoom ≥ 0.4)
 8. Road shield signs (ref-based badges, zoom ≥ 0.4, colored by highwayType)
