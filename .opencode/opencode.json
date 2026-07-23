@@ -8,7 +8,7 @@
   },
   "agent": {
     "build": {
-      "model": "opencode/deepseek-v4-flash-free"
+      "model": "opencode-go/deepseek-v4-flash"
     }
   },
   "mcp": {

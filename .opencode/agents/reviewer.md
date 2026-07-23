@@ -1,7 +1,7 @@
 ---
 description: Read-only checklist reviewer. Verifies that a build agent fully implemented a plan MD — checks every implementation bullet, runs tsc + lint, verifies acceptance criteria at the code level, and confirms docs were updated. Reports gaps as a structured list. Does NOT edit files.
 mode: subagent
-model: opencode/deepseek-v4-flash-free
+model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 color: '#f59e0b'
 permission:

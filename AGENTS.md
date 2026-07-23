@@ -154,7 +154,7 @@ ts/
 The agent harness lives in `.opencode/` and is part of this repo (tracked in git):
 
 - `opencode.json` — agent models, MCP servers (playwright), plugins (graphify), commands, skills paths.
-- `agents/` — `planner.md` (primary, glm-5.2), `build.md` (primary, deepseek-v4-flash-free), `reviewer.md` + `architect.md` (subagents).
+- `agents/` — `planner.md` (primary, glm-5.2), `build.md` (primary, deepseek-v4-flash), `reviewer.md` + `architect.md` (subagents).
 - `commands/` — slash commands: `/test`, `/fix`, `/start`, `/graphify`.
 - `skills/` — `task-planning` (full task lifecycle), `docs-sync` (doc-update protocol), `code-to-pen` (reverse-engineer code → .pen).
 - `plugins/graphify.js` — injects a graphify-reminder before the first bash call when `graphify-out/graph.json` exists.

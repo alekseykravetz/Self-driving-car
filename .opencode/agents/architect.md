@@ -1,6 +1,7 @@
 ---
 description: 'Audits codebase architecture, flags violations of layer isolation / FSD / Atomic Design, and suggests refactoring strategies. Uses graphify for codebase understanding before analysis.'
 mode: subagent
+model: opencode-go/glm-5.2
 color: '#8b5cf6'
 temperature: 0.1
 permission:

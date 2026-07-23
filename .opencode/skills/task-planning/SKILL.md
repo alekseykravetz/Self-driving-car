@@ -152,7 +152,7 @@ Then stop. Do NOT call the build agent. Do NOT edit source. Wait for the user.
 
 ## Step 5 — Hand off to build (only after user says proceed)
 
-When the user replies `proceed` (or equivalent), call the **build** agent via the `task` tool. Build runs on a cheaper model (deepseek-v4-flash-free) — the plan MD is what makes this safe: it's detailed enough that a cheaper model can execute it mechanically.
+When the user replies `proceed` (or equivalent), call the **build** agent via the `task` tool. Build runs on a cheaper model (deepseek-v4-flash) — the plan MD is what makes this safe: it's detailed enough that a cheaper model can execute it mechanically.
 
 The `task` prompt to build:
 
@@ -286,11 +286,11 @@ If unsure whether a request warrants the full flow, default to running it — th
 | Step                     | Agent    | Model                          | Why                                             |
 | ------------------------ | -------- | ------------------------------ | ----------------------------------------------- |
 | Interview + plan writing | planner  | glm-5.2 (smart)                | Judgment, ambiguity resolution                  |
-| Code implementation      | build    | deepseek-v4-flash-free (cheap) | Mechanical execution from detailed plan         |
-| Code review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification, tsc/lint                |
+| Code implementation      | build    | deepseek-v4-flash (cheap) | Mechanical execution from detailed plan         |
+| Code review              | reviewer | deepseek-v4-flash (cheap) | Checklist verification, tsc/lint                |
 | Graph refresh            | planner  | glm-5.2 (smart)                | Trivial command, but planner owns the lifecycle |
 | Docs writing             | planner  | glm-5.2 (smart)                | Doc quality is the regression surface           |
-| Docs review              | reviewer | deepseek-v4-flash-free (cheap) | Checklist verification                          |
+| Docs review              | reviewer | deepseek-v4-flash (cheap) | Checklist verification                          |
 | Archive                  | planner  | glm-5.2 (smart)                | Trivial, just file moves                        |
 
 The expensive judgment work (planning, docs) stays on the smart model. The token-heavy mechanical work (implementation, review) runs on the cheap model. The plan MD is the bridge that makes this safe — it's detailed enough that a cheap model can execute without judgment.
