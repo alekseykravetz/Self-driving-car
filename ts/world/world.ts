@@ -39,11 +39,15 @@ import { LANE_WIDTH_PX } from '../math/worldUnits.js';
 import {
   computeSpeedSignPlacements,
   computeStreetLabelPlacements,
+  computeRoadShieldPlacements,
+  computeExitSignPlacements,
   MIN_SIGNAGE_ZOOM,
 } from './roadSignage.js';
 import type {
   StreetLabelPlacement,
   SpeedSignPlacement,
+  RoadShieldPlacement,
+  ExitSignPlacement,
 } from './roadSignage.js';
 import {
   computeOneWayArrowPlacements,
@@ -75,19 +79,26 @@ export function loadWorldCorridors(info: World): Corridor[] {
 function getRoadFillColor(seg: Segment): string {
   switch (seg.highwayType) {
     case 'motorway':
+    case 'motorway_link':
       return '#888';
     case 'trunk':
+    case 'trunk_link':
       return '#998877';
     case 'primary':
+    case 'primary_link':
       return '#B5774A';
     case 'secondary':
+    case 'secondary_link':
       return '#B0A060';
     case 'tertiary':
+    case 'tertiary_link':
       return '#CCC';
     case 'service':
       return '#AAA';
     case 'living_street':
       return '#AAA';
+    case 'unclassified':
+      return '#BBB';
     default:
       return '#BBB';
   }
@@ -148,6 +159,8 @@ export class World implements IWorld {
   #oneWayArrowCache: { hash: string; arrows: OneWayArrowPlacement[] } | null =
     null;
   #drawOrderCache: { hash: string; envelopes: Envelope[] } | null = null;
+  #shieldCache: { hash: string; shields: RoadShieldPlacement[] } | null = null;
+  #exitSignCache: { hash: string; signs: ExitSignPlacement[] } | null = null;
 
   constructor(
     graph: Graph,
@@ -353,6 +366,9 @@ export class World implements IWorld {
         drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
       }
 
+      // Draw bridge elevation shadows (under borders, above asphalt fills).
+      this.#drawBridgeShadows(ctx);
+
       // Draw road borders (solid white lines)
       for (const seg of this.roadBorders) {
         drawSegment(ctx, seg, { color: 'white', width: 4 });
@@ -369,6 +385,10 @@ export class World implements IWorld {
 
       // Draw speed limit signs
       this.#drawSpeedLimits(ctx);
+
+      // Draw road shield badges (ref) and gantry exit signs (destination)
+      this.#drawRoadShields(ctx);
+      this.#drawExitSigns(ctx);
     }
 
     // Draw road markings (yield, stop, start, crosswalks, lights)
@@ -438,6 +458,7 @@ export class World implements IWorld {
   /** Draws one-way arrows, hard-separation center lines, and dashed dividers. */
   #drawLaneMarkings(ctx: CanvasRenderingContext2D): void {
     for (const seg of this.graph.segments) {
+      if (seg.laneMarkings === false) continue;
       const laneCount = seg.lanes ?? (seg.oneWay ? 1 : 2);
       const roadWidth = laneCount * LANE_WIDTH_PX;
 
@@ -593,6 +614,178 @@ export class World implements IWorld {
       };
     }
     return this.#oneWayArrowCache.arrows;
+  }
+
+  #getRoadShields(): RoadShieldPlacement[] {
+    const hash = this.graph.hash();
+    if (!this.#shieldCache || this.#shieldCache.hash !== hash) {
+      this.#shieldCache = {
+        hash,
+        shields: computeRoadShieldPlacements(this.graph),
+      };
+    }
+    return this.#shieldCache.shields;
+  }
+
+  #getExitSigns(): ExitSignPlacement[] {
+    const hash = this.graph.hash();
+    if (!this.#exitSignCache || this.#exitSignCache.hash !== hash) {
+      this.#exitSignCache = {
+        hash,
+        signs: computeExitSignPlacements(this.graph),
+      };
+    }
+    return this.#exitSignCache.signs;
+  }
+
+  /**
+   * Bridge elevation shadows: a dark, semi-transparent copy of each bridge
+   * envelope's polygon, offset slightly to the lower-right, painted
+   * between the asphalt fill and the road borders. Uses the tier-sorted
+   * envelope order so higher-tier bridges cast over lower-tier roads.
+   */
+  #drawBridgeShadows(ctx: CanvasRenderingContext2D): void {
+    const SHADOW_DX = 4;
+    const SHADOW_DY = 6;
+    for (const env of this.#getDrawOrderedEnvelopes()) {
+      if (!env.skeleton.bridge) continue;
+      const poly = env.polygon;
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.strokeStyle = 'transparent';
+      ctx.moveTo(poly.points[0].x + SHADOW_DX, poly.points[0].y + SHADOW_DY);
+      for (let i = 1; i < poly.points.length; i++) {
+        ctx.lineTo(poly.points[i].x + SHADOW_DX, poly.points[i].y + SHADOW_DY);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  /** Draws road-shield badges (route refs) along named routes. */
+  #drawRoadShields(ctx: CanvasRenderingContext2D): void {
+    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
+
+    const W = 40;
+    const H = 24;
+    const R = 6;
+
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (const s of this.#getRoadShields()) {
+      const type = s.highwayType ?? '';
+      const blue =
+        type === 'motorway' ||
+        type === 'motorway_link' ||
+        type === 'trunk' ||
+        type === 'trunk_link';
+      const bordered =
+        type === 'primary' ||
+        type === 'primary_link' ||
+        type === 'secondary' ||
+        type === 'secondary_link';
+
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.angle);
+
+      // Rounded rectangle badge.
+      ctx.beginPath();
+      const x0 = -W / 2;
+      const y0 = -H / 2;
+      ctx.moveTo(x0 + R, y0);
+      ctx.arcTo(x0 + W, y0, x0 + W, y0 + H, R);
+      ctx.arcTo(x0 + W, y0 + H, x0, y0 + H, R);
+      ctx.arcTo(x0, y0 + H, x0, y0, R);
+      ctx.arcTo(x0, y0, x0 + W, y0, R);
+      ctx.closePath();
+      ctx.fillStyle = blue ? '#2B6CB0' : 'white';
+      ctx.fill();
+      if (bordered) {
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = blue ? 'white' : 'black';
+      ctx.fillText(s.ref, 0, 0);
+      ctx.restore();
+    }
+  }
+
+  /** Draws gantry-style green exit signs on `_link` roads. */
+  #drawExitSigns(ctx: CanvasRenderingContext2D): void {
+    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
+
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (const s of this.#getExitSigns()) {
+      const dests = s.destination
+        .split(';')
+        .map((d) => d.trim())
+        .filter(Boolean);
+      const padX = 8;
+      const lineH = 16;
+      const H = Math.max(28, dests.length * lineH + 8);
+      const maxTextW = Math.max(
+        ...dests.map((d) => ctx.measureText(d).width),
+        40,
+      );
+      const labelW = s.destinationRef
+        ? ctx.measureText(s.destinationRef).width + 8
+        : 0;
+      const W = maxTextW + padX * 2 + labelW;
+      const R = 6;
+
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.angle);
+
+      const x0 = -W / 2;
+      const y0 = -H / 2;
+      ctx.beginPath();
+      ctx.moveTo(x0 + R, y0);
+      ctx.arcTo(x0 + W, y0, x0 + W, y0 + H, R);
+      ctx.arcTo(x0 + W, y0 + H, x0, y0 + H, R);
+      ctx.arcTo(x0, y0 + H, x0, y0, R);
+      ctx.arcTo(x0, y0, x0 + W, y0, R);
+      ctx.closePath();
+      ctx.fillStyle = '#1B7A3D';
+      ctx.fill();
+
+      // Optional exit-ref badge on the left side.
+      let textX = 0;
+      if (s.destinationRef) {
+        const badgeW = labelW;
+        const bx0 = x0 + 2;
+        ctx.beginPath();
+        ctx.moveTo(bx0 + R, y0 + 2);
+        ctx.arcTo(bx0 + badgeW, y0 + 2, bx0 + badgeW, y0 + H - 2, R);
+        ctx.arcTo(bx0 + badgeW, y0 + H - 2, bx0, y0 + H - 2, R);
+        ctx.arcTo(bx0, y0 + H - 2, bx0, y0 + 2, R);
+        ctx.arcTo(bx0, y0 + 2, bx0 + badgeW, y0 + 2, R);
+        ctx.closePath();
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.fillStyle = '#1B7A3D';
+        ctx.fillText(s.destinationRef, bx0 + badgeW / 2, 0);
+        // Shift the main destinations column to the right of the badge.
+        textX = bx0 + badgeW + (W - badgeW) / 2;
+      }
+
+      ctx.fillStyle = 'white';
+      const totalTextH = dests.length * lineH;
+      let ty = -totalTextH / 2 + lineH / 2;
+      for (const d of dests) {
+        ctx.fillText(d, textX, ty);
+        ty += lineH;
+      }
+      ctx.restore();
+    }
   }
 
   #drawRoadNames(ctx: CanvasRenderingContext2D): void {

@@ -2,25 +2,13 @@ https://overpass-turbo.eu/
 
 ---
 
+OSM FILTER:
+
 [out:json];
 (
   way['highway']
-  ['highway' !~'pedestrian']
-  ['highway' !~'footway']
-  ['highway' !~'cycleway']
-  ['highway' !~'path']
-  ['highway' !~'service']
-  ['highway' !~'corridor']
-  ['highway' !~'track']
-  ['highway' !~'steps']
-  ['highway' !~'raceway']
-  ['highway' !~'bridleway']
-  ['highway' !~'proposed']
-  ['highway' !~'construction']
-  ['highway' !~'elevator']
-  ['highway' !~'bus_guideway']
-  ['highway' !~'private']
-  ['highway' !~'no']
+  ['highway' !~'pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no']
+  ['access' !~'private']
   ({{bbox}});
 );
 out body;

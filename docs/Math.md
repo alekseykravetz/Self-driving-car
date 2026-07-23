@@ -43,6 +43,15 @@ class Segment {
   lanes?: number; // Total lane count (drives per-segment road width)
   surface?: string; // e.g. 'asphalt', 'paving_stones'
   maxSpeed?: number; // Parsed from maxspeed tag (km/h)
+  ref?: string; // Road reference number (e.g. 'A1') — rendered as shield sign
+  destination?: string; // Exit destination (on _link roads) — gantry sign text
+  destinationRef?: string; // Exit destination ref (e.g. 'A1→Tel Aviv')
+  bridge?: boolean; // true when bridge=yes — renders drop shadow
+  layer?: number; // Elevation layer (parsed from layer tag)
+  laneMarkings?: boolean; // false when lane_markings=no — skips lane markings
+  roundabout?: boolean; // true when junction=roundabout
+  nameEn?: string; // English name fallback (name:en tag)
+  maxspeedType?: string; // Speed-limit source (maxspeed:type tag)
 
   constructor(
     p1: Point,
@@ -55,6 +64,15 @@ class Segment {
       lanes?: number;
       surface?: string;
       maxSpeed?: number;
+      ref?: string;
+      destination?: string;
+      destinationRef?: string;
+      bridge?: boolean;
+      layer?: number;
+      laneMarkings?: boolean;
+      roundabout?: boolean;
+      nameEn?: string;
+      maxspeedType?: string;
     },
   );
 
@@ -73,10 +91,13 @@ defaults to 2 lanes when `lanes` is `undefined`, preserving the original
 `world.roadWidth = 100` behavior. See [World Editor → OSM Import](WorldEditor.md#osm-import--lane-metadata)
 for how lane count drives per-segment road width.
 
-The `name` and `maxSpeed` fields also drive on-road signage placement (street
-labels and speed-limit signs) via the pure-placement module
-`ts/world/roadSignage.ts`, and both are folded into `Graph.hash()` so metadata
-edits invalidate the world's cached signage placements.
+The `name`, `maxSpeed`, `ref`, `destination`, and `nameEn` fields also drive
+on-road signage placement (street labels, speed-limit signs, road shield signs,
+and exit destination signs) via the pure-placement module
+`ts/world/roadSignage.ts`, and all are folded into `Graph.hash()` so metadata
+edits invalidate the world's cached signage placements. The `bridge` and
+`layer` fields drive bridge shadow rendering; `laneMarkings: false` skips lane
+markings on a per-segment basis.
 
 The `highwayType` field also drives asphalt envelope draw order via
 `ts/world/roadTiers.ts`: higher-class roads (motorway=9) draw on top of
@@ -594,13 +615,21 @@ interface OsmWayElement {
   id: number;
   nodes: number[]; // Array of node IDs forming the road
   tags: {
-    oneway?: string; // "yes", "no", "-1"
+    oneway?: string; // "yes", "no", "-1" (reverse one-way)
     lanes?: string; // Total lane count (string, parsed to int)
     junction?: string; // "roundabout" → implies one-way
     highway?: string; // Road classification (motorway, primary, residential, …)
     name?: string; // Road name (rendered as label on the map)
+    'name:en'?: string; // English name fallback
     surface?: string; // Surface material (asphalt, paving_stones, …)
     maxspeed?: string; // Speed limit (parsed to number, km/h)
+    'maxspeed:type'?: string; // Speed-limit source (e.g. "IL:trunk")
+    ref?: string; // Road reference number (e.g. "A1")
+    destination?: string; // Exit destination text
+    'destination:ref'?: string; // Exit destination ref
+    bridge?: string; // "yes" → bridge
+    layer?: string; // Elevation layer (parsed to int)
+    lane_markings?: string; // "no" → skip lane markings
     [key: string]: string; // Allow other unspecified tags
   };
 }
@@ -639,13 +668,23 @@ class Osm {
 5. PARSE WAYS (roads)
    For each way element:
      Connect consecutive nodes as Segments
-     Detect one-way: tags.oneway === 'yes' OR tags.lanes === '1' OR tags.junction === 'roundabout'
-     Set segment.oneWay = true for one-way roads
-     Parse metadata: highway, name, surface, maxspeed, lanes
+     Detect one-way: tags.oneway === 'yes' OR '-1' OR tags.lanes === '1'
+       OR tags.junction === 'roundabout'
+     Reverse one-ways (oneway='-1'): swap p1/p2 per-segment so direction
+       matches traffic flow; set oneWay = true
+     Parse metadata: highway, name, name:en, surface, maxspeed, maxspeed:type,
+       ref, destination, destination:ref, bridge, layer, lane_markings,
+       junction (roundabout)
+     maxspeed:type inference: if maxspeed absent but maxspeed:type present,
+       look up MAXSPEED_TYPE_DEFAULTS (e.g. 'IL:trunk' → 90, 'IL:urban' → 50)
      Lane count: explicit lanes tag → use it; otherwise default by highway type:
-       motorway/trunk → 4, primary/secondary/tertiary/residential → 2,
+       motorway/trunk → 4, motorway_link/trunk_link → 2,
+       primary/secondary/tertiary/residential/unclassified → 2,
+       primary_link/secondary_link/tertiary_link → 1,
        service/living_street/track → 1, unknown → oneWay ? 1 : 2
-     Store metadata on Segment (highwayType, name, lanes, surface, maxSpeed)
+     Store metadata on Segment (highwayType, name, lanes, surface, maxSpeed,
+       ref, destination, destinationRef, bridge, layer, laneMarkings,
+       roundabout, nameEn, maxspeedType)
 
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)

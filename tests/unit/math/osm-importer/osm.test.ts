@@ -293,5 +293,182 @@ describe('Osm', () => {
       expect(result.segments[0].oneWay).toBe(true);
       expect(result.segments[0].lanes).toBe(2);
     });
+
+    it('oneway=-1 sets oneWay and reverses segment direction', () => {
+      const data: OsmData = {
+        elements: [
+          { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+          { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+          {
+            type: 'way',
+            id: 101,
+            nodes: [1, 2],
+            tags: { highway: 'residential', oneway: '-1' },
+          },
+        ],
+      };
+      const result = Osm.parseRoads(data);
+      const seg = result.segments[0];
+      expect(seg.oneWay).toBe(true);
+      // p1 should equal the 2nd point (reverse of node order).
+      expect(seg.p1.x).toBe(result.points[1].x);
+      expect(seg.p1.y).toBe(result.points[1].y);
+      expect(seg.p2.x).toBe(result.points[0].x);
+      expect(seg.p2.y).toBe(result.points[0].y);
+    });
+
+    const twoNodeDataWith = (tags: Record<string, string>): OsmData => ({
+      elements: [
+        { type: 'node', id: 1, lat: 48.8566, lon: 2.3522 },
+        { type: 'node', id: 2, lat: 48.857, lon: 2.3525 },
+        { type: 'way', id: 101, nodes: [1, 2], tags },
+      ],
+    });
+
+    it('trunk_link highway type defaults to 2 lanes', () => {
+      const result = Osm.parseRoads(twoNodeDataWith({ highway: 'trunk_link' }));
+      expect(result.segments[0].lanes).toBe(2);
+    });
+
+    it('secondary_link highway type defaults to 1 lane', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'secondary_link' }),
+      );
+      expect(result.segments[0].lanes).toBe(1);
+    });
+
+    it('tertiary_link highway type defaults to 1 lane', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'tertiary_link' }),
+      );
+      expect(result.segments[0].lanes).toBe(1);
+    });
+
+    it('motorway_link highway type defaults to 2 lanes', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'motorway_link' }),
+      );
+      expect(result.segments[0].lanes).toBe(2);
+    });
+
+    it('primary_link highway type defaults to 1 lane', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'primary_link' }),
+      );
+      expect(result.segments[0].lanes).toBe(1);
+    });
+
+    it('unclassified highway type defaults to 2 lanes', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'unclassified' }),
+      );
+      expect(result.segments[0].lanes).toBe(2);
+    });
+
+    it('stores ref tag on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'primary', ref: '4' }),
+      );
+      expect(result.segments[0].ref).toBe('4');
+    });
+
+    it('stores destination tag on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'motorway_link', destination: 'Tel Aviv' }),
+      );
+      expect(result.segments[0].destination).toBe('Tel Aviv');
+    });
+
+    it('stores destination:ref tag as destinationRef', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({
+          highway: 'motorway_link',
+          'destination:ref': 'A1',
+        }),
+      );
+      expect(result.segments[0].destinationRef).toBe('A1');
+    });
+
+    it('bridge=yes sets bridge flag on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'secondary', bridge: 'yes' }),
+      );
+      expect(result.segments[0].bridge).toBe(true);
+    });
+
+    it('layer tag is parsed as a number on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'secondary', layer: '1' }),
+      );
+      expect(result.segments[0].layer).toBe(1);
+    });
+
+    it('lane_markings=no sets laneMarkings=false on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'link', lane_markings: 'no' }),
+      );
+      expect(result.segments[0].laneMarkings).toBe(false);
+    });
+
+    it('junction=roundabout sets roundabout and oneWay flags', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'residential', junction: 'roundabout' }),
+      );
+      expect(result.segments[0].roundabout).toBe(true);
+      expect(result.segments[0].oneWay).toBe(true);
+    });
+
+    it('name:en tag stored as nameEn on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({
+          highway: 'residential',
+          name: 'היוצרים',
+          'name:en': 'HaYotsrim',
+        }),
+      );
+      expect(result.segments[0].nameEn).toBe('HaYotsrim');
+    });
+
+    it('maxspeed:type=IL:trunk with no maxspeed infers 90', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'trunk', 'maxspeed:type': 'IL:trunk' }),
+      );
+      expect(result.segments[0].maxSpeed).toBe(90);
+    });
+
+    it('maxspeed:type=IL:urban with no maxspeed infers 50', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({
+          highway: 'residential',
+          'maxspeed:type': 'IL:urban',
+        }),
+      );
+      expect(result.segments[0].maxSpeed).toBe(50);
+    });
+
+    it('explicit maxspeed takes priority over maxspeed:type', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({
+          highway: 'trunk',
+          maxspeed: '70',
+          'maxspeed:type': 'IL:trunk',
+        }),
+      );
+      expect(result.segments[0].maxSpeed).toBe(70);
+    });
+
+    it('unknown maxspeed:type leaves maxSpeed undefined', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'trunk', 'maxspeed:type': 'XX:trunk' }),
+      );
+      expect(result.segments[0].maxSpeed).toBeUndefined();
+    });
+
+    it('stores maxspeed:type tag as maxspeedType on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({ highway: 'trunk', 'maxspeed:type': 'IL:trunk' }),
+      );
+      expect(result.segments[0].maxspeedType).toBe('IL:trunk');
+    });
   });
 });
