@@ -514,7 +514,7 @@ The world draws in this order to ensure proper visual layering:
    → Skipped entirely when segment.laneMarkings === false
 5. One-way arrows (shaft + filled head, chain-aware placement, ~200px spacing)
 6. Bridge deck details (for bridge=yes segments):
-   a. Concrete surface overlay — subtle light-gray tint (rgba(210,210,200,0.15))
+   a. Concrete surface overlay — subtle light-gray tint (rgba(210,210,200,0.15)), painted once as a single combined path across all bridge envelopes so overlapping rounded end-caps at connected joints don't stack into brighter/darker circles
    b. Parapet railings — thick gray lines inset from road edges (#888, 6px wide)
    c. Guardrail posts — small perpendicular tick marks every ~35px along both sides
    d. Expansion joints — thin dark lines (rgba(0,0,0,0.12), 1.5px) spanning the full road width every ~120px

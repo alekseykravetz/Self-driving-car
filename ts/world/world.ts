@@ -662,6 +662,29 @@ export class World implements IWorld {
     const GUARDRAIL_POST_LEN = 10; // px length of each post tick
     const JOINT_INTERVAL = 120; // px spacing between expansion joints
 
+    // --- 1. Concrete deck overlay: a subtle light-gray tint so the bridge
+    //     reads as concrete rather than asphalt. Accumulate every bridge
+    //     envelope into a SINGLE path and fill once — filling all sub-paths
+    //     in one `fill()` means the overlapping rounded end-caps of connected
+    //     bridge segments are painted only once, so the tint stays uniform
+    //     instead of stacking into brighter/darker circles at the joints.
+    let hasBridge = false;
+    ctx.beginPath();
+    for (const env of this.#getDrawOrderedEnvelopes()) {
+      if (!env.skeleton.bridge) continue;
+      hasBridge = true;
+      const poly = env.polygon;
+      ctx.moveTo(poly.points[0].x, poly.points[0].y);
+      for (let i = 1; i < poly.points.length; i++) {
+        ctx.lineTo(poly.points[i].x, poly.points[i].y);
+      }
+      ctx.closePath();
+    }
+    if (hasBridge) {
+      ctx.fillStyle = 'rgba(210, 210, 200, 0.15)';
+      ctx.fill();
+    }
+
     for (const env of this.#getDrawOrderedEnvelopes()) {
       if (!env.skeleton.bridge) continue;
 
@@ -671,13 +694,6 @@ export class World implements IWorld {
       const halfWidth = ((seg.lanes ?? 2) * LANE_WIDTH_PX) / 2;
       const segLen = seg.length();
       if (segLen < 1) continue;
-
-      // --- 1. Concrete deck overlay: a subtle light-gray tint so the
-      //     bridge reads as concrete rather than asphalt.
-      drawEnvelope(ctx, env, {
-        fill: 'rgba(210, 210, 200, 0.15)',
-        stroke: 'transparent',
-      });
 
       // --- 2. Parapet walls: thick gray lines running along both road
       //     edges, inset slightly from the white road borders.

@@ -126,26 +126,33 @@ export class InspectEditor {
       const seg = this.#selectedSegment;
       const ctx = this.#ctx;
       ctx.save();
-      // Outer glow: a wide, translucent amber halo so the selection stands out
-      // against the road fill regardless of the underlying colour.
+      // Soft, low-opacity halo so the selection reads without washing the
+      // segment out.
       drawSegment(ctx, seg, {
-        color: 'rgba(255, 200, 0, 0.35)',
-        width: 18,
+        color: 'rgba(255, 210, 0, 0.18)',
+        width: 16,
+        cap: 'round',
+      });
+      // Dark casing gives the bright core contrast on BOTH the green grass and
+      // the light-gray road surface.
+      drawSegment(ctx, seg, {
+        color: 'rgba(40, 30, 0, 0.9)',
+        width: 8,
         cap: 'round',
       });
       // Bright core line.
       drawSegment(ctx, seg, {
-        color: '#ffd400',
-        width: 6,
+        color: '#ffdd00',
+        width: 4,
         cap: 'round',
       });
       // Endpoint markers to emphasise the exact segment extents.
-      ctx.fillStyle = '#ffd400';
-      ctx.strokeStyle = '#663c00';
+      ctx.fillStyle = '#ffdd00';
+      ctx.strokeStyle = 'rgba(40, 30, 0, 0.9)';
       ctx.lineWidth = 2;
       for (const p of [seg.p1, seg.p2]) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
       }
