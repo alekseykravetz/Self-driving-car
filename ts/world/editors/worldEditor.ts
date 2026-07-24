@@ -370,17 +370,18 @@ export class WorldEditor {
   #applyMetadataToSelectedSegment(meta: Partial<SegmentMetadata>): void {
     const seg = this.#inspectEditor.getSelectedSegment();
     if (!seg) return;
-    if (meta.highwayType !== undefined)
-      seg.highwayType = meta.highwayType || undefined;
+    // In inspect mode the panel always sends the segment's complete state, so
+    // apply every field directly (including toggling bridge / lane markings
+    // back off). `undefined` is a meaningful value here, not "leave unchanged".
+    seg.highwayType = meta.highwayType || undefined;
     if (meta.lanes !== undefined) seg.lanes = meta.lanes;
-    if (meta.oneWay !== undefined) seg.oneWay = meta.oneWay;
-    if (meta.separated !== undefined) seg.separated = meta.separated;
-    if (meta.name !== undefined) seg.name = meta.name || undefined;
-    if (meta.maxSpeed !== undefined) seg.maxSpeed = meta.maxSpeed;
-    if (meta.ref !== undefined) seg.ref = meta.ref || undefined;
-    if (meta.bridge !== undefined) seg.bridge = meta.bridge || undefined;
-    if (meta.laneMarkings !== undefined)
-      seg.laneMarkings = meta.laneMarkings === false ? false : undefined;
+    seg.oneWay = meta.oneWay ?? false;
+    seg.separated = meta.separated ?? false;
+    seg.name = meta.name || undefined;
+    seg.maxSpeed = meta.maxSpeed;
+    seg.ref = meta.ref || undefined;
+    seg.bridge = meta.bridge ? true : undefined;
+    seg.laneMarkings = meta.laneMarkings === false ? false : undefined;
   }
 
   /* Disables all editor tools and resets button styles. */

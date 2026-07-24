@@ -3,6 +3,9 @@ export const EDITOR_TOOLBAR_TEMPLATE = `
       <button id="graphBtn" class="editor-mode-btn active" data-mode="graph" data-tooltip="Graph Editor — Add/remove road points and segments (Left-click: add, Right-click: connect, Drag: move)">
         🌐
       </button>
+    </div>
+    <div class="controls-divider"></div>
+    <div class="controls-group">
       <button id="inspectBtn" class="editor-mode-btn" data-mode="inspect" data-tooltip="Inspect — Click a road segment to view and edit its metadata (road type, lanes, name, etc.)">
         🔍
       </button>

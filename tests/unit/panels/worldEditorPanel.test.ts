@@ -184,4 +184,86 @@ describe('WorldEditorPanelElement', () => {
     expect(state.bridge).toBe(false);
     expect(state.laneMarkings).toBe(true);
   });
+
+  it('inspect-mode edits preserve other fields and allow toggling bridge/laneMarkings off', () => {
+    const changes: Array<Record<string, unknown>> = [];
+    el.setOnMetadataChange((meta) => changes.push({ ...meta }));
+
+    // Select a segment: primary road, 3 lanes, named "Main", no bridge, markings on
+    el.showSegmentMetadata({
+      highwayType: 'primary',
+      lanes: 3,
+      oneWay: false,
+      separated: false,
+      name: 'Main',
+      maxSpeed: 50,
+      ref: undefined,
+      bridge: undefined,
+      laneMarkings: undefined,
+    });
+
+    const bridge = el.querySelector('#wepBridge') as HTMLInputElement;
+    const marks = el.querySelector('#wepLaneMarkings') as HTMLInputElement;
+
+    bridge.checked = true;
+    bridge.dispatchEvent(new Event('change'));
+    bridge.checked = false; // undo
+    bridge.dispatchEvent(new Event('change'));
+    marks.checked = false;
+    marks.dispatchEvent(new Event('change'));
+    marks.checked = true; // undo
+    marks.dispatchEvent(new Event('change'));
+
+    // Every emitted payload preserves the segment's real metadata (no wipe)
+    for (const c of changes) {
+      expect(c.highwayType).toBe('primary');
+      expect(c.lanes).toBe(3);
+      expect(c.name).toBe('Main');
+    }
+    // Bridge can be turned on then back off
+    expect(changes[0].bridge).toBe(true);
+    expect(changes[1].bridge).toBe(false);
+    // Lane markings can be turned off then back on
+    expect(changes[2].laneMarkings).toBe(false);
+    expect(changes[3].laneMarkings).toBe(true);
+  });
+
+  it('selecting a new segment replaces the inspect baseline (no cross-contamination)', () => {
+    const changes: Array<Record<string, unknown>> = [];
+    el.setOnMetadataChange((meta) => changes.push({ ...meta }));
+
+    // Segment A
+    el.showSegmentMetadata({
+      highwayType: 'motorway',
+      lanes: 4,
+      oneWay: true,
+      separated: false,
+      name: 'A',
+      maxSpeed: 120,
+      ref: undefined,
+      bridge: undefined,
+      laneMarkings: undefined,
+    });
+    // Segment B (different values)
+    el.showSegmentMetadata({
+      highwayType: 'residential',
+      lanes: 2,
+      oneWay: false,
+      separated: false,
+      name: 'B',
+      maxSpeed: undefined,
+      ref: undefined,
+      bridge: undefined,
+      laneMarkings: undefined,
+    });
+
+    // Editing B must emit B's values, not A's
+    const bridge = el.querySelector('#wepBridge') as HTMLInputElement;
+    bridge.checked = true;
+    bridge.dispatchEvent(new Event('change'));
+
+    expect(changes.at(-1)?.highwayType).toBe('residential');
+    expect(changes.at(-1)?.lanes).toBe(2);
+    expect(changes.at(-1)?.name).toBe('B');
+  });
 });

@@ -283,9 +283,8 @@ export class WorldEditorPanelElement extends HTMLElement {
         name: this.#brushState.name || undefined,
         maxSpeed: this.#brushState.maxSpeed,
         ref: this.#brushState.ref || undefined,
-        bridge: this.#brushState.bridge || undefined,
-        laneMarkings:
-          this.#brushState.laneMarkings === false ? false : undefined,
+        bridge: this.#brushState.bridge,
+        laneMarkings: this.#brushState.laneMarkings,
       });
     } else {
       this.#onBrushChange?.(this.#brushState);
@@ -348,6 +347,20 @@ export class WorldEditorPanelElement extends HTMLElement {
       this.resetToDefaults();
       return;
     }
+    // Mirror the selected segment's metadata into the brush state so that a
+    // single field edit builds on the segment's real values instead of stale
+    // defaults (prevents cross-segment contamination and lost fields).
+    this.#brushState = {
+      highwayType: meta.highwayType,
+      lanes: meta.lanes ?? 2,
+      oneWay: meta.oneWay,
+      separated: meta.separated,
+      name: meta.name ?? '',
+      maxSpeed: meta.maxSpeed,
+      ref: meta.ref ?? '',
+      bridge: meta.bridge ?? false,
+      laneMarkings: meta.laneMarkings !== false,
+    };
     if (this.#roadTypeSelect)
       this.#roadTypeSelect.value = meta.highwayType ?? '';
     if (this.#autoSetHint) this.#autoSetHint.textContent = 'Auto-set: —';
