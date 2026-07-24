@@ -170,17 +170,22 @@ getMouse(e: MouseEvent, subtractDragOffset: boolean = false): Point {
   const dir = Math.sign(e.deltaY);
   const step = 0.1;
   this.zoom += dir * step;
-  this.zoom = Math.max(0.1, Math.min(5, this.zoom));  // Clamp to [0.1, 5]
+  this.zoom = Math.max(0.8, Math.min(10, this.zoom));  // Clamp to [0.8, 10]
 }
 ```
 
 | Input                   | Effect           |
 | ----------------------- | ---------------- |
 | Scroll down / pinch out | Zoom out (+zoom) |
-| Scroll up / pinch in    | Zoom in (-zoom)  |
+| Scroll up / pinch in    | Zoom in (−zoom)  |
 | Ctrl + scroll           | Same as scroll   |
 
-**Zoom range**: 0.1 (10× zoomed in) to 5 (5× zoomed out).
+The wheel direction follows the conventional map/design-tool behavior:
+scrolling **up/forward zooms in**, scrolling **down/back zooms out**. Because a
+higher `zoom` value means _more zoomed out_ (`ctx.scale(1/zoom, 1/zoom)`),
+scrolling up decreases `zoom` and scrolling down increases it.
+
+**Zoom range**: 0.8 (zoomed in) to 10 (zoomed out).
 
 ---
 

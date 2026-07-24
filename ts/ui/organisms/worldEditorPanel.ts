@@ -192,6 +192,14 @@ export class WorldEditorPanelElement extends HTMLElement {
       }
     });
 
+    // Clear (unset) the max speed — restores the "no limit" (undefined) state.
+    this.querySelector('#wepMaxSpeedClear')?.addEventListener('click', () => {
+      if (this.#maxSpeedInput) {
+        this.#maxSpeedInput.value = '';
+        this.#maxSpeedInput.dispatchEvent(new Event('input'));
+      }
+    });
+
     // Collapsible section toggles
     this.querySelector('#wepRoadTypeToggle')?.addEventListener('click', () => {
       this.querySelector('#wepRoadTypeSection')?.classList.toggle('collapsed');

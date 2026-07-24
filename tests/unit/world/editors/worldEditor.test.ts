@@ -125,6 +125,7 @@ const toolbarMocks = {
   editorToolbar: makeMockElement({
     setModeChangeListener: vi.fn(),
     setMode: vi.fn(),
+    highlightMode: vi.fn(),
   }),
   worldToolbar: makeMockElement({
     showWorldEditorActions: vi.fn(),

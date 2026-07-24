@@ -33,6 +33,19 @@ export class EditorToolbarElement extends HTMLElement {
     this.#setActiveMode(mode);
   }
 
+  /**
+   * Highlight the active-mode button WITHOUT firing the mode-change listener.
+   * Used when the mode is switched from elsewhere (e.g. a keyboard shortcut)
+   * so the toolbar reflects state without re-triggering the switch.
+   */
+  highlightMode(mode: EditorType): void {
+    this.querySelectorAll<HTMLButtonElement>('.editor-mode-btn').forEach(
+      (btn) => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+      },
+    );
+  }
+
   setModeChangeListener(listener: (mode: EditorType) => void): void {
     this.#onModeChange = listener;
   }

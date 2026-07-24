@@ -123,10 +123,33 @@ export class InspectEditor {
       });
     }
     if (this.#selectedSegment) {
-      drawSegment(this.#ctx, this.#selectedSegment, {
-        color: 'orange',
-        width: 6,
+      const seg = this.#selectedSegment;
+      const ctx = this.#ctx;
+      ctx.save();
+      // Outer glow: a wide, translucent amber halo so the selection stands out
+      // against the road fill regardless of the underlying colour.
+      drawSegment(ctx, seg, {
+        color: 'rgba(255, 200, 0, 0.35)',
+        width: 18,
+        cap: 'round',
       });
+      // Bright core line.
+      drawSegment(ctx, seg, {
+        color: '#ffd400',
+        width: 6,
+        cap: 'round',
+      });
+      // Endpoint markers to emphasise the exact segment extents.
+      ctx.fillStyle = '#ffd400';
+      ctx.strokeStyle = '#663c00';
+      ctx.lineWidth = 2;
+      for (const p of [seg.p1, seg.p2]) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.restore();
     }
   }
 }

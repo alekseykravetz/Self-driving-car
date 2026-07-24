@@ -219,10 +219,11 @@ export class Viewport {
     // In mouse mode the wheel always zooms. In touchpad mode only a pinch
     // gesture or an explicit Ctrl+scroll zooms; plain scrolling pans.
     if (this.mode === 'mouse' || e.ctrlKey) {
-      // Zoom in/out
+      // Zoom in/out. Scrolling up (deltaY < 0) zooms IN, scrolling down zooms
+      // OUT — matching the conventional direction used by map/design tools.
       const direction = Math.sign(e.deltaY);
       const step = 0.1;
-      this.zoom -= direction * step;
+      this.zoom += direction * step;
       this.zoom = Math.max(0.8, Math.min(10, this.zoom));
     } else {
       // Two-finger scroll on trackpad → pan directly.

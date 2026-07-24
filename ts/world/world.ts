@@ -625,19 +625,27 @@ export class World implements IWorld {
   #drawBridgeShadows(ctx: CanvasRenderingContext2D): void {
     const SHADOW_DX = 4;
     const SHADOW_DY = 6;
+    // Accumulate every bridge envelope's offset polygon into a SINGLE path and
+    // fill once. Filling all sub-paths in one `fill()` call means overlapping
+    // regions (e.g. where two connected bridge segments meet, including their
+    // rounded end-caps) are painted only once — so the shadow stays a uniform
+    // 30% black instead of darkening into a circle at the overlap.
+    let hasBridge = false;
+    ctx.beginPath();
     for (const env of this.#getDrawOrderedEnvelopes()) {
       if (!env.skeleton.bridge) continue;
+      hasBridge = true;
       const poly = env.polygon;
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.strokeStyle = 'transparent';
       ctx.moveTo(poly.points[0].x + SHADOW_DX, poly.points[0].y + SHADOW_DY);
       for (let i = 1; i < poly.points.length; i++) {
         ctx.lineTo(poly.points[i].x + SHADOW_DX, poly.points[i].y + SHADOW_DY);
       }
       ctx.closePath();
-      ctx.fill();
     }
+    if (!hasBridge) return;
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.strokeStyle = 'transparent';
+    ctx.fill();
   }
 
   /**

@@ -505,7 +505,7 @@ The world draws in this order to ensure proper visual layering:
 1. Road envelopes (highway-type-colored fill) — flat road surface
    → Tier-sorted by road class (hand-drawn/unknown first, motorway last)
    → Higher-class roads paint on top at overlaps
-2. Bridge shadow (envelope polygon offset [4,6]px, rgba(0,0,0,0.3) — first bridge pass, elevation effect for bridge=yes segments)
+2. Bridge shadow (all bridge=yes envelope polygons offset [4,6]px, filled once as a single path at rgba(0,0,0,0.3) — combining sub-paths in one fill keeps overlaps at connected bridge ends a uniform 30% instead of darkening into a circle)
 3. Road borders (white lines) — road edges
 4. Lane markings:
    a. Solid center line (for hard-separated two-way segments)
@@ -805,12 +805,17 @@ The primary tool for designing the road network.
 
 | Key        | Action                                                    |
 | ---------- | --------------------------------------------------------- |
+| `G`        | Switch to the **Graph** editor (draw roads)               |
+| `I`        | Switch to the **Inspect** tool (view/edit metadata)       |
 | `S`        | Mark hovered point as path **start** (for pathfinding)    |
 | `E`        | Mark hovered point as path **end** (for pathfinding)      |
 | `C`        | Clear computed shortest path (also clears start/end)      |
 | `O` (hold) | Enable **one-way** mode; next segment is directed         |
 | `H` (hold) | Enable **hard-separation** mode; next segment is split    |
 | `T` (hold) | Enable **tunnel** (open-ended) mode for the next corridor |
+
+The `G` / `I` editor-switch keys are always-active root bindings registered by
+`WorldEditor`; the rest are pushed by the active editor.
 
 These keys are mirrored in the shared `<shortcuts-toolbar>` (top-left). `S` / `E`
 / `C` flash when pressed; `O` and `H` light while held and can be **clicked to
@@ -989,6 +994,7 @@ panels:
   `hideGroups(...)`. Toolbar order in editor mode: World → OSM → (separator) →
   Storage → Car → Selected → Viewport → Debug.
 - **Shared `<shortcuts-toolbar>`** (top-left, from `ts/ui/molecules/`): visualizes the
+  editor-switch keys (`G` → Graph editor, `I` → Inspect tool), the
   graph-editor momentary keys (`S` / `E` / `C`) plus the `Ctrl` zoom modifier.
   The `O` / `H` / `T` road-mode toggles were **moved out** of this toolbar into
   the new `<world-editor-panel>` (see below). Replaces the old inline
@@ -997,7 +1003,10 @@ panels:
   an organism panel with three collapsible sections — **Road Type** (native
   `<select>` styled with tokens), **Properties** (lanes, one-way, hard-separation,
   name, max speed, ref, bridge, lane markings), and **Path Tools** (the `O` / `H` /
-  `T` toggle key indicators). Selecting a road type auto-sets sensible defaults
+  `T` toggle key indicators). **All three sections are expanded by default**;
+  clicking a section header collapses/expands it. The **Max Speed** field has a
+  clear (✕) button that unsets the value back to "no limit" (`undefined`).
+  Selecting a road type auto-sets sensible defaults
   (e.g. Motorway → 4 lanes, one-way) that the user can override. The panel emits a
   **brush state** consumed by `GraphEditor` (via `setBrushState`) so hand-drawn
   segments carry the chosen metadata; the intent badge shows the road type. Panel
@@ -1008,8 +1017,13 @@ panels:
   wrapping the editor-mode buttons. Order: **Graph** 🌐 and **Inspect** 🔍
   (separator), then the marking editors — **Marking** 🔲, **Start** 🚙,
   **Target** 🎯, **Stop** 🛑, **Crossing** 🚶, **Yield** ⚠️, **Parking** 🅿️,
-  **Light** 🚦, **Corridor** 🛤️. **Inspect** mode (`EditorType 'inspect'`) lets
-  you click an existing segment to view and edit its metadata in the panel. Active
+  **Light** 🚦, **Corridor** 🛤️. The **Graph** and **Inspect** modes also have
+  keyboard shortcuts (`G` / `I`); switching via shortcut updates the active
+  button through `EditorToolbarElement.highlightMode()` (which does not re-fire
+  the mode-change listener). **Inspect** mode (`EditorType 'inspect'`) lets
+  you click an existing segment to view and edit its metadata in the panel; the
+  selected segment is drawn with an amber glow, a bright core line, and endpoint
+  dots for high visibility. Active
   state is driven by CSS `.active` class instead of inline style mutations in
   `WorldEditor`.
 

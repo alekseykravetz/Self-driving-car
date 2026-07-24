@@ -29,6 +29,8 @@ The project supports multiple input methods for controlling cars. All control sy
 
 | Key        | Action                                                                   |
 | ---------- | ------------------------------------------------------------------------ |
+| `G`        | Switch to the **Graph** editor (draw roads)                              |
+| `I`        | Switch to the **Inspect** tool (view/edit segment metadata)              |
 | `S`        | Mark hovered point as path **start**                                     |
 | `E`        | Mark hovered point as path **end**                                       |
 | `C`        | Clear computed shortest path (also clears start/end)                     |

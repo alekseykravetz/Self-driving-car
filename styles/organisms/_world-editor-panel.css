@@ -135,3 +135,11 @@
   display: flex;
   gap: var(--space-1\.5);
 }
+
+.wep-clear-btn {
+  color: var(--color-text-muted);
+}
+
+.wep-clear-btn:hover {
+  color: var(--color-danger, #e05a5a);
+}

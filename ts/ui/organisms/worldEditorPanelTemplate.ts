@@ -13,7 +13,7 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
       </div>
     </div>
 
-    <div class="panel-section wep-section collapsed" id="wepPropertiesSection">
+    <div class="panel-section wep-section" id="wepPropertiesSection">
       <div class="section-title section-title-toggle" id="wepPropertiesToggle">
         <span class="collapse-caret">▶</span>
         Properties
@@ -43,6 +43,7 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
             <button type="button" class="num-btn" id="wepMaxSpeedDec">−</button>
             <input type="number" id="wepMaxSpeed" min="0" step="5" placeholder="km/h">
             <button type="button" class="num-btn" id="wepMaxSpeedInc">+</button>
+            <button type="button" class="num-btn wep-clear-btn" id="wepMaxSpeedClear" title="Clear max speed (unset)">✕</button>
           </div>
         </div>
         <div class="wep-field">
@@ -58,7 +59,7 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
       </div>
     </div>
 
-    <div class="panel-section wep-section collapsed" id="wepPathToolsSection">
+    <div class="panel-section wep-section" id="wepPathToolsSection">
       <div class="section-title section-title-toggle" id="wepPathToolsToggle">
         <span class="collapse-caret">▶</span>
         Path Tools

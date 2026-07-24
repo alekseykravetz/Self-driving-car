@@ -225,6 +225,28 @@ export class WorldEditor {
         kind: 'display',
         keys: ['Control'],
       },
+      {
+        id: 'keyG',
+        key: 'g',
+        label: 'G',
+        title: 'G — Switch to the Graph editor (draw roads)',
+        group: 'Editor',
+        kind: 'momentary',
+        handler: {
+          onKeyDown: () => this.setMode('graph'),
+        },
+      },
+      {
+        id: 'keyI',
+        key: 'i',
+        label: 'I',
+        title: 'I — Switch to the Inspect tool (view/edit segment metadata)',
+        group: 'Editor',
+        kind: 'momentary',
+        handler: {
+          onKeyDown: () => this.setMode('inspect'),
+        },
+      },
     ]);
 
     // World selector: loading a file opens it for editing; picking from the
@@ -360,6 +382,9 @@ export class WorldEditor {
     this.#mode = mode;
     this.disableEditors();
     this.#editors[mode].enable();
+    // Keep the editor-toolbar button highlight in sync (e.g. when the mode is
+    // switched via the G / I keyboard shortcuts rather than a button click).
+    this.#editorToolbar.highlightMode(mode);
     if (mode === 'inspect') {
       this.#worldEditorPanel.showSegmentMetadata(null);
     } else {
