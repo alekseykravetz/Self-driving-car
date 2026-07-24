@@ -24,6 +24,11 @@
     "bash": "allow"
   },
   "command": {
+    "grill": {
+      "template": "Load the grill-me skill and execute the full elicitation workflow on the user's idea. Create a requirements/<slug>.md file with the structured output.",
+      "description": "Interview the user exhaustively to produce structured requirements",
+      "agent": "planner"
+    },
     "test": {
       "template": "Run the vitest unit tests with `npm test`. Report the results, including any failures or errors.",
       "description": "Run all vitest unit tests",
