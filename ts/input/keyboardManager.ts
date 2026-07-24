@@ -38,6 +38,12 @@ export interface ShortcutBinding extends ShortcutDef {
    * keydown sets physical hold, keyup releases it.
    */
   latchOnly?: boolean;
+  /**
+   * When true, the binding is active (key events routed, toggle state managed)
+   * but NOT rendered in the shortcuts toolbar. Used by the world editor panel
+   * to move O/H/T toggles out of the shortcuts toolbar into the panel.
+   */
+  hidden?: boolean;
 }
 
 /**
@@ -132,15 +138,17 @@ export class KeyboardManager {
     this.#allBindings = [...this.#rootBindings, ...this.#pushedBindings];
 
     // Render the visual toolbar from the ShortcutDef fields.
-    const defs: ShortcutDef[] = this.#allBindings.map((b) => ({
-      id: b.id,
-      label: b.label,
-      title: b.title,
-      group: b.group,
-      kind: b.kind ?? 'momentary',
-      display: b.display ?? b.kind === 'display',
-      keys: b.keys,
-    }));
+    const defs: ShortcutDef[] = this.#allBindings
+      .filter((b) => !b.hidden)
+      .map((b) => ({
+        id: b.id,
+        label: b.label,
+        title: b.title,
+        group: b.group,
+        kind: b.kind ?? 'momentary',
+        display: b.display ?? b.kind === 'display',
+        keys: b.keys,
+      }));
     this.#toolbar.setShortcuts(defs);
 
     // Initialise a LatchedToggle for every toggle binding.

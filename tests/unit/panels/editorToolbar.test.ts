@@ -71,5 +71,14 @@ describe('EditorToolbarElement', () => {
     expect(dataModes).toContain('corridor');
     expect(dataModes).toContain('start');
     expect(dataModes).toContain('target');
+    expect(dataModes).toContain('inspect');
+  });
+
+  it('inspect button fires mode change listener with inspect', () => {
+    const listener = vi.fn();
+    el.setModeChangeListener(listener);
+
+    el.querySelector<HTMLButtonElement>('[data-mode="inspect"]')!.click();
+    expect(listener).toHaveBeenCalledWith('inspect');
   });
 });

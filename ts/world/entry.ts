@@ -57,6 +57,8 @@ import '../ui/molecules/worldToolbar.js';
 import '../ui/molecules/shortcutsToolbar.js';
 import '../ui/molecules/worldLayersToolbar.js';
 import '../ui/molecules/editorToolbar.js';
+import '../ui/organisms/worldEditorPanelTemplate.js';
+import '../ui/organisms/worldEditorPanel.js';
 
 (async () => {
   await StoreManager.init();

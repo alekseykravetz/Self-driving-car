@@ -11,6 +11,7 @@ export type EditorType =
   | 'light'
   | 'target'
   | 'corridor'
-  | 'yield';
+  | 'yield'
+  | 'inspect';
 
 export type TrackingMode = 'none' | 'best' | 'keys';

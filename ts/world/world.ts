@@ -59,6 +59,7 @@ import {
 } from './oneWayArrows.js';
 import type { OneWayArrowPlacement } from './oneWayArrows.js';
 import { sortEnvelopesByTier } from './roadTiers.js';
+import { getRoadFillColor } from '../math/roadTypes.js';
 
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field.
@@ -75,35 +76,6 @@ export function loadWorldCorridors(info: World): Corridor[] {
     return [Corridor.load(legacy.corridor)];
   }
   return [];
-}
-
-/** Returns the fill color for a road envelope based on its highway type. */
-function getRoadFillColor(seg: Segment): string {
-  switch (seg.highwayType) {
-    case 'motorway':
-    case 'motorway_link':
-      return '#888';
-    case 'trunk':
-    case 'trunk_link':
-      return '#998877';
-    case 'primary':
-    case 'primary_link':
-      return '#B5774A';
-    case 'secondary':
-    case 'secondary_link':
-      return '#B0A060';
-    case 'tertiary':
-    case 'tertiary_link':
-      return '#CCC';
-    case 'service':
-      return '#AAA';
-    case 'living_street':
-      return '#AAA';
-    case 'unclassified':
-      return '#BBB';
-    default:
-      return '#BBB';
-  }
 }
 
 /** Rebuilds a Tree from a compact v2 instance bound to the world's prototypes.
@@ -364,7 +336,7 @@ export class World implements IWorld {
       // Tier-sorted: higher-class roads paint on top of lower-class at overlaps.
       for (const env of this.#getDrawOrderedEnvelopes()) {
         const seg = env.skeleton;
-        const fill = getRoadFillColor(seg);
+        const fill = getRoadFillColor(seg.highwayType);
         drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
       }
 
