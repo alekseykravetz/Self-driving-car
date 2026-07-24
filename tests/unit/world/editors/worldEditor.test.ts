@@ -148,12 +148,25 @@ const toolbarMocks = {
     setBusy: vi.fn(),
     getVisibility: vi.fn(() => ({})),
   }),
+  worldEditorPanel: makeMockElement({
+    setBrushChangeListener: vi.fn(),
+    setToggleOListener: vi.fn(),
+    setToggleHListener: vi.fn(),
+    setToggleTListener: vi.fn(),
+    setOnMetadataChange: vi.fn(),
+    setToggleOActive: vi.fn(),
+    setToggleHActive: vi.fn(),
+    setToggleTActive: vi.fn(),
+    showSegmentMetadata: vi.fn(),
+    resetToDefaults: vi.fn(),
+  }),
 };
 
 querySelectors.set('editor-toolbar', toolbarMocks.editorToolbar);
 querySelectors.set('world-toolbar', toolbarMocks.worldToolbar);
 querySelectors.set('shortcuts-toolbar', toolbarMocks.shortcutsToolbar);
 querySelectors.set('world-layers-toolbar', toolbarMocks.worldLayersToolbar);
+querySelectors.set('world-editor-panel', toolbarMocks.worldEditorPanel);
 
 const mockDoc = {
   getElementById: vi.fn((id: string) => domElements.get(id) ?? null),
@@ -244,6 +257,10 @@ vi.mock('../../../../ts/world/editors/graphEditor.js', () => ({
       display: vi.fn(),
       bindKeyboard: vi.fn(),
       dispose: vi.fn(),
+      setBrushState: vi.fn(),
+      setOneWay: vi.fn(),
+      setSeparated: vi.fn(),
+      setOnToggleChange: vi.fn(),
     };
   },
 }));
@@ -255,6 +272,8 @@ vi.mock('../../../../ts/world/editors/corridorEditor.js', () => ({
       disable: vi.fn(),
       display: vi.fn(),
       bindKeyboard: vi.fn(),
+      setOpen: vi.fn(),
+      setOnToggleChange: vi.fn(),
     };
   },
 }));
@@ -335,6 +354,19 @@ vi.mock('../../../../ts/world/editors/yieldEditor.js', () => ({
       enable: vi.fn(),
       disable: vi.fn(),
       display: vi.fn(),
+    };
+  },
+}));
+
+vi.mock('../../../../ts/world/editors/inspectEditor.js', () => ({
+  InspectEditor: function () {
+    return {
+      enable: vi.fn(),
+      disable: vi.fn(),
+      display: vi.fn(),
+      bindKeyboard: vi.fn(),
+      setOnSegmentSelected: vi.fn(),
+      getSelectedSegment: vi.fn(() => null),
     };
   },
 }));
@@ -555,6 +587,7 @@ describe('WorldEditor', () => {
         'target',
         'corridor',
         'yield',
+        'inspect',
       ];
 
       for (const mode of modes) {
@@ -627,6 +660,7 @@ describe('WorldEditor', () => {
         'target',
         'corridor',
         'yield',
+        'inspect',
       ];
       for (const key of expected) {
         expect(editors[key]).toBeDefined();

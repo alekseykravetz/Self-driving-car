@@ -3,6 +3,8 @@ import { Graph } from '../../math/graph/graph.js';
 import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
 import { formatMetersFromWorldPixels } from '../../math/worldUnits.js';
+import { ROAD_TYPE_LABELS } from '../../math/roadTypes.js';
+import type { BrushState } from '../../ui/organisms/worldEditorPanel.js';
 import {
   getNearestPoint,
   subtract,
@@ -31,6 +33,8 @@ export class GraphEditor {
   #mouse: Point | null = null; // Current mouse position (relative to viewport/canvas)
   #isOneWay: boolean = false;
   #isSeparated: boolean = false;
+  #brushState: BrushState | null = null;
+  #onToggleChange: ((key: string, active: boolean) => void) | null = null;
   #keyboardManager: KeyboardManager | null = null;
 
   // Temporary points for finding shortest path operation
@@ -87,6 +91,22 @@ export class GraphEditor {
    */
   public bindKeyboard(km: KeyboardManager): void {
     this.#keyboardManager = km;
+  }
+
+  setBrushState(state: BrushState): void {
+    this.#brushState = state;
+  }
+
+  setOneWay(value: boolean): void {
+    this.#isOneWay = value;
+  }
+
+  setSeparated(value: boolean): void {
+    this.#isSeparated = value;
+  }
+
+  setOnToggleChange(cb: (key: string, active: boolean) => void): void {
+    this.#onToggleChange = cb;
   }
 
   public disable(): void {
@@ -152,12 +172,15 @@ export class GraphEditor {
           'O — One-way road mode. Hold while creating a segment, or click to latch it on permanently.',
         group: 'Graph',
         kind: 'toggle',
+        hidden: true,
         toggle: {
           onActivate: () => {
             this.#isOneWay = true;
+            this.#onToggleChange?.('O', true);
           },
           onDeactivate: () => {
             this.#isOneWay = false;
+            this.#onToggleChange?.('O', false);
           },
         },
       },
@@ -169,12 +192,15 @@ export class GraphEditor {
           'H — Hard-separation road mode (solid centre line). Hold while creating a segment, or click to latch it on permanently.',
         group: 'Graph',
         kind: 'toggle',
+        hidden: true,
         toggle: {
           onActivate: () => {
             this.#isSeparated = true;
+            this.#onToggleChange?.('H', true);
           },
           onDeactivate: () => {
             this.#isSeparated = false;
+            this.#onToggleChange?.('H', false);
           },
         },
       },
@@ -244,9 +270,25 @@ export class GraphEditor {
    */
   #selectPoint(point: Point): void {
     if (this.#selected && this.#selected !== point) {
-      // If a point was already selected, try to create a segment to the new point
+      const metadata = this.#brushState
+        ? {
+            highwayType: this.#brushState.highwayType,
+            name: this.#brushState.name || undefined,
+            lanes: this.#brushState.lanes,
+            maxSpeed: this.#brushState.maxSpeed,
+            ref: this.#brushState.ref || undefined,
+            bridge: this.#brushState.bridge || undefined,
+            laneMarkings: this.#brushState.laneMarkings ? undefined : false,
+          }
+        : undefined;
       this.#graph.tryAddSegment(
-        new Segment(this.#selected, point, this.#isOneWay, this.#isSeparated),
+        new Segment(
+          this.#selected,
+          point,
+          this.#isOneWay,
+          this.#isSeparated,
+          metadata,
+        ),
       );
     }
     this.#selected = point;
@@ -308,7 +350,14 @@ export class GraphEditor {
 
     const dir = subtract(segment.p2, segment.p1);
     const angleFromStart = Math.atan2(dir.y, dir.x);
-    const label = `${formatMetersFromWorldPixels(lengthPx)}  ${formatDegrees(angleFromStart)}`;
+    let prefix = '';
+    if (this.#brushState?.highwayType) {
+      const label =
+        ROAD_TYPE_LABELS[this.#brushState.highwayType] ??
+        this.#brushState.highwayType;
+      prefix = `${label} · ${this.#brushState.lanes} lanes · `;
+    }
+    const label = `${prefix}${formatMetersFromWorldPixels(lengthPx)}  ${formatDegrees(angleFromStart)}`;
     const paddingX = 8;
     const paddingY = 5;
     const gap = 12 * this.#viewport.zoom;

@@ -34,6 +34,7 @@ export class CorridorEditor {
   // Tunnel (open-ended) mode mirrors the graph editor's one-way toggle:
   // active while 't' is held OR latched via the shortcuts toolbar.
   #isOpen: boolean = false;
+  #onToggleChange: ((key: string, active: boolean) => void) | null = null;
   #keyboardManager: KeyboardManager | null = null;
 
   #boundMouseDown: (event: MouseEvent) => void;
@@ -63,6 +64,14 @@ export class CorridorEditor {
     this.#keyboardManager = km;
   }
 
+  setOpen(value: boolean): void {
+    this.#isOpen = value;
+  }
+
+  setOnToggleChange(cb: (key: string, active: boolean) => void): void {
+    this.#onToggleChange = cb;
+  }
+
   public enable(): void {
     this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
@@ -89,12 +98,15 @@ export class CorridorEditor {
           'T — Tunnel (open-ended) corridor mode. Hold or click to latch; the next corridor you draw has open ends.',
         group: 'Corridor',
         kind: 'toggle',
+        hidden: true,
         toggle: {
           onActivate: () => {
             this.#isOpen = true;
+            this.#onToggleChange?.('T', true);
           },
           onDeactivate: () => {
             this.#isOpen = false;
+            this.#onToggleChange?.('T', false);
           },
         },
       },

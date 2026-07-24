@@ -5,6 +5,7 @@ import { WorldGenerator } from '../generation/worldGenerator.js';
 import { GraphEditor } from './graphEditor.js';
 import { MarkingEditor } from './markingEditor.js';
 import { CorridorEditor } from './corridorEditor.js';
+import { InspectEditor } from './inspectEditor.js';
 import { StopEditor } from './stopEditor.js';
 import { CrossingEditor } from './crossingEditor.js';
 import { StartEditor } from './startEditor.js';
@@ -24,6 +25,10 @@ import { EditorToolbarElement } from '../../ui/molecules/editorToolbar.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
+import type {
+  WorldEditorPanelElement,
+  SegmentMetadata,
+} from '../../ui/organisms/worldEditorPanel.js';
 
 /** Overpass QL filter used to query drivable roads from OpenStreetMap. */
 const OSM_FILTER = `[out:json];
@@ -101,6 +106,8 @@ export class WorldEditor {
   #shortcutsToolbar!: ShortcutsToolbarElement;
   #keyboardManager!: KeyboardManager;
   #worldLayersToolbar!: WorldLayersToolbarElement;
+  #worldEditorPanel!: WorldEditorPanelElement;
+  #inspectEditor!: InspectEditor;
 
   constructor(canvas: HTMLCanvasElement, miniMapCanvas: HTMLCanvasElement) {
     this.#canvas = canvas;
@@ -153,6 +160,9 @@ export class WorldEditor {
     this.#worldLayersToolbar = document.querySelector(
       'world-layers-toolbar',
     ) as WorldLayersToolbarElement;
+    this.#worldEditorPanel = document.querySelector(
+      'world-editor-panel',
+    ) as WorldEditorPanelElement;
   }
 
   /* Adds event listeners to DOM elements. */
@@ -237,6 +247,17 @@ export class WorldEditor {
     });
     // The editor has no live traffic, so the heatmap overlay toggle is irrelevant.
     this.#worldLayersToolbar.hideOverlays();
+
+    // ── World Editor Panel — toggle → km sync (stored, fires later) ──
+    this.#worldEditorPanel.setToggleOListener((active) =>
+      this.#keyboardManager.setToggleActive('keyO', active),
+    );
+    this.#worldEditorPanel.setToggleHListener((active) =>
+      this.#keyboardManager.setToggleActive('keyH', active),
+    );
+    this.#worldEditorPanel.setToggleTListener((active) =>
+      this.#keyboardManager.setToggleActive('keyT', active),
+    );
   }
 
   /* Initializes or re-initializes the world, viewport, minimap, and tools. */
@@ -266,6 +287,18 @@ export class WorldEditor {
     this.#miniMapViewport = new Viewport(this.#miniMapCanvas);
     this.#miniMapViewport.setMode(this.#viewportMode);
 
+    // Wire brush state + metadata + editor toggle sync (after editors exist)
+    this.#worldEditorPanel?.setBrushChangeListener((state) => {
+      (this.#editors.graph as GraphEditor).setBrushState(state);
+    });
+    (this.#editors.graph as GraphEditor).setOnToggleChange((key, active) => {
+      if (key === 'O') this.#worldEditorPanel?.setToggleOActive(active);
+      if (key === 'H') this.#worldEditorPanel?.setToggleHActive(active);
+    });
+    this.#worldEditorPanel?.setOnMetadataChange((meta) => {
+      this.#applyMetadataToSelectedSegment(meta);
+    });
+
     // A freshly loaded/created world already has its items generated in memory.
     this.#worldLayersToolbar?.setStale(false);
   }
@@ -278,6 +311,34 @@ export class WorldEditor {
     const corridorEditor = new CorridorEditor(viewport, world);
     corridorEditor.bindKeyboard(this.#keyboardManager);
 
+    const inspectEditor = new InspectEditor(viewport, world);
+    inspectEditor.bindKeyboard(this.#keyboardManager);
+    this.#inspectEditor = inspectEditor;
+
+    // Wire corridor toggle sync with panel
+    corridorEditor.setOnToggleChange((key, active) => {
+      if (key === 'T') this.#worldEditorPanel.setToggleTActive(active);
+    });
+
+    // Wire inspect editor segment-selected callback
+    inspectEditor.setOnSegmentSelected((segment) => {
+      if (segment) {
+        this.#worldEditorPanel.showSegmentMetadata({
+          highwayType: segment.highwayType,
+          lanes: segment.lanes,
+          oneWay: segment.oneWay,
+          separated: segment.separated,
+          name: segment.name,
+          maxSpeed: segment.maxSpeed,
+          ref: segment.ref,
+          bridge: segment.bridge,
+          laneMarkings: segment.laneMarkings,
+        });
+      } else {
+        this.#worldEditorPanel.showSegmentMetadata(null);
+      }
+    });
+
     const tools: Editors = {
       graph: graphEditor,
       marking: new MarkingEditor(viewport, world),
@@ -289,6 +350,7 @@ export class WorldEditor {
       target: new TargetEditor(viewport, world),
       corridor: corridorEditor,
       yield: new YieldEditor(viewport, world),
+      inspect: inspectEditor,
     };
     return tools;
   }
@@ -298,6 +360,27 @@ export class WorldEditor {
     this.#mode = mode;
     this.disableEditors();
     this.#editors[mode].enable();
+    if (mode === 'inspect') {
+      this.#worldEditorPanel.showSegmentMetadata(null);
+    } else {
+      this.#worldEditorPanel.resetToDefaults();
+    }
+  }
+
+  #applyMetadataToSelectedSegment(meta: Partial<SegmentMetadata>): void {
+    const seg = this.#inspectEditor.getSelectedSegment();
+    if (!seg) return;
+    if (meta.highwayType !== undefined)
+      seg.highwayType = meta.highwayType || undefined;
+    if (meta.lanes !== undefined) seg.lanes = meta.lanes;
+    if (meta.oneWay !== undefined) seg.oneWay = meta.oneWay;
+    if (meta.separated !== undefined) seg.separated = meta.separated;
+    if (meta.name !== undefined) seg.name = meta.name || undefined;
+    if (meta.maxSpeed !== undefined) seg.maxSpeed = meta.maxSpeed;
+    if (meta.ref !== undefined) seg.ref = meta.ref || undefined;
+    if (meta.bridge !== undefined) seg.bridge = meta.bridge || undefined;
+    if (meta.laneMarkings !== undefined)
+      seg.laneMarkings = meta.laneMarkings === false ? false : undefined;
   }
 
   /* Disables all editor tools and resets button styles. */

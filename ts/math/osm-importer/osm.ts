@@ -5,6 +5,7 @@ import {
   WORLD_PIXELS_PER_METER,
 } from '../worldUnits.js';
 import { invLerp, degToRad } from '../utils.js';
+import { defaultLaneCount } from '../roadTypes.js';
 
 // --- Interfaces for OSM Data Structure ---
 interface OsmNodeElement {
@@ -91,46 +92,6 @@ export class Osm {
       console.warn('No nodes found in OSM data.');
       return { points: [], segments: [] };
     }
-
-    const defaultLaneCount = (
-      highwayType: string | undefined,
-      oneWay: boolean,
-    ): number => {
-      switch (highwayType) {
-        case 'motorway':
-          return 4;
-        case 'motorway_link':
-          return 2;
-        case 'trunk':
-          return 4;
-        case 'trunk_link':
-          return 2;
-        case 'primary':
-          return 2;
-        case 'primary_link':
-          return 1;
-        case 'secondary':
-          return 2;
-        case 'secondary_link':
-          return 1;
-        case 'tertiary':
-          return 2;
-        case 'tertiary_link':
-          return 1;
-        case 'residential':
-          return 2;
-        case 'unclassified':
-          return 2;
-        case 'service':
-          return 1;
-        case 'living_street':
-          return 1;
-        case 'track':
-          return 1;
-        default:
-          return oneWay ? 1 : 2;
-      }
-    };
 
     // Extract latitudes and longitudes for bounding box calculation
     const latitudes = nodes.map((node) => node.lat);
