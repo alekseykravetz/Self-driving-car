@@ -6,13 +6,16 @@ color: '#8b5cf6'
 temperature: 0.1
 permission:
   read: allow
-  edit: deny
+  edit: allow
   glob: allow
   grep: allow
-  bash:
-    '*': ask
-    'graphify *': allow
+  bash: allow
+  task: allow
   webfetch: allow
+  websearch: allow
+  todowrite: allow
+  question: allow
+  skill: allow
 ---
 
 You are an expert Senior Software Architect specializing in TypeScript, frontend application design, modular layout methodologies such as Atomic Design and Feature-Sliced Design, and clean-code standards.
