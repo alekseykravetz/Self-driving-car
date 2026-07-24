@@ -215,19 +215,11 @@ export function computeStreetLabelPlacements(
   const avoid = opts?.avoid;
   const avoidRadius = opts?.avoidRadius ?? LABEL_SIGN_AVOID_RADIUS_PX;
 
-  // Group segments by a display name that falls back to `nameEn` when the
-  // primary `name` contains non-Latin characters (e.g. Hebrew/Arabic), so
-  // street labels render in a Latin script when an English name is
-  // available.
-  const isLatin = (s: string): boolean =>
-    // eslint-disable-next-line no-control-regex
-    /^[\x00-\x7F]*$/.test(s);
-  const displayNameOf = (seg: Segment): string | undefined => {
-    if (seg.name) {
-      return isLatin(seg.name) ? seg.name : (seg.nameEn ?? seg.name);
-    }
-    return seg.nameEn;
-  };
+  // Group segments by their primary `name` (matching the OSM `name` tag and
+  // the value shown in the world editor's inspect panel), falling back to
+  // `nameEn` only when no primary name exists.
+  const displayNameOf = (seg: Segment): string | undefined =>
+    seg.name ?? seg.nameEn;
 
   const byName = new Map<string, Segment[]>();
   for (const seg of segments) {
