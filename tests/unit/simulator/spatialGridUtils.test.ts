@@ -146,4 +146,42 @@ describe('queryBordersNearCar', () => {
     const result = queryBordersNearCar(grid, car);
     expect(result.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('filters borders within broad-phase but outside narrow-phase radius', () => {
+    const grid = new SpatialHashGrid(500);
+    const seg = new Segment(new Point(0, 0), new Point(10, 0));
+    grid.build([[seg.p1, seg.p2]]);
+    const car = makeMockCar({ x: 5, y: 200, sensor: { rayLength: 1 } });
+    const result = queryBordersNearCar(grid, car);
+    expect(result).toEqual([]);
+  });
+
+  it('returns only borders that pass narrow-phase distance filter', () => {
+    const grid = new SpatialHashGrid(500);
+    const close = new Segment(new Point(0, 0), new Point(10, 0));
+    const far = new Segment(new Point(1000, 1000), new Point(1100, 1000));
+    grid.build([
+      [close.p1, close.p2],
+      [far.p1, far.p2],
+    ]);
+    const car = makeMockCar({ x: 5, y: 5, sensor: { rayLength: 200 } });
+    const result = queryBordersNearCar(grid, car);
+    expect(result.length).toBe(1);
+    expect(result[0][0].x).toBe(0);
+  });
+
+  it('handles car with zero width and height', () => {
+    const grid = new SpatialHashGrid(150);
+    const seg = new Segment(new Point(0, 0), new Point(10, 0));
+    grid.build([[seg.p1, seg.p2]]);
+    const car = makeMockCar({
+      x: 5,
+      y: 5,
+      width: 0,
+      height: 0,
+      sensor: { rayLength: 200 },
+    });
+    const result = queryBordersNearCar(grid, car);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+  });
 });
