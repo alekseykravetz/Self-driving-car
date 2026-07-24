@@ -1,4 +1,4 @@
-import { CarInfo } from '../car.js';
+import type { CarInfo } from '../car.js';
 
 /**
  * Parse a .car file content string into a CarInfo object.

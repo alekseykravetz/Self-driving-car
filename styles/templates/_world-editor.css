@@ -35,7 +35,7 @@ h1 {
   right: var(--space-5);
   bottom: var(--space-5);
   background-color: var(--color-bg-canvas);
-  outline: 2px solid var(--color-black);
+  outline: var(--space-0\.5) solid var(--color-black);
 }
 
 editor-toolbar {
@@ -47,7 +47,7 @@ editor-toolbar {
   background-color: var(--color-bg-overlay);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-lg);
-  outline: 2px solid var(--color-bg-dark);
+  outline: var(--space-0\.5) solid var(--color-bg-dark);
   display: flex;
   align-items: center;
   gap: var(--space-1);

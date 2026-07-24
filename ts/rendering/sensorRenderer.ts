@@ -1,10 +1,9 @@
 import type { Sensor } from '../car/sensors/sensor.js';
-import {
-  TRAFFIC_STATE_RED_THRESHOLD,
-  TRAFFIC_STATE_YELLOW_THRESHOLD,
-  BASIC_RAY_DOT_RADIUS,
-  TRAFFIC_RAY_DOT_RADIUS,
-} from '../car/sensors/sensor.js';
+
+const TRAFFIC_STATE_RED_THRESHOLD = 0.9;
+const TRAFFIC_STATE_YELLOW_THRESHOLD = 0.4;
+const BASIC_RAY_DOT_RADIUS = 3;
+const TRAFFIC_RAY_DOT_RADIUS = 4;
 
 export class SensorRenderer {
   static draw(ctx: CanvasRenderingContext2D, sensor: Sensor): void {

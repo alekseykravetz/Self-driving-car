@@ -4,7 +4,7 @@
  * Allows selecting active world/car for use by simulator, race, and world editor.
  */
 
-import { CarInfo } from '../../car/car.js';
+import type { CarInfo } from '../../car/car.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { STORE_PANEL_TEMPLATE } from './storePanelTemplate.js';
 import { stripFileExtension } from '../../store/serialization.js';

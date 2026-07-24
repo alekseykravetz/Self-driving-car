@@ -17,11 +17,6 @@ export interface SensorTrafficControl {
   state: TrafficControlState;
 }
 
-export const TRAFFIC_STATE_RED_THRESHOLD = 0.9;
-export const TRAFFIC_STATE_YELLOW_THRESHOLD = 0.4;
-export const BASIC_RAY_DOT_RADIUS = 3;
-export const TRAFFIC_RAY_DOT_RADIUS = 4;
-
 export function encodeTrafficState(state: TrafficControlState | null): number {
   switch (state) {
     case 'red':

@@ -1,4 +1,4 @@
-import { CarInfo } from '../car/car.js';
+import type { CarInfo } from '../car/car.js';
 
 export interface StoreManifest {
   worlds: string[];

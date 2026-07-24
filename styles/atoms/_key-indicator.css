@@ -53,7 +53,7 @@
   font-size: var(--text-base);
   font-family: var(--font-ui);
   font-weight: normal;
-  padding: 6px 10px;
+  padding: var(--space-1\.5) var(--space-2\.5);
   border-radius: var(--radius-sm);
   white-space: normal;
   max-width: 280px;
