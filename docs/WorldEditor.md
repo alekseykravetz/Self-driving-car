@@ -989,15 +989,29 @@ panels:
   `hideGroups(...)`. Toolbar order in editor mode: World → OSM → (separator) →
   Storage → Car → Selected → Viewport → Debug.
 - **Shared `<shortcuts-toolbar>`** (top-left, from `ts/ui/molecules/`): visualizes the
-  graph-editor keys (`S` / `E` / `C` / `O`) plus the `Ctrl` zoom modifier. The
-  `O` one-way indicator is click-latchable. Replaces the old inline
+  graph-editor momentary keys (`S` / `E` / `C`) plus the `Ctrl` zoom modifier.
+  The `O` / `H` / `T` road-mode toggles were **moved out** of this toolbar into
+  the new `<world-editor-panel>` (see below). Replaces the old inline
   `#keyIndicators` block that used to live in the bottom controls panel.
+- **`<world-editor-panel>`** (top-right corner, from `ts/ui/organisms/worldEditorPanel.ts`):
+  an organism panel with three collapsible sections — **Road Type** (native
+  `<select>` styled with tokens), **Properties** (lanes, one-way, hard-separation,
+  name, max speed, ref, bridge, lane markings), and **Path Tools** (the `O` / `H` /
+  `T` toggle key indicators). Selecting a road type auto-sets sensible defaults
+  (e.g. Motorway → 4 lanes, one-way) that the user can override. The panel emits a
+  **brush state** consumed by `GraphEditor` (via `setBrushState`) so hand-drawn
+  segments carry the chosen metadata; the intent badge shows the road type. Panel
+  state resets to defaults each session (no persistence). The `O` / `H` / `T`
+  bindings still route through `KeyboardManager` but are marked `hidden: true` so
+  they no longer render in the shortcuts toolbar.
 - **`<editor-toolbar>`** (bottom-center, from `ts/ui/molecules/editorToolbar.ts`): custom element
-  wrapping the editor-mode buttons (Graph, Marking, Stop, Start,
-  Light, Crossing, Target, Parking, Yield, Corridor). Replaces the old
-
-  `<div id="controls">`. Active state is driven by CSS `.active` class instead
-  of inline style mutations in `WorldEditor`.
+  wrapping the editor-mode buttons. Order: **Graph** 🌐 and **Inspect** 🔍
+  (separator), then the marking editors — **Marking** 🔲, **Start** 🚙,
+  **Target** 🎯, **Stop** 🛑, **Crossing** 🚶, **Yield** ⚠️, **Parking** 🅿️,
+  **Light** 🚦, **Corridor** 🛤️. **Inspect** mode (`EditorType 'inspect'`) lets
+  you click an existing segment to view and edit its metadata in the panel. Active
+  state is driven by CSS `.active` class instead of inline style mutations in
+  `WorldEditor`.
 
 The OSM text-area panel (`#osmPanel`) stays in `world.html`; only its open button
 moved into the shared toolbar.

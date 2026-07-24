@@ -32,11 +32,10 @@ h1 {
 
 world-editor-panel {
   position: absolute;
-  left: var(--space-3);
-  top: 50%;
-  transform: translateY(-50%);
+  right: var(--space-3);
+  top: var(--space-3);
   z-index: 10;
-  max-height: 80vh;
+  max-height: calc(100vh - var(--space-6));
 }
 
 #miniMapCanvas {

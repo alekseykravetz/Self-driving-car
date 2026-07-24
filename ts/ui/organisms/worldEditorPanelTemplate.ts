@@ -1,5 +1,5 @@
 export const WORLD_EDITOR_PANEL_TEMPLATE = `
-  <div id="worldEditorPanel" class="wep-panel">
+  <div class="wep-panel">
     <div class="panel-section wep-section" id="wepRoadTypeSection">
       <div class="section-title section-title-toggle" id="wepRoadTypeToggle">
         <span class="collapse-caret">▶</span>

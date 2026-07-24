@@ -139,6 +139,13 @@ GraphEditor.disable():
 
 The `CorridorEditor` follows the same pattern with its own `[keyT]` bindings.
 
+The `keyO` / `keyH` / `keyT` bindings are marked `hidden: true`, so they are
+routed and toggled by `KeyboardManager` but are **not rendered** in the
+`<shortcuts-toolbar>` — their visual state lives in the `<world-editor-panel>`
+Path Tools section instead. `#rebuild()` filters `hidden` bindings out of the
+`defs` passed to `setShortcuts()` while still creating their `LatchedToggle`s and
+routing key events.
+
 ### Training Simulator (static set)
 
 ```
