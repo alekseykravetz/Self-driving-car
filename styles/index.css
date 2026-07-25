@@ -37,6 +37,3 @@
 @import './organisms/_human-training.css';
 @import './organisms/_world-layers.css';
 @import './organisms/_world-editor-panel.css';
-
-/* ── Mobile-responsive rules (applied on all pages) ─────────────── */
-@import './pages/_mobile.css';

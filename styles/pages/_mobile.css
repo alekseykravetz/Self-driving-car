@@ -1,3 +1,15 @@
+/* ── Tablet / medium screens: collapse 4-col landing grid to 2 cols ── */
+@media (max-width: 1150px) {
+  .landing-sections {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+  }
+
+  store-panel {
+    grid-column: span 2;
+  }
+}
+
 @media (max-width: 768px) {
   .landing-header {
     padding: var(--space-8) var(--space-4) var(--space-4);
@@ -81,8 +93,9 @@
     max-width: calc(100vw - var(--space-5));
   }
 
-  html,
-  body {
+  /* Full-screen app pages lock scrolling; the landing page must scroll. */
+  html:has(body:not(.main-page)),
+  body:not(.main-page) {
     overflow: hidden;
     width: 100%;
     height: 100dvh;

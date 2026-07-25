@@ -4,3 +4,6 @@
 
 @import './index.css';
 @import './templates/_landing-page.css';
+
+/* Mobile-responsive overrides — must load last so they win the cascade */
+@import './pages/_mobile.css';
