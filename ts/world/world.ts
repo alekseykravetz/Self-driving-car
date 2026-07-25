@@ -30,7 +30,6 @@ import {
   lerp,
   lerp2D,
   normalize,
-  rotate,
   perpendicular,
   mulberry32,
 } from '../math/utils.js';
@@ -38,26 +37,7 @@ import { drawEnvelope } from '../rendering/envelopeRenderer.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPolygon } from '../rendering/polygonRenderer.js';
 import { LANE_WIDTH_PX } from '../math/worldUnits.js';
-import {
-  computeSpeedSignPlacements,
-  computeStreetLabelPlacements,
-  computeRoadShieldPlacements,
-  computeExitSignPlacements,
-  MIN_SIGNAGE_ZOOM,
-} from './roadSignage.js';
-import type {
-  StreetLabelPlacement,
-  SpeedSignPlacement,
-  RoadShieldPlacement,
-  ExitSignPlacement,
-} from './roadSignage.js';
-import {
-  computeOneWayArrowPlacements,
-  ONE_WAY_ARROW_SHAFT_PX,
-  ONE_WAY_ARROW_HEAD_PX,
-  ONE_WAY_ARROW_HEAD_ANGLE,
-} from './oneWayArrows.js';
-import type { OneWayArrowPlacement } from './oneWayArrows.js';
+import { WorldSignageRenderer } from './worldSignageRenderer.js';
 import { sortEnvelopesByTier } from './roadTiers.js';
 import { getRoadFillColor } from '../math/roadTypes.js';
 
@@ -125,16 +105,8 @@ export class World implements IWorld {
   offset?: Point;
 
   // Road signage placement cache, invalidated by Graph.hash() changes.
-  #signageCache: {
-    hash: string;
-    labels: StreetLabelPlacement[];
-    signs: SpeedSignPlacement[];
-  } | null = null;
-  #oneWayArrowCache: { hash: string; arrows: OneWayArrowPlacement[] } | null =
-    null;
+  #signageRenderer = new WorldSignageRenderer();
   #drawOrderCache: { hash: string; envelopes: Envelope[] } | null = null;
-  #shieldCache: { hash: string; shields: RoadShieldPlacement[] } | null = null;
-  #exitSignCache: { hash: string; signs: ExitSignPlacement[] } | null = null;
 
   constructor(
     graph: Graph,
@@ -352,21 +324,21 @@ export class World implements IWorld {
       this.#drawLaneMarkings(ctx);
 
       // Draw one-way arrows
-      this.#drawOneWayArrows(ctx);
+      this.#signageRenderer.drawOneWayArrows(ctx, this.graph);
 
       // Draw bridge deck details: concrete overlay, parapet railings,
       // guardrail posts, and expansion joints.
       this.#drawBridgeDetails(ctx);
 
       // Draw road name labels
-      this.#drawRoadNames(ctx);
+      this.#signageRenderer.drawRoadNames(ctx, this.graph, this.zoom);
 
       // Draw speed limit signs
-      this.#drawSpeedLimits(ctx);
+      this.#signageRenderer.drawSpeedLimits(ctx, this.graph, this.zoom);
 
       // Draw road shield badges (ref) and gantry exit signs (destination)
-      this.#drawRoadShields(ctx);
-      this.#drawExitSigns(ctx);
+      this.#signageRenderer.drawRoadShields(ctx, this.graph, this.zoom);
+      this.#signageRenderer.drawExitSigns(ctx, this.graph, this.zoom);
     }
 
     // Draw road markings (yield, stop, start, crosswalks, lights)
@@ -470,46 +442,6 @@ export class World implements IWorld {
     }
   }
 
-  /** Draw one-way direction arrows from cached chain-aware placements. */
-  #drawOneWayArrows(ctx: CanvasRenderingContext2D): void {
-    const arrows = this.#getOneWayArrows();
-    const totalLen = ONE_WAY_ARROW_SHAFT_PX + ONE_WAY_ARROW_HEAD_PX;
-    const originalLineCap = ctx.lineCap;
-    const originalLineWidth = ctx.lineWidth;
-    ctx.strokeStyle = 'white';
-    ctx.fillStyle = 'white';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'butt';
-    for (const arrow of arrows) {
-      const tip = new Point(arrow.x, arrow.y);
-      const back = new Point(-Math.cos(arrow.angle), -Math.sin(arrow.angle));
-      const shaftStart = add(tip, scale(back, totalLen));
-      const headBase = add(tip, scale(back, ONE_WAY_ARROW_HEAD_PX));
-      const wing1 = add(
-        tip,
-        scale(rotate(back, ONE_WAY_ARROW_HEAD_ANGLE), ONE_WAY_ARROW_HEAD_PX),
-      );
-      const wing2 = add(
-        tip,
-        scale(rotate(back, -ONE_WAY_ARROW_HEAD_ANGLE), ONE_WAY_ARROW_HEAD_PX),
-      );
-      // Shaft
-      ctx.beginPath();
-      ctx.moveTo(shaftStart.x, shaftStart.y);
-      ctx.lineTo(headBase.x, headBase.y);
-      ctx.stroke();
-      // Filled triangular head (same geometry as the old triangle)
-      ctx.beginPath();
-      ctx.moveTo(wing1.x, wing1.y);
-      ctx.lineTo(tip.x, tip.y);
-      ctx.lineTo(wing2.x, wing2.y);
-      ctx.closePath();
-      ctx.fill();
-    }
-    ctx.lineCap = originalLineCap;
-    ctx.lineWidth = originalLineWidth;
-  }
-
   #drawMultiLaneDividers(
     ctx: CanvasRenderingContext2D,
     seg: Segment,
@@ -554,24 +486,9 @@ export class World implements IWorld {
   }
 
   /**
-   * Street-label and speed-sign placements, recomputed only when the graph
-   * (geometry or name/maxSpeed metadata) changes, as detected by its hash.
+   * Tier-sorted envelopes, recomputed only when the graph changes, as
+   * detected by its hash. Higher-class roads paint on top at overlaps.
    */
-  #getSignage(): {
-    labels: StreetLabelPlacement[];
-    signs: SpeedSignPlacement[];
-  } {
-    const hash = this.graph.hash();
-    if (!this.#signageCache || this.#signageCache.hash !== hash) {
-      const signs = computeSpeedSignPlacements(this.graph);
-      const labels = computeStreetLabelPlacements(this.graph.segments, {
-        avoid: signs,
-      });
-      this.#signageCache = { hash, labels, signs };
-    }
-    return this.#signageCache;
-  }
-
   #getDrawOrderedEnvelopes(): Envelope[] {
     const hash = this.graph.hash();
     if (!this.#drawOrderCache || this.#drawOrderCache.hash !== hash) {
@@ -581,39 +498,6 @@ export class World implements IWorld {
       };
     }
     return this.#drawOrderCache.envelopes;
-  }
-
-  #getOneWayArrows(): OneWayArrowPlacement[] {
-    const hash = this.graph.hash();
-    if (!this.#oneWayArrowCache || this.#oneWayArrowCache.hash !== hash) {
-      this.#oneWayArrowCache = {
-        hash,
-        arrows: computeOneWayArrowPlacements(this.graph),
-      };
-    }
-    return this.#oneWayArrowCache.arrows;
-  }
-
-  #getRoadShields(): RoadShieldPlacement[] {
-    const hash = this.graph.hash();
-    if (!this.#shieldCache || this.#shieldCache.hash !== hash) {
-      this.#shieldCache = {
-        hash,
-        shields: computeRoadShieldPlacements(this.graph),
-      };
-    }
-    return this.#shieldCache.shields;
-  }
-
-  #getExitSigns(): ExitSignPlacement[] {
-    const hash = this.graph.hash();
-    if (!this.#exitSignCache || this.#exitSignCache.hash !== hash) {
-      this.#exitSignCache = {
-        hash,
-        signs: computeExitSignPlacements(this.graph),
-      };
-    }
-    return this.#exitSignCache.signs;
   }
 
   /**
@@ -756,179 +640,6 @@ export class World implements IWorld {
         ctx.lineTo(mid.x + jointOffset.x, mid.y + jointOffset.y);
         ctx.stroke();
       }
-    }
-  }
-
-  /** Draws road-shield badges (route refs) along named routes. */
-  #drawRoadShields(ctx: CanvasRenderingContext2D): void {
-    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
-
-    const W = 40;
-    const H = 24;
-    const R = 6;
-
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    for (const s of this.#getRoadShields()) {
-      const type = s.highwayType ?? '';
-      const blue =
-        type === 'motorway' ||
-        type === 'motorway_link' ||
-        type === 'trunk' ||
-        type === 'trunk_link';
-      const bordered =
-        type === 'primary' ||
-        type === 'primary_link' ||
-        type === 'secondary' ||
-        type === 'secondary_link';
-
-      ctx.save();
-      ctx.translate(s.x, s.y);
-      ctx.rotate(s.angle);
-
-      // Rounded rectangle badge.
-      ctx.beginPath();
-      const x0 = -W / 2;
-      const y0 = -H / 2;
-      ctx.moveTo(x0 + R, y0);
-      ctx.arcTo(x0 + W, y0, x0 + W, y0 + H, R);
-      ctx.arcTo(x0 + W, y0 + H, x0, y0 + H, R);
-      ctx.arcTo(x0, y0 + H, x0, y0, R);
-      ctx.arcTo(x0, y0, x0 + W, y0, R);
-      ctx.closePath();
-      ctx.fillStyle = blue ? '#2B6CB0' : 'white';
-      ctx.fill();
-      if (bordered) {
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-
-      ctx.fillStyle = blue ? 'white' : 'black';
-      ctx.fillText(s.ref, 0, 0);
-      ctx.restore();
-    }
-  }
-
-  /** Draws gantry-style green exit signs on `_link` roads. */
-  #drawExitSigns(ctx: CanvasRenderingContext2D): void {
-    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
-
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    for (const s of this.#getExitSigns()) {
-      const dests = s.destination
-        .split(';')
-        .map((d) => d.trim())
-        .filter(Boolean);
-      const padX = 8;
-      const lineH = 16;
-      const H = Math.max(28, dests.length * lineH + 8);
-      const maxTextW = Math.max(
-        ...dests.map((d) => ctx.measureText(d).width),
-        40,
-      );
-      const labelW = s.destinationRef
-        ? ctx.measureText(s.destinationRef).width + 8
-        : 0;
-      const W = maxTextW + padX * 2 + labelW;
-      const R = 6;
-
-      ctx.save();
-      ctx.translate(s.x, s.y);
-      ctx.rotate(s.angle);
-
-      const x0 = -W / 2;
-      const y0 = -H / 2;
-      ctx.beginPath();
-      ctx.moveTo(x0 + R, y0);
-      ctx.arcTo(x0 + W, y0, x0 + W, y0 + H, R);
-      ctx.arcTo(x0 + W, y0 + H, x0, y0 + H, R);
-      ctx.arcTo(x0, y0 + H, x0, y0, R);
-      ctx.arcTo(x0, y0, x0 + W, y0, R);
-      ctx.closePath();
-      ctx.fillStyle = '#1B7A3D';
-      ctx.fill();
-
-      // Optional exit-ref badge on the left side.
-      let textX = 0;
-      if (s.destinationRef) {
-        const badgeW = labelW;
-        const bx0 = x0 + 2;
-        ctx.beginPath();
-        ctx.moveTo(bx0 + R, y0 + 2);
-        ctx.arcTo(bx0 + badgeW, y0 + 2, bx0 + badgeW, y0 + H - 2, R);
-        ctx.arcTo(bx0 + badgeW, y0 + H - 2, bx0, y0 + H - 2, R);
-        ctx.arcTo(bx0, y0 + H - 2, bx0, y0 + 2, R);
-        ctx.arcTo(bx0, y0 + 2, bx0 + badgeW, y0 + 2, R);
-        ctx.closePath();
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.fillStyle = '#1B7A3D';
-        ctx.fillText(s.destinationRef, bx0 + badgeW / 2, 0);
-        // Shift the main destinations column to the right of the badge.
-        textX = bx0 + badgeW + (W - badgeW) / 2;
-      }
-
-      ctx.fillStyle = 'white';
-      const totalTextH = dests.length * lineH;
-      let ty = -totalTextH / 2 + lineH / 2;
-      for (const d of dests) {
-        ctx.fillText(d, textX, ty);
-        ty += lineH;
-      }
-      ctx.restore();
-    }
-  }
-
-  #drawRoadNames(ctx: CanvasRenderingContext2D): void {
-    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
-
-    ctx.font = '14px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    for (const label of this.#getSignage().labels) {
-      ctx.save();
-      ctx.translate(label.x, label.y);
-      ctx.rotate(label.angle);
-
-      const textWidth = ctx.measureText(label.name).width;
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      ctx.fillRect(-textWidth / 2 - 4, -10, textWidth + 8, 20);
-
-      ctx.fillStyle = 'white';
-      ctx.fillText(label.name, 0, 0);
-      ctx.restore();
-    }
-  }
-
-  /** Draws speed limit signs (red-ringed circle with number) at changes. */
-  #drawSpeedLimits(ctx: CanvasRenderingContext2D): void {
-    if (!this.zoom || this.zoom < MIN_SIGNAGE_ZOOM) return;
-
-    const signRadius = 16;
-
-    for (const sign of this.#getSignage().signs) {
-      // Draw red ring
-      ctx.beginPath();
-      ctx.arc(sign.x, sign.y, signRadius, 0, Math.PI * 2);
-      ctx.fillStyle = 'white';
-      ctx.fill();
-      ctx.strokeStyle = '#D4242B';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      // Draw speed number
-      ctx.fillStyle = '#222';
-      ctx.font = 'bold 14px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(String(sign.maxSpeed), sign.x, sign.y);
     }
   }
 }

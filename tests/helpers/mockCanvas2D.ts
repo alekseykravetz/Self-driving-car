@@ -40,6 +40,7 @@ export function mockCanvas2D(): CanvasMockContext {
     fill: (...a: unknown[]) => calls.push({ method: 'fill', args: a }),
     stroke: (...a: unknown[]) => calls.push({ method: 'stroke', args: a }),
     arc: (...a: unknown[]) => calls.push({ method: 'arc', args: a }),
+    arcTo: (...a: unknown[]) => calls.push({ method: 'arcTo', args: a }),
     save: (...a: unknown[]) => calls.push({ method: 'save', args: a }),
     restore: (...a: unknown[]) => calls.push({ method: 'restore', args: a }),
     translate: (...a: unknown[]) =>
