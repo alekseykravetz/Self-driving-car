@@ -594,6 +594,51 @@ The matching renderer (`ts/rendering/heatmapRenderer.ts`) lives in
 
 ---
 
+## Owner Grid — tree placement (`ts/world/generation/worldGenerator.ts`)
+
+A fourth member of the spatial-grid family, private to world generation. Tree
+placement (`wgGenerateTrees`) rejects a candidate point if it is inside/near an
+illegal polygon (buildings + road envelopes), too close to an already-placed
+tree, or "in the middle of nowhere" (no polygon within `treeSize * 2`).
+Previously each check scanned **every** illegal polygon with
+`Polygon.distanceToPoint` (itself O(edges)), making generation
+O(candidates × polygons × edges) — on large imported OSM maps this froze the
+browser for minutes.
+
+`OwnerGrid` fixes it by indexing cells → **owner ids** instead of segments:
+
+```typescript
+class OwnerGrid {
+  constructor(cellSize: number);
+  insertBounds(minX, minY, maxX, maxY, id: number): void; // rasterize a bbox
+  insertPoint(x, y, id: number): void; // point owner (placed tree)
+  query(x, y, radius): number[]; // unique owner ids in the square region
+}
+```
+
+- Illegal-polygon **edges** are bucketed once up front, tagged with their
+  polygon index; placed **trees** go in a second `OwnerGrid` as point owners.
+- Each candidate calls `query()` with `radius = treeSize * 2` (the widest check)
+  and runs the exact `containsPoint`/`distanceToPoint`/tree-distance tests on
+  only the returned owners.
+- Same allocation-free dedup as `SpatialHashGrid` — an `Int32Array` of per-id
+  stamps compared against a monotonic `queryId`. The stamp buffer grows by
+  doubling as the tree index accumulates owners, keeping reallocation amortized
+  O(1).
+
+**Why not reuse `SpatialHashGrid`?** That grid maps cells → **segments** and its
+`query()` returns the raw `[Point, Point]` edges — it has no notion of an owner,
+so it cannot tell which polygon an edge belongs to (yielding duplicate hits per
+polygon) and cannot index points (placed trees). `OwnerGrid` is the same uniform
+hash-grid + stamp-dedup technique generalized to return **owner ids**, so a
+candidate can map nearby edges back to whole polygons and dedup by owner.
+
+The result set is behaviour-preserving for all realistic geometry: any point
+that matters to the inside/near/close checks has a polygon edge within
+`treeSize * 2`, so it is always inside the queried neighbourhood.
+
+---
+
 ## OSM Importer (`ts/math/osm-importer/osm.ts`)
 
 Converts OpenStreetMap JSON data (from Overpass API) into the project's Point/Segment format for creating real-world road networks.
