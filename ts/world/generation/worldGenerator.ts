@@ -186,6 +186,97 @@ function wgGenerateBuildings(world: WorldGeneratable): Building[] {
   return bases.map((b) => new Building(b));
 }
 
+/**
+ * Uniform spatial index mapping grid cells to owner ids (polygon or placed-tree
+ * indices). Tree placement previously tested every candidate point against
+ * *every* illegal polygon (buildings + road envelopes) with `distanceToPoint`,
+ * which is O(candidates × polygons × edges) — on large imported OSM maps this
+ * froze the browser for minutes. This index lets each candidate inspect only
+ * the owners whose bounding box lands in nearby cells.
+ */
+class OwnerGrid {
+  #cellSize: number;
+  #cells = new Map<string, number[]>();
+  #stamps: Int32Array = new Int32Array(0);
+  #queryId = 0;
+  #maxId = -1;
+
+  constructor(cellSize: number) {
+    this.#cellSize = cellSize > 0 ? cellSize : 1;
+  }
+
+  #coord(v: number): number {
+    return Math.floor(v / this.#cellSize);
+  }
+
+  #key(cx: number, cy: number): string {
+    return cx + ',' + cy;
+  }
+
+  /** Register an owner id in every cell its bounding box overlaps. */
+  insertBounds(
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number,
+    id: number,
+  ): void {
+    if (id > this.#maxId) this.#maxId = id;
+    const minCx = this.#coord(minX);
+    const maxCx = this.#coord(maxX);
+    const minCy = this.#coord(minY);
+    const maxCy = this.#coord(maxY);
+    for (let cx = minCx; cx <= maxCx; cx++) {
+      for (let cy = minCy; cy <= maxCy; cy++) {
+        const key = this.#key(cx, cy);
+        const bucket = this.#cells.get(key);
+        if (bucket) {
+          // Same owner's consecutive edges often land in one cell; cheap dedup.
+          if (bucket[bucket.length - 1] !== id) bucket.push(id);
+        } else {
+          this.#cells.set(key, [id]);
+        }
+      }
+    }
+  }
+
+  insertPoint(x: number, y: number, id: number): void {
+    this.insertBounds(x, y, x, y, id);
+  }
+
+  /** Unique owner ids in any cell within the square of half-width `radius`. */
+  query(x: number, y: number, radius: number): number[] {
+    if (this.#stamps.length <= this.#maxId) {
+      // Doubling growth keeps stamp reallocation amortized O(1) as the tree
+      // index accumulates owners one insert at a time.
+      const cap = Math.max(this.#maxId + 1, this.#stamps.length * 2, 16);
+      this.#stamps = new Int32Array(cap);
+      this.#queryId = 0;
+    }
+    const minCx = this.#coord(x - radius);
+    const maxCx = this.#coord(x + radius);
+    const minCy = this.#coord(y - radius);
+    const maxCy = this.#coord(y + radius);
+    const result: number[] = [];
+    const queryId = ++this.#queryId;
+    const stamps = this.#stamps;
+    for (let cx = minCx; cx <= maxCx; cx++) {
+      for (let cy = minCy; cy <= maxCy; cy++) {
+        const bucket = this.#cells.get(this.#key(cx, cy));
+        if (!bucket) continue;
+        for (let i = 0; i < bucket.length; i++) {
+          const id = bucket[i];
+          if (stamps[id] !== queryId) {
+            stamps[id] = queryId;
+            result.push(id);
+          }
+        }
+      }
+    }
+    return result;
+  }
+}
+
 function wgGenerateTrees(world: WorldGeneratable): Tree[] {
   const points = [
     ...world.roadBorders.map((s) => [s.p1, s.p2]).flat(),
@@ -203,6 +294,27 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
     ...world.envelopes.map((e) => e.polygon),
   ];
 
+  // Spatial index over illegal-polygon edges so each candidate only tests the
+  // handful of polygons near it. Query radius is treeSize*2 (the widest check
+  // below), so the cell size is sized to keep that query to a small neighbourhood.
+  const queryRadius = world.treeSize * 2;
+  const polyGrid = new OwnerGrid(Math.max(world.treeSize, 1));
+  for (let pi = 0; pi < illegalPolygons.length; pi++) {
+    for (const s of illegalPolygons[pi].segments) {
+      polyGrid.insertBounds(
+        Math.min(s.p1.x, s.p2.x),
+        Math.min(s.p1.y, s.p2.y),
+        Math.max(s.p1.x, s.p2.x),
+        Math.max(s.p1.y, s.p2.y),
+        pi,
+      );
+    }
+  }
+
+  // Separate index for placed trees so the too-close check stays near-O(1)
+  // instead of scanning every previously placed tree.
+  const treeGrid = new OwnerGrid(Math.max(world.treeSize, 1));
+
   // Reproducible prototype set + a seeded RNG so instance variants/scales/types
   // are deterministic for a given world seed.
   const prototypes = world.treePrototypes;
@@ -216,9 +328,14 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
       lerp(bottom, top, Math.random()),
     );
 
+    // Only polygons with an edge within treeSize*2 of the candidate can affect
+    // any of the checks below (inside/near/close), so gather them once.
+    const nearbyPolys = polyGrid.query(p.x, p.y, queryRadius);
+
     // check if tree inside or nearby building / road
     let keep = true;
-    for (const poly of illegalPolygons) {
+    for (const pi of nearbyPolys) {
+      const poly = illegalPolygons[pi];
       if (
         poly.containsPoint(p) ||
         poly.distanceToPoint(p) < world.treeSize / 2
@@ -230,8 +347,9 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
 
     // check if tree too close to other trees
     if (keep) {
-      for (const tree of trees) {
-        if (distance(tree.center, p) < world.treeSize) {
+      const nearbyTrees = treeGrid.query(p.x, p.y, world.treeSize);
+      for (const ti of nearbyTrees) {
+        if (distance(trees[ti].center, p) < world.treeSize) {
           keep = false;
           break;
         }
@@ -241,8 +359,8 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
     // avoiding trees in the middle of nowhere
     if (keep) {
       let closeToSomething = false;
-      for (const poly of illegalPolygons) {
-        if (poly.distanceToPoint(p) < world.treeSize * 2) {
+      for (const pi of nearbyPolys) {
+        if (illegalPolygons[pi].distanceToPoint(p) < world.treeSize * 2) {
           closeToSomething = true;
           break;
         }
@@ -254,6 +372,7 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
       const protoIndex = Math.floor(rand() * prototypes.length);
       const type = wgPickTreeType(rand());
       const scale = lerp(0.8, 1.2, rand());
+      treeGrid.insertPoint(p.x, p.y, trees.length);
       trees.push(
         new Tree(
           p,
