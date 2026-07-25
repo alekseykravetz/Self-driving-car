@@ -6,6 +6,14 @@ const VIDEO_DOWNSCALE_FACTOR = 4;
 const REVERSE_SIZE_RATIO = 0.8;
 const FORWARD_SIZE_RATIO = 1.2;
 
+interface DetectionOverlay {
+  wheelCenter: Point;
+  wheelRadius: number;
+  forward: boolean;
+  reverse: boolean;
+  centroids: Point[];
+}
+
 export class CameraControls {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -91,7 +99,10 @@ export class CameraControls {
     console.log('Expected marker size saved:', this.expectedSize);
   }
 
-  #processMarkers(result: { leftMarker: Marker; rightMarker: Marker }): void {
+  #processMarkers(result: {
+    leftMarker: Marker;
+    rightMarker: Marker;
+  }): DetectionOverlay {
     const { leftMarker, rightMarker } = result;
 
     // Calculate tilt angle based on marker centroids
@@ -125,25 +136,37 @@ export class CameraControls {
       }
     }
 
-    // --- Drawing (optional visualization) ---
+    // Compute overlay geometry (rendered separately in #drawDetectionOverlay)
     const wheelCenter = average(
       leftMarker.centroid as Point,
       rightMarker.centroid as Point,
     );
     const wheelRadius = distance(wheelCenter, leftMarker.centroid as Point);
 
+    return {
+      wheelCenter,
+      wheelRadius,
+      forward: this.forward,
+      reverse: this.reverse,
+      centroids: [leftMarker.centroid as Point, rightMarker.centroid as Point],
+    };
+  }
+
+  #drawDetectionOverlay(overlay: DetectionOverlay): void {
+    const { wheelCenter, wheelRadius, forward, reverse, centroids } = overlay;
+
     this.ctx.beginPath();
-    this.ctx.fillStyle = this.forward ? 'blue' : this.reverse ? 'red' : 'gray'; // Indicate forward/reverse state
+    this.ctx.fillStyle = forward ? 'blue' : reverse ? 'red' : 'gray'; // Indicate forward/reverse state
     this.ctx.arc(wheelCenter.x, wheelCenter.y, wheelRadius, 0, 2 * Math.PI);
     this.ctx.fill();
 
     // Optionally draw detected marker points/centroids for debugging
     this.ctx.fillStyle = 'lime';
-    [leftMarker, rightMarker].forEach((marker) => {
+    for (const centroid of centroids) {
       this.ctx.beginPath();
-      this.ctx.arc(marker.centroid.x, marker.centroid.y, 5, 0, 2 * Math.PI);
+      this.ctx.arc(centroid.x, centroid.y, 5, 0, 2 * Math.PI);
       this.ctx.fill();
-    });
+    }
   }
 
   #loop(): void {
@@ -172,7 +195,8 @@ export class CameraControls {
     const result = this.markerDetector.detect(imageData);
 
     if (result) {
-      this.#processMarkers(result);
+      const overlay = this.#processMarkers(result);
+      this.#drawDetectionOverlay(overlay);
 
       // --- Visualization on temp canvas (shows only detected marker pixels) ---
       const tempData = this.tempCtx.createImageData(
