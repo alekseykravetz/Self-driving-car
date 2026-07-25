@@ -10,7 +10,7 @@
   max-width: 200px;
   width: 200px;
   flex-shrink: 0;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   order: 20;
@@ -203,7 +203,7 @@ human-training-panel #trainingManagerPanel {
   max-width: 200px;
   width: 200px;
   flex-shrink: 0;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   order: 20;

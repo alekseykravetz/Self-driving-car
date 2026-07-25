@@ -52,11 +52,19 @@ export function resizeSimulatorLayout(
   const { showCamera, showNetwork, showMiniMap, layoutMode } = panelState;
 
   // ── Batch all layout reads first ──
+  // Use documentElement.clientWidth as the source of truth: it reports the real
+  // *visible* layout width (scrollbar excluded) consistently across iOS and
+  // Android. `#simulatorLayout` is sized with `width: 100%` (not `100vw`) so its
+  // clientWidth matches — but on Android `100vw`/`innerWidth` can round a few px
+  // wider than the visible area, which previously overflowed the rightmost
+  // training panel off-screen (clipped by `overflow: hidden`). Floor to stay
+  // conservative and never over-allocate canvas width.
   const layoutEl = document.getElementById('simulatorLayout');
-  const viewportWidth =
-    layoutEl?.clientWidth ||
+  const viewportWidth = Math.floor(
     document.documentElement.clientWidth ||
-    window.innerWidth;
+      layoutEl?.clientWidth ||
+      window.innerWidth,
+  );
 
   const controlPanelEl =
     document.getElementById('trainingManagerPanel') ??
@@ -102,7 +110,7 @@ export function resizeSimulatorLayout(
   const networkPanelWidth = showNetwork ? LAYOUT_NETWORK_PANEL_WIDTH : 0;
   usedWidth += networkPanelWidth;
 
-  const availableWidth = Math.floor(viewportWidth - usedWidth);
+  const availableWidth = Math.max(0, Math.floor(viewportWidth - usedWidth));
 
   // ── Batch all DOM writes ──
   const rightPanel = document.getElementById('rightPanel');
