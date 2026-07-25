@@ -344,15 +344,3 @@ export class Level {
     return level.outputs;
   }
 }
-
-// Example Usage (Optional):
-/*
-const nn = new NeuralNetwork([2, 3, 1]); // 2 input neurons, 3 hidden, 1 output
-const inputs = [0.5, -0.2];
-const outputs = NeuralNetwork.feedForward(inputs, nn);
-console.log(outputs); // Output: e.g., [1] or [0]
-
-NeuralNetwork.mutate(nn, 0.1); // Mutate the network slightly
-const mutatedOutputs = NeuralNetwork.feedForward(inputs, nn);
-console.log(mutatedOutputs);
-*/
