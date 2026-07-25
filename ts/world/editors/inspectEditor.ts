@@ -116,16 +116,21 @@ export class InspectEditor {
   }
 
   display(): void {
+    const ctx = this.#ctx;
+    ctx.save();
+    // The world editor draws all editors under a reduced globalAlpha (0.2 in
+    // non-graph modes) so marking-placement PREVIEWS look translucent. The
+    // inspect tool shows an actual selection, not a preview, so force full
+    // opacity here.
+    ctx.globalAlpha = 1;
     if (this.#hoveredSegment) {
-      drawSegment(this.#ctx, this.#hoveredSegment, {
+      drawSegment(ctx, this.#hoveredSegment, {
         color: 'yellow',
         width: 4,
       });
     }
     if (this.#selectedSegment) {
       const seg = this.#selectedSegment;
-      const ctx = this.#ctx;
-      ctx.save();
       // Soft, low-opacity halo so the selection reads without washing the
       // segment out.
       drawSegment(ctx, seg, {
@@ -156,7 +161,7 @@ export class InspectEditor {
         ctx.fill();
         ctx.stroke();
       }
-      ctx.restore();
     }
+    ctx.restore();
   }
 }

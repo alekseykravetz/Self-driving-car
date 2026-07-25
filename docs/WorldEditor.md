@@ -1022,8 +1022,12 @@ panels:
   button through `EditorToolbarElement.highlightMode()` (which does not re-fire
   the mode-change listener). **Inspect** mode (`EditorType 'inspect'`) lets
   you click an existing segment to view and edit its metadata in the panel; the
-  selected segment is drawn with an amber glow, a bright core line, and endpoint
-  dots for high visibility. Active
+  selected segment is drawn with a soft halo, a dark casing, a bright yellow
+  core line, and endpoint dots for high visibility. `InspectEditor.display()`
+  forces `globalAlpha = 1` (inside a `save`/`restore`) so the selection is fully
+  opaque — the world editor otherwise draws all editors at a reduced alpha
+  (0.5 graph / 0.2 other modes) intended for translucent marking-placement
+  previews. Active
   state is driven by CSS `.active` class instead of inline style mutations in
   `WorldEditor`.
 
