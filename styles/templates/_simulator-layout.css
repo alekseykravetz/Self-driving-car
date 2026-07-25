@@ -48,11 +48,11 @@
   outline: var(--space-0\.5) solid var(--color-bg-dark);
 }
 
-min-width: 0;
 #cameraCanvas {
   background-image: linear-gradient(var(--color-accent-sky), white 70%);
   display: block;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 #topControls .file-input-label {
