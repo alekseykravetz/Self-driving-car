@@ -9,6 +9,7 @@ import {
   type CarDrawData,
 } from './rendering/carRenderer.js';
 import { CarBrainAdapter, type Brain } from './brain/carBrainAdapter.js';
+import { CarLearningManager } from './brain/carLearningManager.js';
 import {
   STEERING_SPEED,
   DEFAULT_CAR_CONFIG,
@@ -99,33 +100,7 @@ export class Car {
 
   #learningFromHuman: boolean = false;
   #autopilot: boolean = false;
-  #learningRate: number = 0.1;
-  #lastBrainOutput: {
-    forward: boolean;
-    left: boolean;
-    right: boolean;
-    reverse: boolean;
-  } = {
-    forward: false,
-    left: false,
-    right: false,
-    reverse: false,
-  };
-  #brainChangedThisFrame: boolean = false;
-
-  #replayBuffer: {
-    inputs: number[];
-    targets: number[];
-    isTurn: boolean;
-  }[] = [];
-  #replayBufferMaxSize: number = 4096;
-  #batchSize: number = 16;
-  #prevControlState: {
-    forward: boolean;
-    left: boolean;
-    right: boolean;
-    reverse: boolean;
-  } | null = null;
+  #learning: CarLearningManager = new CarLearningManager();
 
   constructor(opts: CarOptions) {
     this.x = opts.x;
@@ -306,7 +281,7 @@ export class Car {
     trafficControls?: SensorTrafficControl[],
     otherCars?: Point[][],
   ): void {
-    this.#brainChangedThisFrame = false;
+    this.#learning.resetFrame();
     if (this.sensor && this.brain) {
       this.sensor.update(
         this.x,
@@ -324,7 +299,7 @@ export class Car {
         this.sensor.sensorReadings,
         this.sensor.stateAware,
       );
-      this.#lastBrainOutput = output;
+      this.#learning.setLastBrainOutput(output);
       if (
         (this.useBrain || this.#autopilot) &&
         this.controls instanceof Controls
@@ -351,62 +326,16 @@ export class Car {
           this.sensor.sensorReadings,
           this.sensor.stateAware,
         );
-        const targets: [number, number, number, number] = [
-          this.controls.forward ? 1 : 0,
-          this.controls.left ? 1 : 0,
-          this.controls.right ? 1 : 0,
-          this.controls.reverse ? 1 : 0,
-        ];
-
-        const prev = this.#prevControlState;
-        const isDecisionPoint =
-          prev !== null &&
-          (targets[0] !== (prev.forward ? 1 : 0) ||
-            targets[1] !== (prev.left ? 1 : 0) ||
-            targets[2] !== (prev.right ? 1 : 0) ||
-            targets[3] !== (prev.reverse ? 1 : 0));
-        this.#prevControlState = {
-          forward: this.controls.forward,
-          left: this.controls.left,
-          right: this.controls.right,
-          reverse: this.controls.reverse,
-        };
-
-        const isTurn = targets[1] === 1 || targets[2] === 1;
-        this.#replayBuffer.push({ inputs: inputVector, targets, isTurn });
-        if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
-          this.#replayBuffer.shift();
-        }
-
-        // Per-output learning rates. Turn channels (left/right) are rare
-        // relative to forward, so give them a boost even though the replay
-        // batch is class-balanced. No division by batch size — each replay
-        // sample is a full SGD step.
-        const lr = this.#learningRate;
-        const perOutputLR: [number, number, number, number] = [
-          lr,
-          lr * 1.5,
-          lr * 1.5,
-          lr,
-        ];
-
-        this.#brainChangedThisFrame = this.#trainBatch(perOutputLR);
-
-        if (isDecisionPoint) {
-          const brain = this.brain;
-          for (let i = 0; i < 3; i++) {
-            if (
-              CarBrainAdapter.trainStep(
-                brain,
-                inputVector,
-                targets,
-                perOutputLR,
-              )
-            ) {
-              this.#brainChangedThisFrame = true;
-            }
-          }
-        }
+        this.#learning.learn({
+          brain: this.brain,
+          inputs: inputVector,
+          controls: {
+            forward: this.controls.forward,
+            left: this.controls.left,
+            right: this.controls.right,
+            reverse: this.controls.reverse,
+          },
+        });
       }
     } else if (this.sensor) {
       this.sensor.update(
@@ -418,83 +347,6 @@ export class Car {
         otherCars,
       );
     }
-  }
-
-  #trainBatch(lr: [number, number, number, number]): boolean {
-    const buffer = this.#replayBuffer;
-    const brain = this.brain;
-    const bufferLen = buffer.length;
-    let changed = false;
-
-    if (bufferLen < this.#batchSize) {
-      for (let i = 0; i < bufferLen; i++) {
-        if (
-          CarBrainAdapter.trainStep(
-            brain,
-            buffer[i].inputs,
-            buffer[i].targets,
-            lr,
-          )
-        ) {
-          changed = true;
-        }
-      }
-      return changed;
-    }
-
-    const turnIdx: number[] = [];
-    const straightIdx: number[] = [];
-    for (let i = 0; i < bufferLen; i++) {
-      if (buffer[i].isTurn) turnIdx.push(i);
-      else straightIdx.push(i);
-    }
-
-    const halfBatch = this.#batchSize >> 1;
-    const selected: number[] = [];
-
-    for (let i = 0; i < halfBatch && turnIdx.length > 0; i++) {
-      selected.push(
-        turnIdx.splice(Math.floor(Math.random() * turnIdx.length), 1)[0],
-      );
-    }
-    for (
-      let i = selected.length;
-      i < this.#batchSize && straightIdx.length > 0;
-      i++
-    ) {
-      selected.push(
-        straightIdx.splice(
-          Math.floor(Math.random() * straightIdx.length),
-          1,
-        )[0],
-      );
-    }
-    while (selected.length < this.#batchSize) {
-      const idx = Math.floor(Math.random() * bufferLen);
-      if (!selected.includes(idx)) selected.push(idx);
-    }
-
-    for (let i = selected.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = selected[i];
-      selected[i] = selected[j];
-      selected[j] = tmp;
-    }
-
-    for (const idx of selected) {
-      if (
-        CarBrainAdapter.trainStep(
-          brain,
-          buffer[idx].inputs,
-          buffer[idx].targets,
-          lr,
-        )
-      ) {
-        changed = true;
-      }
-    }
-
-    return changed;
   }
 
   #syncEngine(): void {
@@ -551,15 +403,15 @@ export class Car {
   }
 
   set learningRate(v: number) {
-    this.#learningRate = v;
+    this.#learning.learningRate = v;
   }
 
   get learningRate(): number {
-    return this.#learningRate;
+    return this.#learning.learningRate;
   }
 
   setLearningRate(v: number): void {
-    this.#learningRate = v;
+    this.#learning.setLearningRate(v);
   }
 
   get lastBrainOutput(): {
@@ -568,11 +420,11 @@ export class Car {
     right: boolean;
     reverse: boolean;
   } {
-    return this.#lastBrainOutput;
+    return this.#learning.lastBrainOutput;
   }
 
   get brainChangedThisFrame(): boolean {
-    return this.#brainChangedThisFrame;
+    return this.#learning.brainChangedThisFrame;
   }
 
   respawn(startInfo: { x: number; y: number; angle: number }): void {
