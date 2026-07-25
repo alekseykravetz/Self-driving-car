@@ -1,4 +1,4 @@
-import type { ToolbarUpdater } from '../../input/keyboardManager.js';
+import type { ShortcutDef, ToolbarUpdater } from '../../input/types.js';
 import { SHORTCUTS_TOOLBAR_TEMPLATE } from './shortcutsToolbarTemplate.js';
 
 /**
@@ -21,27 +21,6 @@ import { SHORTCUTS_TOOLBAR_TEMPLATE } from './shortcutsToolbarTemplate.js';
  * the physical keys in `keys` (e.g. Ctrl for zoom, the driving keys). These
  * are informational only and never change page behavior.
  */
-export interface ShortcutDef {
-  /** DOM id for the indicator element (e.g. 'keyO', 'keyCtrl'). */
-  id: string;
-  /** Short text drawn inside the key cap (e.g. 'O', 'Ctrl', '↑'). */
-  label: string;
-  /** Tooltip describing what the shortcut does. */
-  title: string;
-  /** Group label the indicator is filed under (e.g. 'Graph', 'View'). */
-  group: string;
-  /** Whether the shortcut is a one-shot action, a sticky mode toggle, or an informational display-only key. */
-  kind: 'momentary' | 'toggle' | 'display';
-  /**
-   * When true, the toolbar lights this indicator from `keys` while the
-   * matching physical key is held. Used for informational keys (Ctrl, driving)
-   * whose behavior lives elsewhere.
-   */
-  display?: boolean;
-  /** Physical KeyboardEvent.key values (case-insensitive) for display keys. */
-  keys?: string[];
-}
-
 export class ShortcutsToolbarElement
   extends HTMLElement
   implements ToolbarUpdater

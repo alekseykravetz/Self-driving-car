@@ -1,16 +1,5 @@
-import type { ShortcutDef } from '../ui/molecules/shortcutsToolbar.js';
+import type { ShortcutDef, ToolbarUpdater } from './types.js';
 import { LatchedToggle } from '../ui/atoms/latchedToggle.js';
-
-/**
- * Interface that KeyboardManager uses to update the toolbar's visual state.
- * Decouples the atom from the concrete molecule class.
- */
-export interface ToolbarUpdater {
-  flash(key: string): void;
-  setActive(key: string, active: boolean): void;
-  setShortcuts(defs: ShortcutDef[]): void;
-  setToggleHandler(handler: (id: string) => void): void;
-}
 
 /**
  * A binding extends the visual {@link ShortcutDef} with the physical key

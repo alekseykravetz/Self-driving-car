@@ -141,5 +141,5 @@
 }
 
 .wep-clear-btn:hover {
-  color: var(--color-danger, #e05a5a);
+  color: var(--color-accent-red);
 }
