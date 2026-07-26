@@ -185,6 +185,9 @@ store-panel {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
   background: transparent;
+  /* Inline SVG icons inherit `currentColor`; without this a native button
+     falls back to black and the icon disappears on the dark panel. */
+  color: var(--color-text-primary);
   cursor: pointer;
   font-size: 0.8rem;
   transition: all var(--transition-fast);

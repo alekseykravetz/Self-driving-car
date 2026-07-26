@@ -372,9 +372,11 @@ into three layers under `ts/ui/`:
 
 **Atom-level files:**
 
-| Module             | Responsibility                                       |
-| ------------------ | ---------------------------------------------------- |
-| `latchedToggle.ts` | Held/latched state machine (replaces 4 prior copies) |
+| Module             | Responsibility                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| `latchedToggle.ts` | Held/latched state machine (replaces 4 prior copies)                                            |
+| `appIcon.ts`       | `<app-icon>` custom element — inlines registry SVG, `currentColor` + `.ic-*` animations         |
+| `iconRegistry.ts`  | Central SVG icon registry (`ICON_REGISTRY`, `IconName`) — single source of truth for every icon |
 
 > `KeyboardManager` lives in `ts/input/keyboardManager.ts` — it is a cross-cutting singleton outside the Atomic Design tree (used by both UI molecules and domain logic). See [Keyboard.md](Keyboard.md) for details.
 
@@ -388,7 +390,7 @@ into three layers under `ts/ui/`:
 
 <!-- assetSelectors.ts moved to organisms -->
 
-| `worldLayersToolbar.ts` | `<world-layers-toolbar>` | Per-layer visibility toggles + ♻️ Regenerate + 🌡️ heatmap overlay toggle |
+| `worldLayersToolbar.ts` | `<world-layers-toolbar>` | Per-layer visibility toggles + `regenerate` Regenerate + `heatmap` overlay toggle |
 | `worldLayersToolbarTemplate.ts` | — | HTML template for the layers toolbar |
 | `layoutToolbar.ts` | `<layout-toolbar>` | Layout toggle, camera/network/minimap visibility |
 | `layoutToolbarTemplate.ts` | — | HTML template for the layout toolbar |
@@ -430,7 +432,7 @@ into three layers under `ts/ui/`:
 > and `renderInterval` are owned by `<animation-loop-toolbar>` and read by
 > `SimulatorShell` — shared across both the training and Live Traffic Jam pages.
 
-> The `<world-toolbar>` also hosts the **Spawn Car** picker (🚕 dropdown), shown
+> The `<world-toolbar>` also hosts the **Spawn Car** picker (`car` dropdown), shown
 > only on the Live Traffic Jam page via `showSpawnCarPicker()`. It selects which
 > stored/loaded car configuration is painted onto the road on the next click.
 

@@ -79,7 +79,7 @@ refreshed continuously while expensive placement runs only on demand:
 
 **Lazy generation in the editor:** graph edits call only
 `generateRoads` + `reanchorMarkings` (fast); the expensive item placement is
-rebuilt exclusively via the **♻️ Regenerate items** action in the World Layers
+rebuilt exclusively via the **`regenerate` Regenerate items** action in the World Layers
 panel. When items become outdated after a graph edit, the regenerate button is
 tinted ("stale") until rebuilt.
 
@@ -90,16 +90,17 @@ tinted ("stale") until rebuilt.
 The editor's bottom "Generate" checkbox has been replaced by a floating
 `<world-layers-toolbar>` (`ts/ui/molecules/worldLayersToolbar.ts` +
 `templates/worldLayersToolbarTemplate.ts`). It gives independent **visibility**
-control over each world layer via emoji toggles, plus the ♻️ Regenerate action:
+control over each world layer via `<app-icon>` toggle buttons, plus the
+`regenerate` Regenerate action:
 
-| Emoji | Layer       | Draws                                                       |
-| ----- | ----------- | ----------------------------------------------------------- |
-| 🛣️    | `roads`     | envelopes, road borders, lane/dash/arrow/separator markings |
-| 🚦    | `markings`  | stop/yield/light/crossing/parking/start/target              |
-| 🛤️    | `corridors` | authored corridors                                          |
-| 📍    | `itemBases` | flat building footprints + tree base circles (placeholders) |
-| 🌳    | `trees`     | rendered pseudo-3D trees                                    |
-| 🏢    | `buildings` | rendered pseudo-3D buildings                                |
+| Icon (`<app-icon>`) | Layer       | Draws                                                       |
+| ------------------- | ----------- | ----------------------------------------------------------- |
+| `road`              | `roads`     | envelopes, road borders, lane/dash/arrow/separator markings |
+| `traffic-light`     | `markings`  | stop/yield/light/crossing/parking/start/target              |
+| `corridor`          | `corridors` | authored corridors                                          |
+| `pin`               | `itemBases` | flat building footprints + tree base circles (placeholders) |
+| `tree`              | `trees`     | rendered pseudo-3D trees                                    |
+| `building`          | `buildings` | rendered pseudo-3D buildings                                |
 
 - Visibility is a **local editor preference** persisted to `localStorage` under
   `editor:worldLayers` — it is **not** saved into the world file.
@@ -113,11 +114,11 @@ control over each world layer via emoji toggles, plus the ♻️ Regenerate acti
   (world/simulator/race/traffic pages).
 - The same `<world-layers-toolbar>` is reused by the **training** and **traffic**
   simulators (not race). There, shared handling lives in `SimulatorShell`
-  (persisted under `sim:worldLayers`, the ♻️ Items group hidden via
+  (persisted under `sim:worldLayers`, the `regenerate` Items group hidden via
   `hideItems()`), and hiding `trees`/`buildings` applies to **both** the
   top-down 2D view (`world.draw` `layers`) and the 3D camera view
   (`camera.render` `showTrees`/`showBuildings`).
-- The toolbar also hosts an **"Overlays"** group with a 🌡️ **traffic congestion
+- The toolbar also hosts an **"Overlays"** group with a `heatmap` **traffic congestion
   heatmap** toggle, used only by the simulators. The editor calls
   `hideOverlays()` to hide the group (it has no live traffic to record). See
   [Simulators → Spatial Congestion Heatmap](Simulators.md#spatial-congestion-heatmap-tsmathheatmapgridts--tsrenderingheatmaprendererts).
@@ -1014,10 +1015,12 @@ panels:
   bindings still route through `KeyboardManager` but are marked `hidden: true` so
   they no longer render in the shortcuts toolbar.
 - **`<editor-toolbar>`** (bottom-center, from `ts/ui/molecules/editorToolbar.ts`): custom element
-  wrapping the editor-mode buttons. Order: **Graph** 🌐 and **Inspect** 🔍
-  (separator), then the marking editors — **Marking** 🔲, **Start** 🚙,
-  **Target** 🎯, **Stop** 🛑, **Crossing** 🚶, **Yield** ⚠️, **Parking** 🅿️,
-  **Light** 🚦, **Corridor** 🛤️. The **Graph** and **Inspect** modes also have
+  wrapping the editor-mode buttons, each rendered with an `<app-icon>`. Order:
+  **Graph** (`graph`) and **Inspect** (`inspect`) (separator), then the marking
+  editors — **Marking** (`marking`), **Start** (`car`), **Target** (`target`),
+  **Stop** (`stop`), **Crossing** (`crossing`), **Yield** (`yield`), **Parking**
+  (`parking`), **Light** (`traffic-light`), **Corridor** (`corridor`). The
+  **Graph** and **Inspect** modes also have
   keyboard shortcuts (`G` / `I`); switching via shortcut updates the active
   button through `EditorToolbarElement.highlightMode()` (which does not re-fire
   the mode-change listener). **Inspect** mode (`EditorType 'inspect'`) lets

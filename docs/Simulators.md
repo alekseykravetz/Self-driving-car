@@ -43,7 +43,7 @@ abstract class SimulatorShell {
   // Shared helpers
   protected resizeLayout(): void;                       // responsive multi-panel resize
   protected drawNetworkVisualizer(time, brain): void;   // gated by the visualizer toggle
-  recordHeatmap(cars: Car[]): void;                     // gated by the 🌡️ overlay toggle (no-op when off)
+  recordHeatmap(cars: Car[]): void;                     // gated by the `heatmap` overlay toggle (no-op when off)
   drawHeatmap(viewPoint: { x: number; y: number }): void; // viewport-culled colour overlay
   resetHeatmap(): void;                                 // clear counters (restart / world change / toggle off)
   protected animate(time: number): void;                // render-throttled RAF loop
@@ -765,7 +765,7 @@ drawHeatmap(viewPoint: { x: number; y: number }): void; // call from subclass dr
 resetHeatmap(): void;                                   // call on restart / world change
 ```
 
-`heatmapVisible` is a shell field kept in sync with the 🌡️ toggle on the
+`heatmapVisible` is a shell field kept in sync with the `heatmap` toggle on the
 `<world-layers-toolbar>` "Overlays" group via
 `setHeatmapChangeListener`. Toggling off also calls `resetHeatmap()`.
 
@@ -865,7 +865,7 @@ weave around each other and crash.
 
 ### Access
 
-Navigate to `/html/traffic` (or click "Live Traffic Jam" 🚦 on the landing page).
+Navigate to `/html/traffic` (or click the "Live Traffic Jam" `traffic-light` card on the landing page).
 
 ### Architecture
 
@@ -1011,8 +1011,8 @@ teacher.
 ### Access
 
 Navigate to `/html/human-training` (Full World) or
-`/html/human-training?mode=simple` (Simple Road), or click "Human
-Backpropagation" 🎓 on the landing page.
+`/html/human-training?mode=simple` (Simple Road), or click the "Human
+Backpropagation" `graduation` card on the landing page.
 
 ### Architecture
 

@@ -30,6 +30,11 @@ body {
 
 body:not(.main-page) {
   background: var(--color-body-bg);
+  /* App pages sit on dark surfaces — default text (and inline-SVG icons that
+     inherit `currentColor`) to the primary light colour. Without this the body
+     falls back to the UA default (black), making decorative icon holders such
+     as `.stat-emoji` invisible on the dark panels. */
+  color: var(--color-text-primary);
   overflow: hidden;
   display: flex;
   justify-content: center;

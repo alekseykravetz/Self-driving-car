@@ -10,14 +10,14 @@ A dark, data-dense simulator environment that prioritizes clarity and legibility
 
 The canvas is the hero: a bright green-grass road surface (`#2a5`) where grey asphalt roads, white lane markings, and colored traffic elements create a clean, schematic viewport. Cars render as simple colored polygons with name labels, sensor rays glow yellow, and the neural network visualizer pulses beside the driving view. The aesthetic is intentionally hand-rolled — no WebGL, no Three.js, just Canvas 2D with filled polygons and matrix transforms. This "from scratch" quality is part of the identity: the UI signals that everything visible is something you could build yourself.
 
-Emoji icons replace SVG iconography throughout — a design choice that gives the interface an informal, accessible character. Floating toolbars with subtly rounded corners and thin white borders (`1px solid rgba(255,255,255,0.15)`) hover over the canvas, while side panels dock at fixed widths (200px controls, 300px network view). The typographic palette is minimal: Arial for labels, monospace for data, and Inter for the landing page.
+A custom line-icon set (`<app-icon>`, rendered from an inline SVG registry) provides all iconography — a coherent, monochrome, animated set that inherits the surrounding text colour on the dark panels. Floating toolbars with subtly rounded corners and thin white borders (`1px solid rgba(255,255,255,0.15)`) hover over the canvas, while side panels dock at fixed widths (200px controls, 300px network view). The typographic palette is minimal: Arial for labels, monospace for data, and Inter for the landing page.
 
 **Key Characteristics:**
 
 - Dark, near-black backgrounds (`#0f0f14`, `#000`) with semi-transparent UI overlays
 - Green grass road canvas (`#2a5`) as the primary bright color area
 - Hand-rolled Canvas 2D rendering — educational, schematic, from-scratch aesthetic
-- Emoji icons instead of SVG — informal and accessible
+- Custom `<app-icon>` line-icon set (inline SVG, `currentColor`, idle/hover animations) — coherent and monochrome
 - Floating toolbars with `rgba(0,0,0,0.6)` glass overlays
 - Side panels at fixed widths (200px / 300px)
 - Neural network visualizer with amber-cyan diverging palette on black
@@ -138,7 +138,7 @@ Emoji icons replace SVG iconography throughout — a design choice that gives th
 
 - **Large button**: Full-width action, green-tinted for primary
 - **Small button**: Compact action, red/amber/green outline variants
-- **Toolbar button**: 32×32px emoji icon, semi-transparent dark bg, active state with outline
+- **Toolbar button**: 32×32px `<app-icon>`, semi-transparent dark bg, light `currentColor` icon, active state with outline
 
 ### Input Controls
 
@@ -255,7 +255,7 @@ Depth is communicated through background opacity and thin white borders rather t
 - Keep panels semi-transparent (`rgba(0,0,0,0.6)`) so simulation content shows through
 - Use green (`#7ddf7d`) for primary actions and positive states — it's the sole chromatic accent
 - Render everything in Canvas 2D — no WebGL, no Three.js
-- Use emoji icons for toolbar controls — they're universal and maintainable
+- Use the `<app-icon>` set for iconography — one coherent line-icon style that inherits `currentColor`
 - Display all numeric data in monospace for alignment and technical clarity
 - Use gold for the best AI car, cyan for the previous best — consistent visual hierarchy in training
 - Apply uppercase + letter-spacing for labels and section titles
@@ -266,7 +266,7 @@ Depth is communicated through background opacity and thin white borders rather t
 
 - Add shadows to panels — use semi-transparent backgrounds with thin white borders instead
 - Use WebGL or Three.js — the educational value of hand-rolled Canvas 2D is a core feature
-- Introduce SVG icon sets — emoji are sufficient and keep the codebase dependency-free
+- Reach for emoji or third-party icon fonts/SVG `<img>` assets — use the in-repo `<app-icon>` registry so every icon stays consistent and dependency-free
 - Use bright colors for UI chrome — the simulation content should be the most colorful thing on screen
 - Make panels fully opaque — the simulation must remain visible behind all interface elements
 - Add gradients to buttons or panels — flat colors with hover opacity shifts are the pattern
@@ -339,7 +339,7 @@ All values are defined in `styles/tokens.css`. When implementing, use `var(--tok
 
 ### Example Component Prompts
 
-- "Create a floating toolbar with 32x32px emoji buttons on a semi-transparent black background with thin white border, positioned absolutely at top 10px left 10px"
+- "Create a floating toolbar with 32x32px `<app-icon>` buttons on a semi-transparent black background with thin white border, positioned absolutely at top 10px left 10px"
 - "Design a control panel 200px wide with dark background, containing uppercase 10px section titles with letter-spacing 1px, stat rows with monospace values, and large green-accent primary buttons"
 - "Build a side panel with a 300px network visualizer showing neurons as dark discs connected by amber/cyan lines on a pure black background"
 - "Create a training init modal with #1b1d24 background, 12px border-radius, 560px max-width, and a semi-transparent backdrop with blur"
@@ -351,4 +351,4 @@ All values are defined in `styles/tokens.css`. When implementing, use `var(--tok
 2. Use uppercase + letter-spacing for all labels — it's the most consistent visual pattern across the UI
 3. Keep the canvas dominant — UI chrome should never exceed 30% of viewport width
 4. Use the exact color tokens above — the palette is deliberately narrow and constrained
-5. Emoji for icons, monospace for numbers, Arial for everything else
+5. `<app-icon>` for icons, monospace for numbers, Arial for everything else
