@@ -108,11 +108,41 @@ export class ScaleIndicator {
     ctx.fillStyle = this.#options.lineColor;
 
     if (this.#options.inlineStats) {
-      // Compact inline mode: zoom and scale on same line after bar
+      // Compact inline mode: zoom value, a vertical divider, then the scale
+      // label — all on the same line after the bar.
       ctx.textBaseline = 'middle';
-      const statsText = `${zoomValue}x${this.#options.statSeparator}${scaleLabel}`;
-      ctx.strokeText(statsText, x2 + 8, y);
-      ctx.fillText(statsText, x2 + 8, y);
+      const zoomText = `${zoomValue}x`;
+      const gap = 8;
+      let cursorX = x2 + gap;
+
+      ctx.strokeText(zoomText, cursorX, y);
+      ctx.fillText(zoomText, cursorX, y);
+      cursorX += ctx.measureText(zoomText).width + gap;
+
+      // Vertical divider line between the zoom value and the scale label.
+      const dividerHalf = this.#options.fontSize / 2;
+      ctx.lineCap = 'butt';
+      ctx.strokeStyle = this.#options.outlineColor;
+      ctx.lineWidth = this.#options.lineWidth + 2;
+      ctx.beginPath();
+      ctx.moveTo(cursorX, y - dividerHalf);
+      ctx.lineTo(cursorX, y + dividerHalf);
+      ctx.stroke();
+      ctx.strokeStyle = this.#options.lineColor;
+      ctx.lineWidth = this.#options.lineWidth;
+      ctx.beginPath();
+      ctx.moveTo(cursorX, y - dividerHalf);
+      ctx.lineTo(cursorX, y + dividerHalf);
+      ctx.stroke();
+      cursorX += gap;
+
+      // Scale label — restore the text stroke settings changed by the divider.
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = this.#options.outlineColor;
+      ctx.fillStyle = this.#options.lineColor;
+      ctx.strokeText(scaleLabel, cursorX, y);
+      ctx.fillText(scaleLabel, cursorX, y);
     } else {
       // Standard mode: zoom above bar, scale on same line as bar
       ctx.textBaseline = 'bottom';

@@ -48,6 +48,12 @@
   display: none;
 }
 
+/* Collapsed headers hug their title so they aren't taller than an open
+   section's title row. */
+.wep-section.collapsed {
+  padding-bottom: var(--space-1);
+}
+
 .wep-section.collapsed .collapse-caret {
   transform: rotate(0deg);
 }
@@ -134,6 +140,20 @@
 .wep-key-indicators {
   display: flex;
   gap: var(--space-1\.5);
+  position: relative;
+}
+
+/* Path-tools key tooltips: anchor to the row and open upward so they never
+   overflow the scrollable panel (which would otherwise spawn scrollbars). */
+.wep-panel .key-indicator {
+  position: static;
+}
+
+.wep-panel .key-indicator[data-tooltip]:hover::after {
+  top: auto;
+  bottom: calc(100% + var(--space-1));
+  left: 0;
+  max-width: 190px;
 }
 
 .wep-clear-btn {

@@ -305,7 +305,7 @@ export class WorldEditor {
       this.#miniMapCanvas,
       this.#world.graph,
       this.#miniMapCanvas.width, // Use canvas width for size
-      0.03, // Scaler
+      0.02, // Scaler
     );
 
     this.#miniMapViewport = new Viewport(this.#miniMapCanvas);

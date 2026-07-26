@@ -69,8 +69,8 @@ import '../ui/organisms/worldEditorPanel.js';
 
   resizeCanvas();
 
-  miniMapCanvas.width = 150;
-  miniMapCanvas.height = 150;
+  miniMapCanvas.width = 220;
+  miniMapCanvas.height = 220;
 
   const worldEditor = new WorldEditor(myCanvas, miniMapCanvas);
 

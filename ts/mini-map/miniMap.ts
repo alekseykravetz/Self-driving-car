@@ -129,7 +129,7 @@ export class MiniMap {
             paddingY: compactScaleIndicator ? 6 : 20,
             fontSize: compactScaleIndicator ? 9 : 12,
             lineWidth: compactScaleIndicator ? 1 : 2,
-            scaleInMeters: 10,
+            scaleInMeters: 100,
             pixelsPerMeterMultiplier: this.#scaler,
             zoomMultiplier: this.#scaler,
             inlineStats: compactScaleIndicator,
