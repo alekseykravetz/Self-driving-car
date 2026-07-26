@@ -113,11 +113,23 @@ export class Camera implements ICameraPoint {
 
   /**
    * Filters polygons to only those visible within the camera's view frustum.
+   *
+   * @param clip - When `true` (default), polygons that straddle the frustum
+   *   edge are clipped to the visible region. When `false`, any polygon that is
+   *   even partially visible is returned whole (uncut). Use `false` for
+   *   discrete objects such as cars and trees, whose base must stay intact so
+   *   that extrusion produces a correct 3D shape — clipping a car base below 4
+   *   points breaks `extrudeCarShape`, and clipping a tree base makes its top
+   *   wobble as parts move in and out of view.
    */
-  #filter(polygons: Polygon[]): Polygon[] {
+  #filter(polygons: Polygon[], clip: boolean = true): Polygon[] {
     const filteredPolygons: Polygon[] = [];
     for (const polygon of polygons) {
       if (polygon.intersectsPolygon(this.polygon)) {
+        if (!clip) {
+          filteredPolygons.push(polygon);
+          continue;
+        }
         const copy1: Polygon = new Polygon(polygon.points);
         const copy2: Polygon = new Polygon(this.polygon.points);
 
@@ -159,9 +171,15 @@ export class Camera implements ICameraPoint {
       ? extrudePolygons(this.#filter(world.buildings.map((b) => b.base)), 200)
       : [];
 
-    // Trees
+    // Trees (drawn whole even when partially in view so the top stays stable)
     const treePolygons: Polygon[] = showTrees
-      ? extrudeTreeShapes(this.#filter(world.trees.map((t) => t.base)), 200)
+      ? extrudeTreeShapes(
+          this.#filter(
+            world.trees.map((t) => t.base),
+            false,
+          ),
+          200,
+        )
       : [];
 
     // Road borders
@@ -176,11 +194,14 @@ export class Camera implements ICameraPoint {
     // Key car (always extruded as detailed 3D car)
     let keyCarPolygons: Polygon[] = [];
     if (keyCar && keyCar.polygon.length >= 4) {
-      const filteredKeyCar: Polygon[] = this.#filter([
-        new Polygon(
-          keyCar.polygon.map((point: Point) => new Point(point.x, point.y)),
-        ),
-      ]);
+      const filteredKeyCar: Polygon[] = this.#filter(
+        [
+          new Polygon(
+            keyCar.polygon.map((point: Point) => new Point(point.x, point.y)),
+          ),
+        ],
+        false,
+      );
       if (filteredKeyCar.length) {
         keyCarPolygons = extrudeCarShape(filteredKeyCar[0]);
         keyCarPolygons.forEach((poly) => {
@@ -196,11 +217,14 @@ export class Camera implements ICameraPoint {
     if (traffic && traffic.length > 0) {
       for (const car of traffic) {
         if (!car.polygon || car.polygon.length < 4) continue;
-        const filteredBase: Polygon[] = this.#filter([
-          new Polygon(
-            car.polygon.map((point: Point) => new Point(point.x, point.y)),
-          ),
-        ]);
+        const filteredBase: Polygon[] = this.#filter(
+          [
+            new Polygon(
+              car.polygon.map((point: Point) => new Point(point.x, point.y)),
+            ),
+          ],
+          false,
+        );
         if (filteredBase.length) {
           const carPolys = extrudeCarShape(filteredBase[0], 12, 4);
           carPolys.forEach((poly) => {
@@ -221,13 +245,16 @@ export class Camera implements ICameraPoint {
       bestCarSource !== keyCar &&
       bestCarSource.polygon.length >= 4
     ) {
-      const filteredCarBase: Polygon[] = this.#filter([
-        new Polygon(
-          bestCarSource.polygon.map(
-            (point: Point) => new Point(point.x, point.y),
+      const filteredCarBase: Polygon[] = this.#filter(
+        [
+          new Polygon(
+            bestCarSource.polygon.map(
+              (point: Point) => new Point(point.x, point.y),
+            ),
           ),
-        ),
-      ]);
+        ],
+        false,
+      );
       if (filteredCarBase.length) {
         bestCarPolygons = extrudeCarShape(filteredCarBase[0]);
         bestCarPolygons.forEach((poly) => {
@@ -248,6 +275,7 @@ export class Camera implements ICameraPoint {
               c.polygon.map((point: Point) => new Point(point.x, point.y)),
             ),
         ),
+      false,
     );
     carShadowBases.forEach((poly) => {
       const cPoly = poly as IColoredPolygon;
