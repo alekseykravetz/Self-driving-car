@@ -1,4 +1,5 @@
 import type { LayoutMode } from '../../simulator/types.js';
+import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';
 import { LAYOUT_TOOLBAR_TEMPLATE } from './layoutToolbarTemplate.js';
 
 export class LayoutToolbarElement extends HTMLElement {
@@ -20,6 +21,7 @@ export class LayoutToolbarElement extends HTMLElement {
     this.#initLayoutButtons();
     this.#initPanelToggles();
     this.#syncCachedFromDOM();
+    makeToolbarCollapsible(this, 'Layout');
   }
 
   get layoutMode(): LayoutMode {

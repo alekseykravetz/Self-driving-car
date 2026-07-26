@@ -5,6 +5,7 @@ import type { ToolbarViewportMode } from './modeControls.js';
 import { ToolbarAssetSelectors } from '../organisms/assetSelectors.js';
 import type { UnifiedWorldEntry } from '../../store/types.js';
 import type { CarInfo } from '../../car/car.js';
+import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';
 import { WORLD_TOOLBAR_TEMPLATE } from './worldToolbarTemplate.js';
 
 export class WorldToolbarElement extends HTMLElement {
@@ -32,6 +33,8 @@ export class WorldToolbarElement extends HTMLElement {
         this.#_showCameraDebug = debugCb.checked;
       });
     }
+
+    makeToolbarCollapsible(this, 'Setup');
   }
 
   get borderMode(): BorderMode {

@@ -1,4 +1,5 @@
 import { ANIMATION_LOOP_TOOLBAR_TEMPLATE } from './animationLoopToolbarTemplate.js';
+import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';
 import { formatElapsedTime } from '../../math/worldUnits.js';
 
 /**
@@ -51,6 +52,8 @@ export class AnimationLoopToolbarElement extends HTMLElement {
         this.#cachedRenderInterval = this.#clampInterval(intervalInput.value);
       });
     }
+
+    makeToolbarCollapsible(this, 'Anim');
   }
 
   /** Whether the simulation step is currently paused. */

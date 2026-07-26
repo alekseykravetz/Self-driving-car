@@ -24,6 +24,7 @@
 @import './molecules/_controls-group.css';
 @import './molecules/_asset-picker.css';
 @import './molecules/_collapsible.css';
+@import './molecules/_collapsible-toolbar.css';
 @import './molecules/_view-toggles.css';
 @import './molecules/_shortcuts-keys.css';
 @import './molecules/_world-layers-keys.css';

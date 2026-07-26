@@ -1,5 +1,6 @@
 import type { WorldLayerId, WorldLayerVisibility } from '../../world/types.js';
 import { DEFAULT_LAYER_VISIBILITY } from '../../world/types.js';
+import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';
 import { WORLD_LAYERS_TOOLBAR_TEMPLATE } from './worldLayersToolbarTemplate.js';
 
 /**
@@ -55,6 +56,7 @@ export class WorldLayersToolbarElement extends HTMLElement {
   connectedCallback(): void {
     this.innerHTML = WorldLayersToolbarElement.template;
     this.#render();
+    makeToolbarCollapsible(this, 'Layers');
   }
 
   #render(): void {

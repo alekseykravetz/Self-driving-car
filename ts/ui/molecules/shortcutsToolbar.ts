@@ -1,4 +1,5 @@
 import type { ShortcutDef, ToolbarUpdater } from '../../input/types.js';
+import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';
 import { SHORTCUTS_TOOLBAR_TEMPLATE } from './shortcutsToolbarTemplate.js';
 
 /**
@@ -34,6 +35,7 @@ export class ShortcutsToolbarElement
 
   connectedCallback(): void {
     this.innerHTML = ShortcutsToolbarElement.template;
+    makeToolbarCollapsible(this, 'Keys');
   }
 
   /**

@@ -12,5 +12,8 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "cSpell.words": ["Generatable", "lerp", "Raycaster"]
+  "cSpell.words": ["Generatable", "lerp", "Raycaster"],
+  "chat.tools.terminal.autoApprove": {
+    "npx tsc": true
+  }
 }
