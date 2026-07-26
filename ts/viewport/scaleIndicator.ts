@@ -74,7 +74,6 @@ export class ScaleIndicator {
 
     const x1 = this.position.x;
     const y = this.position.y;
-    const x2 = x1 + this.barLength;
     const font = `${this.#options.fontSize}px monospace`;
     const zoomValue = (
       this.#viewport.getZoom() * this.#options.zoomMultiplier
@@ -85,35 +84,39 @@ export class ScaleIndicator {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.lineCap = 'round';
 
-    // Horizontal bar outline
-    ctx.strokeStyle = this.#options.outlineColor;
-    ctx.lineWidth = this.#options.lineWidth + 2;
-    ctx.beginPath();
-    ctx.moveTo(x1, y);
-    ctx.lineTo(x2, y);
-    ctx.stroke();
+    // Draws the horizontal scale bar (outline + foreground) starting at `bx1`.
+    const drawBar = (bx1: number): number => {
+      const bx2 = bx1 + this.barLength;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = this.#options.outlineColor;
+      ctx.lineWidth = this.#options.lineWidth + 2;
+      ctx.beginPath();
+      ctx.moveTo(bx1, y);
+      ctx.lineTo(bx2, y);
+      ctx.stroke();
 
-    // Horizontal bar foreground
-    ctx.strokeStyle = this.#options.lineColor;
-    ctx.lineWidth = this.#options.lineWidth;
-    ctx.beginPath();
-    ctx.moveTo(x1, y);
-    ctx.lineTo(x2, y);
-    ctx.stroke();
-
-    ctx.font = font;
-    ctx.textAlign = 'left';
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = this.#options.outlineColor;
-    ctx.fillStyle = this.#options.lineColor;
+      ctx.strokeStyle = this.#options.lineColor;
+      ctx.lineWidth = this.#options.lineWidth;
+      ctx.beginPath();
+      ctx.moveTo(bx1, y);
+      ctx.lineTo(bx2, y);
+      ctx.stroke();
+      return bx2;
+    };
 
     if (this.#options.inlineStats) {
-      // Compact inline mode: zoom value, a vertical divider, then the scale
-      // label — all on the same line after the bar.
+      // Compact inline mode: zoom value, a vertical divider, the scale label,
+      // then the scale bar at the END.
+      ctx.font = font;
+      ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = this.#options.outlineColor;
+      ctx.fillStyle = this.#options.lineColor;
+
       const zoomText = `${zoomValue}x`;
       const gap = 8;
-      let cursorX = x2 + gap;
+      let cursorX = x1;
 
       ctx.strokeText(zoomText, cursorX, y);
       ctx.fillText(zoomText, cursorX, y);
@@ -143,8 +146,20 @@ export class ScaleIndicator {
       ctx.fillStyle = this.#options.lineColor;
       ctx.strokeText(scaleLabel, cursorX, y);
       ctx.fillText(scaleLabel, cursorX, y);
+      cursorX += ctx.measureText(scaleLabel).width + gap;
+
+      // Scale bar at the end.
+      drawBar(cursorX);
     } else {
-      // Standard mode: zoom above bar, scale on same line as bar
+      // Standard mode: bar first, zoom above bar, scale on same line as bar.
+      const x2 = drawBar(x1);
+
+      ctx.font = font;
+      ctx.textAlign = 'left';
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = this.#options.outlineColor;
+      ctx.fillStyle = this.#options.lineColor;
+
       ctx.textBaseline = 'bottom';
       const zoomLabel = `Zoom: ${zoomValue}x`;
       ctx.strokeText(zoomLabel, x1, y - 8);
