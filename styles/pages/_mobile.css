@@ -52,10 +52,24 @@
     display: none;
   }
 
+  #topControls [data-group='selected'],
+  #topControls [data-group='selected-sep'],
+  #topControls [data-group='tracking'],
+  #topControls [data-group='tracking-sep'],
   #topControls [data-group='viewport'],
   #topControls [data-group='viewport-sep'],
   #topControls [data-group='borders'],
-  #topControls [data-group='borders-sep'] {
+  #topControls [data-group='borders-sep'],
+  #topControls [data-group='debug'],
+  #topControls [data-group='debug-sep'] {
+    display: none;
+  }
+
+  /* Hide the shortcuts + world-layers toolbars across all simulators and the
+     world editor on phone-sized screens. */
+  #shortcutsToolbar,
+  #worldLayersToolbar,
+  #animationLoopToolbar {
     display: none;
   }
 

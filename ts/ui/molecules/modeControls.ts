@@ -58,6 +58,24 @@ export class ToolbarModeControls {
     this.#initBorderModeButtons();
     this.#initTrackingModeButtons();
     this.#initViewportModeButtons();
+
+    // On phone-sized screens default to touchpad wheel behavior (two-finger
+    // scroll pans). Kept in sync with the 768px CSS breakpoint.
+    if (window.matchMedia?.('(max-width: 768px)').matches) {
+      this.setViewportMode('touchpad');
+    }
+  }
+
+  setViewportMode(mode: ToolbarViewportMode): void {
+    this.#_viewportMode = mode;
+    const buttons: Record<ToolbarViewportMode, HTMLButtonElement | null> = {
+      mouse: this.#host.querySelector('#viewportModeMouse'),
+      touchpad: this.#host.querySelector('#viewportModeTouchpad'),
+    };
+    Object.entries(buttons).forEach(([key, btn]) => {
+      if (btn) btn.classList.toggle('active', key === mode);
+    });
+    if (this.#onViewportModeChange) this.#onViewportModeChange(mode);
   }
 
   #initBorderModeButtons(): void {
@@ -114,15 +132,11 @@ export class ToolbarModeControls {
       ) as HTMLButtonElement | null,
     };
 
-    const setActive = (mode: ToolbarViewportMode) => {
-      this.#_viewportMode = mode;
-      Object.entries(buttons).forEach(([key, btn]) => {
-        if (btn) btn.classList.toggle('active', key === mode);
-      });
-      if (this.#onViewportModeChange) this.#onViewportModeChange(mode);
-    };
-
-    buttons.mouse?.addEventListener('click', () => setActive('mouse'));
-    buttons.touchpad?.addEventListener('click', () => setActive('touchpad'));
+    buttons.mouse?.addEventListener('click', () =>
+      this.setViewportMode('mouse'),
+    );
+    buttons.touchpad?.addEventListener('click', () =>
+      this.setViewportMode('touchpad'),
+    );
   }
 }

@@ -208,6 +208,8 @@ export class WorldEditor {
     );
 
     // Viewport wheel-mode toggle (mouse vs. touchpad) driven by the toolbar.
+    // Adopt the toolbar's initial mode (touchpad by default on mobile).
+    this.#viewportMode = this.#worldToolbar.viewportMode;
     this.#worldToolbar.setViewportModeListener((mode) =>
       this.setViewportMode(mode),
     );
