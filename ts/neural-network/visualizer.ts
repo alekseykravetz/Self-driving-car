@@ -491,7 +491,7 @@ export class NetworkVisualizer {
 
       // Numeric value label (always in density mode, or for the hovered neuron).
       if ((this.#showAllValues || focused) && !dim) {
-        this.#drawNeuronValue(ctx, node);
+        this.#drawNeuronValue(ctx, node, this.#showAllValues, layout.rows - 1);
       }
     }
   }
@@ -559,14 +559,41 @@ export class NetworkVisualizer {
     ctx.restore();
   }
 
-  /** Draw a neuron's activation (and bias, if any) as a small label chip. */
-  #drawNeuronValue(ctx: CanvasRenderingContext2D, node: NeuronNode): void {
+  /**
+   * Draw a neuron's activation (and bias, if any) as a small label chip.
+   *
+   * In density mode (every value shown at once) the chips are stacked
+   * vertically clear of the neuron — above it, or below it for the topmost row
+   * whose chips would otherwise collide with the output axis labels — so
+   * horizontally adjacent neurons in the same row don't overlap. On hover the
+   * chip sits beside the node (flipping left near the right edge).
+   */
+  #drawNeuronValue(
+    ctx: CanvasRenderingContext2D,
+    node: NeuronNode,
+    densityMode: boolean,
+    topRow: number,
+  ): void {
     const v = Number.isFinite(node.value) ? node.value : 0;
     const lines = [`a=${v.toFixed(2)}`];
     if (node.bias !== null) lines.push(`b=${node.bias.toFixed(2)}`);
-    // Estimate the chip width so it can flip to the left of the node when it
-    // would otherwise overflow the right canvas edge.
     ctx.font = '10px Arial';
+
+    if (densityMode) {
+      // Stack above the neuron (below for the topmost row) and centre on it so
+      // rows of chips can't overlap each other horizontally.
+      const below = node.rowIndex === topRow;
+      const chipH = lines.length * 12 + 6;
+      const gap = 6;
+      const cy = below
+        ? node.y + node.r + gap + chipH / 2
+        : node.y - node.r - gap - chipH / 2;
+      NetworkVisualizer.#drawLabelChip(ctx, lines, node.x, cy, 'center');
+      return;
+    }
+
+    // Hover mode: sit the chip beside the node, flipping to the left when it
+    // would otherwise overflow the right canvas edge.
     let maxW = 0;
     for (const l of lines) maxW = Math.max(maxW, ctx.measureText(l).width);
     const chipW = maxW + 8;
