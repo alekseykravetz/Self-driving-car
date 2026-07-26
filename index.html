@@ -31,7 +31,9 @@
     <main class="landing-sections">
       <!-- Section 1: AI Training Simulators -->
       <section class="landing-card">
-        <div class="card-icon">🧠</div>
+        <div class="card-icon">
+          <app-icon name="brain" animate></app-icon>
+        </div>
         <h2>AI Training Simulators</h2>
         <p class="card-desc">
           Evolve neural networks through neuroevolution. Watch cars learn to
@@ -39,26 +41,18 @@
         </p>
         <div class="card-links">
           <a class="card-btn" href="html/simulator.html?mode=simple">
-            <span class="btn-icon"
-              ><img
-                src="/assets/road-simple.svg"
-                alt="Simple Road"
-                width="24"
-                height="24"
-            /></span>
+            <span class="btn-icon">
+              <app-icon name="road" animate label="Simple Road"></app-icon>
+            </span>
             <span>
               <strong>Simple Road</strong>
               <small>3-lane straight road with traffic</small>
             </span>
           </a>
           <a class="card-btn" href="html/simulator.html">
-            <span class="btn-icon"
-              ><img
-                src="/assets/world-loader.svg"
-                alt="Full World"
-                width="24"
-                height="24"
-            /></span>
+            <span class="btn-icon">
+              <app-icon name="globe" animate label="Full World"></app-icon>
+            </span>
             <span>
               <strong>Full World</strong>
               <small>Custom maps, camera view & advanced training</small>
@@ -69,7 +63,9 @@
 
       <!-- Section 2: Human Backpropagation -->
       <section class="landing-card">
-        <div class="card-icon">🎓</div>
+        <div class="card-icon">
+          <app-icon name="graduation" animate></app-icon>
+        </div>
         <h2>Human Backpropagation</h2>
         <p class="card-desc">
           Teach a neural network by driving. The car learns from your keypresses
@@ -78,26 +74,18 @@
         </p>
         <div class="card-links">
           <a class="card-btn" href="html/human-training.html?mode=simple">
-            <span class="btn-icon"
-              ><img
-                src="/assets/road-simple.svg"
-                alt="Simple Road"
-                width="24"
-                height="24"
-            /></span>
+            <span class="btn-icon">
+              <app-icon name="road" animate label="Simple Road"></app-icon>
+            </span>
             <span>
               <strong>Simple Road</strong>
               <small>3-lane road, learn to dodge traffic</small>
             </span>
           </a>
           <a class="card-btn" href="html/human-training.html">
-            <span class="btn-icon"
-              ><img
-                src="/assets/world-loader.svg"
-                alt="Full World"
-                width="24"
-                height="24"
-            /></span>
+            <span class="btn-icon">
+              <app-icon name="globe" animate label="Full World"></app-icon>
+            </span>
             <span>
               <strong>Full World</strong>
               <small>Custom maps, learn to navigate roads &amp; lights</small>
@@ -108,7 +96,9 @@
 
       <!-- Section 3: Live Traffic Jam -->
       <section class="landing-card">
-        <div class="card-icon">🚦</div>
+        <div class="card-icon">
+          <app-icon name="traffic-light" animate></app-icon>
+        </div>
         <h2>Live Traffic Jam</h2>
         <p class="card-desc">
           Load a world and click the road to drop trained cars. Watch them drive
@@ -117,7 +107,7 @@
         </p>
         <div class="card-links">
           <a class="card-btn" href="html/traffic.html">
-            <span class="btn-icon">🚕</span>
+            <span class="btn-icon"><app-icon name="car"></app-icon></span>
             <span>
               <strong>Open Traffic Jam</strong>
               <small>Click to spawn self-driving cars on any map</small>
@@ -128,7 +118,9 @@
 
       <!-- Section 4: Games -->
       <section class="landing-card">
-        <div class="card-icon">🏁</div>
+        <div class="card-icon">
+          <app-icon name="flag" animate></app-icon>
+        </div>
         <h2>Games</h2>
         <p class="card-desc">
           Race against AI opponents using keyboard, webcam markers, or phone
@@ -136,21 +128,21 @@
         </p>
         <div class="card-links">
           <a class="card-btn" href="html/race.html">
-            <span class="btn-icon">⌨️</span>
+            <span class="btn-icon"><app-icon name="keyboard"></app-icon></span>
             <span>
               <strong>Race</strong>
               <small>Keyboard controls vs AI</small>
             </span>
           </a>
           <a class="card-btn" href="html/race.html?mode=camera">
-            <span class="btn-icon">📷</span>
+            <span class="btn-icon"><app-icon name="camera"></app-icon></span>
             <span>
               <strong>Race (Camera)</strong>
               <small>Steer with webcam markers</small>
             </span>
           </a>
           <a class="card-btn" href="html/race.html?mode=phone">
-            <span class="btn-icon">📱</span>
+            <span class="btn-icon"><app-icon name="phone"></app-icon></span>
             <span>
               <strong>Race (Phone)</strong>
               <small>Tilt your phone to steer</small>
@@ -161,7 +153,9 @@
 
       <!-- Section 5: World Editor -->
       <section class="landing-card">
-        <div class="card-icon">🗺️</div>
+        <div class="card-icon">
+          <app-icon name="map" animate></app-icon>
+        </div>
         <h2>World Editor</h2>
         <p class="card-desc">
           Design custom road networks, place buildings, trees, traffic lights,
@@ -169,7 +163,7 @@
         </p>
         <div class="card-links">
           <a class="card-btn" href="html/world.html">
-            <span class="btn-icon">✏️</span>
+            <span class="btn-icon"><app-icon name="edit"></app-icon></span>
             <span>
               <strong>Open Editor</strong>
               <small>Create and edit worlds</small>

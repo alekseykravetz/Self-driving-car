@@ -7,14 +7,14 @@ export const WORLD_TOOLBAR_TEMPLATE = `
           class="toolbar-btn"
           data-tooltip="Save — Save world to file and localStorage"
         >
-          💾
+          <app-icon name="save"></app-icon>
         </button>
         <button
           id="disposeBtn"
           class="toolbar-btn"
           data-tooltip="Clear — Reset all graph points and segments"
         >
-          ❌
+          <app-icon name="close"></app-icon>
         </button>
       </div>
     </div>
@@ -31,11 +31,11 @@ export const WORLD_TOOLBAR_TEMPLATE = `
             class="toolbar-btn"
             data-tooltip="Load / select world"
           >
-            🌍
+            <app-icon name="globe"></app-icon>
           </button>
           <div id="worldPicker" class="asset-popover" hidden>
             <label for="loadWorldInput" class="file-input-label asset-load-btn">
-              📁 Load from file
+              <app-icon name="folder"></app-icon> Load from file
               <input type="file" id="loadWorldInput" accept=".world" />
             </label>
             <div id="worldPickerList" class="asset-list"></div>
@@ -47,7 +47,7 @@ export const WORLD_TOOLBAR_TEMPLATE = `
           data-tooltip="Import from OSM — Paste OpenStreetMap data to generate roads"
           style="display: none"
         >
-          🗺️
+          <app-icon name="map"></app-icon>
         </button>
       </div>
     </div>
@@ -61,11 +61,11 @@ export const WORLD_TOOLBAR_TEMPLATE = `
           class="toolbar-btn"
           data-tooltip="Load / select car(s)"
         >
-          🚗
+          <app-icon name="car"></app-icon>
         </button>
         <div id="carPicker" class="asset-popover" hidden>
           <label for="loadCarInput" class="file-input-label asset-load-btn">
-            📁 Load car(s) from file
+            <app-icon name="folder"></app-icon> Load car(s) from file
             <input type="file" id="loadCarInput" accept=".car,.json" multiple />
           </label>
           <div id="carPickerList" class="asset-list"></div>
@@ -79,11 +79,11 @@ export const WORLD_TOOLBAR_TEMPLATE = `
       <span class="controls-group-label">Selected</span>
       <div class="selected-info">
         <div class="selected-row">
-          <span class="selected-tag" title="Selected world">🌍</span>
+          <span class="selected-tag" title="Selected world"><app-icon name="globe"></app-icon></span>
           <span id="selectedWorldName" class="selected-name">—</span>
         </div>
         <div class="selected-row">
-          <span class="selected-tag" title="Selected car(s)">🚗</span>
+          <span class="selected-tag" title="Selected car(s)"><app-icon name="car"></app-icon></span>
           <span id="selectedCarNames" class="selected-name">—</span>
         </div>
       </div>
@@ -99,21 +99,21 @@ export const WORLD_TOOLBAR_TEMPLATE = `
           class="toolbar-btn"
           data-tooltip="No borders"
         >
-          🚫
+          <app-icon name="no-entry"></app-icon>
         </button>
         <button
           id="borderModeDamage"
           class="toolbar-btn active"
           data-tooltip="Damage on collision"
         >
-          💀
+          <app-icon name="skull"></app-icon>
         </button>
         <button
           id="borderModeCollision"
           class="toolbar-btn"
           data-tooltip="Collision with borders"
         >
-          🛡️
+          <app-icon name="shield"></app-icon>
         </button>
       </div>
     </div>
@@ -128,21 +128,21 @@ export const WORLD_TOOLBAR_TEMPLATE = `
           class="toolbar-btn"
           data-tooltip="No tracking (free drag)"
         >
-          ✋
+          <app-icon name="hand"></app-icon>
         </button>
         <button
           id="trackModeBest"
           class="toolbar-btn active"
           data-tooltip="Track best car"
         >
-          🏆
+          <app-icon name="trophy"></app-icon>
         </button>
         <button
           id="trackModeKeys"
           class="toolbar-btn"
           data-tooltip="Track user-controlled car"
         >
-          🎮
+          <app-icon name="gamepad"></app-icon>
         </button>
       </div>
     </div>
@@ -157,14 +157,14 @@ export const WORLD_TOOLBAR_TEMPLATE = `
           class="toolbar-btn active"
           data-tooltip="Mouse mode — scroll wheel zooms"
         >
-          🖱️
+          <app-icon name="mouse"></app-icon>
         </button>
         <button
           id="viewportModeTouchpad"
           class="toolbar-btn"
           data-tooltip="Touchpad mode — two-finger scroll pans, hold Ctrl to zoom"
         >
-          ☝️
+          <app-icon name="pointer"></app-icon>
         </button>
       </div>
     </div>

@@ -1,0 +1,387 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Icon atom — <app-icon>
+   Inline SVG icons with configurable colour and idle/hover animations.
+   ═══════════════════════════════════════════════════════════════════ */
+
+app-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  color: inherit;
+  vertical-align: -0.125em;
+  flex: none;
+}
+
+.app-icon-svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  overflow: visible;
+}
+
+/* Animatable parts default to a smooth transition so hover states ease. */
+.app-icon-svg [class^='ic-'],
+.app-icon-svg [class*=' ic-'] {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    fill 0.25s ease,
+    stroke 0.25s ease;
+}
+
+/* Shared hover trigger: any interactive host lighting up its icon. */
+/* stylelint-disable-next-line no-descending-specificity */
+:where(button, .toolbar-btn, .card, .store-tab, .ti-source, app-icon):hover
+  > app-icon
+  .app-icon-svg,
+:where(button, .toolbar-btn, .card, .store-tab, .ti-source):hover
+  app-icon
+  .app-icon-svg,
+app-icon:hover .app-icon-svg {
+  /* per-part hover animations declared below */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Keyframes
+   ═══════════════════════════════════════════════════════════════════ */
+
+@keyframes ic-scroll-down {
+  from {
+    stroke-dashoffset: 12;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ic-ties-scroll {
+  from {
+    transform: translateY(-5px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes ic-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ic-spin-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes ic-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes ic-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.7;
+  }
+}
+
+@keyframes ic-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.4;
+  }
+  55% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes ic-tl-red {
+  0%,
+  33%,
+  100% {
+    opacity: 1;
+  }
+  34%,
+  99% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes ic-tl-yellow {
+  0%,
+  33% {
+    opacity: 0.2;
+  }
+  34%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes ic-tl-green {
+  0%,
+  55% {
+    opacity: 0.2;
+  }
+  56%,
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes ic-wave {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ic-rise {
+  from {
+    transform: scaleY(0.2);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+@keyframes ic-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes ic-scroll-dot {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(2px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes ic-dash-flow {
+  from {
+    stroke-dashoffset: 20;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Idle animations (opt-in via the `animate` attribute → .is-animated)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.app-icon-svg.is-animated .ic-road-dash,
+.app-icon-svg.is-animated .ic-graph-edge {
+  animation: ic-scroll-down 0.9s linear infinite;
+}
+
+.app-icon-svg.is-animated .ic-corridor-tie {
+  animation: ic-ties-scroll 0.7s linear infinite;
+}
+
+.app-icon-svg.is-animated .ic-tl-red {
+  animation: ic-tl-red 3s steps(1, end) infinite;
+}
+.app-icon-svg.is-animated .ic-tl-yellow {
+  animation: ic-tl-yellow 3s steps(1, end) infinite;
+}
+.app-icon-svg.is-animated .ic-tl-green {
+  animation: ic-tl-green 3s steps(1, end) infinite;
+}
+
+.app-icon-svg.is-animated .ic-dna {
+  animation: ic-spin 6s linear infinite;
+}
+
+.app-icon-svg.is-animated .ic-globe-lines {
+  animation: ic-spin 12s linear infinite;
+}
+
+.app-icon-svg.is-animated .ic-car,
+.app-icon-svg.is-animated .ic-pin,
+.app-icon-svg.is-animated .ic-rocket {
+  animation: ic-bob 1.6s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-brain-spark,
+.app-icon-svg.is-animated .ic-alive-dot,
+.app-icon-svg.is-animated .ic-target-mid {
+  animation: ic-pulse 1.8s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-bolt-path,
+.app-icon-svg.is-animated .ic-rocket-flame,
+.app-icon-svg.is-animated .ic-flashlight-beam {
+  animation: ic-flicker 1.2s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-antenna-wave {
+  animation: ic-wave 1.6s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-frozen {
+  animation: ic-spin 14s linear infinite;
+}
+
+.app-icon-svg.is-animated .ic-crash-burst {
+  animation: ic-pulse 1s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-heatmap-fill {
+  animation: ic-rise 1.6s ease-in-out infinite alternate;
+}
+
+.app-icon-svg.is-animated .ic-dash-lines {
+  stroke-dasharray: 6 14;
+  animation: ic-dash-flow 0.8s linear infinite;
+}
+
+.app-icon-svg.is-animated .ic-mouse-scroll {
+  animation: ic-scroll-dot 1.4s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Hover animations (fire whenever the icon or its host is hovered)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Road / rail scrolling */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-road-dash,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-graph-edge {
+  animation: ic-scroll-down 0.6s linear infinite;
+}
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-corridor-tie {
+  animation: ic-ties-scroll 0.5s linear infinite;
+}
+
+/* Spinning things */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-gear,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-tire-outer {
+  animation: ic-spin 1.4s linear infinite;
+}
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-regen,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-restart {
+  animation: ic-spin-rev 0.8s linear infinite;
+}
+
+/* Trash lid lift */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-trash-lid,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-folder-lid {
+  transform: translateY(-1.5px) rotate(-6deg);
+}
+
+/* Export arrow bounce */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-export-arrow {
+  transform: translateY(1.5px);
+}
+
+/* Pulse / pop */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-brain-spark,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-alive-dot,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-target-mid,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-crash-burst {
+  animation: ic-pulse 0.7s ease-in-out infinite;
+}
+
+/* Compass needle wiggle */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-compass-needle {
+  animation: ic-wiggle 0.6s ease-in-out infinite;
+}
+
+/* Inspect nudge */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-inspect {
+  transform: scale(1.1) rotate(-8deg);
+}
+
+/* Shield check draw */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-shield-check {
+  animation: ic-pulse 0.7s ease-in-out infinite;
+}
+
+/* Close / plus / minus / check / cross pop */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-close,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-plus,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-minus,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-check,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-cross {
+  transform: scale(1.2);
+}
+
+/* Traffic-light quick cycle on hover */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-tl-red {
+  animation: ic-tl-red 1.2s steps(1, end) infinite;
+}
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-tl-yellow {
+  animation: ic-tl-yellow 1.2s steps(1, end) infinite;
+}
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-tl-green {
+  animation: ic-tl-green 1.2s steps(1, end) infinite;
+}
+
+/* Headlight flash */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-headlight {
+  animation: ic-flicker 0.8s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Respect reduced-motion: keep icons legible, drop looping motion.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .app-icon-svg [class^='ic-'],
+  .app-icon-svg [class*=' ic-'] {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -10,26 +10,26 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
 
     <!-- ── Brain source ─────────────────────────────── -->
     <div class="ti-section">
-      <div class="ti-section-title">🧠 Brain source</div>
+      <div class="ti-section-title"><app-icon name="brain"></app-icon> Brain source</div>
       <div class="ti-source-list">
         <label class="ti-source" data-source="fresh">
           <input type="radio" name="tiBrainSource" value="fresh" />
           <span class="ti-source-text">
-            <span class="ti-source-name">🆕 Fresh</span>
+            <span class="ti-source-name"><app-icon name="new"></app-icon> Fresh</span>
             <span class="ti-source-desc">Start from random brains.</span>
           </span>
         </label>
         <label class="ti-source" data-source="pool">
           <input type="radio" name="tiBrainSource" value="pool" />
           <span class="ti-source-text">
-            <span class="ti-source-name">💾 Saved pool <span id="tiPoolCountLabel"></span></span>
+            <span class="ti-source-name"><app-icon name="save"></app-icon> Saved pool <span id="tiPoolCountLabel"></span></span>
             <span class="ti-source-desc" id="tiPoolDesc">Continue from the stored best pool.</span>
           </span>
         </label>
         <label class="ti-source" data-source="selected">
           <input type="radio" name="tiBrainSource" value="selected" />
           <span class="ti-source-text">
-            <span class="ti-source-name">🚗 Selected car(s) <span id="tiSelectedCountLabel"></span></span>
+            <span class="ti-source-name"><app-icon name="car"></app-icon> Selected car(s) <span id="tiSelectedCountLabel"></span></span>
             <span class="ti-source-desc" id="tiSelectedDesc">Seed from the car(s) selected in the toolbar.</span>
           </span>
         </label>
@@ -38,7 +38,7 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
 
     <!-- ── Training params ──────────────────────────── -->
     <div class="ti-section">
-      <div class="ti-section-title">⚙️ Training params</div>
+      <div class="ti-section-title"><app-icon name="gear"></app-icon> Training params</div>
       <div class="ti-param-grid">
         <div class="ctrl">
           <span class="ctrl-label">Cars</span>
@@ -62,7 +62,7 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
     <!-- ── Car config ───────────────────────────────── -->
     <div class="ti-section">
       <div class="ti-section-title">
-        🚙 Car config
+        <app-icon name="car"></app-icon> Car config
         <span class="ti-config-note" id="tiConfigNote"></span>
       </div>
       <div class="ti-param-grid" id="tiCarConfigGrid">

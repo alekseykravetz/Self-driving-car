@@ -1,3 +1,4 @@
+import '../ui/atoms/appIcon.js';
 import { StoreManager } from '../store/storeManager.js';
 import { SimulatorPageHost } from '../simulator/views/simulatorPageHost.js';
 import { RaceSimulator } from '../simulator/racing/raceSimulator.js';

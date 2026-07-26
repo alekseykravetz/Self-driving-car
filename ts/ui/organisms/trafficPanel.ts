@@ -155,7 +155,11 @@ export class TrafficPanelElement extends HTMLElement {
     for (const entry of this.#rows) {
       const { car, row, status, speed, dist, swatch } = entry;
       const crashed = car.damaged;
-      status.textContent = crashed ? '💥' : '🟢';
+      const wantStatus = crashed ? 'crash' : 'alive';
+      if (status.dataset.icon !== wantStatus) {
+        status.dataset.icon = wantStatus;
+        status.innerHTML = `<app-icon name="${wantStatus}"></app-icon>`;
+      }
       status.title = crashed ? 'Crashed' : 'Driving';
       speed.textContent = formatKmhFromPxPerFrame(car.speed);
       dist.textContent = formatMetersFromWorldPixels(car.fitness);
@@ -205,7 +209,7 @@ export class TrafficPanelElement extends HTMLElement {
     const remove = document.createElement('button');
     remove.className = 'traffic-car-remove';
     remove.title = 'Remove this car';
-    remove.textContent = '✕';
+    remove.innerHTML = '<app-icon name="close"></app-icon>';
 
     head.append(caret, swatch, name, status, remove);
 
@@ -214,11 +218,15 @@ export class TrafficPanelElement extends HTMLElement {
     const speedWrap = document.createElement('span');
     speedWrap.title = 'Speed (km/h)';
     const speed = document.createElement('b');
-    speedWrap.append('⚡ ', speed);
+    const speedIcon = document.createElement('app-icon');
+    speedIcon.setAttribute('name', 'bolt');
+    speedWrap.append(speedIcon, ' ', speed);
     const distWrap = document.createElement('span');
     distWrap.title = 'Distance travelled (m)';
     const dist = document.createElement('b');
-    distWrap.append('🛣️ ', dist);
+    const distIcon = document.createElement('app-icon');
+    distIcon.setAttribute('name', 'road');
+    distWrap.append(distIcon, ' ', dist);
     metrics.append(speedWrap, distWrap);
 
     const config = document.createElement('div');

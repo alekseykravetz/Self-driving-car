@@ -8,14 +8,14 @@ export const TRAFFIC_PANEL_TEMPLATE = `
       class="btn-sm btn-danger-outline"
       title="Remove all cars from the road"
     >
-      🗑️ Clear
+      <app-icon name="trash"></app-icon> Clear
     </button>
     <button
       id="trafficDeleteDamagedBtn"
       class="btn-sm btn-warning-outline"
       title="Remove all crashed cars"
     >
-      💥 Delete Crashed
+      <app-icon name="crash"></app-icon> Delete Crashed
     </button>
   </div>
   <div class="traffic-count" id="trafficCount">0 cars</div>

@@ -1,3 +1,4 @@
+import '../ui/atoms/appIcon.js';
 import { StoreManager } from '../store/storeManager.js';
 import { WorldEditor } from './editors/worldEditor.js';
 
