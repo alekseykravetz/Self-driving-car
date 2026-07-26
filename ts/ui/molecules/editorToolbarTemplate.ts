@@ -10,8 +10,8 @@ export const EDITOR_TOOLBAR_TEMPLATE = `
         🔍
       </button>
     </div>
-    <div class="controls-divider"></div>
-    <div class="controls-group">
+    <div class="controls-divider" id="editorMarkingsDivider"></div>
+    <div class="controls-group" id="editorMarkingsGroup">
       <button id="markingBtn" class="editor-mode-btn" data-mode="marking" data-tooltip="Marking Editor — Place generic road markings (Left-click: place, Right-click: remove)">
         🔲
       </button>

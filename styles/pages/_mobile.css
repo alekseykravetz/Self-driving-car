@@ -116,6 +116,12 @@
   }
 
   editor-toolbar {
+    /* World editor bottom toolbar stays visible on mobile, but only the Graph
+       editor + Inspect tools — the markings group and its divider are hidden. */
+    display: flex;
+  }
+  #editorToolbar #editorMarkingsGroup,
+  #editorMarkingsDivider {
     display: none;
   }
 }
