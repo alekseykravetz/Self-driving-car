@@ -37,8 +37,20 @@ const SM_TRACKED_LS_KEYS = [
   'editorWorld',
   'loadedWorlds',
   'loadedCars',
+  'humanTrainedCar',
+  'store:activeWorld',
+  'store:activeCar',
+  'sim:worldLayers',
+  'editor:worldLayers',
+  'markerThreshold',
 ];
-const SM_ARRAY_LS_KEYS = ['bestPool', 'raceCars', 'loadedWorlds', 'loadedCars'];
+const SM_ARRAY_LS_KEYS = [
+  'bestPool',
+  'raceCars',
+  'loadedWorlds',
+  'loadedCars',
+  'store:activeCar',
+];
 
 /** @internal Exported for testing only. */
 export function smGenId(): string {
@@ -472,8 +484,8 @@ export class StoreManager {
 
   /**
    * Item count for array-backed tracked keys (bestPool, raceCars, loadedWorlds,
-   * loadedCars). Returns null for non-array keys (e.g. 'editorWorld') or
-   * unparseable values.
+   * loadedCars, store:activeCar). Returns null for non-array keys (e.g.
+   * 'editorWorld') or unparseable values.
    */
   deleteLocalStorageKey(key: string): void {
     if (SM_TRACKED_LS_KEYS.includes(key)) {

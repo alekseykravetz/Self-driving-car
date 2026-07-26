@@ -498,14 +498,19 @@ fitness = distance traveled along corridor/road
 
 ### LocalStorage Keys
 
-| Key                 | Content                                             | Format            |
-| ------------------- | --------------------------------------------------- | ----------------- |
-| `bestPool`          | Array of top-performing car configs with brains     | JSON `CarInfo[]`  |
-| `raceCars`          | Cars loaded via the race "Load car(s)" button       | JSON `CarInfo[]`  |
-| `editorWorld`       | World saved by the world editor                     | JSON world object |
-| `humanTrainedCar`   | Human-backprop trained brain (single CarInfo)       | JSON `CarInfo`    |
-| `store:activeWorld` | Active store world id (`store:`/`loaded:`/`editor`) | string            |
-| `store:activeCar`   | Active store car ids (multi-select)                 | JSON `string[]`   |
+| Key                  | Content                                             | Format            |
+| -------------------- | --------------------------------------------------- | ----------------- |
+| `bestPool`           | Array of top-performing car configs with brains     | JSON `CarInfo[]`  |
+| `raceCars`           | Cars loaded via the race "Load car(s)" button       | JSON `CarInfo[]`  |
+| `editorWorld`        | World saved by the world editor                     | JSON world object |
+| `loadedWorlds`       | User-loaded `.world` files (`{ id, name, data }`)   | JSON array        |
+| `loadedCars`         | User-loaded `.car` files (`{ id, name, data }`)     | JSON array        |
+| `humanTrainedCar`    | Human-backprop trained brain (single CarInfo)       | JSON `CarInfo`    |
+| `store:activeWorld`  | Active store world id (`store:`/`loaded:`/`editor`) | string            |
+| `store:activeCar`    | Active store car ids (multi-select)                 | JSON `string[]`   |
+| `sim:worldLayers`    | Simulator per-layer visibility preference           | JSON object       |
+| `editor:worldLayers` | World-editor per-layer visibility preference        | JSON object       |
+| `markerThreshold`    | Phone-camera marker detection threshold             | string            |
 
 > The legacy `world` key is migrated to `editorWorld` once on init. See
 > [Save & Load](SaveLoad.md) for the full persistence schema.

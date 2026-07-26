@@ -161,11 +161,11 @@ When a page loads:
 The `<store-panel>` on `index.html` is a **read-only viewer/manager** — selection
 happens in the world toolbar, not here. It displays three tabs:
 
-| Tab              | Shows                                                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **Worlds**       | Selected (✓), Name, Source (loaded/editor/store), start marker, target marker                                      |
-| **Cars**         | Selected (✓), Name, Source, hidden layers, maxSpeed, acceleration, friction, rayCount, rayLength, raySpread        |
-| **LocalStorage** | Key name, size, export/delete actions (tracks `bestPool`, `raceCars`, `editorWorld`, `loadedWorlds`, `loadedCars`) |
+| Tab              | Shows                                                                                                                                                                                                                                     |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Worlds**       | Selected (✓), Name, Source (loaded/editor/store), start marker, target marker                                                                                                                                                             |
+| **Cars**         | Selected (✓), Name, Source, hidden layers, maxSpeed, acceleration, friction, rayCount, rayLength, raySpread                                                                                                                               |
+| **LocalStorage** | Key name, size, export/delete actions (tracks `bestPool`, `raceCars`, `editorWorld`, `loadedWorlds`, `loadedCars`, `humanTrainedCar`, `store:activeWorld`, `store:activeCar`, `sim:worldLayers`, `editor:worldLayers`, `markerThreshold`) |
 
 ## Backward Compatibility
 

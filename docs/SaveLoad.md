@@ -8,15 +8,19 @@ The project uses two persistence mechanisms: browser localStorage for training s
 
 ### Current Storage Schema
 
-| Key                 | Type                 | Content                                                      | Written By                    |
-| ------------------- | -------------------- | ------------------------------------------------------------ | ----------------------------- |
-| `bestPool`          | `CarInfo[]`          | Array of top-K car configs with brains + physics             | TrainingManager.save()        |
-| `raceCars`          | `CarInfo[]`          | Cars loaded via the race "Load car(s)" button (race-only)    | Race.#handleCarsLoaded        |
-| `editorWorld`       | World JSON           | World saved by the world editor (was the legacy `world` key) | WorldEditor.save()            |
-| `loadedWorlds`      | `LoadedWorldEntry[]` | User-loaded `.world` files (`{ id, name, data }`)            | StoreManager.addLoadedWorld() |
-| `loadedCars`        | `LoadedCarEntry[]`   | User-loaded `.car` files (`{ id, name, data }`)              | StoreManager.addLoadedCar()   |
-| `store:activeWorld` | `string`             | Id of the active world (`store:`/`loaded:`/`editor`)         | StoreManager                  |
-| `store:activeCar`   | `string[]`           | JSON array of active car ids (multi-select)                  | StoreManager                  |
+| Key                  | Type                 | Content                                                      | Written By                    |
+| -------------------- | -------------------- | ------------------------------------------------------------ | ----------------------------- |
+| `bestPool`           | `CarInfo[]`          | Array of top-K car configs with brains + physics             | TrainingManager.save()        |
+| `raceCars`           | `CarInfo[]`          | Cars loaded via the race "Load car(s)" button (race-only)    | Race.#handleCarsLoaded        |
+| `editorWorld`        | World JSON           | World saved by the world editor (was the legacy `world` key) | WorldEditor.save()            |
+| `loadedWorlds`       | `LoadedWorldEntry[]` | User-loaded `.world` files (`{ id, name, data }`)            | StoreManager.addLoadedWorld() |
+| `loadedCars`         | `LoadedCarEntry[]`   | User-loaded `.car` files (`{ id, name, data }`)              | StoreManager.addLoadedCar()   |
+| `store:activeWorld`  | `string`             | Id of the active world (`store:`/`loaded:`/`editor`)         | StoreManager                  |
+| `store:activeCar`    | `string[]`           | JSON array of active car ids (multi-select)                  | StoreManager                  |
+| `humanTrainedCar`    | `CarInfo`            | Human-backprop trained brain + config (single car)           | HumanBackpropSimulator        |
+| `sim:worldLayers`    | Visibility object    | Simulator per-layer visibility preference                    | SimulatorShell                |
+| `editor:worldLayers` | Visibility object    | World-editor per-layer visibility preference                 | WorldEditor                   |
+| `markerThreshold`    | `string`             | Phone-camera marker detection threshold                      | MarkerDetector                |
 
 > **Id scheme:** `store:activeWorld` and `store:activeCar` store prefixed **ids**,
 > not bare filenames: `store:<filename>` for bundled assets, `loaded:<genId>` for

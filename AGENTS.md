@@ -261,5 +261,15 @@ The project has a **multi-phase test suite**: **81 test files, 1115 tests** (~70
 | `bestPool`                              | Top-K car configs with brains                 |
 | `raceCars`                              | Cars loaded via race "Load car(s)"            |
 | `editorWorld`                           | World saved by editor                         |
+| `loadedWorlds`                          | User-loaded `.world` files                    |
+| `loadedCars`                            | User-loaded `.car` files                      |
 | `humanTrainedCar`                       | Human-backprop trained brain (single CarInfo) |
 | `store:activeWorld` / `store:activeCar` | Active store selection                        |
+| `sim:worldLayers`                       | Simulator per-layer visibility preference     |
+| `editor:worldLayers`                    | World-editor per-layer visibility preference  |
+| `markerThreshold`                       | Phone-camera marker detection threshold       |
+
+All of the above are tracked by the landing-page `<store-panel>` LocalStorage tab
+(`SM_TRACKED_LS_KEYS` in `ts/store/storeManager.ts`), where they can be exported
+or deleted. Array-backed keys (`bestPool`, `raceCars`, `loadedWorlds`,
+`loadedCars`, `store:activeCar`) show an item count via `SM_ARRAY_LS_KEYS`.
