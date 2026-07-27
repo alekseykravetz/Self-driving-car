@@ -69,7 +69,7 @@ describe('loadPoolFromStorage', () => {
     const legacyBrain = { weights: [0.1, 0.2] };
     store['bestBrain'] = JSON.stringify(legacyBrain);
 
-    const infoLog = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const infoLog = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     const result = loadPoolFromStorage();
     expect(result).toHaveLength(1);
@@ -96,7 +96,7 @@ describe('loadPoolFromStorage', () => {
       sensor: { rayCount: 3, raySpread: 1.0, rayLength: 100, rayOffset: 0 },
     });
 
-    const infoLog = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const infoLog = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     const result = loadPoolFromStorage();
     expect(result).toHaveLength(2);
@@ -120,7 +120,7 @@ describe('loadPoolFromStorage', () => {
       acceleration: 0.05,
     });
 
-    const infoLog = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const infoLog = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     const result = loadPoolFromStorage(fallbackConfig);
     expect(result).toHaveLength(1);
@@ -134,7 +134,7 @@ describe('loadPoolFromStorage', () => {
     const legacyBrain = { weights: [0.5] };
     store['bestBrain'] = JSON.stringify(legacyBrain);
 
-    const infoLog = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const infoLog = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     const result = loadPoolFromStorage();
     expect(result).toHaveLength(1);
@@ -159,7 +159,7 @@ describe('loadPoolFromStorage', () => {
 
   it('handles bestBrain with null/undefined brain data', () => {
     store['bestBrain'] = 'null';
-    const infoLog = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const infoLog = vi.spyOn(console, 'info').mockImplementation(() => {});
     const result = loadPoolFromStorage();
     expect(result).toEqual([]);
     infoLog.mockRestore();
@@ -167,7 +167,7 @@ describe('loadPoolFromStorage', () => {
 
   it('handles bestBrains with null/undefined brain data', () => {
     store['bestBrains'] = 'null';
-    const infoLog = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const infoLog = vi.spyOn(console, 'info').mockImplementation(() => {});
     const result = loadPoolFromStorage();
     expect(result).toEqual([]);
     infoLog.mockRestore();
@@ -181,7 +181,7 @@ describe('savePoolToStorage', () => {
 
   it('writes non-empty pool to bestPool', () => {
     const pool: CarInfo[] = [makeCarInfo()];
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
     savePoolToStorage(pool);
     expect(store['bestPool']).toBe(JSON.stringify(pool));
     expect(logSpy).toHaveBeenCalledWith('Saved top 1 car(s) to localStorage.');
@@ -209,7 +209,7 @@ describe('discardStoredPool', () => {
 
   it('removes bestPool key', () => {
     store['bestPool'] = 'some data';
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
     discardStoredPool();
     expect(store['bestPool']).toBeUndefined();
     logSpy.mockRestore();
@@ -220,7 +220,7 @@ describe('discardStoredPool', () => {
     store['bestBrain'] = 'brain';
     store['bestBrains'] = 'brains';
     store['bestCarInfo'] = 'config';
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
     discardStoredPool();
     expect(store['bestPool']).toBeUndefined();
     expect(store['bestBrain']).toBeUndefined();
@@ -240,7 +240,7 @@ describe('loadRaceCars / saveRaceCars', () => {
       makeCarInfo({ maxSpeed: 8, brain: { levels: [1] } }),
       makeCarInfo({ maxSpeed: 10, brain: { levels: [2] } }),
     ];
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
     saveRaceCars(cars);
     expect(logSpy).toHaveBeenCalledWith('Saved 2 race car(s) to localStorage.');
     logSpy.mockRestore();
@@ -295,7 +295,7 @@ describe('downloadCarFiles', () => {
   });
 
   it('no-op when selectedCars empty', () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
     const blobSpy = vi.spyOn(globalThis, 'Blob');
     downloadCarFiles([]);
     expect(blobSpy).not.toHaveBeenCalled();
@@ -332,7 +332,7 @@ describe('downloadCarFiles', () => {
     const mockCar1 = { toInfo: () => carInfo1 } as Car;
     const mockCar2 = { toInfo: () => carInfo2 } as Car;
 
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     downloadCarFiles([
       { car: mockCar1, poolPosition: 0 },
@@ -366,7 +366,7 @@ describe('downloadCarFiles', () => {
     });
     const mockCar = { toInfo: () => carInfo } as Car;
 
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
     downloadCarFiles([{ car: mockCar, poolPosition: 0 }]);
 

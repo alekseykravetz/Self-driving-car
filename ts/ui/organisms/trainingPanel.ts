@@ -530,7 +530,7 @@ export class TrainingPanelElement extends HTMLElement {
 
     this.#onCarsCreatedCallback(this.cars);
 
-    console.log(
+    console.info(
       `Generation ${this.iteration} started with ${settings.carCount} cars.`,
     );
   }

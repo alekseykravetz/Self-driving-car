@@ -109,7 +109,6 @@ export class WorldTrainingStrategy {
   }
 
   initializeSimulator(worldInfo: World | null): void {
-    console.log('Initializing simulator with world info:', worldInfo);
     this.#parent.world = worldInfo
       ? World.load(worldInfo)
       : new World(new Graph());

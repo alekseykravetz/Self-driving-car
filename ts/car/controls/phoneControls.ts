@@ -70,14 +70,4 @@ export class PhoneControls {
       { passive: true },
     );
   }
-
-  // Optional: Method to remove listeners when controls are no longer needed
-  // destroy(): void {
-  //   // Remove specific listeners added in #addListeners
-  //   // Example (needs the exact function reference or wrapper):
-  //   // window.removeEventListener('devicemotion', this.#handleDeviceMotion);
-  //   // window.removeEventListener('touchstart', this.#handleTouchStart);
-  //   // window.removeEventListener('touchend', this.#handleTouchEnd);
-  //   console.log('PhoneControls listeners removed (Implement actual removal)');
-  // }
 }

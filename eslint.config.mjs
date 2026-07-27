@@ -7,7 +7,7 @@ import tsParser from '@typescript-eslint/parser';
 
 export default defineConfig([
   {
-    ignores: ['js/**'],
+    ignores: ['js/**', 'storybook-static/**'],
   },
   {
     files: ['scripts/**/*.{js,mjs,cjs}'],

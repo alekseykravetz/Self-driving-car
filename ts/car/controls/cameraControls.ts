@@ -96,7 +96,6 @@ export class CameraControls {
   // Public method to finalize initialization if needed externally
   saveExpectedSize(): void {
     this.initializing = false;
-    console.log('Expected marker size saved:', this.expectedSize);
   }
 
   #processMarkers(result: {

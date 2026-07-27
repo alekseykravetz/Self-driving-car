@@ -54,10 +54,6 @@ export class Start extends Marking {
         -this.image.naturalWidth / 2, // Center image horizontally
         -this.image.naturalHeight / 2, // Center image vertically
       );
-    } else {
-      // Optional: Draw a placeholder if the image hasn't loaded yet
-      // ctx.fillStyle = 'red';
-      // ctx.fillRect(-this.width / 4, -this.height / 4, this.width / 2, this.height / 2); // Example placeholder
     }
 
     ctx.restore(); // Restore the canvas state

@@ -39,7 +39,7 @@ export function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
     localStorage.removeItem('bestBrain');
     localStorage.removeItem('bestBrains');
     localStorage.removeItem('bestCarInfo');
-    console.log('Migrated legacy storage to unified bestPool.');
+    console.info('Migrated legacy storage to unified bestPool.');
     return pool;
   }
 
@@ -49,7 +49,7 @@ export function loadPoolFromStorage(fallbackConfig?: CarInfo): CarInfo[] {
 export function savePoolToStorage(pool: CarInfo[]): void {
   if (pool.length > 0) {
     localStorage.setItem('bestPool', JSON.stringify(pool));
-    console.log(`Saved top ${pool.length} car(s) to localStorage.`);
+    console.info(`Saved top ${pool.length} car(s) to localStorage.`);
   } else {
     console.warn('Could not save: no cars with brains found.');
   }
@@ -60,7 +60,7 @@ export function discardStoredPool(): void {
   localStorage.removeItem('bestBrain');
   localStorage.removeItem('bestBrains');
   localStorage.removeItem('bestCarInfo');
-  console.log('Stored pool discarded from localStorage.');
+  console.info('Stored pool discarded from localStorage.');
 }
 
 export function loadRaceCars(): CarInfo[] {
@@ -71,7 +71,7 @@ export function loadRaceCars(): CarInfo[] {
 export function saveRaceCars(cars: CarInfo[]): void {
   if (cars.length > 0) {
     localStorage.setItem('raceCars', JSON.stringify(cars));
-    console.log(`Saved ${cars.length} race car(s) to localStorage.`);
+    console.info(`Saved ${cars.length} race car(s) to localStorage.`);
   } else {
     localStorage.removeItem('raceCars');
   }
@@ -109,5 +109,5 @@ export function downloadCarFiles(
     a.click();
     URL.revokeObjectURL(url);
   }
-  console.log(`Downloaded ${selectedCars.length} car file(s).`);
+  console.info(`Downloaded ${selectedCars.length} car file(s).`);
 }
