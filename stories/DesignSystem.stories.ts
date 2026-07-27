@@ -9,7 +9,7 @@ export default meta;
 
 const wrap = (inner: TemplateResult): TemplateResult => html`
   <div
-    style="padding:24px;color:var(--color-text-primary);font-family:var(--font-ui);background:var(--color-bg-app);min-height:100vh;box-sizing:border-box"
+    style="padding:24px;color:var(--color-text-primary);font-family:var(--font-ui);background:var(--color-bg-app);height:100vh;overflow-y:auto;box-sizing:border-box"
   >
     ${inner}
   </div>

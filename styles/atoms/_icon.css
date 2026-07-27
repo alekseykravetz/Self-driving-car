@@ -238,8 +238,12 @@ app-icon:hover .app-icon-svg {
    Idle animations (opt-in via the `animate` attribute → .is-animated)
    ═══════════════════════════════════════════════════════════════════ */
 
-.app-icon-svg.is-animated .ic-road-dash,
+.app-icon-svg.is-animated .ic-road-dash {
+  animation: ic-scroll-down 0.9s linear infinite;
+}
+
 .app-icon-svg.is-animated .ic-graph-edge {
+  stroke-dasharray: 5 4;
   animation: ic-scroll-down 0.9s linear infinite;
 }
 
@@ -332,8 +336,11 @@ app-icon:hover .app-icon-svg {
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Road / rail scrolling */
-:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-road-dash,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-road-dash {
+  animation: ic-scroll-down 0.6s linear infinite;
+}
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-graph-edge {
+  stroke-dasharray: 5 4;
   animation: ic-scroll-down 0.6s linear infinite;
 }
 :is(button, .toolbar-btn, .card, app-icon):hover
