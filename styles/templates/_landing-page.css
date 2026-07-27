@@ -38,8 +38,7 @@
 .landing-header .subtitle {
   font-size: 1.05rem;
   color: var(--color-text-secondary);
-  max-width: 46ch;
-  margin: 0 auto;
+  margin: 0;
 }
 
 /* ── Grid ──────────────────────────────────────────────────────────── */
@@ -149,7 +148,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2\.5);
-  margin-top: auto;
 }
 
 .card-btn {
