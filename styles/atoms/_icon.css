@@ -351,7 +351,7 @@ app-icon:hover .app-icon-svg {
 
 /* Spinning things */
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-gear,
-:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-tire-outer {
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-tire {
   animation: ic-spin 1.4s linear infinite;
 }
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-regen,
@@ -454,6 +454,62 @@ app-icon:hover .app-icon-svg {
 /* Car wheels hop */
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-wheel {
   animation: ic-hop 0.4s ease-in-out infinite;
+}
+
+/* ── Hover mirrors of idle-only animations ─────────────────────── */
+
+/* Spinners */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-dna {
+  animation: ic-spin 2s linear infinite;
+}
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-globe-lines {
+  animation: ic-spin 3s linear infinite;
+}
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-frozen {
+  animation: ic-spin 3s linear infinite;
+}
+
+/* Bobbers */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-car,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-pin,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-rocket {
+  animation: ic-bob 0.9s ease-in-out infinite;
+}
+
+/* Flicker parts */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-bolt-path,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-rocket-flame,
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-flashlight-beam {
+  animation: ic-flicker 0.7s ease-in-out infinite;
+}
+
+/* Antenna waves */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-antenna-wave {
+  animation: ic-wave 0.9s ease-in-out infinite;
+}
+
+/* Heatmap fill rise */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-heatmap-fill {
+  animation: ic-rise 0.9s ease-in-out infinite alternate;
+}
+
+/* Dashboard lines flow */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-dash-lines {
+  stroke-dasharray: 6 14;
+  animation: ic-dash-flow 0.5s linear infinite;
+}
+
+/* Mouse scroll dot */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-mouse-scroll {
+  animation: ic-scroll-dot 0.9s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

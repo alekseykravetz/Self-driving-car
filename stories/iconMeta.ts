@@ -40,7 +40,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: V,
     desc: 'Side-view car with wheels + headlight',
     idle: 'Bob — gentle up/down float',
-    hover: 'Headlight flicker · wheels hop',
+    hover: 'Bob · headlight flicker · wheels hop',
   },
   brain: {
     category: V,
@@ -52,7 +52,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: V,
     desc: 'DNA double helix',
     idle: 'Spin — full rotation (6s)',
-    hover: null,
+    hover: 'Spin (faster)',
   },
 
   // ── Geo / Navigation ─────────────────────────────────────────────
@@ -61,7 +61,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: GEO,
     desc: 'Globe with meridian lines',
     idle: 'Meridian lines spin (12s)',
-    hover: null,
+    hover: 'Meridians spin (faster)',
   },
   graph: {
     category: GEO,
@@ -79,7 +79,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: GEO,
     desc: 'Map location pin',
     idle: 'Bob — gentle up/down float',
-    hover: null,
+    hover: 'Bob (faster)',
   },
   inspect: {
     category: GEO,
@@ -180,7 +180,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: MEDIA,
     desc: 'Computer mouse',
     idle: 'Scroll dot bobs down',
-    hover: null,
+    hover: 'Scroll dot bobs (faster)',
   },
   pointer: {
     category: MEDIA,
@@ -272,7 +272,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: STATUS,
     desc: 'Snowflake / frozen',
     idle: 'Slow spin (14s)',
-    hover: null,
+    hover: 'Spin (faster)',
   },
   shield: {
     category: STATUS,
@@ -285,7 +285,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: STATUS,
     desc: 'Thermometer / heatmap',
     idle: 'Fill rises + falls',
-    hover: null,
+    hover: 'Fill rises + falls (faster)',
   },
   graduation: {
     category: STATUS,
@@ -309,38 +309,38 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: PARAM,
     desc: 'Rocket with flame',
     idle: 'Bob + flame flicker',
-    hover: null,
+    hover: 'Bob + flame flicker (faster)',
   },
   bolt: {
     category: PARAM,
     desc: 'Lightning bolt',
     idle: 'Flicker',
-    hover: null,
+    hover: 'Flicker (faster)',
   },
   tire: {
     category: PARAM,
     desc: 'Tire / wheel',
     idle: null,
-    hover: 'Outer ring spin',
+    hover: 'Wheel spins',
   },
   antenna: {
     category: PARAM,
     desc: 'Antenna with signal waves',
     idle: 'Waves pulse in/out',
-    hover: null,
+    hover: 'Waves pulse (faster)',
   },
   ruler: { category: PARAM, desc: 'Ruler', idle: null, hover: null },
   flashlight: {
     category: PARAM,
     desc: 'Flashlight with beam',
     idle: 'Beam flicker',
-    hover: null,
+    hover: 'Beam flicker (faster)',
   },
   dash: {
     category: PARAM,
     desc: 'Dashboard / speed lines',
     idle: 'Lines flow',
-    hover: null,
+    hover: 'Lines flow (faster)',
   },
   width: { category: PARAM, desc: 'Width arrows', idle: null, hover: null },
   height: { category: PARAM, desc: 'Height arrows', idle: null, hover: null },
