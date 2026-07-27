@@ -1,16 +1,18 @@
 .landing-header {
-  padding: var(--space-6) var(--space-5) var(--space-3);
+  padding: var(--space-8) var(--space-5) var(--space-4);
   text-align: center;
 }
 
 .landing-header h1 {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: var(--weight-extrabold);
-  margin: 0 0 var(--space-1\.5);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-2);
   background: linear-gradient(
-    135deg,
-    var(--color-accent-green),
-    var(--color-accent-cyan)
+    115deg,
+    var(--color-accent-green) 0%,
+    var(--color-accent-green-strong) 40%,
+    var(--color-accent-cyan) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -30,52 +32,107 @@
   flex-shrink: 0;
   width: var(--space-14);
   height: var(--space-14);
-  filter: drop-shadow(var(--color-accent-cyan-shadow));
+  filter: drop-shadow(0 4px 14px rgba(125, 223, 125, 0.45));
 }
 
 .landing-header .subtitle {
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: var(--color-text-secondary);
-  margin: 0;
+  max-width: 46ch;
+  margin: 0 auto;
 }
 
+/* ── Grid ──────────────────────────────────────────────────────────── */
 .landing-sections {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-6);
+  gap: var(--space-5);
   max-width: 1500px;
   margin: 0 auto;
-  padding: var(--space-3) var(--space-4) var(--space-12);
+  padding: var(--space-4) var(--space-6) var(--space-8);
 }
 
+/* ── Feature card ──────────────────────────────────────────────────── */
 .landing-card {
-  background: var(--color-bg-surface-raised);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8) var(--space-7);
+  padding: var(--space-7) var(--space-6);
   text-align: left;
   min-width: 0;
-  max-height: 500px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   transition:
-    border-color 0.2s,
-    transform 0.2s;
+    border-color var(--transition-normal),
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+/* Green accent line along the top edge, revealed on hover. */
+.landing-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-accent-green),
+    var(--color-accent-cyan),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--transition-normal);
 }
 
 .landing-card:hover {
-  border-color: var(--color-border-default);
-  transform: translateY(calc(-1 * var(--space-0\.5)));
+  border-color: var(--color-accent-green-border);
+  transform: translateY(calc(-1 * var(--space-1)));
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.35),
+    0 0 0 1px var(--color-accent-green-border-strong);
 }
 
+.landing-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Icon badge ────────────────────────────────────────────────────── */
 .card-icon {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  font-size: 1.75rem;
+  margin-bottom: var(--space-4);
+  color: var(--color-accent-green);
+  background: var(--color-accent-green-bg);
+  border: 1px solid var(--color-accent-green-border);
+  border-radius: var(--radius-xl);
+  box-shadow: inset 0 0 18px rgba(125, 223, 125, 0.1);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.landing-card:hover .card-icon {
+  transform: scale(1.06);
+  box-shadow:
+    inset 0 0 18px rgba(125, 223, 125, 0.18),
+    0 0 20px rgba(125, 223, 125, 0.25);
 }
 
 .landing-card h2 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
   margin: 0 0 var(--space-2\.5);
   color: var(--color-text-primary);
 }
@@ -87,37 +144,49 @@
   margin: 0 0 var(--space-5);
 }
 
+/* ── Link buttons ──────────────────────────────────────────────────── */
 .card-links {
   display: flex;
   flex-direction: column;
   gap: var(--space-2\.5);
+  margin-top: auto;
 }
 
 .card-btn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3\.5);
-  padding: var(--space-3\.5) var(--space-4\.5);
-  background: var(--color-bg-surface-raised);
+  padding: var(--space-3\.5) var(--space-4);
+  background: rgba(255, 255, 255, 0.025);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xl);
   text-decoration: none;
   color: inherit;
   transition:
-    background 0.15s,
-    border-color 0.15s,
-    transform 0.1s;
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .card-btn:hover {
-  background: var(--color-bg-active);
+  background: var(--color-accent-green-bg);
   border-color: var(--color-accent-green-border);
   transform: translateX(var(--space-1));
 }
 
 .card-btn .btn-icon {
-  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
   flex-shrink: 0;
+  color: var(--color-accent-green);
+  transition: transform var(--transition-fast);
+}
+
+.card-btn:hover .btn-icon {
+  transform: scale(1.12);
 }
 
 .card-btn span {
