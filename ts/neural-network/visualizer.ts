@@ -23,57 +23,23 @@
 
 import { NeuralNetwork } from './network.js';
 import { lerp } from '../math/utils.js';
-
-/** Direction of an output-neuron arrow glyph. */
-export type ArrowDir = 'up' | 'down' | 'left' | 'right';
-
-/** A single drawn neuron with the geometry needed for hit-testing. */
-export interface NeuronNode {
-  x: number;
-  y: number;
-  r: number;
-  /** Activation value carried by this neuron (input value or output value). */
-  value: number;
-  /** Threshold bias — `null` for the input row (inputs have no bias). */
-  bias: number | null;
-  rowIndex: number;
-  nodeIndex: number;
-  /** Axis label text (e.g. `ray1`, `speed`, `forward`) or `null`. */
-  label: string | null;
-  /** Direction arrow drawn inside output neurons, or `null`. */
-  arrow: ArrowDir | null;
-}
-
-/** A single drawn connection (weight) with the geometry needed for hit-testing. */
-export interface ConnectionEdge {
-  /** Source (input-side, lower) endpoint. */
-  x1: number;
-  y1: number;
-  /** Target (output-side, upper) endpoint. */
-  x2: number;
-  y2: number;
-  weight: number;
-  /** Activation of the source neuron. */
-  input: number;
-  /** Live contribution `input × weight`. */
-  signal: number;
-  fromRow: number;
-  i: number;
-  j: number;
-}
-
-/** Cached per-frame geometry used for both drawing and hit-testing. */
-export interface NetworkLayout {
-  neurons: NeuronNode[];
-  edges: ConnectionEdge[];
-  rows: number;
-}
-
-/** What the mouse is currently over (indices into the cached layout). */
-export type Hover =
-  | { kind: 'neuron'; index: number }
-  | { kind: 'connection'; index: number }
-  | null;
+import type {
+  ArrowDir,
+  ConnectionEdge,
+  Hover,
+  NetworkLayout,
+  NeuronNode,
+} from './visualizerTypes.js';
+import {
+  alphaFloor,
+  divergingColor,
+  drawArrow,
+  drawLabelChip,
+  drawTooltip,
+  inputLabels,
+  pointSegmentDistance,
+  roundRectPath,
+} from './visualizerPrimitives.js';
 
 export class NetworkVisualizer {
   /** Geometry from the most recent draw, retained for hit-testing. */
@@ -250,10 +216,7 @@ export class NetworkVisualizer {
       rowBiases.push(levels[r - 1].biases);
     }
 
-    const inputLabels = NetworkVisualizer.#inputLabels(
-      rowValues[0].length,
-      this.#stateAware,
-    );
+    const inLabels = inputLabels(rowValues[0].length, this.#stateAware);
     const outputLabels = ['forward', 'left', 'right', 'reverse'];
     const outputArrows: ArrowDir[] = ['up', 'left', 'right', 'down'];
 
@@ -272,7 +235,7 @@ export class NetworkVisualizer {
         indexOf[r][n] = neurons.length;
         let label: string | null = null;
         let arrow: ArrowDir | null = null;
-        if (r === 0) label = inputLabels[n] ?? null;
+        if (r === 0) label = inLabels[n] ?? null;
         else if (r === rows - 1) {
           label = outputLabels[n] ?? null;
           arrow = outputArrows[n] ?? null;
@@ -320,24 +283,6 @@ export class NetworkVisualizer {
     return { neurons, edges, rows };
   }
 
-  /** Input axis labels: `ray1…rayN` (or paired `ray1 d`/`ray1 s` when stateAware),
-   *  then the trailing `speed` input.
-   */
-  static #inputLabels(count: number, stateAware: boolean): string[] {
-    const labels: string[] = [];
-    if (stateAware) {
-      const rayCount = (count - 1) / 2;
-      for (let i = 0; i < rayCount; i++) {
-        labels.push(`ray${i + 1} d`);
-        labels.push(`ray${i + 1} s`);
-      }
-    } else {
-      for (let i = 0; i < count - 1; i++) labels.push(`ray${i + 1}`);
-    }
-    labels.push('speed');
-    return labels;
-  }
-
   // ---------------------------------------------------------------------------
   // Edge / neuron rendering
   // ---------------------------------------------------------------------------
@@ -363,9 +308,9 @@ export class NetworkVisualizer {
       ctx.moveTo(edge.x1, edge.y1);
       ctx.lineTo(edge.x2, edge.y2);
       ctx.lineWidth = focused ? 3 : 1 + mag * 2;
-      ctx.strokeStyle = NetworkVisualizer.#color(
+      ctx.strokeStyle = divergingColor(
         edge.weight,
-        dim ? 0.08 : NetworkVisualizer.#alpha(edge.weight),
+        dim ? 0.08 : alphaFloor(edge.weight),
       );
       ctx.stroke();
 
@@ -401,7 +346,7 @@ export class NetworkVisualizer {
       const y = lerp(edge.y1, edge.y2, p);
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = NetworkVisualizer.#color(edge.signal, 0.6 + 0.4 * mag);
+      ctx.fillStyle = divergingColor(edge.signal, 0.6 + 0.4 * mag);
       ctx.fill();
     }
   }
@@ -425,7 +370,7 @@ export class NetworkVisualizer {
       ctx.fill();
 
       // Glowing core representing the activation via a radial gradient.
-      const coreAlpha = (dim ? 0.4 : 1) * NetworkVisualizer.#alpha(node.value);
+      const coreAlpha = (dim ? 0.4 : 1) * alphaFloor(node.value);
       const grad = ctx.createRadialGradient(
         node.x,
         node.y,
@@ -434,8 +379,8 @@ export class NetworkVisualizer {
         node.y,
         node.r * 0.85,
       );
-      grad.addColorStop(0, NetworkVisualizer.#color(node.value, coreAlpha));
-      grad.addColorStop(1, NetworkVisualizer.#color(node.value, 0));
+      grad.addColorStop(0, divergingColor(node.value, coreAlpha));
+      grad.addColorStop(1, divergingColor(node.value, 0));
       ctx.beginPath();
       ctx.arc(node.x, node.y, node.r * 0.85, 0, Math.PI * 2);
       ctx.fillStyle = grad;
@@ -447,9 +392,9 @@ export class NetworkVisualizer {
         ctx.lineWidth = 2;
         ctx.arc(node.x, node.y, node.r * 0.82, 0, Math.PI * 2);
         ctx.setLineDash([3, 3]);
-        ctx.strokeStyle = NetworkVisualizer.#color(
+        ctx.strokeStyle = divergingColor(
           node.bias,
-          dim ? 0.15 : NetworkVisualizer.#alpha(node.bias),
+          dim ? 0.15 : alphaFloor(node.bias),
         );
         ctx.stroke();
         ctx.setLineDash([]);
@@ -481,7 +426,7 @@ export class NetworkVisualizer {
 
       // Output direction arrow drawn inside the node.
       if (node.arrow && !dim) {
-        NetworkVisualizer.#drawArrow(ctx, node.x, node.y, node.arrow, node.r);
+        drawArrow(ctx, node.x, node.y, node.arrow, node.r);
       }
 
       // Axis label (ray1…/speed under inputs, control name above outputs).
@@ -509,54 +454,6 @@ export class NetworkVisualizer {
       ctx.textBaseline = 'bottom';
       ctx.fillText(node.label!, node.x, node.y - node.r - 6);
     }
-  }
-
-  /**
-   * Draw a simple direction arrow centred at (x, y). Stroked twice (dark
-   * outline then white) so it reads on any node-core colour.
-   */
-  static #drawArrow(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    dir: ArrowDir,
-    nodeRadius: number,
-  ): void {
-    const s = nodeRadius * 0.55; // half-length of the arrow shaft
-    const rot = {
-      up: 0,
-      right: Math.PI / 2,
-      down: Math.PI,
-      left: -Math.PI / 2,
-    }[dir];
-
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    // Path traced pointing "up" before rotation.
-    const trace = (): void => {
-      ctx.beginPath();
-      ctx.moveTo(0, s);
-      ctx.lineTo(0, -s);
-      ctx.moveTo(-s * 0.55, -s * 0.35);
-      ctx.lineTo(0, -s);
-      ctx.lineTo(s * 0.55, -s * 0.35);
-    };
-
-    ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-    ctx.lineWidth = 4;
-    trace();
-    ctx.stroke();
-
-    ctx.strokeStyle = 'rgba(255,255,255,0.95)';
-    ctx.lineWidth = 2;
-    trace();
-    ctx.stroke();
-
-    ctx.restore();
   }
 
   /**
@@ -588,7 +485,7 @@ export class NetworkVisualizer {
       const cy = below
         ? node.y + node.r + gap + chipH / 2
         : node.y - node.r - gap - chipH / 2;
-      NetworkVisualizer.#drawLabelChip(ctx, lines, node.x, cy, 'center');
+      drawLabelChip(ctx, lines, node.x, cy, 'center');
       return;
     }
 
@@ -599,15 +496,9 @@ export class NetworkVisualizer {
     const chipW = maxW + 8;
     const rightX = node.x + node.r + 6;
     if (rightX + chipW <= ctx.canvas.width - 4) {
-      NetworkVisualizer.#drawLabelChip(ctx, lines, rightX, node.y, 'left');
+      drawLabelChip(ctx, lines, rightX, node.y, 'left');
     } else {
-      NetworkVisualizer.#drawLabelChip(
-        ctx,
-        lines,
-        node.x - node.r - 6,
-        node.y,
-        'right',
-      );
+      drawLabelChip(ctx, lines, node.x - node.r - 6, node.y, 'right');
     }
   }
 
@@ -638,13 +529,7 @@ export class NetworkVisualizer {
       const y = isOutgoing
         ? edge.y2 - (dy / len) * offset
         : edge.y1 + (dy / len) * offset;
-      NetworkVisualizer.#drawLabelChip(
-        ctx,
-        [edge.weight.toFixed(2)],
-        x,
-        y,
-        'center',
-      );
+      drawLabelChip(ctx, [edge.weight.toFixed(2)], x, y, 'center');
     }
   }
 
@@ -662,9 +547,9 @@ export class NetworkVisualizer {
 
     // Gradient bar cyan(−1) → dark(0) → amber(+1).
     const grad = ctx.createLinearGradient(x, 0, x + barW, 0);
-    grad.addColorStop(0, NetworkVisualizer.#color(-1, 1));
+    grad.addColorStop(0, divergingColor(-1, 1));
     grad.addColorStop(0.5, 'rgba(40,40,40,1)');
-    grad.addColorStop(1, NetworkVisualizer.#color(1, 1));
+    grad.addColorStop(1, divergingColor(1, 1));
     ctx.fillStyle = grad;
     ctx.fillRect(x, y, barW, barH);
     ctx.lineWidth = 1;
@@ -690,7 +575,7 @@ export class NetworkVisualizer {
     const h = 18;
     this.#toggleRect = { x, y, w, h };
     ctx.beginPath();
-    NetworkVisualizer.#roundRect(ctx, x, y, w, h, 4);
+    roundRectPath(ctx, x, y, w, h, 4);
     ctx.fillStyle = this.#showAllValues
       ? 'rgba(255,176,0,0.85)'
       : 'rgba(20,20,26,0.85)';
@@ -715,12 +600,7 @@ export class NetworkVisualizer {
       `contrib ${edge.signal.toFixed(3)}`,
       `#${edge.i} → #${edge.j}`,
     ];
-    NetworkVisualizer.#drawTooltip(
-      ctx,
-      lines,
-      this.#mouseX + 14,
-      this.#mouseY + 14,
-    );
+    drawTooltip(ctx, lines, this.#mouseX + 14, this.#mouseY + 14);
   }
 
   // ---------------------------------------------------------------------------
@@ -746,14 +626,7 @@ export class NetworkVisualizer {
     let bestDist = NetworkVisualizer.#EDGE_HIT_TOLERANCE;
     for (let e = 0; e < layout.edges.length; e++) {
       const edge = layout.edges[e];
-      const d = NetworkVisualizer.#pointSegmentDistance(
-        x,
-        y,
-        edge.x1,
-        edge.y1,
-        edge.x2,
-        edge.y2,
-      );
+      const d = pointSegmentDistance(x, y, edge.x1, edge.y1, edge.x2, edge.y2);
       if (d < bestDist) {
         bestDist = d;
         best = e;
@@ -765,157 +638,5 @@ export class NetworkVisualizer {
   #isOverToggle(x: number, y: number): boolean {
     const r = this.#toggleRect;
     return !!r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
-  }
-
-  // ---------------------------------------------------------------------------
-  // Shared drawing / math helpers
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Diverging palette: positive → amber→yellow, negative → cyan. Both read
-   * strongly on the black canvas (unlike the old dark blue).
-   */
-  static #color(value: number, alpha: number): string {
-    // Brains that have never been fed (e.g. the KEYS car's brain, which is
-    // built but never driven by feedForward) have undefined/NaN neuron
-    // values. Treat those as 0 so the visualizer renders a neutral net
-    // instead of crashing on `rgba(NaN, NaN, 255, NaN)`.
-    const v = Number.isFinite(value) ? value : 0;
-    const a = Number.isFinite(alpha) ? alpha : 0;
-    const t = Math.max(-1, Math.min(1, v));
-    let r: number;
-    let g: number;
-    let b: number;
-    if (t >= 0) {
-      // #FFB000 (low) → #FFE44D (high)
-      r = 255;
-      g = Math.round(lerp(176, 228, t));
-      b = Math.round(lerp(0, 77, t));
-    } else {
-      // pale cyan (low magnitude) → pure #00E5FF (high magnitude)
-      const m = -t;
-      r = Math.round(lerp(140, 0, m));
-      g = Math.round(lerp(210, 229, m));
-      b = 255;
-    }
-    return `rgba(${r}, ${g}, ${b}, ${a})`;
-  }
-
-  /** Alpha with a floor so weak values stay faintly visible instead of vanishing. */
-  static #alpha(value: number): number {
-    const v = Number.isFinite(value) ? value : 0;
-    return 0.25 + 0.75 * Math.min(1, Math.abs(v));
-  }
-
-  /** Shortest distance from a point to a line segment. */
-  static #pointSegmentDistance(
-    px: number,
-    py: number,
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-  ): number {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const lenSq = dx * dx + dy * dy;
-    let t = lenSq === 0 ? 0 : ((px - x1) * dx + (py - y1) * dy) / lenSq;
-    t = Math.max(0, Math.min(1, t));
-    const cx = x1 + t * dx;
-    const cy = y1 + t * dy;
-    return Math.hypot(px - cx, py - cy);
-  }
-
-  /** A small dark rounded chip with light text, used for inline value labels. */
-  static #drawLabelChip(
-    ctx: CanvasRenderingContext2D,
-    lines: string[],
-    x: number,
-    y: number,
-    align: 'left' | 'center' | 'right',
-  ): void {
-    ctx.font = '10px Arial';
-    const padX = 4;
-    const padY = 3;
-    const lineH = 12;
-    let maxW = 0;
-    for (const l of lines) maxW = Math.max(maxW, ctx.measureText(l).width);
-    const w = maxW + padX * 2;
-    const h = lines.length * lineH + padY * 2;
-    const bx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
-    const by = y - h / 2;
-
-    ctx.beginPath();
-    NetworkVisualizer.#roundRect(ctx, bx, by, w, h, 4);
-    ctx.fillStyle = 'rgba(10,10,15,0.9)';
-    ctx.fill();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.stroke();
-
-    ctx.fillStyle = 'rgba(240,240,240,0.95)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], bx + w / 2, by + padY + lineH * (i + 0.5));
-    }
-  }
-
-  /** A cursor tooltip clamped to stay fully on-canvas. */
-  static #drawTooltip(
-    ctx: CanvasRenderingContext2D,
-    lines: string[],
-    x: number,
-    y: number,
-  ): void {
-    ctx.font = '11px monospace';
-    const padX = 8;
-    const padY = 6;
-    const lineH = 14;
-    let maxW = 0;
-    for (const l of lines) maxW = Math.max(maxW, ctx.measureText(l).width);
-    const w = maxW + padX * 2;
-    const h = lines.length * lineH + padY * 2;
-
-    // Clamp so the tooltip never spills off the canvas.
-    let bx = x;
-    let by = y;
-    if (bx + w > ctx.canvas.width) bx = ctx.canvas.width - w - 4;
-    if (by + h > ctx.canvas.height) by = ctx.canvas.height - h - 4;
-    if (bx < 4) bx = 4;
-    if (by < 4) by = 4;
-
-    ctx.beginPath();
-    NetworkVisualizer.#roundRect(ctx, bx, by, w, h, 6);
-    ctx.fillStyle = 'rgba(10,10,15,0.85)';
-    ctx.fill();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-    ctx.stroke();
-
-    ctx.fillStyle = 'rgba(240,240,240,0.95)';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], bx + padX, by + padY + lineH * (i + 0.5));
-    }
-  }
-
-  /** Trace a rounded-rectangle path (caller fills/strokes). */
-  static #roundRect(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    r: number,
-  ): void {
-    const radius = Math.min(r, w / 2, h / 2);
-    ctx.moveTo(x + radius, y);
-    ctx.arcTo(x + w, y, x + w, y + h, radius);
-    ctx.arcTo(x + w, y + h, x, y + h, radius);
-    ctx.arcTo(x, y + h, x, y, radius);
-    ctx.arcTo(x, y, x + w, y, radius);
-    ctx.closePath();
   }
 }
