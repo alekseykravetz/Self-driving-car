@@ -120,4 +120,39 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // Layer-1 purity: math/primitives/graph/osm-importer must stay pure and
+    // must never import "upward" into higher-layer domains. Enforced here so
+    // the architectural invariant is caught by CI/lint, not review alone.
+    files: ['ts/math/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: [
+                '**/car/**',
+                '**/world/**',
+                '**/rendering/**',
+                '**/neural-network/**',
+                '**/simulator/**',
+                '**/ui/**',
+                '**/store/**',
+                '**/race/**',
+                '**/traffic/**',
+                '**/viewport/**',
+                '**/camera/**',
+                '**/audio/**',
+                '**/mini-map/**',
+                '**/input/**',
+              ],
+              message:
+                'Layer-1 purity: ts/math/** must not import from higher layers (car, world, rendering, neural-network, simulator, ui, store, race, traffic, viewport, camera, audio, mini-map, input). Define local types instead (see heatmapGrid.ts VehiclePosition).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
