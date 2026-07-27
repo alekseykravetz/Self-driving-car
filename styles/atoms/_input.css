@@ -94,6 +94,16 @@
   padding: var(--space-0\.5) var(--space-1);
   font-size: var(--text-base);
 }
+
+/* The generic `#trainingManagerPanel input[type='number']` rule above has ID
+   specificity and would otherwise override the compact width/padding/font,
+   stretching the input full-width and taller than the +/- buttons. Re-scope
+   the compact values under the panel ID so they win. */
+#trainingManagerPanel .num-input-row-sm input[type='number'] {
+  width: var(--space-12);
+  padding: var(--space-0\.5) var(--space-1);
+  font-size: var(--text-base);
+}
 .num-input-row-sm .num-btn {
   width: var(--size-checkbox-lg);
   min-width: var(--size-checkbox-lg);
