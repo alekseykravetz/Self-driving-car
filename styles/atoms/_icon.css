@@ -234,6 +234,19 @@ app-icon:hover .app-icon-svg {
   }
 }
 
+@keyframes ic-write {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  25% {
+    transform: translate(-0.6px, 0.6px) rotate(-4deg);
+  }
+  75% {
+    transform: translate(0.6px, -0.6px) rotate(4deg);
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    Idle animations (opt-in via the `animate` attribute → .is-animated)
    ═══════════════════════════════════════════════════════════════════ */
@@ -329,6 +342,10 @@ app-icon:hover .app-icon-svg {
 
 .app-icon-svg.is-animated .ic-crossing-legs {
   animation: ic-wiggle 1.6s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-edit {
+  animation: ic-write 2s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
