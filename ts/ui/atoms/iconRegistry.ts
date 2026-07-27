@@ -56,6 +56,8 @@ export type IconName =
   | 'folder'
   | 'regenerate'
   | 'restart'
+  | 'play'
+  | 'pause'
   | 'plus'
   | 'minus'
   | 'edit'
@@ -317,6 +319,17 @@ export const ICON_REGISTRY: Record<IconName, string> = {
     <g class="ic-restart" ${S}>
       <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
       <path d="M4 4v4h4" />
+    </g>`,
+
+  play: `
+    <g class="ic-play" ${F} stroke="none">
+      <path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.87l11.3-6.8a1 1 0 0 0 0-1.74L9 4.33a1 1 0 0 0-1.5.87z" />
+    </g>`,
+
+  pause: `
+    <g class="ic-pause" ${F} stroke="none">
+      <rect x="6.5" y="4.5" width="3.6" height="15" rx="1.2" />
+      <rect x="13.9" y="4.5" width="3.6" height="15" rx="1.2" />
     </g>`,
 
   plus: `

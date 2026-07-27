@@ -60,6 +60,13 @@ editor-toolbar .controls-group {
   align-items: center;
 }
 
+/* Match the render-frames control height to sibling groups so its
+   input + buttons sit vertically centred within the section. */
+#animationLoopToolbar .num-input-row {
+  height: var(--space-8);
+  align-items: center;
+}
+
 .time-display-group {
   height: var(--space-8);
   display: flex;

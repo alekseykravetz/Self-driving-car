@@ -38,6 +38,20 @@
   min-width: 0;
   -moz-appearance: textfield;
   appearance: textfield;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  text-align: center;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.num-input-row input[type='number']:focus {
+  outline: none;
+  border-color: var(--color-border-input-focus);
+  background: var(--color-bg-active);
 }
 .num-input-row input[type='number']::-webkit-inner-spin-button,
 .num-input-row input[type='number']::-webkit-outer-spin-button {

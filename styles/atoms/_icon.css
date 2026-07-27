@@ -404,7 +404,9 @@ app-icon:hover .app-icon-svg {
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-plus,
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-minus,
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-check,
-:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-cross {
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-cross,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-play,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-pause {
   transform: scale(1.2);
 }
 

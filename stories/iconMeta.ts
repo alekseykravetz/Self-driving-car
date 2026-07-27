@@ -228,6 +228,18 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     idle: null,
     hover: 'Spin (reverse)',
   },
+  play: {
+    category: ACTION,
+    desc: 'Play / resume triangle',
+    idle: null,
+    hover: 'Scale pop',
+  },
+  pause: {
+    category: ACTION,
+    desc: 'Pause bars',
+    idle: null,
+    hover: 'Scale pop',
+  },
   plus: {
     category: ACTION,
     desc: 'Plus / add',

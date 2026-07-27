@@ -24,7 +24,7 @@
 }
 
 .car-config-summary {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-1) var(--space-1\.5);
 }

@@ -8,7 +8,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
           class="toolbar-btn active"
           data-tooltip="Pause / resume the simulation"
         >
-          ⏸️
+          <app-icon name="pause"></app-icon>
         </button>
       </div>
     </div>
@@ -16,12 +16,14 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
     <div class="controls-separator"></div>
 
     <div class="controls-group">
-      <span class="controls-group-label">Render fr</span>
-      <label
-        class="view-toggle-label"
+      <span class="controls-group-label">Render frames</span>
+      <div
+        class="num-input-row num-input-row-sm"
         data-tooltip="Draw 1 of every N frames (physics always runs at full rate). Higher = fewer redraws = faster sim with choppier visuals."
       >
-        <span>1 /</span>
+        <button type="button" class="num-btn" id="renderIntervalDec">
+          <app-icon name="minus"></app-icon>
+        </button>
         <input
           type="number"
           id="renderInterval"
@@ -29,9 +31,11 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
           max="10"
           step="1"
           value="1"
-          style="width: 3em"
         />
-      </label>
+        <button type="button" class="num-btn" id="renderIntervalInc">
+          <app-icon name="plus"></app-icon>
+        </button>
+      </div>
     </div>
 
     <div class="controls-separator"></div>

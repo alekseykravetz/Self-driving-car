@@ -51,6 +51,20 @@ export class AnimationLoopToolbarElement extends HTMLElement {
       intervalInput.addEventListener('change', () => {
         this.#cachedRenderInterval = this.#clampInterval(intervalInput.value);
       });
+
+      const step = (delta: number): void => {
+        const next = this.#clampInterval(
+          String((Number(intervalInput.value) || 1) + delta),
+        );
+        intervalInput.value = String(next);
+        this.#cachedRenderInterval = next;
+      };
+      this.querySelector('#renderIntervalDec')?.addEventListener('click', () =>
+        step(-1),
+      );
+      this.querySelector('#renderIntervalInc')?.addEventListener('click', () =>
+        step(1),
+      );
     }
 
     makeToolbarCollapsible(this, 'Anim');
@@ -129,7 +143,9 @@ export class AnimationLoopToolbarElement extends HTMLElement {
   togglePause(forceState?: boolean): void {
     this.#_paused = forceState !== undefined ? forceState : !this.#_paused;
     if (this.#pauseBtn) {
-      this.#pauseBtn.textContent = this.#_paused ? '▶️' : '⏸️';
+      this.#pauseBtn
+        .querySelector('app-icon')
+        ?.setAttribute('name', this.#_paused ? 'play' : 'pause');
       this.#pauseBtn.classList.toggle('active', !this.#_paused);
     }
   }
