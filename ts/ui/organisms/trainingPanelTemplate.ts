@@ -11,14 +11,14 @@ export const TRAINING_PANEL_TEMPLATE = `
       class="btn-sm btn-success-outline"
       title="Save pool to localStorage and download .car files"
     >
-      💾 Save
+      <app-icon name="save"></app-icon> Save
     </button>
     <button
       id="discardBtn"
       class="btn-sm btn-danger-outline"
       title="Delete saved brain from localStorage"
     >
-      🗑️ Clear
+      <app-icon name="trash"></app-icon> Clear
     </button>
   </div>
 </div>
@@ -28,38 +28,38 @@ export const TRAINING_PANEL_TEMPLATE = `
   <div class="section-title">Statistics</div>
   <div id="statsPanel">
     <div class="stat-row">
-      <span class="stat-emoji">🧬</span>
+      <span class="stat-emoji"><app-icon name="dna"></app-icon></span>
       <span class="stat-label">Gen</span>
       <span class="stat-value" id="stat-gen">0</span>
     </div>
     <div class="stat-row">
-      <span class="stat-emoji">🛣️</span>
+      <span class="stat-emoji"><app-icon name="road"></app-icon></span>
       <span class="stat-label">Dist</span>
       <span class="stat-value" id="stat-dist">0</span>
     </div>
     <div class="stat-row">
-      <span class="stat-emoji">💨</span>
+      <span class="stat-emoji"><app-icon name="dash"></app-icon></span>
       <span class="stat-label">Speed</span>
       <span class="stat-value" id="stat-speed">0 km/h</span>
     </div>
     <div class="stat-row">
-      <span class="stat-emoji">🟢</span>
+      <span class="stat-emoji"><app-icon name="alive"></app-icon></span>
       <span class="stat-label">Alive</span>
       <span class="stat-value" id="stat-alive">0</span>
     </div>
     <div class="stat-row">
-      <span class="stat-emoji">💀</span>
+      <span class="stat-emoji"><app-icon name="skull"></app-icon></span>
       <span class="stat-label">Dead</span>
       <span class="stat-value" id="stat-dead">0</span>
     </div>
     <div class="stat-row stat-row-toggle" id="stat-frozen-row" title="Click to toggle idle (freeze far cars)">
-      <span class="stat-emoji">❄️</span>
+      <span class="stat-emoji"><app-icon name="frozen"></app-icon></span>
       <span class="stat-label">Idle</span>
       <span class="stat-value" id="stat-frozen">0</span>
     </div>
     <div class="idle-range-wrap" id="idleRangeWrap" title="Cars farther than this distance from the best car are frozen (idle) to save performance">
       <div class="num-input-row num-input-row-sm">
-        <button class="num-btn num-btn-dec" data-target="idleRange">➖</button>
+        <button class="num-btn num-btn-dec" data-target="idleRange"><app-icon name="minus"></app-icon></button>
         <input
           type="number"
           id="idleRange"
@@ -69,7 +69,7 @@ export const TRAINING_PANEL_TEMPLATE = `
           step="200"
           title="Cars farther than this distance from the best car are frozen (idle) to save performance"
         />
-        <button class="num-btn num-btn-inc" data-target="idleRange">➕</button>
+        <button class="num-btn num-btn-inc" data-target="idleRange"><app-icon name="plus"></app-icon></button>
       </div>
     </div>
   </div>
@@ -225,7 +225,7 @@ export const TRAINING_PANEL_TEMPLATE = `
     <div class="ctrl">
       <span class="ctrl-label">Cars</span>
       <div class="num-input-row">
-        <button class="num-btn num-btn-dec" data-target="carCount">➖</button>
+        <button class="num-btn num-btn-dec" data-target="carCount"><app-icon name="minus"></app-icon></button>
         <input
           type="number"
           id="carCount"
@@ -235,13 +235,13 @@ export const TRAINING_PANEL_TEMPLATE = `
           step="500"
           title="Number of AI cars in the population"
         />
-        <button class="num-btn num-btn-inc" data-target="carCount">➕</button>
+        <button class="num-btn num-btn-inc" data-target="carCount"><app-icon name="plus"></app-icon></button>
       </div>
     </div>
     <div class="ctrl">
       <span class="ctrl-label">Mutation</span>
       <div class="num-input-row">
-        <button class="num-btn num-btn-dec" data-target="threshold">➖</button>
+        <button class="num-btn num-btn-dec" data-target="threshold"><app-icon name="minus"></app-icon></button>
         <input
           type="number"
           id="threshold"
@@ -251,13 +251,13 @@ export const TRAINING_PANEL_TEMPLATE = `
           max="1"
           title="Mutation amount applied each generation"
         />
-        <button class="num-btn num-btn-inc" data-target="threshold">➕</button>
+        <button class="num-btn num-btn-inc" data-target="threshold"><app-icon name="plus"></app-icon></button>
       </div>
     </div>
     <div class="ctrl">
       <span class="ctrl-label">Pool</span>
       <div class="num-input-row">
-        <button class="num-btn num-btn-dec" data-target="poolCount">➖</button>
+        <button class="num-btn num-btn-dec" data-target="poolCount"><app-icon name="minus"></app-icon></button>
         <input
           type="number"
           id="poolCount"
@@ -267,7 +267,7 @@ export const TRAINING_PANEL_TEMPLATE = `
           step="1"
           title="Number of top cars kept in the best pool"
         />
-        <button class="num-btn num-btn-inc" data-target="poolCount">➕</button>
+        <button class="num-btn num-btn-inc" data-target="poolCount"><app-icon name="plus"></app-icon></button>
       </div>
     </div>
   </div>
@@ -282,14 +282,14 @@ export const TRAINING_PANEL_TEMPLATE = `
       class="btn-lg btn-primary"
       title="Start next generation (keeps best brains)"
     >
-      🧬 Next Gen
+      <app-icon name="dna"></app-icon> Next Gen
     </button>
     <button
       id="newTrainingBtn"
       class="btn-lg btn-danger"
       title="Start fresh training (no brains carried over)"
     >
-      🔄 New Training
+      <app-icon name="restart"></app-icon> New Training
     </button>
   </div>
 </div>

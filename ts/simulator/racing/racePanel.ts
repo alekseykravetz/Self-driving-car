@@ -62,7 +62,7 @@ export class RacePanel {
     const restartBtn = document.createElement('button');
     restartBtn.id = 'restartRaceBtn';
     restartBtn.style.margin = '0';
-    restartBtn.textContent = '🔄 Restart';
+    restartBtn.innerHTML = '<app-icon name="restart"></app-icon> Restart';
     restartBtn.className = 'race-panel-btn';
     restartBtn.addEventListener('click', onRestart);
 
@@ -92,7 +92,12 @@ export class RacePanel {
       const stat = document.getElementById('stat_' + i) as HTMLElement;
       if (!stat) continue;
       stat.style.color = cars[i].type === 'AI' ? 'white' : cars[i].color;
-      stat.innerText = `${i + 1}: ${cars[i].name} ${cars[i].damaged ? '💀' : ''}`;
+      stat.textContent = `${i + 1}: ${cars[i].name} `;
+      if (cars[i].damaged) {
+        const skull = document.createElement('app-icon');
+        skull.setAttribute('name', 'skull');
+        stat.appendChild(skull);
+      }
       stat.style.backgroundColor = cars[i].type === 'AI' ? 'black' : 'white';
       if (cars[i].finishTime) {
         stat.innerHTML +=

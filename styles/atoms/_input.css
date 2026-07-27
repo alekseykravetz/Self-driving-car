@@ -58,6 +58,10 @@
   padding: 0;
   cursor: pointer;
   background: var(--color-bg-active);
+  /* Inline SVG icons use `currentColor`; keep buttons on the light UI colour
+     so icons stay legible on the dark surface (native buttons default to
+     black). */
+  color: var(--color-text-primary);
   font-size: var(--text-sm);
   line-height: 1;
   flex-shrink: 0;

@@ -345,7 +345,7 @@ export class TrainingPanelElement extends HTMLElement {
     }
   }
 
-  /** Rebuild the collapsed car-config summary (emoji icon + readonly value). */
+  /** Rebuild the collapsed car-config summary (icon + readonly value). */
   #updateCarConfigSummary(): void {
     if (!this.#carConfigSummary) return;
     const v = (input: HTMLInputElement | null, fallback = ''): string => {
@@ -354,25 +354,33 @@ export class TrainingPanelElement extends HTMLElement {
     };
     const items: Array<[string, string, string]> = [
       [
-        '↕️',
+        'height',
         'Height',
         v(this.#carHeightInput, String(DEFAULT_CAR_CONFIG.height)),
       ],
-      ['↔️', 'Width', v(this.#carWidthInput, String(DEFAULT_CAR_CONFIG.width))],
-      ['🧠', 'Hidden Layers', v(this.#carHiddenLayersInput)],
-      ['🚀', 'Max Speed', v(this.#carMaxSpeedInput)],
-      ['⚡', 'Accel', v(this.#carAccelerationInput)],
-      ['🛞', 'Friction', v(this.#carFrictionInput)],
-      ['📡', 'Rays', v(this.#carRayCountInput)],
-      ['📐', 'Ray Len', v(this.#carRayLengthInput)],
-      ['🔦', 'Ray Spread', v(this.#carRaySpreadInput)],
-      ['🎯', 'Ray Offset', v(this.#carRayOffsetInput)],
-      ['🧠', 'State Aware', this.#carStateAwareCheck?.checked ? 'yes' : 'no'],
+      [
+        'width',
+        'Width',
+        v(this.#carWidthInput, String(DEFAULT_CAR_CONFIG.width)),
+      ],
+      ['brain', 'Hidden Layers', v(this.#carHiddenLayersInput)],
+      ['rocket', 'Max Speed', v(this.#carMaxSpeedInput)],
+      ['bolt', 'Accel', v(this.#carAccelerationInput)],
+      ['tire', 'Friction', v(this.#carFrictionInput)],
+      ['antenna', 'Rays', v(this.#carRayCountInput)],
+      ['ruler', 'Ray Len', v(this.#carRayLengthInput)],
+      ['flashlight', 'Ray Spread', v(this.#carRaySpreadInput)],
+      ['target', 'Ray Offset', v(this.#carRayOffsetInput)],
+      [
+        'brain',
+        'State Aware',
+        this.#carStateAwareCheck?.checked ? 'yes' : 'no',
+      ],
     ];
     this.#carConfigSummary.innerHTML = items
       .map(
-        ([emoji, label, value]) =>
-          `<span class="cfg-chip" title="${label}"><span class="cfg-chip-emoji">${emoji}</span><span class="cfg-chip-value">${value}</span></span>`,
+        ([icon, label, value]) =>
+          `<span class="cfg-chip" title="${label}"><span class="cfg-chip-emoji"><app-icon name="${icon}"></app-icon></span><span class="cfg-chip-value">${value}</span></span>`,
       )
       .join('');
   }

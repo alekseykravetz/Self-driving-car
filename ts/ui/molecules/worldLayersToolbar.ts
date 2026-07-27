@@ -18,26 +18,38 @@ import { WORLD_LAYERS_TOOLBAR_TEMPLATE } from './worldLayersToolbarTemplate.js';
  * outside the class; file-scope button metadata) — see the storePanel pattern.
  */
 
-/** Ordered layer buttons: emoji glyph + tooltip per WorldLayerId. */
+/** Ordered layer buttons: icon name + tooltip per WorldLayerId. */
 const WORLD_LAYER_BUTTONS: {
   id: WorldLayerId;
-  emoji: string;
+  icon: string;
   title: string;
 }[] = [
   {
     id: 'roads',
-    emoji: '🛣️',
+    icon: 'road',
     title: 'Roads — asphalt, borders, lane & direction markings',
   },
-  { id: 'markings', emoji: '🚦', title: 'Markings — stop/yield/light/etc.' },
-  { id: 'corridors', emoji: '🛤️', title: 'Corridors — authored corridors' },
+  {
+    id: 'markings',
+    icon: 'traffic-light',
+    title: 'Markings — stop/yield/light/etc.',
+  },
+  {
+    id: 'corridors',
+    icon: 'corridor',
+    title: 'Corridors — authored corridors',
+  },
   {
     id: 'itemBases',
-    emoji: '📍',
+    icon: 'pin',
     title: 'Item bases — flat building footprints & tree base circles',
   },
-  { id: 'trees', emoji: '🌳', title: 'Trees — rendered 3D trees' },
-  { id: 'buildings', emoji: '🏢', title: 'Buildings — rendered 3D buildings' },
+  { id: 'trees', icon: 'tree', title: 'Trees — rendered 3D trees' },
+  {
+    id: 'buildings',
+    icon: 'building',
+    title: 'Buildings — rendered 3D buildings',
+  },
 ];
 
 export class WorldLayersToolbarElement extends HTMLElement {
@@ -65,7 +77,7 @@ export class WorldLayersToolbarElement extends HTMLElement {
 
     const toggles = WORLD_LAYER_BUTTONS.map(
       (b) =>
-        `<button class="toolbar-btn layer-toggle" data-layer="${b.id}" data-tooltip="${b.title}">${b.emoji}</button>`,
+        `<button class="toolbar-btn layer-toggle" data-layer="${b.id}" data-tooltip="${b.title}"><app-icon name="${b.icon}"></app-icon></button>`,
     ).join('');
 
     container.innerHTML = `
@@ -77,14 +89,14 @@ export class WorldLayersToolbarElement extends HTMLElement {
       <div class="controls-group" data-items>
         <span class="controls-group-label">Items</span>
         <div class="world-layers-keys">
-          <button id="regenerateItemsBtn" class="toolbar-btn" data-tooltip="Regenerate items — rebuild buildings & trees">♻️</button>
+          <button id="regenerateItemsBtn" class="toolbar-btn" data-tooltip="Regenerate items — rebuild buildings & trees"><app-icon name="regenerate"></app-icon></button>
         </div>
       </div>
       <div class="controls-separator" data-overlays></div>
       <div class="controls-group" data-overlays>
         <span class="controls-group-label">Overlays</span>
         <div class="world-layers-keys">
-          <button id="showHeatmapBtn" class="toolbar-btn layer-toggle" data-tooltip="Traffic congestion heatmap — paint vehicle occupancy per grid cell">🌡️</button>
+          <button id="showHeatmapBtn" class="toolbar-btn layer-toggle" data-tooltip="Traffic congestion heatmap — paint vehicle occupancy per grid cell"><app-icon name="heatmap"></app-icon></button>
         </div>
       </div>`;
 

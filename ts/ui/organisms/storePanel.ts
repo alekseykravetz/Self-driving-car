@@ -202,11 +202,11 @@ export class StorePanelElement extends HTMLElement {
       .map(
         (w) => `
       <tr class="${w.id === activeId ? 'store-row-active' : ''}">
-        <td class="store-marker">${w.id === activeId ? '✓' : ''}</td>
+        <td class="store-marker">${w.id === activeId ? '<app-icon name="check" style="color: var(--color-accent-green-strong)"></app-icon>' : ''}</td>
         <td>${stripFileExtension(w.name)}</td>
         <td class="store-source">${w.source}</td>
-        <td class="store-marker">${w.hasStartMarker ? '✓' : '✗'}</td>
-        <td class="store-marker">${w.hasEndMarker ? '✓' : '✗'}</td>
+        <td class="store-marker">${w.hasStartMarker ? '<app-icon name="check" style="color: var(--color-accent-green-strong)"></app-icon>' : '<app-icon name="cross" style="color: var(--color-accent-red)"></app-icon>'}</td>
+        <td class="store-marker">${w.hasEndMarker ? '<app-icon name="check" style="color: var(--color-accent-green-strong)"></app-icon>' : '<app-icon name="cross" style="color: var(--color-accent-red)"></app-icon>'}</td>
       </tr>`,
       )
       .join('');
@@ -260,7 +260,7 @@ export class StorePanelElement extends HTMLElement {
       .map(
         (c) => `
       <tr class="${activeIds.has(c.id) ? 'store-row-active' : ''}">
-        <td class="store-marker">${activeIds.has(c.id) ? '✓' : ''}</td>
+        <td class="store-marker">${activeIds.has(c.id) ? '<app-icon name="check" style="color: var(--color-accent-green-strong)"></app-icon>' : ''}</td>
         <td>${stripFileExtension(c.name)}</td>
         <td class="store-source">${c.source}</td>
         <td>${spFormatHiddenLayers(c.data)}</td>
@@ -315,8 +315,8 @@ export class StorePanelElement extends HTMLElement {
         <td>${spFormatSize(e.size)}</td>
         <td>${e.count ?? '-'}</td>
         <td class="store-actions">
-          <button class="store-action-btn store-export-btn" data-key="${e.key}" title="Export">📥</button>
-          <button class="store-action-btn store-delete-btn" data-key="${e.key}" title="Delete">🗑️</button>
+          <button class="store-action-btn store-export-btn" data-key="${e.key}" title="Export"><app-icon name="export"></app-icon></button>
+          <button class="store-action-btn store-delete-btn" data-key="${e.key}" title="Delete"><app-icon name="trash"></app-icon></button>
         </td>
       </tr>`,
       )

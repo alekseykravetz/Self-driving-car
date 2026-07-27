@@ -1,3 +1,4 @@
+import '../../ui/atoms/appIcon.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { HumanBackpropSimulator } from './humanBackpropSimulator.js';

@@ -219,6 +219,52 @@ Smallest reusable styles — single-element rules and base resets.
 | `_badge.css`         | Status badge / indicator dot styles                                  |
 | `_key-indicator.css` | Keyboard shortcut indicator caps                                     |
 | `_toolbar-btn.css`   | Toolbar-specific button sizing and appearance                        |
+| `_icon.css`          | `<app-icon>` sizing, colour, and idle/hover SVG animations           |
+
+> **Colour inheritance note:** App pages set `body:not(.main-page)` to
+> `--color-text-primary`, and every icon-hosting `<button>` (`.toolbar-btn`,
+> `.num-btn`, `.store-action-btn`, …) sets an explicit light `color`. This
+> matters because inline SVG icons paint with `currentColor` — a native
+> `<button>` otherwise falls back to the UA default (black) and the icon
+> disappears on the dark panels.
+
+### Icons (`<app-icon>`)
+
+Every icon in the app is a custom line-icon rendered by the `<app-icon>` atom
+(`ts/ui/atoms/appIcon.ts`), which inlines SVG markup from a central registry
+(`ts/ui/atoms/iconRegistry.ts`). Emoji glyphs and `assets/*.svg` `<img>` icons
+have been replaced by this single, coherent set.
+
+**Usage:**
+
+```html
+<!-- decorative icon next to text (aria-hidden) -->
+<app-icon name="save"></app-icon>
+
+<!-- standalone, accessible icon with idle animation -->
+<app-icon name="brain" animate label="AI brain"></app-icon>
+```
+
+| Attribute | Purpose                                                                |
+| --------- | ---------------------------------------------------------------------- |
+| `name`    | Required. An `IconName` from the registry (`car`, `brain`, `road`, …). |
+| `animate` | Optional. Enables the icon's idle/looping animation.                   |
+| `label`   | Optional. Accessible label (`role="img"`); omit for decorative icons.  |
+
+**Conventions:**
+
+- **24×24 viewBox, ~2px round strokes** — one consistent line-icon style.
+- **Size** follows the inherited `font-size` (the SVG is `1em`); override with
+  CSS `width`/`height`.
+- **Monochrome icons** paint with `currentColor`, so they inherit the
+  surrounding text colour (keep icon-hosting elements on a light `color`).
+- **Multi-colour icons** (`traffic-light`, `stop`, `alive`, `bolt`, …) read
+  `--icon-a` / `--icon-b` / `--icon-c`, each falling back to an accent token, so
+  callers can recolour them.
+- **Animations** live in `_icon.css`, keyed off `.ic-*` part classes: an idle
+  loop when `animate` is present, plus hover animations on the icon or its
+  enclosing `button`/`.toolbar-btn`/`.card`. All looping motion is disabled
+  under `prefers-reduced-motion`.
 
 ---
 

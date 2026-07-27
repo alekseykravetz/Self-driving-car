@@ -1,11 +1,11 @@
 export const STORE_PANEL_TEMPLATE = `
 <div class="store-panel">
   <div class="store-panel-header">
-    <h3 class="store-panel-title">📦 Store Files</h3>
+    <h3 class="store-panel-title"><app-icon name="package"></app-icon> Store Files</h3>
     <div class="store-tabs">
-      <button class="store-tab active" data-tab="worlds">🗺️ Worlds <span class="store-tab-count" data-count="worlds"></span></button>
-      <button class="store-tab" data-tab="cars">🚗 Cars <span class="store-tab-count" data-count="cars"></span></button>
-      <button class="store-tab" data-tab="localStorage">💾 LocalStorage <span class="store-tab-count" data-count="localStorage"></span></button>
+      <button class="store-tab active" data-tab="worlds"><app-icon name="map"></app-icon> Worlds <span class="store-tab-count" data-count="worlds"></span></button>
+      <button class="store-tab" data-tab="cars"><app-icon name="car"></app-icon> Cars <span class="store-tab-count" data-count="cars"></span></button>
+      <button class="store-tab" data-tab="localStorage"><app-icon name="save"></app-icon> LocalStorage <span class="store-tab-count" data-count="localStorage"></span></button>
     </div>
   </div>
 

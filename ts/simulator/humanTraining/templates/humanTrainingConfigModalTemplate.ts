@@ -8,7 +8,7 @@ export const HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE = `
 
     <div class="ti-section">
       <div class="ti-section-title">
-        🚙 Car config
+        <app-icon name="car"></app-icon> Car config
         <span class="ti-config-note" id="htcConfigNote"></span>
       </div>
       <div class="ti-param-grid" id="htcCarConfigGrid">
