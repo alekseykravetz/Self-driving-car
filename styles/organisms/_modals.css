@@ -61,11 +61,20 @@ human-training-config-modal.open {
 }
 
 .ti-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1\.5);
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: var(--tracking-widest);
   color: var(--color-text-muted);
   margin-bottom: var(--space-2);
+}
+
+.ti-section-icon {
+  font-size: 1.4rem;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
 }
 
 .ti-config-note {
@@ -84,9 +93,9 @@ human-training-config-modal.open {
 
 .ti-source {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-2\.5);
-  padding: var(--space-2) var(--space-2\.5);
+  padding: var(--space-2\.5);
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -101,8 +110,17 @@ human-training-config-modal.open {
   cursor: not-allowed;
 }
 
-.ti-source input {
-  margin-top: var(--space-0\.5);
+.ti-source > input[type='radio'] {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.ti-source-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 1.6rem;
+  color: var(--color-text-primary);
 }
 
 .ti-source-text {
@@ -130,4 +148,70 @@ human-training-config-modal.open {
   justify-content: flex-end;
   gap: var(--space-2\.5);
   margin-top: var(--space-5);
+}
+
+/* ── Full-width grid cells (hidden layers, state-aware) ─────────── */
+.ti-param-grid .ctrl-wide {
+  grid-column: 1 / -1;
+}
+
+/* ── Car-config column labels with icons ───────────────────────── */
+.ti-param-grid .ctrl-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ti-param-grid .ctrl-label app-icon {
+  font-size: 1.05rem;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── State-aware checkbox + description ─────────────────────────── */
+.ti-checkbox-ctrl {
+  gap: var(--space-1);
+}
+
+.ti-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.ti-checkbox-label .ctrl-label {
+  margin: 0;
+}
+
+.ti-field-desc {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+/* ── In-modal car picker (Selected car(s) source) ──────────────── */
+.ti-car-selector {
+  margin-top: var(--space-1);
+  padding: var(--space-2) var(--space-2\.5);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface-raised);
+}
+
+.ti-car-selector[hidden] {
+  display: none;
+}
+
+.ti-car-selector-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1\.5);
+  margin-bottom: var(--space-1\.5);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.ti-car-list {
+  max-height: 180px;
 }

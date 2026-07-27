@@ -1,3 +1,5 @@
+import { numInputRowHtml } from '../../../ui/molecules/numInputRow.js';
+
 export const HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE = `
 <div class="ti-overlay">
   <div class="ti-dialog" role="dialog" aria-modal="true" aria-labelledby="htcTitle">
@@ -8,60 +10,43 @@ export const HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE = `
 
     <div class="ti-section">
       <div class="ti-section-title">
-        <app-icon name="car"></app-icon> Car config
+        <app-icon class="ti-section-icon" name="car"></app-icon> Car config
         <span class="ti-config-note" id="htcConfigNote"></span>
       </div>
       <div class="ti-param-grid" id="htcCarConfigGrid">
-        <div class="ctrl">
-          <span class="ctrl-label">Height</span>
-          <input type="number" id="htcCarHeight" min="20" max="150" step="5" />
+        ${numInputRowHtml({ id: 'htcCarHeight', label: 'Height', icon: 'height', min: 20, max: 150, step: 5, title: 'Car height' })}
+        ${numInputRowHtml({ id: 'htcCarWidth', label: 'Width', icon: 'width', min: 10, max: 100, step: 5, title: 'Car width' })}
+        <div class="ctrl ctrl-wide">
+          <span class="ctrl-label"><app-icon name="graph"></app-icon> Hidden Layers</span>
+          <input type="text" id="htcCarHiddenLayers" title="Hidden layer sizes (comma-separated, e.g. 6 or 8,6)" />
         </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Width</span>
-          <input type="number" id="htcCarWidth" min="10" max="100" step="5" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Hidden Layers</span>
-          <input type="text" id="htcCarHiddenLayers" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Max Speed</span>
-          <input type="number" id="htcCarMaxSpeed" min="1" max="20" step="0.01" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Accel</span>
-          <input type="number" id="htcCarAcceleration" min="0.001" max="1" step="0.001" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Friction</span>
-          <input type="number" id="htcCarFriction" min="0.001" max="0.5" step="0.001" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Rays</span>
-          <input type="number" id="htcCarRayCount" min="1" max="20" step="1" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Ray Len</span>
-          <input type="number" id="htcCarRayLength" min="50" max="500" step="10" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Ray Spread</span>
-          <input type="number" id="htcCarRaySpread" min="0.1" max="6.28" step="0.1" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">Ray Offset</span>
-          <input type="number" id="htcCarRayOffset" min="-3.14" max="3.14" step="0.1" />
-        </div>
-        <div class="ctrl">
-          <span class="ctrl-label">State Aware</span>
-          <input type="checkbox" id="htcCarStateAware" />
+        ${numInputRowHtml({ id: 'htcCarMaxSpeed', label: 'Max Speed', icon: 'rocket', min: 1, max: 20, step: 0.01, title: 'Car maximum speed' })}
+        ${numInputRowHtml({ id: 'htcCarAcceleration', label: 'Accel', icon: 'bolt', min: 0.001, max: 1, step: 0.001, title: 'Car acceleration' })}
+        ${numInputRowHtml({ id: 'htcCarFriction', label: 'Friction', icon: 'tire', min: 0.001, max: 0.5, step: 0.001, title: 'Car friction' })}
+        ${numInputRowHtml({ id: 'htcCarRayCount', label: 'Rays', icon: 'antenna', min: 1, max: 20, step: 1, title: 'Sensor ray count' })}
+        ${numInputRowHtml({ id: 'htcCarRayLength', label: 'Ray Len', icon: 'ruler', min: 50, max: 500, step: 10, title: 'Sensor ray length' })}
+        ${numInputRowHtml({ id: 'htcCarRaySpread', label: 'Ray Spread', icon: 'flashlight', min: 0.1, max: 6.28, step: 0.1, title: 'Sensor ray spread (radians)' })}
+        ${numInputRowHtml({ id: 'htcCarRayOffset', label: 'Ray Offset', icon: 'compass', min: -3.14, max: 3.14, step: 0.1, title: 'Sensor ray offset (radians)' })}
+        <div class="ctrl ctrl-wide ti-checkbox-ctrl">
+          <label class="ti-checkbox-label">
+            <input type="checkbox" id="htcCarStateAware" />
+            <span class="ctrl-label"><app-icon name="traffic-light"></app-icon> State Aware</span>
+          </label>
+          <span class="ti-field-desc">
+            Doubles the network inputs — each ray reports the nearby traffic-control
+            state as a second value (2 inputs per ray instead of 1).
+          </span>
         </div>
       </div>
     </div>
 
     <div class="ti-actions">
-      <button id="htcCancelBtn" class="btn-lg btn-danger-outline" type="button">Cancel</button>
-      <button id="htcStartBtn" class="btn-lg btn-primary" type="button">▶️ Start</button>
+      <button id="htcCancelBtn" class="btn-lg btn-danger-outline" type="button">
+        <app-icon name="close"></app-icon> Cancel
+      </button>
+      <button id="htcStartBtn" class="btn-lg btn-primary" type="button">
+        <app-icon name="play"></app-icon> Start
+      </button>
     </div>
   </div>
 </div>

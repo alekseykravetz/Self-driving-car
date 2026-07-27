@@ -3,8 +3,12 @@ import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
-import { safeJsonParse } from '../../store/serialization.js';
+import {
+  safeJsonParse,
+  stripFileExtension,
+} from '../../store/serialization.js';
 import { inferHiddenLayers } from '../../simulator/training/genetics/poolManager.js';
+import { wireNumInputRows } from '../molecules/numInputRow.js';
 import type { KeyboardManager } from '../../input/keyboardManager.js';
 
 export interface TrainingInitDefaults {
@@ -52,6 +56,7 @@ export class TrainingInitModalElement extends HTMLElement {
   connectedCallback(): void {
     this.innerHTML = TRAINING_INIT_MODAL_TEMPLATE;
     this.#bindEvents();
+    wireNumInputRows(this);
   }
 
   /** Show the modal, prefilled from `defaults`, and report the choice. */
@@ -161,10 +166,12 @@ export class TrainingInitModalElement extends HTMLElement {
     this.#selectedCars = StoreManager.getActiveCars();
 
     const poolAvailable = this.#storedPool.length > 0;
-    const selectedAvailable = this.#selectedCars.length > 0;
+    const carsExist = StoreManager.getAllCars().length > 0;
 
     this.#setSourceAvailability('pool', poolAvailable);
-    this.#setSourceAvailability('selected', selectedAvailable);
+    // "Selected" is enabled whenever the store has any cars to pick from — the
+    // user chooses which ones directly in this modal.
+    this.#setSourceAvailability('selected', carsExist);
 
     const poolCountLabel = this.querySelector<HTMLElement>('#tiPoolCountLabel');
     if (poolCountLabel) {
@@ -177,6 +184,64 @@ export class TrainingInitModalElement extends HTMLElement {
       poolDesc.textContent = 'No saved pool in local storage.';
     }
 
+    this.#renderCarSelector();
+    this.#updateSelectedInfo();
+
+    // Default selection: continue a saved pool if present, else selected
+    // car(s) when some are already active, else fresh.
+    const initial = poolAvailable
+      ? 'pool'
+      : this.#selectedCars.length > 0
+        ? 'selected'
+        : 'fresh';
+    const radio = this.querySelector<HTMLInputElement>(
+      `input[name="tiBrainSource"][value="${initial}"]`,
+    );
+    if (radio) radio.checked = true;
+    this.#applySourceLock(initial);
+  }
+
+  /** Render the in-modal car picker list (checkboxes bound to the store). */
+  #renderCarSelector(): void {
+    const list = this.querySelector<HTMLElement>('#tiCarList');
+    if (!list) return;
+    const cars = StoreManager.getAllCars();
+    const activeIds = new Set(StoreManager.getActiveCarIds());
+
+    if (cars.length === 0) {
+      list.innerHTML =
+        '<div class="asset-empty">No cars in store. Load car(s) from the toolbar first.</div>';
+      return;
+    }
+
+    list.innerHTML = cars
+      .map(
+        (c) => `
+        <label class="asset-item">
+          <input type="checkbox" name="tiCarPick" value="${c.id}" ${
+            activeIds.has(c.id) ? 'checked' : ''
+          } />
+          <span class="asset-item-name" title="${c.name}">${stripFileExtension(c.name)}</span>
+          <span class="asset-item-src">${c.source}</span>
+        </label>`,
+      )
+      .join('');
+
+    list
+      .querySelectorAll<HTMLInputElement>('input[name="tiCarPick"]')
+      .forEach((input) => {
+        input.addEventListener('change', () => {
+          StoreManager.getInstance()?.toggleActiveCarId(input.value);
+          this.#updateSelectedInfo();
+        });
+      });
+  }
+
+  /** Refresh the selected-source count label + description from live state. */
+  #updateSelectedInfo(): void {
+    this.#selectedCars = StoreManager.getActiveCars();
+    const selectedAvailable = this.#selectedCars.length > 0;
+
     const selCountLabel = this.querySelector<HTMLElement>(
       '#tiSelectedCountLabel',
     );
@@ -188,27 +253,19 @@ export class TrainingInitModalElement extends HTMLElement {
     const selDesc = this.querySelector<HTMLElement>('#tiSelectedDesc');
     if (selDesc) {
       if (!selectedAvailable) {
-        selDesc.textContent = 'No car selected in the toolbar.';
+        selDesc.textContent = 'No car selected — pick at least one below.';
       } else if (!CarLoader.allParamsMatch(this.#selectedCars)) {
         selDesc.textContent =
           'Selected cars differ — only the first will be used.';
       } else {
-        selDesc.textContent = 'Seed from the car(s) selected in the toolbar.';
+        selDesc.textContent = 'Seed from the car(s) selected below.';
       }
     }
 
-    // Default selection: continue a saved pool if present, else selected
-    // car(s), else fresh.
-    const initial = poolAvailable
-      ? 'pool'
-      : selectedAvailable
-        ? 'selected'
-        : 'fresh';
-    const radio = this.querySelector<HTMLInputElement>(
-      `input[name="tiBrainSource"][value="${initial}"]`,
-    );
-    if (radio) radio.checked = true;
-    this.#applySourceLock(initial);
+    const source = this.querySelector<HTMLInputElement>(
+      'input[name="tiBrainSource"]:checked',
+    )?.value;
+    if (source === 'selected') this.#applySourceLock('selected');
   }
 
   #setSourceAvailability(source: string, available: boolean): void {
@@ -237,6 +294,10 @@ export class TrainingInitModalElement extends HTMLElement {
       sourceConfig = this.#selectedCars[0];
     }
 
+    // Reveal the in-modal car picker only for the "selected" source.
+    const selector = this.querySelector<HTMLElement>('#tiCarSelector');
+    if (selector) selector.hidden = source !== 'selected';
+
     if (sourceConfig) {
       this.#fillCarConfig(sourceConfig);
       if (note) note.textContent = '(locked to brain source)';
@@ -260,6 +321,11 @@ export class TrainingInitModalElement extends HTMLElement {
         input.disabled = locked;
       },
     );
+    this.querySelectorAll<HTMLButtonElement>(
+      '#tiCarConfigGrid .num-btn',
+    ).forEach((btn) => {
+      btn.disabled = locked;
+    });
     const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
     if (saCheck) saCheck.disabled = locked;
   }

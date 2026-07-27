@@ -2,6 +2,7 @@ import { HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE } from '../../simulator/humanTrain
 import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { inferHiddenLayers } from '../../simulator/training/genetics/poolManager.js';
+import { wireNumInputRows } from '../molecules/numInputRow.js';
 import type { KeyboardManager } from '../../input/keyboardManager.js';
 
 export interface HumanTrainingConfigResult {
@@ -27,6 +28,7 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
   connectedCallback(): void {
     this.innerHTML = HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE;
     this.#bindEvents();
+    wireNumInputRows(this);
   }
 
   open(options: HumanTrainingConfigOpenOptions): void {
@@ -132,6 +134,11 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
         input.disabled = locked;
       },
     );
+    this.querySelectorAll<HTMLButtonElement>(
+      '#htcCarConfigGrid .num-btn',
+    ).forEach((btn) => {
+      btn.disabled = locked;
+    });
     const saCheck = this.querySelector<HTMLInputElement>('#htcCarStateAware');
     if (saCheck) saCheck.disabled = locked;
   }
