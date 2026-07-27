@@ -211,6 +211,29 @@ app-icon:hover .app-icon-svg {
   }
 }
 
+@keyframes ic-swing {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(14deg);
+  }
+  75% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes ic-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.2px);
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    Idle animations (opt-in via the `animate` attribute → .is-animated)
    ═══════════════════════════════════════════════════════════════════ */
@@ -283,6 +306,25 @@ app-icon:hover .app-icon-svg {
 
 .app-icon-svg.is-animated .ic-mouse-scroll {
   animation: ic-scroll-dot 1.4s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-video-lens,
+.app-icon-svg.is-animated .ic-camera-lens,
+.app-icon-svg.is-animated .ic-phone-home {
+  animation: ic-pulse 1.8s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-keyboard-keys {
+  animation: ic-flicker 1.4s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-grad-tassel {
+  transform-origin: top;
+  animation: ic-swing 2.4s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-crossing-legs {
+  animation: ic-wiggle 1.6s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -373,6 +415,38 @@ app-icon:hover .app-icon-svg {
 /* Headlight flash */
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-headlight {
   animation: ic-flicker 0.8s ease-in-out infinite;
+}
+
+/* Camera / video / phone lens focus pop */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-video-lens,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-camera-lens,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-phone-home {
+  animation: ic-pulse 0.7s ease-in-out infinite;
+}
+
+/* Keyboard typing flicker */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-keyboard-keys {
+  animation: ic-flicker 0.6s ease-in-out infinite;
+}
+
+/* Graduation tassel swing */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-grad-tassel {
+  transform-origin: top;
+  animation: ic-swing 0.8s ease-in-out infinite;
+}
+
+/* Pedestrian walk */
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-crossing-legs {
+  animation: ic-wiggle 0.5s ease-in-out infinite;
+}
+
+/* Car wheels hop */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-wheel {
+  animation: ic-hop 0.4s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

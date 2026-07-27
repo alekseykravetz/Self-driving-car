@@ -1,5 +1,11 @@
 {
-  "exclude": ["eslint.config.mjs", "tests/**/*.ts", "vitest.config.ts"],
+  "exclude": [
+    "eslint.config.mjs",
+    "tests/**/*.ts",
+    "vitest.config.ts",
+    ".storybook/**",
+    "stories/**"
+  ],
   "compilerOptions": {
     /* Projects */
     // "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */

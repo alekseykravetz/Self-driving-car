@@ -68,8 +68,35 @@ export default defineConfig([
     },
   },
   {
+    files: ['stories/**/*.{ts,tsx}', '.storybook/**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      sourceType: 'module',
+      parserOptions: { project: null },
+      globals: { ...globals.node, ...globals.browser },
+    },
+    plugins: {
+      prettier: eslintPluginPrettier,
+      '@typescript-eslint': ts,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...ts.configs.recommended.rules,
+      'prettier/prettier': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
-    ignores: ['tests/**/*.ts', 'vitest.config.ts'],
+    ignores: [
+      'tests/**/*.ts',
+      'vitest.config.ts',
+      'stories/**/*.ts',
+      '.storybook/**/*.ts',
+    ],
     languageOptions: {
       parser: tsParser,
       sourceType: 'module',

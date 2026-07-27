@@ -1,0 +1,46 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Introduction" />
+
+# Self-Driving Car — Design System
+
+This Storybook documents the project's **Atomic-Design** UI system: design
+tokens, atoms, and the full custom **icon collection** (`<app-icon>`).
+
+## Where to look
+
+- **Icons › Gallery** — every icon, grouped by category, with idle animations
+  running. Hover a tile to see its hover reaction.
+- **Icons › Playground** — pick any icon and tweak size, colour, `--icon-a`,
+  and the `animate` toggle live.
+- **Icons › Animation Reference** — the full table: description, whether the
+  icon animates, its idle loop, its hover trigger, and notes on parts that look
+  animatable but aren't wired up yet.
+- **Design System** — colour / typography / spacing / radius tokens plus the
+  button and key-indicator atoms.
+- **Project Views** — live iframes of the actual app pages (needs the dev
+  server on :9090).
+
+## Using an icon
+
+```html
+<!-- static, inherits text colour + size -->
+<app-icon name="brain"></app-icon>
+
+<!-- idle looping animation -->
+<app-icon name="dna" animate></app-icon>
+
+<!-- accessible (non-decorative) -->
+<app-icon name="save" label="Save"></app-icon>
+```
+
+## Animation model
+
+- **Idle** animations only run when the host adds the `animate` attribute
+  (`.is-animated` on the inner `<svg>`).
+- **Hover** animations fire automatically when the icon — or an enclosing
+  `button` / `.toolbar-btn` / `.card` — is hovered. No attribute needed.
+- All motion is disabled under `prefers-reduced-motion: reduce`.
+
+Colour: monochrome icons follow `currentColor`; multi-colour icons read the
+`--icon-a` / `--icon-b` / `--icon-c` custom properties (with token fallbacks).
