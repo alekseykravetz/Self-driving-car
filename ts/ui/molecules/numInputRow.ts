@@ -10,6 +10,8 @@ export interface NumInputRowOptions {
   min?: number | string;
   max?: number | string;
   step?: number | string;
+  /** Optional initial value for the `<input>`. */
+  value?: number | string;
   title?: string;
 }
 
@@ -23,6 +25,7 @@ export function numInputRowHtml(o: NumInputRowOptions): string {
     o.min !== undefined ? `min="${o.min}"` : '',
     o.max !== undefined ? `max="${o.max}"` : '',
     o.step !== undefined ? `step="${o.step}"` : '',
+    o.value !== undefined ? `value="${o.value}"` : '',
     o.title ? `title="${o.title}"` : '',
   ]
     .filter(Boolean)

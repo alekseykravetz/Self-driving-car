@@ -41,6 +41,19 @@
   justify-content: space-between;
 }
 
+/* Group the status dot directly before its section title (dot then label,
+   left-aligned) instead of pushing the dot to the far right. */
+#trainingManagerPanel .section-title {
+  justify-content: flex-start;
+  gap: var(--space-1\.5);
+}
+
+/* The base .status-dot uses margin-left:auto to sit at the right edge; reset it
+   so the dot hugs the title now that it precedes the label. */
+#trainingManagerPanel .section-title .status-dot {
+  margin-left: 0;
+}
+
 /* ── Stats panel ─────────────────────────────────────────────────---- */
 #statsPanel {
   display: flex;

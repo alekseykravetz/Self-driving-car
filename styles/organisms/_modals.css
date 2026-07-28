@@ -156,13 +156,15 @@ human-training-config-modal.open {
 }
 
 /* ── Car-config column labels with icons ───────────────────────── */
-.ti-param-grid .ctrl-label {
+.ti-param-grid .ctrl-label,
+.car-config-grid .ctrl-label {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
 }
 
-.ti-param-grid .ctrl-label app-icon {
+.ti-param-grid .ctrl-label app-icon,
+.car-config-grid .ctrl-label app-icon {
   font-size: 1.05rem;
   color: var(--color-text-secondary);
   flex-shrink: 0;
