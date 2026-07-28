@@ -29,9 +29,10 @@
   border-bottom: none;
 }
 
-/* Section headers: caret sits directly next to the title (left-aligned) */
+/* Section headers: title on the left, caret pinned to the far right */
 .wep-section .section-title {
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
   gap: var(--space-1\.5);
   margin-bottom: 0;
   padding-bottom: 0;
@@ -48,10 +49,12 @@
   display: none;
 }
 
-/* Collapsed headers hug their title so they aren't taller than an open
-   section's title row. */
-.wep-section.collapsed {
-  padding-bottom: var(--space-1);
+/* Keep the caret glyph optically centered within the header row. */
+.wep-section .collapse-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .wep-section.collapsed .collapse-caret {

@@ -2,8 +2,8 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
   <div class="wep-panel">
     <div class="panel-section wep-section" id="wepRoadTypeSection">
       <div class="section-title section-title-toggle" id="wepRoadTypeToggle">
+        <span class="section-title-text">Road Type</span>
         <span class="collapse-caret">▶</span>
-        Road Type
       </div>
       <div class="wep-section-content">
         <select id="wepRoadType" class="wep-select">
@@ -15,8 +15,8 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
 
     <div class="panel-section wep-section" id="wepPropertiesSection">
       <div class="section-title section-title-toggle" id="wepPropertiesToggle">
+        <span class="section-title-text">Properties</span>
         <span class="collapse-caret">▶</span>
-        Properties
       </div>
       <div class="wep-section-content">
         <div class="wep-field">
@@ -61,8 +61,8 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
 
     <div class="panel-section wep-section" id="wepPathToolsSection">
       <div class="section-title section-title-toggle" id="wepPathToolsToggle">
+        <span class="section-title-text">Path Tools</span>
         <span class="collapse-caret">▶</span>
-        Path Tools
       </div>
       <div class="wep-section-content">
         <div class="wep-key-indicators">
