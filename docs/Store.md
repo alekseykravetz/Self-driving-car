@@ -59,7 +59,7 @@ const cars = StoreManager.getActiveCars(); // All active cars (multi-select)
 const allCars = StoreManager.getAllCars(); // Every selectable car across all sources
 ```
 
-> Worlds and cars are **selected in the in-page world toolbar** (`<world-toolbar>`),
+> Worlds and cars are **selected in the in-page World Setup toolbar** (`<world-setup>`),
 > not in the landing-page `<store-panel>`. The toolbar's Load-World popover and
 > Car selector list every entry from `getAllWorlds()` / `getAllCars()`. The Live
 > Traffic Jam and Training pages use a **single-select** car selector; the Race
@@ -159,7 +159,7 @@ When a page loads:
 ## Landing Page Panel
 
 The `<store-panel>` on `index.html` is a **read-only viewer/manager** — selection
-happens in the world toolbar, not here. It displays three tabs:
+happens in the World Setup toolbar, not here. It displays three tabs:
 
 | Tab              | Shows                                                                                                                                                                                                                                     |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

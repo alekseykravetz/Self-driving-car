@@ -7,7 +7,7 @@ The project provides multiple simulation environments for training and testing a
 ## Simulator Shell (`ts/simulator/core/simulatorShell.ts`)
 
 Every canvas-based simulator shares the same non-domain scaffolding: four
-canvases, a viewport/camera/mini-map, the shared world-toolbar / layout-toolbar /
+canvases, a viewport/camera/mini-map, the shared world-setup / layout-toolbar /
 animation-loop-toolbar panels, responsive layout, the neural-network visualizer,
 and a render-throttled animation loop. That scaffolding lives in one reusable
 abstract base class, `SimulatorShell`, so each concrete simulator only writes its
@@ -20,7 +20,7 @@ from page-specific DOM queries.
 
 ```typescript
 class SimulatorPageHost {
-  readonly toolbarPanel: WorldToolbarElement;
+  readonly toolbarPanel: WorldSetupElement;
   readonly layoutToolbar: LayoutToolbarElement;
   readonly animationLoopToolbar: AnimationLoopToolbarElement;
   readonly worldLayersToolbar: WorldLayersToolbarElement | null;
@@ -35,7 +35,7 @@ abstract class SimulatorShell {
   protected viewport: Viewport | null;
   protected miniMap: MiniMap | null;
   protected camera: Camera | null;
-  protected toolbarPanel: WorldToolbarElement;
+  protected toolbarPanel: WorldSetupElement;
   protected layoutToolbar: LayoutToolbarElement;
 
   constructor(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host?: SimulatorPageHost);
@@ -151,11 +151,11 @@ The central training orchestrator — a custom HTML element that owns both the U
 | ----------------------------- | -------------------------- | ----------------------------------------------------------------------- |
 | `TrainingPanelElement`        | `<training-panel>`         | Training UI + genetic algorithm + car generation                        |
 | `AnimationLoopToolbarElement` | `<animation-loop-toolbar>` | Play/pause, render throttle, time display, FPS counter                  |
-| `WorldToolbarElement`         | `<world-toolbar>`          | Border mode, tracking mode, world/car loading                           |
+| `WorldSetupElement`           | `<world-setup>`            | Border mode, tracking mode, world/car loading                           |
 | `LayoutToolbarElement`        | `<layout-toolbar>`         | Layout toggle, camera/visualizer/minimap toggles                        |
 | `ShortcutsToolbarElement`     | `<shortcuts-toolbar>`      | Per-page keyboard-shortcut indicators (momentary + click-latch toggles) |
 
-> `AnimationLoopToolbarElement`, `WorldToolbarElement`, and `ShortcutsToolbarElement`
+> `AnimationLoopToolbarElement`, `WorldSetupElement`, and `ShortcutsToolbarElement`
 > live in the shared `ts/ui/molecules/` directory (not the simulator domain) and are reused
 > across the simulator, race, Live Traffic Jam, and World Editor pages.
 
@@ -579,7 +579,7 @@ interface WorldDrawOptions {
 
 ### Border Modes
 
-Three radio-button options in `<world-toolbar>`:
+Three radio-button options in `<world-setup>`:
 
 | Mode       | Icon | Behavior                                                           |
 | ---------- | ---- | ------------------------------------------------------------------ |
@@ -589,7 +589,7 @@ Three radio-button options in `<world-toolbar>`:
 
 ### Tracking Modes
 
-Radio-button group in `<world-toolbar>`:
+Radio-button group in `<world-setup>`:
 
 | Mode     | Icon | Behavior                                                                                                                                                                 |
 | -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -912,7 +912,7 @@ spawns a car at the clicked world point:
 
 ### Car picker (unified Car selector)
 
-The traffic page uses the world toolbar's **unified Car selector** in
+The traffic page uses the World Setup toolbar's **unified Car selector** in
 **single-select** mode — the same selector used by Race (multi) and Training
 (single). It is configured during init via:
 

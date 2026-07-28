@@ -20,7 +20,7 @@ export function parseWorldFileContent(content: string): object | null {
  * Reusable world loader utility.
  * Handles file input, reading, and JSON extraction from .world files.
  * Binds to an existing `#loadWorldInput` element provided by the page markup
- * (static HTML in world.html, or the shared <world-toolbar> template).
+ * (static HTML in world.html, or the shared <world-setup> template).
  */
 export class WorldLoader {
   #input: HTMLInputElement;

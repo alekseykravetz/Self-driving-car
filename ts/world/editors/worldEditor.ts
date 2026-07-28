@@ -18,7 +18,7 @@ import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Osm, OsmData } from '../../math/osm-importer/osm.js';
 import { StoreManager } from '../../store/storeManager.js';
-import { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
+import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
 import { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { EditorToolbarElement } from '../../ui/molecules/editorToolbar.js';
@@ -102,7 +102,7 @@ export class WorldEditor {
   #openOverpassBtn!: HTMLButtonElement;
   #copyFilterBtn!: HTMLButtonElement;
   #editorToolbar!: EditorToolbarElement;
-  #worldToolbar!: WorldToolbarElement;
+  #worldToolbar!: WorldSetupElement;
   #shortcutsToolbar!: ShortcutsToolbarElement;
   #keyboardManager!: KeyboardManager;
   #worldLayersToolbar!: WorldLayersToolbarElement;
@@ -117,16 +117,23 @@ export class WorldEditor {
 
     this.#assignElementReferences();
     this.#keyboardManager = new KeyboardManager(this.#shortcutsToolbar);
-    this.#addEventListeners();
 
-    const worldString = localStorage.getItem('editorWorld');
-    const storedWorld = safeJsonParse<World>(worldString);
+    // Decide which world the editor opens, and reflect that choice as the active
+    // store selection *before* the toolbar selectors render so the "Selected"
+    // display and world-picker radio stay in sync on every (re-)entry.
+    const storedWorld = safeJsonParse<World>(
+      localStorage.getItem('editorWorld'),
+    );
+    let initialWorld: World | null;
     if (storedWorld) {
-      this.#initializeWorldEditor(storedWorld);
+      StoreManager.getInstance()?.setActiveWorldId('editor');
+      initialWorld = storedWorld;
     } else {
-      const storeWorld = StoreManager.getActiveWorld();
-      this.#initializeWorldEditor(storeWorld as World | null);
+      initialWorld = StoreManager.getActiveWorld() as World | null;
     }
+
+    this.#addEventListeners();
+    this.#initializeWorldEditor(initialWorld);
   }
 
   /* Assigns DOM elements to class properties. */
@@ -152,8 +159,8 @@ export class WorldEditor {
       'editor-toolbar',
     ) as EditorToolbarElement;
     this.#worldToolbar = document.querySelector(
-      'world-toolbar',
-    ) as WorldToolbarElement;
+      'world-setup',
+    ) as WorldSetupElement;
     this.#shortcutsToolbar = document.querySelector(
       'shortcuts-toolbar',
     ) as ShortcutsToolbarElement;
@@ -193,7 +200,7 @@ export class WorldEditor {
     // Editor mode switching via the <editor-toolbar> custom element
     this.#editorToolbar.setModeChangeListener((mode) => this.setMode(mode));
 
-    // The shared <world-toolbar> hosts the World group (load/save/dispose/OSM)
+    // The shared <world-setup> hosts the World group (load/save/dispose/OSM)
     // and the Viewport mode toggle. Reveal the editor-only actions and hide the
     // simulator-only groups (Car, Borders, Tracking, Debug).
     this.#worldToolbar.showWorldEditorActions();
@@ -258,6 +265,8 @@ export class WorldEditor {
       onWorldSelected: (entry) =>
         this.#initializeWorldEditor((entry?.data as World) ?? null),
     });
+    // The editor edits a single world; the car selector is irrelevant here.
+    this.#worldToolbar.hideSelectedCarRow();
 
     // World Layers toolbar: per-layer visibility toggles + Regenerate items action.
     this.#worldLayersToolbar.setVisibility(this.#layerVisibility);

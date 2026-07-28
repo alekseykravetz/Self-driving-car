@@ -147,7 +147,9 @@ export class SimpleTrainingStrategy {
   init(): void {
     this.#parent.toolbarPanel.hideGroups('world', 'borders', 'borders-sep');
     this.#parent.toolbarPanel.configureSelectors({ carMode: 'multi' });
+    this.#parent.toolbarPanel.hideSelectedWorldRow();
     this.#parent.toolbarPanel.hideCameraDebug();
+    this.#parent.showHeatmapLayerOnly();
     this.#parent.layoutToolbar.setDefaultLayoutMode('camera-big');
 
     const simpleWorld = new SimpleWorld(

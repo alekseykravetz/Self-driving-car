@@ -108,7 +108,7 @@ function makeMockToolbars() {
     setViewportModeListener: vi.fn(),
     addEventListener: vi.fn(),
     querySelector: vi.fn(),
-  } as unknown as import('../../../../ts/panels/worldToolbar.js').WorldToolbarElement;
+  } as unknown as import('../../../../ts/ui/molecules/worldSetup.js').WorldSetupElement;
 
   return { animationLoopToolbar, layoutToolbar, toolbarPanel };
 }

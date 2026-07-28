@@ -69,7 +69,7 @@ class RaceSimulator extends SimulatorShell {
    - 1 KEYS car (player) + one AI car per entry across three sources
    - AI sources (all applied as-is, no mutation):
      - `loadPoolFromStorage()` — training results pool (`bestPool`), read-only
-     - `StoreManager.getActiveCars()` — cars selected in the world toolbar Car selector (multi-select, multiple or none)
+     - `StoreManager.getActiveCars()` — cars selected in the World Setup toolbar Car selector (multi-select, multiple or none)
      - `loadRaceCars()` — cars loaded via the race "Load car(s)" button (`raceCars`)
    - Player car: physical params from the first available source (brain not applied)
    - If all three sources are empty: only the player car races
@@ -316,7 +316,7 @@ The panel is built dynamically at runtime:
 
 ### World Loading
 
-Via `WorldLoader` (binds to `#loadWorldInput` in `<world-toolbar>`):
+Via `WorldLoader` (binds to `#loadWorldInput` in `<world-setup>`):
 
 ```typescript
 new WorldLoader((worldInfo) => this.#initializeRace(worldInfo));
@@ -326,7 +326,7 @@ Loading a new world reinitializes the entire race (new corridor, new cars, new c
 
 ### Car Loading
 
-Via `CarLoader` (binds to `#loadCarInput` in `<world-toolbar>`):
+Via `CarLoader` (binds to `#loadCarInput` in `<world-setup>`):
 
 ```typescript
 new CarLoader((carInfos: CarInfo[]) => {

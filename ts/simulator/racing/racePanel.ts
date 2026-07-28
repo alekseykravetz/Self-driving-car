@@ -1,4 +1,4 @@
-import type { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
+import type { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import type { UnifiedWorldEntry } from '../../store/types.js';
 import type { BorderMode } from '../types.js';
 import type { TrackingMode } from '../types.js';
@@ -6,15 +6,15 @@ import type { Car } from '../../car/car.js';
 import { beep } from '../../audio/sound.js';
 
 export class RacePanel {
-  toolbarPanel: WorldToolbarElement;
+  toolbarPanel: WorldSetupElement;
   statistics: HTMLElement;
   counter: HTMLElement;
   element!: HTMLElement;
 
   constructor() {
     this.toolbarPanel = document.querySelector(
-      'world-toolbar',
-    ) as WorldToolbarElement;
+      'world-setup',
+    ) as WorldSetupElement;
     this.statistics = document.getElementById('statistics')!;
     this.counter = document.getElementById('counter')!;
   }

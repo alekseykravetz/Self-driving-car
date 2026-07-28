@@ -4,7 +4,7 @@ import { NetworkVisualizer } from '../../neural-network/visualizer.js';
 import type { Viewport } from '../../viewport/viewport.js';
 import type { MiniMap } from '../../mini-map/miniMap.js';
 import type { Camera } from '../../camera/camera.js';
-import type { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
+import type { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import type { LayoutToolbarElement } from '../../ui/molecules/layoutToolbar.js';
 import type { AnimationLoopToolbarElement } from '../../ui/molecules/animationLoopToolbar.js';
 import type { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
@@ -24,7 +24,7 @@ import type { Car } from '../../car/car.js';
  *   - the four canvases + their 2D contexts (top-down game, 3D camera,
  *     neural-network visualizer, mini-map)
  *   - the Viewport, MiniMap and Camera references
- *   - the shared `<world-toolbar>` / `<layout-toolbar>` /
+ *   - the shared `<world-setup>` / `<layout-toolbar>` /
  *     `<animation-loop-toolbar>` element refs
  *   - the multi-panel responsive layout/resize wiring
  *   - the render-throttled `requestAnimationFrame` loop
@@ -70,7 +70,7 @@ export abstract class SimulatorShell {
   camera: Camera | null = null;
 
   // Shared UI panels (custom elements present on every simulator page).
-  toolbarPanel: WorldToolbarElement;
+  toolbarPanel: WorldSetupElement;
   layoutToolbar: LayoutToolbarElement;
   animationLoopToolbar: AnimationLoopToolbarElement;
 
@@ -146,6 +146,15 @@ export abstract class SimulatorShell {
     if (window.matchMedia('(max-width: 768px)').matches) {
       this.layoutToolbar.applyMobileDefaults();
     }
+  }
+
+  /**
+   * Restrict the world-layers toolbar to just the heatmap overlay. Used by
+   * simple-mode training, whose flat road has no per-layer content to toggle.
+   * No-op when the page omits the toolbar (e.g. human-training).
+   */
+  showHeatmapLayerOnly(): void {
+    this.worldLayersToolbar?.hideLayers();
   }
 
   /**

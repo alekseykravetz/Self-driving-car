@@ -6,9 +6,9 @@ import { ToolbarAssetSelectors } from '../organisms/assetSelectors.js';
 import type { UnifiedWorldEntry } from '../../store/types.js';
 import type { CarInfo } from '../../car/car.js';
 import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';
-import { WORLD_SETUP_TEMPLATE } from './worldSetupTemplate.js';
+import { WORLD_TOOLBAR_TEMPLATE } from './worldToolbarTemplate.js';
 
-export class WorldSetupElement extends HTMLElement {
+export class WorldToolbarElement extends HTMLElement {
   #modeControls: ToolbarModeControls;
   #assetSelectors: ToolbarAssetSelectors;
   #_showCameraDebug: boolean = false;
@@ -21,7 +21,7 @@ export class WorldSetupElement extends HTMLElement {
   }
 
   connectedCallback(): void {
-    this.innerHTML = WorldSetupElement.template;
+    this.innerHTML = WorldToolbarElement.template;
     this.#modeControls.init();
 
     const debugCb = this.querySelector(
@@ -119,7 +119,7 @@ export class WorldSetupElement extends HTMLElement {
     }
   }
 
-  static readonly template = WORLD_SETUP_TEMPLATE;
+  static readonly template = WORLD_TOOLBAR_TEMPLATE;
 }
 
-customElements.define('world-setup', WorldSetupElement);
+customElements.define('world-toolbar', WorldToolbarElement);

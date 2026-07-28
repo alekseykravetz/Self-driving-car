@@ -1,4 +1,4 @@
-import type { WorldToolbarElement } from '../../ui/molecules/worldToolbar.js';
+import type { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import type { LayoutToolbarElement } from '../../ui/molecules/layoutToolbar.js';
 import type { AnimationLoopToolbarElement } from '../../ui/molecules/animationLoopToolbar.js';
 import type { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
@@ -14,15 +14,15 @@ import type { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersTo
  * on pages with different layouts.
  */
 export class SimulatorPageHost {
-  readonly toolbarPanel: WorldToolbarElement;
+  readonly toolbarPanel: WorldSetupElement;
   readonly layoutToolbar: LayoutToolbarElement;
   readonly animationLoopToolbar: AnimationLoopToolbarElement;
   readonly worldLayersToolbar: WorldLayersToolbarElement | null;
 
   constructor() {
     this.toolbarPanel = document.querySelector(
-      'world-toolbar',
-    ) as WorldToolbarElement;
+      'world-setup',
+    ) as WorldSetupElement;
     this.layoutToolbar = document.querySelector(
       'layout-toolbar',
     ) as LayoutToolbarElement;

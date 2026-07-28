@@ -48,6 +48,22 @@ export class ToolbarAssetSelectors {
     if (this.#selectorsReady) this.refreshCarList();
   }
 
+  /** Hide the "Selected car(s)" row (e.g. in the world editor). */
+  hideSelectedCarRow(): void {
+    const row = this.#host.querySelector<HTMLElement>(
+      '[data-selected-row="car"]',
+    );
+    if (row) row.style.display = 'none';
+  }
+
+  /** Hide the "Selected world" row (e.g. in simple-mode training). */
+  hideSelectedWorldRow(): void {
+    const row = this.#host.querySelector<HTMLElement>(
+      '[data-selected-row="world"]',
+    );
+    if (row) row.style.display = 'none';
+  }
+
   getSelectedCars(): CarInfo[] {
     return StoreManager.getActiveCars();
   }

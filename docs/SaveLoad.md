@@ -263,7 +263,7 @@ new WorldLoader((worldInfo) => {
 
 ### Integration
 
-The `<world-toolbar>` custom element contains a hidden file input with `id="loadWorldInput"`. WorldLoader binds to this element by ID. Just instantiate `new WorldLoader(callback)` after the panel is in the DOM.
+The `<world-setup>` custom element contains a hidden file input with `id="loadWorldInput"`. WorldLoader binds to this element by ID. Just instantiate `new WorldLoader(callback)` after the panel is in the DOM.
 
 ---
 

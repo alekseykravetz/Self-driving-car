@@ -1,16 +1,16 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { WorldToolbarElement } from '../../../ts/ui/molecules/worldToolbar.js';
+import { WorldSetupElement } from '../../../ts/ui/molecules/worldSetup.js';
 
-function createElement(): WorldToolbarElement {
-  const el = new WorldToolbarElement();
+function createElement(): WorldSetupElement {
+  const el = new WorldSetupElement();
   document.body.appendChild(el);
   el.connectedCallback();
   return el;
 }
 
-describe('WorldToolbarElement', () => {
-  let el: WorldToolbarElement;
+describe('WorldSetupElement', () => {
+  let el: WorldSetupElement;
 
   beforeEach(() => {
     el = createElement();

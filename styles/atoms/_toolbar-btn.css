@@ -20,7 +20,7 @@
   position: relative;
   transition:
     background 0.15s,
-    outline-color 0.15s;
+    box-shadow 0.15s;
 }
 
 .toolbar-btn:hover {
@@ -29,7 +29,10 @@
 
 .toolbar-btn.active {
   background: var(--color-bg-active-strong);
-  outline: var(--space-0\.5) solid var(--color-bg-active-outline);
+  /* Inset ring (not `outline`) so the active highlight stays within the button
+     box — an outward outline overflows the bounds and makes adjacent toggled
+     buttons touch/overlap across the small inter-button gap. */
+  box-shadow: inset 0 0 0 var(--space-0\.5) var(--color-bg-active-outline);
 }
 
 .toolbar-btn:disabled {

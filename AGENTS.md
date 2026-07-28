@@ -58,7 +58,7 @@ ts/
   input/                ← cross-cutting input handling: keyboardManager.ts (decoupled via ToolbarUpdater)
   ui/
     atoms/                ← smallest building blocks: latchedToggle.ts
-    molecules/            ← compound components: shortcutsToolbar, worldLayersToolbar, worldToolbar,
+    molecules/            ← compound components: shortcutsToolbar, worldLayersToolbar, worldSetup,
     │                         editorToolbar, layoutToolbar, animationLoopToolbar, modeControls
     organisms/            ← full feature panels: trainingPanel, trainingInitModal, humanTrainingPanel,
                              humanTrainingConfigModal, trafficPanel, storePanel, assetSelectors

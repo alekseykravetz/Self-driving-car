@@ -785,7 +785,7 @@ class WorldEditor {
 
 Manages which editor is active at a time, triggers world regeneration when the graph changes, and handles save/load operations.
 
-The viewport wheel-mode toggle and the World file actions (load / OSM import) are hosted by the shared `<world-toolbar>`: the editor calls `showWorldEditorActions()` to reveal the OSM button and Storage group (Save / Clear), `hideGroups(...)` to hide the simulator-only groups, and `setViewportModeListener(...)` to drive `setViewportMode()`.
+The viewport wheel-mode toggle and the World file actions (load / OSM import) are hosted by the shared `<world-setup>`: the editor calls `showWorldEditorActions()` to reveal the OSM button and Storage group (Save / Clear), `hideGroups(...)` to hide the simulator-only groups, and `setViewportModeListener(...)` to drive `setViewportMode()`.
 
 ### Graph Editor (`graphEditor.ts`)
 
@@ -987,8 +987,8 @@ The `WorldLoader` utility handles file parsing:
 The world editor page provides a complete UI for map creation, split across two
 panels:
 
-- **Shared `<world-toolbar>`** (top-left, from `ts/ui/molecules/`): the **World** group
-  (Load 🌍 / OSM Import 🗺️) and a **Storage** group (Save 💾 / Clear ❌), plus
+- **Shared `<world-setup>`** (top-left, from `ts/ui/molecules/`): the **World** group
+  (Load 🌍 / OSM Import 🗺️) and a **Storage** group (Save 💾 / Clear 🗑️), plus
   the **Viewport** mode toggle (mouse 🖱️ vs. touchpad ☝️). The editor-only OSM,
   Storage group and separator are revealed via `showWorldEditorActions()`, while
   the simulator-only groups (Car, Borders, Tracking, Debug) are hidden via

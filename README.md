@@ -270,7 +270,7 @@ Self-driving-car/
 │   │   └── templates/          # HTML template for the store panel
 │   │
 │   ├── panels/                 # Shared floating UI toolbars (custom elements)
-│   │   ├── worldToolbar.ts     # Custom element <world-toolbar>: border/tracking mode, file loading, camera debug
+│   │   ├── worldSetup.ts     # Custom element <world-setup>: border/tracking mode, file loading, camera debug
 │   │   ├── shortcutsToolbar.ts # Custom element <shortcuts-toolbar>: keyboard-shortcut indicators
 │   │   ├── worldLayersToolbar.ts # Custom element <world-layers-toolbar>: editor layer visibility + regenerate items + 🌡️ heatmap overlay toggle
 │   │   ├── assetSelectors.ts   # File-input trigger helpers for worlds & cars

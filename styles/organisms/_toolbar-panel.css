@@ -147,3 +147,14 @@
   filter: grayscale(80%);
   opacity: 0.45;
 }
+
+/* ── Storage actions (world editor): Save = green hover, Clear = red hover ─ */
+#topControls [data-group='storage'] #saveBtn:hover {
+  background: var(--color-bg-green-hover);
+  color: var(--color-accent-green);
+}
+
+#topControls [data-group='storage'] #disposeBtn:hover {
+  background: var(--color-bg-red-hover);
+  color: var(--color-accent-red);
+}

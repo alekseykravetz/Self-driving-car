@@ -130,6 +130,7 @@ const toolbarMocks = {
   worldToolbar: makeMockElement({
     showWorldEditorActions: vi.fn(),
     hideGroups: vi.fn(),
+    hideSelectedCarRow: vi.fn(),
     setViewportModeListener: vi.fn(),
     configureSelectors: vi.fn(),
     refreshWorldList: vi.fn(),
@@ -164,7 +165,7 @@ const toolbarMocks = {
 };
 
 querySelectors.set('editor-toolbar', toolbarMocks.editorToolbar);
-querySelectors.set('world-toolbar', toolbarMocks.worldToolbar);
+querySelectors.set('world-setup', toolbarMocks.worldToolbar);
 querySelectors.set('shortcuts-toolbar', toolbarMocks.shortcutsToolbar);
 querySelectors.set('world-layers-toolbar', toolbarMocks.worldLayersToolbar);
 querySelectors.set('world-editor-panel', toolbarMocks.worldEditorPanel);

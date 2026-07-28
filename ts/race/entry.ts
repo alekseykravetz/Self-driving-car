@@ -75,12 +75,12 @@ import '../store/storeManager.js';
 import '../simulator/training/modes/borderCollision.js';
 import '../simulator/training/rendering/carRenderer.js';
 import '../simulator/training/genetics/storageManager.js';
-import '../ui/molecules/worldToolbarTemplate.js';
+import '../ui/molecules/worldSetupTemplate.js';
 import '../ui/molecules/layoutToolbarTemplate.js';
 import '../ui/molecules/animationLoopToolbarTemplate.js';
 import '../ui/molecules/modeControls.js';
 import '../ui/organisms/assetSelectors.js';
-import '../ui/molecules/worldToolbar.js';
+import '../ui/molecules/worldSetup.js';
 import '../ui/molecules/layoutToolbar.js';
 import '../ui/molecules/animationLoopToolbar.js';
 import '../simulator/views/simulatorPageHost.js';
@@ -116,7 +116,7 @@ import '../simulator/racing/racePanel.js';
       'top:50%;left:50%;position:absolute;transform:translate(-50%,-50%)';
     miniMapCanvas.style.display = 'none';
     statistics!.style.display = 'none';
-    (document.querySelector('world-toolbar') as HTMLElement).style.display =
+    (document.querySelector('world-setup') as HTMLElement).style.display =
       'none';
     controls = new PhoneControls(cameraCanvas);
     document.addEventListener('click', () => {

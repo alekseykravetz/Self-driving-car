@@ -123,7 +123,7 @@ math/primitives (Point, Segment, Polygon, Envelope)
   → car/car, car/loader
   → neural-network
   → store
-  → ui: molecules + organisms (world-toolbar, layout-toolbar, training-panel, etc.)
+  → ui: molecules + organisms (world-setup, layout-toolbar, training-panel, etc.)
   → simulator: spatialGridUtils, training modes, genetics, panels
   → simulator/core (SimulatorShell)
   → simulator/training/trainingSimulator
@@ -382,11 +382,11 @@ into three layers under `ts/ui/`:
 
 **Molecule-level components:**
 
-| Module                    | Tag               | Responsibility                                                        |
-| ------------------------- | ----------------- | --------------------------------------------------------------------- |
-| `worldToolbar.ts`         | `<world-toolbar>` | Composition root: file I/O, border/tracking mode, camera debug toggle |
-| `worldToolbarTemplate.ts` | —                 | HTML template for the toolbar                                         |
-| `modeControls.ts`         | —                 | `ToolbarModeControls` — border/tracking/viewport mode button wiring   |
+| Module                  | Tag             | Responsibility                                                        |
+| ----------------------- | --------------- | --------------------------------------------------------------------- |
+| `worldSetup.ts`         | `<world-setup>` | Composition root: file I/O, border/tracking mode, camera debug toggle |
+| `worldSetupTemplate.ts` | —               | HTML template for the toolbar                                         |
+| `modeControls.ts`       | —               | `ToolbarModeControls` — border/tracking/viewport mode button wiring   |
 
 <!-- assetSelectors.ts moved to organisms -->
 
@@ -416,7 +416,7 @@ into three layers under `ts/ui/`:
 | `storePanelTemplate.ts`        | —                               | HTML template for the store panel                                        |
 | `assetSelectors.ts`            | —                               | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding |
 
-> All UI components live under `ts/ui/` following Atomic Design. `worldToolbar.ts`
+> All UI components live under `ts/ui/` following Atomic Design. `worldSetup.ts`
 > is a **molecule** reused by the simulator, race, Live Traffic Jam, and
 > World Editor pages. Its World group exposes editor-only Save / Dispose /
 > OSM-Import buttons (revealed via `showWorldEditorActions()`), and
@@ -432,7 +432,7 @@ into three layers under `ts/ui/`:
 > and `renderInterval` are owned by `<animation-loop-toolbar>` and read by
 > `SimulatorShell` — shared across both the training and Live Traffic Jam pages.
 
-> The `<world-toolbar>` also hosts the **Spawn Car** picker (`car` dropdown), shown
+> The `<world-setup>` also hosts the **Spawn Car** picker (`car` dropdown), shown
 > only on the Live Traffic Jam page via `showSpawnCarPicker()`. It selects which
 > stored/loaded car configuration is painted onto the road on the next click.
 

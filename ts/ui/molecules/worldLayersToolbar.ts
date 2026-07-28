@@ -81,7 +81,7 @@ export class WorldLayersToolbarElement extends HTMLElement {
     ).join('');
 
     container.innerHTML = `
-      <div class="controls-group">
+      <div class="controls-group" data-layers>
         <span class="controls-group-label">Layers</span>
         <div class="world-layers-keys">${toggles}</div>
       </div>
@@ -223,6 +223,21 @@ export class WorldLayersToolbarElement extends HTMLElement {
     this.querySelectorAll<HTMLElement>('[data-overlays]').forEach((el) => {
       el.style.display = 'none';
     });
+  }
+
+  /**
+   * Hide the per-layer "Layers" toggle group, leaving only the Overlays
+   * (heatmap) group. Used by simple-mode training, whose flat road has no
+   * roads/markings/items to toggle — only the congestion heatmap is relevant.
+   * Also drops the now-leading Overlays separator so it doesn't dangle.
+   */
+  hideLayers(): void {
+    const layers = this.querySelector<HTMLElement>('[data-layers]');
+    if (layers) layers.style.display = 'none';
+    const overlaysSep = this.querySelector<HTMLElement>(
+      '.controls-separator[data-overlays]',
+    );
+    if (overlaysSep) overlaysSep.style.display = 'none';
   }
 
   static readonly template = WORLD_LAYERS_TOOLBAR_TEMPLATE;

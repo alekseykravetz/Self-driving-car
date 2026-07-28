@@ -147,8 +147,8 @@ For each screen, analyze the HTML to determine:
 
 1. **Layout containers** — `div#simulatorLayout`, `#rightPanel`, `#simulatorToolbar`
 2. **Canvas elements** — `canvas#gameCanvas`, `canvas#networkCanvas`, `canvas#miniMapCanvas`
-3. **Custom elements** — `<training-panel>`, `<world-toolbar>`, etc.
-4. **Toolbar groupings** — world-toolbar, layout-toolbar, animation-loop-toolbar, shortcuts-toolbar
+3. **Custom elements** — `<training-panel>`, `<world-setup>`, etc.
+4. **Toolbar groupings** — world-setup, layout-toolbar, animation-loop-toolbar, shortcuts-toolbar
 
 Map to Pencil frames:
 

@@ -111,6 +111,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
     } else {
       this.toolbarPanel.hideGroups('world', 'borders', 'borders-sep');
       this.toolbarPanel.configureSelectors({ carMode: 'single' });
+      this.toolbarPanel.hideSelectedWorldRow();
       this.toolbarPanel.hideCameraDebug();
       this.layoutToolbar.setDefaultLayoutMode('camera-big');
 

@@ -294,7 +294,7 @@ Full feature panel styles — complex compositions with their own layout and sta
 
 | File                      | Tag / Component                                           |
 | ------------------------- | --------------------------------------------------------- |
-| `_toolbar-panel.css`      | `<world-toolbar>` — the shared floating toolbar           |
+| `_toolbar-panel.css`      | `<world-setup>` — the shared floating toolbar             |
 | `_modals.css`             | `<training-init-modal>`, `<human-training-config-modal>`  |
 | `_training-panel.css`     | `<training-panel>` — full training UI                     |
 | `_traffic-panel.css`      | `<traffic-panel>` — Live Traffic Jam stats panel          |
