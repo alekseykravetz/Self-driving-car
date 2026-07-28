@@ -5,6 +5,7 @@ import {
   DEFAULT_TREE_PROTOTYPE,
   Tree,
 } from '../../../../ts/world/items/tree.js';
+import { mockCanvas2D } from '../../../helpers/mockCanvas2D.js';
 
 describe('buildTreePrototypes', () => {
   it('returns correct count for given seed and count', () => {
@@ -80,5 +81,31 @@ describe('Tree constructor', () => {
     expect(inst.p).toBe(3);
     expect(inst.s).toBe(1.5);
     expect(inst.t).toBe(2);
+  });
+});
+
+describe('Tree.draw', () => {
+  const prototypes = buildTreePrototypes(123456, 8);
+  const viewPoint = new Point(500, 500);
+
+  it('draws the classic canopy (type 0)', () => {
+    const tree = new Tree(new Point(100, 200), 160, prototypes[0], 0, 0);
+    const { ctx, calls } = mockCanvas2D();
+    tree.draw(ctx, { viewPoint });
+    expect(calls.some((c) => c.method === 'fill')).toBe(true);
+  });
+
+  it('draws the conifer (type 1)', () => {
+    const tree = new Tree(new Point(100, 200), 160, prototypes[0], 0, 1);
+    const { ctx, calls } = mockCanvas2D();
+    tree.draw(ctx, { viewPoint });
+    expect(calls.some((c) => c.method === 'fill')).toBe(true);
+  });
+
+  it('draws the cluster (type 2)', () => {
+    const tree = new Tree(new Point(100, 200), 160, prototypes[0], 0, 2);
+    const { ctx, calls } = mockCanvas2D();
+    tree.draw(ctx, { viewPoint });
+    expect(calls.some((c) => c.method === 'fill')).toBe(true);
   });
 });

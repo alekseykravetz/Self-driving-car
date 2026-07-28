@@ -3,6 +3,7 @@ import { Point } from '../../../../ts/math/primitives/point.js';
 import { Polygon } from '../../../../ts/math/primitives/polygon.js';
 import { Building } from '../../../../ts/world/items/building.js';
 import type { BuildingFootprint } from '../../../../ts/world/types.js';
+import { mockCanvas2D } from '../../../helpers/mockCanvas2D.js';
 
 function makeBuilding(): Building {
   const points = [
@@ -80,5 +81,29 @@ describe('Building', () => {
     };
     const b = Building.loadFootprint(info as unknown as BuildingFootprint);
     expect(b.height).toBe(200);
+  });
+});
+
+describe('Building.draw', () => {
+  it('draws base, sides, ceiling and roof polygons (4-point base)', () => {
+    const b = makeBuilding();
+    const { ctx, calls } = mockCanvas2D();
+    b.draw(ctx, { viewPoint: new Point(500, 500) });
+    // Each polygon draw issues a fill; a 4-point base yields base + 4 sides +
+    // ceiling + 2 roof polys => several fills and strokes.
+    expect(calls.filter((c) => c.method === 'fill').length).toBeGreaterThan(4);
+    expect(calls.some((c) => c.method === 'stroke')).toBe(true);
+  });
+
+  it('skips the roof style for a triangular (3-point) base without throwing', () => {
+    const tri = new Building(
+      new Polygon([new Point(0, 0), new Point(100, 0), new Point(50, 100)]),
+      150,
+    );
+    const { ctx, calls } = mockCanvas2D();
+    expect(() =>
+      tri.draw(ctx, { viewPoint: new Point(500, 500) }),
+    ).not.toThrow();
+    expect(calls.some((c) => c.method === 'fill')).toBe(true);
   });
 });
