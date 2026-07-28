@@ -247,21 +247,76 @@ app-icon:hover .app-icon-svg {
   }
 }
 
+@keyframes ic-map-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-1px);
+  }
+}
+
+@keyframes ic-flag-wave {
+  0%,
+  100% {
+    transform: skewX(0) scaleX(1);
+  }
+  25% {
+    transform: skewX(-7deg) scaleX(0.96);
+  }
+  75% {
+    transform: skewX(7deg) scaleX(1.02);
+  }
+}
+
+@keyframes ic-package-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-1.5px) rotate(-4deg);
+  }
+}
+
+@keyframes ic-dna-twist {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.12);
+  }
+}
+
+@keyframes ic-sparkle {
+  0%,
+  100% {
+    transform: scale(0.75) rotate(0);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.15) rotate(90deg);
+    opacity: 1;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    Idle animations (opt-in via the `animate` attribute → .is-animated)
    ═══════════════════════════════════════════════════════════════════ */
 
 .app-icon-svg.is-animated .ic-road-dash {
-  animation: ic-scroll-down 0.9s linear infinite;
+  animation: ic-scroll-down 1.8s linear infinite;
 }
 
 .app-icon-svg.is-animated .ic-graph-edge {
   stroke-dasharray: 5 4;
-  animation: ic-scroll-down 0.9s linear infinite;
+  animation: ic-scroll-down 1.8s linear infinite;
 }
 
 .app-icon-svg.is-animated .ic-corridor-tie {
-  animation: ic-ties-scroll 0.7s linear infinite;
+  animation: ic-ties-scroll 1.4s linear infinite;
 }
 
 .app-icon-svg.is-animated .ic-tl-red {
@@ -276,6 +331,42 @@ app-icon:hover .app-icon-svg {
 
 .app-icon-svg.is-animated .ic-dna {
   animation: ic-spin 6s linear infinite;
+}
+
+.app-icon-svg.is-animated .ic-dna-rung {
+  animation: ic-dna-twist 2s ease-in-out infinite;
+}
+.app-icon-svg.is-animated .ic-dna-rung:nth-of-type(3) {
+  animation-delay: 0s;
+}
+.app-icon-svg.is-animated .ic-dna-rung:nth-of-type(4) {
+  animation-delay: 0.16s;
+}
+.app-icon-svg.is-animated .ic-dna-rung:nth-of-type(5) {
+  animation-delay: 0.32s;
+}
+.app-icon-svg.is-animated .ic-dna-rung:nth-of-type(6) {
+  animation-delay: 0.48s;
+}
+.app-icon-svg.is-animated .ic-dna-rung:nth-of-type(7) {
+  animation-delay: 0.64s;
+}
+
+.app-icon-svg.is-animated .ic-map {
+  animation: ic-map-sway 3.4s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-flag-wave {
+  transform-origin: left center;
+  animation: ic-flag-wave 1.6s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-package {
+  animation: ic-package-bob 2.2s ease-in-out infinite;
+}
+
+.app-icon-svg.is-animated .ic-new-spark {
+  animation: ic-sparkle 2s ease-in-out infinite;
 }
 
 .app-icon-svg.is-animated .ic-globe-lines {
@@ -371,7 +462,9 @@ app-icon:hover .app-icon-svg {
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-tire {
   animation: ic-spin 1.4s linear infinite;
 }
-:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-regen,
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-regen {
+  animation: ic-spin 0.8s linear infinite;
+}
 :is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-restart {
   animation: ic-spin-rev 0.8s linear infinite;
 }
@@ -529,6 +622,32 @@ app-icon:hover .app-icon-svg {
   .app-icon-svg
   .ic-mouse-scroll {
   animation: ic-scroll-dot 0.9s ease-in-out infinite;
+}
+
+/* Map sway */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-map {
+  animation: ic-map-sway 1.6s ease-in-out infinite;
+}
+
+/* Flag ripple */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-flag-wave {
+  transform-origin: left center;
+  animation: ic-flag-wave 0.8s ease-in-out infinite;
+}
+
+/* Package bob */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-package {
+  animation: ic-package-bob 1s ease-in-out infinite;
+}
+
+/* DNA rungs twist faster */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-dna-rung {
+  animation: ic-dna-twist 1s ease-in-out infinite;
+}
+
+/* New sparkle pop */
+:is(button, .toolbar-btn, .card, app-icon):hover .app-icon-svg .ic-new-spark {
+  animation: ic-sparkle 1s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

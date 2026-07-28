@@ -51,12 +51,17 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
   dna: {
     category: V,
     desc: 'DNA double helix',
-    idle: 'Spin — full rotation (6s)',
-    hover: 'Spin (faster)',
+    idle: 'Spin (6s) + rungs twist in sequence',
+    hover: 'Spin (faster) + rungs twist',
   },
 
   // ── Geo / Navigation ─────────────────────────────────────────────
-  map: { category: GEO, desc: 'Folded map', idle: null, hover: null },
+  map: {
+    category: GEO,
+    desc: 'Folded map',
+    idle: 'Gentle sway',
+    hover: 'Sway (faster)',
+  },
   globe: {
     category: GEO,
     desc: 'Globe with meridian lines',
@@ -66,7 +71,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
   graph: {
     category: GEO,
     desc: 'Node/edge graph',
-    idle: 'Edges flow (dash scroll)',
+    idle: 'Edges flow (dash scroll, slow)',
     hover: 'Edges flow (faster)',
   },
   compass: {
@@ -92,7 +97,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
   road: {
     category: ROAD,
     desc: 'Road with centre dashes',
-    idle: 'Centre dashes scroll',
+    idle: 'Centre dashes scroll (slow)',
     hover: 'Dashes scroll (faster)',
   },
   'traffic-light': {
@@ -104,7 +109,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
   corridor: {
     category: ROAD,
     desc: 'Rail corridor with ties',
-    idle: 'Ties scroll along track',
+    idle: 'Ties scroll along track (slow)',
     hover: 'Ties scroll (faster)',
   },
   stop: {
@@ -220,7 +225,7 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     category: ACTION,
     desc: 'Circular refresh',
     idle: null,
-    hover: 'Spin (reverse)',
+    hover: 'Spin (clockwise)',
   },
   restart: {
     category: ACTION,
@@ -305,16 +310,31 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     idle: 'Tassel swing',
     hover: 'Tassel swing (faster)',
   },
-  flag: { category: STATUS, desc: 'Checkered flag', idle: null, hover: null },
+  flag: {
+    category: STATUS,
+    desc: 'Checkered flag',
+    idle: 'Banner ripples from pole',
+    hover: 'Ripple (faster)',
+  },
   hand: { category: STATUS, desc: 'Open hand', idle: null, hover: null },
-  new: { category: STATUS, desc: '"NEW" badge', idle: null, hover: null },
+  new: {
+    category: STATUS,
+    desc: 'New document with sparkle',
+    idle: 'Sparkle twinkle',
+    hover: 'Sparkle twinkle (faster)',
+  },
   gear: {
     category: STATUS,
     desc: 'Cog / settings',
     idle: null,
     hover: 'Spin',
   },
-  package: { category: STATUS, desc: 'Package / box', idle: null, hover: null },
+  package: {
+    category: STATUS,
+    desc: 'Package / box',
+    idle: 'Gentle bob + tilt',
+    hover: 'Bob + tilt (faster)',
+  },
 
   // ── Car Params ───────────────────────────────────────────────────
   rocket: {

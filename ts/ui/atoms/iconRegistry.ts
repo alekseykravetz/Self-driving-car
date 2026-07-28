@@ -116,9 +116,13 @@ export const ICON_REGISTRY: Record<IconName, string> = {
 
   dna: `
     <g class="ic-dna" ${S}>
-      <path d="M7 3c0 5 10 5 10 10s-10 5-10 10" />
-      <path d="M17 3c0 5-10 5-10 10s10 5 10 10" />
-      <path d="M8.5 6h7M8.5 18h7M7 10.5h10M7 13.5h10" />
+      <path class="ic-dna-strand" d="M7 3c0 5 10 5 10 10s-10 5-10 10" />
+      <path class="ic-dna-strand" d="M17 3c0 5-10 5-10 10s10 5 10 10" />
+      <path class="ic-dna-rung" d="M8.7 6h6.6" />
+      <path class="ic-dna-rung" d="M7.2 9.5h9.6" />
+      <path class="ic-dna-rung" d="M7 12.5h10" />
+      <path class="ic-dna-rung" d="M7.2 15.5h9.6" />
+      <path class="ic-dna-rung" d="M8.7 19h6.6" />
     </g>`,
 
   // ── Geo / navigation ─────────────────────────────────────────────
@@ -412,8 +416,10 @@ export const ICON_REGISTRY: Record<IconName, string> = {
   flag: `
     <g class="ic-flag" ${S}>
       <path d="M6 3v18" />
-      <path d="M6 4h12v9H6z" ${F} fill-opacity="0.15" />
-      <path d="M6 4h4v3h4V4h4v3h-4v3h4v3h-4v-3h-4v3H6v-3h4V7H6V4z" ${F} stroke="none" />
+      <g class="ic-flag-wave">
+        <path d="M6 4h12v9H6z" ${F} fill-opacity="0.15" />
+        <path d="M6 4h4v3h4V4h4v3h-4v3h4v3h-4v-3h-4v3H6v-3h4V7H6V4z" ${F} stroke="none" />
+      </g>
     </g>`,
 
   hand: `
@@ -425,8 +431,9 @@ export const ICON_REGISTRY: Record<IconName, string> = {
 
   new: `
     <g class="ic-new" ${S}>
-      <rect x="3.5" y="6" width="17" height="12" rx="2.5" />
-      <path d="M7 15V9l2.5 6V9M12.5 9v6M12.5 9h2.5M12.5 12h2M12.5 15h2.5M17.5 15V9h2.5M17.5 12h2" stroke-width="1.4" />
+      <path d="M13 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9l-6-6z" />
+      <path d="M13 3v6h6" />
+      <path class="ic-new-spark" d="M10 12.2l.85 1.95 1.95.85-1.95.85L10 18.6l-.85-1.95-1.95-.85 1.95-.85L10 12.2z" ${F} stroke="none" />
     </g>`,
 
   gear: `
