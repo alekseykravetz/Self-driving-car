@@ -257,7 +257,12 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     idle: null,
     hover: 'Scale pop',
   },
-  edit: { category: ACTION, desc: 'Pencil / edit', idle: null, hover: null },
+  edit: {
+    category: ACTION,
+    desc: 'Pencil / edit',
+    idle: 'Pencil scribble',
+    hover: null,
+  },
   check: {
     category: ACTION,
     desc: 'Checkmark',

@@ -17,6 +17,8 @@ store-panel {
   height: 100%;
   max-height: 400px;
   min-width: 0;
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition:
@@ -25,12 +27,33 @@ store-panel {
     box-shadow var(--transition-normal);
 }
 
+/* Green accent line along the top edge, revealed on hover (matches .landing-card). */
+.store-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-accent-green),
+    var(--color-accent-cyan),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
 .store-panel:hover {
   border-color: var(--color-accent-green-border);
-  transform: translateY(calc(-1 * var(--space-0\.5)));
+  transform: translateY(calc(-1 * var(--space-1)));
   box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.35),
     0 0 0 1px var(--color-accent-green-border-strong);
+}
+
+.store-panel:hover::before {
+  opacity: 1;
 }
 
 .store-panel-header {
