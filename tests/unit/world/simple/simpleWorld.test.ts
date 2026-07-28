@@ -7,6 +7,7 @@ beforeAll(() => {
 
 import { SimpleWorld } from '../../../../ts/world/simple/simpleWorld.js';
 import { Point } from '../../../../ts/math/primitives/point.js';
+import { mockCanvas2D } from '../../../helpers/mockCanvas2D.js';
 
 describe('SimpleWorld', () => {
   describe('constructor', () => {
@@ -116,6 +117,46 @@ describe('SimpleWorld', () => {
       const w = new SimpleWorld(200, 180, 3);
       w.generateCorridor(new Point(0, 0), new Point(100, 0));
       expect(w.corridors).toEqual([]);
+    });
+  });
+
+  describe('draw', () => {
+    it('fills the road surface and strokes both borders', () => {
+      const w = new SimpleWorld(200, 180, 3);
+      const { ctx, calls } = mockCanvas2D();
+      w.draw(ctx, {} as never);
+      const fillRects = calls.filter((c) => c.method === 'fillRect');
+      expect(fillRects).toHaveLength(1);
+      expect(fillRects[0].args[0]).toBe(110); // left edge
+      expect(fillRects[0].args[2]).toBe(180); // width
+      const strokes = calls.filter((c) => c.method === 'stroke');
+      expect(strokes.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('draws laneCount-1 dashed lane dividers', () => {
+      const w = new SimpleWorld(200, 180, 3);
+      const { ctx, calls } = mockCanvas2D();
+      w.draw(ctx, {} as never);
+      const dashed = calls.filter(
+        (c) =>
+          c.method === 'setLineDash' &&
+          Array.isArray(c.args[0]) &&
+          (c.args[0] as number[]).length === 2,
+      );
+      expect(dashed).toHaveLength(2);
+    });
+
+    it('draws no dashed dividers for a single-lane road', () => {
+      const w = new SimpleWorld(200, 180, 1);
+      const { ctx, calls } = mockCanvas2D();
+      w.draw(ctx, {} as never);
+      const dashed = calls.filter(
+        (c) =>
+          c.method === 'setLineDash' &&
+          Array.isArray(c.args[0]) &&
+          (c.args[0] as number[]).length === 2,
+      );
+      expect(dashed).toHaveLength(0);
     });
   });
 });

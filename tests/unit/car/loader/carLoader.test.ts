@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   parseCarFileContent,
   compareCarInfoParams,
@@ -189,5 +189,168 @@ describe('CarLoader static delegates', () => {
     const a = makeCarInfo();
     const b = makeCarInfo();
     expect(CarLoader.compareCarParams(a, b)).toBe(compareCarInfoParams(a, b));
+  });
+});
+
+// --- Instance (DOM + FileReader) tests ---
+
+interface FakeFile {
+  name: string;
+  __content?: string;
+  __error?: boolean;
+}
+
+/** Minimal fake input element capturing listeners so tests can dispatch. */
+class FakeInput {
+  type = '';
+  id = '';
+  accept = '';
+  multiple = false;
+  style: Record<string, string> = {};
+  value = '';
+  files: FakeFile[] | null = null;
+  listeners: Record<string, ((e: unknown) => void)[]> = {};
+
+  addEventListener(event: string, fn: (e: unknown) => void): void {
+    (this.listeners[event] ??= []).push(fn);
+  }
+
+  dispatch(event: string, e: unknown): void {
+    for (const fn of this.listeners[event] ?? []) fn(e);
+  }
+}
+
+/** Synchronous FileReader mock driven by FakeFile metadata. */
+class FakeFileReader {
+  onload: ((e: { target: { result: string } }) => void) | null = null;
+  onerror: (() => void) | null = null;
+  error: unknown = null;
+  result: string | null = null;
+
+  readAsText(file: FakeFile): void {
+    if (file.__error) {
+      this.error = new Error('read failed');
+      this.onerror?.();
+      return;
+    }
+    this.result = file.__content ?? '';
+    this.onload?.({ target: { result: this.result } });
+  }
+}
+
+describe('CarLoader instance', () => {
+  let created: FakeInput[] = [];
+  let existing: Record<string, FakeInput> = {};
+  const alertMock = vi.fn();
+
+  beforeEach(() => {
+    created = [];
+    existing = {};
+    alertMock.mockClear();
+    vi.stubGlobal('document', {
+      getElementById: (id: string) => existing[id] ?? null,
+      createElement: () => {
+        const el = new FakeInput();
+        created.push(el);
+        return el;
+      },
+      body: { appendChild: () => {} },
+    });
+    vi.stubGlobal('FileReader', FakeFileReader);
+    vi.stubGlobal('alert', alertMock);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function carJson(overrides: Partial<CarInfo> = {}): string {
+    return JSON.stringify(makeCarInfo(overrides));
+  }
+
+  it('creates a hidden file input when none exists', () => {
+    new CarLoader(() => {});
+    expect(created).toHaveLength(1);
+    const input = created[0];
+    expect(input.type).toBe('file');
+    expect(input.id).toBe('loadCarInput');
+    expect(input.accept).toBe('.car,.json');
+    expect(input.multiple).toBe(true);
+    expect(input.style.display).toBe('none');
+  });
+
+  it('reuses an existing input element by id', () => {
+    const preexisting = new FakeInput();
+    existing['loadCarInput'] = preexisting;
+    new CarLoader(() => {});
+    expect(created).toHaveLength(0);
+    expect(preexisting.multiple).toBe(true);
+  });
+
+  it('parses multiple valid files and invokes onLoad with all cars', () => {
+    const onLoad = vi.fn();
+    new CarLoader(onLoad);
+    const input = created[0];
+    input.files = [
+      { name: 'a.car', __content: carJson({ maxSpeed: 3 }) },
+      { name: 'b.car', __content: carJson({ maxSpeed: 5 }) },
+    ];
+    input.dispatch('change', { target: input });
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    const cars = onLoad.mock.calls[0][0] as CarInfo[];
+    expect(cars).toHaveLength(2);
+    expect(cars.map((c) => c.maxSpeed).sort()).toEqual([3, 5]);
+    // input value reset after processing
+    expect(input.value).toBe('');
+  });
+
+  it('skips unparseable files but still loads the valid ones', () => {
+    const onLoad = vi.fn();
+    new CarLoader(onLoad);
+    const input = created[0];
+    input.files = [
+      { name: 'good.car', __content: carJson() },
+      { name: 'bad.car', __content: 'not json' },
+    ];
+    input.dispatch('change', { target: input });
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    expect((onLoad.mock.calls[0][0] as CarInfo[]).length).toBe(1);
+    expect(alertMock).not.toHaveBeenCalled();
+  });
+
+  it('alerts and does not call onLoad when no files parse', () => {
+    const onLoad = vi.fn();
+    new CarLoader(onLoad);
+    const input = created[0];
+    input.files = [{ name: 'bad.car', __content: 'garbage' }];
+    input.dispatch('change', { target: input });
+    expect(onLoad).not.toHaveBeenCalled();
+    expect(alertMock).toHaveBeenCalledWith(
+      'No valid car files could be parsed.',
+    );
+  });
+
+  it('resets value and returns early when no files selected', () => {
+    const onLoad = vi.fn();
+    new CarLoader(onLoad);
+    const input = created[0];
+    input.files = [];
+    input.value = 'stale';
+    input.dispatch('change', { target: input });
+    expect(onLoad).not.toHaveBeenCalled();
+    expect(input.value).toBe('');
+  });
+
+  it('still loads valid results when another file errors while reading', () => {
+    const onLoad = vi.fn();
+    new CarLoader(onLoad);
+    const input = created[0];
+    input.files = [
+      { name: 'good.car', __content: carJson() },
+      { name: 'broken.car', __error: true },
+    ];
+    input.dispatch('change', { target: input });
+    expect(onLoad).toHaveBeenCalledTimes(1);
+    expect((onLoad.mock.calls[0][0] as CarInfo[]).length).toBe(1);
   });
 });
