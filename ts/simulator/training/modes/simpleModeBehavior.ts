@@ -261,6 +261,10 @@ export class SimpleTrainingStrategy {
     const cars = this.#parent.trainingManager.cars;
     const bestCar = this.#parent.trainingManager.bestCar;
 
+    // Size the canvas layout first so the game canvas has a valid width even
+    // before any cars are spawned (e.g. an idle/paused page on first load).
+    this.#parent.resizeLayout();
+
     if (
       !cars.length ||
       !this.#parent.world ||
@@ -272,8 +276,6 @@ export class SimpleTrainingStrategy {
     }
 
     const simpleWorld = this.#parent.world as SimpleWorld;
-
-    this.#parent.resizeLayout();
 
     const viewportTop =
       this.#simpleState.simpleViewY -

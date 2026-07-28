@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   smGenId,
   smWorldMarkers,
@@ -12,22 +12,25 @@ import type { CarInfo } from '../../../ts/car/car.js';
 
 // Shared localStorage mock for tests that need it
 const store: Record<string, string> = {};
-vi.stubGlobal('localStorage', {
-  getItem: (key: string) => store[key] ?? null,
-  setItem: (key: string, value: string) => {
-    store[key] = value;
-  },
-  removeItem: (key: string) => {
-    delete store[key];
-  },
-  clear: () => {
-    for (const k in store) delete store[k];
-  },
-  get length() {
-    return Object.keys(store).length;
-  },
-  key: (i: number) => Object.keys(store)[i] ?? null,
-});
+function installLocalStorageMock(): void {
+  vi.stubGlobal('localStorage', {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      for (const k in store) delete store[k];
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (i: number) => Object.keys(store)[i] ?? null,
+  });
+}
+installLocalStorageMock();
 
 describe('smGenId', () => {
   it('returns a non-empty string', () => {
@@ -491,5 +494,91 @@ describe('StoreManager static methods', () => {
 
   it('static getActiveCarIds returns [] before init', () => {
     expect(StoreManager.getActiveCarIds()).toEqual([]);
+  });
+});
+
+describe('StoreManager.exportLocalStorageKey', () => {
+  let clickSpy: ReturnType<typeof vi.fn>;
+  let createdAnchor: { href: string; download: string; click: () => void };
+  let createObjectURL: ReturnType<typeof vi.fn>;
+  let revokeObjectURL: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    for (const k in store) delete store[k];
+    clickSpy = vi.fn();
+    createdAnchor = { href: '', download: '', click: clickSpy };
+    createObjectURL = vi.fn(() => 'blob:mock-url');
+    revokeObjectURL = vi.fn();
+
+    vi.stubGlobal(
+      'Blob',
+      class {
+        parts: unknown[];
+        opts: unknown;
+        constructor(parts: unknown[], opts: unknown) {
+          this.parts = parts;
+          this.opts = opts;
+        }
+      },
+    );
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL });
+    vi.stubGlobal('document', {
+      createElement: () => createdAnchor,
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    // unstubAllGlobals also removes the module-level localStorage mock, so
+    // reinstall it for the tests that run afterwards.
+    installLocalStorageMock();
+  });
+
+  it('triggers a download with the key-named file for an existing key', () => {
+    store['bestPool'] = JSON.stringify([1, 2, 3]);
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    mgr.exportLocalStorageKey('bestPool');
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+    expect(createdAnchor.href).toBe('blob:mock-url');
+    expect(createdAnchor.download).toBe('bestPool.json');
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
+  });
+
+  it('does nothing when the key is absent from localStorage', () => {
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    mgr.exportLocalStorageKey('missingKey');
+
+    expect(createObjectURL).not.toHaveBeenCalled();
+    expect(clickSpy).not.toHaveBeenCalled();
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+  });
+});
+
+describe('StoreManager.getLocalStorageStates edge cases', () => {
+  beforeEach(() => {
+    for (const k in store) delete store[k];
+  });
+
+  it('reports size and null count for non-array keys', () => {
+    store['editorWorld'] = '{"a":1}';
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const states = mgr.getLocalStorageStates();
+    const entry = states.find((s) => s.key === 'editorWorld');
+    expect(entry).toBeDefined();
+    expect(entry!.size).toBe(store['editorWorld'].length);
+    expect(entry!.count).toBeNull();
+  });
+
+  it('ignores untracked keys entirely', () => {
+    store['notTracked'] = 'x';
+    // @ts-expect-error - TypeScript prevents calling private constructor
+    const mgr = new StoreManager();
+    const states = mgr.getLocalStorageStates();
+    expect(states.some((s) => s.key === 'notTracked')).toBe(false);
   });
 });

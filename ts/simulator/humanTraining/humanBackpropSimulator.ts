@@ -495,10 +495,13 @@ export class HumanBackpropSimulator extends SimulatorShell {
   }
 
   protected draw(time: number): void {
+    // Size the canvas layout first so the game canvas has a valid width even
+    // before the car/world are ready (e.g. an idle/paused page on first load).
+    this.resizeLayout();
+
     if (!this.#car || !this.world || !this.viewport || !this.roadBorders)
       return;
 
-    this.resizeLayout();
     this.viewport.reset();
 
     if (this.#mode === 'world') {

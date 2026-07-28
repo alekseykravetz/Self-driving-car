@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Controls, ControlType } from '../../../../ts/car/controls/controls.js';
 
 describe('Controls', () => {
@@ -89,5 +89,75 @@ describe('Controls', () => {
     expect(ctrl.reverse).toBe(true);
     expect(ctrl.left).toBe(false);
     expect(ctrl.right).toBe(false);
+  });
+});
+
+describe('Controls KEYS type', () => {
+  let handlers: Record<string, ((e: KeyboardEvent) => void)[]>;
+
+  beforeEach(() => {
+    handlers = {};
+    vi.stubGlobal('document', {
+      addEventListener: (type: string, fn: (e: KeyboardEvent) => void) => {
+        (handlers[type] ??= []).push(fn);
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function dispatch(type: 'keydown' | 'keyup', key: string): void {
+    for (const fn of handlers[type] ?? []) fn({ key } as KeyboardEvent);
+  }
+
+  it('registers keydown and keyup listeners', () => {
+    new Controls('KEYS');
+    expect(handlers['keydown']).toHaveLength(1);
+    expect(handlers['keyup']).toHaveLength(1);
+  });
+
+  it.each([
+    ['ArrowUp', 'forward'],
+    ['w', 'forward'],
+    ['ArrowDown', 'reverse'],
+    ['s', 'reverse'],
+    ['ArrowLeft', 'left'],
+    ['a', 'left'],
+    ['ArrowRight', 'right'],
+    ['d', 'right'],
+  ] as const)('keydown "%s" sets %s true, keyup clears it', (key, prop) => {
+    const c = new Controls('KEYS');
+    dispatch('keydown', key);
+    expect(c[prop]).toBe(true);
+    dispatch('keyup', key);
+    expect(c[prop]).toBe(false);
+  });
+
+  it('unrelated keys do not change any control', () => {
+    const c = new Controls('KEYS');
+    dispatch('keydown', 'x');
+    expect(c.forward).toBe(false);
+    expect(c.left).toBe(false);
+    expect(c.right).toBe(false);
+    expect(c.reverse).toBe(false);
+  });
+
+  it('frozen ignores keydown input', () => {
+    const c = new Controls('KEYS');
+    c.frozen = true;
+    dispatch('keydown', 'w');
+    expect(c.forward).toBe(false);
+  });
+
+  it('frozen ignores keyup input (state is preserved)', () => {
+    const c = new Controls('KEYS');
+    dispatch('keydown', 'w');
+    expect(c.forward).toBe(true);
+    c.frozen = true;
+    dispatch('keyup', 'w');
+    // keyup ignored while frozen, so forward stays true
+    expect(c.forward).toBe(true);
   });
 });

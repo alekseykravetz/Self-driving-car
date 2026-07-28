@@ -203,6 +203,10 @@ export class WorldTrainingStrategy {
     const cars = this.#parent.trainingManager.cars;
     const bestCar = this.#parent.trainingManager.bestCar;
 
+    // Size the canvas layout first so the game canvas has a valid width even
+    // before any cars are spawned (e.g. an idle/paused page on first load).
+    this.#parent.resizeLayout();
+
     if (
       !cars.length ||
       !this.#parent.world ||
@@ -214,7 +218,6 @@ export class WorldTrainingStrategy {
       return;
     }
 
-    this.#parent.resizeLayout();
     this.#parent.viewport.reset();
     const viewPoint = scale(this.#parent.viewport.getOffset(), -1);
 
