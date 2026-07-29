@@ -5,7 +5,16 @@ import {
   WORLD_PIXELS_PER_METER,
   LANE_WIDTH_PX,
 } from '../worldUnits.js';
-import { invLerp, degToRad, subtract, normalize, dot } from '../utils.js';
+import {
+  invLerp,
+  degToRad,
+  subtract,
+  normalize,
+  dot,
+  add,
+  scale,
+  distance,
+} from '../utils.js';
 import { defaultLaneCount } from '../roadTypes.js';
 
 // --- Interfaces for OSM Data Structure ---
@@ -39,6 +48,9 @@ interface OsmWayTags {
   'name:en': string;
   [key: string]: string; // Allow for other unspecified tags
 }
+
+/** Signals within this world-pixel radius are treated as one intersection. */
+const SIGNAL_CLUSTER_RADIUS_PX = 400;
 
 /** Country-specific default speeds (km/h) inferred from `maxspeed:type`. */
 const MAXSPEED_TYPE_DEFAULTS: Record<string, number> = {
@@ -298,18 +310,51 @@ export class Osm {
     }
 
     // --- Assemble traffic lights collected from tagged nodes ---
-    // OSM marks signalised junctions with `highway=traffic_signals` on a node.
-    // Orient each light across the road that runs straight through the signal,
-    // resolved from all incident road neighbours (see `throughAxis`).
+    // OSM marks signalised junctions with `highway=traffic_signals` on a node,
+    // usually placed AT the crossing of two roads. Drawn there, a light's facing
+    // is ambiguous (two roads overlap). Instead, for signals that belong to the
+    // same junction (a nearby cluster) we orient each RADIALLY — along the line
+    // from the junction centre out through the signal — which is the approach
+    // road the signal controls, and nudge the light outward onto that approach
+    // edge (where the road ends and the crossing begins). Isolated signals fall
+    // back to the straight-through geometry.
+    const signalEntries = [...signalAccum.values()];
     const lights: OsmLightPlacement[] = [];
-    for (const { center, neighbors, lanes } of signalAccum.values()) {
-      const axis = throughAxis(center, neighbors);
-      if (!axis) continue;
-      lights.push({
-        center,
-        directionVector: normalize(axis),
-        width: (lanes * LANE_WIDTH_PX) / 2,
-      });
+    for (const entry of signalEntries) {
+      const { center, neighbors, lanes } = entry;
+      const width = (lanes * LANE_WIDTH_PX) / 2;
+
+      // Junction centre = centroid of the OTHER signals at this intersection.
+      let sumX = 0;
+      let sumY = 0;
+      let count = 0;
+      for (const other of signalEntries) {
+        if (other === entry) continue;
+        if (distance(center, other.center) <= SIGNAL_CLUSTER_RADIUS_PX) {
+          sumX += other.center.x;
+          sumY += other.center.y;
+          count++;
+        }
+      }
+
+      let dir: Point | undefined;
+      let placed = center;
+      if (count > 0) {
+        const centroid = new Point(sumX / count, sumY / count);
+        // Radial points from the junction centre out to the signal: this is the
+        // approach road's axis (cars travel along it toward the stop line).
+        const radial = subtract(center, centroid);
+        if (radial.x !== 0 || radial.y !== 0) {
+          dir = radial;
+          // Push the light outward, clear of the crossing box, onto the road.
+          placed = add(center, scale(normalize(radial), width));
+        }
+      }
+      // Isolated signal (or degenerate radial): use the straight-through road.
+      if (!dir) dir = throughAxis(center, neighbors);
+      if (!dir) continue;
+
+      lights.push({ center: placed, directionVector: normalize(dir), width });
     }
 
     // Return the processed points and segments
