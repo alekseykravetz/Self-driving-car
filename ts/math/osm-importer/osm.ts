@@ -208,9 +208,10 @@ export class Osm {
     );
 
     // Collect tagged nodes that become road markings. All lie ON highway ways,
-    // so `out body;` output carries their tags. Signals may additionally carry
-    // `direction` / `traffic_signals:direction` (forward|backward) telling which
-    // way traffic flows past them — authoritative for the light's facing.
+    // so `out body;` output carries their tags. Directional markings (lights,
+    // stops, give-ways) may additionally carry `direction` /
+    // `traffic_signals:direction` (forward|backward) telling which way traffic
+    // flows past them — authoritative for the marking's facing.
     const nodeKind = new Map<number, MarkingKind>();
     const signalDir = new Map<number, 'forward' | 'backward'>();
     for (const node of nodes) {
@@ -222,7 +223,9 @@ export class Osm {
       else if (hw === 'give_way') kind = 'yield';
       if (!kind) continue;
       nodeKind.set(node.id, kind);
-      if (kind === 'light') {
+      // Directional kinds (light/stop/yield) honour the node's `direction` tag;
+      // crossings are symmetric and ignore it.
+      if (kind === 'light' || kind === 'stop' || kind === 'yield') {
         const dir =
           node.tags?.direction ?? node.tags?.['traffic_signals:direction'];
         if (dir === 'forward' || dir === 'backward')
@@ -344,10 +347,11 @@ export class Osm {
             });
           }
 
-          // Authoritative facing from the signal's direction tag: `forward`
+          // Authoritative facing from the node's direction tag: `forward`
           // controls traffic travelling in way-node order (approaching from
           // `prev`); `backward` is the opposite (approaching from `next`).
-          // Prefer an assignment from a through (interior) node.
+          // Applies to lights, stops and give-ways. Prefer an assignment from a
+          // through (interior) node.
           const sd = signalDir.get(nid);
           if (
             sd &&
