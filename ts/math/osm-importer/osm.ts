@@ -79,21 +79,46 @@ export interface OsmData {
 }
 
 /**
- * Placement data for a traffic light derived from an OSM `highway=traffic_signals`
- * node. Kept as plain math primitives so this (math-layer) module never imports
- * the world-layer `Light` marking. Consumers construct the actual marking.
+ * Placement data for a road marking derived from a tagged OSM node
+ * (`highway=traffic_signals` / `crossing` / `stop` / `give_way`). Kept as plain
+ * math primitives so this (math-layer) module never imports the world-layer
+ * marking classes. Consumers construct the actual `Light`/`Crossing`/`Stop`/
+ * `Yield`. `height` is omitted for lights (their constructor takes none).
  */
-export interface OsmLightPlacement {
-  center: Point; // Position of the signal (a road node).
-  directionVector: Point; // Unit vector along the road at that node.
-  width: number; // Light strip width (spans the road).
+export interface OsmMarkingPlacement {
+  center: Point; // Placed position (approach stop line, or the node).
+  directionVector: Point; // Unit vector along the road at that point.
+  width: number; // Strip width across the road.
+  height?: number; // Strip length along the road (crossing/stop/yield only).
+}
+
+/** Node-marking kinds derived from OSM node `highway=*` tags. */
+type MarkingKind = 'light' | 'crossing' | 'stop' | 'yield';
+
+/** A road node adjacent to a tagged node, with its one-way approach flag. */
+interface MarkNeighbor {
+  point: Point; // Adjacent road node (on the centreline).
+  approach: boolean; // True when oncoming traffic flows from here into node.
+}
+
+/** Per-node accumulator gathered across every incident way. */
+interface MarkAccumulator {
+  center: Point;
+  kind: MarkingKind;
+  neighbors: MarkNeighbor[];
+  lanes: number;
+  directedApproach?: Point; // Upstream side from `traffic_signals:direction`.
+  directedInterior: boolean; // Whether that assignment came from a through node.
 }
 
 // Interface for the return type of parseRoads
 interface ParsedRoads {
   points: Point[]; // Array of created Point instances
   segments: Segment[]; // Array of created Segment instances
-  lights: OsmLightPlacement[]; // Traffic-signal placements from tagged nodes
+  lights: OsmMarkingPlacement[]; // highway=traffic_signals
+  crossings: OsmMarkingPlacement[]; // highway=crossing (zebra)
+  stops: OsmMarkingPlacement[]; // highway=stop
+  yields: OsmMarkingPlacement[]; // highway=give_way
 }
 
 // --- Converted Osm Object ---
@@ -118,7 +143,14 @@ export class Osm {
     // Early exit if no nodes are found
     if (nodes.length === 0) {
       console.warn('No nodes found in OSM data.');
-      return { points: [], segments: [], lights: [] };
+      return {
+        points: [],
+        segments: [],
+        lights: [],
+        crossings: [],
+        stops: [],
+        yields: [],
+      };
     }
 
     // Extract latitudes and longitudes for bounding box calculation
@@ -174,26 +206,32 @@ export class Osm {
       (element): element is OsmWayElement => element.type === 'way',
     );
 
-    // Collect the ids of nodes tagged as traffic signals so we can turn them
-    // into Light markings, oriented along the road they actually sit on.
-    const signalNodeIds = new Set<number>();
+    // Collect tagged nodes that become road markings. All lie ON highway ways,
+    // so `out body;` output carries their tags. Signals may additionally carry
+    // `direction` / `traffic_signals:direction` (forward|backward) telling which
+    // way traffic flows past them — authoritative for the light's facing.
+    const nodeKind = new Map<number, MarkingKind>();
+    const signalDir = new Map<number, 'forward' | 'backward'>();
     for (const node of nodes) {
-      if (node.tags?.highway === 'traffic_signals') signalNodeIds.add(node.id);
+      const hw = node.tags?.highway;
+      let kind: MarkingKind | undefined;
+      if (hw === 'traffic_signals') kind = 'light';
+      else if (hw === 'crossing') kind = 'crossing';
+      else if (hw === 'stop') kind = 'stop';
+      else if (hw === 'give_way') kind = 'yield';
+      if (!kind) continue;
+      nodeKind.set(node.id, kind);
+      if (kind === 'light') {
+        const dir =
+          node.tags?.direction ?? node.tags?.['traffic_signals:direction'];
+        if (dir === 'forward' || dir === 'backward')
+          signalDir.set(node.id, dir);
+      }
     }
-    // Per signal node, gather every neighbouring road node (across all ways)
-    // together with whether traffic can APPROACH the signal from that side
-    // (derived from the way's one-way direction). This lets us place the light
-    // on the correct approach arm and orient it across that road.
-    interface SignalNeighbor {
-      point: Point; // Adjacent road node (on the centreline).
-      approach: boolean; // True when oncoming traffic flows from here into node.
-    }
-    interface SignalAccumulator {
-      center: Point;
-      neighbors: SignalNeighbor[];
-      lanes: number;
-    }
-    const signalAccum = new Map<number, SignalAccumulator>();
+    // Per tagged node, gather every neighbouring road node (across all ways)
+    // with its one-way approach flag, so placement can pick the approach arm
+    // and orientation after all ways are processed.
+    const markAccum = new Map<number, MarkAccumulator>();
 
     // Convert ways to Segment objects
     for (const way of ways) {
@@ -243,21 +281,28 @@ export class Osm {
           ? lanesParsed
           : defaultLaneCount(highwayType, isOneWay);
 
-      // Record any traffic-signal nodes on this way, gathering their immediate
-      // road neighbours (prev/next along this way). Orientation is resolved
-      // later from the full set of neighbours across every incident way.
-      if (signalNodeIds.size > 0) {
+      // Record any tagged marking nodes on this way, gathering their road
+      // neighbours (prev/next) and one-way approach sides. Orientation and
+      // placement are resolved after all ways are processed.
+      if (nodeKind.size > 0) {
         for (let idx = 0; idx < nodeIds.length; idx++) {
           const nid = nodeIds[idx];
-          if (!signalNodeIds.has(nid)) continue;
+          const kind = nodeKind.get(nid);
+          if (!kind) continue;
 
           const center = nodeMap.get(nid);
           if (!center) continue;
 
-          let entry = signalAccum.get(nid);
+          let entry = markAccum.get(nid);
           if (!entry) {
-            entry = { center, neighbors: [], lanes: laneCount };
-            signalAccum.set(nid, entry);
+            entry = {
+              center,
+              kind,
+              neighbors: [],
+              lanes: laneCount,
+              directedInterior: false,
+            };
+            markAccum.set(nid, entry);
           }
           // The controlled road is usually the widest one at the junction.
           entry.lanes = Math.max(entry.lanes, laneCount);
@@ -267,8 +312,9 @@ export class Osm {
             idx < nodeIds.length - 1
               ? nodeMap.get(nodeIds[idx + 1])
               : undefined;
+          const interior = !!(prev && next);
           // A neighbour is a valid APPROACH side when oncoming traffic can
-          // reach the signal from it. Two-way roads qualify on both sides; a
+          // reach the node from it. Two-way roads qualify on both sides; a
           // one-way qualifies only on its upstream side (reverse one-ways flow
           // in the opposite node order, swapping which side is upstream).
           if (prev) {
@@ -282,6 +328,22 @@ export class Osm {
               point: next,
               approach: !isOneWay || isReverseOneWay,
             });
+          }
+
+          // Authoritative facing from the signal's direction tag: `forward`
+          // controls traffic travelling in way-node order (approaching from
+          // `prev`); `backward` is the opposite (approaching from `next`).
+          // Prefer an assignment from a through (interior) node.
+          const sd = signalDir.get(nid);
+          if (
+            sd &&
+            (!entry.directedApproach || (interior && !entry.directedInterior))
+          ) {
+            const upstream = sd === 'forward' ? prev : next;
+            if (upstream) {
+              entry.directedApproach = upstream;
+              entry.directedInterior = interior;
+            }
           }
         }
       }
@@ -327,85 +389,153 @@ export class Osm {
       }
     }
 
-    // --- Assemble traffic lights collected from tagged nodes ---
-    // OSM marks signalised junctions with `highway=traffic_signals` on a node,
-    // usually AT the crossing of two roads, where a light's facing is ambiguous.
-    // For signals belonging to the same junction (a nearby cluster) we choose
-    // the APPROACH arm — the neighbouring road, reachable by one-way traffic,
-    // that points most directly away from the junction centre — and slide the
-    // light UPSTREAM along that road's centreline to the stop line. Sliding
-    // along the centreline keeps the light centred on the road width. Isolated
-    // signals fall back to the straight-through geometry, drawn at the node.
-    const signalEntries = [...signalAccum.values()];
-    const lights: OsmLightPlacement[] = [];
-    for (const entry of signalEntries) {
-      const { center, neighbors, lanes } = entry;
-      const width = (lanes * LANE_WIDTH_PX) / 2;
+    // --- Assemble markings from tagged nodes ---
+    // Lights are signal HEADS facing oncoming traffic on one approach, so they
+    // use approach placement (`placeApproachMarking`): pick the approach arm and
+    // slide upstream to the stop line. Crossings / stops / give-ways are painted
+    // lines that span the road, so they are simply oriented across the road at
+    // the node (straight-through axis) and drawn there.
+    const markEntries = [...markAccum.values()];
+    const lights: OsmMarkingPlacement[] = [];
+    const crossings: OsmMarkingPlacement[] = [];
+    const stops: OsmMarkingPlacement[] = [];
+    const yields: OsmMarkingPlacement[] = [];
 
-      // Junction centre = centroid of the OTHER signals at this intersection.
-      let sumX = 0;
-      let sumY = 0;
-      let count = 0;
-      for (const other of signalEntries) {
-        if (other === entry) continue;
-        if (distance(center, other.center) <= SIGNAL_CLUSTER_RADIUS_PX) {
-          sumX += other.center.x;
-          sumY += other.center.y;
-          count++;
-        }
-      }
+    for (const entry of markEntries) {
+      const { center, neighbors, lanes, kind } = entry;
+      const roadWidth = lanes * LANE_WIDTH_PX;
 
-      let placed = center;
-      let dir: Point | undefined;
-
-      if (count > 0) {
-        const centroid = new Point(sumX / count, sumY / count);
-        const radial = subtract(center, centroid); // outward = approach side
-        const radialUnit =
-          radial.x !== 0 || radial.y !== 0 ? normalize(radial) : undefined;
-
-        // Prefer neighbours cars can approach from; pick the one whose road
-        // direction points most outward (aligned with the radial).
-        const approachable = neighbors.filter((n) => n.approach);
-        const pool = approachable.length > 0 ? approachable : neighbors;
-        let bestUnit: Point | undefined;
-        let bestPoint: Point | undefined;
-        let bestScore = -Infinity;
-        for (const n of pool) {
-          const d = subtract(n.point, center);
-          if (d.x === 0 && d.y === 0) continue;
-          const unit = normalize(d);
-          const score = radialUnit ? dot(unit, radialUnit) : 0;
-          if (score > bestScore) {
-            bestScore = score;
-            bestUnit = unit;
-            bestPoint = n.point;
-          }
-        }
-
-        if (bestUnit && bestPoint) {
-          dir = bestUnit; // road centreline direction at the signal
-          // Slide upstream to the stop line, clamped so it stays on this edge.
-          const span = distance(center, bestPoint);
-          placed = add(center, scale(bestUnit, Math.min(width, span * 0.5)));
-        }
-      }
-
-      // Isolated signal (or degenerate radial): use the straight-through road.
-      if (!dir) {
-        dir = throughAxis(
-          center,
-          neighbors.map((n) => n.point),
+      if (kind === 'light') {
+        const placement = placeApproachMarking(
+          entry,
+          markEntries,
+          roadWidth / 2,
         );
+        if (placement) lights.push(placement);
+        continue;
       }
-      if (!dir) continue;
 
-      lights.push({ center: placed, directionVector: normalize(dir), width });
+      // Painted line spanning the road: orient across it at the node.
+      const axis = throughAxis(
+        center,
+        neighbors.map((n) => n.point),
+      );
+      if (!axis) continue;
+      const directionVector = normalize(axis);
+      if (kind === 'crossing') {
+        // Zebra spans the full road; ~half-road depth along travel (matches the
+        // editor's `roadWidth` / `roadWidth / 2`).
+        crossings.push({
+          center,
+          directionVector,
+          width: roadWidth,
+          height: roadWidth / 2,
+        });
+      } else if (kind === 'stop') {
+        stops.push({
+          center,
+          directionVector,
+          width: roadWidth / 2,
+          height: roadWidth / 2,
+        });
+      } else {
+        yields.push({
+          center,
+          directionVector,
+          width: roadWidth / 2,
+          height: roadWidth / 2,
+        });
+      }
     }
 
-    // Return the processed points and segments
-    return { points, segments, lights };
+    // Return the processed points, segments and node markings.
+    return { points, segments, lights, crossings, stops, yields };
   }
+}
+
+/**
+ * Places an approach-facing marking (a traffic light) so it sits on the correct
+ * approach arm, centred on the road, at the stop line just before the junction.
+ *
+ * Facing is resolved in priority order:
+ *   1. `directedApproach` — from the node's `traffic_signals:direction` tag
+ *      (authoritative when present).
+ *   2. Radial — the approach neighbour pointing most outward from the centroid
+ *      of the other signals at the same junction (a nearby cluster).
+ *   3. `throughAxis` — the straight-through road, drawn at the node (isolated
+ *      signal, no cluster to give a radial).
+ *
+ * When an approach arm is chosen the light slides UPSTREAM along that road's
+ * real centreline (`center + dir * min(width, span/2)`), which keeps it centred
+ * on the road width. Returns `undefined` when no usable direction exists.
+ */
+function placeApproachMarking(
+  entry: MarkAccumulator,
+  allEntries: MarkAccumulator[],
+  width: number,
+): OsmMarkingPlacement | undefined {
+  const { center, neighbors, directedApproach } = entry;
+  let bestUnit: Point | undefined;
+  let bestPoint: Point | undefined;
+
+  // 1. Authoritative direction tag.
+  if (directedApproach) {
+    const d = subtract(directedApproach, center);
+    if (d.x !== 0 || d.y !== 0) {
+      bestUnit = normalize(d);
+      bestPoint = directedApproach;
+    }
+  }
+
+  // 2. Radial from the junction centroid (other signals within the cluster).
+  if (!bestUnit) {
+    let sumX = 0;
+    let sumY = 0;
+    let count = 0;
+    for (const other of allEntries) {
+      if (other === entry || other.kind !== 'light') continue;
+      if (distance(center, other.center) <= SIGNAL_CLUSTER_RADIUS_PX) {
+        sumX += other.center.x;
+        sumY += other.center.y;
+        count++;
+      }
+    }
+    if (count > 0) {
+      const centroid = new Point(sumX / count, sumY / count);
+      const radial = subtract(center, centroid); // outward = approach side
+      const radialUnit =
+        radial.x !== 0 || radial.y !== 0 ? normalize(radial) : undefined;
+      const approachable = neighbors.filter((n) => n.approach);
+      const pool = approachable.length > 0 ? approachable : neighbors;
+      let bestScore = -Infinity;
+      for (const n of pool) {
+        const d = subtract(n.point, center);
+        if (d.x === 0 && d.y === 0) continue;
+        const unit = normalize(d);
+        const score = radialUnit ? dot(unit, radialUnit) : 0;
+        if (score > bestScore) {
+          bestScore = score;
+          bestUnit = unit;
+          bestPoint = n.point;
+        }
+      }
+    }
+  }
+
+  // 3. Isolated signal: straight-through road axis, drawn at the node.
+  if (!bestUnit || !bestPoint) {
+    const axis = throughAxis(
+      center,
+      neighbors.map((n) => n.point),
+    );
+    if (!axis) return undefined;
+    return { center, directionVector: normalize(axis), width };
+  }
+
+  // Slide upstream to the stop line, clamped so it stays on this edge.
+  const span = distance(center, bestPoint);
+  const placed = add(center, scale(bestUnit, Math.min(width, span * 0.5)));
+  return { center: placed, directionVector: bestUnit, width };
 }
 
 /**

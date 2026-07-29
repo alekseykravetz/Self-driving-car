@@ -438,45 +438,57 @@ Road envelope fill color varies by `highwayType`:
 | `unclassified`      | `#BBB`     |
 | other / residential | `#BBB`     |
 
-### Traffic light import
+### Node marking import (traffic lights, crossings, stops, give-ways)
 
-The importer also converts OSM **vehicle traffic signals** into `Light`
-markings. Nodes tagged `highway=traffic_signals` carry their tags only when the
-Overpass query outputs node bodies, so the filter ends with `out body;` (not
-`out skel;`, which strips tags). Pedestrian signals (`crossing=traffic_signals`)
-are ignored.
+The importer converts tagged OSM **nodes** into road markings. These nodes carry
+their tags only when the Overpass query outputs node bodies, so the filter ends
+with `out body;` (not `out skel;`, which strips tags). Because they all lie on
+the highway ways, no extra query is needed.
 
-`Osm.parseRoads()` returns a `lights: OsmLightPlacement[]` array
-(`{ center, directionVector, width }` — plain math primitives, so the math layer
-never imports the world-layer `Light`). `WorldEditor.parseOsmData()` builds a
-`Light` per placement, `setAnchor`s it to the graph, and pushes it onto
-`world.markings` **in place** (the `TrafficManager` holds that array reference
-and re-reads it to build control centers).
+| OSM node tag              | App marking | Placement                          |
+| ------------------------- | ----------- | ---------------------------------- |
+| `highway=traffic_signals` | `Light`     | Approach arm, at the stop line     |
+| `highway=crossing`        | `Crossing`  | Zebra across the road, at the node |
+| `highway=stop`            | `Stop`      | Line across the road, at the node  |
+| `highway=give_way`        | `Yield`     | Line across the road, at the node  |
 
-Placement is designed so each signal lands on its **approach arm, centred on the
-road, at the stop line** — matching how a person would place it in the editor:
+`Osm.parseRoads()` returns four `OsmMarkingPlacement[]` arrays (`lights`,
+`crossings`, `stops`, `yields`; each `{ center, directionVector, width, height? }`
+— plain math primitives, so the math layer never imports the world-layer marking
+classes). `WorldEditor.parseOsmData()` builds a `Light`/`Crossing`/`Stop`/`Yield`
+per placement, `setAnchor`s it, and pushes onto `world.markings` **in place**
+(the `TrafficManager` holds that array reference and re-reads it for control
+centers). `markingLoader` already handles all four types for save/load.
 
-1. **Approach sides** — for each signal node, its road neighbours (prev/next in
-   every incident way) are flagged as an _approach_ when one-way traffic can
-   reach the node from that side. Two-way roads qualify on both sides; a one-way
-   only on its upstream side (reverse one-ways swap which side is upstream).
-2. **Junction clustering** — signals within `SIGNAL_CLUSTER_RADIUS_PX` (400
-   world-px ≈ 28 m) are treated as one intersection; their centroid is the
-   junction centre.
-3. **Arm selection** — the chosen arm is the approach-side neighbour whose road
-   direction points most **outward** from the centroid (the radial only selects
-   the arm; it no longer sets the facing).
-4. **Orientation** — the light's `directionVector` is that neighbour's real
-   centreline direction, so the strip spans squarely across the road width.
-5. **Stop-line offset** — the light slides **upstream along the centreline**
-   (`center + roadDir * min(halfWidth, span/2)`). Moving along a real graph edge
-   keeps it centred on the road; `setAnchor` records ≈zero lateral so it stays
-   centred through edits.
+**Crossings / stops / give-ways** are painted lines that span the road, so they
+are simply oriented **across** the road at the node (via `throughAxis`, the two
+most-opposite neighbours) and drawn there. Crossing width = full road
+(`lanes * LANE_WIDTH_PX`); stop/yield width = half.
 
-**Isolated signals** (no nearby cluster) fall back to the straight-through road
-axis (`throughAxis` — the two most-opposite neighbours) and are drawn at the
-node. The two tunables are `SIGNAL_CLUSTER_RADIUS_PX` and the upstream offset
-(road half-width, capped at half the edge span).
+**Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
+each on its **approach arm, centred on the road, at the stop line** — matching
+how a person would place it in the editor. `placeApproachMarking()` resolves the
+facing in priority order:
+
+1. **Direction tag** — if the node has `direction` or `traffic_signals:direction`
+   (`forward` = controls traffic in way-node order, approaching from the previous
+   node; `backward` = the opposite), that authoritatively picks the approach
+   neighbour. (Preferred from a through/interior node when the node is in several
+   ways.)
+2. **Radial** — otherwise, signals within `SIGNAL_CLUSTER_RADIUS_PX` (400
+   world-px ≈ 28 m) form one junction; the arm is the approach-side neighbour
+   (reachable by one-way traffic) pointing most **outward** from the cluster
+   centroid.
+3. **Straight-through** — an isolated signal (no cluster) uses `throughAxis`,
+   drawn at the node.
+
+Once an arm is chosen, the light's `directionVector` is that neighbour's real
+centreline direction (strip spans across the road), and it slides **upstream
+along the centreline** (`center + roadDir * min(halfWidth, span/2)`) to the stop
+line. Moving along a real graph edge keeps it centred on the road width;
+`setAnchor` records ≈zero lateral so it stays centred through edits. The two
+tunables are `SIGNAL_CLUSTER_RADIUS_PX` and the upstream offset (road half-width,
+capped at half the edge span).
 
 ### Road name labels & speed signs
 

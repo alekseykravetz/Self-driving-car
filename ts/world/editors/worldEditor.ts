@@ -18,6 +18,9 @@ import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Osm, OsmData } from '../../math/osm-importer/osm.js';
 import { Light } from '../markings/light.js';
+import { Crossing } from '../markings/crossing.js';
+import { Stop } from '../markings/stop.js';
+import { Yield } from '../markings/yield.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
@@ -513,15 +516,38 @@ export class WorldEditor {
       this.#world.graph.segments = result.segments;
       this.#oldGraphHash = null; // Force regeneration on next draw
 
-      // Import traffic lights (OSM `highway=traffic_signals` nodes) as Light
+      // Import OSM node markings (traffic signals, pedestrian crossings, stop
+      // and give-way signs) as their corresponding Light/Crossing/Stop/Yield
       // markings, anchored to the graph so they follow later road edits.
       // Mutate the array in place: the world's TrafficManager holds this exact
       // reference and re-reads it to build control centers.
       this.#world.markings.length = 0;
+      const addMarking = (m: Light | Crossing | Stop | Yield): void => {
+        m.setAnchor(this.#world.graph);
+        this.#world.markings.push(m);
+      };
       for (const l of result.lights) {
-        const light = new Light(l.center, l.directionVector, l.width);
-        light.setAnchor(this.#world.graph);
-        this.#world.markings.push(light);
+        addMarking(new Light(l.center, l.directionVector, l.width));
+      }
+      for (const c of result.crossings) {
+        addMarking(
+          new Crossing(
+            c.center,
+            c.directionVector,
+            c.width,
+            c.height ?? c.width,
+          ),
+        );
+      }
+      for (const s of result.stops) {
+        addMarking(
+          new Stop(s.center, s.directionVector, s.width, s.height ?? s.width),
+        );
+      }
+      for (const y of result.yields) {
+        addMarking(
+          new Yield(y.center, y.directionVector, y.width, y.height ?? y.width),
+        );
       }
 
       // Center viewport on the imported data

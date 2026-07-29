@@ -654,7 +654,8 @@ interface OsmNodeElement {
   lat: number;
   lon: number;
   tags?: Record<string, string>; // Present only with `out body;` output
-  //   (e.g. { highway: 'traffic_signals' } for a vehicle traffic light)
+  //   highway=traffic_signals | crossing | stop | give_way → a road marking;
+  //   traffic_signals may add direction / traffic_signals:direction
 }
 
 interface OsmWayElement {
@@ -682,21 +683,26 @@ interface OsmWayElement {
 }
 
 /**
- * Placement for a traffic light from an OSM `highway=traffic_signals` node.
- * Plain math primitives so this (math-layer) module never imports the
- * world-layer `Light`; the editor constructs the actual marking.
+ * Placement for a road marking from a tagged OSM node
+ * (highway=traffic_signals | crossing | stop | give_way). Plain math
+ * primitives so this (math-layer) module never imports the world-layer
+ * marking classes; the editor builds the Light/Crossing/Stop/Yield.
  */
-interface OsmLightPlacement {
-  center: Point; // Stop-line position on the approach road centreline
-  directionVector: Point; // Unit vector along that road (strip spans across)
-  width: number; // Light strip width (road half-width)
+interface OsmMarkingPlacement {
+  center: Point; // Placed position (approach stop line, or the node)
+  directionVector: Point; // Unit vector along the road (strip spans across)
+  width: number; // Strip width across the road
+  height?: number; // Strip length along the road (crossing/stop/yield only)
 }
 
 class Osm {
   static parseRoads(data: OsmData): {
     points: Point[];
     segments: Segment[];
-    lights: OsmLightPlacement[];
+    lights: OsmMarkingPlacement[]; // highway=traffic_signals
+    crossings: OsmMarkingPlacement[]; // highway=crossing (zebra)
+    stops: OsmMarkingPlacement[]; // highway=stop
+    yields: OsmMarkingPlacement[]; // highway=give_way
   };
 }
 ```
@@ -751,22 +757,25 @@ class Osm {
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)
 
-7. EXTRACT TRAFFIC LIGHTS (nodes tagged highway=traffic_signals)
+7. EXTRACT NODE MARKINGS (nodes tagged highway=traffic_signals|crossing|stop|
+   give_way)
    Requires `out body;` for nodes (NOT `out skel;`) so node tags survive.
-   Pedestrian signals (crossing=traffic_signals) are ignored.
-   For each vehicle-signal node:
-     Gather road neighbours (prev/next in every incident way), flagging each
-       side as an APPROACH when one-way travel can reach the node from it
-       (two-way roads qualify on both sides; reverse one-ways swap sides)
-     Cluster signals of one junction (within SIGNAL_CLUSTER_RADIUS_PX = 400)
-     Choose the approach arm = neighbour pointing most OUTWARD from the
-       junction centroid (radial), preferring valid one-way approach sides
-     Orient the light along that neighbour's centreline direction (strip spans
-       across the road) and slide it UPSTREAM along the centreline to the stop
-       line — clamped to half the edge span — so it stays centred on the road
-     Isolated signals (no cluster) fall back to the straight-through road axis
-       (`throughAxis`), drawn at the node
-   → returns `lights: OsmLightPlacement[]`; the editor builds `Light` markings
+   All are nodes lying on the highway ways — no extra query needed.
+   For every tagged node, gather road neighbours (prev/next in each incident
+     way) with a one-way APPROACH flag.
+   LIGHTS (signal heads facing oncoming traffic) — placed on the approach arm
+     at the stop line by `placeApproachMarking`, facing resolved in order:
+       1. direction / traffic_signals:direction tag (forward→approach from prev,
+          backward→from next) — authoritative
+       2. radial — cluster signals within SIGNAL_CLUSTER_RADIUS_PX = 400; arm =
+          approach neighbour pointing most OUTWARD from the junction centroid
+       3. throughAxis — straight-through road, drawn at the node (isolated)
+     Then slide UPSTREAM along the centreline (min(width, span/2)) so the light
+     stays centred on the road width.
+   CROSSINGS / STOPS / YIELDS (painted lines) — oriented across the road via
+     throughAxis and drawn at the node; crossing width = full road, stop/yield
+     width = half.
+   → returns lights / crossings / stops / yields; the editor builds the markings
 ```
 
 ### Real-World Scale

@@ -435,6 +435,9 @@ vi.mock('../../../../ts/math/osm-importer/osm.js', () => ({
       points: [],
       segments: [],
       lights: [],
+      crossings: [],
+      stops: [],
+      yields: [],
     })),
   },
 }));
