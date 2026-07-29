@@ -5,7 +5,7 @@ import {
   WORLD_PIXELS_PER_METER,
   LANE_WIDTH_PX,
 } from '../worldUnits.js';
-import { invLerp, degToRad, subtract, normalize } from '../utils.js';
+import { invLerp, degToRad, subtract, normalize, dot } from '../utils.js';
 import { defaultLaneCount } from '../roadTypes.js';
 
 // --- Interfaces for OSM Data Structure ---
@@ -168,13 +168,16 @@ export class Osm {
     for (const node of nodes) {
       if (node.tags?.highway === 'traffic_signals') signalNodeIds.add(node.id);
     }
-    // Keyed by node id so a signal shared by several ways is placed once. We
-    // prefer the way where the node is INTERIOR (a through approach) so the
-    // light faces down that road rather than across a crossing street.
-    const lightsByNode = new Map<
-      number,
-      OsmLightPlacement & { interior: boolean }
-    >();
+    // Per signal node, gather every neighbouring road node (across all ways) so
+    // we can pick the road that runs STRAIGHT THROUGH the signal. Way naming is
+    // unreliable at junctions (a node can be interior to several overlapping
+    // ways), so orientation is derived from geometry rather than membership.
+    interface SignalAccumulator {
+      center: Point;
+      neighbors: Point[];
+      lanes: number;
+    }
+    const signalAccum = new Map<number, SignalAccumulator>();
 
     // Convert ways to Segment objects
     for (const way of ways) {
@@ -224,8 +227,9 @@ export class Osm {
           ? lanesParsed
           : defaultLaneCount(highwayType, isOneWay);
 
-      // Record any traffic-signal nodes on this way, orienting the light strip
-      // along the way's local direction at that node (prev → next neighbours).
+      // Record any traffic-signal nodes on this way, gathering their immediate
+      // road neighbours (prev/next along this way). Orientation is resolved
+      // later from the full set of neighbours across every incident way.
       if (signalNodeIds.size > 0) {
         for (let idx = 0; idx < nodeIds.length; idx++) {
           const nid = nodeIds[idx];
@@ -234,29 +238,21 @@ export class Osm {
           const center = nodeMap.get(nid);
           if (!center) continue;
 
+          let entry = signalAccum.get(nid);
+          if (!entry) {
+            entry = { center, neighbors: [], lanes: laneCount };
+            signalAccum.set(nid, entry);
+          }
+          // The controlled road is usually the widest one at the junction.
+          entry.lanes = Math.max(entry.lanes, laneCount);
+
           const prev = idx > 0 ? nodeMap.get(nodeIds[idx - 1]) : undefined;
           const next =
             idx < nodeIds.length - 1
               ? nodeMap.get(nodeIds[idx + 1])
               : undefined;
-
-          let dir: Point | undefined;
-          if (prev && next) dir = subtract(next, prev);
-          else if (next) dir = subtract(next, center);
-          else if (prev) dir = subtract(center, prev);
-          if (!dir) continue;
-
-          const interior = !!(prev && next);
-          const existing = lightsByNode.get(nid);
-          // Keep the first placement, but upgrade to an interior one if found.
-          if (!existing || (interior && !existing.interior)) {
-            lightsByNode.set(nid, {
-              center,
-              directionVector: normalize(dir),
-              width: (laneCount * LANE_WIDTH_PX) / 2,
-              interior,
-            });
-          }
+          if (prev) entry.neighbors.push(prev);
+          if (next) entry.neighbors.push(next);
         }
       }
 
@@ -303,13 +299,55 @@ export class Osm {
 
     // --- Assemble traffic lights collected from tagged nodes ---
     // OSM marks signalised junctions with `highway=traffic_signals` on a node.
-    // Each placement was oriented along its owning road during the way loop.
+    // Orient each light across the road that runs straight through the signal,
+    // resolved from all incident road neighbours (see `throughAxis`).
     const lights: OsmLightPlacement[] = [];
-    for (const { center, directionVector, width } of lightsByNode.values()) {
-      lights.push({ center, directionVector, width });
+    for (const { center, neighbors, lanes } of signalAccum.values()) {
+      const axis = throughAxis(center, neighbors);
+      if (!axis) continue;
+      lights.push({
+        center,
+        directionVector: normalize(axis),
+        width: (lanes * LANE_WIDTH_PX) / 2,
+      });
     }
 
     // Return the processed points and segments
     return { points, segments, lights };
   }
+}
+
+/**
+ * Determines the axis of the road passing straight through a signalised node.
+ * Given the node and the road nodes adjacent to it (across every incident way),
+ * returns a vector along the two most-opposite (straightest) neighbours — the
+ * "through" road the signal controls. Falls back to the single neighbour for a
+ * dead-end. Returns `undefined` when no usable direction exists.
+ */
+function throughAxis(center: Point, neighbors: Point[]): Point | undefined {
+  // Keep only neighbours that give a non-degenerate direction.
+  const dirs: { point: Point; unit: Point }[] = [];
+  for (const point of neighbors) {
+    const d = subtract(point, center);
+    if (d.x === 0 && d.y === 0) continue;
+    dirs.push({ point, unit: normalize(d) });
+  }
+  if (dirs.length === 0) return undefined;
+  if (dirs.length === 1) return subtract(dirs[0].point, center);
+
+  // Pick the pair whose unit directions are most opposite (dot most negative).
+  let bestDot = Infinity;
+  let a = dirs[0].point;
+  let b = dirs[1].point;
+  for (let i = 0; i < dirs.length; i++) {
+    for (let j = i + 1; j < dirs.length; j++) {
+      const d = dot(dirs[i].unit, dirs[j].unit);
+      if (d < bestDot) {
+        bestDot = d;
+        a = dirs[i].point;
+        b = dirs[j].point;
+      }
+    }
+  }
+  return subtract(a, b);
 }
