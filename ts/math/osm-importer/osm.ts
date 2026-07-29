@@ -5,7 +5,7 @@ import {
   WORLD_PIXELS_PER_METER,
   LANE_WIDTH_PX,
 } from '../worldUnits.js';
-import { invLerp, degToRad } from '../utils.js';
+import { invLerp, degToRad, subtract, normalize } from '../utils.js';
 import { defaultLaneCount } from '../roadTypes.js';
 
 // --- Interfaces for OSM Data Structure ---
@@ -162,6 +162,20 @@ export class Osm {
       (element): element is OsmWayElement => element.type === 'way',
     );
 
+    // Collect the ids of nodes tagged as traffic signals so we can turn them
+    // into Light markings, oriented along the road they actually sit on.
+    const signalNodeIds = new Set<number>();
+    for (const node of nodes) {
+      if (node.tags?.highway === 'traffic_signals') signalNodeIds.add(node.id);
+    }
+    // Keyed by node id so a signal shared by several ways is placed once. We
+    // prefer the way where the node is INTERIOR (a through approach) so the
+    // light faces down that road rather than across a crossing street.
+    const lightsByNode = new Map<
+      number,
+      OsmLightPlacement & { interior: boolean }
+    >();
+
     // Convert ways to Segment objects
     for (const way of ways) {
       const nodeIds = way.nodes;
@@ -210,6 +224,42 @@ export class Osm {
           ? lanesParsed
           : defaultLaneCount(highwayType, isOneWay);
 
+      // Record any traffic-signal nodes on this way, orienting the light strip
+      // along the way's local direction at that node (prev → next neighbours).
+      if (signalNodeIds.size > 0) {
+        for (let idx = 0; idx < nodeIds.length; idx++) {
+          const nid = nodeIds[idx];
+          if (!signalNodeIds.has(nid)) continue;
+
+          const center = nodeMap.get(nid);
+          if (!center) continue;
+
+          const prev = idx > 0 ? nodeMap.get(nodeIds[idx - 1]) : undefined;
+          const next =
+            idx < nodeIds.length - 1
+              ? nodeMap.get(nodeIds[idx + 1])
+              : undefined;
+
+          let dir: Point | undefined;
+          if (prev && next) dir = subtract(next, prev);
+          else if (next) dir = subtract(next, center);
+          else if (prev) dir = subtract(center, prev);
+          if (!dir) continue;
+
+          const interior = !!(prev && next);
+          const existing = lightsByNode.get(nid);
+          // Keep the first placement, but upgrade to an interior one if found.
+          if (!existing || (interior && !existing.interior)) {
+            lightsByNode.set(nid, {
+              center,
+              directionVector: normalize(dir),
+              width: (laneCount * LANE_WIDTH_PX) / 2,
+              interior,
+            });
+          }
+        }
+      }
+
       // Iterate through pairs of node IDs in the way
       for (let i = 1; i < nodeIds.length; i++) {
         // Find the corresponding Point objects using the map
@@ -251,27 +301,12 @@ export class Osm {
       }
     }
 
-    // --- Extract traffic lights from tagged nodes ---
+    // --- Assemble traffic lights collected from tagged nodes ---
     // OSM marks signalised junctions with `highway=traffic_signals` on a node.
-    // Build a placement for each such node that lies on an imported road, using
-    // an incident segment's direction and per-segment road width.
+    // Each placement was oriented along its owning road during the way loop.
     const lights: OsmLightPlacement[] = [];
-    for (const node of nodes) {
-      if (node.tags?.highway !== 'traffic_signals') continue;
-
-      const center = nodeMap.get(node.id);
-      if (!center) continue;
-
-      // Find a segment touching this node to orient the light strip.
-      const seg = segments.find((s) => s.includes(center));
-      if (!seg) continue;
-
-      const laneCount = seg.lanes ?? 2;
-      lights.push({
-        center,
-        directionVector: seg.directionVector(),
-        width: (laneCount * LANE_WIDTH_PX) / 2,
-      });
+    for (const { center, directionVector, width } of lightsByNode.values()) {
+      lights.push({ center, directionVector, width });
     }
 
     // Return the processed points and segments
