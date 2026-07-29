@@ -438,6 +438,46 @@ Road envelope fill color varies by `highwayType`:
 | `unclassified`      | `#BBB`     |
 | other / residential | `#BBB`     |
 
+### Traffic light import
+
+The importer also converts OSM **vehicle traffic signals** into `Light`
+markings. Nodes tagged `highway=traffic_signals` carry their tags only when the
+Overpass query outputs node bodies, so the filter ends with `out body;` (not
+`out skel;`, which strips tags). Pedestrian signals (`crossing=traffic_signals`)
+are ignored.
+
+`Osm.parseRoads()` returns a `lights: OsmLightPlacement[]` array
+(`{ center, directionVector, width }` — plain math primitives, so the math layer
+never imports the world-layer `Light`). `WorldEditor.parseOsmData()` builds a
+`Light` per placement, `setAnchor`s it to the graph, and pushes it onto
+`world.markings` **in place** (the `TrafficManager` holds that array reference
+and re-reads it to build control centers).
+
+Placement is designed so each signal lands on its **approach arm, centred on the
+road, at the stop line** — matching how a person would place it in the editor:
+
+1. **Approach sides** — for each signal node, its road neighbours (prev/next in
+   every incident way) are flagged as an _approach_ when one-way traffic can
+   reach the node from that side. Two-way roads qualify on both sides; a one-way
+   only on its upstream side (reverse one-ways swap which side is upstream).
+2. **Junction clustering** — signals within `SIGNAL_CLUSTER_RADIUS_PX` (400
+   world-px ≈ 28 m) are treated as one intersection; their centroid is the
+   junction centre.
+3. **Arm selection** — the chosen arm is the approach-side neighbour whose road
+   direction points most **outward** from the centroid (the radial only selects
+   the arm; it no longer sets the facing).
+4. **Orientation** — the light's `directionVector` is that neighbour's real
+   centreline direction, so the strip spans squarely across the road width.
+5. **Stop-line offset** — the light slides **upstream along the centreline**
+   (`center + roadDir * min(halfWidth, span/2)`). Moving along a real graph edge
+   keeps it centred on the road; `setAnchor` records ≈zero lateral so it stays
+   centred through edits.
+
+**Isolated signals** (no nearby cluster) fall back to the straight-through road
+axis (`throughAxis` — the two most-opposite neighbours) and are drawn at the
+node. The two tunables are `SIGNAL_CLUSTER_RADIUS_PX` and the upstream offset
+(road half-width, capped at half the edge span).
+
 ### Road name labels & speed signs
 
 On-road signage placement is computed by the pure module

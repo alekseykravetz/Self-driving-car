@@ -151,7 +151,7 @@ Self-driving-car/
 │   │   ├── graph/
 │   │   │   └── graph.ts        # Road network graph with Dijkstra pathfinding
 │   │   ├── osm-importer/
-│   │   │   └── osm.ts          # OpenStreetMap data parser (lat/lon → canvas)
+│   │   │   └── osm.ts          # OpenStreetMap parser (lat/lon → canvas + traffic lights)
 │   │   ├── spatialGrid.ts      # Uniform hash grid for fast range queries (segments)
 │   │   ├── trafficControlGrid.ts # Spatial hash grid indexing traffic-light polygons for AI perception
 │   │   └── heatmapGrid.ts      # Lazy grid-based congestion counter for the heatmap overlay

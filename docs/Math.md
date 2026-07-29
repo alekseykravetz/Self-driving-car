@@ -653,6 +653,8 @@ interface OsmNodeElement {
   id: number;
   lat: number;
   lon: number;
+  tags?: Record<string, string>; // Present only with `out body;` output
+  //   (e.g. { highway: 'traffic_signals' } for a vehicle traffic light)
 }
 
 interface OsmWayElement {
@@ -679,8 +681,23 @@ interface OsmWayElement {
   };
 }
 
+/**
+ * Placement for a traffic light from an OSM `highway=traffic_signals` node.
+ * Plain math primitives so this (math-layer) module never imports the
+ * world-layer `Light`; the editor constructs the actual marking.
+ */
+interface OsmLightPlacement {
+  center: Point; // Stop-line position on the approach road centreline
+  directionVector: Point; // Unit vector along that road (strip spans across)
+  width: number; // Light strip width (road half-width)
+}
+
 class Osm {
-  static parseRoads(data: OsmData): { points: Point[]; segments: Segment[] };
+  static parseRoads(data: OsmData): {
+    points: Point[];
+    segments: Segment[];
+    lights: OsmLightPlacement[];
+  };
 }
 ```
 
@@ -733,6 +750,23 @@ class Osm {
 
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)
+
+7. EXTRACT TRAFFIC LIGHTS (nodes tagged highway=traffic_signals)
+   Requires `out body;` for nodes (NOT `out skel;`) so node tags survive.
+   Pedestrian signals (crossing=traffic_signals) are ignored.
+   For each vehicle-signal node:
+     Gather road neighbours (prev/next in every incident way), flagging each
+       side as an APPROACH when one-way travel can reach the node from it
+       (two-way roads qualify on both sides; reverse one-ways swap sides)
+     Cluster signals of one junction (within SIGNAL_CLUSTER_RADIUS_PX = 400)
+     Choose the approach arm = neighbour pointing most OUTWARD from the
+       junction centroid (radial), preferring valid one-way approach sides
+     Orient the light along that neighbour's centreline direction (strip spans
+       across the road) and slide it UPSTREAM along the centreline to the stop
+       line — clamped to half the edge span — so it stays centred on the road
+     Isolated signals (no cluster) fall back to the straight-through road axis
+       (`throughAxis`), drawn at the node
+   → returns `lights: OsmLightPlacement[]`; the editor builds `Light` markings
 ```
 
 ### Real-World Scale
