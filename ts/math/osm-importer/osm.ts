@@ -99,6 +99,7 @@ type MarkingKind = 'light' | 'crossing' | 'stop' | 'yield';
 interface MarkNeighbor {
   point: Point; // Adjacent road node (on the centreline).
   approach: boolean; // True when oncoming traffic flows from here into node.
+  degree: number; // Connectivity of the neighbour (higher = junction side).
 }
 
 /** Per-node accumulator gathered across every incident way. */
@@ -228,6 +229,17 @@ export class Osm {
           signalDir.set(node.id, dir);
       }
     }
+    // How many way-endpoints reference each node id (its "connectivity"). A node
+    // shared by several ways is a junction; a mid-way node scores 1. Used to
+    // orient directional markings on two-way roads (face away from the junction).
+    const nodeRefCount = new Map<number, number>();
+    if (nodeKind.size > 0) {
+      for (const way of ways) {
+        for (const nid of way.nodes) {
+          nodeRefCount.set(nid, (nodeRefCount.get(nid) ?? 0) + 1);
+        }
+      }
+    }
     // Per tagged node, gather every neighbouring road node (across all ways)
     // with its one-way approach flag, so placement can pick the approach arm
     // and orientation after all ways are processed.
@@ -321,12 +333,14 @@ export class Osm {
             entry.neighbors.push({
               point: prev,
               approach: !isOneWay || !isReverseOneWay,
+              degree: nodeRefCount.get(nodeIds[idx - 1]) ?? 1,
             });
           }
           if (next) {
             entry.neighbors.push({
               point: next,
               approach: !isOneWay || isReverseOneWay,
+              degree: nodeRefCount.get(nodeIds[idx + 1]) ?? 1,
             });
           }
 
@@ -392,9 +406,11 @@ export class Osm {
     // --- Assemble markings from tagged nodes ---
     // Lights are signal HEADS facing oncoming traffic on one approach, so they
     // use approach placement (`placeApproachMarking`): pick the approach arm and
-    // slide upstream to the stop line. Crossings / stops / give-ways are painted
-    // lines that span the road, so they are simply oriented across the road at
-    // the node (straight-through axis) and drawn there.
+    // slide upstream to the stop line. Stops and give-ways are DIRECTIONAL too
+    // (the painted "STOP"/"YIELD" text must read for the approaching driver), so
+    // they orient along the approach travel direction (`approachFacingDir`).
+    // Crossings are symmetric zebra lines, so they are simply oriented across
+    // the road at the node (straight-through axis).
     const markEntries = [...markAccum.values()];
     const lights: OsmMarkingPlacement[] = [];
     const crossings: OsmMarkingPlacement[] = [];
@@ -415,37 +431,35 @@ export class Osm {
         continue;
       }
 
-      // Painted line spanning the road: orient across it at the node.
+      if (kind === 'stop' || kind === 'yield') {
+        // Directional: face the approaching driver (like the editor's lane
+        // guide). Drawn at the node so the stop line sits where OSM placed it.
+        const facing = approachFacingDir(entry);
+        if (!facing) continue;
+        const placement: OsmMarkingPlacement = {
+          center,
+          directionVector: facing,
+          width: roadWidth / 2,
+          height: roadWidth / 2,
+        };
+        if (kind === 'stop') stops.push(placement);
+        else yields.push(placement);
+        continue;
+      }
+
+      // Crossing: symmetric zebra spanning the full road; orient across it at
+      // the node (straight-through axis), ~half-road depth along travel.
       const axis = throughAxis(
         center,
         neighbors.map((n) => n.point),
       );
       if (!axis) continue;
-      const directionVector = normalize(axis);
-      if (kind === 'crossing') {
-        // Zebra spans the full road; ~half-road depth along travel (matches the
-        // editor's `roadWidth` / `roadWidth / 2`).
-        crossings.push({
-          center,
-          directionVector,
-          width: roadWidth,
-          height: roadWidth / 2,
-        });
-      } else if (kind === 'stop') {
-        stops.push({
-          center,
-          directionVector,
-          width: roadWidth / 2,
-          height: roadWidth / 2,
-        });
-      } else {
-        yields.push({
-          center,
-          directionVector,
-          width: roadWidth / 2,
-          height: roadWidth / 2,
-        });
-      }
+      crossings.push({
+        center,
+        directionVector: normalize(axis),
+        width: roadWidth,
+        height: roadWidth / 2,
+      });
     }
 
     // Return the processed points, segments and node markings.
@@ -536,6 +550,74 @@ function placeApproachMarking(
   const span = distance(center, bestPoint);
   const placed = add(center, scale(bestUnit, Math.min(width, span * 0.5)));
   return { center: placed, directionVector: bestUnit, width };
+}
+
+/**
+ * Resolves the facing for a DIRECTIONAL painted marking (stop / give-way) whose
+ * text must read for the approaching driver. Returns a unit vector pointing
+ * back toward the oncoming traffic (matching the editor's lane-guide
+ * convention: `directionVector` points opposite to travel). Priority:
+ *   1. `directedApproach` — the node's `direction` tag.
+ *   2. The single one-way approach neighbour (the upstream side) when the road
+ *      is one-way (exactly one approach side, at least one non-approach side).
+ *   3. Two-way road: face AWAY from the junction — the driver approaches the
+ *      more-connected node, so orient toward the neighbour most opposite to the
+ *      highest-`degree` (junction) neighbour.
+ *   4. `throughAxis` — no junction cue (e.g. mid-block); sign not resolvable.
+ * Returns `undefined` when no usable direction exists.
+ */
+function approachFacingDir(entry: MarkAccumulator): Point | undefined {
+  const { center, neighbors, directedApproach } = entry;
+
+  // 1. Authoritative direction tag: face the upstream (approach) side.
+  if (directedApproach) {
+    const d = subtract(directedApproach, center);
+    if (d.x !== 0 || d.y !== 0) return normalize(d);
+  }
+
+  // 2. One-way road: the upstream side is the sole approach-flagged neighbour.
+  const approaches = neighbors.filter((n) => n.approach);
+  const others = neighbors.filter((n) => !n.approach);
+  if (approaches.length === 1 && others.length >= 1) {
+    const d = subtract(approaches[0].point, center);
+    if (d.x !== 0 || d.y !== 0) return normalize(d);
+  }
+
+  // 3. Two-way road: face away from the junction. The junction is the
+  // highest-connectivity neighbour; the driver travels toward it, so the sign
+  // (opposite to travel) faces the neighbour most opposite to the junction.
+  const dirs = neighbors
+    .map((n) => ({ n, d: subtract(n.point, center) }))
+    .filter((x) => x.d.x !== 0 || x.d.y !== 0);
+  if (dirs.length >= 2) {
+    let junction = dirs[0];
+    let minDegree = dirs[0].n.degree;
+    for (const x of dirs) {
+      if (x.n.degree > junction.n.degree) junction = x;
+      if (x.n.degree < minDegree) minDegree = x.n.degree;
+    }
+    if (junction.n.degree > minDegree) {
+      const jUnit = normalize(junction.d);
+      let upstream = dirs[0];
+      let bestDot = Infinity;
+      for (const x of dirs) {
+        if (x === junction) continue;
+        const dp = dot(normalize(x.d), jUnit);
+        if (dp < bestDot) {
+          bestDot = dp;
+          upstream = x;
+        }
+      }
+      return normalize(upstream.d);
+    }
+  }
+
+  // 4. No junction cue (e.g. mid-block): straight-through axis (arbitrary sign).
+  const axis = throughAxis(
+    center,
+    neighbors.map((n) => n.point),
+  );
+  return axis ? normalize(axis) : undefined;
 }
 
 /**

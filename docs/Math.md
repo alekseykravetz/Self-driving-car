@@ -772,9 +772,12 @@ class Osm {
        3. throughAxis — straight-through road, drawn at the node (isolated)
      Then slide UPSTREAM along the centreline (min(width, span/2)) so the light
      stays centred on the road width.
-   CROSSINGS / STOPS / YIELDS (painted lines) — oriented across the road via
-     throughAxis and drawn at the node; crossing width = full road, stop/yield
-     width = half.
+   CROSSINGS (symmetric zebra) — oriented across the road via throughAxis at the
+     node; width = full road.
+   STOPS / YIELDS (directional text) — face the approaching driver via
+     approachFacingDir: direction tag → single one-way approach neighbour →
+     two-way faces away from the junction (highest-degree neighbour) →
+     throughAxis fallback; width = half road.
    → returns lights / crossings / stops / yields; the editor builds the markings
 ```
 
