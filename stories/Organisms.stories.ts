@@ -10,6 +10,7 @@ import '../ts/ui/organisms/trainingInitModal.js';
 import '../ts/ui/organisms/humanTrainingConfigModal.js';
 import type { TrainingInitModalElement } from '../ts/ui/organisms/trainingInitModal.js';
 import type { HumanTrainingConfigModalElement } from '../ts/ui/organisms/humanTrainingConfigModal.js';
+import type { TrainingPanelElement } from '../ts/ui/organisms/trainingPanel.js';
 import { DEFAULT_CAR_CONFIG } from '../ts/car/config.js';
 
 /**
@@ -68,9 +69,20 @@ export const TrainingPanel: StoryObj = {
   render: () => {
     const el = make('training-panel');
     el.id = 'trainingManagerPanel';
+    // configure() wires up the event listeners (collapse toggles, idle row) and
+    // populates the car-config summary. connectedCallback only sets innerHTML,
+    // so without configure() the Car Config / idle sections are inert. The
+    // callbacks are stubs — no simulator drives the panel in Storybook.
+    requestAnimationFrame(() =>
+      (el as TrainingPanelElement).configure({
+        evaluateFitness: () => 0,
+        getStartInfo: () => ({ x: 0, y: 0, angle: 0 }),
+        onCarsCreated: () => {},
+      }),
+    );
     return stage(el, {
       sidebar: true,
-      note: 'The genetic-training side panel: storage controls, generation stats, population/mutation/pool settings and the full car-config editor. Live metrics are driven by the simulator at runtime.',
+      note: 'The genetic-training side panel: storage controls, generation stats, population/mutation/pool settings and the full car-config editor (click the <strong>Car Config</strong> header to expand). Live metrics are driven by the simulator at runtime.',
     });
   },
 };
@@ -106,7 +118,9 @@ export const StorePanel: StoryObj = {
   name: 'Store Panel',
   render: () => {
     const el = make('store-panel');
-    el.style.cssText = 'display:block;max-width:720px;margin:0 auto';
+    // Match the landing page's `grid-column: span 3` width (~1120px) so the
+    // header (icon + title + tabs) lays out on a single line as it does there.
+    el.style.cssText = 'display:block;max-width:1120px;margin:0 auto';
     return stage(el, {
       note: 'Landing-page browser for preloaded store assets (worlds / cars) and localStorage state, with tabbed, sortable tables.',
     });

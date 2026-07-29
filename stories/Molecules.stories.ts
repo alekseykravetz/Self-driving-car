@@ -11,6 +11,7 @@ import '../ts/ui/molecules/layoutToolbar.js';
 import '../ts/ui/molecules/animationLoopToolbar.js';
 import '../ts/ui/molecules/worldLayersToolbar.js';
 import '../ts/ui/molecules/worldSetup.js';
+import '../ts/ui/molecules/worldToolbar.js';
 import {
   numInputRowHtml,
   wireNumInputRows,
@@ -30,16 +31,34 @@ const meta: Meta = {
 };
 export default meta;
 
-/** Stage a live DOM node inside a padded, app-coloured canvas. */
-function stage(node: Node, note?: string): HTMLElement {
+/** Stage a live DOM node inside a padded, app-coloured canvas.
+ *
+ * `bg: 'canvas'` renders the node over the simulator's sky-gradient canvas
+ * (the same `linear-gradient(var(--color-accent-sky), white 70%)` used by the
+ * simulator/world pages). The floating toolbars use a translucent dark surface
+ * (`--color-bg-toolbar: rgba(0,0,0,0.6)`) that only reads correctly over the
+ * bright canvas — over the near-black app background it blends in and looks
+ * washed-out, which is why the toolbar stories use the canvas backdrop. */
+function stage(
+  node: Node,
+  note?: string,
+  bg: 'app' | 'canvas' = 'app',
+): HTMLElement {
   const wrapper = document.createElement('div');
-  wrapper.style.cssText =
-    'padding:32px;background:var(--color-bg-app);min-height:100vh;box-sizing:border-box;font-family:var(--font-ui);color:var(--color-text-primary)';
+  const background =
+    bg === 'canvas'
+      ? 'linear-gradient(var(--color-accent-sky), white 70%)'
+      : 'var(--color-bg-app)';
+  // A column flex box with `align-items:flex-start` keeps the toolbars sized to
+  // their content (they are `display:flex` custom elements that would otherwise
+  // stretch to fill the full block width) — matching how they float in the app.
+  wrapper.style.cssText = `padding:32px;background:${background};min-height:100vh;box-sizing:border-box;font-family:var(--font-ui);color:var(--color-text-primary);display:flex;flex-direction:column;align-items:flex-start`;
   wrapper.appendChild(node);
   if (note) {
     const p = document.createElement('p');
     p.style.cssText =
       'margin:20px 0 0;font-size:11px;color:var(--color-text-secondary);max-width:640px';
+    if (bg === 'canvas') p.style.color = 'var(--color-bg-dark)';
     p.innerHTML = note;
     wrapper.appendChild(p);
   }
@@ -127,6 +146,7 @@ export const ShortcutsToolbar: StoryObj = {
     return stage(
       el,
       'Presentational only — the <code>KeyboardManager</code> calls <code>flash()</code> / <code>setActive()</code> to reflect live key state. The <strong>O</strong> toggle is shown latched.',
+      'canvas',
     );
   },
 };
@@ -141,6 +161,7 @@ export const EditorToolbar: StoryObj = {
     return stage(
       el,
       'Mode switcher for the world editor. Click any tool to activate it (Graph is active by default).',
+      'canvas',
     );
   },
 };
@@ -154,6 +175,7 @@ export const LayoutToolbar: StoryObj = {
     stage(
       make('layout-toolbar'),
       'Switches the big/small layout and toggles the 3D view, network visualizer and mini-map.',
+      'canvas',
     ),
 };
 
@@ -166,6 +188,7 @@ export const AnimationLoopToolbar: StoryObj = {
     stage(
       make('animation-loop-toolbar'),
       'Owns the shared play/pause toggle, the elapsed-time readout, a live FPS counter and the render-interval throttle.',
+      'canvas',
     ),
 };
 
@@ -179,6 +202,7 @@ export const WorldLayersToolbar: StoryObj = {
     return stage(
       el,
       'Independent visibility control for each world layer (roads, markings, corridors, item bases, trees, buildings) plus the ♻️ auto-regenerate toggle and the traffic heatmap overlay.',
+      'canvas',
     );
   },
 };
@@ -192,6 +216,20 @@ export const WorldSetup: StoryObj = {
     stage(
       make('world-setup'),
       'The simulator setup toolbar: border mode (none / damage / collision), camera tracking, viewport mode and the world/car asset selectors.',
+      'canvas',
+    ),
+};
+
+// ══════════════════════════════════════════════════════════════
+//  World toolbar — the world-editor's collapsible setup toolbar.
+// ══════════════════════════════════════════════════════════════
+export const WorldToolbar: StoryObj = {
+  name: 'World Toolbar',
+  render: () =>
+    stage(
+      make('world-toolbar'),
+      'The world-editor / camera-view setup toolbar (border, tracking and viewport modes plus asset selectors), wrapped in a collapsible “Setup” container.',
+      'canvas',
     ),
 };
 

@@ -8,6 +8,10 @@ import '../styles/index.css';
 // World-editor-panel lives outside index.css's "common" set on some pages, so
 // pull its stylesheet in explicitly for the organism stories.
 import '../styles/organisms/_world-editor-panel.css';
+// The landing-page template styles (feature cards + `.card-icon` badge used by
+// the store panel header) live outside index.css's "common" set, so pull them
+// in explicitly for the landing-page and store-panel stories.
+import '../styles/templates/_landing-page.css';
 
 // Register the <app-icon> custom element (self-registers on import).
 import '../ts/ui/atoms/appIcon.js';
@@ -38,6 +42,7 @@ const preview: Preview = {
           'Atoms',
           'Molecules',
           'Organisms',
+          'Templates',
           'Project Views',
         ],
       },
