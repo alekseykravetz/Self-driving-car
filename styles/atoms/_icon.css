@@ -190,6 +190,24 @@ app-icon:hover .app-icon-svg {
   }
 }
 
+@keyframes ic-cross-walk {
+  0% {
+    transform: translateX(-5px) translateY(0);
+  }
+  25% {
+    transform: translateX(-2.5px) translateY(-0.6px);
+  }
+  50% {
+    transform: translateX(5px) translateY(0);
+  }
+  75% {
+    transform: translateX(2.5px) translateY(-0.6px);
+  }
+  100% {
+    transform: translateX(-5px) translateY(0);
+  }
+}
+
 @keyframes ic-scroll-dot {
   0%,
   100% {
@@ -435,6 +453,10 @@ app-icon:hover .app-icon-svg {
   animation: ic-wiggle 1.6s ease-in-out infinite;
 }
 
+.app-icon-svg.is-animated .ic-crossing-walker {
+  animation: ic-cross-walk 3.2s ease-in-out infinite;
+}
+
 .app-icon-svg.is-animated .ic-edit {
   animation: ic-write 2s ease-in-out infinite;
 }
@@ -561,6 +583,11 @@ app-icon:hover .app-icon-svg {
   .app-icon-svg
   .ic-crossing-legs {
   animation: ic-wiggle 0.5s ease-in-out infinite;
+}
+:is(button, .toolbar-btn, .card, app-icon):hover
+  .app-icon-svg
+  .ic-crossing-walker {
+  animation: ic-cross-walk 1.4s ease-in-out infinite;
 }
 
 /* Car wheels hop */

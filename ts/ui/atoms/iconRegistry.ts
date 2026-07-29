@@ -202,8 +202,16 @@ export const ICON_REGISTRY: Record<IconName, string> = {
 
   crossing: `
     <g class="ic-crossing" ${S}>
-      <circle cx="12" cy="4.5" r="2" ${F} stroke="none" />
-      <path class="ic-crossing-legs" d="M12 7v6M12 9l-3 5M12 9l3 5M12 8l-3-1M12 8l3-1" />
+      <g class="ic-crossing-stripes" ${F} stroke="none">
+        <rect x="3" y="17.5" width="2.6" height="4.5" rx="0.6" />
+        <rect x="7.7" y="17.5" width="2.6" height="4.5" rx="0.6" />
+        <rect x="12.4" y="17.5" width="2.6" height="4.5" rx="0.6" />
+        <rect x="17.1" y="17.5" width="2.6" height="4.5" rx="0.6" />
+      </g>
+      <g class="ic-crossing-walker">
+        <circle cx="12" cy="4" r="2" ${F} stroke="none" />
+        <path class="ic-crossing-legs" d="M12 6.5v5M12 8.5l-3 4.5M12 8.5l3 4.5M12 7.5l-3-1M12 7.5l3-1" />
+      </g>
     </g>`,
 
   parking: `
