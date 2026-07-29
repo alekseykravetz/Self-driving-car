@@ -17,6 +17,7 @@ import { Graph } from '../../math/graph/graph.js';
 import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Osm, OsmData } from '../../math/osm-importer/osm.js';
+import { Light } from '../markings/light.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
@@ -40,7 +41,7 @@ const OSM_FILTER = `[out:json];
 );
 out body;
 >;
-out skel;`;
+out body;`;
 
 /** localStorage key for the editor's per-layer visibility preference. */
 const EDITOR_LAYERS_KEY = 'editor:worldLayers';
@@ -511,6 +512,17 @@ export class WorldEditor {
       this.#world.graph.points = result.points;
       this.#world.graph.segments = result.segments;
       this.#oldGraphHash = null; // Force regeneration on next draw
+
+      // Import traffic lights (OSM `highway=traffic_signals` nodes) as Light
+      // markings, anchored to the graph so they follow later road edits.
+      // Mutate the array in place: the world's TrafficManager holds this exact
+      // reference and re-reads it to build control centers.
+      this.#world.markings.length = 0;
+      for (const l of result.lights) {
+        const light = new Light(l.center, l.directionVector, l.width);
+        light.setAnchor(this.#world.graph);
+        this.#world.markings.push(light);
+      }
 
       // Center viewport on the imported data
       const pts = result.points;

@@ -434,6 +434,7 @@ vi.mock('../../../../ts/math/osm-importer/osm.js', () => ({
     parseRoads: vi.fn(() => ({
       points: [],
       segments: [],
+      lights: [],
     })),
   },
 }));

@@ -3,6 +3,7 @@ import { Segment } from '../primitives/segment.js';
 import {
   METERS_PER_DEGREE_LATITUDE,
   WORLD_PIXELS_PER_METER,
+  LANE_WIDTH_PX,
 } from '../worldUnits.js';
 import { invLerp, degToRad } from '../utils.js';
 import { defaultLaneCount } from '../roadTypes.js';
@@ -13,6 +14,9 @@ interface OsmNodeElement {
   id: number;
   lat: number;
   lon: number;
+  // Present only when the Overpass query outputs node bodies (`out body;`).
+  // Skeleton output (`out skel;`) omits tags entirely.
+  tags?: Record<string, string>;
 }
 
 interface OsmWayTags {
@@ -62,10 +66,22 @@ export interface OsmData {
   elements: OsmElement[];
 }
 
+/**
+ * Placement data for a traffic light derived from an OSM `highway=traffic_signals`
+ * node. Kept as plain math primitives so this (math-layer) module never imports
+ * the world-layer `Light` marking. Consumers construct the actual marking.
+ */
+export interface OsmLightPlacement {
+  center: Point; // Position of the signal (a road node).
+  directionVector: Point; // Unit vector along the road at that node.
+  width: number; // Light strip width (spans the road).
+}
+
 // Interface for the return type of parseRoads
 interface ParsedRoads {
   points: Point[]; // Array of created Point instances
   segments: Segment[]; // Array of created Segment instances
+  lights: OsmLightPlacement[]; // Traffic-signal placements from tagged nodes
 }
 
 // --- Converted Osm Object ---
@@ -90,7 +106,7 @@ export class Osm {
     // Early exit if no nodes are found
     if (nodes.length === 0) {
       console.warn('No nodes found in OSM data.');
-      return { points: [], segments: [] };
+      return { points: [], segments: [], lights: [] };
     }
 
     // Extract latitudes and longitudes for bounding box calculation
@@ -235,7 +251,30 @@ export class Osm {
       }
     }
 
+    // --- Extract traffic lights from tagged nodes ---
+    // OSM marks signalised junctions with `highway=traffic_signals` on a node.
+    // Build a placement for each such node that lies on an imported road, using
+    // an incident segment's direction and per-segment road width.
+    const lights: OsmLightPlacement[] = [];
+    for (const node of nodes) {
+      if (node.tags?.highway !== 'traffic_signals') continue;
+
+      const center = nodeMap.get(node.id);
+      if (!center) continue;
+
+      // Find a segment touching this node to orient the light strip.
+      const seg = segments.find((s) => s.includes(center));
+      if (!seg) continue;
+
+      const laneCount = seg.lanes ?? 2;
+      lights.push({
+        center,
+        directionVector: seg.directionVector(),
+        width: (laneCount * LANE_WIDTH_PX) / 2,
+      });
+    }
+
     // Return the processed points and segments
-    return { points, segments };
+    return { points, segments, lights };
   }
 }
