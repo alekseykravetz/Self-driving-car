@@ -451,18 +451,35 @@ the highway ways, no extra query is needed.
 | `highway=crossing`        | `Crossing`  | Zebra across the road, at the node |
 | `highway=stop`            | `Stop`      | Line across the road, at the node  |
 | `highway=give_way`        | `Yield`     | Line across the road, at the node  |
+| `parking:*` (way tag)     | `Parking`   | Row of bays along the curb         |
 
-`Osm.parseRoads()` returns four `OsmMarkingPlacement[]` arrays (`lights`,
-`crossings`, `stops`, `yields`; each `{ center, directionVector, width, height? }`
-— plain math primitives, so the math layer never imports the world-layer marking
-classes). `WorldEditor.parseOsmData()` builds a `Light`/`Crossing`/`Stop`/`Yield`
+`Osm.parseRoads()` returns five `OsmMarkingPlacement[]` arrays (`lights`,
+`crossings`, `stops`, `yields`, `parkings`; each
+`{ center, directionVector, width, height? }` — plain math primitives, so the
+math layer never imports the world-layer marking classes).
+`WorldEditor.parseOsmData()` builds a `Light`/`Crossing`/`Stop`/`Yield`/`Parking`
 per placement, `setAnchor`s it, and pushes onto `world.markings` **in place**
 (the `TrafficManager` holds that array reference and re-reads it for control
-centers). `markingLoader` already handles all four types for save/load.
+centers). `markingLoader` already handles all five types for save/load.
 
 **Crossings** are symmetric zebra lines, so they are simply oriented **across**
 the road at the node (via `throughAxis`, the two most-opposite neighbours) and
 drawn there — width = full road (`lanes * LANE_WIDTH_PX`).
+
+**Parking** differs from the four node markings above: OSM tags parking as a
+**way-side attribute** (`parking:right*` / `parking:left*` / `parking:both*`,
+and the legacy `parking:lane:*`), not a discrete node. `hasParkingSide()`
+detects the tagged side(s) per way (a value of `no`/`none` counts as absent),
+and `emitParkingBays()` distributes a **row** of `Parking` bays evenly **along**
+each qualifying segment (spacing ≈ `PARKING_BAY_LEN_PX * 1.5`), each laterally
+offset to the **curb** (`roadWidth/2 + bayWidth/2`) on the tagged side —
+`+perpendicular(dir)` = right of `p1→p2`, `−` = left (reverse one-ways swap the
+sides). Each bay is `PARKING_BAY_LEN_PX × PARKING_BAY_WIDTH_PX`
+(`LANE_WIDTH_PX × LANE_WIDTH_PX/2`) with `directionVector` = the segment
+direction, so the white "P" boxes hug the curb along the road rather than sitting
+at a single point. This is a separate creation path from the manual
+`ParkingEditor` (which places one square `roadWidth/2` spot on a lane guide);
+both produce the same `Parking` class, just sized/positioned differently.
 
 **Stops / give-ways** are DIRECTIONAL painted markings — the "STOP" / "YIELD"
 text must read for the approaching driver, so their `directionVector` must point

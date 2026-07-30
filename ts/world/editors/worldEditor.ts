@@ -21,6 +21,7 @@ import { Light } from '../markings/light.js';
 import { Crossing } from '../markings/crossing.js';
 import { Stop } from '../markings/stop.js';
 import { Yield } from '../markings/yield.js';
+import { Parking } from '../markings/parking.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
@@ -534,7 +535,9 @@ export class WorldEditor {
       // Mutate the array in place: the world's TrafficManager holds this exact
       // reference and re-reads it to build control centers.
       this.#world.markings.length = 0;
-      const addMarking = (m: Light | Crossing | Stop | Yield): void => {
+      const addMarking = (
+        m: Light | Crossing | Stop | Yield | Parking,
+      ): void => {
         m.setAnchor(this.#world.graph);
         this.#world.markings.push(m);
       };
@@ -559,6 +562,18 @@ export class WorldEditor {
       for (const y of result.yields) {
         addMarking(
           new Yield(y.center, y.directionVector, y.width, y.height ?? y.width),
+        );
+      }
+      // On-street parking (`parking:*` way-side attribute) distributed along
+      // the curb as a row of Parking bays.
+      for (const p of result.parkings) {
+        addMarking(
+          new Parking(
+            p.center,
+            p.directionVector,
+            p.width,
+            p.height ?? p.width,
+          ),
         );
       }
 
