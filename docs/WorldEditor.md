@@ -438,6 +438,68 @@ Road envelope fill color varies by `highwayType`:
 | `unclassified`      | `#BBB`     |
 | other / residential | `#BBB`     |
 
+### Node marking import (traffic lights, crossings, stops, give-ways)
+
+The importer converts tagged OSM **nodes** into road markings. These nodes carry
+their tags only when the Overpass query outputs node bodies, so the filter ends
+with `out body;` (not `out skel;`, which strips tags). Because they all lie on
+the highway ways, no extra query is needed.
+
+| OSM node tag              | App marking | Placement                          |
+| ------------------------- | ----------- | ---------------------------------- |
+| `highway=traffic_signals` | `Light`     | Approach arm, at the stop line     |
+| `highway=crossing`        | `Crossing`  | Zebra across the road, at the node |
+| `highway=stop`            | `Stop`      | Line across the road, at the node  |
+| `highway=give_way`        | `Yield`     | Line across the road, at the node  |
+
+`Osm.parseRoads()` returns four `OsmMarkingPlacement[]` arrays (`lights`,
+`crossings`, `stops`, `yields`; each `{ center, directionVector, width, height? }`
+— plain math primitives, so the math layer never imports the world-layer marking
+classes). `WorldEditor.parseOsmData()` builds a `Light`/`Crossing`/`Stop`/`Yield`
+per placement, `setAnchor`s it, and pushes onto `world.markings` **in place**
+(the `TrafficManager` holds that array reference and re-reads it for control
+centers). `markingLoader` already handles all four types for save/load.
+
+**Crossings** are symmetric zebra lines, so they are simply oriented **across**
+the road at the node (via `throughAxis`, the two most-opposite neighbours) and
+drawn there — width = full road (`lanes * LANE_WIDTH_PX`).
+
+**Stops / give-ways** are DIRECTIONAL painted markings — the "STOP" / "YIELD"
+text must read for the approaching driver, so their `directionVector` must point
+back toward oncoming traffic (the same convention as a lane guide in the
+editor). `approachFacingDir()` resolves it in priority order: (1) the node's
+`direction` tag; (2) the single one-way approach neighbour (the upstream side);
+(3) on a two-way road, face **away from the junction** — the driver approaches
+the more-connected node, so the sign faces the neighbour most opposite to the
+highest-`degree` one (`degree` = how many way-endpoints reference the node); (4)
+`throughAxis` fallback when there is no junction cue (e.g. mid-block), whose sign
+is arbitrary. Width = half the road.
+
+**Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
+each on its **approach arm, centred on the road, at the stop line** — matching
+how a person would place it in the editor. `placeApproachMarking()` resolves the
+facing in priority order:
+
+1. **Direction tag** — if the node has `direction` or `traffic_signals:direction`
+   (`forward` = controls traffic in way-node order, approaching from the previous
+   node; `backward` = the opposite), that authoritatively picks the approach
+   neighbour. (Preferred from a through/interior node when the node is in several
+   ways.)
+2. **Radial** — otherwise, signals within `SIGNAL_CLUSTER_RADIUS_PX` (400
+   world-px ≈ 28 m) form one junction; the arm is the approach-side neighbour
+   (reachable by one-way traffic) pointing most **outward** from the cluster
+   centroid.
+3. **Straight-through** — an isolated signal (no cluster) uses `throughAxis`,
+   drawn at the node.
+
+Once an arm is chosen, the light's `directionVector` is that neighbour's real
+centreline direction (strip spans across the road), and it slides **upstream
+along the centreline** (`center + roadDir * min(halfWidth, span/2)`) to the stop
+line. Moving along a real graph edge keeps it centred on the road width;
+`setAnchor` records ≈zero lateral so it stays centred through edits. The two
+tunables are `SIGNAL_CLUSTER_RADIUS_PX` and the upstream offset (road half-width,
+capped at half the edge span).
+
 ### Road name labels & speed signs
 
 On-road signage placement is computed by the pure module

@@ -13,7 +13,7 @@ OSM FILTER:
 );
 out body;
 >;
-out skel;
+out body;
 
 ---
 

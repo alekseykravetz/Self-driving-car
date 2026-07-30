@@ -653,6 +653,9 @@ interface OsmNodeElement {
   id: number;
   lat: number;
   lon: number;
+  tags?: Record<string, string>; // Present only with `out body;` output
+  //   highway=traffic_signals | crossing | stop | give_way → a road marking;
+  //   traffic_signals may add direction / traffic_signals:direction
 }
 
 interface OsmWayElement {
@@ -679,8 +682,28 @@ interface OsmWayElement {
   };
 }
 
+/**
+ * Placement for a road marking from a tagged OSM node
+ * (highway=traffic_signals | crossing | stop | give_way). Plain math
+ * primitives so this (math-layer) module never imports the world-layer
+ * marking classes; the editor builds the Light/Crossing/Stop/Yield.
+ */
+interface OsmMarkingPlacement {
+  center: Point; // Placed position (approach stop line, or the node)
+  directionVector: Point; // Unit vector along the road (strip spans across)
+  width: number; // Strip width across the road
+  height?: number; // Strip length along the road (crossing/stop/yield only)
+}
+
 class Osm {
-  static parseRoads(data: OsmData): { points: Point[]; segments: Segment[] };
+  static parseRoads(data: OsmData): {
+    points: Point[];
+    segments: Segment[];
+    lights: OsmMarkingPlacement[]; // highway=traffic_signals
+    crossings: OsmMarkingPlacement[]; // highway=crossing (zebra)
+    stops: OsmMarkingPlacement[]; // highway=stop
+    yields: OsmMarkingPlacement[]; // highway=give_way
+  };
 }
 ```
 
@@ -733,6 +756,29 @@ class Osm {
 
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)
+
+7. EXTRACT NODE MARKINGS (nodes tagged highway=traffic_signals|crossing|stop|
+   give_way)
+   Requires `out body;` for nodes (NOT `out skel;`) so node tags survive.
+   All are nodes lying on the highway ways — no extra query needed.
+   For every tagged node, gather road neighbours (prev/next in each incident
+     way) with a one-way APPROACH flag.
+   LIGHTS (signal heads facing oncoming traffic) — placed on the approach arm
+     at the stop line by `placeApproachMarking`, facing resolved in order:
+       1. direction / traffic_signals:direction tag (forward→approach from prev,
+          backward→from next) — authoritative
+       2. radial — cluster signals within SIGNAL_CLUSTER_RADIUS_PX = 400; arm =
+          approach neighbour pointing most OUTWARD from the junction centroid
+       3. throughAxis — straight-through road, drawn at the node (isolated)
+     Then slide UPSTREAM along the centreline (min(width, span/2)) so the light
+     stays centred on the road width.
+   CROSSINGS (symmetric zebra) — oriented across the road via throughAxis at the
+     node; width = full road.
+   STOPS / YIELDS (directional text) — face the approaching driver via
+     approachFacingDir: direction tag → single one-way approach neighbour →
+     two-way faces away from the junction (highest-degree neighbour) →
+     throughAxis fallback; width = half road.
+   → returns lights / crossings / stops / yields; the editor builds the markings
 ```
 
 ### Real-World Scale
