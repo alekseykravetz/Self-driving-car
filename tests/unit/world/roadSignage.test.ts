@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { Point } from '../../../ts/math/primitives/point.js';
 import { Segment } from '../../../ts/math/primitives/segment.js';
 import { Graph } from '../../../ts/math/graph/graph.js';
@@ -8,6 +8,10 @@ import {
   LABEL_SIGN_AVOID_RADIUS_PX,
   SPEED_SIGN_NODE_OFFSET_PX,
 } from '../../../ts/world/roadSignage.js';
+import {
+  getSignageLanguage,
+  setSignageLanguage,
+} from '../../../ts/world/signageLanguage.js';
 
 /** Builds a segment with OSM metadata between two shared points. */
 function namedSeg(
@@ -129,6 +133,72 @@ describe('computeStreetLabelPlacements', () => {
     const labels = computeStreetLabelPlacements(segments, { avoid });
 
     expect(labels).toHaveLength(0);
+  });
+});
+
+describe('computeStreetLabelPlacements — display language', () => {
+  const savedLang = getSignageLanguage();
+  afterEach(() => setSignageLanguage(savedLang));
+
+  function localizedSeg(): Segment[] {
+    const p1 = new Point(0, 0);
+    const p2 = new Point(400, 0);
+    return [
+      new Segment(p1, p2, false, false, {
+        name: 'רחוב',
+        nameEn: 'The Street',
+        nameHe: 'רחוב',
+        nameRu: 'Улица',
+      }),
+    ];
+  }
+
+  it('labels using the native name by default', () => {
+    setSignageLanguage('native');
+    const labels = computeStreetLabelPlacements(localizedSeg(), {
+      spacing: 1000,
+    });
+    expect(labels[0].name).toBe('רחוב');
+  });
+
+  it('labels in English when language is en', () => {
+    setSignageLanguage('en');
+    const labels = computeStreetLabelPlacements(localizedSeg(), {
+      spacing: 1000,
+    });
+    expect(labels[0].name).toBe('The Street');
+  });
+
+  it('labels in Russian when language is ru', () => {
+    setSignageLanguage('ru');
+    const labels = computeStreetLabelPlacements(localizedSeg(), {
+      spacing: 1000,
+    });
+    expect(labels[0].name).toBe('Улица');
+  });
+
+  it('falls back to native when the chosen language tag is absent', () => {
+    setSignageLanguage('ar'); // localizedSeg has no nameAr
+    const labels = computeStreetLabelPlacements(localizedSeg(), {
+      spacing: 1000,
+    });
+    expect(labels[0].name).toBe('רחוב');
+  });
+
+  it('groups segments by resolved display name', () => {
+    setSignageLanguage('en');
+    const a = new Point(0, 0);
+    const b = new Point(400, 0);
+    const c = new Point(800, 0);
+    // Both segments share nameEn but differ in native name; in EN they form
+    // one 800px street (1 label), grouped by the resolved name.
+    const segments = [
+      new Segment(a, b, false, false, { name: 'א', nameEn: 'Shared' }),
+      new Segment(b, c, false, false, { name: 'ב', nameEn: 'Shared' }),
+    ];
+    const labels = computeStreetLabelPlacements(segments, { spacing: 1000 });
+    expect(labels).toHaveLength(1);
+    expect(labels[0].name).toBe('Shared');
   });
 });
 

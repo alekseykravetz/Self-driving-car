@@ -5,12 +5,21 @@ import {
   applyRoadTypeDefaults,
 } from '../../math/roadTypes.js';
 import { LatchedToggle } from '../atoms/latchedToggle.js';
+import {
+  getSignageLanguage,
+  setSignageLanguage,
+  type SignageLanguage,
+} from '../../world/signageLanguage.js';
 export interface BrushState {
   highwayType: string | undefined;
   lanes: number;
   oneWay: boolean;
   separated: boolean;
   name: string;
+  nameEn: string;
+  nameHe: string;
+  nameAr: string;
+  nameRu: string;
   maxSpeed: number | undefined;
   ref: string;
   bridge: boolean;
@@ -23,6 +32,10 @@ export interface SegmentMetadata {
   oneWay: boolean;
   separated: boolean;
   name: string | undefined;
+  nameEn?: string | undefined;
+  nameHe?: string | undefined;
+  nameAr?: string | undefined;
+  nameRu?: string | undefined;
   maxSpeed: number | undefined;
   ref: string | undefined;
   bridge: boolean | undefined;
@@ -36,6 +49,10 @@ export class WorldEditorPanelElement extends HTMLElement {
     oneWay: false,
     separated: false,
     name: '',
+    nameEn: '',
+    nameHe: '',
+    nameAr: '',
+    nameRu: '',
     maxSpeed: undefined,
     ref: '',
     bridge: false,
@@ -47,6 +64,7 @@ export class WorldEditorPanelElement extends HTMLElement {
   #onToggleH: ((active: boolean) => void) | null = null;
   #onToggleT: ((active: boolean) => void) | null = null;
   #onMetadataChange: ((meta: Partial<SegmentMetadata>) => void) | null = null;
+  #onSignageLanguageChange: (() => void) | null = null;
 
   #toggleO = new LatchedToggle();
   #toggleH = new LatchedToggle();
@@ -60,6 +78,11 @@ export class WorldEditorPanelElement extends HTMLElement {
   #oneWayCheck: HTMLInputElement | null = null;
   #separatedCheck: HTMLInputElement | null = null;
   #nameInput: HTMLInputElement | null = null;
+  #nameEnInput: HTMLInputElement | null = null;
+  #nameHeInput: HTMLInputElement | null = null;
+  #nameArInput: HTMLInputElement | null = null;
+  #nameRuInput: HTMLInputElement | null = null;
+  #signageLangSelect: HTMLSelectElement | null = null;
   #maxSpeedInput: HTMLInputElement | null = null;
   #refInput: HTMLInputElement | null = null;
   #bridgeCheck: HTMLInputElement | null = null;
@@ -89,6 +112,11 @@ export class WorldEditorPanelElement extends HTMLElement {
     this.#oneWayCheck = this.querySelector('#wepOneWay');
     this.#separatedCheck = this.querySelector('#wepSeparated');
     this.#nameInput = this.querySelector('#wepName');
+    this.#nameEnInput = this.querySelector('#wepNameEn');
+    this.#nameHeInput = this.querySelector('#wepNameHe');
+    this.#nameArInput = this.querySelector('#wepNameAr');
+    this.#nameRuInput = this.querySelector('#wepNameRu');
+    this.#signageLangSelect = this.querySelector('#wepSignageLang');
     this.#maxSpeedInput = this.querySelector('#wepMaxSpeed');
     this.#refInput = this.querySelector('#wepRef');
     this.#bridgeCheck = this.querySelector('#wepBridge');
@@ -136,6 +164,35 @@ export class WorldEditorPanelElement extends HTMLElement {
       this.#brushState.name = this.#nameInput!.value;
       this.#notifyBrushChange();
     });
+
+    this.#nameEnInput?.addEventListener('input', () => {
+      this.#brushState.nameEn = this.#nameEnInput!.value;
+      this.#notifyBrushChange();
+    });
+
+    this.#nameHeInput?.addEventListener('input', () => {
+      this.#brushState.nameHe = this.#nameHeInput!.value;
+      this.#notifyBrushChange();
+    });
+
+    this.#nameArInput?.addEventListener('input', () => {
+      this.#brushState.nameAr = this.#nameArInput!.value;
+      this.#notifyBrushChange();
+    });
+
+    this.#nameRuInput?.addEventListener('input', () => {
+      this.#brushState.nameRu = this.#nameRuInput!.value;
+      this.#notifyBrushChange();
+    });
+
+    // Global display-language preference (not per-segment metadata).
+    if (this.#signageLangSelect) {
+      this.#signageLangSelect.value = getSignageLanguage();
+      this.#signageLangSelect.addEventListener('change', () => {
+        setSignageLanguage(this.#signageLangSelect!.value as SignageLanguage);
+        this.#onSignageLanguageChange?.();
+      });
+    }
 
     this.#maxSpeedInput?.addEventListener('input', () => {
       const val = this.#maxSpeedInput!.value;
@@ -215,6 +272,14 @@ export class WorldEditorPanelElement extends HTMLElement {
     this.querySelector('#wepPathToolsToggle')?.addEventListener('click', () => {
       this.querySelector('#wepPathToolsSection')?.classList.toggle('collapsed');
     });
+    this.querySelector('#wepLocalizedNamesToggle')?.addEventListener(
+      'click',
+      () => {
+        this.querySelector('#wepLocalizedNamesSection')?.classList.toggle(
+          'collapsed',
+        );
+      },
+    );
   }
 
   #initToggles(): void {
@@ -270,6 +335,10 @@ export class WorldEditorPanelElement extends HTMLElement {
     if (this.#separatedCheck)
       this.#separatedCheck.checked = this.#brushState.separated;
     if (this.#nameInput) this.#nameInput.value = this.#brushState.name;
+    if (this.#nameEnInput) this.#nameEnInput.value = this.#brushState.nameEn;
+    if (this.#nameHeInput) this.#nameHeInput.value = this.#brushState.nameHe;
+    if (this.#nameArInput) this.#nameArInput.value = this.#brushState.nameAr;
+    if (this.#nameRuInput) this.#nameRuInput.value = this.#brushState.nameRu;
     if (this.#maxSpeedInput)
       this.#maxSpeedInput.value =
         this.#brushState.maxSpeed !== undefined
@@ -289,6 +358,10 @@ export class WorldEditorPanelElement extends HTMLElement {
         oneWay: this.#brushState.oneWay,
         separated: this.#brushState.separated,
         name: this.#brushState.name || undefined,
+        nameEn: this.#brushState.nameEn || undefined,
+        nameHe: this.#brushState.nameHe || undefined,
+        nameAr: this.#brushState.nameAr || undefined,
+        nameRu: this.#brushState.nameRu || undefined,
         maxSpeed: this.#brushState.maxSpeed,
         ref: this.#brushState.ref || undefined,
         bridge: this.#brushState.bridge,
@@ -364,6 +437,10 @@ export class WorldEditorPanelElement extends HTMLElement {
       oneWay: meta.oneWay,
       separated: meta.separated,
       name: meta.name ?? '',
+      nameEn: meta.nameEn ?? '',
+      nameHe: meta.nameHe ?? '',
+      nameAr: meta.nameAr ?? '',
+      nameRu: meta.nameRu ?? '',
       maxSpeed: meta.maxSpeed,
       ref: meta.ref ?? '',
       bridge: meta.bridge ?? false,
@@ -378,6 +455,10 @@ export class WorldEditorPanelElement extends HTMLElement {
     if (this.#oneWayCheck) this.#oneWayCheck.checked = meta.oneWay;
     if (this.#separatedCheck) this.#separatedCheck.checked = meta.separated;
     if (this.#nameInput) this.#nameInput.value = meta.name ?? '';
+    if (this.#nameEnInput) this.#nameEnInput.value = meta.nameEn ?? '';
+    if (this.#nameHeInput) this.#nameHeInput.value = meta.nameHe ?? '';
+    if (this.#nameArInput) this.#nameArInput.value = meta.nameAr ?? '';
+    if (this.#nameRuInput) this.#nameRuInput.value = meta.nameRu ?? '';
     if (this.#maxSpeedInput)
       this.#maxSpeedInput.value =
         meta.maxSpeed !== undefined ? String(meta.maxSpeed) : '';
@@ -391,6 +472,10 @@ export class WorldEditorPanelElement extends HTMLElement {
     this.#onMetadataChange = cb;
   }
 
+  setOnSignageLanguageChange(cb: () => void): void {
+    this.#onSignageLanguageChange = cb;
+  }
+
   resetToDefaults(): void {
     this.#inspectMode = false;
     this.#brushState = {
@@ -399,6 +484,10 @@ export class WorldEditorPanelElement extends HTMLElement {
       oneWay: false,
       separated: false,
       name: '',
+      nameEn: '',
+      nameHe: '',
+      nameAr: '',
+      nameRu: '',
       maxSpeed: undefined,
       ref: '',
       bridge: false,

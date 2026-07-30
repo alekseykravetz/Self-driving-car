@@ -514,9 +514,16 @@ full arc length, rotated to align with the road and normalized so text is never
 upside down. A semi-transparent black background improves readability over
 asphalt. A label landing within 100 px (`LABEL_SIGN_AVOID_RADIUS_PX`) of a
 speed sign is shifted ±150 px along the street, or skipped if both retries
-still collide. The display name falls back to `nameEn` when `name` contains
-non-Latin characters (e.g. Hebrew/Arabic), so English labels render
-automatically on OSM-imported maps that have a `name:en` tag.
+still collide. The display name is chosen by the **signage display-language
+preference** (`ts/world/signageLanguage.ts`, values `native | en | he | ar |
+ru`, default `native`, persisted to `localStorage` under `sim:signageLanguage`).
+The resolver prefers the segment's name in the chosen language, then falls back
+to `name` → `nameEn` → `nameHe` → `nameAr` → `nameRu`; segments are grouped by
+the RESOLVED name so a street with mixed tags still groups correctly. The
+language is selected from the **Labels** dropdown in the world-editor panel and
+is folded into the street-label signage cache key
+(`worldSignageRenderer.ts` `#getSignage`) so changing it invalidates the cache
+and re-renders the labels.
 
 **Speed-limit signs** — drawn only where the limit changes: at each graph node
 whose incident segments have differing `maxSpeed` values (`undefined` counts as
@@ -552,11 +559,11 @@ All metadata fields are optional and serialized automatically via
 `JSON.stringify` (they are enumerable properties on `Segment`). `Graph.load()`
 restores them after reconstructing the segment endpoints. `Graph.hash()`
 folds the lane count, `name`, `maxSpeed`, `ref`, `destination`,
-`destinationRef`, `nameEn`, `maxspeedType`, and the `bridge`/`layer`/
-`laneMarkings`/`roundabout` flags into its mix so metadata changes
-trigger road regeneration in the editor and invalidate the cached signage,
-shield, and exit-sign placements. Legacy worlds without metadata load and
-render with the original 2-lane defaults.
+`destinationRef`, `nameEn`, `nameHe`, `nameAr`, `nameRu`, `maxspeedType`, and
+the `bridge`/`layer`/`laneMarkings`/`roundabout` flags into its mix so metadata
+changes trigger road regeneration in the editor and invalidate the cached
+signage, shield, and exit-sign placements. Legacy worlds without metadata load
+and render with the original 2-lane defaults.
 
 ---
 
@@ -1064,18 +1071,27 @@ panels:
   `#keyIndicators` block that used to live in the bottom controls panel.
 - **`<world-editor-panel>`** (top-right corner, from `ts/ui/organisms/worldEditorPanel.ts`):
   an organism panel with three collapsible sections — **Road Type** (native
-  `<select>` styled with tokens), **Properties** (lanes, one-way, hard-separation,
-  name, max speed, ref, bridge, lane markings), and **Path Tools** (the `O` / `H` /
+  `<select>` styled with tokens, plus a **Labels** display-language dropdown —
+  Native / English / Hebrew / Arabic / Russian — that sets the global signage
+  language via `setSignageLanguage()` and triggers a redraw), **Properties**
+  (lanes, one-way, hard-separation, name, a collapsible **Localized names**
+  sub-block with `name:en` / `name:he` / `name:ar` / `name:ru` inputs, max speed,
+  ref, bridge, lane markings), and **Path Tools** (the `O` / `H` /
   `T` toggle key indicators). **All three sections are expanded by default**;
   clicking a section header collapses/expands it. The **Max Speed** field has a
   clear (✕) button that unsets the value back to "no limit" (`undefined`).
   Selecting a road type auto-sets sensible defaults
   (e.g. Motorway → 4 lanes, one-way) that the user can override. The panel emits a
-  **brush state** consumed by `GraphEditor` (via `setBrushState`) so hand-drawn
-  segments carry the chosen metadata; the intent badge shows the road type. Panel
-  state resets to defaults each session (no persistence). The `O` / `H` / `T`
-  bindings still route through `KeyboardManager` but are marked `hidden: true` so
-  they no longer render in the shortcuts toolbar.
+  **brush state** (including the localized name fields) consumed by `GraphEditor`
+  (via `setBrushState`) so hand-drawn segments carry the chosen metadata; the
+  intent badge shows the road type. In inspect mode the localized-name inputs are
+  synced from and written back to the selected segment via the
+  `SegmentMetadata` flow. The **Labels** language dropdown is global (not
+  per-segment) — it is NOT routed through the brush/metadata flow. Panel
+  state resets to defaults each session (no persistence), except the signage
+  language, which persists to `localStorage` (`sim:signageLanguage`). The `O` /
+  `H` / `T` bindings still route through `KeyboardManager` but are marked
+  `hidden: true` so they no longer render in the shortcuts toolbar.
 - **`<editor-toolbar>`** (bottom-center, from `ts/ui/molecules/editorToolbar.ts`): custom element
   wrapping the editor-mode buttons, each rendered with an `<app-icon>`. Order:
   **Graph** (`graph`) and **Inspect** (`inspect`) (separator), then the marking

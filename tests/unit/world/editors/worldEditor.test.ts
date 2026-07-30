@@ -156,6 +156,7 @@ const toolbarMocks = {
     setToggleHListener: vi.fn(),
     setToggleTListener: vi.fn(),
     setOnMetadataChange: vi.fn(),
+    setOnSignageLanguageChange: vi.fn(),
     setToggleOActive: vi.fn(),
     setToggleHActive: vi.fn(),
     setToggleTActive: vi.fn(),

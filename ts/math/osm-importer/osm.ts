@@ -46,6 +46,9 @@ interface OsmWayTags {
   'destination:ref': string;
   'maxspeed:type': string;
   'name:en': string;
+  'name:he': string;
+  'name:ar': string;
+  'name:ru': string;
   [key: string]: string; // Allow for other unspecified tags
 }
 
@@ -277,6 +280,9 @@ export class Osm {
       const layer = layerStr ? parseInt(layerStr, 10) : undefined;
       const laneMarkings = way.tags.lane_markings === 'no' ? false : undefined;
       const nameEn = way.tags['name:en'];
+      const nameHe = way.tags['name:he'];
+      const nameAr = way.tags['name:ar'];
+      const nameRu = way.tags['name:ru'];
       const maxspeedType = way.tags['maxspeed:type'];
 
       const speedStr = way.tags.maxspeed;
@@ -395,6 +401,9 @@ export class Osm {
               laneMarkings,
               roundabout: isRoundabout,
               nameEn,
+              nameHe,
+              nameAr,
+              nameRu,
               maxspeedType,
             }),
           );

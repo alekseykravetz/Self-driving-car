@@ -9,6 +9,7 @@ import {
   orderSegmentWalk,
 } from './streetWalk.js';
 import { HIGHWAY_TIER_RANK } from './roadTiers.js';
+import { getSignageLanguage } from './signageLanguage.js';
 
 /** Target spacing between street-name labels along a street, in px. */
 export const STREET_LABEL_SPACING_PX = 1000;
@@ -215,11 +216,31 @@ export function computeStreetLabelPlacements(
   const avoid = opts?.avoid;
   const avoidRadius = opts?.avoidRadius ?? LABEL_SIGN_AVOID_RADIUS_PX;
 
-  // Group segments by their primary `name` (matching the OSM `name` tag and
-  // the value shown in the world editor's inspect panel), falling back to
-  // `nameEn` only when no primary name exists.
-  const displayNameOf = (seg: Segment): string | undefined =>
-    seg.name ?? seg.nameEn;
+  // Group segments by their display name. The active signage language selects
+  // which localized name to prefer (`native`/en/he/ar/ru), falling back to the
+  // native `name`, then any available localized variant. Grouping by the
+  // RESOLVED name keeps a street with mixed tags together.
+  const lang = getSignageLanguage();
+  const displayNameOf = (seg: Segment): string | undefined => {
+    const preferred =
+      lang === 'native'
+        ? seg.name
+        : lang === 'en'
+          ? seg.nameEn
+          : lang === 'he'
+            ? seg.nameHe
+            : lang === 'ar'
+              ? seg.nameAr
+              : seg.nameRu;
+    return (
+      preferred ??
+      seg.name ??
+      seg.nameEn ??
+      seg.nameHe ??
+      seg.nameAr ??
+      seg.nameRu
+    );
+  };
 
   const byName = new Map<string, Segment[]>();
   for (const seg of segments) {
