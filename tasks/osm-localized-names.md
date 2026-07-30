@@ -15,7 +15,13 @@ OSM ways carry names in several languages (`name:en`, `name:he`, `name:ar`,
 
 1. Parses and stores the additional localized names on `Segment`.
 2. Adds a **display-language preference** so street labels can render a chosen
-   language (e.g. English, Hebrew, native), falling back gracefully.
+   language (e.g. English, Hebrew, native), falling back gracefully. The
+   language dropdown lives in the **world-editor panel**
+   (`<world-editor-panel>`), not the world-layers toolbar (decided — see UI).
+3. Lets the user **edit the localized names** (`name`, `name:en`, `name:he`,
+   `name:ar`, `name:ru`) of a selected segment via the world-editor panel's
+   inspect/brush UI, so hand-drawn or corrected roads can carry localized
+   labels.
 
 ## Background (read first)
 
@@ -36,7 +42,19 @@ OSM ways carry names in several languages (`name:en`, `name:he`, `name:ar`,
 - `ts/world/world.ts` — `World.draw()` calls the signage computation and caches
   results keyed by `Graph.hash()`. If the language preference changes at runtime,
   the cache must be invalidated (see Implementation).
-- `AGENTS.md` § "Segment OSM metadata" and § "Road signage placement".
+- `ts/ui/organisms/worldEditorPanel.ts` + `worldEditorPanelTemplate.ts` — the
+  world-editor panel. It owns the road `BrushState` (which already includes
+  `name`), a single `#nameInput` (`#wepName`), inspect-mode metadata sync
+  (`showSegmentMetadata` / `#notifyBrushChange` → `SegmentMetadata`), and
+  collapsible sections. This is where the language dropdown AND the localized
+  name inputs go. `styles/organisms/_world-editor-panel.css` holds its CSS
+  (class-scoped `.wep-*`, atomic-design tokens only).
+- `ts/world/editors/inspectEditor.ts` + `ts/world/worldEditor.ts` — the inspect
+  editor reads a clicked segment's metadata into the panel and writes edits back
+  onto the `Segment`. Localized name edits flow through the same
+  `SegmentMetadata` → segment path.
+- `AGENTS.md` § "Segment OSM metadata", § "Road signage placement", and
+  § "World editor road panel & inspect mode".
 - `docs/Units.md` / `docs/WorldEditor.md` for the metadata/signage docs.
 - `tests/unit/math/osm-importer/osm.test.ts` — parser tests.
 - `tests/unit/world/` — signage/roadSignage tests if present (search for
@@ -76,11 +94,16 @@ Store these optional way tags on `Segment` (all strings):
    available. Group segments by the RESOLVED display name (so a street with mixed
    tags still groups correctly).
 6. Invalidate the signage cache when the language changes (see Implementation).
-7. A minimal UI control to change the language (a dropdown in the world-layers
-   or world-editor toolbar; keep it small and optional). If a full UI is too
-   large, expose the setter and default to `native`, and document the setting —
-   but a dropdown is strongly preferred so the feature is usable.
-8. Tests + docs.
+7. A **language dropdown** (native / EN / HE / AR / RU) in the **world-editor
+   panel** (`<world-editor-panel>`). On change it calls `setSignageLanguage()`,
+   persists the choice, and triggers a redraw. This is the pinned location —
+   not the world-layers toolbar.
+8. **Localized-name editing** in the world-editor panel: add `name:en`,
+   `name:he`, `name:ar`, `name:ru` text inputs alongside the existing `Name`
+   input, wired into the `BrushState` / `SegmentMetadata` flow so edits apply to
+   the selected segment in inspect mode (and stamp onto hand-drawn segments in
+   brush mode). See Implementation → "World-editor panel".
+9. Tests + docs.
 
 ### Out of scope
 
@@ -139,12 +162,43 @@ Store these optional way tags on `Segment` (all strings):
   - Or expose a `World.invalidateSignage()` the UI calls on language change.
     The cache-key approach is preferred (no cross-layer call).
 
-### UI
+### UI — language dropdown (world-editor panel)
 
-- Add a small `<select>` (native / EN / HE / AR / RU) to an existing toolbar
-  (e.g. `ts/ui/molecules/worldLayersToolbar.ts` or the world-editor panel). On
-  change, call `setSignageLanguage()` and trigger a redraw. Keep it behind the
-  existing toolbar styling conventions (atomic-design CSS tokens, no raw px/hex).
+- Add a `<select id="wepSignageLang">` with options native / EN / HE / AR / RU
+  to `worldEditorPanelTemplate.ts` (its own `.wep-field`, e.g. in a small
+  "Labels" row or the Properties section header — keep it above the per-segment
+  fields since it's a global display preference, not segment metadata).
+- In `worldEditorPanel.ts`: cache it in `#cacheDom`, initialise its value from
+  `getSignageLanguage()` in `connectedCallback`, and on `change` call
+  `setSignageLanguage(select.value)` then fire a new panel callback
+  (`setOnSignageLanguageChange(cb)`) that `WorldEditor` wires to a redraw /
+  cache-invalidation. Do NOT route this through `BrushState`/`SegmentMetadata`
+  — it's global, not per-segment.
+- Style via `styles/organisms/_world-editor-panel.css` using atomic-design
+  tokens only (no raw px/hex).
+
+### UI — localized name editing (world-editor panel)
+
+- Extend `BrushState` and `SegmentMetadata` in `worldEditorPanel.ts` with
+  `nameEn`, `nameHe`, `nameAr`, `nameRu` (strings in `BrushState`, optional
+  strings in `SegmentMetadata`), mirroring the existing `name` field exactly.
+- In `worldEditorPanelTemplate.ts`, add four text inputs
+  (`#wepNameEn`/`#wepNameHe`/`#wepNameAr`/`#wepNameRu`) next to the existing
+  `#wepName` (`Name`) input. Group them under the `Name` label (e.g. a small
+  collapsible "Localized names" block) so the panel stays compact.
+- In `worldEditorPanel.ts`:
+  - Cache the four inputs in `#cacheDom`.
+  - Wire `input` listeners that set the matching `#brushState.name*` field and
+    call `#notifyBrushChange()` (same pattern as `#nameInput`).
+  - Mirror them in `#syncBrushState`, `showSegmentMetadata`,
+    `resetToDefaults`, and the `#notifyBrushChange` → `SegmentMetadata` object
+    (`nameEn: this.#brushState.nameEn || undefined`, etc.).
+- `GraphEditor.setBrushState()` and the inspect-editor write-back path must
+  carry the new fields onto the `Segment` metadata (5th constructor arg /
+  metadata assignment). Verify `Osm.parseRoads` and `Graph.load` already
+  populate them so inspect mode shows imported values.
+- Keep it behind the existing panel styling conventions (`.wep-*` classes,
+  atomic-design tokens, no raw px/hex).
 
 ## Testing
 
@@ -164,22 +218,39 @@ Store these optional way tags on `Segment` (all strings):
   it labels using `name`; fallback chain works when the chosen language tag is
   absent.
 
+### world-editor panel tests (`tests/unit/ui/` if panel tests exist)
+
+- `BrushState` / `SegmentMetadata` include `nameEn`/`nameHe`/`nameAr`/`nameRu`
+  and round-trip through `showSegmentMetadata` → `#notifyBrushChange`.
+- Editing a localized-name input fires the metadata-change callback with the
+  updated field (others preserved from the selected segment).
+- If the panel is not unit-testable in the JSDOM/Node harness (custom-element +
+  template), cover the pure `BrushState`/`SegmentMetadata` mapping only and note
+  the DOM-dependent parts as verified via the visual/manual path.
+
 ## Acceptance criteria
 
 - `npm run rebuild` succeeds with no TypeScript errors.
 - `npm run fix:all` passes (format + lint).
 - `npm test` passes — existing tests plus the new ones.
-- Importing an OSM JSON with `name:en`/`name:he` and switching the language
-  dropdown re-labels the streets in the chosen language and persists the choice
-  across reload.
+- Importing an OSM JSON with `name:en`/`name:he` and switching the world-editor
+  panel's language dropdown re-labels the streets in the chosen language and
+  persists the choice across reload.
 - Worlds without localized tags fall back to the native `name` (no regression).
 - The new `localStorage` key appears in the landing-page store panel.
+- Selecting a segment in inspect mode shows its localized names in the panel;
+  editing any of them (native / EN / HE / AR / RU) updates the segment and the
+  rendered label (in the matching display language). Hand-drawing a road with
+  localized names set in the brush stamps them onto the new segment.
 
 ## Docs to update
 
 - `docs/Units.md` / `docs/WorldEditor.md` — document the new `Segment` localized
-  name fields and the display-language preference.
+  name fields, the display-language preference, the world-editor panel language
+  dropdown, and the new localized-name inputs in the panel's inspect/brush UI.
 - `AGENTS.md` — extend "Segment OSM metadata" with the new `nameHe`/`nameAr`/
   `nameRu` fields and note the signage language preference + its `localStorage`
-  key and cache-key handling.
+  key and cache-key handling. Extend "World editor road panel & inspect mode"
+  with the language dropdown and the localized-name inputs (and their
+  `BrushState`/`SegmentMetadata` fields).
 - Persistence table in `AGENTS.md` (localStorage keys) — add `sim:signageLanguage`.
