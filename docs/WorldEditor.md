@@ -504,15 +504,20 @@ the road.
 a single centred marking can only face one travel direction, the world layer
 **expands each seed into one marking per approach lane** via
 `expandDirectionalMarking()` (`ts/world/osmDirectionalMarkings.ts`): it finds the
-approach segment (incident to the node, pointing most like the seed direction),
-builds that segment's per-lane guides with `laneGuidesForSegment()` (extracted
-from `wgGenerateLaneGuides`, same convention), and keeps only the lanes whose
-guide direction matches the seed — one-way roads → **all** lanes, two-way roads →
-only the lanes **entering** the junction. Each per-lane marking uses that lane
-guide's direction and `LANE_WIDTH_PX` size, so it renders identically to a
-hand-placed marking on the same lane; a degenerate node with no approach lane
-falls back to the single centred seed. An optional `STOP_LINE_SETBACK_PX`
-(default 0) nudges the marking upstream of the junction.
+approach segment as the incident road whose **axis is most collinear with the
+seed direction** (the road the yielding driver is on — selecting by axis rather
+than which endpoint is up/downstream keeps the marking on the approach even
+where the road **bends or dead-ends** into the junction), builds that segment's
+per-lane guides with `laneGuidesForSegment()` (extracted from
+`wgGenerateLaneGuides`, same convention), and keeps the entering lanes:
+**two-way** roads → only the lanes whose guide direction aligns with the seed
+(the opposing lanes get none); **one-way** roads → **all** lanes (they share one
+direction, so the two-way alignment filter would wrongly reject every lane).
+Each per-lane marking uses that lane guide's own direction and `LANE_WIDTH_PX`
+size, so it renders identically to a hand-placed marking on the same lane; a
+degenerate node with no incident approach segment falls back to the single
+centred seed. An optional `STOP_LINE_SETBACK_PX` (default 0) nudges the marking
+upstream of the junction.
 
 **Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
 each on its **approach arm, centred on the road, at the stop line** — matching

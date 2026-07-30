@@ -15,7 +15,7 @@
 import { Point } from '../math/primitives/point.js';
 import { Segment } from '../math/primitives/segment.js';
 import { Graph } from '../math/graph/graph.js';
-import { normalize, subtract, dot, add, scale } from '../math/utils.js';
+import { dot, add, scale } from '../math/utils.js';
 import { laneGuidesForSegment } from './generation/worldGenerator.js';
 import { LANE_WIDTH_PX } from '../math/worldUnits.js';
 
@@ -32,9 +32,25 @@ export interface DirectionalPlacement {
 
 /**
  * Expands a single OSM stop/give-way node seed into one placement per APPROACH
- * lane. `directionVector` follows the lane-guide convention (points upstream,
- * toward the approach road's far end). Falls back to the single seed placement
- * when no approach segment / lane is found.
+ * lane. `directionVector` is the lane-guide-convention travel direction the seed
+ * renders with. Falls back to the single seed placement when no approach segment
+ * / lane is found.
+ *
+ * Approach segment: the incident road whose AXIS is most collinear with the
+ * seed direction (the road the yielding driver is on). Selecting by axis
+ * collinearity — rather than which endpoint is up/downstream — keeps the
+ * marking on the approach road even where the road bends or dead-ends into the
+ * junction (a downstream-endpoint heuristic would pick a cross street or fall
+ * back to the node centre).
+ *
+ * Lane selection:
+ *   - Two-way road → only the lanes travelling INTO the junction (guide
+ *     direction aligned with the seed), so the opposing lanes get no marking.
+ *   - One-way road → every lane (all flow the same way into the junction); the
+ *     lane guides all share one direction, so the two-way alignment filter
+ *     would wrongly reject them all.
+ * Each per-lane marking uses that lane guide's own direction, so it renders
+ * identically to a hand-placed marking on the same guide.
  */
 export function expandDirectionalMarking(
   center: Point,
@@ -42,31 +58,29 @@ export function expandDirectionalMarking(
   graph: Graph,
   setback: number = STOP_LINE_SETBACK_PX,
 ): DirectionalPlacement[] {
-  // 1. Approach segment: incident to the node, pointing (node→far end) most
-  //    like directionVector.
+  // 1. Approach segment: incident to the node, road axis most collinear with
+  //    the seed direction (either orientation).
   let best: Segment | undefined;
-  let bestScore = 0; // require a positive match
+  let bestAbsDot = 0;
   for (const seg of graph.segments) {
-    let far: Point | undefined;
-    if (seg.p1.equals(center)) far = seg.p2;
-    else if (seg.p2.equals(center)) far = seg.p1;
-    if (!far) continue;
-    const d = subtract(far, center);
-    if (d.x === 0 && d.y === 0) continue;
-    const score = dot(normalize(d), directionVector);
-    if (score > bestScore) {
-      bestScore = score;
+    if (!seg.p1.equals(center) && !seg.p2.equals(center)) continue;
+    const segDir = seg.directionVector();
+    if (segDir.x === 0 && segDir.y === 0) continue;
+    const absDot = Math.abs(dot(segDir, directionVector));
+    if (absDot > bestAbsDot) {
+      bestAbsDot = absDot;
       best = seg;
     }
   }
   if (!best) return [{ center, directionVector }]; // fallback
 
-  // 2/3. Lane guides of the approach segment; keep same-direction (approach)
-  //      lanes.
+  // 2/3. Lane guides of the approach segment; keep the entering lanes.
   const out: DirectionalPlacement[] = [];
   for (const guide of laneGuidesForSegment(best)) {
     const guideDir = guide.directionVector();
-    if (dot(guideDir, directionVector) <= 0) continue; // departing lane
+    // Two-way: skip departing lanes (guide opposite to the approach travel
+    // direction). One-way: all lanes flow into the junction, so keep them all.
+    if (!best.oneWay && dot(guideDir, directionVector) <= 0) continue;
     // 4. Lane cross-section at the node, nudged upstream by the setback.
     const laneCenter = guide.projectPoint(center).point;
     const placed =

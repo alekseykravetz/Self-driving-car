@@ -88,4 +88,39 @@ describe('expandDirectionalMarking', () => {
   it('default setback constant is 0', () => {
     expect(STOP_LINE_SETBACK_PX).toBe(0);
   });
+
+  it('one-way approach still expands to every lane when the seed points downstream', () => {
+    // One-way lane guides all share one direction. Regression: the two-way
+    // "aligned lane" filter would reject them all and fall back to the node
+    // centre (marking in the middle of the road). One-way roads must keep all
+    // lanes at their distinct lane centres.
+    const { graph, node } = makeRoad(true, 2);
+    const downstream = new Point(1, 0); // opposite to the guide direction
+    const out = expandDirectionalMarking(node, downstream, graph);
+    expect(out.length).toBe(2);
+    const ys = out.map((p) => p.center.y).sort((a, b) => a - b);
+    expect(ys[0]).toBeCloseTo(-25);
+    expect(ys[1]).toBeCloseTo(25);
+    // Not collapsed onto the node centre.
+    for (const p of out) expect(p.center.y).not.toBeCloseTo(0);
+  });
+
+  it('picks the collinear approach segment at a bend, not a cross street', () => {
+    // Node where the approach road (horizontal) bends into a vertical road.
+    // Regression: the old node→far heuristic rejected the approach segment and
+    // fell back to the node centre; axis-collinearity must pick the approach.
+    const a = new Point(-100, 0);
+    const n = new Point(0, 0);
+    const b = new Point(0, 100);
+    const approach = new Segment(a, n, false, false, { lanes: 2 }); // horizontal
+    const cross = new Segment(n, b, false, false, { lanes: 2 }); // vertical
+    const graph = new Graph([a, n, b], [approach, cross]);
+    const seed = new Point(1, 0); // travel along the horizontal approach
+
+    const out = expandDirectionalMarking(n, seed, graph);
+    expect(out.length).toBe(1);
+    // On a lane of the horizontal approach (y offset), not the node centre.
+    expect(out[0].center.x).toBeCloseTo(0);
+    expect(Math.abs(out[0].center.y)).toBeCloseTo(25);
+  });
 });
