@@ -274,6 +274,10 @@ export class GraphEditor {
         ? {
             highwayType: this.#brushState.highwayType,
             name: this.#brushState.name || undefined,
+            nameEn: this.#brushState.nameEn || undefined,
+            nameHe: this.#brushState.nameHe || undefined,
+            nameAr: this.#brushState.nameAr || undefined,
+            nameRu: this.#brushState.nameRu || undefined,
             lanes: this.#brushState.lanes,
             maxSpeed: this.#brushState.maxSpeed,
             ref: this.#brushState.ref || undefined,

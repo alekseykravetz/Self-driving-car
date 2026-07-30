@@ -27,6 +27,9 @@ export class Segment {
   laneMarkings?: boolean;
   roundabout?: boolean;
   nameEn?: string;
+  nameHe?: string;
+  nameAr?: string;
+  nameRu?: string;
   maxspeedType?: string;
 
   constructor(
@@ -48,6 +51,9 @@ export class Segment {
       laneMarkings?: boolean;
       roundabout?: boolean;
       nameEn?: string;
+      nameHe?: string;
+      nameAr?: string;
+      nameRu?: string;
       maxspeedType?: string;
     },
   ) {
@@ -69,6 +75,9 @@ export class Segment {
       this.laneMarkings = metadata.laneMarkings;
       this.roundabout = metadata.roundabout;
       this.nameEn = metadata.nameEn;
+      this.nameHe = metadata.nameHe;
+      this.nameAr = metadata.nameAr;
+      this.nameRu = metadata.nameRu;
       this.maxspeedType = metadata.maxspeedType;
     }
   }

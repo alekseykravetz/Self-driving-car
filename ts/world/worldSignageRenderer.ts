@@ -8,6 +8,7 @@ import {
   computeExitSignPlacements,
   MIN_SIGNAGE_ZOOM,
 } from './roadSignage.js';
+import { getSignageLanguage } from './signageLanguage.js';
 import type {
   StreetLabelPlacement,
   SpeedSignPlacement,
@@ -52,7 +53,9 @@ export class WorldSignageRenderer {
     labels: StreetLabelPlacement[];
     signs: SpeedSignPlacement[];
   } {
-    const hash = graph.hash();
+    // Fold the active signage language into the key: it selects label text but
+    // is not part of the graph, so a language change must invalidate the cache.
+    const hash = `${graph.hash()}|${getSignageLanguage()}`;
     if (!this.#signageCache || this.#signageCache.hash !== hash) {
       const signs = computeSpeedSignPlacements(graph);
       const labels = computeStreetLabelPlacements(graph.segments, {

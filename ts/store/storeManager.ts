@@ -42,6 +42,7 @@ const SM_TRACKED_LS_KEYS = [
   'store:activeCar',
   'sim:worldLayers',
   'editor:worldLayers',
+  'sim:signageLanguage',
   'markerThreshold',
 ];
 const SM_ARRAY_LS_KEYS = [

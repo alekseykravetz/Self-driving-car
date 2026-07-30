@@ -429,6 +429,21 @@ describe('Osm', () => {
       expect(result.segments[0].nameEn).toBe('HaYotsrim');
     });
 
+    it('name:he / name:ar / name:ru tags stored on segment', () => {
+      const result = Osm.parseRoads(
+        twoNodeDataWith({
+          highway: 'residential',
+          name: 'Main',
+          'name:he': 'רחוב ראשי',
+          'name:ar': 'الشارع الرئيسي',
+          'name:ru': 'Главная улица',
+        }),
+      );
+      expect(result.segments[0].nameHe).toBe('רחוב ראשי');
+      expect(result.segments[0].nameAr).toBe('الشارع الرئيسي');
+      expect(result.segments[0].nameRu).toBe('Главная улица');
+    });
+
     it('maxspeed:type=IL:trunk with no maxspeed infers 90', () => {
       const result = Osm.parseRoads(
         twoNodeDataWith({ highway: 'trunk', 'maxspeed:type': 'IL:trunk' }),

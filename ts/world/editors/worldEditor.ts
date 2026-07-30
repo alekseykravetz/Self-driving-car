@@ -335,7 +335,11 @@ export class WorldEditor {
     this.#worldEditorPanel?.setOnMetadataChange((meta) => {
       this.#applyMetadataToSelectedSegment(meta);
     });
-
+    // Language changes only affect label text; the signage cache key folds the
+    // language, so a redraw re-renders the labels in the chosen language.
+    this.#worldEditorPanel?.setOnSignageLanguageChange(() => {
+      this.draw();
+    });
     // A freshly loaded/created world already has its items generated in memory.
     this.#worldLayersToolbar?.setStale(false);
   }
@@ -366,6 +370,10 @@ export class WorldEditor {
           oneWay: segment.oneWay,
           separated: segment.separated,
           name: segment.name,
+          nameEn: segment.nameEn,
+          nameHe: segment.nameHe,
+          nameAr: segment.nameAr,
+          nameRu: segment.nameRu,
           maxSpeed: segment.maxSpeed,
           ref: segment.ref,
           bridge: segment.bridge,
@@ -418,6 +426,10 @@ export class WorldEditor {
     seg.oneWay = meta.oneWay ?? false;
     seg.separated = meta.separated ?? false;
     seg.name = meta.name || undefined;
+    seg.nameEn = meta.nameEn || undefined;
+    seg.nameHe = meta.nameHe || undefined;
+    seg.nameAr = meta.nameAr || undefined;
+    seg.nameRu = meta.nameRu || undefined;
     seg.maxSpeed = meta.maxSpeed;
     seg.ref = meta.ref || undefined;
     seg.bridge = meta.bridge ? true : undefined;

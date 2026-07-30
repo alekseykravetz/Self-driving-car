@@ -42,6 +42,9 @@ export class Graph {
       segments[idx].laneMarkings = s.laneMarkings;
       segments[idx].roundabout = s.roundabout;
       segments[idx].nameEn = s.nameEn;
+      segments[idx].nameHe = s.nameHe;
+      segments[idx].nameAr = s.nameAr;
+      segments[idx].nameRu = s.nameRu;
       segments[idx].maxspeedType = s.maxspeedType;
     });
     return new Graph(points, segments);
@@ -95,6 +98,9 @@ export class Graph {
         s.destination,
         s.destinationRef,
         s.nameEn,
+        s.nameHe,
+        s.nameAr,
+        s.nameRu,
         s.maxspeedType,
       ]) {
         if (fld) {

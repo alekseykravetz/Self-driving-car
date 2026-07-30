@@ -101,6 +101,42 @@ describe('Graph', () => {
       expect(plain.hash()).not.toBe(named.hash());
       expect(plain.hash()).not.toBe(limited.hash());
     });
+
+    it('changes when a localized name (nameHe) changes', () => {
+      const p1 = new Point(0, 0);
+      const p2 = new Point(100, 0);
+      const a = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { name: 'Main', nameHe: 'ראשי' })],
+      );
+      const b = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { name: 'Main', nameHe: 'שני' })],
+      );
+      expect(a.hash()).not.toBe(b.hash());
+    });
+
+    it('round-trips localized names through Graph.load', () => {
+      const p1 = new Point(0, 0);
+      const p2 = new Point(100, 0);
+      const info = new Graph(
+        [p1, p2],
+        [
+          new Segment(p1, p2, false, false, {
+            name: 'Main',
+            nameEn: 'Main',
+            nameHe: 'ראשי',
+            nameAr: 'رئيسي',
+            nameRu: 'Главная',
+          }),
+        ],
+      );
+      const loaded = Graph.load(info);
+      expect(loaded.segments[0].nameEn).toBe('Main');
+      expect(loaded.segments[0].nameHe).toBe('ראשי');
+      expect(loaded.segments[0].nameAr).toBe('رئيسي');
+      expect(loaded.segments[0].nameRu).toBe('Главная');
+    });
   });
 
   describe('point management', () => {

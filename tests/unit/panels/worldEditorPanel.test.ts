@@ -116,6 +116,8 @@ describe('WorldEditorPanelElement', () => {
       oneWay: false,
       separated: false,
       name: 'Test Road',
+      nameEn: 'Test Road',
+      nameHe: 'כביש',
       maxSpeed: 80,
       ref: 'T1',
       bridge: true,
@@ -124,15 +126,46 @@ describe('WorldEditorPanelElement', () => {
 
     const lanesInput = el.querySelector('#wepLanes') as HTMLInputElement;
     const nameInput = el.querySelector('#wepName') as HTMLInputElement;
+    const nameEnInput = el.querySelector('#wepNameEn') as HTMLInputElement;
+    const nameHeInput = el.querySelector('#wepNameHe') as HTMLInputElement;
     const maxSpeedInput = el.querySelector('#wepMaxSpeed') as HTMLInputElement;
     const refInput = el.querySelector('#wepRef') as HTMLInputElement;
     const bridgeCheck = el.querySelector('#wepBridge') as HTMLInputElement;
 
     expect(lanesInput.value).toBe('4');
     expect(nameInput.value).toBe('Test Road');
+    expect(nameEnInput.value).toBe('Test Road');
+    expect(nameHeInput.value).toBe('כביש');
     expect(maxSpeedInput.value).toBe('80');
     expect(refInput.value).toBe('T1');
     expect(bridgeCheck.checked).toBe(true);
+  });
+
+  it('editing a localized name input fires metadata change with the field, preserving others', () => {
+    const changes: Array<Record<string, unknown>> = [];
+    el.setOnMetadataChange((meta) => changes.push({ ...meta }));
+
+    el.showSegmentMetadata({
+      highwayType: 'primary',
+      lanes: 2,
+      oneWay: false,
+      separated: false,
+      name: 'Main',
+      nameEn: 'Main',
+      maxSpeed: undefined,
+      ref: undefined,
+      bridge: undefined,
+      laneMarkings: undefined,
+    });
+
+    const nameHe = el.querySelector('#wepNameHe') as HTMLInputElement;
+    nameHe.value = 'ראשי';
+    nameHe.dispatchEvent(new Event('input'));
+
+    expect(changes).toHaveLength(1);
+    expect(changes[0].nameHe).toBe('ראשי');
+    expect(changes[0].nameEn).toBe('Main');
+    expect(changes[0].name).toBe('Main');
   });
 
   it('showSegmentMetadata(null) resets to brush mode', () => {

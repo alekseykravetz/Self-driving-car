@@ -198,7 +198,7 @@ The geometric engine powering all spatial operations.
 | `primitives/polygon.ts`  | Closed shapes, union, intersection, containment (ray casting)                                                                                                 |
 | `primitives/envelope.ts` | Rounded rectangles around segments (road surfaces)                                                                                                            |
 | `graph/graph.ts`         | Point/segment network, Dijkstra shortest path                                                                                                                 |
-| `osm-importer/osm.ts`    | OpenStreetMap JSON → Point/Segment conversion + node-marking placement (lights, crossings, stops, give-ways)                                                |
+| `osm-importer/osm.ts`    | OpenStreetMap JSON → Point/Segment conversion + node-marking placement (lights, crossings, stops, give-ways)                                                  |
 | `spatialGrid.ts`         | Uniform spatial hash grid for fast range queries over segments                                                                                                |
 | `trafficControlGrid.ts`  | Spatial hash grid (150px cells) indexing `Light` polygons for AI traffic-light perception; rebuilt on markings change, state read live via `getState` closure |
 | `heatmapGrid.ts`         | Lazy grid-based congestion counter for the spatial heatmap overlay                                                                                            |
