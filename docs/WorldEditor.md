@@ -486,15 +486,19 @@ path from the manual `ParkingEditor` (which places one `roadWidth/2` square
 hand-drawn segments.
 
 **Stops / give-ways** are DIRECTIONAL painted markings — the "STOP" / "YIELD"
-text must read for the approaching driver, so their `directionVector` must point
-back toward oncoming traffic (the same convention as a lane guide in the
-editor). `approachFacingDir()` resolves it in priority order: (1) the node's
+text must read for the approaching driver. `approachFacingDir()` resolves the
+upstream (oncoming-traffic) direction in priority order: (1) the node's
 `direction` tag; (2) the single one-way approach neighbour (the upstream side);
 (3) on a two-way road, face **away from the junction** — the driver approaches
 the more-connected node, so the sign faces the neighbour most opposite to the
 highest-`degree` one (`degree` = how many way-endpoints reference the node); (4)
 `throughAxis` fallback when there is no junction cue (e.g. mid-block), whose sign
-is arbitrary. Width = half the road.
+is arbitrary. The placement then **negates** this vector so the emitted
+`directionVector` matches the lane-guide convention that `Stop`/`Yield` `draw()`
+expects — a manually placed marking passes the lane guide's `directionVector()`
+directly (the opposite orientation to `approachFacingDir`), so the negation
+makes an OSM-imported sign render identically to a hand-placed one. Width = half
+the road.
 
 **Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
 each on its **approach arm, centred on the road, at the stop line** — matching

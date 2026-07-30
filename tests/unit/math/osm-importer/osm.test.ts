@@ -490,8 +490,10 @@ describe('Osm', () => {
   describe('directional marking orientation (direction tag)', () => {
     // Straight two-way road of three collinear nodes; the middle node carries
     // the marking. `direction=forward` means traffic travels in node order
-    // (approaching from the previous node), so the sign faces upstream (prev).
-    // `direction=backward` faces the next node.
+    // (approaching from the previous node). The emitted `directionVector`
+    // follows the lane-guide convention used by the marking `draw()` (opposite
+    // to `approachFacingDir`), so a forward marking points toward the NEXT
+    // (downstream) node; `direction=backward` points toward the previous node.
     const roadWithMarking = (
       highway: 'stop' | 'give_way',
       direction?: string,
@@ -515,18 +517,8 @@ describe('Osm', () => {
       ],
     });
 
-    it('stop with direction=forward faces the previous (upstream) node', () => {
+    it('stop with direction=forward points toward the next (downstream) node', () => {
       const result = Osm.parseRoads(roadWithMarking('stop', 'forward'));
-      expect(result.stops.length).toBe(1);
-      const center = result.points[1];
-      const prev = result.points[0];
-      const dv = result.stops[0].directionVector;
-      expect(Math.sign(dv.x)).toBe(Math.sign(prev.x - center.x));
-      expect(Math.sign(dv.y)).toBe(Math.sign(prev.y - center.y));
-    });
-
-    it('stop with direction=backward faces the next (upstream) node', () => {
-      const result = Osm.parseRoads(roadWithMarking('stop', 'backward'));
       expect(result.stops.length).toBe(1);
       const center = result.points[1];
       const next = result.points[2];
@@ -535,14 +527,24 @@ describe('Osm', () => {
       expect(Math.sign(dv.y)).toBe(Math.sign(next.y - center.y));
     });
 
-    it('give_way honours direction=forward (faces previous node)', () => {
+    it('stop with direction=backward points toward the previous node', () => {
+      const result = Osm.parseRoads(roadWithMarking('stop', 'backward'));
+      expect(result.stops.length).toBe(1);
+      const center = result.points[1];
+      const prev = result.points[0];
+      const dv = result.stops[0].directionVector;
+      expect(Math.sign(dv.x)).toBe(Math.sign(prev.x - center.x));
+      expect(Math.sign(dv.y)).toBe(Math.sign(prev.y - center.y));
+    });
+
+    it('give_way honours direction=forward (points toward next node)', () => {
       const result = Osm.parseRoads(roadWithMarking('give_way', 'forward'));
       expect(result.yields.length).toBe(1);
       const center = result.points[1];
-      const prev = result.points[0];
+      const next = result.points[2];
       const dv = result.yields[0].directionVector;
-      expect(Math.sign(dv.x)).toBe(Math.sign(prev.x - center.x));
-      expect(Math.sign(dv.y)).toBe(Math.sign(prev.y - center.y));
+      expect(Math.sign(dv.x)).toBe(Math.sign(next.x - center.x));
+      expect(Math.sign(dv.y)).toBe(Math.sign(next.y - center.y));
     });
 
     it('forward and backward stops face opposite directions', () => {

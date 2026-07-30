@@ -774,10 +774,12 @@ class Osm {
      stays centred on the road width.
    CROSSINGS (symmetric zebra) — oriented across the road via throughAxis at the
      node; width = full road.
-   STOPS / YIELDS (directional text) — face the approaching driver via
-     approachFacingDir: direction tag → single one-way approach neighbour →
+   STOPS / YIELDS (directional text) — approachFacingDir finds the upstream
+     (oncoming) direction: direction tag → single one-way approach neighbour →
      two-way faces away from the junction (highest-degree neighbour) →
-     throughAxis fallback; width = half road.
+     throughAxis fallback; the placement NEGATES it so directionVector matches
+     the lane-guide convention the Stop/Yield draw() expects (identical to a
+     hand-placed marking); width = half road.
    PARKING (parking:* WAY-side attribute, NOT a node, NOT a marking) —
      hasParkingSide() reads parking:right*/parking:left*/parking:both* (and
      legacy parking:lane:*) on each way (value no/none = absent) and records

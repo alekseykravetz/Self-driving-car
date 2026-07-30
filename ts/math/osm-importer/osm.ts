@@ -484,13 +484,16 @@ export class Osm {
       }
 
       if (kind === 'stop' || kind === 'yield') {
-        // Directional: face the approaching driver (like the editor's lane
-        // guide). Drawn at the node so the stop line sits where OSM placed it.
+        // Directional: the painted text must read for the approaching driver.
+        // `approachFacingDir` points UPSTREAM (toward oncoming traffic); the
+        // marking `draw()` (shared with the manual editor) expects the lane-
+        // guide convention, which is the OPPOSITE orientation, so negate it to
+        // match how a lane-placed Stop/Yield renders.
         const facing = approachFacingDir(entry);
         if (!facing) continue;
         const placement: OsmMarkingPlacement = {
           center,
-          directionVector: facing,
+          directionVector: new Point(-facing.x, -facing.y),
           width: roadWidth / 2,
           height: roadWidth / 2,
         };
