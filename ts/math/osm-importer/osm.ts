@@ -14,8 +14,6 @@ import {
   add,
   scale,
   distance,
-  perpendicular,
-  lerp2D,
 } from '../utils.js';
 import { defaultLaneCount } from '../roadTypes.js';
 
@@ -125,21 +123,15 @@ interface ParsedRoads {
   crossings: OsmMarkingPlacement[]; // highway=crossing (zebra)
   stops: OsmMarkingPlacement[]; // highway=stop
   yields: OsmMarkingPlacement[]; // highway=give_way
-  parkings: OsmMarkingPlacement[]; // parking:* way-side attribute
 }
-
-/** Length of a single imported parking bay (world px, ~one car). */
-const PARKING_BAY_LEN_PX = LANE_WIDTH_PX;
-/** Width (depth) of a parking bay, across the curb (world px). */
-const PARKING_BAY_WIDTH_PX = LANE_WIDTH_PX / 2;
-/** Spacing multiplier between successive bays along the segment. */
-const PARKING_BAY_SPACING = 1.5;
 
 /**
  * True when a way has parking on `side` (`'right'` | `'left'`). OSM marks
  * parking as a way-side attribute under the modern `parking:right*` /
  * `parking:left*` / `parking:both*` scheme (and the legacy `parking:lane:*`).
  * Any such key means that side has parking unless its value is `no`/`none`.
+ * Parking is recorded on the segment metadata (`parkingLeft`/`parkingRight`)
+ * and baked into the road envelope during generation — NOT emitted as markings.
  */
 function hasParkingSide(
   tags: Record<string, string>,
@@ -159,50 +151,6 @@ function hasParkingSide(
     return true;
   }
   return false;
-}
-
-/**
- * Emits parking-bay placements distributed along one road segment, laterally
- * offset to the curb on the requested side(s). `right`/`left` are relative to
- * the segment direction (`p1 → p2`); `perpendicular(dir)` points to the right
- * side in screen coordinates (y-down), so `+offset` is right, `-offset` left.
- */
-function emitParkingBays(
-  p1: Point,
-  p2: Point,
-  roadWidth: number,
-  parkRight: boolean,
-  parkLeft: boolean,
-  out: OsmMarkingPlacement[],
-): void {
-  const segLen = distance(p1, p2);
-  if (segLen < PARKING_BAY_LEN_PX) return; // Too short for even one bay.
-  const dir = normalize(subtract(p2, p1));
-  const normal = perpendicular(dir); // Unit; points to the right of travel.
-  const lateral = roadWidth / 2 + PARKING_BAY_WIDTH_PX / 2;
-  const n = Math.max(
-    1,
-    Math.floor(segLen / (PARKING_BAY_LEN_PX * PARKING_BAY_SPACING)),
-  );
-  for (let i = 0; i < n; i++) {
-    const along = lerp2D(p1, p2, (i + 0.5) / n);
-    if (parkRight) {
-      out.push({
-        center: add(along, scale(normal, lateral)),
-        directionVector: dir,
-        width: PARKING_BAY_WIDTH_PX,
-        height: PARKING_BAY_LEN_PX,
-      });
-    }
-    if (parkLeft) {
-      out.push({
-        center: add(along, scale(normal, -lateral)),
-        directionVector: dir,
-        width: PARKING_BAY_WIDTH_PX,
-        height: PARKING_BAY_LEN_PX,
-      });
-    }
-  }
 }
 
 // --- Converted Osm Object ---
@@ -234,7 +182,6 @@ export class Osm {
         crossings: [],
         stops: [],
         yields: [],
-        parkings: [],
       };
     }
 
@@ -332,10 +279,6 @@ export class Osm {
     // and orientation after all ways are processed.
     const markAccum = new Map<number, MarkAccumulator>();
 
-    // On-street parking (`parking:*` way-side attribute) distributed along the
-    // curb of each qualifying segment.
-    const parkings: OsmMarkingPlacement[] = [];
-
     // Convert ways to Segment objects
     for (const way of ways) {
       const nodeIds = way.nodes;
@@ -389,12 +332,12 @@ export class Osm {
 
       // On-street parking side flags (way-level attribute). Relative to the
       // way's node order; reverse one-ways swap the sides so "right" stays the
-      // right of the segment's stored direction.
+      // right of the segment's stored direction. Recorded on the segment so the
+      // road generator bakes a parking lane into the collision envelope.
       const rawParkRight = hasParkingSide(way.tags, 'right');
       const rawParkLeft = hasParkingSide(way.tags, 'left');
-      const parkRight = isReverseOneWay ? rawParkLeft : rawParkRight;
-      const parkLeft = isReverseOneWay ? rawParkRight : rawParkLeft;
-      const roadWidth = laneCount * LANE_WIDTH_PX;
+      const parkingRight = isReverseOneWay ? rawParkLeft : rawParkRight;
+      const parkingLeft = isReverseOneWay ? rawParkRight : rawParkLeft;
 
       // Record any tagged marking nodes on this way, gathering their road
       // neighbours (prev/next) and one-way approach sides. Orientation and
@@ -499,13 +442,10 @@ export class Osm {
               nameAr,
               nameRu,
               maxspeedType,
+              parkingLeft: parkingLeft || undefined,
+              parkingRight: parkingRight || undefined,
             }),
           );
-
-          // Distribute parking bays along this segment when the way is tagged.
-          if (parkRight || parkLeft) {
-            emitParkingBays(p1, p2, roadWidth, parkRight, parkLeft, parkings);
-          }
         } else {
           // Log a warning if points referenced by a way were not found (e.g., filtered out or missing)
           console.warn(
@@ -575,7 +515,7 @@ export class Osm {
     }
 
     // Return the processed points, segments and node markings.
-    return { points, segments, lights, crossings, stops, yields, parkings };
+    return { points, segments, lights, crossings, stops, yields };
   }
 }
 

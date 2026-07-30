@@ -31,12 +31,13 @@ import {
   lerp2D,
   normalize,
   perpendicular,
+  angle,
   mulberry32,
 } from '../math/utils.js';
 import { drawEnvelope } from '../rendering/envelopeRenderer.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPolygon } from '../rendering/polygonRenderer.js';
-import { LANE_WIDTH_PX } from '../math/worldUnits.js';
+import { LANE_WIDTH_PX, PARKING_LANE_WIDTH_PX } from '../math/worldUnits.js';
 import { WorldSignageRenderer } from './worldSignageRenderer.js';
 import { sortEnvelopesByTier } from './roadTiers.js';
 import { getRoadFillColor } from '../math/roadTypes.js';
@@ -323,6 +324,9 @@ export class World implements IWorld {
       // Draw lane separators or direction arrows
       this.#drawLaneMarkings(ctx);
 
+      // Draw parking-lane 'P' markings (from segment metadata)
+      this.#drawParkingLanes(ctx);
+
       // Draw one-way arrows
       this.#signageRenderer.drawOneWayArrows(ctx, this.graph);
 
@@ -416,6 +420,50 @@ export class World implements IWorld {
         this.#drawMultiLaneDividers(ctx, seg, laneCount, roadWidth);
       } else {
         this.#drawSimpleLaneMarkings(ctx, seg, laneCount);
+      }
+    }
+  }
+
+  /**
+   * Draws spaced 'P' glyphs along each segment's parking lane(s). Parking is a
+   * per-segment property (`parkingLeft`/`parkingRight`) that widens the road
+   * envelope; the glyphs sit at the parking-lane centre
+   * (`drivingWidth/2 + PARKING_LANE_WIDTH_PX/2`) on the tagged side(s).
+   */
+  #drawParkingLanes(ctx: CanvasRenderingContext2D): void {
+    const bayLen = LANE_WIDTH_PX;
+    const spacing = bayLen * 1.5;
+    for (const seg of this.graph.segments) {
+      if (!seg.parkingRight && !seg.parkingLeft) continue;
+      const laneCount = seg.lanes ?? (seg.oneWay ? 1 : 2);
+      const drivingWidth = laneCount * LANE_WIDTH_PX;
+      const laneCenter = drivingWidth / 2 + PARKING_LANE_WIDTH_PX / 2;
+      const dir = seg.directionVector();
+      const perp = perpendicular(dir); // unit; +perp = right of p1→p2
+      const rot = angle(dir);
+      const segLen = seg.length();
+      if (segLen < bayLen) continue;
+      const n = Math.max(1, Math.floor(segLen / spacing));
+
+      const sides: number[] = [];
+      if (seg.parkingRight) sides.push(1);
+      if (seg.parkingLeft) sides.push(-1);
+
+      for (const side of sides) {
+        for (let i = 0; i < n; i++) {
+          const along = lerp2D(seg.p1, seg.p2, (i + 0.5) / n);
+          const center = add(along, scale(perp, laneCenter * side));
+          ctx.save();
+          ctx.translate(center.x, center.y);
+          ctx.rotate(rot);
+          ctx.beginPath();
+          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.font = 'bold ' + PARKING_LANE_WIDTH_PX * 0.8 + 'px Arial';
+          ctx.fillText('P', 0, 0);
+          ctx.restore();
+        }
       }
     }
   }

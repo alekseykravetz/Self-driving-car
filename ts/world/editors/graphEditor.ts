@@ -283,6 +283,8 @@ export class GraphEditor {
             ref: this.#brushState.ref || undefined,
             bridge: this.#brushState.bridge || undefined,
             laneMarkings: this.#brushState.laneMarkings ? undefined : false,
+            parkingLeft: this.#brushState.parkingLeft || undefined,
+            parkingRight: this.#brushState.parkingRight || undefined,
           }
         : undefined;
       this.#graph.tryAddSegment(

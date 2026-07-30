@@ -21,7 +21,6 @@ import { Light } from '../markings/light.js';
 import { Crossing } from '../markings/crossing.js';
 import { Stop } from '../markings/stop.js';
 import { Yield } from '../markings/yield.js';
-import { Parking } from '../markings/parking.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
@@ -379,6 +378,8 @@ export class WorldEditor {
           ref: segment.ref,
           bridge: segment.bridge,
           laneMarkings: segment.laneMarkings,
+          parkingLeft: segment.parkingLeft,
+          parkingRight: segment.parkingRight,
         });
       } else {
         this.#worldEditorPanel.showSegmentMetadata(null);
@@ -435,6 +436,8 @@ export class WorldEditor {
     seg.ref = meta.ref || undefined;
     seg.bridge = meta.bridge ? true : undefined;
     seg.laneMarkings = meta.laneMarkings === false ? false : undefined;
+    seg.parkingLeft = meta.parkingLeft ? true : undefined;
+    seg.parkingRight = meta.parkingRight ? true : undefined;
   }
 
   /* Disables all editor tools and resets button styles. */
@@ -535,9 +538,7 @@ export class WorldEditor {
       // Mutate the array in place: the world's TrafficManager holds this exact
       // reference and re-reads it to build control centers.
       this.#world.markings.length = 0;
-      const addMarking = (
-        m: Light | Crossing | Stop | Yield | Parking,
-      ): void => {
+      const addMarking = (m: Light | Crossing | Stop | Yield): void => {
         m.setAnchor(this.#world.graph);
         this.#world.markings.push(m);
       };
@@ -564,18 +565,9 @@ export class WorldEditor {
           new Yield(y.center, y.directionVector, y.width, y.height ?? y.width),
         );
       }
-      // On-street parking (`parking:*` way-side attribute) distributed along
-      // the curb as a row of Parking bays.
-      for (const p of result.parkings) {
-        addMarking(
-          new Parking(
-            p.center,
-            p.directionVector,
-            p.width,
-            p.height ?? p.width,
-          ),
-        );
-      }
+      // Note: on-street parking (`parking:*`) is imported as segment metadata
+      // (`parkingLeft`/`parkingRight`) and baked into the road envelope during
+      // generation — not as standalone markings. See WorldGenerator/World.
 
       // Center viewport on the imported data
       const pts = result.points;

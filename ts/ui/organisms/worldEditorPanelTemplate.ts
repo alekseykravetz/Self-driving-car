@@ -90,6 +90,12 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
         <label class="checkbox-label">
           <input type="checkbox" id="wepLaneMarkings" checked> Lane markings
         </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="wepParkingLeft"> Parking (left)
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="wepParkingRight"> Parking (right)
+        </label>
       </div>
     </div>
 

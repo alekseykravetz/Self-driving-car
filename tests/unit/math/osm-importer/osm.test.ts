@@ -556,8 +556,12 @@ describe('Osm', () => {
   });
 
   describe('on-street parking (parking:* way attribute)', () => {
-    // A single long road; parking tags are read from the way.
-    const parkingRoad = (tags: Record<string, string>): OsmData => ({
+    // A single road; parking tags are read from the way and recorded on the
+    // segment metadata (parkingLeft / parkingRight), NOT emitted as markings.
+    const parkingRoad = (
+      tags: Record<string, string>,
+      extraWayTags: Record<string, string> = {},
+    ): OsmData => ({
       elements: [
         { type: 'node', id: 1, lat: 48.856, lon: 2.351 },
         { type: 'node', id: 2, lat: 48.862, lon: 2.358 },
@@ -565,85 +569,67 @@ describe('Osm', () => {
           type: 'way',
           id: 101,
           nodes: [1, 2],
-          tags: { highway: 'residential', ...tags },
+          tags: { highway: 'residential', ...extraWayTags, ...tags },
         },
       ],
     });
 
-    /** Signed perpendicular distance of a point from the p1->p2 line. */
-    const lateralOffset = (
-      center: { x: number; y: number },
-      p1: { x: number; y: number },
-      p2: { x: number; y: number },
-    ): number => {
-      const dx = p2.x - p1.x;
-      const dy = p2.y - p1.y;
-      const len = Math.hypot(dx, dy);
-      const nx = -dy / len; // perpendicular unit x
-      const ny = dx / len; // perpendicular unit y
-      return (center.x - p1.x) * nx + (center.y - p1.y) * ny;
-    };
-
-    it('no parking tags yields no parking placements', () => {
-      const result = Osm.parseRoads(parkingRoad({}));
-      expect(result.parkings).toEqual([]);
+    it('no parking tags leaves both flags undefined', () => {
+      const seg = Osm.parseRoads(parkingRoad({})).segments[0];
+      expect(seg.parkingLeft).toBeUndefined();
+      expect(seg.parkingRight).toBeUndefined();
     });
 
-    it('parking:right:zone produces placements offset to one side', () => {
-      const result = Osm.parseRoads(
-        parkingRoad({ 'parking:right:zone': '10' }),
-      );
-      expect(result.parkings.length).toBeGreaterThan(0);
-      const p1 = result.points[0];
-      const p2 = result.points[1];
-      const signs = result.parkings.map((pk) =>
-        Math.sign(lateralOffset(pk.center, p1, p2)),
-      );
-      // All bays on the same (positive/right) side.
-      expect(signs.every((s) => s === signs[0])).toBe(true);
-      expect(signs[0]).not.toBe(0);
+    it('parking:right:zone sets parkingRight only', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:right:zone': '10' }))
+        .segments[0];
+      expect(seg.parkingRight).toBe(true);
+      expect(seg.parkingLeft).toBeFalsy();
     });
 
-    it('parking:both places bays on both sides, roughly balanced', () => {
-      const result = Osm.parseRoads(parkingRoad({ 'parking:both': 'yes' }));
-      const p1 = result.points[0];
-      const p2 = result.points[1];
-      const rights = result.parkings.filter(
-        (pk) => lateralOffset(pk.center, p1, p2) > 0,
-      ).length;
-      const lefts = result.parkings.filter(
-        (pk) => lateralOffset(pk.center, p1, p2) < 0,
-      ).length;
-      expect(rights).toBeGreaterThan(0);
-      expect(lefts).toBeGreaterThan(0);
-      expect(rights).toBe(lefts);
+    it('parking:left sets parkingLeft only', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:left': 'yes' }))
+        .segments[0];
+      expect(seg.parkingLeft).toBe(true);
+      expect(seg.parkingRight).toBeFalsy();
     });
 
-    it('parking:right=no yields no placements for that side', () => {
-      const result = Osm.parseRoads(parkingRoad({ 'parking:right': 'no' }));
-      expect(result.parkings).toEqual([]);
+    it('parking:both sets both flags', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:both': 'yes' }))
+        .segments[0];
+      expect(seg.parkingLeft).toBe(true);
+      expect(seg.parkingRight).toBe(true);
+    });
+
+    it('parking:right=no leaves flags unset', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:right': 'no' }))
+        .segments[0];
+      expect(seg.parkingRight).toBeFalsy();
+      expect(seg.parkingLeft).toBeFalsy();
     });
 
     it('legacy parking:lane:left is honoured', () => {
-      const result = Osm.parseRoads(
+      const seg = Osm.parseRoads(
         parkingRoad({ 'parking:lane:left': 'parallel' }),
-      );
-      expect(result.parkings.length).toBeGreaterThan(0);
+      ).segments[0];
+      expect(seg.parkingLeft).toBe(true);
     });
 
-    it('placement directionVector is parallel to the segment', () => {
-      const result = Osm.parseRoads(parkingRoad({ 'parking:right': 'yes' }));
-      const p1 = result.points[0];
-      const p2 = result.points[1];
-      const segLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-      const ux = (p2.x - p1.x) / segLen;
-      const uy = (p2.y - p1.y) / segLen;
-      for (const pk of result.parkings) {
-        const dv = pk.directionVector;
-        const dvLen = Math.hypot(dv.x, dv.y);
-        const dotAbs = Math.abs((dv.x / dvLen) * ux + (dv.y / dvLen) * uy);
-        expect(dotAbs).toBeCloseTo(1, 5);
-      }
+    it('reverse one-way swaps parking sides', () => {
+      // oneway=-1 swaps p1/p2 per segment, so the stored "right" is the way's
+      // original left. A right-tagged reverse one-way ends up parkingLeft.
+      const seg = Osm.parseRoads(
+        parkingRoad({ 'parking:right': 'yes' }, { oneway: '-1' }),
+      ).segments[0];
+      expect(seg.parkingLeft).toBe(true);
+      expect(seg.parkingRight).toBeFalsy();
+    });
+
+    it('no Parking markings are produced (parking is metadata)', () => {
+      const result = Osm.parseRoads(parkingRoad({ 'parking:both': 'yes' }));
+      expect('parkings' in (result as unknown as Record<string, unknown>)).toBe(
+        false,
+      );
     });
   });
 });

@@ -24,6 +24,8 @@ export interface BrushState {
   ref: string;
   bridge: boolean;
   laneMarkings: boolean;
+  parkingLeft: boolean;
+  parkingRight: boolean;
 }
 
 export interface SegmentMetadata {
@@ -40,6 +42,8 @@ export interface SegmentMetadata {
   ref: string | undefined;
   bridge: boolean | undefined;
   laneMarkings: boolean | undefined;
+  parkingLeft?: boolean | undefined;
+  parkingRight?: boolean | undefined;
 }
 
 export class WorldEditorPanelElement extends HTMLElement {
@@ -57,6 +61,8 @@ export class WorldEditorPanelElement extends HTMLElement {
     ref: '',
     bridge: false,
     laneMarkings: true,
+    parkingLeft: false,
+    parkingRight: false,
   };
 
   #onBrushChange: ((state: BrushState) => void) | null = null;
@@ -87,6 +93,8 @@ export class WorldEditorPanelElement extends HTMLElement {
   #refInput: HTMLInputElement | null = null;
   #bridgeCheck: HTMLInputElement | null = null;
   #laneMarkingsCheck: HTMLInputElement | null = null;
+  #parkingLeftCheck: HTMLInputElement | null = null;
+  #parkingRightCheck: HTMLInputElement | null = null;
   #keyO: HTMLElement | null = null;
   #keyH: HTMLElement | null = null;
   #keyT: HTMLElement | null = null;
@@ -121,6 +129,8 @@ export class WorldEditorPanelElement extends HTMLElement {
     this.#refInput = this.querySelector('#wepRef');
     this.#bridgeCheck = this.querySelector('#wepBridge');
     this.#laneMarkingsCheck = this.querySelector('#wepLaneMarkings');
+    this.#parkingLeftCheck = this.querySelector('#wepParkingLeft');
+    this.#parkingRightCheck = this.querySelector('#wepParkingRight');
     this.#keyO = this.querySelector('#wepKeyO');
     this.#keyH = this.querySelector('#wepKeyH');
     this.#keyT = this.querySelector('#wepKeyT');
@@ -212,6 +222,16 @@ export class WorldEditorPanelElement extends HTMLElement {
 
     this.#laneMarkingsCheck?.addEventListener('change', () => {
       this.#brushState.laneMarkings = this.#laneMarkingsCheck!.checked;
+      this.#notifyBrushChange();
+    });
+
+    this.#parkingLeftCheck?.addEventListener('change', () => {
+      this.#brushState.parkingLeft = this.#parkingLeftCheck!.checked;
+      this.#notifyBrushChange();
+    });
+
+    this.#parkingRightCheck?.addEventListener('change', () => {
+      this.#brushState.parkingRight = this.#parkingRightCheck!.checked;
       this.#notifyBrushChange();
     });
 
@@ -348,6 +368,10 @@ export class WorldEditorPanelElement extends HTMLElement {
     if (this.#bridgeCheck) this.#bridgeCheck.checked = this.#brushState.bridge;
     if (this.#laneMarkingsCheck)
       this.#laneMarkingsCheck.checked = this.#brushState.laneMarkings;
+    if (this.#parkingLeftCheck)
+      this.#parkingLeftCheck.checked = this.#brushState.parkingLeft;
+    if (this.#parkingRightCheck)
+      this.#parkingRightCheck.checked = this.#brushState.parkingRight;
   }
 
   #notifyBrushChange(): void {
@@ -366,6 +390,8 @@ export class WorldEditorPanelElement extends HTMLElement {
         ref: this.#brushState.ref || undefined,
         bridge: this.#brushState.bridge,
         laneMarkings: this.#brushState.laneMarkings,
+        parkingLeft: this.#brushState.parkingLeft,
+        parkingRight: this.#brushState.parkingRight,
       });
     } else {
       this.#onBrushChange?.(this.#brushState);
@@ -445,6 +471,8 @@ export class WorldEditorPanelElement extends HTMLElement {
       ref: meta.ref ?? '',
       bridge: meta.bridge ?? false,
       laneMarkings: meta.laneMarkings !== false,
+      parkingLeft: meta.parkingLeft ?? false,
+      parkingRight: meta.parkingRight ?? false,
     };
     if (this.#roadTypeSelect)
       this.#roadTypeSelect.value = meta.highwayType ?? '';
@@ -466,6 +494,10 @@ export class WorldEditorPanelElement extends HTMLElement {
     if (this.#bridgeCheck) this.#bridgeCheck.checked = meta.bridge ?? false;
     if (this.#laneMarkingsCheck)
       this.#laneMarkingsCheck.checked = meta.laneMarkings !== false;
+    if (this.#parkingLeftCheck)
+      this.#parkingLeftCheck.checked = meta.parkingLeft ?? false;
+    if (this.#parkingRightCheck)
+      this.#parkingRightCheck.checked = meta.parkingRight ?? false;
   }
 
   setOnMetadataChange(cb: (meta: Partial<SegmentMetadata>) => void): void {
@@ -492,6 +524,8 @@ export class WorldEditorPanelElement extends HTMLElement {
       ref: '',
       bridge: false,
       laneMarkings: true,
+      parkingLeft: false,
+      parkingRight: false,
     };
     if (this.#roadTypeSelect) this.#roadTypeSelect.value = '';
     if (this.#autoSetHint) this.#autoSetHint.textContent = 'Auto-set: —';

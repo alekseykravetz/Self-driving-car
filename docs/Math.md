@@ -703,7 +703,6 @@ class Osm {
     crossings: OsmMarkingPlacement[]; // highway=crossing (zebra)
     stops: OsmMarkingPlacement[]; // highway=stop
     yields: OsmMarkingPlacement[]; // highway=give_way
-    parkings: OsmMarkingPlacement[]; // parking:* way-side attribute
   };
 }
 ```
@@ -753,7 +752,7 @@ class Osm {
        service/living_street/track → 1, unknown → oneWay ? 1 : 2
      Store metadata on Segment (highwayType, name, lanes, surface, maxSpeed,
        ref, destination, destinationRef, bridge, layer, laneMarkings,
-       roundabout, nameEn, maxspeedType)
+       roundabout, nameEn, maxspeedType, parkingLeft, parkingRight)
 
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)
@@ -779,15 +778,15 @@ class Osm {
      approachFacingDir: direction tag → single one-way approach neighbour →
      two-way faces away from the junction (highest-degree neighbour) →
      throughAxis fallback; width = half road.
-   PARKING (parking:* WAY-side attribute, NOT a node) — hasParkingSide() reads
-     parking:right*/parking:left*/parking:both* (and legacy parking:lane:*) on
-     each way (value no/none = absent). Qualifying segments emit a ROW of bays
-     distributed along the segment (emitParkingBays), each laterally offset to
-     the curb (roadWidth/2 + bayWidth/2) on the tagged side(s): +perpendicular
-     = right of p1→p2, − = left (reverse one-ways swap the sides). Bay size =
-     PARKING_BAY_LEN_PX × PARKING_BAY_WIDTH_PX (LANE_WIDTH_PX × LANE_WIDTH_PX/2),
-     directionVector = segment direction.
-   → returns lights / crossings / stops / yields / parkings; the editor builds
+   PARKING (parking:* WAY-side attribute, NOT a node, NOT a marking) —
+     hasParkingSide() reads parking:right*/parking:left*/parking:both* (and
+     legacy parking:lane:*) on each way (value no/none = absent) and records
+     parkingLeft/parkingRight on the SEGMENT metadata (reverse one-ways swap the
+     sides). During road generation these flags widen the collision/asphalt
+     envelope (see getSegmentEnvelopeGeometry + Envelope lateralOffset) so the
+     road border sits AFTER the parking lane; the "P" glyphs are drawn from the
+     metadata by World.#drawParkingLanes. No parking markings are emitted.
+   → returns lights / crossings / stops / yields; the editor builds
      the markings
 ```
 

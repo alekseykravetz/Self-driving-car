@@ -27,7 +27,7 @@ import {
   normalize,
   mulberry32,
 } from '../../math/utils.js';
-import { LANE_WIDTH_PX } from '../../math/worldUnits.js';
+import { LANE_WIDTH_PX, PARKING_LANE_WIDTH_PX } from '../../math/worldUnits.js';
 
 export interface WorldGeneratable {
   graph: Graph;
@@ -53,6 +53,28 @@ export interface WorldGeneratable {
 /** Compute road width for a segment based on its lane count. */
 function getSegmentRoadWidth(segment: Segment): number {
   return (segment.lanes ?? 2) * LANE_WIDTH_PX;
+}
+
+/**
+ * Collision/asphalt envelope geometry for a segment, accounting for parking
+ * lanes. Parking on a side adds one `PARKING_LANE_WIDTH_PX` to that side. Since
+ * the envelope band is symmetric, one-sided parking is represented by widening
+ * the band AND shifting it toward the parking side (`lateralOffset`), so the
+ * driving lanes stay put and the collision border sits past the parking lane.
+ *   - both sides  → width += 2P, offset 0
+ *   - right only  → width += P,  offset +P/2 (perpendicular = right of p1→p2)
+ *   - left only   → width += P,  offset −P/2
+ */
+function getSegmentEnvelopeGeometry(segment: Segment): {
+  width: number;
+  offset: number;
+} {
+  const driving = getSegmentRoadWidth(segment);
+  const right = segment.parkingRight ? 1 : 0;
+  const left = segment.parkingLeft ? 1 : 0;
+  const width = driving + (right + left) * PARKING_LANE_WIDTH_PX;
+  const offset = ((right - left) * PARKING_LANE_WIDTH_PX) / 2;
+  return { width, offset };
 }
 
 /** Per-lane guidance lines for marking placement.
@@ -125,7 +147,7 @@ function wgGenerateSeparatorBorders(graph: Graph): Segment[] {
 function wgGenerateBuildings(world: WorldGeneratable): Building[] {
   const tempEnvelopes: Envelope[] = [];
   for (const seg of world.graph.segments) {
-    const segWidth = getSegmentRoadWidth(seg);
+    const segWidth = getSegmentEnvelopeGeometry(seg).width;
     tempEnvelopes.push(
       new Envelope(
         seg,
@@ -409,12 +431,9 @@ export class WorldGenerator {
     world.separatorBorders.length = 0;
 
     for (const segment of world.graph.segments) {
+      const { width, offset } = getSegmentEnvelopeGeometry(segment);
       world.envelopes.push(
-        new Envelope(
-          segment,
-          getSegmentRoadWidth(segment),
-          world.roadRoundness,
-        ),
+        new Envelope(segment, width, world.roadRoundness, undefined, offset),
       );
     }
 
