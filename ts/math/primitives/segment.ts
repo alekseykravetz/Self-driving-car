@@ -31,6 +31,8 @@ export class Segment {
   nameAr?: string;
   nameRu?: string;
   maxspeedType?: string;
+  parkingLeft?: boolean;
+  parkingRight?: boolean;
 
   constructor(
     p1: Point,
@@ -55,6 +57,8 @@ export class Segment {
       nameAr?: string;
       nameRu?: string;
       maxspeedType?: string;
+      parkingLeft?: boolean;
+      parkingRight?: boolean;
     },
   ) {
     this.p1 = p1;
@@ -79,6 +83,8 @@ export class Segment {
       this.nameAr = metadata.nameAr;
       this.nameRu = metadata.nameRu;
       this.maxspeedType = metadata.maxspeedType;
+      this.parkingLeft = metadata.parkingLeft;
+      this.parkingRight = metadata.parkingRight;
     }
   }
 

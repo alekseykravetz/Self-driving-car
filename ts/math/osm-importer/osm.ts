@@ -125,6 +125,34 @@ interface ParsedRoads {
   yields: OsmMarkingPlacement[]; // highway=give_way
 }
 
+/**
+ * True when a way has parking on `side` (`'right'` | `'left'`). OSM marks
+ * parking as a way-side attribute under the modern `parking:right*` /
+ * `parking:left*` / `parking:both*` scheme (and the legacy `parking:lane:*`).
+ * Any such key means that side has parking unless its value is `no`/`none`.
+ * Parking is recorded on the segment metadata (`parkingLeft`/`parkingRight`)
+ * and baked into the road envelope during generation — NOT emitted as markings.
+ */
+function hasParkingSide(
+  tags: Record<string, string>,
+  side: 'right' | 'left',
+): boolean {
+  for (const key of Object.keys(tags)) {
+    if (!key.startsWith('parking:')) continue;
+    // Legacy `parking:lane:right` / modern `parking:right:zone` etc.
+    const isSide =
+      key.startsWith(`parking:${side}`) ||
+      key.startsWith('parking:both') ||
+      key === `parking:lane:${side}` ||
+      key === 'parking:lane:both';
+    if (!isSide) continue;
+    const value = String(tags[key] ?? '').toLowerCase();
+    if (value === 'no' || value === 'none') continue;
+    return true;
+  }
+  return false;
+}
+
 // --- Converted Osm Object ---
 
 type OsmPoint = Point & {
@@ -302,6 +330,15 @@ export class Osm {
           ? lanesParsed
           : defaultLaneCount(highwayType, isOneWay);
 
+      // On-street parking side flags (way-level attribute). Relative to the
+      // way's node order; reverse one-ways swap the sides so "right" stays the
+      // right of the segment's stored direction. Recorded on the segment so the
+      // road generator bakes a parking lane into the collision envelope.
+      const rawParkRight = hasParkingSide(way.tags, 'right');
+      const rawParkLeft = hasParkingSide(way.tags, 'left');
+      const parkingRight = isReverseOneWay ? rawParkLeft : rawParkRight;
+      const parkingLeft = isReverseOneWay ? rawParkRight : rawParkLeft;
+
       // Record any tagged marking nodes on this way, gathering their road
       // neighbours (prev/next) and one-way approach sides. Orientation and
       // placement are resolved after all ways are processed.
@@ -405,6 +442,8 @@ export class Osm {
               nameAr,
               nameRu,
               maxspeedType,
+              parkingLeft: parkingLeft || undefined,
+              parkingRight: parkingRight || undefined,
             }),
           );
         } else {
@@ -445,13 +484,16 @@ export class Osm {
       }
 
       if (kind === 'stop' || kind === 'yield') {
-        // Directional: face the approaching driver (like the editor's lane
-        // guide). Drawn at the node so the stop line sits where OSM placed it.
+        // Directional: the painted text must read for the approaching driver.
+        // `approachFacingDir` points UPSTREAM (toward oncoming traffic); the
+        // marking `draw()` (shared with the manual editor) expects the lane-
+        // guide convention, which is the OPPOSITE orientation, so negate it to
+        // match how a lane-placed Stop/Yield renders.
         const facing = approachFacingDir(entry);
         if (!facing) continue;
         const placement: OsmMarkingPlacement = {
           center,
-          directionVector: facing,
+          directionVector: new Point(-facing.x, -facing.y),
           width: roadWidth / 2,
           height: roadWidth / 2,
         };

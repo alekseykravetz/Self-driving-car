@@ -41,3 +41,10 @@ export function formatElapsedTime(frames: number): string {
 
 /** Pixels per lane for road width calculation in OSM import. */
 export const LANE_WIDTH_PX = 50;
+
+/**
+ * Width of a curb-side parking lane (world px), ≈ half a driving lane. A
+ * segment tagged with parking gets its road envelope widened by this amount on
+ * each parking side so the collision border sits AFTER the parking lane.
+ */
+export const PARKING_LANE_WIDTH_PX = LANE_WIDTH_PX / 2;

@@ -380,6 +380,8 @@ stores **per-way metadata** on each `Segment`:
 | `bridge`          | `bridge`         | `yes` → bridge rendering: drop shadow, concrete deck overlay, parapet railings, guardrail posts, and expansion joints |
 | `layer`           | `layer`          | Elevation layer (parsed to int)                                                                                       |
 | `lane_markings`   | `laneMarkings`   | `no` → skips lane markings on that segment                                                                            |
+| `parking:left*`   | `parkingLeft`    | Left-side parking → widens the road envelope on the left (border after the parking lane)                              |
+| `parking:right*`  | `parkingRight`   | Right-side parking → widens the road envelope on the right (border after the parking lane)                            |
 
 ### Lane count defaults
 
@@ -451,6 +453,7 @@ the highway ways, no extra query is needed.
 | `highway=crossing`        | `Crossing`  | Zebra across the road, at the node |
 | `highway=stop`            | `Stop`      | Line across the road, at the node  |
 | `highway=give_way`        | `Yield`     | Line across the road, at the node  |
+| `parking:*` (way tag)     | _(none)_    | Segment property → widens envelope |
 
 `Osm.parseRoads()` returns four `OsmMarkingPlacement[]` arrays (`lights`,
 `crossings`, `stops`, `yields`; each `{ center, directionVector, width, height? }`
@@ -464,16 +467,38 @@ centers). `markingLoader` already handles all four types for save/load.
 the road at the node (via `throughAxis`, the two most-opposite neighbours) and
 drawn there — width = full road (`lanes * LANE_WIDTH_PX`).
 
+**Parking** differs from the four node markings above: OSM tags parking as a
+**way-side attribute** (`parking:right*` / `parking:left*` / `parking:both*`,
+and the legacy `parking:lane:*`), not a discrete node, and it is a **road
+geometry property, not a marking**. `hasParkingSide()` detects the tagged
+side(s) per way (a value of `no`/`none` counts as absent) and records
+`parkingLeft` / `parkingRight` on the `Segment` metadata (reverse one-ways swap
+the sides). During road generation, `getSegmentEnvelopeGeometry()` widens the
+collision/asphalt envelope by one `PARKING_LANE_WIDTH_PX` per parking side and
+shifts it (via the `Envelope` `lateralOffset`) toward that side, so the road
+border sits **after** the parking lane — a training car can pull into the
+parking without the sensor crashing on a border. The driving lane guides are
+unchanged (they still use `segment.lanes`), and the white "P" glyphs are drawn
+along the parking-lane centre by `World.#drawParkingLanes()`. This is a separate
+path from the manual `ParkingEditor` (which places one `roadWidth/2` square
+`Parking` marking on a lane guide and does NOT widen the envelope). The panel's
+**Parking (left)** / **Parking (right)** checkboxes stamp the same flags onto
+hand-drawn segments.
+
 **Stops / give-ways** are DIRECTIONAL painted markings — the "STOP" / "YIELD"
-text must read for the approaching driver, so their `directionVector` must point
-back toward oncoming traffic (the same convention as a lane guide in the
-editor). `approachFacingDir()` resolves it in priority order: (1) the node's
+text must read for the approaching driver. `approachFacingDir()` resolves the
+upstream (oncoming-traffic) direction in priority order: (1) the node's
 `direction` tag; (2) the single one-way approach neighbour (the upstream side);
 (3) on a two-way road, face **away from the junction** — the driver approaches
 the more-connected node, so the sign faces the neighbour most opposite to the
 highest-`degree` one (`degree` = how many way-endpoints reference the node); (4)
 `throughAxis` fallback when there is no junction cue (e.g. mid-block), whose sign
-is arbitrary. Width = half the road.
+is arbitrary. The placement then **negates** this vector so the emitted
+`directionVector` matches the lane-guide convention that `Stop`/`Yield` `draw()`
+expects — a manually placed marking passes the lane guide's `directionVector()`
+directly (the opposite orientation to `approachFacingDir`), so the negation
+makes an OSM-imported sign render identically to a hand-placed one. Width = half
+the road.
 
 **Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
 each on its **approach arm, centred on the road, at the stop line** — matching
@@ -1076,7 +1101,8 @@ panels:
   language via `setSignageLanguage()` and triggers a redraw), **Properties**
   (lanes, one-way, hard-separation, name, a collapsible **Localized names**
   sub-block with `name:en` / `name:he` / `name:ar` / `name:ru` inputs, max speed,
-  ref, bridge, lane markings), and **Path Tools** (the `O` / `H` /
+  ref, bridge, lane markings, **Parking (left)** / **Parking (right)**), and
+  **Path Tools** (the `O` / `H` /
   `T` toggle key indicators). **All three sections are expanded by default**;
   clicking a section header collapses/expands it. The **Max Speed** field has a
   clear (✕) button that unsets the value back to "no limit" (`undefined`).

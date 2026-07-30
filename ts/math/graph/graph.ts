@@ -46,6 +46,8 @@ export class Graph {
       segments[idx].nameAr = s.nameAr;
       segments[idx].nameRu = s.nameRu;
       segments[idx].maxspeedType = s.maxspeedType;
+      segments[idx].parkingLeft = s.parkingLeft;
+      segments[idx].parkingRight = s.parkingRight;
     });
     return new Graph(points, segments);
   }
@@ -82,7 +84,9 @@ export class Graph {
         (s.bridge ? 64 : 0) |
         ((s.layer ?? 0) << 7) |
         (s.laneMarkings === false ? 4096 : 0) |
-        (s.roundabout ? 8192 : 0);
+        (s.roundabout ? 8192 : 0) |
+        (s.parkingLeft ? 16384 : 0) |
+        (s.parkingRight ? 32768 : 0);
       mix(hFlags);
       // Metadata: maxSpeed scaled to preserve one decimal; name folded per
       // char with a trailing 0 separating named/unnamed and delimiting names.

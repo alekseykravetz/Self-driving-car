@@ -1,7 +1,13 @@
 import { Point } from './point.js';
 import { Segment } from './segment.js';
 import { Polygon } from './polygon.js';
-import { angle, subtract, translate } from '../utils.js';
+import {
+  angle,
+  subtract,
+  translate,
+  perpendicular,
+  normalize,
+} from '../utils.js';
 
 export class Envelope {
   #skeleton: Segment;
@@ -16,12 +22,13 @@ export class Envelope {
     width: number = 10,
     roundness: number = 1,
     generatedPolygon?: Polygon,
+    lateralOffset: number = 0,
   ) {
     this.#skeleton = skeleton;
     if (generatedPolygon) {
       this.polygon = generatedPolygon;
     } else {
-      this.polygon = this.#generatePolygon(width, roundness);
+      this.polygon = this.#generatePolygon(width, roundness, lateralOffset);
     }
   }
 
@@ -33,8 +40,29 @@ export class Envelope {
     return env;
   }
 
-  #generatePolygon(width: number, roundness: number): Polygon {
-    const { p1, p2 } = this.#skeleton!;
+  #generatePolygon(
+    width: number,
+    roundness: number,
+    lateralOffset: number,
+  ): Polygon {
+    let { p1, p2 } = this.#skeleton!;
+    // Shift the generated band perpendicular to the skeleton without moving the
+    // skeleton itself (renderer reads metadata off env.skeleton). Used to bake a
+    // one-sided parking lane into the road envelope.
+    if (lateralOffset !== 0) {
+      const dir = subtract(p2, p1);
+      if (dir.x !== 0 || dir.y !== 0) {
+        const perp = perpendicular(normalize(dir));
+        p1 = new Point(
+          p1.x + perp.x * lateralOffset,
+          p1.y + perp.y * lateralOffset,
+        );
+        p2 = new Point(
+          p2.x + perp.x * lateralOffset,
+          p2.y + perp.y * lateralOffset,
+        );
+      }
+    }
     const radius = width / 2;
     const alpha = angle(subtract(p1, p2));
     const alpha_cw = alpha + Math.PI / 2;

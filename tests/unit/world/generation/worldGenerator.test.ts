@@ -38,6 +38,31 @@ function createWorldWithRoad(): WorldGeneratable {
   return world;
 }
 
+/** Horizontal 2-lane road (0,0)->(200,0) with optional parking metadata. */
+function createWorldWithParking(meta: {
+  parkingLeft?: boolean;
+  parkingRight?: boolean;
+}): WorldGeneratable {
+  const world = createEmptyWorld();
+  const p1 = new Point(0, 0);
+  const p2 = new Point(200, 0);
+  world.graph.addPoint(p1);
+  world.graph.addPoint(p2);
+  world.graph.tryAddSegment(
+    new Segment(p1, p2, false, false, { lanes: 2, ...meta }),
+  );
+  return world;
+}
+
+/** Signed perpendicular (y) extent of the first envelope polygon. */
+function envelopeYExtent(world: WorldGeneratable): {
+  minY: number;
+  maxY: number;
+} {
+  const ys = world.envelopes[0].polygon.points.map((p) => p.y);
+  return { minY: Math.min(...ys), maxY: Math.max(...ys) };
+}
+
 describe('WorldGenerator', () => {
   it('generateRoads creates envelopes and road borders from graph', () => {
     const world = createWorldWithRoad();
@@ -54,6 +79,53 @@ describe('WorldGenerator', () => {
     WorldGenerator.generateRoads(world);
 
     expect(world.laneGuides.length).toBeGreaterThan(0);
+  });
+
+  describe('parking lane widening', () => {
+    // 2-lane road: driving half-width = 2*50/2 = 50; parking lane = 25.
+    // perpendicular of (0,0)->(200,0) is (0,1) → +y is the RIGHT side.
+    it('no parking → symmetric band [-50, 50]', () => {
+      const world = createWorldWithParking({});
+      WorldGenerator.generateRoads(world);
+      const { minY, maxY } = envelopeYExtent(world);
+      expect(minY).toBeCloseTo(-50, 5);
+      expect(maxY).toBeCloseTo(50, 5);
+    });
+
+    it('parkingRight extends the right (+y) border by 25, left unchanged', () => {
+      const world = createWorldWithParking({ parkingRight: true });
+      WorldGenerator.generateRoads(world);
+      const { minY, maxY } = envelopeYExtent(world);
+      expect(minY).toBeCloseTo(-50, 5);
+      expect(maxY).toBeCloseTo(75, 5);
+    });
+
+    it('parkingLeft extends the left (-y) border by 25, right unchanged', () => {
+      const world = createWorldWithParking({ parkingLeft: true });
+      WorldGenerator.generateRoads(world);
+      const { minY, maxY } = envelopeYExtent(world);
+      expect(minY).toBeCloseTo(-75, 5);
+      expect(maxY).toBeCloseTo(50, 5);
+    });
+
+    it('parking on both sides widens symmetrically to [-75, 75]', () => {
+      const world = createWorldWithParking({
+        parkingLeft: true,
+        parkingRight: true,
+      });
+      WorldGenerator.generateRoads(world);
+      const { minY, maxY } = envelopeYExtent(world);
+      expect(minY).toBeCloseTo(-75, 5);
+      expect(maxY).toBeCloseTo(75, 5);
+    });
+
+    it('parking flags do not change the lane-guide count', () => {
+      const plain = createWorldWithParking({});
+      const parked = createWorldWithParking({ parkingRight: true });
+      WorldGenerator.generateRoads(plain);
+      WorldGenerator.generateRoads(parked);
+      expect(parked.laneGuides.length).toBe(plain.laneGuides.length);
+    });
   });
 
   it('generateRoads clears previous data before regenerating', () => {

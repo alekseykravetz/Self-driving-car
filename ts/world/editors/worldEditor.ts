@@ -378,6 +378,8 @@ export class WorldEditor {
           ref: segment.ref,
           bridge: segment.bridge,
           laneMarkings: segment.laneMarkings,
+          parkingLeft: segment.parkingLeft,
+          parkingRight: segment.parkingRight,
         });
       } else {
         this.#worldEditorPanel.showSegmentMetadata(null);
@@ -434,6 +436,8 @@ export class WorldEditor {
     seg.ref = meta.ref || undefined;
     seg.bridge = meta.bridge ? true : undefined;
     seg.laneMarkings = meta.laneMarkings === false ? false : undefined;
+    seg.parkingLeft = meta.parkingLeft ? true : undefined;
+    seg.parkingRight = meta.parkingRight ? true : undefined;
   }
 
   /* Disables all editor tools and resets button styles. */
@@ -561,6 +565,9 @@ export class WorldEditor {
           new Yield(y.center, y.directionVector, y.width, y.height ?? y.width),
         );
       }
+      // Note: on-street parking (`parking:*`) is imported as segment metadata
+      // (`parkingLeft`/`parkingRight`) and baked into the road envelope during
+      // generation — not as standalone markings. See WorldGenerator/World.
 
       // Center viewport on the imported data
       const pts = result.points;

@@ -490,8 +490,10 @@ describe('Osm', () => {
   describe('directional marking orientation (direction tag)', () => {
     // Straight two-way road of three collinear nodes; the middle node carries
     // the marking. `direction=forward` means traffic travels in node order
-    // (approaching from the previous node), so the sign faces upstream (prev).
-    // `direction=backward` faces the next node.
+    // (approaching from the previous node). The emitted `directionVector`
+    // follows the lane-guide convention used by the marking `draw()` (opposite
+    // to `approachFacingDir`), so a forward marking points toward the NEXT
+    // (downstream) node; `direction=backward` points toward the previous node.
     const roadWithMarking = (
       highway: 'stop' | 'give_way',
       direction?: string,
@@ -515,18 +517,8 @@ describe('Osm', () => {
       ],
     });
 
-    it('stop with direction=forward faces the previous (upstream) node', () => {
+    it('stop with direction=forward points toward the next (downstream) node', () => {
       const result = Osm.parseRoads(roadWithMarking('stop', 'forward'));
-      expect(result.stops.length).toBe(1);
-      const center = result.points[1];
-      const prev = result.points[0];
-      const dv = result.stops[0].directionVector;
-      expect(Math.sign(dv.x)).toBe(Math.sign(prev.x - center.x));
-      expect(Math.sign(dv.y)).toBe(Math.sign(prev.y - center.y));
-    });
-
-    it('stop with direction=backward faces the next (upstream) node', () => {
-      const result = Osm.parseRoads(roadWithMarking('stop', 'backward'));
       expect(result.stops.length).toBe(1);
       const center = result.points[1];
       const next = result.points[2];
@@ -535,14 +527,24 @@ describe('Osm', () => {
       expect(Math.sign(dv.y)).toBe(Math.sign(next.y - center.y));
     });
 
-    it('give_way honours direction=forward (faces previous node)', () => {
+    it('stop with direction=backward points toward the previous node', () => {
+      const result = Osm.parseRoads(roadWithMarking('stop', 'backward'));
+      expect(result.stops.length).toBe(1);
+      const center = result.points[1];
+      const prev = result.points[0];
+      const dv = result.stops[0].directionVector;
+      expect(Math.sign(dv.x)).toBe(Math.sign(prev.x - center.x));
+      expect(Math.sign(dv.y)).toBe(Math.sign(prev.y - center.y));
+    });
+
+    it('give_way honours direction=forward (points toward next node)', () => {
       const result = Osm.parseRoads(roadWithMarking('give_way', 'forward'));
       expect(result.yields.length).toBe(1);
       const center = result.points[1];
-      const prev = result.points[0];
+      const next = result.points[2];
       const dv = result.yields[0].directionVector;
-      expect(Math.sign(dv.x)).toBe(Math.sign(prev.x - center.x));
-      expect(Math.sign(dv.y)).toBe(Math.sign(prev.y - center.y));
+      expect(Math.sign(dv.x)).toBe(Math.sign(next.x - center.x));
+      expect(Math.sign(dv.y)).toBe(Math.sign(next.y - center.y));
     });
 
     it('forward and backward stops face opposite directions', () => {
@@ -552,6 +554,84 @@ describe('Osm', () => {
         .directionVector;
       expect(Math.sign(fwd.x)).toBe(-Math.sign(bwd.x));
       expect(Math.sign(fwd.y)).toBe(-Math.sign(bwd.y));
+    });
+  });
+
+  describe('on-street parking (parking:* way attribute)', () => {
+    // A single road; parking tags are read from the way and recorded on the
+    // segment metadata (parkingLeft / parkingRight), NOT emitted as markings.
+    const parkingRoad = (
+      tags: Record<string, string>,
+      extraWayTags: Record<string, string> = {},
+    ): OsmData => ({
+      elements: [
+        { type: 'node', id: 1, lat: 48.856, lon: 2.351 },
+        { type: 'node', id: 2, lat: 48.862, lon: 2.358 },
+        {
+          type: 'way',
+          id: 101,
+          nodes: [1, 2],
+          tags: { highway: 'residential', ...extraWayTags, ...tags },
+        },
+      ],
+    });
+
+    it('no parking tags leaves both flags undefined', () => {
+      const seg = Osm.parseRoads(parkingRoad({})).segments[0];
+      expect(seg.parkingLeft).toBeUndefined();
+      expect(seg.parkingRight).toBeUndefined();
+    });
+
+    it('parking:right:zone sets parkingRight only', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:right:zone': '10' }))
+        .segments[0];
+      expect(seg.parkingRight).toBe(true);
+      expect(seg.parkingLeft).toBeFalsy();
+    });
+
+    it('parking:left sets parkingLeft only', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:left': 'yes' }))
+        .segments[0];
+      expect(seg.parkingLeft).toBe(true);
+      expect(seg.parkingRight).toBeFalsy();
+    });
+
+    it('parking:both sets both flags', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:both': 'yes' }))
+        .segments[0];
+      expect(seg.parkingLeft).toBe(true);
+      expect(seg.parkingRight).toBe(true);
+    });
+
+    it('parking:right=no leaves flags unset', () => {
+      const seg = Osm.parseRoads(parkingRoad({ 'parking:right': 'no' }))
+        .segments[0];
+      expect(seg.parkingRight).toBeFalsy();
+      expect(seg.parkingLeft).toBeFalsy();
+    });
+
+    it('legacy parking:lane:left is honoured', () => {
+      const seg = Osm.parseRoads(
+        parkingRoad({ 'parking:lane:left': 'parallel' }),
+      ).segments[0];
+      expect(seg.parkingLeft).toBe(true);
+    });
+
+    it('reverse one-way swaps parking sides', () => {
+      // oneway=-1 swaps p1/p2 per segment, so the stored "right" is the way's
+      // original left. A right-tagged reverse one-way ends up parkingLeft.
+      const seg = Osm.parseRoads(
+        parkingRoad({ 'parking:right': 'yes' }, { oneway: '-1' }),
+      ).segments[0];
+      expect(seg.parkingLeft).toBe(true);
+      expect(seg.parkingRight).toBeFalsy();
+    });
+
+    it('no Parking markings are produced (parking is metadata)', () => {
+      const result = Osm.parseRoads(parkingRoad({ 'parking:both': 'yes' }));
+      expect('parkings' in (result as unknown as Record<string, unknown>)).toBe(
+        false,
+      );
     });
   });
 });

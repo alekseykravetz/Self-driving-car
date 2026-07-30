@@ -360,6 +360,14 @@ Every frame, the car's polygon is tested against obstacle polygons:
 2. **Buildings** — Polygon bases (when in world mode)
 3. **Other cars** — Traffic car polygon boundaries
 
+> **Parking lanes extend the road border.** A segment tagged with parking
+> (`parkingLeft` / `parkingRight`, from OSM or the editor panel) has its road
+> envelope widened by one `PARKING_LANE_WIDTH_PX` on each parking side (and
+> shifted via the `Envelope` `lateralOffset` for one-sided parking), so the
+> collision border sits **after** the parking lane. Training cars can therefore
+> drive into / across a parking lane without the sensor detecting a border until
+> beyond it. See [WorldEditor](WorldEditor.md) and `getSegmentEnvelopeGeometry`.
+
 Uses `polysIntersect(carPolygon, obstacle)` which checks pairs of edges for intersection using the parametric line-line intersection formula. Two optimizations keep this cheap at large populations:
 
 - **AABB broad phase.** `#assessDamage` first computes the car's axis-aligned bounding box and each obstacle's box, and skips the full edge-edge test whenever the boxes are disjoint. The shared narrow phase feeds every segment within _sensor_ range (far larger than the car body), so most candidates cannot possibly touch the car — the box test rejects them in a few comparisons.

@@ -137,6 +137,40 @@ describe('Graph', () => {
       expect(loaded.segments[0].nameAr).toBe('رئيسي');
       expect(loaded.segments[0].nameRu).toBe('Главная');
     });
+
+    it('changes when a parking side toggles', () => {
+      const p1 = new Point(0, 0);
+      const p2 = new Point(100, 0);
+      const plain = new Graph([p1, p2], [new Segment(p1, p2)]);
+      const right = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { parkingRight: true })],
+      );
+      const left = new Graph(
+        [p1, p2],
+        [new Segment(p1, p2, false, false, { parkingLeft: true })],
+      );
+      expect(plain.hash()).not.toBe(right.hash());
+      expect(plain.hash()).not.toBe(left.hash());
+      expect(right.hash()).not.toBe(left.hash());
+    });
+
+    it('round-trips parking flags through Graph.load', () => {
+      const p1 = new Point(0, 0);
+      const p2 = new Point(100, 0);
+      const info = new Graph(
+        [p1, p2],
+        [
+          new Segment(p1, p2, false, false, {
+            parkingLeft: true,
+            parkingRight: true,
+          }),
+        ],
+      );
+      const loaded = Graph.load(info);
+      expect(loaded.segments[0].parkingLeft).toBe(true);
+      expect(loaded.segments[0].parkingRight).toBe(true);
+    });
   });
 
   describe('point management', () => {

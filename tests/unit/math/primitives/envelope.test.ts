@@ -34,6 +34,43 @@ describe('Envelope', () => {
     expect(envelope.polygon.points.length).toBeGreaterThanOrEqual(4);
   });
 
+  describe('lateralOffset', () => {
+    // Horizontal skeleton (0,0)->(100,0): perpendicular = (0,1), so a positive
+    // offset shifts the band toward +y.
+    it('shifts the polygon perpendicular to the skeleton', () => {
+      const base = new Envelope(skeleton, 20, 1, undefined, 0);
+      const shifted = new Envelope(skeleton, 20, 1, undefined, 15);
+      const meanY = (e: Envelope): number =>
+        e.polygon.points.reduce((s, p) => s + p.y, 0) / e.polygon.points.length;
+      expect(meanY(shifted) - meanY(base)).toBeCloseTo(15, 5);
+    });
+
+    it('leaves the skeleton (metadata source) untouched', () => {
+      const seg = new Segment(
+        new Point(0, 0),
+        new Point(100, 0),
+        false,
+        false,
+        {
+          highwayType: 'primary',
+        },
+      );
+      const env = new Envelope(seg, 20, 1, undefined, 10);
+      expect(env.skeleton).toBe(seg);
+      expect(env.skeleton.highwayType).toBe('primary');
+    });
+
+    it('does not change the band width (perpendicular extent)', () => {
+      const base = new Envelope(skeleton, 20, 1, undefined, 0);
+      const shifted = new Envelope(skeleton, 20, 1, undefined, 15);
+      const extent = (e: Envelope): number => {
+        const ys = e.polygon.points.map((p) => p.y);
+        return Math.max(...ys) - Math.min(...ys);
+      };
+      expect(extent(shifted)).toBeCloseTo(extent(base), 5);
+    });
+  });
+
   describe('static load', () => {
     it('reconstructs an envelope from serialized data', () => {
       const original = new Envelope(skeleton, 20, 1);

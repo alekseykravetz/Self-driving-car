@@ -752,7 +752,7 @@ class Osm {
        service/living_street/track → 1, unknown → oneWay ? 1 : 2
      Store metadata on Segment (highwayType, name, lanes, surface, maxSpeed,
        ref, destination, destinationRef, bridge, layer, laneMarkings,
-       roundabout, nameEn, maxspeedType)
+       roundabout, nameEn, maxspeedType, parkingLeft, parkingRight)
 
 6. CENTER RESULT
    Offset all points so the centroid is at (0, 0)
@@ -774,11 +774,22 @@ class Osm {
      stays centred on the road width.
    CROSSINGS (symmetric zebra) — oriented across the road via throughAxis at the
      node; width = full road.
-   STOPS / YIELDS (directional text) — face the approaching driver via
-     approachFacingDir: direction tag → single one-way approach neighbour →
+   STOPS / YIELDS (directional text) — approachFacingDir finds the upstream
+     (oncoming) direction: direction tag → single one-way approach neighbour →
      two-way faces away from the junction (highest-degree neighbour) →
-     throughAxis fallback; width = half road.
-   → returns lights / crossings / stops / yields; the editor builds the markings
+     throughAxis fallback; the placement NEGATES it so directionVector matches
+     the lane-guide convention the Stop/Yield draw() expects (identical to a
+     hand-placed marking); width = half road.
+   PARKING (parking:* WAY-side attribute, NOT a node, NOT a marking) —
+     hasParkingSide() reads parking:right*/parking:left*/parking:both* (and
+     legacy parking:lane:*) on each way (value no/none = absent) and records
+     parkingLeft/parkingRight on the SEGMENT metadata (reverse one-ways swap the
+     sides). During road generation these flags widen the collision/asphalt
+     envelope (see getSegmentEnvelopeGeometry + Envelope lateralOffset) so the
+     road border sits AFTER the parking lane; the "P" glyphs are drawn from the
+     metadata by World.#drawParkingLanes. No parking markings are emitted.
+   → returns lights / crossings / stops / yields; the editor builds
+     the markings
 ```
 
 ### Real-World Scale
