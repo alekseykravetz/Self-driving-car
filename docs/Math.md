@@ -782,7 +782,8 @@ class Osm {
      hand-placed marking); width = half road. osm.ts emits ONE seed per node;
      the seed is expanded PER APPROACH LANE downstream in the world layer
      (expandDirectionalMarking + laneGuidesForSegment), one-way → all lanes,
-     two-way → the entering lanes only. Not one marking per node.
+     two-way → the driver's-right (approaching) lanes only; every per-lane
+     marking keeps the seed's travel-direction facing. Not one marking per node.
    PARKING (parking:* WAY-side attribute, NOT a node, NOT a marking) —
      hasParkingSide() reads parking:right*/parking:left*/parking:both* (and
      legacy parking:lane:*) on each way (value no/none = absent) and records

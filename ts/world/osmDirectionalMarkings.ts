@@ -15,11 +15,11 @@
 import { Point } from '../math/primitives/point.js';
 import { Segment } from '../math/primitives/segment.js';
 import { Graph } from '../math/graph/graph.js';
-import { dot, add, scale } from '../math/utils.js';
+import { dot, add, scale, subtract } from '../math/utils.js';
 import { laneGuidesForSegment } from './generation/worldGenerator.js';
 import { LANE_WIDTH_PX } from '../math/worldUnits.js';
 
-/** Stop line offset upstream from the junction node (world px). 0 disables. */
+/** Stop line offset upstream (against travel) from the junction node (px). */
 export const STOP_LINE_SETBACK_PX = 0;
 
 /** One-lane marking size (matches manual roadWidth/2 on a 2-lane road). */
@@ -32,25 +32,22 @@ export interface DirectionalPlacement {
 
 /**
  * Expands a single OSM stop/give-way node seed into one placement per APPROACH
- * lane. `directionVector` is the lane-guide-convention travel direction the seed
- * renders with. Falls back to the single seed placement when no approach segment
- * / lane is found.
+ * lane. `directionVector` is the seed TRAVEL direction (points along the way the
+ * approaching driver is going, i.e. into the junction). Every emitted placement
+ * keeps this same facing so the painted "STOP"/"YIELD" text reads for the
+ * approaching driver — identical to the single-marking OSM placement that this
+ * expansion replaces. Falls back to the single seed placement when no approach
+ * segment / lane is found.
  *
  * Approach segment: the incident road whose AXIS is most collinear with the
  * seed direction (the road the yielding driver is on). Selecting by axis
- * collinearity — rather than which endpoint is up/downstream — keeps the
- * marking on the approach road even where the road bends or dead-ends into the
- * junction (a downstream-endpoint heuristic would pick a cross street or fall
- * back to the node centre).
+ * collinearity — rather than which endpoint is up/downstream — keeps the marking
+ * on the approach road even where the road bends or dead-ends into the junction.
  *
- * Lane selection:
- *   - Two-way road → only the lanes travelling INTO the junction (guide
- *     direction aligned with the seed), so the opposing lanes get no marking.
- *   - One-way road → every lane (all flow the same way into the junction); the
- *     lane guides all share one direction, so the two-way alignment filter
- *     would wrongly reject them all.
- * Each per-lane marking uses that lane guide's own direction, so it renders
- * identically to a hand-placed marking on the same guide.
+ * Lane selection (Israel / right-hand traffic):
+ *   - Two-way road → only the lanes on the driver's RIGHT of the road centre
+ *     (the approaching side); the opposing lanes get none.
+ *   - One-way road → every lane (all flow the same way into the junction).
  */
 export function expandDirectionalMarking(
   center: Point,
@@ -58,6 +55,8 @@ export function expandDirectionalMarking(
   graph: Graph,
   setback: number = STOP_LINE_SETBACK_PX,
 ): DirectionalPlacement[] {
+  const facing = (): Point => new Point(directionVector.x, directionVector.y);
+
   // 1. Approach segment: incident to the node, road axis most collinear with
   //    the seed direction (either orientation).
   let best: Segment | undefined;
@@ -72,22 +71,24 @@ export function expandDirectionalMarking(
       best = seg;
     }
   }
-  if (!best) return [{ center, directionVector }]; // fallback
+  if (!best) return [{ center, directionVector: facing() }]; // fallback
 
-  // 2/3. Lane guides of the approach segment; keep the entering lanes.
+  // Driver's right (right-hand traffic): perpendicular to travel, +90° in the
+  // y-down world. Used to keep only the approaching-side lanes on two-way roads.
+  const right = new Point(-directionVector.y, directionVector.x);
+
   const out: DirectionalPlacement[] = [];
   for (const guide of laneGuidesForSegment(best)) {
-    const guideDir = guide.directionVector();
-    // Two-way: skip departing lanes (guide opposite to the approach travel
-    // direction). One-way: all lanes flow into the junction, so keep them all.
-    if (!best.oneWay && dot(guideDir, directionVector) <= 0) continue;
-    // 4. Lane cross-section at the node, nudged upstream by the setback.
     const laneCenter = guide.projectPoint(center).point;
+    // Two-way: keep only the lanes on the driver's right (the approaching side).
+    // One-way: all lanes flow into the junction, so keep them all.
+    if (!best.oneWay && dot(subtract(laneCenter, center), right) <= 0) continue;
+    // Stop line optionally set back UPSTREAM (against travel) from the node.
     const placed =
       setback !== 0
-        ? add(laneCenter, scale(directionVector, setback))
+        ? add(laneCenter, scale(directionVector, -setback))
         : laneCenter;
-    out.push({ center: placed, directionVector: guideDir });
+    out.push({ center: placed, directionVector: facing() });
   }
-  return out.length > 0 ? out : [{ center, directionVector }]; // fallback
+  return out.length > 0 ? out : [{ center, directionVector: facing() }]; // fallback
 }

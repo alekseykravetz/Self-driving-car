@@ -508,16 +508,15 @@ approach segment as the incident road whose **axis is most collinear with the
 seed direction** (the road the yielding driver is on — selecting by axis rather
 than which endpoint is up/downstream keeps the marking on the approach even
 where the road **bends or dead-ends** into the junction), builds that segment's
-per-lane guides with `laneGuidesForSegment()` (extracted from
-`wgGenerateLaneGuides`, same convention), and keeps the entering lanes:
-**two-way** roads → only the lanes whose guide direction aligns with the seed
-(the opposing lanes get none); **one-way** roads → **all** lanes (they share one
-direction, so the two-way alignment filter would wrongly reject every lane).
-Each per-lane marking uses that lane guide's own direction and `LANE_WIDTH_PX`
-size, so it renders identically to a hand-placed marking on the same lane; a
-degenerate node with no incident approach segment falls back to the single
-centred seed. An optional `STOP_LINE_SETBACK_PX` (default 0) nudges the marking
-upstream of the junction.
+per-lane guides with `laneGuidesForSegment()`, and keeps the approaching lanes:
+**two-way** roads → only the lanes on the driver's **right** of the road centre
+(the approaching side under Israel's right-hand traffic); the opposing lanes get
+none. **one-way** roads → **all** lanes (every lane flows into the junction).
+Every emitted marking keeps the seed's **travel-direction facing** (the same
+`directionVector` the single-marking placement used), so the painted text reads
+for the approaching driver. A degenerate node with no incident approach segment
+falls back to the single centred seed. An optional `STOP_LINE_SETBACK_PX`
+(default 0) nudges the marking upstream (against travel) of the junction.
 
 **Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
 each on its **approach arm, centred on the road, at the stop line** — matching

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Graph } from '../../../ts/math/graph/graph.js';
 import { Point } from '../../../ts/math/primitives/point.js';
 import { Segment } from '../../../ts/math/primitives/segment.js';
-import { dot } from '../../../ts/math/utils.js';
+import { dot, subtract } from '../../../ts/math/utils.js';
 import {
   expandDirectionalMarking,
   STOP_LINE_SETBACK_PX,
@@ -67,12 +67,12 @@ describe('expandDirectionalMarking', () => {
     expect(ys[1]).toBeCloseTo(25);
   });
 
-  it('setback moves centres upstream along the seed direction', () => {
+  it('setback moves centres upstream (against the travel direction)', () => {
     const { graph, node } = makeRoad(false, 2);
     const base = expandDirectionalMarking(node, SEED_DIR, graph, 0);
     const shifted = expandDirectionalMarking(node, SEED_DIR, graph, 10);
-    // Seed direction is (-1, 0) so x decreases by 10.
-    expect(shifted[0].center.x).toBeCloseTo(base[0].center.x - 10);
+    // Seed (travel) is (-1, 0); upstream (against travel) is +x, so x increases.
+    expect(shifted[0].center.x).toBeCloseTo(base[0].center.x + 10);
     expect(shifted[0].center.y).toBeCloseTo(base[0].center.y);
   });
 
@@ -82,7 +82,8 @@ describe('expandDirectionalMarking', () => {
     const out = expandDirectionalMarking(orphan, SEED_DIR, graph);
     expect(out.length).toBe(1);
     expect(out[0].center).toBe(orphan);
-    expect(out[0].directionVector).toBe(SEED_DIR);
+    expect(out[0].directionVector.x).toBeCloseTo(SEED_DIR.x);
+    expect(out[0].directionVector.y).toBeCloseTo(SEED_DIR.y);
   });
 
   it('default setback constant is 0', () => {
@@ -122,5 +123,31 @@ describe('expandDirectionalMarking', () => {
     // On a lane of the horizontal approach (y offset), not the node centre.
     expect(out[0].center.x).toBeCloseTo(0);
     expect(Math.abs(out[0].center.y)).toBeCloseTo(25);
+  });
+
+  it('every placement faces the seed travel direction', () => {
+    for (const [oneWay, lanes] of [
+      [false, 2],
+      [true, 2],
+      [false, 4],
+    ] as [boolean, number][]) {
+      const { graph, node } = makeRoad(oneWay, lanes);
+      for (const p of expandDirectionalMarking(node, SEED_DIR, graph)) {
+        expect(p.directionVector.x).toBeCloseTo(SEED_DIR.x);
+        expect(p.directionVector.y).toBeCloseTo(SEED_DIR.y);
+      }
+    }
+  });
+
+  it('places the two-way marking on the driver’s right (right-hand traffic)', () => {
+    // Horizontal road, node at p2=(200,0), seed travel = (-1,0) (west). The
+    // driver’s right is (0,-1) (north / negative y), so the approach lane centre
+    // must have a negative y offset.
+    const { graph, node } = makeRoad(false, 2);
+    const out = expandDirectionalMarking(node, SEED_DIR, graph);
+    expect(out.length).toBe(1);
+    const right = new Point(-SEED_DIR.y, SEED_DIR.x);
+    const side = dot(subtract(out[0].center, node), right);
+    expect(side).toBeGreaterThan(0); // on the driver’s right
   });
 });
