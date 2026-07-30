@@ -447,13 +447,13 @@ their tags only when the Overpass query outputs node bodies, so the filter ends
 with `out body;` (not `out skel;`, which strips tags). Because they all lie on
 the highway ways, no extra query is needed.
 
-| OSM node tag              | App marking | Placement                          |
-| ------------------------- | ----------- | ---------------------------------- |
-| `highway=traffic_signals` | `Light`     | Approach arm, at the stop line     |
-| `highway=crossing`        | `Crossing`  | Zebra across the road, at the node |
-| `highway=stop`            | `Stop`      | Line across the road, at the node  |
-| `highway=give_way`        | `Yield`     | Line across the road, at the node  |
-| `parking:*` (way tag)     | _(none)_    | Segment property → widens envelope |
+| OSM node tag              | App marking | Placement                           |
+| ------------------------- | ----------- | ----------------------------------- |
+| `highway=traffic_signals` | `Light`     | Approach arm, at the stop line      |
+| `highway=crossing`        | `Crossing`  | Zebra across the road, at the node  |
+| `highway=stop`            | `Stop`      | Per approach lane, at the stop line |
+| `highway=give_way`        | `Yield`     | Per approach lane, at the stop line |
+| `parking:*` (way tag)     | _(none)_    | Segment property → widens envelope  |
 
 `Osm.parseRoads()` returns four `OsmMarkingPlacement[]` arrays (`lights`,
 `crossings`, `stops`, `yields`; each `{ center, directionVector, width, height? }`
@@ -499,6 +499,20 @@ expects — a manually placed marking passes the lane guide's `directionVector()
 directly (the opposite orientation to `approachFacingDir`), so the negation
 makes an OSM-imported sign render identically to a hand-placed one. Width = half
 the road.
+
+`osm.ts` emits **one** stop/give-way seed per node (the direction above). Because
+a single centred marking can only face one travel direction, the world layer
+**expands each seed into one marking per approach lane** via
+`expandDirectionalMarking()` (`ts/world/osmDirectionalMarkings.ts`): it finds the
+approach segment (incident to the node, pointing most like the seed direction),
+builds that segment's per-lane guides with `laneGuidesForSegment()` (extracted
+from `wgGenerateLaneGuides`, same convention), and keeps only the lanes whose
+guide direction matches the seed — one-way roads → **all** lanes, two-way roads →
+only the lanes **entering** the junction. Each per-lane marking uses that lane
+guide's direction and `LANE_WIDTH_PX` size, so it renders identically to a
+hand-placed marking on the same lane; a degenerate node with no approach lane
+falls back to the single centred seed. An optional `STOP_LINE_SETBACK_PX`
+(default 0) nudges the marking upstream of the junction.
 
 **Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
 each on its **approach arm, centred on the road, at the stop line** — matching
