@@ -230,12 +230,16 @@ Parsed by `CarLoader.parseCarFile()`.
 
 ### OSM Data Files (`.json`)
 
-**Format**: Standard Overpass API JSON export:
+**Format**: Standard Overpass API JSON export. The query must end with `out body;`
+(not `out skel;`) so that node tags survive — the importer reads
+`highway=traffic_signals` / `crossing` / `stop` / `give_way` node tags to place
+road markings (lights, crossings, stops, give-ways). See
+[World Editor → Node marking import](WorldEditor.md#node-marking-import-traffic-lights-crossings-stops-give-ways).
 
 ```json
 {
   "elements": [
-    { "type": "node", "id": 12345, "lat": 31.6, "lon": 34.5 },
+    { "type": "node", "id": 12345, "lat": 31.6, "lon": 34.5, "tags": { "highway": "traffic_signals" } },
     { "type": "way", "id": 67890, "nodes": [12345, ...], "tags": { "highway": "primary" } }
   ]
 }
