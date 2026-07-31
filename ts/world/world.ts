@@ -108,6 +108,10 @@ export class World implements IWorld {
   // Road signage placement cache, invalidated by Graph.hash() changes.
   #signageRenderer = new WorldSignageRenderer();
   #drawOrderCache: { hash: string; envelopes: Envelope[] } | null = null;
+  // The graph hash computed once at the top of the current draw() frame. Lets
+  // internal helpers (bridge shadows/details) reuse it instead of triggering a
+  // fresh O(n) Graph.hash() via the default parameter.
+  #frameGraphHash: string | null = null;
 
   constructor(
     graph: Graph,
@@ -307,6 +311,7 @@ export class World implements IWorld {
     // recomputing it in each — that was ~5 redundant passes per frame. When the
     // caller already computed it (editor change-detection), reuse that.
     const graphHash = providedGraphHash ?? this.graph.hash();
+    this.#frameGraphHash = graphHash;
     this.#signageRenderer.setFrameHash(graphHash);
 
     // Update traffic light states before drawing
@@ -545,7 +550,9 @@ export class World implements IWorld {
    * Tier-sorted envelopes, recomputed only when the graph changes, as
    * detected by its hash. Higher-class roads paint on top at overlaps.
    */
-  #getDrawOrderedEnvelopes(graphHash: string = this.graph.hash()): Envelope[] {
+  #getDrawOrderedEnvelopes(
+    graphHash: string = this.#frameGraphHash ?? this.graph.hash(),
+  ): Envelope[] {
     if (!this.#drawOrderCache || this.#drawOrderCache.hash !== graphHash) {
       this.#drawOrderCache = {
         hash: graphHash,
