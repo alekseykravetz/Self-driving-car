@@ -586,6 +586,7 @@ interface WorldDrawOptions {
   showCarNames?: boolean;
   layers?: Partial<WorldLayerVisibility>; // Per-layer visibility mask
   graphHash?: string; // Precomputed Graph.hash() for this frame (reused if given)
+  screenBounds?: VisibleWorldRect; // Visible world rect for viewport culling
 }
 
 // Corridor is a class in ts/world/corridor.ts (not an interface):

@@ -225,6 +225,7 @@ export class WorldTrainingStrategy {
       viewPoint,
       showStartMarkings: false,
       layers: this.#parent.worldLayers,
+      screenBounds: this.#parent.viewport.getVisibleBounds(),
     });
     this.#parent.viewport.drawScaleIndicator(this.#parent.gameCtx);
 

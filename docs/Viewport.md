@@ -34,6 +34,9 @@ class Viewport {
   getZoom(): number; // Returns current zoom value
   getPixelsPerMeter(): number; // Returns WORLD_PIXELS_PER_METER / zoom
 
+  // Viewport culling
+  getVisibleBounds(margin?): VisibleWorldRect; // Visible world-space AABB
+
   // Scale indicator
   drawScaleIndicator(
     ctx?: CanvasRenderingContext2D, // defaults to this.ctx
@@ -158,6 +161,30 @@ getMouse(e: MouseEvent, subtractDragOffset: boolean = false): Point {
 ```
 
 **Key behavior**: During drag, `getOffset()` returns `offset + drag.offset` (sum of permanent + temporary). On release, the temporary drag offset is committed to the permanent offset.
+
+---
+
+## Viewport Culling (`getVisibleBounds`)
+
+`getVisibleBounds(margin = 0): VisibleWorldRect` returns the axis-aligned
+world-space rectangle currently visible on the canvas. It mirrors the transform
+applied in `reset()`: the screen center maps to `-getOffset()` in world space,
+and one canvas pixel spans `zoom` world units, so:
+
+```typescript
+const centerX = -getOffset().x;
+const halfW = (canvas.width / 2) * zoom;
+// minX = centerX - halfW - margin,  maxX = centerX + halfW + margin  (same for Y)
+```
+
+Callers pass the result as `WorldDrawOptions.screenBounds`, and `World.draw()`
+skips any road envelope, border, lane marking, parking glyph, bridge polygon, or
+marking whose bounding box (expanded by `WORLD_CULL_MARGIN_PX = 300`) lies
+off-screen. On large OSM maps this is the single biggest render win — drawing
+drops from "the whole city" to "what's on screen." When `screenBounds` is
+omitted, nothing is culled (behavior-preserving fallback for tests / off-screen
+renders). Buildings and trees keep their orthogonal `renderRadius` distance cull.
+The math is unit-tested in `tests/unit/viewport/viewport.test.ts`.
 
 ---
 

@@ -6,7 +6,7 @@ import type { Marking } from './markings/marking.js';
 import type { Corridor } from './corridor.js';
 import type { Building } from './items/building.js';
 import type { Tree, TreeInstance } from './items/tree.js';
-import type { Viewport } from '../viewport/viewport.js';
+import type { Viewport, VisibleWorldRect } from '../viewport/viewport.js';
 import type { IMiniMapCar } from '../mini-map/miniMap.js';
 
 export interface CarDrawOptions {
@@ -108,4 +108,10 @@ export interface WorldDrawOptions {
    * lets `World.draw()` reuse it instead of recomputing the O(n) hash.
    */
   graphHash?: string;
+  /**
+   * Visible world rectangle for viewport culling. When provided, roads,
+   * envelopes, lane markings, parking glyphs, bridges, and markings whose
+   * bounding box lies fully off-screen are skipped. Omit to draw everything.
+   */
+  screenBounds?: VisibleWorldRect;
 }
