@@ -102,4 +102,10 @@ export interface WorldDrawOptions {
   showCarNames?: boolean;
   /** Per-layer visibility mask, merged over DEFAULT_LAYER_VISIBILITY. */
   layers?: Partial<WorldLayerVisibility>;
+  /**
+   * Precomputed `Graph.hash()` for this frame. When the caller already
+   * computed the hash (e.g. the editor's change-detection), passing it here
+   * lets `World.draw()` reuse it instead of recomputing the O(n) hash.
+   */
+  graphHash?: string;
 }

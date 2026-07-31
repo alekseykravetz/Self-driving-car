@@ -574,6 +574,7 @@ interface WorldDrawOptions {
   bestCar?: Car | null; // Highlighted car drawn with its sensor rays
   showStartMarkings?: boolean;
   renderRadius?: number;
+  graphHash?: string; // Precomputed Graph.hash() for this frame (reused if given)
 }
 ```
 

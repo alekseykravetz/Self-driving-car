@@ -680,9 +680,25 @@ class TrafficManager {
   releaseOverride(light: Light): void;
   releaseAllOverrides(): void;
 
-  update(): void;
+  // graphHash: the per-frame Graph.hash(), passed in by World.draw() so the
+  // manager reuses it instead of recomputing.
+  update(graphHash?: string): void;
 }
 ```
+
+### Performance: cached control centers
+
+Crossroad detection is `O(points × segments)` (it counts, for every graph point,
+how many segments include it). Running that every frame froze the app on large
+OSM imports. Two caches fix it:
+
+- **Crossroads** are cached by `Graph.hash()` — the `O(n²)` scan reruns only when
+  the graph topology actually changes.
+- **Control centers** are rebuilt only when a cheap signature (graph hash +
+  Light count + Light positions) changes. `update()` calls
+  `#refreshControlCenters(graphHash)`, which is a no-op on frames where nothing
+  changed. Overrides don't change the signature (they're handled in the cycling
+  loop), so pausing/cycling a light never triggers a rebuild.
 
 ### Initialization
 

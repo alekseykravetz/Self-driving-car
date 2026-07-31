@@ -689,8 +689,14 @@ export class WorldEditor {
     // Get the current viewpoint based on viewport offset
     const viewPoint = scale(this.#viewport.getOffset(), -1);
 
-    // Draw the world with the current per-layer visibility mask.
-    this.#world.draw(this.#ctx, { viewPoint, layers: this.#layerVisibility });
+    // Draw the world with the current per-layer visibility mask. Reuse the
+    // hash already computed above for change detection so world.draw doesn't
+    // recompute it.
+    this.#world.draw(this.#ctx, {
+      viewPoint,
+      layers: this.#layerVisibility,
+      graphHash: currentGraphHash,
+    });
 
     // Draw editor previews (e.g., marking intent) with transparency
     this.#ctx.globalAlpha = this.#mode === 'graph' ? 0.5 : 0.2;

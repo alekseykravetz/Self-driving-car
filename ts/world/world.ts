@@ -294,6 +294,7 @@ export class World implements IWorld {
       carAlpha = 0.2,
       showCarNames = false,
       layers: layerOverrides,
+      graphHash: providedGraphHash,
     } = options;
 
     const layers: WorldLayerVisibility = {
@@ -303,8 +304,9 @@ export class World implements IWorld {
 
     // Graph.hash() is O(n); compute it once per frame and share it with every
     // consumer (traffic manager, draw-order cache, signage caches) instead of
-    // recomputing it in each — that was ~5 redundant passes per frame.
-    const graphHash = this.graph.hash();
+    // recomputing it in each — that was ~5 redundant passes per frame. When the
+    // caller already computed it (editor change-detection), reuse that.
+    const graphHash = providedGraphHash ?? this.graph.hash();
     this.#signageRenderer.setFrameHash(graphHash);
 
     // Update traffic light states before drawing
