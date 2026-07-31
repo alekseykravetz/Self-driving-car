@@ -20,16 +20,30 @@ export class TrafficManager {
   controlCenters!: lightControlCenterPoint[];
   frameCount: number;
 
+  // Crossroad detection is O(points × segments) and control-center layout only
+  // changes when the graph or the set/positions of lights change — never on a
+  // plain animation frame. These caches keep `update()` from re-running that
+  // scan every frame (was ~76% of frame time on large OSM imports).
+  #controlCentersKey: string | null = null;
+  #crossroadsCache: Point[] | null = null;
+  #crossroadsKey: string | null = null;
+
   constructor(graph: Graph, markings: Marking[] = []) {
     this.graph = graph; // todo: avoid serializing the graph object during save world as it a part of it already
     this.markings = markings;
     this.frameCount = 0;
 
-    this.#initializeControlCenters();
+    this.#refreshControlCenters();
   }
 
   // Crossroads, an intersection of two or more roads. Finds graph points where more than 2 segments meet
   #getCrossroads(): Point[] {
+    // Depends only on graph topology; cache by the graph's change signature.
+    const key = this.graph.hash();
+    if (this.#crossroadsCache && this.#crossroadsKey === key) {
+      return this.#crossroadsCache;
+    }
+
     const subset: Point[] = [];
     for (const point of this.graph.points) {
       let degree = 0;
@@ -43,7 +57,39 @@ export class TrafficManager {
         subset.push(point);
       }
     }
+
+    this.#crossroadsCache = subset;
+    this.#crossroadsKey = key;
     return subset;
+  }
+
+  /**
+   * Cheap signature of everything that affects control-center layout: the graph
+   * topology plus the count and positions of Light markings. When unchanged,
+   * the cached control centers are reused instead of rebuilt.
+   */
+  #controlCentersSignature(): string {
+    const graphHash = this.graph.hash();
+    let lightHash = 2166136261;
+    let lightCount = 0;
+    for (const m of this.markings) {
+      if (m instanceof Light) {
+        lightCount++;
+        lightHash ^= (m.center.x * 1000) | 0;
+        lightHash = Math.imul(lightHash, 16777619);
+        lightHash ^= (m.center.y * 1000) | 0;
+        lightHash = Math.imul(lightHash, 16777619);
+      }
+    }
+    return `${graphHash}|${lightCount}|${lightHash}`;
+  }
+
+  /** Rebuilds control centers only when their inputs have changed. */
+  #refreshControlCenters(): void {
+    const key = this.#controlCentersSignature();
+    if (key === this.#controlCentersKey && this.controlCenters) return;
+    this.#initializeControlCenters();
+    this.#controlCentersKey = key;
   }
 
   #initializeControlCenters(): void {
@@ -114,7 +160,7 @@ export class TrafficManager {
 
   // Updates the state of all managed traffic lights based on time/frameCount
   update(): void {
-    this.#initializeControlCenters(); // todo: fix not init lights on each update (problem with markings and graph changes outside)
+    this.#refreshControlCenters(); // Rebuilds only when graph/lights changed
     if (!this.controlCenters.length) return; // Nothing to update
 
     // Determine current state based on frame count (assuming 60 FPS target)
