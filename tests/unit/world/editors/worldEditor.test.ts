@@ -443,11 +443,47 @@ vi.mock('../../../../ts/math/osm-importer/osm.js', () => ({
   },
 }));
 
+// Track Stop/Yield marking instantiation so the OSM per-lane expansion can be
+// asserted without reaching into the editor's private world.
+const markingTrackers = vi.hoisted(() => ({
+  stops: [] as { type: string }[],
+  yields: [] as { type: string }[],
+}));
+
+vi.mock('../../../../ts/world/markings/stop.js', () => ({
+  Stop: class {
+    type = 'stop';
+    constructor(
+      public center: unknown,
+      public directionVector: unknown,
+    ) {
+      markingTrackers.stops.push(this);
+    }
+    setAnchor(): void {}
+  },
+}));
+
+vi.mock('../../../../ts/world/markings/yield.js', () => ({
+  Yield: class {
+    type = 'yield';
+    constructor(
+      public center: unknown,
+      public directionVector: unknown,
+    ) {
+      markingTrackers.yields.push(this);
+    }
+    setAnchor(): void {}
+  },
+}));
+
 // ── Module under test ─────────────────────────────────────
 
 import { WorldEditor } from '../../../../ts/world/editors/worldEditor.js';
 import { DEFAULT_LAYER_VISIBILITY } from '../../../../ts/world/types.js';
 import type { EditorType } from '../../../../ts/simulator/types.js';
+import { Osm } from '../../../../ts/math/osm-importer/osm.js';
+import { Point } from '../../../../ts/math/primitives/point.js';
+import { Segment } from '../../../../ts/math/primitives/segment.js';
 
 // ── Helpers ───────────────────────────────────────────────
 
@@ -711,6 +747,40 @@ describe('WorldEditor', () => {
       >;
       osmDataEl.value = '{"elements":[]}';
       editor.parseOsmData();
+    });
+
+    it('expands an OSM stop seed into one Stop marking per approach lane', () => {
+      markingTrackers.stops.length = 0;
+      const p1 = new Point(0, 0);
+      const p2 = new Point(200, 0);
+      // Two-way 2-lane road; stop node at p2 with seed direction upstream (-1,0)
+      // → expansion yields exactly one entering-lane Stop marking.
+      vi.mocked(Osm.parseRoads).mockReturnValueOnce({
+        points: [p1, p2],
+        segments: [new Segment(p1, p2, false, false, { lanes: 2 })],
+        lights: [],
+        crossings: [],
+        stops: [
+          {
+            center: p2,
+            directionVector: new Point(-1, 0),
+            width: 100,
+            height: 100,
+          },
+        ],
+        yields: [],
+      } as unknown as ReturnType<typeof Osm.parseRoads>);
+
+      const editor = createEditor();
+      const osmDataEl = domElements.get('osmDataContainer') as Record<
+        string,
+        unknown
+      >;
+      osmDataEl.value = '{"elements":[]}';
+      editor.parseOsmData();
+
+      expect(markingTrackers.stops.length).toBe(1);
+      expect(markingTrackers.stops[0].type).toBe('stop');
     });
   });
 

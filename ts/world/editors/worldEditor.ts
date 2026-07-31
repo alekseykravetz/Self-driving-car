@@ -21,6 +21,10 @@ import { Light } from '../markings/light.js';
 import { Crossing } from '../markings/crossing.js';
 import { Stop } from '../markings/stop.js';
 import { Yield } from '../markings/yield.js';
+import {
+  expandDirectionalMarking,
+  OSM_STOP_YIELD_SIZE_PX,
+} from '../osmDirectionalMarkings.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
@@ -556,14 +560,36 @@ export class WorldEditor {
         );
       }
       for (const s of result.stops) {
-        addMarking(
-          new Stop(s.center, s.directionVector, s.width, s.height ?? s.width),
-        );
+        for (const lane of expandDirectionalMarking(
+          s.center,
+          s.directionVector,
+          this.#world.graph,
+        )) {
+          addMarking(
+            new Stop(
+              lane.center,
+              lane.directionVector,
+              OSM_STOP_YIELD_SIZE_PX,
+              OSM_STOP_YIELD_SIZE_PX,
+            ),
+          );
+        }
       }
       for (const y of result.yields) {
-        addMarking(
-          new Yield(y.center, y.directionVector, y.width, y.height ?? y.width),
-        );
+        for (const lane of expandDirectionalMarking(
+          y.center,
+          y.directionVector,
+          this.#world.graph,
+        )) {
+          addMarking(
+            new Yield(
+              lane.center,
+              lane.directionVector,
+              OSM_STOP_YIELD_SIZE_PX,
+              OSM_STOP_YIELD_SIZE_PX,
+            ),
+          );
+        }
       }
       // Note: on-street parking (`parking:*`) is imported as segment metadata
       // (`parkingLeft`/`parkingRight`) and baked into the road envelope during

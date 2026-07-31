@@ -92,34 +92,40 @@ function getSegmentEnvelopeGeometry(segment: Segment): {
  *   - One-way roads: ALL lanes point p2→p1 (opposite to traffic flow),
  *     so cars face forward (in the p1→p2 traffic direction).
  */
+export function laneGuidesForSegment(segment: Segment): Segment[] {
+  const guides: Segment[] = [];
+  const laneCount = segment.lanes ?? (segment.oneWay ? 1 : 2);
+  const dir = segment.directionVector();
+  const perpDir = normalize(new Point(-dir.y, dir.x));
+  const laneWidth = LANE_WIDTH_PX;
+  const halfRoadWidth = (laneCount * laneWidth) / 2;
+
+  for (let k = 0; k < laneCount; k++) {
+    // Lane center offset from road center (leftmost lane = most negative)
+    const offset = (k + 0.5) * laneWidth - halfRoadWidth;
+    const p1 = add(segment.p1, scale(perpDir, offset));
+    const p2 = add(segment.p2, scale(perpDir, offset));
+
+    if (segment.oneWay) {
+      // All lanes point p2→p1 (opposite to traffic flow) so that
+      // the car heading formula produces forward-facing cars.
+      guides.push(new Segment(p2, p1));
+    } else {
+      // Two-way: even k = forward (p1→p2), odd k = backward (p2→p1)
+      if (k % 2 === 0) {
+        guides.push(new Segment(p1, p2));
+      } else {
+        guides.push(new Segment(p2, p1));
+      }
+    }
+  }
+  return guides;
+}
+
 function wgGenerateLaneGuides(graph: Graph): Segment[] {
   const guides: Segment[] = [];
   for (const segment of graph.segments) {
-    const laneCount = segment.lanes ?? (segment.oneWay ? 1 : 2);
-    const dir = segment.directionVector();
-    const perpDir = normalize(new Point(-dir.y, dir.x));
-    const laneWidth = LANE_WIDTH_PX;
-    const halfRoadWidth = (laneCount * laneWidth) / 2;
-
-    for (let k = 0; k < laneCount; k++) {
-      // Lane center offset from road center (leftmost lane = most negative)
-      const offset = (k + 0.5) * laneWidth - halfRoadWidth;
-      const p1 = add(segment.p1, scale(perpDir, offset));
-      const p2 = add(segment.p2, scale(perpDir, offset));
-
-      if (segment.oneWay) {
-        // All lanes point p2→p1 (opposite to traffic flow) so that
-        // the car heading formula produces forward-facing cars.
-        guides.push(new Segment(p2, p1));
-      } else {
-        // Two-way: even k = forward (p1→p2), odd k = backward (p2→p1)
-        if (k % 2 === 0) {
-          guides.push(new Segment(p1, p2));
-        } else {
-          guides.push(new Segment(p2, p1));
-        }
-      }
-    }
+    guides.push(...laneGuidesForSegment(segment));
   }
   return guides;
 }

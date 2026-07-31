@@ -3,6 +3,7 @@ import { Graph } from '../../../../ts/math/graph/graph.js';
 import { Point } from '../../../../ts/math/primitives/point.js';
 import { Segment } from '../../../../ts/math/primitives/segment.js';
 import { WorldGenerator } from '../../../../ts/world/generation/worldGenerator.js';
+import { laneGuidesForSegment } from '../../../../ts/world/generation/worldGenerator.js';
 import type { WorldGeneratable } from '../../../../ts/world/generation/worldGenerator.js';
 
 function createEmptyWorld(): WorldGeneratable {
@@ -290,5 +291,37 @@ describe('WorldGenerator', () => {
         expect(dot).toBeLessThan(0);
       }
     }
+  });
+});
+
+describe('laneGuidesForSegment', () => {
+  it('returns one guide per lane pointing both ways on a 2-lane two-way road', () => {
+    const seg = new Segment(new Point(0, 0), new Point(200, 0), false, false, {
+      lanes: 2,
+    });
+    const guides = laneGuidesForSegment(seg);
+    expect(guides.length).toBe(2);
+    const dots = guides.map((g) => g.p2.x - g.p1.x); // horizontal road
+    expect(dots.some((d) => d > 0)).toBe(true);
+    expect(dots.some((d) => d < 0)).toBe(true);
+  });
+
+  it('returns lanes all the same way on a 3-lane one-way road', () => {
+    const seg = new Segment(new Point(0, 0), new Point(200, 0), true, false, {
+      lanes: 3,
+    });
+    const guides = laneGuidesForSegment(seg);
+    expect(guides.length).toBe(3);
+    // one-way: all guides point p2→p1 (opposite to segment)
+    for (const g of guides) {
+      expect(g.p2.x - g.p1.x).toBeLessThan(0);
+    }
+  });
+
+  it('guide count equals lane count', () => {
+    const seg = new Segment(new Point(0, 0), new Point(200, 0), false, false, {
+      lanes: 4,
+    });
+    expect(laneGuidesForSegment(seg).length).toBe(4);
   });
 });
