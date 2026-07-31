@@ -226,7 +226,7 @@ describe('StoreManager class', () => {
   });
 
   it('getTrackedKeyCount static', () => {
-    expect(StoreManager.getTrackedKeyCount()).toBe(11);
+    expect(StoreManager.getTrackedKeyCount()).toBe(12);
   });
 
   it('getAllWorlds returns ordered sources', () => {
