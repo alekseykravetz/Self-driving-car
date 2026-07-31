@@ -41,6 +41,12 @@ import { LANE_WIDTH_PX, PARKING_LANE_WIDTH_PX } from '../math/worldUnits.js';
 import { WorldSignageRenderer } from './worldSignageRenderer.js';
 import { sortEnvelopesByTier } from './roadTiers.js';
 import { getRoadFillColor } from '../math/roadTypes.js';
+import type { VisibleWorldRect } from '../viewport/viewport.js';
+
+/** World-space padding (px) added around the visible rect when culling roads,
+ * lane markings, and markings, so wide roads and labels straddling the screen
+ * edge aren't clipped. Covers the widest road half-width plus signage. */
+const WORLD_CULL_MARGIN_PX = 300;
 
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field.
@@ -108,6 +114,10 @@ export class World implements IWorld {
   // Road signage placement cache, invalidated by Graph.hash() changes.
   #signageRenderer = new WorldSignageRenderer();
   #drawOrderCache: { hash: string; envelopes: Envelope[] } | null = null;
+  // The graph hash computed once at the top of the current draw() frame. Lets
+  // internal helpers (bridge shadows/details) reuse it instead of triggering a
+  // fresh O(n) Graph.hash() via the default parameter.
+  #frameGraphHash: string | null = null;
 
   constructor(
     graph: Graph,
@@ -294,6 +304,8 @@ export class World implements IWorld {
       carAlpha = 0.2,
       showCarNames = false,
       layers: layerOverrides,
+      graphHash: providedGraphHash,
+      screenBounds,
     } = options;
 
     const layers: WorldLayerVisibility = {
@@ -301,38 +313,50 @@ export class World implements IWorld {
       ...layerOverrides,
     };
 
+    // Graph.hash() is O(n); compute it once per frame and share it with every
+    // consumer (traffic manager, draw-order cache, signage caches) instead of
+    // recomputing it in each — that was ~5 redundant passes per frame. When the
+    // caller already computed it (editor change-detection), reuse that.
+    const graphHash = providedGraphHash ?? this.graph.hash();
+    this.#frameGraphHash = graphHash;
+    this.#signageRenderer.setFrameHash(graphHash);
+
     // Update traffic light states before drawing
-    this.trafficManager.update();
+    this.trafficManager.update(graphHash);
 
     if (layers.roads) {
       // Draw road envelopes (asphalt style, more wider then road borders itself)
       // Tier-sorted: higher-class roads paint on top of lower-class at overlaps.
-      for (const env of this.#getDrawOrderedEnvelopes()) {
+      for (const env of this.#getDrawOrderedEnvelopes(graphHash)) {
+        if (screenBounds && !this.#polygonInView(env.polygon, screenBounds)) {
+          continue;
+        }
         const seg = env.skeleton;
         const fill = getRoadFillColor(seg.highwayType);
         drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
       }
 
       // Draw bridge elevation shadows (under borders, above asphalt fills).
-      this.#drawBridgeShadows(ctx);
+      this.#drawBridgeShadows(ctx, screenBounds);
 
       // Draw road borders (solid white lines)
       for (const seg of this.roadBorders) {
+        if (screenBounds && !this.#segmentInView(seg, screenBounds)) continue;
         drawSegment(ctx, seg, { color: 'white', width: 4 });
       }
 
       // Draw lane separators or direction arrows
-      this.#drawLaneMarkings(ctx);
+      this.#drawLaneMarkings(ctx, screenBounds);
 
       // Draw parking-lane 'P' markings (from segment metadata)
-      this.#drawParkingLanes(ctx);
+      this.#drawParkingLanes(ctx, screenBounds);
 
       // Draw one-way arrows
       this.#signageRenderer.drawOneWayArrows(ctx, this.graph);
 
       // Draw bridge deck details: concrete overlay, parapet railings,
       // guardrail posts, and expansion joints.
-      this.#drawBridgeDetails(ctx);
+      this.#drawBridgeDetails(ctx, screenBounds);
 
       // Draw road name labels
       this.#signageRenderer.drawRoadNames(ctx, this.graph, this.zoom);
@@ -348,6 +372,9 @@ export class World implements IWorld {
     // Draw road markings (yield, stop, start, crosswalks, lights)
     if (layers.markings) {
       for (const marking of this.markings) {
+        if (screenBounds && !this.#pointInView(marking.center, screenBounds)) {
+          continue;
+        }
         if (!(marking instanceof Start) || showStartMarkings) {
           marking.draw(ctx);
         }
@@ -410,9 +437,13 @@ export class World implements IWorld {
   }
 
   /** Draws one-way arrows, hard-separation center lines, and dashed dividers. */
-  #drawLaneMarkings(ctx: CanvasRenderingContext2D): void {
+  #drawLaneMarkings(
+    ctx: CanvasRenderingContext2D,
+    screenBounds?: VisibleWorldRect,
+  ): void {
     for (const seg of this.graph.segments) {
       if (seg.laneMarkings === false) continue;
+      if (screenBounds && !this.#segmentInView(seg, screenBounds)) continue;
       const laneCount = seg.lanes ?? (seg.oneWay ? 1 : 2);
       const roadWidth = laneCount * LANE_WIDTH_PX;
 
@@ -430,11 +461,15 @@ export class World implements IWorld {
    * envelope; the glyphs sit at the parking-lane centre
    * (`drivingWidth/2 + PARKING_LANE_WIDTH_PX/2`) on the tagged side(s).
    */
-  #drawParkingLanes(ctx: CanvasRenderingContext2D): void {
+  #drawParkingLanes(
+    ctx: CanvasRenderingContext2D,
+    screenBounds?: VisibleWorldRect,
+  ): void {
     const bayLen = LANE_WIDTH_PX;
     const spacing = bayLen * 1.5;
     for (const seg of this.graph.segments) {
       if (!seg.parkingRight && !seg.parkingLeft) continue;
+      if (screenBounds && !this.#segmentInView(seg, screenBounds)) continue;
       const laneCount = seg.lanes ?? (seg.oneWay ? 1 : 2);
       const drivingWidth = laneCount * LANE_WIDTH_PX;
       const laneCenter = drivingWidth / 2 + PARKING_LANE_WIDTH_PX / 2;
@@ -537,15 +572,64 @@ export class World implements IWorld {
    * Tier-sorted envelopes, recomputed only when the graph changes, as
    * detected by its hash. Higher-class roads paint on top at overlaps.
    */
-  #getDrawOrderedEnvelopes(): Envelope[] {
-    const hash = this.graph.hash();
-    if (!this.#drawOrderCache || this.#drawOrderCache.hash !== hash) {
+  #getDrawOrderedEnvelopes(
+    graphHash: string = this.#frameGraphHash ?? this.graph.hash(),
+  ): Envelope[] {
+    if (!this.#drawOrderCache || this.#drawOrderCache.hash !== graphHash) {
       this.#drawOrderCache = {
-        hash,
+        hash: graphHash,
         envelopes: sortEnvelopesByTier(this.envelopes),
       };
     }
     return this.#drawOrderCache.envelopes;
+  }
+
+  /** True if a point lies within the visible rect, expanded by a margin. */
+  #pointInView(
+    p: Point,
+    b: VisibleWorldRect,
+    margin: number = WORLD_CULL_MARGIN_PX,
+  ): boolean {
+    return (
+      p.x >= b.minX - margin &&
+      p.x <= b.maxX + margin &&
+      p.y >= b.minY - margin &&
+      p.y <= b.maxY + margin
+    );
+  }
+
+  /** True if a segment's AABB (plus margin) overlaps the visible rect. */
+  #segmentInView(
+    seg: Segment,
+    b: VisibleWorldRect,
+    margin: number = WORLD_CULL_MARGIN_PX,
+  ): boolean {
+    const minX = Math.min(seg.p1.x, seg.p2.x);
+    const maxX = Math.max(seg.p1.x, seg.p2.x);
+    const minY = Math.min(seg.p1.y, seg.p2.y);
+    const maxY = Math.max(seg.p1.y, seg.p2.y);
+    return (
+      maxX >= b.minX - margin &&
+      minX <= b.maxX + margin &&
+      maxY >= b.minY - margin &&
+      minY <= b.maxY + margin
+    );
+  }
+
+  /** True if a polygon's AABB overlaps the visible rect (polygon already
+   * includes road width, so no extra margin is needed). */
+  #polygonInView(poly: { points: Point[] }, b: VisibleWorldRect): boolean {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const p of poly.points) {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    }
+    return maxX >= b.minX && minX <= b.maxX && maxY >= b.minY && minY <= b.maxY;
   }
 
   /**
@@ -554,7 +638,10 @@ export class World implements IWorld {
    * between the asphalt fill and the road borders. Uses the tier-sorted
    * envelope order so higher-tier bridges cast over lower-tier roads.
    */
-  #drawBridgeShadows(ctx: CanvasRenderingContext2D): void {
+  #drawBridgeShadows(
+    ctx: CanvasRenderingContext2D,
+    screenBounds?: VisibleWorldRect,
+  ): void {
     const SHADOW_DX = 4;
     const SHADOW_DY = 6;
     // Accumulate every bridge envelope's offset polygon into a SINGLE path and
@@ -566,6 +653,9 @@ export class World implements IWorld {
     ctx.beginPath();
     for (const env of this.#getDrawOrderedEnvelopes()) {
       if (!env.skeleton.bridge) continue;
+      if (screenBounds && !this.#polygonInView(env.polygon, screenBounds)) {
+        continue;
+      }
       hasBridge = true;
       const poly = env.polygon;
       ctx.moveTo(poly.points[0].x + SHADOW_DX, poly.points[0].y + SHADOW_DY);
@@ -587,7 +677,10 @@ export class World implements IWorld {
    * Designed to be subtle but readable — gives bridges a distinct
    * "engineered structure" feel without adding visual noise.
    */
-  #drawBridgeDetails(ctx: CanvasRenderingContext2D): void {
+  #drawBridgeDetails(
+    ctx: CanvasRenderingContext2D,
+    screenBounds?: VisibleWorldRect,
+  ): void {
     const PARAPET_WIDTH = 6;
     const PARAPET_INSET = 3; // px inset from the road border (white line)
     const GUARDRAIL_INTERVAL = 35; // px spacing between posts
@@ -604,6 +697,9 @@ export class World implements IWorld {
     ctx.beginPath();
     for (const env of this.#getDrawOrderedEnvelopes()) {
       if (!env.skeleton.bridge) continue;
+      if (screenBounds && !this.#polygonInView(env.polygon, screenBounds)) {
+        continue;
+      }
       hasBridge = true;
       const poly = env.polygon;
       ctx.moveTo(poly.points[0].x, poly.points[0].y);
@@ -618,6 +714,9 @@ export class World implements IWorld {
     }
 
     for (const env of this.#getDrawOrderedEnvelopes()) {
+      if (screenBounds && !this.#polygonInView(env.polygon, screenBounds)) {
+        continue;
+      }
       if (!env.skeleton.bridge) continue;
 
       const seg = env.skeleton;

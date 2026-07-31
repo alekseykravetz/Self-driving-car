@@ -400,6 +400,12 @@ vi.mock('../../../../ts/viewport/viewport.js', () => ({
       getZoom: vi.fn(() => 1),
       getMouse: vi.fn(() => ({ x: 0, y: 0 })),
       getPixelsPerMeter: vi.fn(() => 10),
+      getVisibleBounds: vi.fn(() => ({
+        minX: -1000,
+        minY: -1000,
+        maxX: 1000,
+        maxY: 1000,
+      })),
     };
   },
 }));

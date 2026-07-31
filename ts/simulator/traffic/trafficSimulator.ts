@@ -394,6 +394,7 @@ export class TrafficSimulator extends SimulatorShell {
       viewPoint,
       showStartMarkings: false,
       layers: this.worldLayers,
+      screenBounds: this.viewport.getVisibleBounds(),
     });
 
     this.viewport.drawScaleIndicator(this.gameCtx);

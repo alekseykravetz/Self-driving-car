@@ -17,6 +17,14 @@ export interface DragState {
  */
 export type ViewportMode = 'mouse' | 'touchpad';
 
+/** Axis-aligned world-space rectangle currently visible on the canvas. */
+export interface VisibleWorldRect {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
 export class Viewport {
   public canvas: HTMLCanvasElement;
   #ctx: CanvasRenderingContext2D;
@@ -121,6 +129,28 @@ export class Viewport {
 
   public getZoom(): number {
     return this.zoom;
+  }
+
+  /**
+   * The world-space rectangle currently visible on the canvas, used for
+   * viewport culling. Mirrors the transform applied in {@link reset}: the
+   * screen center maps to `-getOffset()` in world space, and one canvas pixel
+   * spans `zoom` world units.
+   * @param margin - Extra world-space padding added on every side so objects
+   *   straddling the edge aren't culled prematurely (default 0).
+   */
+  public getVisibleBounds(margin: number = 0): VisibleWorldRect {
+    const off = this.getOffset();
+    const centerX = -off.x;
+    const centerY = -off.y;
+    const halfW = (this.canvas.width / 2) * this.zoom;
+    const halfH = (this.canvas.height / 2) * this.zoom;
+    return {
+      minX: centerX - halfW - margin,
+      minY: centerY - halfH - margin,
+      maxX: centerX + halfW + margin,
+      maxY: centerY + halfH + margin,
+    };
   }
 
   public getPixelsPerMeter(): number {

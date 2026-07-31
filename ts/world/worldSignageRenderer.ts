@@ -45,6 +45,24 @@ export class WorldSignageRenderer {
   #shieldCache: { hash: string; shields: RoadShieldPlacement[] } | null = null;
   #exitSignCache: { hash: string; signs: ExitSignPlacement[] } | null = null;
 
+  // Precomputed graph hash for the current frame. `Graph.hash()` is O(n) and was
+  // being recomputed once per signage getter (~5 passes/frame). World sets this
+  // once via setFrameHash() so all getters share a single hash computation.
+  #frameHash: string | null = null;
+
+  /**
+   * Supplies the graph hash for the current draw frame so the placement getters
+   * avoid recomputing `Graph.hash()` individually. Pass `null` to fall back to
+   * computing the hash on demand.
+   */
+  setFrameHash(hash: string | null): void {
+    this.#frameHash = hash;
+  }
+
+  #graphHash(graph: Graph): string {
+    return this.#frameHash ?? graph.hash();
+  }
+
   /**
    * Street-label and speed-sign placements, recomputed only when the graph
    * (geometry or name/maxSpeed metadata) changes, as detected by its hash.
@@ -55,7 +73,7 @@ export class WorldSignageRenderer {
   } {
     // Fold the active signage language into the key: it selects label text but
     // is not part of the graph, so a language change must invalidate the cache.
-    const hash = `${graph.hash()}|${getSignageLanguage()}`;
+    const hash = `${this.#graphHash(graph)}|${getSignageLanguage()}`;
     if (!this.#signageCache || this.#signageCache.hash !== hash) {
       const signs = computeSpeedSignPlacements(graph);
       const labels = computeStreetLabelPlacements(graph.segments, {
@@ -67,7 +85,7 @@ export class WorldSignageRenderer {
   }
 
   #getOneWayArrows(graph: Graph): OneWayArrowPlacement[] {
-    const hash = graph.hash();
+    const hash = this.#graphHash(graph);
     if (!this.#oneWayArrowCache || this.#oneWayArrowCache.hash !== hash) {
       this.#oneWayArrowCache = {
         hash,
@@ -78,7 +96,7 @@ export class WorldSignageRenderer {
   }
 
   #getRoadShields(graph: Graph): RoadShieldPlacement[] {
-    const hash = graph.hash();
+    const hash = this.#graphHash(graph);
     if (!this.#shieldCache || this.#shieldCache.hash !== hash) {
       this.#shieldCache = {
         hash,
@@ -89,7 +107,7 @@ export class WorldSignageRenderer {
   }
 
   #getExitSigns(graph: Graph): ExitSignPlacement[] {
-    const hash = graph.hash();
+    const hash = this.#graphHash(graph);
     if (!this.#exitSignCache || this.#exitSignCache.hash !== hash) {
       this.#exitSignCache = {
         hash,
