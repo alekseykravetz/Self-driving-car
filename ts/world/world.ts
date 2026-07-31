@@ -301,13 +301,19 @@ export class World implements IWorld {
       ...layerOverrides,
     };
 
+    // Graph.hash() is O(n); compute it once per frame and share it with every
+    // consumer (traffic manager, draw-order cache, signage caches) instead of
+    // recomputing it in each — that was ~5 redundant passes per frame.
+    const graphHash = this.graph.hash();
+    this.#signageRenderer.setFrameHash(graphHash);
+
     // Update traffic light states before drawing
-    this.trafficManager.update();
+    this.trafficManager.update(graphHash);
 
     if (layers.roads) {
       // Draw road envelopes (asphalt style, more wider then road borders itself)
       // Tier-sorted: higher-class roads paint on top of lower-class at overlaps.
-      for (const env of this.#getDrawOrderedEnvelopes()) {
+      for (const env of this.#getDrawOrderedEnvelopes(graphHash)) {
         const seg = env.skeleton;
         const fill = getRoadFillColor(seg.highwayType);
         drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
@@ -537,11 +543,10 @@ export class World implements IWorld {
    * Tier-sorted envelopes, recomputed only when the graph changes, as
    * detected by its hash. Higher-class roads paint on top at overlaps.
    */
-  #getDrawOrderedEnvelopes(): Envelope[] {
-    const hash = this.graph.hash();
-    if (!this.#drawOrderCache || this.#drawOrderCache.hash !== hash) {
+  #getDrawOrderedEnvelopes(graphHash: string = this.graph.hash()): Envelope[] {
+    if (!this.#drawOrderCache || this.#drawOrderCache.hash !== graphHash) {
       this.#drawOrderCache = {
-        hash,
+        hash: graphHash,
         envelopes: sortEnvelopesByTier(this.envelopes),
       };
     }

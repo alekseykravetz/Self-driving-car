@@ -33,14 +33,13 @@ export class TrafficManager {
     this.markings = markings;
     this.frameCount = 0;
 
-    this.#refreshControlCenters();
+    this.#refreshControlCenters(this.graph.hash());
   }
 
   // Crossroads, an intersection of two or more roads. Finds graph points where more than 2 segments meet
-  #getCrossroads(): Point[] {
+  #getCrossroads(graphHash: string): Point[] {
     // Depends only on graph topology; cache by the graph's change signature.
-    const key = this.graph.hash();
-    if (this.#crossroadsCache && this.#crossroadsKey === key) {
+    if (this.#crossroadsCache && this.#crossroadsKey === graphHash) {
       return this.#crossroadsCache;
     }
 
@@ -59,7 +58,7 @@ export class TrafficManager {
     }
 
     this.#crossroadsCache = subset;
-    this.#crossroadsKey = key;
+    this.#crossroadsKey = graphHash;
     return subset;
   }
 
@@ -68,8 +67,7 @@ export class TrafficManager {
    * topology plus the count and positions of Light markings. When unchanged,
    * the cached control centers are reused instead of rebuilt.
    */
-  #controlCentersSignature(): string {
-    const graphHash = this.graph.hash();
+  #controlCentersSignature(graphHash: string): string {
     let lightHash = 2166136261;
     let lightCount = 0;
     for (const m of this.markings) {
@@ -85,20 +83,20 @@ export class TrafficManager {
   }
 
   /** Rebuilds control centers only when their inputs have changed. */
-  #refreshControlCenters(): void {
-    const key = this.#controlCentersSignature();
+  #refreshControlCenters(graphHash: string): void {
+    const key = this.#controlCentersSignature(graphHash);
     if (key === this.#controlCentersKey && this.controlCenters) return;
-    this.#initializeControlCenters();
+    this.#initializeControlCenters(graphHash);
     this.#controlCentersKey = key;
   }
 
-  #initializeControlCenters(): void {
+  #initializeControlCenters(graphHash: string): void {
     this.controlCenters = []; // Reset
     // Filter only Light instances from all markings
     const lights = this.markings.filter((m): m is Light => m instanceof Light);
     if (!lights.length) return; // No lights to manage
 
-    const crossroadPoints = this.#getCrossroads();
+    const crossroadPoints = this.#getCrossroads(graphHash);
     if (crossroadPoints.length === 0) {
       // Maybe handle lights not at intersections differently or log a warning
       // console.warn("No intersections found to control lights.");
@@ -159,8 +157,8 @@ export class TrafficManager {
   }
 
   // Updates the state of all managed traffic lights based on time/frameCount
-  update(): void {
-    this.#refreshControlCenters(); // Rebuilds only when graph/lights changed
+  update(graphHash: string = this.graph.hash()): void {
+    this.#refreshControlCenters(graphHash); // Rebuilds only when graph/lights changed
     if (!this.controlCenters.length) return; // Nothing to update
 
     // Determine current state based on frame count (assuming 60 FPS target)
