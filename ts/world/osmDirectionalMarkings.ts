@@ -55,7 +55,9 @@ export function expandDirectionalMarking(
   graph: Graph,
   setback: number = STOP_LINE_SETBACK_PX,
 ): DirectionalPlacement[] {
-  const facing = (): Point => new Point(directionVector.x, directionVector.y);
+  // Emit the marking flipped 180° from the seed travel direction so the painted
+  // text reads for the approaching driver.
+  const facing = (): Point => new Point(-directionVector.x, -directionVector.y);
 
   // 1. Approach segment: incident to the node, road axis most collinear with
   //    the seed direction (either orientation).

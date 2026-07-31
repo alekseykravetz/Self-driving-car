@@ -512,9 +512,9 @@ per-lane guides with `laneGuidesForSegment()`, and keeps the approaching lanes:
 **two-way** roads → only the lanes on the driver's **right** of the road centre
 (the approaching side under Israel's right-hand traffic); the opposing lanes get
 none. **one-way** roads → **all** lanes (every lane flows into the junction).
-Every emitted marking keeps the seed's **travel-direction facing** (the same
-`directionVector` the single-marking placement used), so the painted text reads
-for the approaching driver. A degenerate node with no incident approach segment
+Every emitted marking faces **180° from the seed** travel direction (the seed's
+`directionVector` negated), so the painted text reads for the approaching
+driver. A degenerate node with no incident approach segment
 falls back to the single centred seed. An optional `STOP_LINE_SETBACK_PX`
 (default 0) nudges the marking upstream (against travel) of the junction.
 
@@ -801,6 +801,7 @@ interface MarkingAnchor {
   p2: Point;
   offset: number; // 0..1 position along the segment
   lateral: number; // Signed perpendicular distance from the segment
+  flipped?: boolean; // Marking faces OPPOSITE to the segment's p1→p2 direction
 }
 ```
 
@@ -808,10 +809,15 @@ On regeneration, `World.generate` calls `marking.reanchor(graph)` for every
 marking. `reanchor` re-finds the anchor segment (by matching endpoints, falling
 back to the nearest segment) and recomputes `center` / `directionVector`, then
 rebuilds the marking geometry via a protected `rebuildGeometry()` hook
-(subclasses override it to refresh cached borders, e.g. `Stop.border`). If no
-matching segment exists, the marking keeps its last absolute position. Old
-saved worlds without an `anchor` still load and gain one the first time they are
-placed near a segment.
+(subclasses override it to refresh cached borders, e.g. `Stop.border`). The
+direction is restored as `±seg.directionVector()` according to the anchor's
+`flipped` flag (recorded by `setAnchor` from the authored `directionVector`), so
+the marking's authored orientation survives reanchoring — without `flipped`,
+`reanchor` would force **every** marking to face `p1→p2`, discarding intentional
+flips such as the per-lane OSM stop/yield facing. If no matching segment exists,
+the marking keeps its last absolute position. Old saved worlds without an
+`anchor` still load and gain one the first time they are placed near a segment
+(legacy anchors without `flipped` default to facing `p1→p2`).
 
 ### Marking Types
 

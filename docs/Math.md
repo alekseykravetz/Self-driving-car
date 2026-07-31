@@ -783,7 +783,7 @@ class Osm {
      the seed is expanded PER APPROACH LANE downstream in the world layer
      (expandDirectionalMarking + laneGuidesForSegment), one-way → all lanes,
      two-way → the driver's-right (approaching) lanes only; every per-lane
-     marking keeps the seed's travel-direction facing. Not one marking per node.
+     marking faces 180° from the seed travel direction. Not one marking per node.
    PARKING (parking:* WAY-side attribute, NOT a node, NOT a marking) —
      hasParkingSide() reads parking:right*/parking:left*/parking:both* (and
      legacy parking:lane:*) on each way (value no/none = absent) and records

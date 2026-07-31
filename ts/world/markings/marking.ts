@@ -37,6 +37,10 @@ export interface MarkingAnchor {
   p2: Point;
   offset: number;
   lateral: number;
+  // True when the marking faces OPPOSITE to the anchored segment's
+  // directionVector (p1→p2). Preserves the authored orientation across
+  // reanchoring; absent on legacy saves (treated as false = faces with p1→p2).
+  flipped?: boolean;
 }
 
 /** Finds the graph segment matching a saved anchor (same endpoint order). */
@@ -107,11 +111,16 @@ export class Marking {
     const along = lerp2D(seg.p1, seg.p2, offset);
     const normal = perpendicular(seg.directionVector());
     const lateral = dot(subtract(this.center, along), normal);
+    // Record whether the marking faces against the segment direction so the
+    // authored orientation survives reanchoring (reanchor would otherwise force
+    // every marking to face p1→p2, discarding intentional flips).
+    const flipped = dot(this.directionVector, seg.directionVector()) < 0;
     this.anchor = {
       p1: new Point(seg.p1.x, seg.p1.y),
       p2: new Point(seg.p2.x, seg.p2.y),
       offset,
       lateral,
+      flipped,
     };
   }
 
@@ -132,7 +141,12 @@ export class Marking {
     const along = lerp2D(seg.p1, seg.p2, this.anchor.offset);
     const normal = perpendicular(seg.directionVector());
     this.center = add(along, scale(normal, this.anchor.lateral));
-    this.directionVector = seg.directionVector();
+    // Restore the authored orientation: face against the segment when the anchor
+    // recorded a flip, otherwise with it. Preserves per-lane / OSM facing.
+    const segDir = seg.directionVector();
+    this.directionVector = this.anchor.flipped
+      ? new Point(-segDir.x, -segDir.y)
+      : segDir;
     this.anchor.p1 = new Point(seg.p1.x, seg.p1.y);
     this.anchor.p2 = new Point(seg.p2.x, seg.p2.y);
     this.rebuildGeometry();
