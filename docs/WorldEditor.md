@@ -363,6 +363,40 @@ The OSM importer (`ts/math/osm-importer/osm.ts`) converts raw OpenStreetMap JSON
 `Point`/`Segment` graph. In addition to the road geometry, it now extracts and
 stores **per-way metadata** on each `Segment`:
 
+### Non-blocking import (time-sliced generation + progress overlay)
+
+Large OSM imports used to freeze the tab (and trip the browser's "page
+unresponsive" dialog) because the whole pipeline — JSON parse → OSM parse →
+marking placement → road/building/tree generation — ran in one synchronous
+burst. It is now **cooperatively time-sliced** and driven by a full-screen
+progress overlay (`<generation-progress>`, `ts/ui/molecules/generationProgress.ts`):
+
+1. `WorldEditor.parseOsmData()` is `async`. It shows the overlay **first**
+   (label "Reading data…"), yields a frame so it paints, then runs
+   `JSON.parse` (native, unavoidably synchronous — the one remaining hard block
+   for enormous pastes; a Web Worker would be needed to offload it).
+2. `Osm.parseRoadsChunked(data)` — a generator that yields a `[0, 1]` progress
+   fraction at every loop boundary (element partition, node→Point conversion,
+   way→Segment conversion, marking assembly). `Osm.parseRoads()` remains a thin
+   synchronous drain wrapper for tests and non-UI callers. The prefix is a
+   **single-pass partition** of `data.elements` into nodes/ways with the
+   geographic bounds computed inline — no more double `.filter()` or
+   `Math.min(...hugeArray)` spread (which risked a call-stack overflow).
+3. Marking placement (`expandDirectionalMarking`, which scans every segment per
+   stop/yield seed) yields to the browser every few markings.
+4. `World.generateAsync({ roads, buildings, trees, onProgress })` runs the
+   geometry stages time-sliced (see [Math → time-sliced generation](Math.md#time-sliced-world-generation)).
+
+The runner is `runChunkedGenerator(gen, onProgress, budgetMs = 12)`
+(`ts/world/generation/generationProgress.ts`): it pumps the generator, calling
+`onProgress` with each yielded fraction and returning control to the browser
+(via `setTimeout(0)`) whenever a slice exceeds the ~12 ms budget. The **♻️
+Regenerate items** action uses the same `World.generateAsync` path
+(`{ roads: false, buildings: true, trees: true }`). A `#generating` guard blocks
+re-entrant runs, and the overlay blocks interaction while active.
+
+### Per-way metadata
+
 | Tag               | Segment field    | Notes                                                                                                                 |
 | ----------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `highway`         | `highwayType`    | Road classification — drives envelope fill color                                                                      |

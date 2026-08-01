@@ -530,30 +530,40 @@ export class WorldEditor {
       return;
     }
 
-    let osmDataJson: OsmData;
-    try {
-      osmDataJson = JSON.parse(osmData);
-    } catch (error) {
-      alert(`Invalid JSON data in OSM input: ${error}`);
-      console.error('Error parsing OSM JSON:', error);
-      return;
-    }
-
     if (this.#generating) return;
-    // Reveal the progress overlay and let it paint BEFORE the synchronous OSM
-    // parse + geometry work, so a large import never leaves the tab frozen.
+    // Reveal the progress overlay and let it paint BEFORE any heavy synchronous
+    // work (JSON.parse + OSM parse + geometry), so a large import never leaves
+    // the tab frozen with no feedback.
     this.#generating = true;
     this.#worldLayersToolbar?.setBusy(true);
     const overlay = this.#generationProgress;
     overlay?.start('Importing OSM data…');
     overlay?.update({
       stage: 'roads',
-      label: 'Parsing road network…',
+      label: 'Reading data…',
       fraction: 0,
     });
     await yieldToBrowser();
 
     try {
+      // JSON.parse is native and cannot be chunked; run it with the overlay
+      // already visible. (For extremely large pastes this is the one remaining
+      // synchronous block — a Web Worker would be needed to offload it.)
+      let osmDataJson: OsmData;
+      try {
+        osmDataJson = JSON.parse(osmData);
+      } catch (error) {
+        alert(`Invalid JSON data in OSM input: ${error}`);
+        console.error('Error parsing OSM JSON:', error);
+        return;
+      }
+      overlay?.update({
+        stage: 'roads',
+        label: 'Parsing road network…',
+        fraction: 0,
+      });
+      await yieldToBrowser();
+
       // Parse roads via the time-sliced generator so a large import keeps the
       // main thread responsive (and updates the progress bar) instead of
       // freezing at 0% while parsing.

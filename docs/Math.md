@@ -639,6 +639,90 @@ that matters to the inside/near/close checks has a polygon edge within
 
 ---
 
+## Time-sliced world generation (`ts/world/generation/`)
+
+Large OSM imports generate tens of thousands of segments/buildings. Running the
+pipeline synchronously froze the tab and tripped the browser's "page
+unresponsive" dialog. Generation is now **cooperatively time-sliced**: the heavy
+loops are generators that `yield` a local `[0, 1]` progress fraction, driven by a
+small runner in `generationProgress.ts`.
+
+```typescript
+interface GenerationProgress {
+  stage: 'roads' | 'buildings' | 'trees';
+  label: string;
+  fraction: number; // overall [0, 1]
+}
+
+// Pump a progress-yielding generator, returning control to the browser
+// (setTimeout 0) whenever a slice exceeds ~budgetMs, and reporting each yielded
+// fraction. Returns the generator's return value.
+async function runChunkedGenerator<T>(
+  gen: Generator<number, T>,
+  onLocalProgress: (f: number) => void,
+  budgetMs = 12,
+): Promise<T>;
+
+function drainGenerator<T>(gen: Generator<unknown, T>): T; // run to completion (sync)
+function yieldToBrowser(): Promise<void>; // resolve on next macrotask
+```
+
+`WorldGenerator.generateAsync(world, { roads, buildings, trees, onProgress })`
+splits `[0, 1]` evenly across the active stages and drives each stage's
+generator through `runChunkedGenerator`. `World.generateAsync(...)` wraps it and
+clears the draw-order cache afterwards. The synchronous `WorldGenerator.generate`
+/ `generateRoads` / `generateBuildings` / `generateTrees` remain (they now
+`drainGenerator` the same generators), so tests and non-UI callers are unchanged
+and produce **identical** output.
+
+### Grid-accelerated chunked union (`unionGen`)
+
+`Polygon.union` breaks overlapping polygon pairs with an **O(n²)** all-pairs
+bounding-box scan and runs with no yields — the dominant "finding places" freeze
+on both road and building generation. `unionGen(polygons)` is a generation-local
+generator that produces the **same segment set and order** as `Polygon.union`
+but:
+
+- replaces the O(n²) pair scan with an `OwnerGrid` lookup (each polygon queries
+  only nearby candidates — near-linear), and
+- yields a `[0, 1]` fraction across its two phases (break, then interior-segment
+  cull) so the union no longer blocks.
+
+Order preservation: candidate polygons are visited in ascending index order
+(replicating `Polygon.multiBreak`'s `i < j` pairing), and the interior test
+discards a segment iff some polygon contains its midpoint — identical to the
+linear scan, the grid just narrows the set of polygons that can.
+
+### Grid-indexed building footprint filter
+
+Building de-overlap kept a base iff no earlier-kept base overlapped it (or sat
+within `spacing`) — an **O(n²)** scan that dominated the "placing buildings"
+step. It is now a **forward-greedy filter over an `OwnerGrid`** of kept bases:
+each candidate tests only nearby keepers (query radius covers `maxExtent * 2 +
+spacing`). This yields the **identical** survivor set and order (verified by a
+non-overlap/spacing invariant test in `tests/unit/world/generation/`), turning
+O(n²) into near-linear work.
+
+### Chunked OSM parse (`Osm.parseRoadsChunked`)
+
+`Osm.parseRoads` is a generator (`parseRoadsChunked`) drained by a thin
+synchronous wrapper. Every O(map-size) loop yields: a single-pass partition of
+`data.elements` into nodes/ways (bounds computed inline — no double `.filter()`
+or `Math.min(...)` spread), node→Point conversion, the marking-kind and
+ref-count passes, the way→Segment loop, and marking assembly. Only native
+`JSON.parse` (in `WorldEditor.parseOsmData`, before the generator) stays
+synchronous.
+
+### Draw-order cache invalidation
+
+`World.#getDrawOrderedEnvelopes` caches the tier-sorted envelope list. It is
+keyed by `Graph.hash()` **and** `this.envelopes.length`: async generation
+repopulates the envelopes array without changing the graph hash, so a hash-only
+key would keep serving the pre-generation (empty) set and leave imported roads
+unfilled until the next hash change.
+
+---
+
 ## OSM Importer (`ts/math/osm-importer/osm.ts`)
 
 Converts OpenStreetMap JSON data (from Overpass API) into the project's Point/Segment format for creating real-world road networks.
@@ -696,6 +780,7 @@ interface OsmMarkingPlacement {
 }
 
 class Osm {
+  // Synchronous — drains parseRoadsChunked to completion (tests, non-UI callers)
   static parseRoads(data: OsmData): {
     points: Point[];
     segments: Segment[];
@@ -704,22 +789,23 @@ class Osm {
     stops: OsmMarkingPlacement[]; // highway=stop
     yields: OsmMarkingPlacement[]; // highway=give_way
   };
+
+  // Time-sliced generator (same result) — yields [0, 1] progress at loop
+  // boundaries so large imports stay responsive. See "Time-sliced world
+  // generation". Driven by the World Editor via runChunkedGenerator.
+  static *parseRoadsChunked(data: OsmData): Generator<number, ParsedRoads>;
 }
 ```
 
 ### Conversion Process
 
 ```
-1. EXTRACT NODES
-   Filter elements where type === 'node'
-   Collect all lat/lon coordinates
+1. PARTITION ELEMENTS (single pass, chunked)
+   One loop over data.elements → nodes[] and ways[],
+   computing lat/lon bounds inline (no double .filter or Math.min spread)
 
-2. CALCULATE BOUNDS
-   minLat, maxLat, minLon, maxLon
-   deltaLat = maxLat - minLat
-   deltaLon = maxLon - minLon
-
-3. COMPUTE SCALE
+2. BOUNDS → SCALE
+   deltaLat = maxLat - minLat;  deltaLon = maxLon - minLon
    height = deltaLat * METERS_PER_DEGREE_LATITUDE * WORLD_PIXELS_PER_METER
    // 1° latitude ≈ 111km, WORLD_PIXELS_PER_METER = 14
    // 14px = 1m, so a 100px two-lane road is ≈7.1m
@@ -727,13 +813,13 @@ class Osm {
    width = height * ar * cos(avgLatitude)
    // Cosine correction for longitude distance at latitude
 
-4. CONVERT COORDINATES
+3. CONVERT COORDINATES
    For each node:
      x = invLerp(minLon, maxLon, node.lon) * width
      y = invLerp(maxLat, minLat, node.lat) * height
      // Note: Y inverted (north = top = low Y)
 
-5. PARSE WAYS (roads)
+4. PARSE WAYS (roads)
    For each way element:
      Connect consecutive nodes as Segments
      Detect one-way: tags.oneway === 'yes' OR '-1' OR tags.lanes === '1'

@@ -181,10 +181,31 @@ export class Osm {
    * drive it with a chunked runner to keep the UI responsive.
    */
   static *parseRoadsChunked(data: OsmData): Generator<number, ParsedRoads> {
-    // Filter out only node elements using a type guard
-    const nodes = data.elements.filter(
-      (element): element is OsmNodeElement => element.type === 'node',
-    );
+    // Partition elements into nodes/ways in a SINGLE chunked pass and compute
+    // the geographic bounds inline. Previously this was two `.filter()` passes
+    // plus a `Math.min(...latitudes)` spread — an unchunked O(elements) block
+    // (and a call-stack-overflow risk on huge imports) that ran before the
+    // first yield, so it could still freeze the tab.
+    const elements = data.elements;
+    const nodes: OsmNodeElement[] = [];
+    const ways: OsmWayElement[] = [];
+    let minLat = Infinity;
+    let maxLat = -Infinity;
+    let minLon = Infinity;
+    let maxLon = -Infinity;
+    for (let ei = 0; ei < elements.length; ei++) {
+      const el = elements[ei];
+      if (el.type === 'node') {
+        nodes.push(el);
+        if (el.lat < minLat) minLat = el.lat;
+        if (el.lat > maxLat) maxLat = el.lat;
+        if (el.lon < minLon) minLon = el.lon;
+        if (el.lon > maxLon) maxLon = el.lon;
+      } else if (el.type === 'way') {
+        ways.push(el);
+      }
+      if ((ei & 8191) === 0) yield (0.15 * ei) / Math.max(elements.length, 1);
+    }
 
     // Early exit if no nodes are found
     if (nodes.length === 0) {
@@ -197,20 +218,6 @@ export class Osm {
         stops: [],
         yields: [],
       };
-    }
-
-    // Geographic bounds. Compute in a single pass — spreading a huge coordinate
-    // array into Math.min/Math.max (`Math.min(...latitudes)`) risks a call-stack
-    // overflow on large imports, and allocating the arrays is wasteful.
-    let minLat = Infinity;
-    let maxLat = -Infinity;
-    let minLon = Infinity;
-    let maxLon = -Infinity;
-    for (const node of nodes) {
-      if (node.lat < minLat) minLat = node.lat;
-      if (node.lat > maxLat) maxLat = node.lat;
-      if (node.lon < minLon) minLon = node.lon;
-      if (node.lon > maxLon) maxLon = node.lon;
     }
 
     // Calculate scaling factors for coordinate conversion
@@ -249,15 +256,13 @@ export class Osm {
       point.id = node.id; // Attach OSM ID to the Point object (requires Point class modification)
       points.push(point);
       nodeMap.set(node.id, point); // Store in map for quick lookup
-      // Node conversion is O(nodes); yield through the first ~30% of progress.
-      if ((ni & 4095) === 0) yield (0.3 * ni) / nodes.length;
+      // Node conversion is O(nodes); yield through the ~0.15→0.3 progress band.
+      if ((ni & 4095) === 0) {
+        yield 0.15 + (0.15 * ni) / nodes.length;
+      }
     }
 
     const segments: Segment[] = []; // To store created Segment objects
-    // Filter out only way elements using a type guard
-    const ways = data.elements.filter(
-      (element): element is OsmWayElement => element.type === 'way',
-    );
 
     // Collect tagged nodes that become road markings. All lie ON highway ways,
     // so `out body;` output carries their tags. Directional markings (lights,
@@ -266,13 +271,15 @@ export class Osm {
     // flows past them — authoritative for the marking's facing.
     const nodeKind = new Map<number, MarkingKind>();
     const signalDir = new Map<number, 'forward' | 'backward'>();
-    for (const node of nodes) {
+    for (let ni = 0; ni < nodes.length; ni++) {
+      const node = nodes[ni];
       const hw = node.tags?.highway;
       let kind: MarkingKind | undefined;
       if (hw === 'traffic_signals') kind = 'light';
       else if (hw === 'crossing') kind = 'crossing';
       else if (hw === 'stop') kind = 'stop';
       else if (hw === 'give_way') kind = 'yield';
+      if ((ni & 8191) === 0) yield 0.3;
       if (!kind) continue;
       nodeKind.set(node.id, kind);
       // Directional kinds (light/stop/yield) honour the node's `direction` tag;
@@ -289,10 +296,12 @@ export class Osm {
     // orient directional markings on two-way roads (face away from the junction).
     const nodeRefCount = new Map<number, number>();
     if (nodeKind.size > 0) {
-      for (const way of ways) {
+      for (let wi = 0; wi < ways.length; wi++) {
+        const way = ways[wi];
         for (const nid of way.nodes) {
           nodeRefCount.set(nid, (nodeRefCount.get(nid) ?? 0) + 1);
         }
+        if ((wi & 8191) === 0) yield 0.3;
       }
     }
     // Per tagged node, gather every neighbouring road node (across all ways)
