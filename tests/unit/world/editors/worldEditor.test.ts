@@ -448,9 +448,10 @@ vi.mock('../../../../ts/math/osm-importer/osm.js', () => {
   return {
     Osm: {
       parseRoads: vi.fn(() => ({ ...emptyResult })),
-      // The editor drives the chunked generator; default returns a generator
-      // that immediately completes with an empty result.
+      // The editor drives the chunked generator; default yields once (100%)
+      // then completes with an empty result.
       parseRoadsChunked: vi.fn(function* () {
+        yield 1;
         return { ...emptyResult };
       }),
     },
@@ -787,6 +788,7 @@ describe('WorldEditor', () => {
       };
       vi.mocked(Osm.parseRoadsChunked).mockReturnValueOnce(
         (function* () {
+          yield 1;
           return parsed;
         })() as unknown as ReturnType<typeof Osm.parseRoadsChunked>,
       );

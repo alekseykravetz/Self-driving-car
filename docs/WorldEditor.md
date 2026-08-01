@@ -584,6 +584,16 @@ On-road signage placement is computed by the pure module
 viewport zoom is ≥ 0.4 (`MIN_SIGNAGE_ZOOM`). Placements are cached on `World`
 keyed by `Graph.hash()` and recomputed only when the graph changes.
 
+> **Performance.** The placement math groups/chains segments by shared
+> endpoints. All shared-endpoint logic — `buildConnectedComponents` and
+> `orderSegmentWalk` (`ts/world/streetWalk.ts`), the speed-zone union-find and
+> the per-node limit-change scan (`roadSignage.ts`) — uses **`"x,y"` endpoint
+> hash indexes** rather than pairwise `Point.equals`/`Segment.includes` scans,
+> so building the signage caches is near-linear. This matters because the caches
+> are built inside the draw loop on the first frame after an import; the old
+> O(n²) versions took minutes on large OSM maps. Keep it near-linear — do not
+> reintroduce all-pairs endpoint comparisons.
+
 **Street-name labels** — connected segments sharing the same display name are
 grouped into street polylines; each street gets `max(1, round(length /
 STREET_LABEL_SPACING_PX))` labels (spacing = 1000 px) evenly spaced along its
@@ -722,12 +732,15 @@ class TrafficManager {
 
 ### Performance: cached control centers
 
-Crossroad detection is `O(points × segments)` (it counts, for every graph point,
-how many segments include it). Running that every frame froze the app on large
-OSM imports. Two caches fix it:
+Crossroad detection finds graph points where 3+ segments meet. It builds an
+**endpoint-degree map** in one pass over the segments (keyed by the exact `"x,y"`
+coordinate, since `Point.equals` is an exact compare) and then selects points
+with degree > 2 — near-linear, replacing the original `O(points × segments)`
+scan (`seg.includes(point)` for every point×segment pair) that froze large OSM
+imports. Two caches further reduce work:
 
-- **Crossroads** are cached by `Graph.hash()` — the `O(n²)` scan reruns only when
-  the graph topology actually changes.
+- **Crossroads** are cached by `Graph.hash()` — the near-linear scan reruns only
+  when the graph topology actually changes.
 - **Control centers** are rebuilt only when a cheap signature (graph hash +
   Light count + Light positions) changes. `update()` calls
   `#refreshControlCenters(graphHash)`, which is a no-op on frames where nothing
