@@ -221,22 +221,48 @@ function* wgGenerateBuildingsGen(
     bases.push(new Envelope(seg, world.buildingWidth).polygon);
   }
 
+  // Footprint de-overlap. The original algorithm keeps a base iff no EARLIER
+  // kept base overlaps it (or sits within `spacing`) — an O(n²) all-pairs scan
+  // that dominated large-map generation (the "placing buildings" step). This
+  // keeps the identical survivor set and order (forward greedy in original
+  // index order) but uses a spatial grid so each candidate only tests nearby
+  // keepers, turning O(n²) into near-linear work.
   const epsilon = 0.001;
-  const total = Math.max(bases.length - 1, 1);
-  for (let i = 0; i < bases.length - 1; i++) {
-    for (let j = i + 1; j < bases.length; j++) {
+  const total = Math.max(bases.length, 1);
+  const baseBounds = bases.map(polygonAABB);
+  let maxExtent = 0;
+  for (const b of baseBounds) {
+    maxExtent = Math.max(maxExtent, b.maxX - b.minX, b.maxY - b.minY);
+  }
+  const keepGrid = new OwnerGrid(Math.max(maxExtent, 1));
+  // A colliding keeper's AABB lies within (candidate half-extent + spacing +
+  // keeper extent) of the candidate centre; this square covers that bound.
+  const queryRadius = maxExtent * 2 + world.spacing;
+  const kept: Polygon[] = [];
+  for (let i = 0; i < bases.length; i++) {
+    const c = bases[i];
+    const cb = baseBounds[i];
+    const cx = (cb.minX + cb.maxX) / 2;
+    const cy = (cb.minY + cb.maxY) / 2;
+    let collides = false;
+    for (const k of keepGrid.query(cx, cy, queryRadius)) {
+      const kp = kept[k];
       if (
-        bases[i].intersectsPolygon(bases[j]) ||
-        bases[i].distanceToPolygon(bases[j]) < world.spacing - epsilon
+        kp.intersectsPolygon(c) ||
+        kp.distanceToPolygon(c) < world.spacing - epsilon
       ) {
-        bases.splice(j, 1);
-        j--;
+        collides = true;
+        break;
       }
     }
-    if ((i & 15) === 0) yield 0.35 + (0.65 * i) / total;
+    if (!collides) {
+      keepGrid.insertBounds(cb.minX, cb.minY, cb.maxX, cb.maxY, kept.length);
+      kept.push(c);
+    }
+    if ((i & 63) === 0) yield 0.35 + (0.65 * i) / total;
   }
   yield 1;
-  return bases.map((b) => new Building(b));
+  return kept.map((b) => new Building(b));
 }
 
 /** Building placement (O(n²) footprint collision filter). */
@@ -610,15 +636,22 @@ function* wgGenerateRoadsGen(world: WorldGeneratable): Generator<number, void> {
   world.roadBorders.length = 0;
   world.separatorBorders.length = 0;
 
-  for (const segment of world.graph.segments) {
+  const segments = world.graph.segments;
+  const segTotal = Math.max(segments.length, 1);
+  for (let s = 0; s < segments.length; s++) {
+    const segment = segments[s];
     const { width, offset } = getSegmentEnvelopeGeometry(segment);
     world.envelopes.push(
       new Envelope(segment, width, world.roadRoundness, undefined, offset),
     );
+    // Envelope construction is O(segments); yield periodically so a large map
+    // doesn't block the main thread here before the union even starts. The
+    // union itself (below) reports the bulk of the [0, 1] road progress.
+    if ((s & 255) === 0) yield (0.1 * s) / segTotal;
   }
 
   const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
-  const borders = yield* unionGen(roadPolygons);
+  const borders = yield* remapGen(unionGen(roadPolygons), 0.1, 1);
   world.roadBorders.push(...borders);
   world.laneGuides.push(...wgGenerateLaneGuides(world.graph));
   world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
