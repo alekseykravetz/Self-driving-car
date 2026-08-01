@@ -17,6 +17,7 @@ import { Start } from './markings/start.js';
 import { Corridor } from './corridor.js';
 import { TrafficManager } from './trafficManager.js';
 import { WorldGenerator } from './generation/worldGenerator.js';
+import type { GenerationProgressCallback } from './generation/generationProgress.js';
 import {
   IWorld,
   WorldDrawOptions,
@@ -113,7 +114,11 @@ export class World implements IWorld {
 
   // Road signage placement cache, invalidated by Graph.hash() changes.
   #signageRenderer = new WorldSignageRenderer();
-  #drawOrderCache: { hash: string; envelopes: Envelope[] } | null = null;
+  #drawOrderCache: {
+    hash: string;
+    count: number;
+    envelopes: Envelope[];
+  } | null = null;
   // The graph hash computed once at the top of the current draw() frame. Lets
   // internal helpers (bridge shadows/details) reuse it instead of triggering a
   // fresh O(n) Graph.hash() via the default parameter.
@@ -261,6 +266,24 @@ export class World implements IWorld {
   }): void {
     this.#drawOrderCache = null;
     WorldGenerator.generate(this, opts);
+  }
+
+  /**
+   * Cooperative, time-sliced generation that keeps the UI responsive and
+   * reports progress. Used for large OSM imports and "Regenerate items".
+   */
+  async generateAsync(opts?: {
+    roads?: boolean;
+    buildings?: boolean;
+    trees?: boolean;
+    onProgress?: GenerationProgressCallback;
+  }): Promise<void> {
+    this.#drawOrderCache = null;
+    await WorldGenerator.generateAsync(this, opts);
+    // Envelopes were repopulated in place (stable array ref, unchanged graph
+    // hash); drop the cache so the next draw rebuilds the tier order from the
+    // freshly generated set.
+    this.#drawOrderCache = null;
   }
 
   /** Back-compat accessor: the primary (first) corridor, or null. */
@@ -575,9 +598,18 @@ export class World implements IWorld {
   #getDrawOrderedEnvelopes(
     graphHash: string = this.#frameGraphHash ?? this.graph.hash(),
   ): Envelope[] {
-    if (!this.#drawOrderCache || this.#drawOrderCache.hash !== graphHash) {
+    // Key on the envelope count as well as the graph hash: async generation
+    // repopulates `this.envelopes` WITHOUT changing the graph hash, so a
+    // hash-only key would keep serving the pre-generation (empty/old) set and
+    // leave the roads unfilled until the next hash change.
+    if (
+      !this.#drawOrderCache ||
+      this.#drawOrderCache.hash !== graphHash ||
+      this.#drawOrderCache.count !== this.envelopes.length
+    ) {
       this.#drawOrderCache = {
         hash: graphHash,
+        count: this.envelopes.length,
         envelopes: sortEnvelopesByTier(this.envelopes),
       };
     }

@@ -167,10 +167,45 @@ export class Osm {
    * @returns An object containing arrays of Point and Segment instances.
    */
   static parseRoads(data: OsmData): ParsedRoads {
-    // Filter out only node elements using a type guard
-    const nodes = data.elements.filter(
-      (element): element is OsmNodeElement => element.type === 'node',
-    );
+    const gen = Osm.parseRoadsChunked(data);
+    let step = gen.next();
+    while (!step.done) step = gen.next();
+    return step.value;
+  }
+
+  /**
+   * Time-sliceable version of {@link parseRoads}: a generator that yields a
+   * local `[0, 1]` progress fraction at loop boundaries so a large OSM import
+   * doesn't block the main thread (and trip the browser's "unresponsive tab"
+   * dialog) while parsing. Produces exactly the same result as `parseRoads`;
+   * drive it with a chunked runner to keep the UI responsive.
+   */
+  static *parseRoadsChunked(data: OsmData): Generator<number, ParsedRoads> {
+    // Partition elements into nodes/ways in a SINGLE chunked pass and compute
+    // the geographic bounds inline. Previously this was two `.filter()` passes
+    // plus a `Math.min(...latitudes)` spread — an unchunked O(elements) block
+    // (and a call-stack-overflow risk on huge imports) that ran before the
+    // first yield, so it could still freeze the tab.
+    const elements = data.elements;
+    const nodes: OsmNodeElement[] = [];
+    const ways: OsmWayElement[] = [];
+    let minLat = Infinity;
+    let maxLat = -Infinity;
+    let minLon = Infinity;
+    let maxLon = -Infinity;
+    for (let ei = 0; ei < elements.length; ei++) {
+      const el = elements[ei];
+      if (el.type === 'node') {
+        nodes.push(el);
+        if (el.lat < minLat) minLat = el.lat;
+        if (el.lat > maxLat) maxLat = el.lat;
+        if (el.lon < minLon) minLon = el.lon;
+        if (el.lon > maxLon) maxLon = el.lon;
+      } else if (el.type === 'way') {
+        ways.push(el);
+      }
+      if ((ei & 8191) === 0) yield (0.15 * ei) / Math.max(elements.length, 1);
+    }
 
     // Early exit if no nodes are found
     if (nodes.length === 0) {
@@ -184,16 +219,6 @@ export class Osm {
         yields: [],
       };
     }
-
-    // Extract latitudes and longitudes for bounding box calculation
-    const latitudes = nodes.map((node) => node.lat);
-    const longitudes = nodes.map((node) => node.lon);
-
-    // Calculate geographic bounds
-    const minLat = Math.min(...latitudes);
-    const maxLat = Math.max(...latitudes);
-    const minLon = Math.min(...longitudes);
-    const maxLon = Math.max(...longitudes);
 
     // Calculate scaling factors for coordinate conversion
     const deltaLat = maxLat - minLat;
@@ -216,7 +241,8 @@ export class Osm {
     const nodeMap = new Map<number | string, Point>();
 
     // Convert nodes to Point objects
-    for (const node of nodes) {
+    for (let ni = 0; ni < nodes.length; ni++) {
+      const node = nodes[ni];
       // Calculate canvas coordinates using inverse linear interpolation
       // Handle zero delta cases to avoid NaN/Infinity
       const y =
@@ -230,13 +256,13 @@ export class Osm {
       point.id = node.id; // Attach OSM ID to the Point object (requires Point class modification)
       points.push(point);
       nodeMap.set(node.id, point); // Store in map for quick lookup
+      // Node conversion is O(nodes); yield through the ~0.15→0.3 progress band.
+      if ((ni & 4095) === 0) {
+        yield 0.15 + (0.15 * ni) / nodes.length;
+      }
     }
 
     const segments: Segment[] = []; // To store created Segment objects
-    // Filter out only way elements using a type guard
-    const ways = data.elements.filter(
-      (element): element is OsmWayElement => element.type === 'way',
-    );
 
     // Collect tagged nodes that become road markings. All lie ON highway ways,
     // so `out body;` output carries their tags. Directional markings (lights,
@@ -245,13 +271,15 @@ export class Osm {
     // flows past them — authoritative for the marking's facing.
     const nodeKind = new Map<number, MarkingKind>();
     const signalDir = new Map<number, 'forward' | 'backward'>();
-    for (const node of nodes) {
+    for (let ni = 0; ni < nodes.length; ni++) {
+      const node = nodes[ni];
       const hw = node.tags?.highway;
       let kind: MarkingKind | undefined;
       if (hw === 'traffic_signals') kind = 'light';
       else if (hw === 'crossing') kind = 'crossing';
       else if (hw === 'stop') kind = 'stop';
       else if (hw === 'give_way') kind = 'yield';
+      if ((ni & 8191) === 0) yield 0.3;
       if (!kind) continue;
       nodeKind.set(node.id, kind);
       // Directional kinds (light/stop/yield) honour the node's `direction` tag;
@@ -268,10 +296,12 @@ export class Osm {
     // orient directional markings on two-way roads (face away from the junction).
     const nodeRefCount = new Map<number, number>();
     if (nodeKind.size > 0) {
-      for (const way of ways) {
+      for (let wi = 0; wi < ways.length; wi++) {
+        const way = ways[wi];
         for (const nid of way.nodes) {
           nodeRefCount.set(nid, (nodeRefCount.get(nid) ?? 0) + 1);
         }
+        if ((wi & 8191) === 0) yield 0.3;
       }
     }
     // Per tagged node, gather every neighbouring road node (across all ways)
@@ -280,7 +310,13 @@ export class Osm {
     const markAccum = new Map<number, MarkAccumulator>();
 
     // Convert ways to Segment objects
-    for (const way of ways) {
+    for (let wi = 0; wi < ways.length; wi++) {
+      const way = ways[wi];
+      // The ways loop (segment creation + marking accumulation) is the bulk of
+      // parsing; yield across ~0.3→0.9 of the progress bar.
+      if ((wi & 127) === 0) {
+        yield 0.3 + (0.6 * wi) / Math.max(ways.length, 1);
+      }
       const nodeIds = way.nodes;
 
       // Way-level metadata (constant across all sub-segments of this way).
@@ -469,7 +505,13 @@ export class Osm {
     const stops: OsmMarkingPlacement[] = [];
     const yields: OsmMarkingPlacement[] = [];
 
-    for (const entry of markEntries) {
+    for (let mi = 0; mi < markEntries.length; mi++) {
+      const entry = markEntries[mi];
+      // Marking assembly can be O(markings²) for signal clusters; yield across
+      // the last ~10% of progress.
+      if ((mi & 63) === 0) {
+        yield 0.9 + (0.1 * mi) / Math.max(markEntries.length, 1);
+      }
       const { center, neighbors, lanes, kind } = entry;
       const roadWidth = lanes * LANE_WIDTH_PX;
 

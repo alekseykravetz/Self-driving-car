@@ -60,6 +60,7 @@ import '../ui/molecules/worldLayersToolbar.js';
 import '../ui/molecules/editorToolbar.js';
 import '../ui/organisms/worldEditorPanelTemplate.js';
 import '../ui/organisms/worldEditorPanel.js';
+import '../ui/molecules/generationProgress.js';
 
 (async () => {
   await StoreManager.init();

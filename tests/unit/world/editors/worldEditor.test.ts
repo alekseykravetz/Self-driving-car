@@ -436,18 +436,27 @@ vi.mock('../../../../ts/store/storeManager.js', () => ({
   },
 }));
 
-vi.mock('../../../../ts/math/osm-importer/osm.js', () => ({
-  Osm: {
-    parseRoads: vi.fn(() => ({
-      points: [],
-      segments: [],
-      lights: [],
-      crossings: [],
-      stops: [],
-      yields: [],
-    })),
-  },
-}));
+vi.mock('../../../../ts/math/osm-importer/osm.js', () => {
+  const emptyResult = {
+    points: [],
+    segments: [],
+    lights: [],
+    crossings: [],
+    stops: [],
+    yields: [],
+  };
+  return {
+    Osm: {
+      parseRoads: vi.fn(() => ({ ...emptyResult })),
+      // The editor drives the chunked generator; default yields once (100%)
+      // then completes with an empty result.
+      parseRoadsChunked: vi.fn(function* () {
+        yield 1;
+        return { ...emptyResult };
+      }),
+    },
+  };
+});
 
 // Track Stop/Yield marking instantiation so the OSM per-lane expansion can be
 // asserted without reaching into the editor's private world.
@@ -745,23 +754,24 @@ describe('WorldEditor', () => {
       expect(alert).toHaveBeenCalled();
     });
 
-    it('parseOsmData stores parsed data via mock', () => {
+    it('parseOsmData stores parsed data via mock', async () => {
       const editor = createEditor();
       const osmDataEl = domElements.get('osmDataContainer') as Record<
         string,
         unknown
       >;
       osmDataEl.value = '{"elements":[]}';
-      editor.parseOsmData();
+      await editor.parseOsmData();
     });
 
-    it('expands an OSM stop seed into one Stop marking per approach lane', () => {
+    it('expands an OSM stop seed into one Stop marking per approach lane', async () => {
       markingTrackers.stops.length = 0;
       const p1 = new Point(0, 0);
       const p2 = new Point(200, 0);
       // Two-way 2-lane road; stop node at p2 with seed direction upstream (-1,0)
-      // → expansion yields exactly one entering-lane Stop marking.
-      vi.mocked(Osm.parseRoads).mockReturnValueOnce({
+      // → expansion yields exactly one entering-lane Stop marking. The editor
+      // consumes the chunked parser, so return a generator completing with it.
+      const parsed = {
         points: [p1, p2],
         segments: [new Segment(p1, p2, false, false, { lanes: 2 })],
         lights: [],
@@ -775,7 +785,13 @@ describe('WorldEditor', () => {
           },
         ],
         yields: [],
-      } as unknown as ReturnType<typeof Osm.parseRoads>);
+      };
+      vi.mocked(Osm.parseRoadsChunked).mockReturnValueOnce(
+        (function* () {
+          yield 1;
+          return parsed;
+        })() as unknown as ReturnType<typeof Osm.parseRoadsChunked>,
+      );
 
       const editor = createEditor();
       const osmDataEl = domElements.get('osmDataContainer') as Record<
@@ -783,7 +799,7 @@ describe('WorldEditor', () => {
         unknown
       >;
       osmDataEl.value = '{"elements":[]}';
-      editor.parseOsmData();
+      await editor.parseOsmData();
 
       expect(markingTrackers.stops.length).toBe(1);
       expect(markingTrackers.stops[0].type).toBe('stop');

@@ -64,6 +64,34 @@ function envelopeYExtent(world: WorldGeneratable): {
   return { minY: Math.min(...ys), maxY: Math.max(...ys) };
 }
 
+/**
+ * A 3×3 grid of intersections wired into a street network — dense enough that
+ * building placement produces many adjacent candidates and exercises the
+ * footprint de-overlap filter.
+ */
+function createStreetGrid(): WorldGeneratable {
+  const world = createEmptyWorld();
+  const coords = [0, 200, 400];
+  const pts: Point[] = [];
+  for (const x of coords) {
+    for (const y of coords) {
+      const p = new Point(x, y);
+      pts.push(p);
+      world.graph.addPoint(p);
+    }
+  }
+  const at = (ix: number, iy: number): Point => pts[ix * 3 + iy];
+  for (let ix = 0; ix < 3; ix++) {
+    for (let iy = 0; iy < 3; iy++) {
+      if (ix < 2)
+        world.graph.tryAddSegment(new Segment(at(ix, iy), at(ix + 1, iy)));
+      if (iy < 2)
+        world.graph.tryAddSegment(new Segment(at(ix, iy), at(ix, iy + 1)));
+    }
+  }
+  return world;
+}
+
 describe('WorldGenerator', () => {
   it('generateRoads creates envelopes and road borders from graph', () => {
     const world = createWorldWithRoad();
@@ -157,6 +185,41 @@ describe('WorldGenerator', () => {
     WorldGenerator.generateBuildings(world);
 
     expect(world.buildings.length).toBeGreaterThan(0);
+  });
+
+  it('generateBuildings yields a non-overlapping, spacing-respecting set', () => {
+    const world = createStreetGrid();
+    WorldGenerator.generateRoads(world);
+    WorldGenerator.generateBuildings(world);
+
+    const buildings = world.buildings;
+    expect(buildings.length).toBeGreaterThan(1);
+
+    // Postcondition of the footprint de-overlap filter: no earlier building
+    // overlaps or sits within `spacing` of a later one.
+    const eps = 0.001;
+    for (let i = 0; i < buildings.length; i++) {
+      for (let j = i + 1; j < buildings.length; j++) {
+        const a = buildings[i].base;
+        const b = buildings[j].base;
+        const collides =
+          a.intersectsPolygon(b) ||
+          a.distanceToPolygon(b) < world.spacing - eps;
+        expect(collides).toBe(false);
+      }
+    }
+  });
+
+  it('generateBuildings is deterministic', () => {
+    const centers = (): string => {
+      const world = createStreetGrid();
+      WorldGenerator.generateRoads(world);
+      WorldGenerator.generateBuildings(world);
+      return world.buildings
+        .map((b) => b.base.points.map((p) => `${p.x},${p.y}`).join(';'))
+        .join('|');
+    };
+    expect(centers()).toBe(centers());
   });
 
   it('generate trees creates tree instances', () => {

@@ -72,6 +72,61 @@ describe('buildConnectedComponents', () => {
     expect(components).toHaveLength(1);
     expect(components[0]).toHaveLength(2);
   });
+
+  it('matches a brute-force reference on a mixed graph (membership)', () => {
+    // A grid-ish network with a couple of disconnected extras.
+    const pt = (x: number, y: number): Point => new Point(x, y);
+    const grid: Segment[] = [];
+    const nodes: Point[][] = [];
+    for (let x = 0; x <= 3; x++) {
+      nodes[x] = [];
+      for (let y = 0; y <= 3; y++) nodes[x][y] = pt(x * 10, y * 10);
+    }
+    for (let x = 0; x <= 3; x++) {
+      for (let y = 0; y <= 3; y++) {
+        if (x < 3) grid.push(new Segment(nodes[x][y], nodes[x + 1][y]));
+        if (y < 3) grid.push(new Segment(nodes[x][y], nodes[x][y + 1]));
+      }
+    }
+    // Two disconnected extra edges.
+    grid.push(new Segment(pt(100, 100), pt(110, 100)));
+    grid.push(new Segment(pt(200, 200), pt(200, 210)));
+
+    // Brute-force connected components via sharesEndpoint (the old semantics).
+    const remaining = new Set(grid);
+    const refComponents: Set<Segment>[] = [];
+    while (remaining.size > 0) {
+      const seed = remaining.values().next().value!;
+      remaining.delete(seed);
+      const comp = new Set([seed]);
+      let grew = true;
+      while (grew) {
+        grew = false;
+        for (const seg of [...remaining]) {
+          if ([...comp].some((c) => sharesEndpoint(c, seg))) {
+            remaining.delete(seg);
+            comp.add(seg);
+            grew = true;
+          }
+        }
+      }
+      refComponents.push(comp);
+    }
+
+    const components = buildConnectedComponents(grid);
+    // Same component count, and each result component's membership matches a
+    // reference component exactly.
+    expect(components).toHaveLength(refComponents.length);
+    const toKeySet = (segs: Segment[]): string =>
+      segs
+        .map((s) => `${s.p1.x},${s.p1.y}->${s.p2.x},${s.p2.y}`)
+        .sort()
+        .join('|');
+    const refKeys = new Set(refComponents.map((c) => toKeySet([...c])));
+    for (const comp of components) {
+      expect(refKeys.has(toKeySet(comp))).toBe(true);
+    }
+  });
 });
 
 describe('orderSegmentWalk', () => {

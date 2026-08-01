@@ -29,6 +29,7 @@
 @import './molecules/_view-toggles.css';
 @import './molecules/_shortcuts-keys.css';
 @import './molecules/_world-layers-keys.css';
+@import './molecules/_generation-progress.css';
 
 /* ── Common Organisms (used across multiple pages) ──────────────── */
 @import './organisms/_toolbar-panel.css';

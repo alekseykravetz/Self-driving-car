@@ -4,7 +4,6 @@ import { Segment } from '../math/primitives/segment.js';
 import { add, subtract, scale, normalize, lerp2D } from '../math/utils.js';
 import {
   WalkPiece,
-  sharesEndpoint,
   buildConnectedComponents,
   orderSegmentWalk,
 } from './streetWalk.js';
@@ -68,9 +67,25 @@ export function computeSpeedSignPlacements(graph: Graph): SpeedSignPlacement[] {
   const signs: SpeedSignPlacement[] = [];
   const changeNodeKeys = new Set<string>();
 
+  // Prebuild endpoint key → incident segments once (O(segments)) so the
+  // per-point limit-change scan below is near-linear instead of
+  // O(points × segments) (`getSegmentsWithPoint` filters all segments per call).
+  const incidentByKey = new Map<string, Segment[]>();
+  const addIncident = (key: string, seg: Segment): void => {
+    const list = incidentByKey.get(key);
+    if (list) list.push(seg);
+    else incidentByKey.set(key, [seg]);
+  };
+  for (const seg of graph.segments) {
+    const k1 = nodeKey(seg.p1);
+    const k2 = nodeKey(seg.p2);
+    addIncident(k1, seg);
+    if (k2 !== k1) addIncident(k2, seg);
+  }
+
   // Steps 1-3: limit-change nodes.
   for (const point of graph.points) {
-    const incident = graph.getSegmentsWithPoint(point);
+    const incident = incidentByKey.get(nodeKey(point)) ?? [];
     if (incident.length < 2) continue;
 
     // `undefined` (no limit tag) counts as a distinct value.
@@ -117,13 +132,26 @@ export function computeSpeedSignPlacements(graph: Graph): SpeedSignPlacement[] {
     const rb = find(b);
     if (ra !== rb) parent.set(ra, rb);
   };
-  for (let i = 0; i < speedSegs.length; i++) {
-    for (let j = i + 1; j < speedSegs.length; j++) {
-      const a = speedSegs[i];
-      const b = speedSegs[j];
-      if (a.maxSpeed === b.maxSpeed && sharesEndpoint(a, b)) {
-        union(a, b);
-      }
+  // Index speed segments by endpoint, then union equal-`maxSpeed` segments that
+  // meet at each endpoint. Near-linear vs the old O(speedSegs²) all-pairs
+  // `sharesEndpoint` scan; union-find transitivity makes the result identical.
+  const byEndpoint = new Map<string, Segment[]>();
+  const addEnd = (key: string, seg: Segment): void => {
+    const list = byEndpoint.get(key);
+    if (list) list.push(seg);
+    else byEndpoint.set(key, [seg]);
+  };
+  for (const s of speedSegs) {
+    addEnd(nodeKey(s.p1), s);
+    addEnd(nodeKey(s.p2), s);
+  }
+  for (const list of byEndpoint.values()) {
+    const firstBySpeed = new Map<number, Segment>();
+    for (const seg of list) {
+      const sp = seg.maxSpeed!;
+      const first = firstBySpeed.get(sp);
+      if (first) union(first, seg);
+      else firstBySpeed.set(sp, seg);
     }
   }
   const components = new Map<Segment, Segment[]>();

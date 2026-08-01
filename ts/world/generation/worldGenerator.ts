@@ -26,8 +26,16 @@ import {
   distance,
   normalize,
   mulberry32,
+  average,
 } from '../../math/utils.js';
 import { LANE_WIDTH_PX, PARKING_LANE_WIDTH_PX } from '../../math/worldUnits.js';
+import {
+  GenerationProgress,
+  GenerationProgressCallback,
+  drainGenerator,
+  runChunkedGenerator,
+  yieldToBrowser,
+} from './generationProgress.js';
 
 export interface WorldGeneratable {
   graph: Graph;
@@ -150,7 +158,15 @@ function wgGenerateSeparatorBorders(graph: Graph): Segment[] {
   return borders;
 }
 
-function wgGenerateBuildings(world: WorldGeneratable): Building[] {
+/**
+ * Building placement as a generator that yields a local `[0, 1]` progress
+ * fraction during the expensive O(n²) footprint-collision filter, so the async
+ * generator can time-slice it. Drained synchronously by {@link wgGenerateBuildings}.
+ */
+function* wgGenerateBuildingsGen(
+  world: WorldGeneratable,
+): Generator<number, Building[]> {
+  yield 0;
   const tempEnvelopes: Envelope[] = [];
   for (const seg of world.graph.segments) {
     const segWidth = getSegmentEnvelopeGeometry(seg).width;
@@ -163,7 +179,13 @@ function wgGenerateBuildings(world: WorldGeneratable): Building[] {
     );
   }
 
-  const guides = Polygon.union(tempEnvelopes.map((e) => e.polygon));
+  // The union is the heavy "finding places" step; delegate to the chunked,
+  // grid-accelerated union so it stays responsive and reports progress.
+  const guides = yield* remapGen(
+    unionGen(tempEnvelopes.map((e) => e.polygon)),
+    0,
+    0.35,
+  );
 
   for (let i = 0; i < guides.length; i++) {
     const seg = guides[i];
@@ -199,19 +221,53 @@ function wgGenerateBuildings(world: WorldGeneratable): Building[] {
     bases.push(new Envelope(seg, world.buildingWidth).polygon);
   }
 
+  // Footprint de-overlap. The original algorithm keeps a base iff no EARLIER
+  // kept base overlaps it (or sits within `spacing`) — an O(n²) all-pairs scan
+  // that dominated large-map generation (the "placing buildings" step). This
+  // keeps the identical survivor set and order (forward greedy in original
+  // index order) but uses a spatial grid so each candidate only tests nearby
+  // keepers, turning O(n²) into near-linear work.
   const epsilon = 0.001;
-  for (let i = 0; i < bases.length - 1; i++) {
-    for (let j = i + 1; j < bases.length; j++) {
+  const total = Math.max(bases.length, 1);
+  const baseBounds = bases.map(polygonAABB);
+  let maxExtent = 0;
+  for (const b of baseBounds) {
+    maxExtent = Math.max(maxExtent, b.maxX - b.minX, b.maxY - b.minY);
+  }
+  const keepGrid = new OwnerGrid(Math.max(maxExtent, 1));
+  // A colliding keeper's AABB lies within (candidate half-extent + spacing +
+  // keeper extent) of the candidate centre; this square covers that bound.
+  const queryRadius = maxExtent * 2 + world.spacing;
+  const kept: Polygon[] = [];
+  for (let i = 0; i < bases.length; i++) {
+    const c = bases[i];
+    const cb = baseBounds[i];
+    const cx = (cb.minX + cb.maxX) / 2;
+    const cy = (cb.minY + cb.maxY) / 2;
+    let collides = false;
+    for (const k of keepGrid.query(cx, cy, queryRadius)) {
+      const kp = kept[k];
       if (
-        bases[i].intersectsPolygon(bases[j]) ||
-        bases[i].distanceToPolygon(bases[j]) < world.spacing - epsilon
+        kp.intersectsPolygon(c) ||
+        kp.distanceToPolygon(c) < world.spacing - epsilon
       ) {
-        bases.splice(j, 1);
-        j--;
+        collides = true;
+        break;
       }
     }
+    if (!collides) {
+      keepGrid.insertBounds(cb.minX, cb.minY, cb.maxX, cb.maxY, kept.length);
+      kept.push(c);
+    }
+    if ((i & 63) === 0) yield 0.35 + (0.65 * i) / total;
   }
-  return bases.map((b) => new Building(b));
+  yield 1;
+  return kept.map((b) => new Building(b));
+}
+
+/** Building placement (O(n²) footprint collision filter). */
+function wgGenerateBuildings(world: WorldGeneratable): Building[] {
+  return drainGenerator(wgGenerateBuildingsGen(world));
 }
 
 /**
@@ -305,7 +361,16 @@ class OwnerGrid {
   }
 }
 
-function wgGenerateTrees(world: WorldGeneratable): Tree[] {
+/**
+ * Tree placement as a generator that yields a local `[0, 1]` progress fraction
+ * during the rejection-sampling loop, so the async generator can time-slice it.
+ * The tree count is not known ahead of time, so progress is an asymptotic
+ * estimate over iterations (never reaching 1 until the loop ends). Drained
+ * synchronously by {@link wgGenerateTrees}.
+ */
+function* wgGenerateTreesGen(
+  world: WorldGeneratable,
+): Generator<number, Tree[]> {
   const points = [
     ...world.roadBorders.map((s) => [s.p1, s.p2]).flat(),
     ...world.buildings.map((b) => b.base.points).flat(),
@@ -350,6 +415,7 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
 
   const trees: Tree[] = [];
   let tryCount = 0;
+  let iterations = 0;
   while (tryCount < 100) {
     const p = new Point(
       lerp(left, right, Math.random()),
@@ -414,8 +480,21 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
       tryCount = 0;
     }
     tryCount++;
+    // Progress is indeterminate (final tree count is unknown), so advance the
+    // bar asymptotically toward 1 based on total iterations.
+    if ((++iterations & 511) === 0) {
+      yield 1 - 1 / (1 + iterations / 20000);
+    }
   }
   return trees;
+}
+
+/**
+ * Tree placement (rejection sampling). Ensures the caller has already built the
+ * world's tree prototype set. Drains {@link wgGenerateTreesGen}.
+ */
+function wgGenerateTrees(world: WorldGeneratable): Tree[] {
+  return drainGenerator(wgGenerateTreesGen(world));
 }
 
 /** Weighted tree-type pick: mostly classic, with some conifers and clusters. */
@@ -425,28 +504,166 @@ function wgPickTreeType(r: number): number {
   return 2;
 }
 
+/** Axis-aligned bounding box of a polygon (generation-local). */
+interface PolyAABB {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+function polygonAABB(polygon: Polygon): PolyAABB {
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
+  for (const p of polygon.points) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+function aabbOverlap(a: PolyAABB, b: PolyAABB): boolean {
+  return (
+    a.minX <= b.maxX && a.maxX >= b.minX && a.minY <= b.maxY && a.maxY >= b.minY
+  );
+}
+
+/**
+ * Remaps a sub-generator's local `[0, 1]` progress into the `[lo, hi]` band of
+ * the parent generator, passing the return value through.
+ */
+function* remapGen<R>(
+  gen: Generator<number, R>,
+  lo: number,
+  hi: number,
+): Generator<number, R> {
+  let step = gen.next();
+  while (!step.done) {
+    yield lo + (hi - lo) * step.value;
+    step = gen.next();
+  }
+  return step.value;
+}
+
+/**
+ * Spatially-indexed, time-sliceable polygon union used by world generation.
+ *
+ * Produces the SAME segment set and order as {@link Polygon.union}, but replaces
+ * its O(n²) all-pairs bounding-box scan with an {@link OwnerGrid} lookup so large
+ * OSM imports don't spend "forever" in the union, and yields a local `[0, 1]`
+ * progress fraction so the async generator can keep the UI responsive.
+ *
+ * Order preservation: candidate polygons are visited in ascending index order,
+ * exactly replicating `Polygon.multiBreak`'s `(i < j)` pairing; the interior
+ * test discards a segment iff some polygon contains its midpoint, identical to
+ * the linear scan (the grid just narrows the set of polygons that can).
+ */
+function* unionGen(polygons: Polygon[]): Generator<number, Segment[]> {
+  const n = polygons.length;
+  if (n === 0) return [];
+
+  const bounds = polygons.map(polygonAABB);
+  // Cell size ≈ average AABB extent: buckets stay small yet few per query.
+  let extentSum = 0;
+  for (const b of bounds) {
+    extentSum += Math.max(b.maxX - b.minX, b.maxY - b.minY);
+  }
+  const cell = Math.max(1, extentSum / n);
+  const grid = new OwnerGrid(cell);
+  for (let i = 0; i < n; i++) {
+    const b = bounds[i];
+    grid.insertBounds(b.minX, b.minY, b.maxX, b.maxY, i);
+  }
+
+  // Phase 1 — break overlapping pairs (each unordered pair once, j ascending).
+  for (let i = 0; i < n; i++) {
+    const bi = bounds[i];
+    const cx = (bi.minX + bi.maxX) / 2;
+    const cy = (bi.minY + bi.maxY) / 2;
+    const radius = Math.max(bi.maxX - bi.minX, bi.maxY - bi.minY) / 2;
+    const candidates = grid.query(cx, cy, radius).sort((a, b) => a - b);
+    for (const j of candidates) {
+      if (j <= i) continue;
+      if (!aabbOverlap(bi, bounds[j])) continue;
+      Polygon.break(polygons[i], polygons[j]);
+    }
+    if ((i & 31) === 0) yield (0.5 * i) / n;
+  }
+
+  // Phase 2 — keep only non-interior segments. `break` inserts points on
+  // existing edges, so the AABBs (and the grid) remain valid.
+  const kept: Segment[] = [];
+  for (let i = 0; i < n; i++) {
+    for (const segment of polygons[i].segments) {
+      const midpoint = average(segment.p1, segment.p2);
+      let keep = true;
+      for (const j of grid.query(midpoint.x, midpoint.y, 0)) {
+        if (j === i) continue;
+        const b = bounds[j];
+        if (
+          midpoint.x < b.minX ||
+          midpoint.x > b.maxX ||
+          midpoint.y < b.minY ||
+          midpoint.y > b.maxY
+        ) {
+          continue;
+        }
+        if (polygons[j].containsPoint(midpoint)) {
+          keep = false;
+          break;
+        }
+      }
+      if (keep) kept.push(segment);
+    }
+    if ((i & 31) === 0) yield 0.5 + (0.5 * i) / n;
+  }
+  return kept;
+}
+
+/**
+ * Road geometry as a generator: envelopes, then the (chunked) border union,
+ * lane guides and separator borders. Yields a local `[0, 1]` fraction so the
+ * async path stays responsive; drained synchronously by
+ * {@link WorldGenerator.generateRoads}.
+ */
+function* wgGenerateRoadsGen(world: WorldGeneratable): Generator<number, void> {
+  world.envelopes.length = 0;
+  world.laneGuides.length = 0;
+  world.roadBorders.length = 0;
+  world.separatorBorders.length = 0;
+
+  const segments = world.graph.segments;
+  const segTotal = Math.max(segments.length, 1);
+  for (let s = 0; s < segments.length; s++) {
+    const segment = segments[s];
+    const { width, offset } = getSegmentEnvelopeGeometry(segment);
+    world.envelopes.push(
+      new Envelope(segment, width, world.roadRoundness, undefined, offset),
+    );
+    // Envelope construction is O(segments); yield periodically so a large map
+    // doesn't block the main thread here before the union even starts. The
+    // union itself (below) reports the bulk of the [0, 1] road progress.
+    if ((s & 255) === 0) yield (0.1 * s) / segTotal;
+  }
+
+  const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
+  const borders = yield* remapGen(unionGen(roadPolygons), 0.1, 1);
+  world.roadBorders.push(...borders);
+  world.laneGuides.push(...wgGenerateLaneGuides(world.graph));
+  world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
+}
+
 export class WorldGenerator {
   /**
    * Cheap, deterministic road geometry: envelopes, road borders, lane guides
    * and separator borders. Safe to run on every graph edit.
    */
   static generateRoads(world: WorldGeneratable): void {
-    world.envelopes.length = 0;
-    world.laneGuides.length = 0;
-    world.roadBorders.length = 0;
-    world.separatorBorders.length = 0;
-
-    for (const segment of world.graph.segments) {
-      const { width, offset } = getSegmentEnvelopeGeometry(segment);
-      world.envelopes.push(
-        new Envelope(segment, width, world.roadRoundness, undefined, offset),
-      );
-    }
-
-    const roadPolygons = world.envelopes.map((envelope) => envelope.polygon);
-    world.roadBorders.push(...Polygon.union(roadPolygons));
-    world.laneGuides.push(...wgGenerateLaneGuides(world.graph));
-    world.separatorBorders.push(...wgGenerateSeparatorBorders(world.graph));
+    drainGenerator(wgGenerateRoadsGen(world));
   }
 
   /** Expensive building placement (O(n²) footprint collision filter). */
@@ -510,5 +727,80 @@ export class WorldGenerator {
     if (buildings) this.generateBuildings(world);
     if (trees) this.generateTrees(world);
     this.reanchorMarkings(world);
+  }
+
+  /**
+   * Cooperative, time-sliced version of {@link generate}. Runs the same stages
+   * but yields to the browser between chunks so the main thread never blocks
+   * long enough to freeze the tab, reporting progress via `onProgress`. Used by
+   * the world editor for large OSM imports and the "Regenerate items" action.
+   */
+  static async generateAsync(
+    world: WorldGeneratable,
+    opts: {
+      roads?: boolean;
+      buildings?: boolean;
+      trees?: boolean;
+      onProgress?: GenerationProgressCallback;
+    } = {},
+  ): Promise<void> {
+    const { roads = true, buildings = true, trees = true, onProgress } = opts;
+
+    // Split the [0, 1] progress range evenly across the active stages.
+    const stages: GenerationProgress['stage'][] = [];
+    if (roads) stages.push('roads');
+    if (buildings) stages.push('buildings');
+    if (trees) stages.push('trees');
+    const bandCount = stages.length || 1;
+
+    const report = (
+      stage: GenerationProgress['stage'],
+      label: string,
+      local: number,
+    ): void => {
+      if (!onProgress) return;
+      const idx = stages.indexOf(stage);
+      const start = idx / bandCount;
+      const clamped = Math.max(0, Math.min(1, local));
+      onProgress({ stage, label, fraction: start + clamped / bandCount });
+    };
+
+    if (roads) {
+      report('roads', 'Generating road geometry…', 0);
+      await yieldToBrowser();
+      await runChunkedGenerator(wgGenerateRoadsGen(world), (f) =>
+        report('roads', 'Generating road geometry…', f),
+      );
+    }
+
+    if (buildings) {
+      report('buildings', 'Placing buildings…', 0);
+      await yieldToBrowser();
+      world.buildings = await runChunkedGenerator(
+        wgGenerateBuildingsGen(world),
+        (f) => report('buildings', 'Placing buildings…', f),
+      );
+    }
+
+    if (trees) {
+      report('trees', 'Planting trees…', 0);
+      await yieldToBrowser();
+      if (world.treePrototypes.length !== world.treePrototypeCount) {
+        world.treePrototypes = buildTreePrototypes(
+          world.treeSeed,
+          world.treePrototypeCount,
+        );
+      }
+      world.trees = await runChunkedGenerator(wgGenerateTreesGen(world), (f) =>
+        report('trees', 'Planting trees…', f),
+      );
+    }
+
+    this.reanchorMarkings(world);
+    onProgress?.({
+      stage: stages[stages.length - 1] ?? 'trees',
+      label: 'Done',
+      fraction: 1,
+    });
   }
 }

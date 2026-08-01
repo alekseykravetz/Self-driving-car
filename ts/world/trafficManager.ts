@@ -43,16 +43,23 @@ export class TrafficManager {
       return this.#crossroadsCache;
     }
 
+    // Count segments incident to each endpoint coordinate in one pass, then
+    // pick points with degree > 2. Replaces the old O(points × segments) scan
+    // (`seg.includes(point)` → `Point.equals` for every pair) that froze large
+    // OSM imports. `Point.equals` is an exact x/y compare, so a "x,y" key
+    // matches it exactly.
+    const key = (p: Point): string => p.x + ',' + p.y;
+    const degree = new Map<string, number>();
+    for (const seg of this.graph.segments) {
+      const k1 = key(seg.p1);
+      const k2 = key(seg.p2);
+      degree.set(k1, (degree.get(k1) ?? 0) + 1);
+      if (k2 !== k1) degree.set(k2, (degree.get(k2) ?? 0) + 1);
+    }
+
     const subset: Point[] = [];
     for (const point of this.graph.points) {
-      let degree = 0;
-      for (const seg of this.graph.segments) {
-        if (seg.includes(point)) {
-          degree++;
-        }
-      }
-
-      if (degree > 2) {
+      if ((degree.get(key(point)) ?? 0) > 2) {
         subset.push(point);
       }
     }

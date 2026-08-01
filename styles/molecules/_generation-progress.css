@@ -1,0 +1,66 @@
+/* ── Generation progress overlay ──────────────────────────────────────
+   Full-screen modal shown while the world editor generates geometry for a
+   large OSM import or "Regenerate items". Blocks interaction and shows a
+   determinate progress bar. */
+
+generation-progress[hidden] {
+  display: none;
+}
+
+.gen-progress-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(2px);
+}
+
+.gen-progress-dialog {
+  width: min(420px, 86vw);
+  padding: var(--space-6);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-bg-hover-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-modal);
+  font-family: var(--font-ui);
+  text-align: center;
+}
+
+.gen-progress-title {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.gen-progress-label {
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+  min-height: 1.2em;
+}
+
+.gen-progress-track {
+  height: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-input);
+  overflow: hidden;
+}
+
+.gen-progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: var(--radius-lg);
+  background: var(--color-accent-green-strong);
+  transition: width var(--transition-fast) linear;
+}
+
+.gen-progress-pct {
+  margin-top: var(--space-2);
+  font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
