@@ -436,18 +436,26 @@ vi.mock('../../../../ts/store/storeManager.js', () => ({
   },
 }));
 
-vi.mock('../../../../ts/math/osm-importer/osm.js', () => ({
-  Osm: {
-    parseRoads: vi.fn(() => ({
-      points: [],
-      segments: [],
-      lights: [],
-      crossings: [],
-      stops: [],
-      yields: [],
-    })),
-  },
-}));
+vi.mock('../../../../ts/math/osm-importer/osm.js', () => {
+  const emptyResult = {
+    points: [],
+    segments: [],
+    lights: [],
+    crossings: [],
+    stops: [],
+    yields: [],
+  };
+  return {
+    Osm: {
+      parseRoads: vi.fn(() => ({ ...emptyResult })),
+      // The editor drives the chunked generator; default returns a generator
+      // that immediately completes with an empty result.
+      parseRoadsChunked: vi.fn(function* () {
+        return { ...emptyResult };
+      }),
+    },
+  };
+});
 
 // Track Stop/Yield marking instantiation so the OSM per-lane expansion can be
 // asserted without reaching into the editor's private world.
@@ -760,8 +768,9 @@ describe('WorldEditor', () => {
       const p1 = new Point(0, 0);
       const p2 = new Point(200, 0);
       // Two-way 2-lane road; stop node at p2 with seed direction upstream (-1,0)
-      // → expansion yields exactly one entering-lane Stop marking.
-      vi.mocked(Osm.parseRoads).mockReturnValueOnce({
+      // → expansion yields exactly one entering-lane Stop marking. The editor
+      // consumes the chunked parser, so return a generator completing with it.
+      const parsed = {
         points: [p1, p2],
         segments: [new Segment(p1, p2, false, false, { lanes: 2 })],
         lights: [],
@@ -775,7 +784,12 @@ describe('WorldEditor', () => {
           },
         ],
         yields: [],
-      } as unknown as ReturnType<typeof Osm.parseRoads>);
+      };
+      vi.mocked(Osm.parseRoadsChunked).mockReturnValueOnce(
+        (function* () {
+          return parsed;
+        })() as unknown as ReturnType<typeof Osm.parseRoadsChunked>,
+      );
 
       const editor = createEditor();
       const osmDataEl = domElements.get('osmDataContainer') as Record<

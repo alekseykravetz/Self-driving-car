@@ -167,6 +167,20 @@ export class Osm {
    * @returns An object containing arrays of Point and Segment instances.
    */
   static parseRoads(data: OsmData): ParsedRoads {
+    const gen = Osm.parseRoadsChunked(data);
+    let step = gen.next();
+    while (!step.done) step = gen.next();
+    return step.value;
+  }
+
+  /**
+   * Time-sliceable version of {@link parseRoads}: a generator that yields a
+   * local `[0, 1]` progress fraction at loop boundaries so a large OSM import
+   * doesn't block the main thread (and trip the browser's "unresponsive tab"
+   * dialog) while parsing. Produces exactly the same result as `parseRoads`;
+   * drive it with a chunked runner to keep the UI responsive.
+   */
+  static *parseRoadsChunked(data: OsmData): Generator<number, ParsedRoads> {
     // Filter out only node elements using a type guard
     const nodes = data.elements.filter(
       (element): element is OsmNodeElement => element.type === 'node',
@@ -185,15 +199,19 @@ export class Osm {
       };
     }
 
-    // Extract latitudes and longitudes for bounding box calculation
-    const latitudes = nodes.map((node) => node.lat);
-    const longitudes = nodes.map((node) => node.lon);
-
-    // Calculate geographic bounds
-    const minLat = Math.min(...latitudes);
-    const maxLat = Math.max(...latitudes);
-    const minLon = Math.min(...longitudes);
-    const maxLon = Math.max(...longitudes);
+    // Geographic bounds. Compute in a single pass — spreading a huge coordinate
+    // array into Math.min/Math.max (`Math.min(...latitudes)`) risks a call-stack
+    // overflow on large imports, and allocating the arrays is wasteful.
+    let minLat = Infinity;
+    let maxLat = -Infinity;
+    let minLon = Infinity;
+    let maxLon = -Infinity;
+    for (const node of nodes) {
+      if (node.lat < minLat) minLat = node.lat;
+      if (node.lat > maxLat) maxLat = node.lat;
+      if (node.lon < minLon) minLon = node.lon;
+      if (node.lon > maxLon) maxLon = node.lon;
+    }
 
     // Calculate scaling factors for coordinate conversion
     const deltaLat = maxLat - minLat;
@@ -216,7 +234,8 @@ export class Osm {
     const nodeMap = new Map<number | string, Point>();
 
     // Convert nodes to Point objects
-    for (const node of nodes) {
+    for (let ni = 0; ni < nodes.length; ni++) {
+      const node = nodes[ni];
       // Calculate canvas coordinates using inverse linear interpolation
       // Handle zero delta cases to avoid NaN/Infinity
       const y =
@@ -230,6 +249,8 @@ export class Osm {
       point.id = node.id; // Attach OSM ID to the Point object (requires Point class modification)
       points.push(point);
       nodeMap.set(node.id, point); // Store in map for quick lookup
+      // Node conversion is O(nodes); yield through the first ~30% of progress.
+      if ((ni & 4095) === 0) yield (0.3 * ni) / nodes.length;
     }
 
     const segments: Segment[] = []; // To store created Segment objects
@@ -280,7 +301,13 @@ export class Osm {
     const markAccum = new Map<number, MarkAccumulator>();
 
     // Convert ways to Segment objects
-    for (const way of ways) {
+    for (let wi = 0; wi < ways.length; wi++) {
+      const way = ways[wi];
+      // The ways loop (segment creation + marking accumulation) is the bulk of
+      // parsing; yield across ~0.3→0.9 of the progress bar.
+      if ((wi & 127) === 0) {
+        yield 0.3 + (0.6 * wi) / Math.max(ways.length, 1);
+      }
       const nodeIds = way.nodes;
 
       // Way-level metadata (constant across all sub-segments of this way).
@@ -469,7 +496,13 @@ export class Osm {
     const stops: OsmMarkingPlacement[] = [];
     const yields: OsmMarkingPlacement[] = [];
 
-    for (const entry of markEntries) {
+    for (let mi = 0; mi < markEntries.length; mi++) {
+      const entry = markEntries[mi];
+      // Marking assembly can be O(markings²) for signal clusters; yield across
+      // the last ~10% of progress.
+      if ((mi & 63) === 0) {
+        yield 0.9 + (0.1 * mi) / Math.max(markEntries.length, 1);
+      }
       const { center, neighbors, lanes, kind } = entry;
       const roadWidth = lanes * LANE_WIDTH_PX;
 
