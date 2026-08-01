@@ -17,6 +17,7 @@ import { Start } from './markings/start.js';
 import { Corridor } from './corridor.js';
 import { TrafficManager } from './trafficManager.js';
 import { WorldGenerator } from './generation/worldGenerator.js';
+import type { GenerationProgressCallback } from './generation/generationProgress.js';
 import {
   IWorld,
   WorldDrawOptions,
@@ -261,6 +262,20 @@ export class World implements IWorld {
   }): void {
     this.#drawOrderCache = null;
     WorldGenerator.generate(this, opts);
+  }
+
+  /**
+   * Cooperative, time-sliced generation that keeps the UI responsive and
+   * reports progress. Used for large OSM imports and "Regenerate items".
+   */
+  async generateAsync(opts?: {
+    roads?: boolean;
+    buildings?: boolean;
+    trees?: boolean;
+    onProgress?: GenerationProgressCallback;
+  }): Promise<void> {
+    this.#drawOrderCache = null;
+    await WorldGenerator.generateAsync(this, opts);
   }
 
   /** Back-compat accessor: the primary (first) corridor, or null. */

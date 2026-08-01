@@ -30,6 +30,7 @@ import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
 import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar.js';
 import { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { EditorToolbarElement } from '../../ui/molecules/editorToolbar.js';
+import { GenerationProgressElement } from '../../ui/molecules/generationProgress.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
@@ -92,6 +93,9 @@ export class WorldEditor {
   #oldGraphHash: string | null = null;
   #autoRegen: boolean = false;
   #animationFrameId: number = -1;
+  // True while an async (time-sliced) generation is in progress; blocks
+  // re-entrant generation requests.
+  #generating: boolean = false;
 
   // Per-layer visibility (local editor preference, persisted to localStorage —
   // never saved into the world file).
@@ -116,6 +120,7 @@ export class WorldEditor {
   #worldLayersToolbar!: WorldLayersToolbarElement;
   #worldEditorPanel!: WorldEditorPanelElement;
   #inspectEditor!: InspectEditor;
+  #generationProgress: GenerationProgressElement | null = null;
 
   constructor(canvas: HTMLCanvasElement, miniMapCanvas: HTMLCanvasElement) {
     this.#canvas = canvas;
@@ -178,6 +183,8 @@ export class WorldEditor {
     this.#worldEditorPanel = document.querySelector(
       'world-editor-panel',
     ) as WorldEditorPanelElement;
+    this.#generationProgress =
+      document.querySelector<GenerationProgressElement>('generation-progress');
   }
 
   /* Adds event listeners to DOM elements. */
@@ -534,7 +541,6 @@ export class WorldEditor {
       // Update the world's graph
       this.#world.graph.points = result.points;
       this.#world.graph.segments = result.segments;
-      this.#oldGraphHash = null; // Force regeneration on next draw
 
       // Import OSM node markings (traffic signals, pedestrian crossings, stop
       // and give-way signs) as their corresponding Light/Crossing/Stop/Yield
@@ -626,6 +632,18 @@ export class WorldEditor {
       }
 
       this.closeOsmPanel(); // Close panel on success
+
+      // Generate road (and, when auto-regen is on, item) geometry off the
+      // critical path: time-sliced with a progress overlay so a large import
+      // never freezes the tab. Claim the current graph hash *now* so the draw
+      // loop's synchronous regeneration path is suppressed while the async
+      // generation runs below.
+      this.#oldGraphHash = this.#world.graph.hash();
+      void this.#runGeneration({
+        roads: true,
+        buildings: this.#autoRegen,
+        trees: this.#autoRegen,
+      });
     } catch (error) {
       alert(`Error processing OSM data: ${error}`);
       console.error('Error processing OSM data:', error);
@@ -655,13 +673,48 @@ export class WorldEditor {
 
   /* Rebuilds the expensive item placement (buildings + trees) on demand. */
   regenerateItems(): void {
-    this.#worldLayersToolbar.setBusy(true);
-    // Yield once so the busy state paints before the heavy synchronous work.
-    setTimeout(() => {
-      this.#world.generate({ roads: false, buildings: true, trees: true });
-      this.#worldLayersToolbar.setStale(false);
-      this.#worldLayersToolbar.setBusy(false);
-    }, 0);
+    void this.#runGeneration({ roads: false, buildings: true, trees: true });
+  }
+
+  /**
+   * Runs a time-sliced world generation with a progress overlay, keeping the
+   * UI responsive so large OSM imports never freeze the tab. Re-entrant calls
+   * while a generation is in flight are ignored.
+   */
+  async #runGeneration(opts: {
+    roads?: boolean;
+    buildings?: boolean;
+    trees?: boolean;
+  }): Promise<void> {
+    if (this.#generating) return;
+    this.#generating = true;
+    this.#worldLayersToolbar?.setBusy(true);
+    const overlay = this.#generationProgress;
+    overlay?.start('Generating world…');
+    try {
+      await this.#world.generateAsync({
+        ...opts,
+        onProgress: (p) => overlay?.update(p),
+      });
+      this.#oldGraphHash = this.#world.graph.hash();
+      // Items were (re)built unless both were skipped; clear the stale flag if
+      // items now exist, otherwise mark stale so the user knows to regenerate.
+      const builtItems = opts.buildings || opts.trees;
+      if (
+        !builtItems &&
+        (this.#world.buildings.length || this.#world.trees.length)
+      ) {
+        this.#worldLayersToolbar?.setStale(true);
+      } else {
+        this.#worldLayersToolbar?.setStale(false);
+      }
+    } catch (err) {
+      console.error('World generation failed:', err);
+    } finally {
+      overlay?.finish();
+      this.#worldLayersToolbar?.setBusy(false);
+      this.#generating = false;
+    }
   }
 
   /* Main draw loop called by animate. */

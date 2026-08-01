@@ -28,6 +28,13 @@ import {
   mulberry32,
 } from '../../math/utils.js';
 import { LANE_WIDTH_PX, PARKING_LANE_WIDTH_PX } from '../../math/worldUnits.js';
+import {
+  GenerationProgress,
+  GenerationProgressCallback,
+  drainGenerator,
+  runChunkedGenerator,
+  yieldToBrowser,
+} from './generationProgress.js';
 
 export interface WorldGeneratable {
   graph: Graph;
@@ -150,7 +157,15 @@ function wgGenerateSeparatorBorders(graph: Graph): Segment[] {
   return borders;
 }
 
-function wgGenerateBuildings(world: WorldGeneratable): Building[] {
+/**
+ * Building placement as a generator that yields a local `[0, 1]` progress
+ * fraction during the expensive O(n²) footprint-collision filter, so the async
+ * generator can time-slice it. Drained synchronously by {@link wgGenerateBuildings}.
+ */
+function* wgGenerateBuildingsGen(
+  world: WorldGeneratable,
+): Generator<number, Building[]> {
+  yield 0;
   const tempEnvelopes: Envelope[] = [];
   for (const seg of world.graph.segments) {
     const segWidth = getSegmentEnvelopeGeometry(seg).width;
@@ -200,6 +215,7 @@ function wgGenerateBuildings(world: WorldGeneratable): Building[] {
   }
 
   const epsilon = 0.001;
+  const total = Math.max(bases.length - 1, 1);
   for (let i = 0; i < bases.length - 1; i++) {
     for (let j = i + 1; j < bases.length; j++) {
       if (
@@ -210,8 +226,15 @@ function wgGenerateBuildings(world: WorldGeneratable): Building[] {
         j--;
       }
     }
+    if ((i & 15) === 0) yield i / total;
   }
+  yield 1;
   return bases.map((b) => new Building(b));
+}
+
+/** Building placement (O(n²) footprint collision filter). */
+function wgGenerateBuildings(world: WorldGeneratable): Building[] {
+  return drainGenerator(wgGenerateBuildingsGen(world));
 }
 
 /**
@@ -305,7 +328,16 @@ class OwnerGrid {
   }
 }
 
-function wgGenerateTrees(world: WorldGeneratable): Tree[] {
+/**
+ * Tree placement as a generator that yields a local `[0, 1]` progress fraction
+ * during the rejection-sampling loop, so the async generator can time-slice it.
+ * The tree count is not known ahead of time, so progress is an asymptotic
+ * estimate over iterations (never reaching 1 until the loop ends). Drained
+ * synchronously by {@link wgGenerateTrees}.
+ */
+function* wgGenerateTreesGen(
+  world: WorldGeneratable,
+): Generator<number, Tree[]> {
   const points = [
     ...world.roadBorders.map((s) => [s.p1, s.p2]).flat(),
     ...world.buildings.map((b) => b.base.points).flat(),
@@ -350,6 +382,7 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
 
   const trees: Tree[] = [];
   let tryCount = 0;
+  let iterations = 0;
   while (tryCount < 100) {
     const p = new Point(
       lerp(left, right, Math.random()),
@@ -414,8 +447,21 @@ function wgGenerateTrees(world: WorldGeneratable): Tree[] {
       tryCount = 0;
     }
     tryCount++;
+    // Progress is indeterminate (final tree count is unknown), so advance the
+    // bar asymptotically toward 1 based on total iterations.
+    if ((++iterations & 511) === 0) {
+      yield 1 - 1 / (1 + iterations / 20000);
+    }
   }
   return trees;
+}
+
+/**
+ * Tree placement (rejection sampling). Ensures the caller has already built the
+ * world's tree prototype set. Drains {@link wgGenerateTreesGen}.
+ */
+function wgGenerateTrees(world: WorldGeneratable): Tree[] {
+  return drainGenerator(wgGenerateTreesGen(world));
 }
 
 /** Weighted tree-type pick: mostly classic, with some conifers and clusters. */
@@ -510,5 +556,81 @@ export class WorldGenerator {
     if (buildings) this.generateBuildings(world);
     if (trees) this.generateTrees(world);
     this.reanchorMarkings(world);
+  }
+
+  /**
+   * Cooperative, time-sliced version of {@link generate}. Runs the same stages
+   * but yields to the browser between chunks so the main thread never blocks
+   * long enough to freeze the tab, reporting progress via `onProgress`. Used by
+   * the world editor for large OSM imports and the "Regenerate items" action.
+   */
+  static async generateAsync(
+    world: WorldGeneratable,
+    opts: {
+      roads?: boolean;
+      buildings?: boolean;
+      trees?: boolean;
+      onProgress?: GenerationProgressCallback;
+    } = {},
+  ): Promise<void> {
+    const { roads = true, buildings = true, trees = true, onProgress } = opts;
+
+    // Split the [0, 1] progress range evenly across the active stages.
+    const stages: GenerationProgress['stage'][] = [];
+    if (roads) stages.push('roads');
+    if (buildings) stages.push('buildings');
+    if (trees) stages.push('trees');
+    const bandCount = stages.length || 1;
+
+    const report = (
+      stage: GenerationProgress['stage'],
+      label: string,
+      local: number,
+    ): void => {
+      if (!onProgress) return;
+      const idx = stages.indexOf(stage);
+      const start = idx / bandCount;
+      const clamped = Math.max(0, Math.min(1, local));
+      onProgress({ stage, label, fraction: start + clamped / bandCount });
+    };
+
+    if (roads) {
+      // The road union is a single blocking call; yield first so the overlay
+      // paints before it runs.
+      report('roads', 'Generating road geometry…', 0);
+      await yieldToBrowser();
+      this.generateRoads(world);
+      report('roads', 'Generating road geometry…', 1);
+    }
+
+    if (buildings) {
+      report('buildings', 'Placing buildings…', 0);
+      await yieldToBrowser();
+      world.buildings = await runChunkedGenerator(
+        wgGenerateBuildingsGen(world),
+        (f) => report('buildings', 'Placing buildings…', f),
+      );
+    }
+
+    if (trees) {
+      report('trees', 'Planting trees…', 0);
+      await yieldToBrowser();
+      if (world.treePrototypes.length !== world.treePrototypeCount) {
+        world.treePrototypes = buildTreePrototypes(
+          world.treeSeed,
+          world.treePrototypeCount,
+        );
+      }
+      world.trees = await runChunkedGenerator(wgGenerateTreesGen(world), (f) =>
+        report('trees', 'Planting trees…', f),
+      );
+    }
+
+    this.reanchorMarkings(world);
+    onProgress?.({
+      stage: stages[stages.length - 1] ?? 'trees',
+      label: 'Done',
+      fraction: 1,
+    });
   }
 }
