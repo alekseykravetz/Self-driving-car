@@ -31,6 +31,7 @@ import { WorldLayersToolbarElement } from '../../ui/molecules/worldLayersToolbar
 import { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { EditorToolbarElement } from '../../ui/molecules/editorToolbar.js';
 import { GenerationProgressElement } from '../../ui/molecules/generationProgress.js';
+import { yieldToBrowser } from '../generation/generationProgress.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
@@ -519,7 +520,7 @@ export class WorldEditor {
   }
 
   /* Parses OSM data from the text area and updates the world graph. */
-  parseOsmData(): void {
+  async parseOsmData(): Promise<void> {
     const osmData = this.#osmDataContainer.value;
     if (!osmData) {
       alert('Paste OSM data (JSON format) into the text area first.');
@@ -534,6 +535,20 @@ export class WorldEditor {
       console.error('Error parsing OSM JSON:', error);
       return;
     }
+
+    if (this.#generating) return;
+    // Reveal the progress overlay and let it paint BEFORE the synchronous OSM
+    // parse + geometry work, so a large import never leaves the tab frozen.
+    this.#generating = true;
+    this.#worldLayersToolbar?.setBusy(true);
+    const overlay = this.#generationProgress;
+    overlay?.start('Importing OSM data…');
+    overlay?.update({
+      stage: 'roads',
+      label: 'Parsing road network…',
+      fraction: 0,
+    });
+    await yieldToBrowser();
 
     try {
       // Use the Osm utility to parse roads
@@ -633,20 +648,33 @@ export class WorldEditor {
 
       this.closeOsmPanel(); // Close panel on success
 
-      // Generate road (and, when auto-regen is on, item) geometry off the
-      // critical path: time-sliced with a progress overlay so a large import
-      // never freezes the tab. Claim the current graph hash *now* so the draw
-      // loop's synchronous regeneration path is suppressed while the async
-      // generation runs below.
+      // Generate road (and, when auto-regen is on, item) geometry time-sliced
+      // with the visible progress overlay so a large import never freezes the
+      // tab. Claim the current graph hash *now* so the draw loop's synchronous
+      // regeneration path is suppressed while the async generation runs.
       this.#oldGraphHash = this.#world.graph.hash();
-      void this.#runGeneration({
+      await this.#world.generateAsync({
         roads: true,
         buildings: this.#autoRegen,
         trees: this.#autoRegen,
+        onProgress: (p) => overlay?.update(p),
       });
+      this.#oldGraphHash = this.#world.graph.hash();
+      if (
+        !this.#autoRegen &&
+        (this.#world.buildings.length || this.#world.trees.length)
+      ) {
+        this.#worldLayersToolbar?.setStale(true);
+      } else {
+        this.#worldLayersToolbar?.setStale(false);
+      }
     } catch (error) {
       alert(`Error processing OSM data: ${error}`);
       console.error('Error processing OSM data:', error);
+    } finally {
+      overlay?.finish();
+      this.#worldLayersToolbar?.setBusy(false);
+      this.#generating = false;
     }
   }
   /* Opens Overpass Turbo in a new tab. */

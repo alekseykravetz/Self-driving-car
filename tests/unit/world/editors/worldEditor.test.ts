@@ -745,17 +745,17 @@ describe('WorldEditor', () => {
       expect(alert).toHaveBeenCalled();
     });
 
-    it('parseOsmData stores parsed data via mock', () => {
+    it('parseOsmData stores parsed data via mock', async () => {
       const editor = createEditor();
       const osmDataEl = domElements.get('osmDataContainer') as Record<
         string,
         unknown
       >;
       osmDataEl.value = '{"elements":[]}';
-      editor.parseOsmData();
+      await editor.parseOsmData();
     });
 
-    it('expands an OSM stop seed into one Stop marking per approach lane', () => {
+    it('expands an OSM stop seed into one Stop marking per approach lane', async () => {
       markingTrackers.stops.length = 0;
       const p1 = new Point(0, 0);
       const p2 = new Point(200, 0);
@@ -783,7 +783,7 @@ describe('WorldEditor', () => {
         unknown
       >;
       osmDataEl.value = '{"elements":[]}';
-      editor.parseOsmData();
+      await editor.parseOsmData();
 
       expect(markingTrackers.stops.length).toBe(1);
       expect(markingTrackers.stops[0].type).toBe('stop');
