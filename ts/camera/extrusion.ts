@@ -4,7 +4,17 @@
  */
 import { Point } from '../math/primitives/point.js';
 import { Polygon } from '../math/primitives/polygon.js';
-import { lerp, lerp2D, average } from '../math/utils.js';
+import {
+  lerp,
+  lerp2D,
+  average,
+  subtract,
+  add,
+  scale,
+  normalize,
+  perpendicular,
+  distance,
+} from '../math/utils.js';
 import { IColoredPolygon } from './types.js';
 
 export function movePointsInward(
@@ -299,4 +309,58 @@ export function extrudeTreeShapes(
     extrudedPolygons.push(canopyBottom);
   }
   return extrudedPolygons;
+}
+
+/**
+ * Builds a single flat rectangular quad centred on the segment `p1`→`p2`, held
+ * at a constant height `z`. Used to paint ground-level road markings (lane
+ * lines, separators, crossings) in the 3D camera view. Returns `null` for a
+ * degenerate (zero-length) segment.
+ */
+export function segmentToFlatQuad(
+  p1: Point,
+  p2: Point,
+  width: number,
+  z: number = -1,
+): Polygon | null {
+  const dir = subtract(p2, p1);
+  if (dir.x === 0 && dir.y === 0) return null;
+  const perp = perpendicular(normalize(dir));
+  const half = width / 2;
+  const a = add(p1, scale(perp, half));
+  const b = add(p2, scale(perp, half));
+  const c = add(p2, scale(perp, -half));
+  const d = add(p1, scale(perp, -half));
+  return new Polygon([
+    new Point(a.x, a.y, z),
+    new Point(b.x, b.y, z),
+    new Point(c.x, c.y, z),
+    new Point(d.x, d.y, z),
+  ]);
+}
+
+/**
+ * Splits the segment `p1`→`p2` into evenly spaced dashes and returns one flat
+ * quad per dash (see {@link segmentToFlatQuad}). Used to paint dashed lane
+ * lines on the ground in the 3D camera view.
+ */
+export function dashSegmentFlat(
+  p1: Point,
+  p2: Point,
+  width: number,
+  z: number = -1,
+  dashLen: number = 30,
+  gapLen: number = 40,
+): Polygon[] {
+  const total = distance(p1, p2);
+  if (total < 1) return [];
+  const dir = normalize(subtract(p2, p1));
+  const quads: Polygon[] = [];
+  for (let d = 0; d < total; d += dashLen + gapLen) {
+    const a = add(p1, scale(dir, d));
+    const b = add(p1, scale(dir, Math.min(d + dashLen, total)));
+    const quad = segmentToFlatQuad(a, b, width, z);
+    if (quad) quads.push(quad);
+  }
+  return quads;
 }

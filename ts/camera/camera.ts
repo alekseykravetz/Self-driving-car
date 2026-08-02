@@ -18,7 +18,25 @@ import {
   extrudePolygons,
   extrudeTreeShapes,
   extrudeCarShape,
+  segmentToFlatQuad,
+  dashSegmentFlat,
 } from './extrusion.js';
+
+/** Fill colour of a traffic-light "gate" by its current state. */
+const LIGHT_STATE_COLORS: Record<string, string> = {
+  green: 'rgba(40, 220, 90, 0.55)',
+  yellow: 'rgba(245, 205, 40, 0.6)',
+  red: 'rgba(240, 60, 60, 0.6)',
+  off: 'rgba(120, 120, 120, 0.4)',
+};
+
+/** Fill colour of a flat painted marking by its type. */
+const MARKING_FLAT_COLORS: Record<string, string> = {
+  crossing: 'rgba(235, 235, 235, 0.85)',
+  stop: 'rgba(235, 235, 235, 0.9)',
+  yield: 'rgba(235, 235, 235, 0.85)',
+  target: 'rgba(90, 200, 120, 0.6)',
+};
 
 export class Camera implements ICameraPoint {
   public x!: number;
@@ -151,6 +169,31 @@ export class Camera implements ICameraPoint {
       }
     }
     return filteredPolygons;
+  }
+
+  /** Unit forward vector (camera looks along −sin/−cos of its angle). */
+  #forward(): { x: number; y: number } {
+    return { x: -Math.sin(this.angle), y: -Math.cos(this.angle) };
+  }
+
+  /** True when `p` lies ahead of the camera (avoids behind-camera projection). */
+  #inFront(p: Point): boolean {
+    const f = this.#forward();
+    return (p.x - this.x) * f.x + (p.y - this.y) * f.y > 1;
+  }
+
+  /**
+   * Cheap per-segment frustum cull for flat ground markings. Requires both
+   * endpoints ahead of the camera (so projection stays well-defined) and any of
+   * the endpoints/midpoint inside the view triangle.
+   */
+  #segmentVisible(p1: Point, p2: Point): boolean {
+    if (!this.#inFront(p1) || !this.#inFront(p2)) return false;
+    if (this.polygon.containsPoint(p1) || this.polygon.containsPoint(p2)) {
+      return true;
+    }
+    const mid = new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    return this.polygon.containsPoint(mid);
   }
 
   /**
@@ -290,11 +333,106 @@ export class Camera implements ICameraPoint {
       cPoly.stroke = 'rgba(150, 150, 150, 0.2)';
     });
 
+    // Ground plane: a single flat wedge matching the view frustum (grass),
+    // drawn first so everything else sits on top. The near apex is nudged
+    // forward so it never coincides with the camera (avoids /0 in projection).
+    const f = this.#forward();
+    const groundPolygons: Polygon[] = [];
+    {
+      const nearApex = new Point(this.x + f.x * 30, this.y + f.y * 30, 0);
+      const ground = new Polygon([
+        nearApex,
+        new Point(this.left.x, this.left.y, 0),
+        new Point(this.right.x, this.right.y, 0),
+      ]) as IColoredPolygon;
+      ground.fill = 'rgba(58, 74, 52, 1)';
+      ground.stroke = 'rgba(58, 74, 52, 1)';
+      groundPolygons.push(ground);
+    }
+
+    // Road surface: envelope polygons drawn flat on the ground (asphalt).
+    const roadSurfacePolygons: Polygon[] = this.#filter(
+      (world.envelopes ?? []).map((e) => e.polygon),
+    ).map((poly) => {
+      const flat = new Polygon(
+        poly.points.map((p) => new Point(p.x, p.y, 0)),
+      ) as IColoredPolygon;
+      flat.fill = 'rgba(45, 45, 50, 1)';
+      flat.stroke = 'rgba(45, 45, 50, 1)';
+      return flat;
+    });
+
+    // Lane markings: dashed centrelines per lane guide, flat on the road.
+    const laneMarkingPolygons: Polygon[] = [];
+    for (const g of world.laneGuides ?? []) {
+      if (!this.#segmentVisible(g.p1, g.p2)) continue;
+      for (const quad of dashSegmentFlat(g.p1, g.p2, 3, -1)) {
+        const c = quad as IColoredPolygon;
+        c.fill = 'rgba(225, 225, 205, 0.8)';
+        c.stroke = 'rgba(225, 225, 205, 0.8)';
+        laneMarkingPolygons.push(quad);
+      }
+    }
+
+    // Separators: solid yellow centre lines of hard-divided two-way roads.
+    const separatorPolygons: Polygon[] = [];
+    for (const s of world.separatorBorders ?? []) {
+      if (!this.#segmentVisible(s.p1, s.p2)) continue;
+      const quad = segmentToFlatQuad(s.p1, s.p2, 5, -1);
+      if (!quad) continue;
+      const c = quad as IColoredPolygon;
+      c.fill = 'rgba(240, 210, 80, 0.9)';
+      c.stroke = 'rgba(240, 210, 80, 0.9)';
+      separatorPolygons.push(quad);
+    }
+
+    // Painted markings (crossings, stop/yield lines, target) and traffic
+    // lights (short colour-coded gates across the road).
+    const paintedMarkingPolygons: Polygon[] = [];
+    const lightPolygons: Polygon[] = [];
+    for (const m of world.markings) {
+      if (!m.polygon) continue;
+      const type = (m as { type?: string }).type;
+      if (!this.#inFront(m.center)) continue;
+      if (
+        !this.polygon.containsPoint(m.center) &&
+        !m.polygon.intersectsPolygon(this.polygon)
+      ) {
+        continue;
+      }
+      if (type === 'light') {
+        const state = (m as unknown as { state?: string }).state ?? 'off';
+        const color = LIGHT_STATE_COLORS[state] ?? LIGHT_STATE_COLORS.off;
+        const base = new Polygon(
+          m.polygon.points.map((p) => new Point(p.x, p.y)),
+        );
+        for (const wall of extrudePolygons([base], 34)) {
+          const c = wall as IColoredPolygon;
+          c.fill = color;
+          c.stroke = 'rgba(0, 0, 0, 0.25)';
+          lightPolygons.push(wall);
+        }
+      } else if (type && MARKING_FLAT_COLORS[type]) {
+        const flat = new Polygon(
+          m.polygon.points.map((p) => new Point(p.x, p.y, -1)),
+        ) as IColoredPolygon;
+        flat.fill = MARKING_FLAT_COLORS[type];
+        flat.stroke = 'rgba(0, 0, 0, 0)';
+        paintedMarkingPolygons.push(flat);
+      }
+    }
+
     return [
+      ...groundPolygons,
+      ...roadSurfacePolygons,
+      ...laneMarkingPolygons,
+      ...separatorPolygons,
+      ...paintedMarkingPolygons,
       ...carShadowBases,
       ...roadPolygons,
       ...buildingPolygons,
       ...treePolygons,
+      ...lightPolygons,
       ...trafficPolygons,
       ...bestCarPolygons,
       ...keyCarPolygons,

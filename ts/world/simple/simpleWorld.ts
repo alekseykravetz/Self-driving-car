@@ -1,6 +1,7 @@
 import { IWorld, WorldDrawOptions } from '../types.js';
 import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
+import { Envelope } from '../../math/primitives/envelope.js';
 import { Graph } from '../../math/graph/graph.js';
 import { Corridor } from '../corridor.js';
 import { Building } from '../items/building.js';
@@ -18,6 +19,8 @@ export class SimpleWorld implements IWorld {
   markings: Marking[] = [];
   roadBorders: Segment[];
   separatorBorders: Segment[] = [];
+  envelopes: Envelope[] = [];
+  laneGuides: Segment[] = [];
   corridors: Corridor[] = [];
   buildings: Building[] = [];
   trees: Tree[] = [];
@@ -62,6 +65,9 @@ export class SimpleWorld implements IWorld {
       [graphTop, graphBottom],
       [new Segment(graphTop, graphBottom)],
     );
+
+    // Road-surface envelope spanning the straight road (used by the 3D camera).
+    this.envelopes = [new Envelope(this.graph.segments[0], this.#width, 1)];
 
     // Create a synthetic Start marking at spawn position (lane 1, y=100)
     const startY = 100;
