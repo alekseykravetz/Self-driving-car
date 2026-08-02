@@ -127,7 +127,7 @@ effective state changes.
 ```
 WorldEditor constructor:
   → new KeyboardManager(toolbar)
-  → km.setBindings([keyCtrl])          // root: always-active (Ctrl display)
+  → km.setBindings([...zoomViewBindings(), keyG, keyI])  // root: Ctrl/Shift + mode keys
 
 GraphEditor.enable():
   → km.pushBindings([keyS, keyE, keyC, keyO, keyH])  // editor-specific
@@ -151,17 +151,21 @@ routing key events.
 ```
 TrainingSimulator.#initKeyboardManager():
   → new KeyboardManager(toolbar)
-  → km.setBindings([keyUp, keyDown, keyLeft, keyRight, keyG, keyV, keyCtrl])
+  → km.setBindings([keyUp, keyDown, keyLeft, keyRight, keyG,
+                    ...zoomViewBindings(!isSimple), keyV])
 ```
 
-All bindings are always-active — there is no editor context switching.
+All bindings are always-active — there is no editor context switching. The
+`Ctrl` / `Shift` View indicators come from the shared `zoomViewBindings()` helper
+(see **Shared View shortcuts** below); the `Shift` fine-zoom key is omitted in
+simple mode.
 
 ### Traffic Simulator (static set)
 
 ```
 TrafficSimulator.#initToolbar():
   → new KeyboardManager(toolbar)
-  → km.setBindings([keyR, keyG, keyV, keyCtrl])
+  → km.setBindings([keyR, keyG, ...zoomViewBindings(), keyV])
 ```
 
 ### Human Backpropagation Simulator (static set)
@@ -169,8 +173,39 @@ TrafficSimulator.#initToolbar():
 ```
 HumanBackpropSimulator.#initToolbar():
   → new KeyboardManager(toolbar)
-  → km.setBindings([keyL, keyG, keyV, keyCtrl])
+  → km.setBindings([keyL, keyUp, keyDown, keyLeft, keyRight,
+                    ...zoomViewBindings(this.#mode !== 'simple'), keyV])
 ```
+
+As with training, the `Shift` fine-zoom indicator is hidden in simple mode.
+
+---
+
+## Shared View shortcuts (`ts/input/viewShortcuts.ts`)
+
+Every page with a pannable/zoomable `Viewport` shows the same two scroll-wheel
+modifier indicators in the **View** group:
+
+| Key     | Behavior                                                           |
+| ------- | ------------------------------------------------------------------ |
+| `Ctrl`  | Hold + scroll wheel to zoom in touchpad mode.                      |
+| `Shift` | Hold + scroll wheel for slow, fine-grained zoom (default is fast). |
+
+Rather than re-declaring these binding object literals in the world editor and
+each simulator, `zoomViewBindings(includeShift = true)` returns fresh copies that
+are spread into each page's root binding set:
+
+```typescript
+km.setBindings([
+  ...otherBindings,
+  ...zoomViewBindings(includeShift), // Ctrl (+ Shift when includeShift)
+]);
+```
+
+Pass `includeShift: false` for **simple-mode** simulators (the flat,
+vertically-scrolling road), where fine-zoom framing is not useful — so the
+`Shift` indicator is hidden there. A wording or key change is then made in exactly
+one place instead of being copy-pasted across every page.
 
 ---
 
@@ -179,15 +214,16 @@ HumanBackpropSimulator.#initToolbar():
 | File                                                   | Role                                                                                          |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
 | `ts/input/keyboardManager.ts`                          | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync |
+| `ts/input/viewShortcuts.ts`                            | `zoomViewBindings()` — shared Ctrl / Shift View-group zoom indicators reused by every page    |
 | `ts/ui/atoms/latchedToggle.ts`                         | Held/latched state machine (extracted from 4 prior copies)                                    |
 | `ts/ui/molecules/shortcutsToolbar.ts`                  | `<shortcuts-toolbar>` custom element — purely presentational rendering of key indicators      |
 | `ts/ui/molecules/shortcutsToolbarTemplate.ts`          | Static HTML template for the toolbar                                                          |
 | `ts/world/editors/worldEditor.ts`                      | Creates `KeyboardManager`, sets root bindings, passes to editors                              |
 | `ts/world/editors/graphEditor.ts`                      | Defines shortcut bindings for S/E/C/O/H keys, calls `pushBindings`/`popBindings`              |
 | `ts/world/editors/corridorEditor.ts`                   | Defines shortcut bindings for T key, calls `pushBindings`/`popBindings`                       |
-| `ts/simulator/training/trainingSimulator.ts`           | Creates `KeyboardManager` with training simulator bindings (arrows, G, Ctrl)                  |
-| `ts/simulator/traffic/trafficSimulator.ts`             | Creates `KeyboardManager` with traffic simulator bindings (R, G, Ctrl)                        |
-| `ts/simulator/humanTraining/humanBackpropSimulator.ts` | Creates `KeyboardManager` with Human Backpropagation bindings (L, G, Ctrl)                    |
+| `ts/simulator/training/trainingSimulator.ts`           | Creates `KeyboardManager` with training simulator bindings (arrows, G, Ctrl/Shift)            |
+| `ts/simulator/traffic/trafficSimulator.ts`             | Creates `KeyboardManager` with traffic simulator bindings (R, G, Ctrl/Shift)                  |
+| `ts/simulator/humanTraining/humanBackpropSimulator.ts` | Creates `KeyboardManager` with Human Backpropagation bindings (L, arrows, Ctrl/Shift)         |
 
 ---
 

@@ -5,6 +5,7 @@ import type { GridSegment } from '../../math/spatialGrid.js';
 import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import type { TrafficPanelElement } from '../../ui/organisms/trafficPanel.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
+import { zoomViewBindings } from '../../input/viewShortcuts.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
@@ -161,15 +162,9 @@ export class TrafficSimulator extends SimulatorShell {
             onDeactivate: () => this.#disableGreenWave(),
           },
         },
-        {
-          id: 'keyCtrl',
-          key: '',
-          label: 'Ctrl',
-          title: 'Ctrl + scroll wheel — Zoom in/out (touchpad mode)',
-          group: 'View',
-          kind: 'display',
-          keys: ['Control'],
-        },
+        // Shared Ctrl / Shift zoom-modifier indicators (traffic is always a
+        // full world view, so include the Shift fine-zoom key).
+        ...zoomViewBindings(),
         {
           id: 'visDensity',
           key: 'v',

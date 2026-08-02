@@ -8,6 +8,7 @@ import type {
   TrainingInitResult,
 } from '../../ui/organisms/trainingInitModal.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
+import { zoomViewBindings } from '../../input/viewShortcuts.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
@@ -133,15 +134,10 @@ export class TrainingSimulator extends SimulatorShell {
           onDeactivate: () => this.#disableGreenWave(),
         },
       },
-      {
-        id: 'keyCtrl',
-        key: '',
-        label: 'Ctrl',
-        title: 'Ctrl + scroll wheel \u2014 Zoom in/out (touchpad mode)',
-        group: 'View',
-        kind: 'display',
-        keys: ['Control'],
-      },
+      // Shared Ctrl / Shift zoom-modifier indicators. Simple mode is a flat,
+      // vertically-scrolling road where fine-zoom framing is not useful, so the
+      // Shift key is hidden there.
+      ...zoomViewBindings(!(this.#strategy instanceof SimpleTrainingStrategy)),
       {
         id: 'visDensity',
         key: 'v',

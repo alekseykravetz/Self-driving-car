@@ -38,6 +38,7 @@ import {
   runChunkedGenerator,
 } from '../generation/generationProgress.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
+import { zoomViewBindings } from '../../input/viewShortcuts.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
 import type {
@@ -246,24 +247,9 @@ export class WorldEditor {
     // Editor-specific shortcuts (S, E, C, O, H, T) are registered by the
     // editors themselves via KeyboardManager.pushBindings().
     this.#keyboardManager.setBindings([
-      {
-        id: 'keyCtrl',
-        key: '',
-        label: 'Ctrl',
-        title: 'Ctrl + scroll wheel — Zoom in/out (touchpad mode)',
-        group: 'View',
-        kind: 'display',
-        keys: ['Control'],
-      },
-      {
-        id: 'keyShift',
-        key: '',
-        label: 'Shift',
-        title: 'Shift + scroll wheel — Slow, fine-grained zoom',
-        group: 'View',
-        kind: 'display',
-        keys: ['Shift'],
-      },
+      // Shared Ctrl / Shift zoom-modifier indicators (the editor is always a
+      // full world view, so include the Shift fine-zoom key).
+      ...zoomViewBindings(),
       {
         id: 'keyG',
         key: 'g',

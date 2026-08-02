@@ -1,6 +1,7 @@
 import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
+import { zoomViewBindings } from '../../input/viewShortcuts.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { Point } from '../../math/primitives/point.js';
@@ -724,15 +725,10 @@ export class HumanBackpropSimulator extends SimulatorShell {
         kind: 'display',
         keys: ['ArrowRight', 'd'],
       },
-      {
-        id: 'keyCtrl',
-        key: '',
-        label: 'Ctrl',
-        title: 'Ctrl + scroll wheel \u2014 Zoom in/out (touchpad mode)',
-        group: 'View',
-        kind: 'display',
-        keys: ['Control'],
-      },
+      // Shared Ctrl / Shift zoom-modifier indicators. Simple mode is a flat,
+      // vertically-scrolling road where fine-zoom framing is not useful, so the
+      // Shift key is hidden there.
+      ...zoomViewBindings(this.#mode !== 'simple'),
       {
         id: 'visDensity',
         key: 'v',
