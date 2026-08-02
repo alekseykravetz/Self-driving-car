@@ -256,6 +256,15 @@ export class WorldEditor {
         keys: ['Control'],
       },
       {
+        id: 'keyShift',
+        key: '',
+        label: 'Shift',
+        title: 'Shift + scroll wheel — Slow, fine-grained zoom',
+        group: 'View',
+        kind: 'display',
+        keys: ['Shift'],
+      },
+      {
         id: 'keyG',
         key: 'g',
         label: 'G',
@@ -696,12 +705,19 @@ export class WorldEditor {
         const dataW = maxX - minX;
         const dataH = maxY - minY;
         if (dataW > 0 && dataH > 0) {
+          // Fraction of the viewport the imported data should occupy (leaving a
+          // margin around it). `zoom` maps one canvas pixel to `zoom` world
+          // units, so the world-space width visible on screen is
+          // `canvas.width * zoom`; to make the data span `pad` of that we need
+          // `zoom = dataW / (canvas.width * pad)`. Take the larger of the two
+          // axes so both fit, then clamp to the same range the wheel handler
+          // uses so the first scroll doesn't snap the zoom to a new value.
           const pad = 0.8;
-          const fitZoom = Math.min(
-            (this.#canvas.width * pad) / dataW,
-            (this.#canvas.height * pad) / dataH,
+          const fitZoom = Math.max(
+            dataW / (this.#canvas.width * pad),
+            dataH / (this.#canvas.height * pad),
           );
-          this.#viewport.zoom = Math.max(0.1, Math.min(5, fitZoom));
+          this.#viewport.zoom = Math.max(0.8, Math.min(10, fitZoom));
         }
       }
 
@@ -839,8 +855,12 @@ export class WorldEditor {
       screenBounds: this.#viewport.getVisibleBounds(),
     });
 
-    // Draw editor previews (e.g., marking intent) with transparency
-    this.#ctx.globalAlpha = this.#mode === 'graph' ? 0.5 : 0.2;
+    // Draw editor previews (e.g., marking intent) with transparency. In inspect
+    // mode fade the graph (points + segments) to almost invisible so the
+    // selected/hovered segment reads clearly; the inspect tool forces full
+    // opacity for its own highlight internally.
+    this.#ctx.globalAlpha =
+      this.#mode === 'graph' ? 0.5 : this.#mode === 'inspect' ? 0.06 : 0.2;
     for (const editor of Object.values(this.#editors)) {
       editor.display();
     }

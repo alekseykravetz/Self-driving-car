@@ -17,6 +17,11 @@ export interface DragState {
  */
 export type ViewportMode = 'mouse' | 'touchpad';
 
+/** Default (fast) zoom increment applied per scroll-wheel notch. */
+const ZOOM_STEP_FAST = 0.3;
+/** Slow, fine-grained zoom increment used while Shift is held. */
+const ZOOM_STEP_SLOW = 0.1;
+
 /** Axis-aligned world-space rectangle currently visible on the canvas. */
 export interface VisibleWorldRect {
   minX: number;
@@ -251,8 +256,10 @@ export class Viewport {
     if (this.mode === 'mouse' || e.ctrlKey) {
       // Zoom in/out. Scrolling up (deltaY < 0) zooms IN, scrolling down zooms
       // OUT — matching the conventional direction used by map/design tools.
+      // The default step is fast; holding Shift falls back to the slower,
+      // fine-grained step for precise framing.
       const direction = Math.sign(e.deltaY);
-      const step = 0.1;
+      const step = e.shiftKey ? ZOOM_STEP_SLOW : ZOOM_STEP_FAST;
       this.zoom += direction * step;
       this.zoom = Math.max(0.8, Math.min(10, this.zoom));
     } else {
