@@ -19,7 +19,8 @@ import {
   extrudeTreeShapes,
   extrudeCarShape,
   segmentToFlatQuad,
-  dashSegmentFlat,
+  dashSegmentAnchored,
+  zebraStripes,
 } from './extrusion.js';
 
 /** Fill colour of a traffic-light "gate" by its current state. */
@@ -32,8 +33,8 @@ const LIGHT_STATE_COLORS: Record<string, string> = {
 
 /** Fill colour of a flat painted marking by its type. */
 const MARKING_FLAT_COLORS: Record<string, string> = {
-  crossing: 'rgba(235, 235, 235, 0.85)',
-  stop: 'rgba(235, 235, 235, 0.9)',
+  stop: 'rgba(230, 60, 60, 0.85)',
+  yield: 'rgba(235, 205, 60, 0.85)',
   target: 'rgba(90, 200, 120, 0.6)',
 };
 
@@ -179,20 +180,6 @@ export class Camera implements ICameraPoint {
   #inFront(p: Point): boolean {
     const f = this.#forward();
     return (p.x - this.x) * f.x + (p.y - this.y) * f.y > 1;
-  }
-
-  /**
-   * Cheap per-segment frustum cull for flat ground markings. Requires both
-   * endpoints ahead of the camera (so projection stays well-defined) and any of
-   * the endpoints/midpoint inside the view triangle.
-   */
-  #segmentVisible(p1: Point, p2: Point): boolean {
-    if (!this.#inFront(p1) || !this.#inFront(p2)) return false;
-    if (this.polygon.containsPoint(p1) || this.polygon.containsPoint(p2)) {
-      return true;
-    }
-    const mid = new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-    return this.polygon.containsPoint(mid);
   }
 
   /**
@@ -377,23 +364,41 @@ export class Camera implements ICameraPoint {
     // gets a single central dashed line). The graph segment IS the centreline,
     // so a divider is only drawn for roads with >=2 lanes; separated roads use
     // the solid separator below, and `laneMarkings === false` roads are bare.
-    // Segments are frustum-clipped so the road under the camera keeps its line.
-    const dividerBases: Polygon[] = [];
+    // Each segment is frustum-clipped to its visible range, but the dash pattern
+    // is anchored to the segment's fixed world start so dashes stay locked in
+    // place as the car moves (no crawling).
+    const laneMarkingPolygons: Polygon[] = [];
     for (const seg of world.graph?.segments ?? []) {
       const lanes = seg.lanes ?? 2;
       if (lanes < 2 || seg.separated || seg.laneMarkings === false) continue;
-      dividerBases.push(
+      const segLen = distance(seg.p1, seg.p2);
+      if (segLen < 1) continue;
+      const dirX = (seg.p2.x - seg.p1.x) / segLen;
+      const dirY = (seg.p2.y - seg.p1.y) / segLen;
+      const clipped = this.#filter([
         new Polygon([
           new Point(seg.p1.x, seg.p1.y),
           new Point(seg.p2.x, seg.p2.y),
         ]),
-      );
-    }
-    const laneMarkingPolygons: Polygon[] = [];
-    for (const poly of this.#filter(dividerBases)) {
-      const pts = poly.points;
-      for (let i = 0; i + 1 < pts.length; i++) {
-        for (const quad of dashSegmentFlat(pts[i], pts[i + 1], 3, -1)) {
+      ]);
+      for (const poly of clipped) {
+        let tMin = Infinity;
+        let tMax = -Infinity;
+        for (const pt of poly.points) {
+          const t = (pt.x - seg.p1.x) * dirX + (pt.y - seg.p1.y) * dirY;
+          if (t < tMin) tMin = t;
+          if (t > tMax) tMax = t;
+        }
+        tMin = Math.max(0, tMin);
+        tMax = Math.min(segLen, tMax);
+        for (const quad of dashSegmentAnchored(
+          seg.p1,
+          seg.p2,
+          tMin,
+          tMax,
+          3,
+          -1,
+        )) {
           const c = quad as IColoredPolygon;
           c.fill = 'rgba(225, 225, 205, 0.8)';
           c.stroke = 'rgba(225, 225, 205, 0.8)';
@@ -402,16 +407,26 @@ export class Camera implements ICameraPoint {
       }
     }
 
-    // Separators: solid yellow centre lines of hard-divided two-way roads.
-    const separatorPolygons: Polygon[] = [];
+    // Separators: solid yellow centre lines of hard-divided two-way roads,
+    // frustum-clipped (like the lane dividers) so they stay put as the car
+    // moves instead of popping in and out.
+    const separatorBases: Polygon[] = [];
     for (const s of world.separatorBorders ?? []) {
-      if (!this.#segmentVisible(s.p1, s.p2)) continue;
-      const quad = segmentToFlatQuad(s.p1, s.p2, 5, -1);
-      if (!quad) continue;
-      const c = quad as IColoredPolygon;
-      c.fill = 'rgba(240, 210, 80, 0.9)';
-      c.stroke = 'rgba(240, 210, 80, 0.9)';
-      separatorPolygons.push(quad);
+      separatorBases.push(
+        new Polygon([new Point(s.p1.x, s.p1.y), new Point(s.p2.x, s.p2.y)]),
+      );
+    }
+    const separatorPolygons: Polygon[] = [];
+    for (const poly of this.#filter(separatorBases)) {
+      const pts = poly.points;
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const quad = segmentToFlatQuad(pts[i], pts[i + 1], 5, -1);
+        if (!quad) continue;
+        const c = quad as IColoredPolygon;
+        c.fill = 'rgba(240, 210, 80, 0.9)';
+        c.stroke = 'rgba(240, 210, 80, 0.9)';
+        separatorPolygons.push(quad);
+      }
     }
 
     // Painted markings (crossings, stop/yield lines, target) and traffic
@@ -439,6 +454,19 @@ export class Camera implements ICameraPoint {
           c.fill = color;
           c.stroke = 'rgba(0, 0, 0, 0.25)';
           lightPolygons.push(wall);
+        }
+      } else if (type === 'crossing') {
+        // Real zebra bars instead of a solid white slab.
+        for (const stripe of zebraStripes(
+          m.center,
+          m.directionVector,
+          m.width,
+          m.height,
+        )) {
+          const c = stripe as IColoredPolygon;
+          c.fill = 'rgba(240, 240, 240, 0.9)';
+          c.stroke = 'rgba(0, 0, 0, 0)';
+          paintedMarkingPolygons.push(stripe);
         }
       } else if (type && MARKING_FLAT_COLORS[type]) {
         const flat = new Polygon(
