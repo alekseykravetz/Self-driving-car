@@ -6,6 +6,10 @@ import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import type { TrafficPanelElement } from '../../ui/organisms/trafficPanel.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
 import { zoomViewBindings } from '../../input/viewShortcuts.js';
+import {
+  greenWaveBinding,
+  visualizerDensityBinding,
+} from '../../input/simulatorShortcuts.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { World } from '../../world/world.js';
 import { Graph } from '../../math/graph/graph.js';
@@ -149,33 +153,15 @@ export class TrafficSimulator extends SimulatorShell {
             },
           },
         },
-        {
-          id: 'keyG',
-          key: 'g',
-          label: 'G',
-          title:
-            'G — Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
+        greenWaveBinding({
           group: 'Spawn',
-          kind: 'toggle',
-          toggle: {
-            onActivate: () => this.#enableGreenWave(),
-            onDeactivate: () => this.#disableGreenWave(),
-          },
-        },
+          onActivate: () => this.#enableGreenWave(),
+          onDeactivate: () => this.#disableGreenWave(),
+        }),
         // Shared Ctrl / Shift zoom-modifier indicators (traffic is always a
         // full world view, so include the Shift fine-zoom key).
         ...zoomViewBindings(),
-        {
-          id: 'visDensity',
-          key: 'v',
-          label: 'V',
-          title: 'V — Toggle network visualizer density (show all values)',
-          group: 'Visualizer',
-          kind: 'momentary',
-          handler: {
-            onKeyDown: () => this.networkVisualizer.toggleDensity(),
-          },
-        },
+        visualizerDensityBinding(() => this.networkVisualizer.toggleDensity()),
       ]);
     }
 

@@ -2,6 +2,10 @@ import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
 import { zoomViewBindings } from '../../input/viewShortcuts.js';
+import {
+  driveKeyBindings,
+  visualizerDensityBinding,
+} from '../../input/simulatorShortcuts.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { Point } from '../../math/primitives/point.js';
@@ -689,57 +693,12 @@ export class HumanBackpropSimulator extends SimulatorShell {
           onDeactivate: () => this.#setLearning(false),
         },
       },
-      {
-        id: 'keyUp',
-        key: '',
-        label: '\u2191 / W',
-        title: 'Arrow Up / W \u2014 Accelerate (drive the car)',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowUp', 'w'],
-      },
-      {
-        id: 'keyDown',
-        key: '',
-        label: '\u2193 / S',
-        title: 'Arrow Down / S \u2014 Brake / reverse',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowDown', 's'],
-      },
-      {
-        id: 'keyLeft',
-        key: '',
-        label: '\u2190 / A',
-        title: 'Arrow Left / A \u2014 Steer left',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowLeft', 'a'],
-      },
-      {
-        id: 'keyRight',
-        key: '',
-        label: '\u2192 / D',
-        title: 'Arrow Right / D \u2014 Steer right',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowRight', 'd'],
-      },
+      ...driveKeyBindings(),
       // Shared Ctrl / Shift zoom-modifier indicators. Simple mode is a flat,
       // vertically-scrolling road where fine-zoom framing is not useful, so the
       // Shift key is hidden there.
       ...zoomViewBindings(this.#mode !== 'simple'),
-      {
-        id: 'visDensity',
-        key: 'v',
-        label: 'V',
-        title: 'V \u2014 Toggle network visualizer density (show all values)',
-        group: 'Visualizer',
-        kind: 'momentary',
-        handler: {
-          onKeyDown: () => this.networkVisualizer.toggleDensity(),
-        },
-      },
+      visualizerDensityBinding(() => this.networkVisualizer.toggleDensity()),
     ]);
   }
 }

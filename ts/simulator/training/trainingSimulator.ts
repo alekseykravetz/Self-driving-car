@@ -9,6 +9,11 @@ import type {
 } from '../../ui/organisms/trainingInitModal.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
 import { zoomViewBindings } from '../../input/viewShortcuts.js';
+import {
+  driveKeyBindings,
+  greenWaveBinding,
+  visualizerDensityBinding,
+} from '../../input/simulatorShortcuts.js';
 import type { ShortcutsToolbarElement } from '../../ui/molecules/shortcutsToolbar.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
@@ -85,70 +90,17 @@ export class TrainingSimulator extends SimulatorShell {
     if (!toolbar) return;
     this.#keyboardManager = new KeyboardManager(toolbar);
     this.#keyboardManager.setBindings([
-      {
-        id: 'keyUp',
-        key: '',
-        label: '\u2191 / W',
-        title: 'Arrow Up / W \u2014 Accelerate (drive the \u{1f3ae} user car)',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowUp', 'w'],
-      },
-      {
-        id: 'keyDown',
-        key: '',
-        label: '\u2193 / S',
-        title: 'Arrow Down / S \u2014 Brake / reverse',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowDown', 's'],
-      },
-      {
-        id: 'keyLeft',
-        key: '',
-        label: '\u2190 / A',
-        title: 'Arrow Left / A \u2014 Steer left',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowLeft', 'a'],
-      },
-      {
-        id: 'keyRight',
-        key: '',
-        label: '\u2192 / D',
-        title: 'Arrow Right / D \u2014 Steer right',
-        group: 'Drive',
-        kind: 'display',
-        keys: ['ArrowRight', 'd'],
-      },
-      {
-        id: 'keyG',
-        key: 'g',
-        label: 'G',
-        title:
-          'G \u2014 Toggle global green wave for all traffic lights. Press once to force all lights green, again to restore normal cycling.',
+      ...driveKeyBindings('the \u{1f3ae} user car'),
+      greenWaveBinding({
         group: 'Traffic',
-        kind: 'toggle',
-        toggle: {
-          onActivate: () => this.#enableGreenWave(),
-          onDeactivate: () => this.#disableGreenWave(),
-        },
-      },
+        onActivate: () => this.#enableGreenWave(),
+        onDeactivate: () => this.#disableGreenWave(),
+      }),
       // Shared Ctrl / Shift zoom-modifier indicators. Simple mode is a flat,
       // vertically-scrolling road where fine-zoom framing is not useful, so the
       // Shift key is hidden there.
       ...zoomViewBindings(!(this.#strategy instanceof SimpleTrainingStrategy)),
-      {
-        id: 'visDensity',
-        key: 'v',
-        label: 'V',
-        title: 'V \u2014 Toggle network visualizer density (show all values)',
-        group: 'Visualizer',
-        kind: 'momentary',
-        handler: {
-          onKeyDown: () => this.networkVisualizer.toggleDensity(),
-        },
-      },
+      visualizerDensityBinding(() => this.networkVisualizer.toggleDensity()),
     ]);
   }
 
