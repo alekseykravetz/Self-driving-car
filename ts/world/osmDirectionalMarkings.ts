@@ -56,11 +56,11 @@ export function expandDirectionalMarking(
   setback: number = STOP_LINE_SETBACK_PX,
   incident?: Segment[],
 ): DirectionalPlacement[] {
-  // The seed `directionVector` ALREADY encodes the desired marking facing:
-  // `Osm.parseRoads` emits it as `-approachFacingDir`, the lane-guide convention
-  // the shared Stop/Yield `draw()` expects (so an OSM sign renders identically to
-  // a hand-placed one). Emit it per lane UNCHANGED — negating here double-flips
-  // the sign 180° (the regression this restores).
+  // Emit the marking flipped 180° from the seed travel direction so the painted
+  // text reads for the approaching driver. The seed points along travel (into
+  // the junction); the lane guide a hand-placed marking would sit on points the
+  // OPPOSITE way (cars face against their guide), so negating the seed makes the
+  // OSM sign face — and render — exactly like a hand-placed one.
   const facing = (): Point => new Point(-directionVector.x, -directionVector.y);
 
   // 1. Approach segment: incident to the node, road axis most collinear with
