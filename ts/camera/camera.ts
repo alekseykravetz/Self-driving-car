@@ -12,7 +12,17 @@ import { Polygon } from '../math/primitives/polygon.js';
 
 import { IWorld } from '../world/types.js';
 import { Corridor } from '../world/corridor.js';
-import { lerp, cross, subtract, distance } from '../math/utils.js';
+import {
+  lerp,
+  cross,
+  subtract,
+  distance,
+  normalize,
+  perpendicular,
+  add,
+  scale,
+} from '../math/utils.js';
+import { LANE_WIDTH_PX, PARKING_LANE_WIDTH_PX } from '../math/worldUnits.js';
 import { drawPolygon } from '../rendering/polygonRenderer.js';
 import {
   extrudePolygons,
@@ -22,6 +32,7 @@ import {
   dashSegmentAnchored,
   zebraStripes,
 } from './extrusion.js';
+import { textStrokeQuads } from './roadText.js';
 
 /** Fill colour of a traffic-light "gate" by its current state. */
 const LIGHT_STATE_COLORS: Record<string, string> = {
@@ -33,10 +44,11 @@ const LIGHT_STATE_COLORS: Record<string, string> = {
 
 /** Fill colour of a flat painted marking by its type. */
 const MARKING_FLAT_COLORS: Record<string, string> = {
-  stop: 'rgba(230, 60, 60, 0.85)',
-  yield: 'rgba(235, 205, 60, 0.85)',
   target: 'rgba(90, 200, 120, 0.6)',
 };
+
+/** White used for painted road lines/words. */
+const ROAD_PAINT = 'rgba(240, 240, 240, 0.9)';
 
 export class Camera implements ICameraPoint {
   public x!: number;
@@ -180,6 +192,120 @@ export class Camera implements ICameraPoint {
   #inFront(p: Point): boolean {
     const f = this.#forward();
     return (p.x - this.x) * f.x + (p.y - this.y) * f.y > 1;
+  }
+
+  /**
+   * Clips a flat polygon against the camera's near plane (a line just in front
+   * of the camera, perpendicular to the view direction), keeping only the part
+   * ahead of it. Unlike clipping to the full frustum triangle — which collapses
+   * to a point at the camera and drops the wedge right in front of it — the near
+   * plane is straight, so road surfaces stay filled all the way up to the
+   * camera (no grass gap under the car). Off-screen sides project harmlessly off
+   * the canvas. Returns `null` when nothing survives.
+   */
+  #nearPlaneClip(poly: Polygon): Polygon | null {
+    const f = this.#forward();
+    const nx = this.x + f.x * 2;
+    const ny = this.y + f.y * 2;
+    const side = (p: Point): number => (p.x - nx) * f.x + (p.y - ny) * f.y;
+    const pts = poly.points;
+    const out: Point[] = [];
+    for (let i = 0; i < pts.length; i++) {
+      const cur = pts[i];
+      const nxt = pts[(i + 1) % pts.length];
+      const dCur = side(cur);
+      const dNxt = side(nxt);
+      if (dCur >= 0) out.push(new Point(cur.x, cur.y, cur.z));
+      if (dCur >= 0 !== dNxt >= 0) {
+        const t = dCur / (dCur - dNxt);
+        out.push(
+          new Point(
+            cur.x + t * (nxt.x - cur.x),
+            cur.y + t * (nxt.y - cur.y),
+            cur.z + t * (nxt.z - cur.z),
+          ),
+        );
+      }
+    }
+    return out.length >= 3 ? new Polygon(out) : null;
+  }
+
+  /**
+   * Returns the visible sub-range `[tMin, tMax]` (distances from `a`) of the
+   * segment `a`→`b` after frustum-clipping, or `null` if nothing is visible.
+   * Callers anchor dashes to `a` within this range so they stay world-locked.
+   */
+  #visibleRange(a: Point, b: Point): { tMin: number; tMax: number } | null {
+    const segLen = distance(a, b);
+    if (segLen < 1) return null;
+    const dirX = (b.x - a.x) / segLen;
+    const dirY = (b.y - a.y) / segLen;
+    const clipped = this.#filter([
+      new Polygon([new Point(a.x, a.y), new Point(b.x, b.y)]),
+    ]);
+    if (!clipped.length) return null;
+    let tMin = Infinity;
+    let tMax = -Infinity;
+    for (const poly of clipped) {
+      for (const pt of poly.points) {
+        const t = (pt.x - a.x) * dirX + (pt.y - a.y) * dirY;
+        if (t < tMin) tMin = t;
+        if (t > tMax) tMax = t;
+      }
+    }
+    tMin = Math.max(0, tMin);
+    tMax = Math.min(segLen, tMax);
+    return tMax > tMin ? { tMin, tMax } : null;
+  }
+
+  /**
+   * Emits a painted road line (`a`→`b`) into `out`, frustum-clipped. Dashed
+   * lines anchor their pattern to `a` so they stay world-locked as the car
+   * moves; solid lines become a single clipped quad.
+   */
+  #emitRoadLine(
+    a: Point,
+    b: Point,
+    out: Polygon[],
+    opts: {
+      color: string;
+      width: number;
+      dashed: boolean;
+      dashLen?: number;
+      gapLen?: number;
+    },
+  ): void {
+    const range = this.#visibleRange(a, b);
+    if (!range) return;
+    if (opts.dashed) {
+      for (const quad of dashSegmentAnchored(
+        a,
+        b,
+        range.tMin,
+        range.tMax,
+        opts.width,
+        -1,
+        opts.dashLen ?? 30,
+        opts.gapLen ?? 40,
+      )) {
+        const c = quad as IColoredPolygon;
+        c.fill = opts.color;
+        c.stroke = opts.color;
+        out.push(quad);
+      }
+    } else {
+      const segLen = distance(a, b);
+      const dx = (b.x - a.x) / segLen;
+      const dy = (b.y - a.y) / segLen;
+      const pa = new Point(a.x + dx * range.tMin, a.y + dy * range.tMin);
+      const pb = new Point(a.x + dx * range.tMax, a.y + dy * range.tMax);
+      const quad = segmentToFlatQuad(pa, pb, opts.width, -1);
+      if (!quad) return;
+      const c = quad as IColoredPolygon;
+      c.fill = opts.color;
+      c.stroke = opts.color;
+      out.push(quad);
+    }
   }
 
   /**
@@ -348,84 +474,99 @@ export class Camera implements ICameraPoint {
       groundPolygons.push(ground);
     }
 
-    // Road surface: envelope polygons drawn flat on the ground (asphalt).
-    const roadSurfacePolygons: Polygon[] = this.#filter(
-      (world.envelopes ?? []).map((e) => e.polygon),
-    ).map((poly) => {
-      const flat = new Polygon(
-        poly.points.map((p) => new Point(p.x, p.y, 0)),
-      ) as IColoredPolygon;
-      flat.fill = 'rgba(45, 45, 50, 1)';
-      flat.stroke = 'rgba(45, 45, 50, 1)';
-      return flat;
-    });
+    // Road surface: envelope polygons drawn flat, clipped only against the near
+    // plane (not the collapsing frustum triangle) so the asphalt stays filled
+    // right up to the camera — no grass gap under/behind the car.
+    const roadSurfacePolygons: Polygon[] = [];
+    for (const env of world.envelopes ?? []) {
+      const poly = env.polygon;
+      if (poly.distanceToPoint(this.center) > this.range) continue;
+      const relevant =
+        poly.intersectsPolygon(this.polygon) ||
+        this.polygon.containsPolygon(poly) ||
+        poly.containsPoint(this.center);
+      if (!relevant) continue;
+      const flat = new Polygon(poly.points.map((p) => new Point(p.x, p.y, 0)));
+      const clipped = this.#nearPlaneClip(flat);
+      if (!clipped) continue;
+      const c = clipped as IColoredPolygon;
+      c.fill = 'rgba(45, 45, 50, 1)';
+      c.stroke = 'rgba(45, 45, 50, 1)';
+      roadSurfacePolygons.push(clipped);
+    }
 
-    // Lane dividers: one dashed line down each road centreline (a 2-lane road
-    // gets a single central dashed line). The graph segment IS the centreline,
-    // so a divider is only drawn for roads with >=2 lanes; separated roads use
-    // the solid separator below, and `laneMarkings === false` roads are bare.
-    // Each segment is frustum-clipped to its visible range, but the dash pattern
-    // is anchored to the segment's fixed world start so dashes stay locked in
-    // place as the car moves (no crawling).
+    // Lane markings, mirroring the 2D map: N-1 white dividers per road (thicker,
+    // longer dashes for the centre divider — solid on hard-separated roads —
+    // and thin dashes for the rest; one-way roads get thin dashes throughout),
+    // plus a solid boundary line and bay ticks for each parking lane. Every line
+    // is frustum-clipped with world-anchored dashes so it stays locked in place.
     const laneMarkingPolygons: Polygon[] = [];
     for (const seg of world.graph?.segments ?? []) {
-      const lanes = seg.lanes ?? 2;
-      if (lanes < 2 || seg.separated || seg.laneMarkings === false) continue;
-      const segLen = distance(seg.p1, seg.p2);
-      if (segLen < 1) continue;
-      const dirX = (seg.p2.x - seg.p1.x) / segLen;
-      const dirY = (seg.p2.y - seg.p1.y) / segLen;
-      const clipped = this.#filter([
-        new Polygon([
-          new Point(seg.p1.x, seg.p1.y),
-          new Point(seg.p2.x, seg.p2.y),
-        ]),
-      ]);
-      for (const poly of clipped) {
-        let tMin = Infinity;
-        let tMax = -Infinity;
-        for (const pt of poly.points) {
-          const t = (pt.x - seg.p1.x) * dirX + (pt.y - seg.p1.y) * dirY;
-          if (t < tMin) tMin = t;
-          if (t > tMax) tMax = t;
-        }
-        tMin = Math.max(0, tMin);
-        tMax = Math.min(segLen, tMax);
-        for (const quad of dashSegmentAnchored(
-          seg.p1,
-          seg.p2,
-          tMin,
-          tMax,
-          3,
-          -1,
-        )) {
-          const c = quad as IColoredPolygon;
-          c.fill = 'rgba(225, 225, 205, 0.8)';
-          c.stroke = 'rgba(225, 225, 205, 0.8)';
-          laneMarkingPolygons.push(quad);
+      if (seg.distanceToPoint(this.center) > this.range) continue;
+      if (!this.#inFront(seg.p1) && !this.#inFront(seg.p2)) continue;
+      const laneCount = seg.lanes ?? (seg.oneWay ? 1 : 2);
+      const roadWidth = laneCount * LANE_WIDTH_PX;
+      const dir = normalize(seg.directionVector());
+      const perp = perpendicular(dir);
+
+      if (seg.laneMarkings !== false && laneCount >= 2) {
+        for (let i = 0; i < laneCount - 1; i++) {
+          const offset = (i + 1 - laneCount / 2) * LANE_WIDTH_PX;
+          if (Math.abs(offset) >= roadWidth / 2 - 1) continue;
+          const isCenter = Math.abs(offset) < LANE_WIDTH_PX * 0.6;
+          const a = add(seg.p1, scale(perp, offset));
+          const b = add(seg.p2, scale(perp, offset));
+          if (!seg.oneWay && seg.separated && isCenter) {
+            this.#emitRoadLine(a, b, laneMarkingPolygons, {
+              color: ROAD_PAINT,
+              width: 4,
+              dashed: false,
+            });
+          } else if (!seg.oneWay && isCenter) {
+            this.#emitRoadLine(a, b, laneMarkingPolygons, {
+              color: ROAD_PAINT,
+              width: 4,
+              dashed: true,
+              dashLen: 30,
+              gapLen: 30,
+            });
+          } else {
+            this.#emitRoadLine(a, b, laneMarkingPolygons, {
+              color: ROAD_PAINT,
+              width: 2,
+              dashed: true,
+              dashLen: 20,
+              gapLen: 30,
+            });
+          }
         }
       }
-    }
 
-    // Separators: solid yellow centre lines of hard-divided two-way roads,
-    // frustum-clipped (like the lane dividers) so they stay put as the car
-    // moves instead of popping in and out.
-    const separatorBases: Polygon[] = [];
-    for (const s of world.separatorBorders ?? []) {
-      separatorBases.push(
-        new Polygon([new Point(s.p1.x, s.p1.y), new Point(s.p2.x, s.p2.y)]),
-      );
-    }
-    const separatorPolygons: Polygon[] = [];
-    for (const poly of this.#filter(separatorBases)) {
-      const pts = poly.points;
-      for (let i = 0; i + 1 < pts.length; i++) {
-        const quad = segmentToFlatQuad(pts[i], pts[i + 1], 5, -1);
-        if (!quad) continue;
-        const c = quad as IColoredPolygon;
-        c.fill = 'rgba(240, 210, 80, 0.9)';
-        c.stroke = 'rgba(240, 210, 80, 0.9)';
-        separatorPolygons.push(quad);
+      if (seg.parkingRight || seg.parkingLeft) {
+        const innerHalf = roadWidth / 2;
+        const outerHalf = innerHalf + PARKING_LANE_WIDTH_PX;
+        const segLen = seg.length();
+        const sides: number[] = [];
+        if (seg.parkingRight) sides.push(1);
+        if (seg.parkingLeft) sides.push(-1);
+        const bays = Math.max(1, Math.floor(segLen / (LANE_WIDTH_PX * 1.5)));
+        for (const s of sides) {
+          this.#emitRoadLine(
+            add(seg.p1, scale(perp, innerHalf * s)),
+            add(seg.p2, scale(perp, innerHalf * s)),
+            laneMarkingPolygons,
+            { color: ROAD_PAINT, width: 2, dashed: false },
+          );
+          for (let i = 0; i <= bays; i++) {
+            const alongPt = add(seg.p1, scale(dir, (i / bays) * segLen));
+            this.#emitRoadLine(
+              add(alongPt, scale(perp, innerHalf * s)),
+              add(alongPt, scale(perp, outerHalf * s)),
+              laneMarkingPolygons,
+              { color: ROAD_PAINT, width: 2, dashed: false },
+            );
+          }
+        }
       }
     }
 
@@ -468,6 +609,36 @@ export class Camera implements ICameraPoint {
           c.stroke = 'rgba(0, 0, 0, 0)';
           paintedMarkingPolygons.push(stripe);
         }
+      } else if (type === 'stop' || type === 'yield') {
+        // Painted like the 2D map: a white stop/yield line across the road plus
+        // the word written on the tarmac, reading for the approaching driver.
+        const dir = normalize(m.directionVector);
+        const across = perpendicular(dir);
+        const lineA = add(m.center, scale(across, m.width / 2));
+        const lineB = add(m.center, scale(across, -m.width / 2));
+        const line = segmentToFlatQuad(lineA, lineB, 6, -1);
+        if (line) {
+          const c = line as IColoredPolygon;
+          c.fill = ROAD_PAINT;
+          c.stroke = 'rgba(0, 0, 0, 0)';
+          paintedMarkingPolygons.push(line);
+        }
+        const word = type === 'stop' ? 'STOP' : 'YIELD';
+        for (const glyph of textStrokeQuads(
+          word,
+          m.center,
+          dir,
+          m.width * 0.5,
+          m.width * 0.42,
+          m.width * 0.12,
+          4,
+          -1,
+        )) {
+          const c = glyph as IColoredPolygon;
+          c.fill = ROAD_PAINT;
+          c.stroke = 'rgba(0, 0, 0, 0)';
+          paintedMarkingPolygons.push(glyph);
+        }
       } else if (type && MARKING_FLAT_COLORS[type]) {
         const flat = new Polygon(
           m.polygon.points.map((p) => new Point(p.x, p.y, -1)),
@@ -482,7 +653,6 @@ export class Camera implements ICameraPoint {
       ...groundPolygons,
       ...roadSurfacePolygons,
       ...laneMarkingPolygons,
-      ...separatorPolygons,
       ...paintedMarkingPolygons,
       ...carShadowBases,
       ...roadPolygons,
