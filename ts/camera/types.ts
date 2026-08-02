@@ -10,6 +10,8 @@ export interface ICameraPoint {
 export interface IColoredPolygon extends Polygon {
   fill: string;
   stroke: string;
+  /** When true, omitted from the top-view debug overlay (synthetic ground). */
+  skipDebug?: boolean;
 }
 
 export interface ICameraRenderOptions {

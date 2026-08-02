@@ -229,10 +229,13 @@ export class WorldTrainingStrategy {
     });
     this.#parent.viewport.drawScaleIndicator(this.#parent.gameCtx);
 
-    const viewportTop = bestCar.y - this.#parent.gameCanvas.height * 2;
-    const viewportBottom = bestCar.y + this.#parent.gameCanvas.height * 2;
-    const viewportLeft = bestCar.x - this.#parent.gameCanvas.width * 2;
-    const viewportRight = bestCar.x + this.#parent.gameCanvas.width * 2;
+    // Cull cars around the tracked view centre (which follows the key car when
+    // tracking keys), not the best car — otherwise cars near the key car but
+    // far from the best car vanish while you drive it.
+    const viewportTop = viewPoint.y - this.#parent.gameCanvas.height * 2;
+    const viewportBottom = viewPoint.y + this.#parent.gameCanvas.height * 2;
+    const viewportLeft = viewPoint.x - this.#parent.gameCanvas.width * 2;
+    const viewportRight = viewPoint.x + this.#parent.gameCanvas.width * 2;
     const settings = this.#parent.trainingManager.getSettings();
     const drawMasks = settings.carCount <= 5000;
 

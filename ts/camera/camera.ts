@@ -34,7 +34,6 @@ const LIGHT_STATE_COLORS: Record<string, string> = {
 const MARKING_FLAT_COLORS: Record<string, string> = {
   crossing: 'rgba(235, 235, 235, 0.85)',
   stop: 'rgba(235, 235, 235, 0.9)',
-  yield: 'rgba(235, 235, 235, 0.85)',
   target: 'rgba(90, 200, 120, 0.6)',
 };
 
@@ -322,7 +321,7 @@ export class Camera implements ICameraPoint {
     );
     carShadowBases.forEach((poly) => {
       const cPoly = poly as IColoredPolygon;
-      cPoly.fill = 'rgba(220, 220, 220, 1)';
+      cPoly.fill = 'rgba(0, 0, 0, 0.25)';
       cPoly.stroke = 'rgba(0, 0, 0, 0)';
     });
 
@@ -333,20 +332,32 @@ export class Camera implements ICameraPoint {
       cPoly.stroke = 'rgba(150, 150, 150, 0.2)';
     });
 
-    // Ground plane: a single flat wedge matching the view frustum (grass),
-    // drawn first so everything else sits on top. The near apex is nudged
-    // forward so it never coincides with the camera (avoids /0 in projection).
-    const f = this.#forward();
+    // Ground plane: a flat trapezoid covering the whole field of view (grass),
+    // drawn first so everything else sits on top. Near corners are placed just
+    // in front of the camera at the FOV edges so the ground fills the screen
+    // bottom (a triangle would leave the lower corners empty).
     const groundPolygons: Polygon[] = [];
     {
-      const nearApex = new Point(this.x + f.x * 30, this.y + f.y * 30, 0);
+      const near = 20;
+      const nearLeft = new Point(
+        this.x - near * Math.sin(this.angle - Math.PI / 4),
+        this.y - near * Math.cos(this.angle - Math.PI / 4),
+        0,
+      );
+      const nearRight = new Point(
+        this.x - near * Math.sin(this.angle + Math.PI / 4),
+        this.y - near * Math.cos(this.angle + Math.PI / 4),
+        0,
+      );
       const ground = new Polygon([
-        nearApex,
+        nearLeft,
         new Point(this.left.x, this.left.y, 0),
         new Point(this.right.x, this.right.y, 0),
+        nearRight,
       ]) as IColoredPolygon;
       ground.fill = 'rgba(58, 74, 52, 1)';
       ground.stroke = 'rgba(58, 74, 52, 1)';
+      ground.skipDebug = true;
       groundPolygons.push(ground);
     }
 
@@ -362,15 +373,32 @@ export class Camera implements ICameraPoint {
       return flat;
     });
 
-    // Lane markings: dashed centrelines per lane guide, flat on the road.
+    // Lane dividers: one dashed line down each road centreline (a 2-lane road
+    // gets a single central dashed line). The graph segment IS the centreline,
+    // so a divider is only drawn for roads with >=2 lanes; separated roads use
+    // the solid separator below, and `laneMarkings === false` roads are bare.
+    // Segments are frustum-clipped so the road under the camera keeps its line.
+    const dividerBases: Polygon[] = [];
+    for (const seg of world.graph?.segments ?? []) {
+      const lanes = seg.lanes ?? 2;
+      if (lanes < 2 || seg.separated || seg.laneMarkings === false) continue;
+      dividerBases.push(
+        new Polygon([
+          new Point(seg.p1.x, seg.p1.y),
+          new Point(seg.p2.x, seg.p2.y),
+        ]),
+      );
+    }
     const laneMarkingPolygons: Polygon[] = [];
-    for (const g of world.laneGuides ?? []) {
-      if (!this.#segmentVisible(g.p1, g.p2)) continue;
-      for (const quad of dashSegmentFlat(g.p1, g.p2, 3, -1)) {
-        const c = quad as IColoredPolygon;
-        c.fill = 'rgba(225, 225, 205, 0.8)';
-        c.stroke = 'rgba(225, 225, 205, 0.8)';
-        laneMarkingPolygons.push(quad);
+    for (const poly of this.#filter(dividerBases)) {
+      const pts = poly.points;
+      for (let i = 0; i + 1 < pts.length; i++) {
+        for (const quad of dashSegmentFlat(pts[i], pts[i + 1], 3, -1)) {
+          const c = quad as IColoredPolygon;
+          c.fill = 'rgba(225, 225, 205, 0.8)';
+          c.stroke = 'rgba(225, 225, 205, 0.8)';
+          laneMarkingPolygons.push(quad);
+        }
       }
     }
 
@@ -470,6 +498,7 @@ export class Camera implements ICameraPoint {
 
     if (options.debugCtx) {
       for (const polygon of polygons) {
+        if ((polygon as IColoredPolygon).skipDebug) continue;
         drawPolygon(options.debugCtx, polygon);
       }
     }
