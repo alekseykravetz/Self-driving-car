@@ -14,6 +14,8 @@ import { LightEditor } from './lightEditor.js';
 import { TargetEditor } from './targetEditor.js';
 import { YieldEditor } from './yieldEditor.js';
 import { Graph } from '../../math/graph/graph.js';
+import { Point } from '../../math/primitives/point.js';
+import { Segment } from '../../math/primitives/segment.js';
 import { Viewport } from '../../viewport/viewport.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { Osm, OsmData } from '../../math/osm-importer/osm.js';
@@ -591,9 +593,23 @@ export class WorldEditor {
         fraction: 1,
       });
       this.#world.markings.length = 0;
-      // `expandDirectionalMarking` scans every segment per stop/yield seed, so
-      // on a large map this loop is expensive; yield to the browser every few
-      // markings so it never blocks long enough to freeze the tab.
+      // `expandDirectionalMarking` needs the segments incident to each stop/
+      // yield node. Index them once by "x,y" endpoint key so each seed is an
+      // O(1) lookup instead of an O(segments) scan (near-linear over the map).
+      const incidentByKey = new Map<string, Segment[]>();
+      const nodeKeyOf = (p: Point): string => `${p.x},${p.y}`;
+      for (const seg of this.#world.graph.segments) {
+        const k1 = nodeKeyOf(seg.p1);
+        const k2 = nodeKeyOf(seg.p2);
+        (incidentByKey.get(k1) ?? incidentByKey.set(k1, []).get(k1)!).push(seg);
+        if (k2 !== k1) {
+          (incidentByKey.get(k2) ?? incidentByKey.set(k2, []).get(k2)!).push(
+            seg,
+          );
+        }
+      }
+      // Import may place many markings; yield to the browser every few so it
+      // never blocks long enough to freeze the tab.
       let markCount = 0;
       const yieldEvery = async (): Promise<void> => {
         if ((++markCount & 15) === 0) await yieldToBrowser();
@@ -622,6 +638,8 @@ export class WorldEditor {
           s.center,
           s.directionVector,
           this.#world.graph,
+          undefined,
+          incidentByKey.get(nodeKeyOf(s.center)) ?? [],
         )) {
           addMarking(
             new Stop(
@@ -639,6 +657,8 @@ export class WorldEditor {
           y.center,
           y.directionVector,
           this.#world.graph,
+          undefined,
+          incidentByKey.get(nodeKeyOf(y.center)) ?? [],
         )) {
           addMarking(
             new Yield(

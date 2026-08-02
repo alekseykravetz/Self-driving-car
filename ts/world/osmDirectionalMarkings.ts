@@ -54,16 +54,22 @@ export function expandDirectionalMarking(
   directionVector: Point,
   graph: Graph,
   setback: number = STOP_LINE_SETBACK_PX,
+  incident?: Segment[],
 ): DirectionalPlacement[] {
-  // Emit the marking flipped 180° from the seed travel direction so the painted
-  // text reads for the approaching driver.
+  // The seed `directionVector` ALREADY encodes the desired marking facing:
+  // `Osm.parseRoads` emits it as `-approachFacingDir`, the lane-guide convention
+  // the shared Stop/Yield `draw()` expects (so an OSM sign renders identically to
+  // a hand-placed one). Emit it per lane UNCHANGED — negating here double-flips
+  // the sign 180° (the regression this restores).
   const facing = (): Point => new Point(-directionVector.x, -directionVector.y);
 
   // 1. Approach segment: incident to the node, road axis most collinear with
-  //    the seed direction (either orientation).
+  //    the seed direction (either orientation). `incident` (optional) is the
+  //    pre-indexed set of segments touching this node — pass it to avoid an
+  //    O(segments) scan per seed on large maps; falls back to all segments.
   let best: Segment | undefined;
   let bestAbsDot = 0;
-  for (const seg of graph.segments) {
+  for (const seg of incident ?? graph.segments) {
     if (!seg.p1.equals(center) && !seg.p2.equals(center)) continue;
     const segDir = seg.directionVector();
     if (segDir.x === 0 && segDir.y === 0) continue;
