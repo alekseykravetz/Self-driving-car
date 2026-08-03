@@ -4,7 +4,16 @@
  */
 import { Point } from '../math/primitives/point.js';
 import { Polygon } from '../math/primitives/polygon.js';
-import { lerp, lerp2D, average } from '../math/utils.js';
+import {
+  lerp,
+  lerp2D,
+  average,
+  subtract,
+  add,
+  scale,
+  normalize,
+  perpendicular,
+} from '../math/utils.js';
 import { IColoredPolygon } from './types.js';
 
 export function movePointsInward(
@@ -299,4 +308,116 @@ export function extrudeTreeShapes(
     extrudedPolygons.push(canopyBottom);
   }
   return extrudedPolygons;
+}
+
+/**
+ * Builds a single flat rectangular quad centred on the segment `p1`→`p2`, held
+ * at a constant height `z`. Used to paint ground-level road markings (lane
+ * lines, separators, crossings) in the 3D camera view. Returns `null` for a
+ * degenerate (zero-length) segment.
+ */
+export function segmentToFlatQuad(
+  p1: Point,
+  p2: Point,
+  width: number,
+  z: number = -1,
+): Polygon | null {
+  const dir = subtract(p2, p1);
+  if (dir.x === 0 && dir.y === 0) return null;
+  const perp = perpendicular(normalize(dir));
+  const half = width / 2;
+  const a = add(p1, scale(perp, half));
+  const b = add(p2, scale(perp, half));
+  const c = add(p2, scale(perp, -half));
+  const d = add(p1, scale(perp, -half));
+  return new Polygon([
+    new Point(a.x, a.y, z),
+    new Point(b.x, b.y, z),
+    new Point(c.x, c.y, z),
+    new Point(d.x, d.y, z),
+  ]);
+}
+
+/**
+ * Emits flat dash quads along the segment `p1`→`p2`, but only within the range
+ * `[tMin, tMax]` (distances measured from `p1`). Crucially, the dash pattern is
+ * anchored to `p1` (a fixed world point), so the visible dashes stay locked to
+ * world positions as the camera moves instead of crawling. Used to paint dashed
+ * lane dividers on the ground in the 3D camera view.
+ */
+export function dashSegmentAnchored(
+  p1: Point,
+  p2: Point,
+  tMin: number,
+  tMax: number,
+  width: number,
+  z: number = -1,
+  dashLen: number = 30,
+  gapLen: number = 40,
+): Polygon[] {
+  if (tMax <= tMin) return [];
+  const dir = normalize(subtract(p2, p1));
+  const period = dashLen + gapLen;
+  const quads: Polygon[] = [];
+  const kStart = Math.max(0, Math.floor(tMin / period));
+  for (let k = kStart; k * period < tMax; k++) {
+    const start = Math.max(tMin, k * period);
+    const end = Math.min(tMax, k * period + dashLen);
+    if (end <= start) continue;
+    const a = add(p1, scale(dir, start));
+    const b = add(p1, scale(dir, end));
+    const quad = segmentToFlatQuad(a, b, width, z);
+    if (quad) quads.push(quad);
+  }
+  return quads;
+}
+
+/**
+ * Builds the white bars of a zebra crossing as individual flat quads (matching
+ * the 2D `Crossing.draw` look): stripes run the full crossing depth (`height`,
+ * along `directionVector`) and repeat across the road width (`width`). Used so
+ * the 3D crossing reads as real painted stripes instead of a solid white slab.
+ */
+export function zebraStripes(
+  center: Point,
+  directionVector: Point,
+  width: number,
+  height: number,
+  z: number = -1,
+): Polygon[] {
+  const depthU = normalize(directionVector);
+  const acrossU = perpendicular(depthU);
+  const halfDepth = height / 2;
+  const stripeW = 11;
+  const period = stripeW * 2; // stripe + equal gap
+  const stripes: Polygon[] = [];
+  for (let o = -width / 2; o + stripeW <= width / 2 + 0.001; o += period) {
+    const c0 = o + stripeW / 2;
+    const cc = add(center, scale(acrossU, c0));
+    const a = add(
+      add(cc, scale(acrossU, stripeW / 2)),
+      scale(depthU, halfDepth),
+    );
+    const b = add(
+      add(cc, scale(acrossU, stripeW / 2)),
+      scale(depthU, -halfDepth),
+    );
+    const c = add(
+      add(cc, scale(acrossU, -stripeW / 2)),
+      scale(depthU, -halfDepth),
+    );
+    const d = add(
+      add(cc, scale(acrossU, -stripeW / 2)),
+      scale(depthU, halfDepth),
+    );
+    stripes.push(
+      new Polygon([
+        new Point(a.x, a.y, z),
+        new Point(b.x, b.y, z),
+        new Point(c.x, c.y, z),
+        new Point(d.x, d.y, z),
+      ]),
+    );
+  }
+  return stripes;
 }

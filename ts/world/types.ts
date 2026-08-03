@@ -1,5 +1,6 @@
 import type { Point } from '../math/primitives/point.js';
 import type { Segment } from '../math/primitives/segment.js';
+import type { Envelope } from '../math/primitives/envelope.js';
 import type { Graph } from '../math/graph/graph.js';
 import type { Car } from '../car/car.js';
 import type { Marking } from './markings/marking.js';
@@ -54,6 +55,10 @@ export interface IWorld {
   markings: Marking[];
   roadBorders: Segment[];
   separatorBorders: Segment[];
+  /** Asphalt road-surface polygons (per graph segment). */
+  envelopes: Envelope[];
+  /** Per-lane centerline segments. */
+  laneGuides: Segment[];
   corridors: Corridor[];
   buildings: Building[];
   trees: Tree[];

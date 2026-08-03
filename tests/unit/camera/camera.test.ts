@@ -11,6 +11,8 @@ function makeMinimalWorld(): Record<string, unknown> {
     markings: [],
     roadBorders: [],
     separatorBorders: [],
+    envelopes: [],
+    laneGuides: [],
     corridors: [],
     buildings: [],
     trees: [],
