@@ -610,12 +610,13 @@ export class Camera implements ICameraPoint {
           paintedMarkingPolygons.push(stripe);
         }
       } else if (type === 'stop' || type === 'yield') {
-        // Painted like the 2D map: a white stop/yield line across the road plus
-        // the word written on the tarmac, reading for the approaching driver.
+        // Painted like the 2D map: the word written across the road (reading
+        // horizontally for the approaching driver) with a white line above it.
         const dir = normalize(m.directionVector);
         const across = perpendicular(dir);
-        const lineA = add(m.center, scale(across, m.width / 2));
-        const lineB = add(m.center, scale(across, -m.width / 2));
+        const lineCenter = add(m.center, scale(dir, m.width * 0.24));
+        const lineA = add(lineCenter, scale(across, m.width / 2));
+        const lineB = add(lineCenter, scale(across, -m.width / 2));
         const line = segmentToFlatQuad(lineA, lineB, 6, -1);
         if (line) {
           const c = line as IColoredPolygon;
@@ -628,9 +629,8 @@ export class Camera implements ICameraPoint {
           word,
           m.center,
           dir,
-          m.width * 0.5,
-          m.width * 0.42,
-          m.width * 0.12,
+          m.width * 0.8,
+          m.width * 0.3,
           4,
           -1,
         )) {

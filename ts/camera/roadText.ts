@@ -100,35 +100,38 @@ const GLYPHS: Record<string, Glyph> = {
 };
 
 /**
- * Builds the flat stroke quads for `text`, centred on `center`, with letters
- * advancing along `alongDir` (travel direction). `letterAcross` is the glyph
- * width across the road, `letterAlong` the glyph height along the road, `gap`
- * the spacing between letters. Unknown characters are skipped.
+ * Builds the flat stroke quads for `text`, centred on `center` and running
+ * ACROSS the road so it reads horizontally for the approaching driver. Letters
+ * advance along the across-road axis (perpendicular to `alongDir`) and stand
+ * upright along `alongDir`. `totalWidth` is the full word width across the road,
+ * `letterHeight` the glyph height along the road. Unknown characters are skipped.
  */
 export function textStrokeQuads(
   text: string,
   center: Point,
   alongDir: Point,
-  letterAcross: number,
-  letterAlong: number,
-  gap: number,
+  totalWidth: number,
+  letterHeight: number,
   strokeWidth: number,
   z: number = -1,
 ): Polygon[] {
-  const along = normalize(alongDir);
-  const across = perpendicular(along);
+  const up = normalize(alongDir); // letter vertical (along the road)
+  const across = perpendicular(up); // letters advance across the road
   const n = text.length;
-  const totalLen = n * letterAlong + (n - 1) * gap;
+  if (n === 0) return [];
+  const gapRatio = 0.3;
+  const letterW = totalWidth / (n + gapRatio * (n - 1));
+  const gap = gapRatio * letterW;
   const quads: Polygon[] = [];
 
   for (let j = 0; j < n; j++) {
     const glyph = GLYPHS[text[j].toUpperCase()];
     if (!glyph) continue;
-    const startAlong = -totalLen / 2 + j * (letterAlong + gap);
+    const startAcross = -totalWidth / 2 + j * (letterW + gap);
     const place = (gx: number, gy: number): Point => {
-      const a = startAlong + gy * letterAlong;
-      const c = (gx - 0.5) * letterAcross;
-      return add(add(center, scale(along, a)), scale(across, c));
+      const a = startAcross + gx * letterW; // across the road
+      const u = (gy - 0.5) * letterHeight; // along the road (centred)
+      return add(add(center, scale(across, a)), scale(up, u));
     };
     for (const polyline of glyph) {
       for (let i = 0; i + 1 < polyline.length; i++) {
