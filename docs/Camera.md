@@ -6,11 +6,12 @@ The camera system in `ts/camera/` provides pseudo-3D perspective rendering by pr
 
 ## File Structure (`ts/camera/`)
 
-| File           | Responsibility                                                         |
-| -------------- | ---------------------------------------------------------------------- |
-| `types.ts`     | Interfaces (`ICameraPoint`, `IColoredPolygon`, `ICameraRenderOptions`) |
-| `extrusion.ts` | Pure geometry functions for 3D extrusion (buildings, cars, trees)      |
-| `camera.ts`    | Camera class (movement, frustum, projection, filtering, rendering)     |
+| File           | Responsibility                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `types.ts`     | Interfaces (`ICameraPoint`, `IColoredPolygon`, `ICameraRenderOptions`)                                         |
+| `extrusion.ts` | Pure geometry functions for 3D extrusion (buildings, cars, trees) and flat ground paint (quads, dashes, zebra) |
+| `roadText.ts`  | Tiny stroke vector font for painting road words (STOP / YIELD) flat on the tarmac                              |
+| `camera.ts`    | Camera class (movement, frustum, projection, filtering, rendering)                                             |
 
 ---
 
@@ -30,6 +31,8 @@ interface ICameraRenderOptions {
   bestCar?: Car; // Best AI car (gold highlight)
   cars?: Car[]; // All scene cars; non-key/non-best drawn as flat shadows
   traffic?: Car[]; // Traffic/opponent cars (smaller 3D)
+  showTrees?: boolean; // Omit trees from the 3D scene (perf). Default true
+  showBuildings?: boolean; // Omit buildings from the 3D scene (perf). Default true
   debugCtx?: CanvasRenderingContext2D; // Optional debug canvas for raw polygons
 }
 
@@ -290,43 +293,127 @@ camera.render(cameraCtx, world, {
 
 ```
 1. Gather world geometry:
+   - Ground plane (a flat grass trapezoid covering the whole FOV)
+   - world.envelopes → flat asphalt road surface (near-plane clipped)
+   - world.graph.segments → lane markings (dividers, one-way, parking)
+   - world.markings → zebra crossings, stop/yield paint + words, lights
    - world.buildings → base polygons
    - world.trees → base polygons
-   - world.roadBorders → road surface polygons
+   - world.roadBorders → border walls (height 10)
 
-2. Filter by frustum (cull/clip invisible objects)
-   → Only polygons inside or intersecting the triangle pass through
+2. Cull / clip:
+   - Discrete objects (buildings, cars, trees) → frustum triangle (#filter)
+   - Road surface → near plane only (#nearPlaneClip), so asphalt fills up
+     to the camera with no gap (the frustum triangle collapses at the apex)
+   - Ground-level lines → frustum-clipped visible range with world-anchored
+     dashes (#emitRoadLine / #visibleRange), so paint stays put as the car moves
 
-3. Extrude filtered polygons to 3D:
+3. Extrude / build:
    - Buildings: height 200, gray (#AAA sides, #BBB roof)
-   - Trees: cone shape, green (varying shades per face)
-   - Roads: height 10, dark gray
-   - Key car: full detail car model in car's color
-   - Best car: full detail, gold tint
-   - Traffic: slightly smaller car models
+   - Trees: trunk + cone canopy, green
+   - Roads (borders): height 10, dark gray walls
+   - Traffic lights: short colour-coded gates by live state
+   - Key/best/traffic cars: full detail car models
 
 4. Project all 3D polygon points to 2D screen space
    → Each Point(x, y, z) → Point(screenX, screenY)
 
-5. Sort all projected polygons by average distance to camera
-   → Painter's algorithm: far objects drawn first
+5. Draw in fixed layer order (back to front — no per-polygon depth sort)
 
-6. Draw in order with fog/distance effect:
+6. Apply fog/distance effect while drawing:
    → alpha = max(0, (1 - distance/range)²)
-   → Far objects fade to transparent
 
-7. Optionally draw raw polygons to debugCtx
+7. Optionally draw raw polygons to debugCtx (skipping any tagged skipDebug,
+   e.g. the synthetic ground plane)
 ```
 
 ### Layer Priority (back to front)
 
-1. Car shadows (flat, gray, on ground)
-2. Road surface polygons
-3. Building polygons (sides then roof)
-4. Tree polygons (cone faces)
-5. Traffic car polygons
-6. Best car polygons (gold)
-7. Key car polygons (always on top, never occluded)
+1. Ground plane (grass trapezoid, `skipDebug`)
+2. Road surface (flat asphalt envelopes)
+3. Lane markings (dividers, parking lines/bays)
+4. Painted markings (zebra crossings, stop/yield paint + words, target)
+5. Car shadows (flat, dark, on ground)
+6. Road border walls
+7. Building polygons (sides then roof)
+8. Tree polygons
+9. Traffic-light gates
+10. Traffic car polygons
+11. Best car polygons (gold)
+12. Key car polygons (always on top, never occluded)
+
+---
+
+## Ground-level detail (road surface, markings, signage)
+
+Beyond the extruded objects, the camera paints the road itself and its markings
+as **flat polygons at `z = 0` / `z = -1`**, gathered in `#getPolygons` and
+mixed into the same painter's-order list.
+
+### Ground plane
+
+A single flat grass trapezoid covering the whole field of view, built from the
+frustum's near corners (nudged just in front of the camera to avoid a
+divide-by-zero in projection) out to `left`/`right` at `range`. Drawn first so
+everything sits on top. Tagged `skipDebug = true` so it is omitted from the
+top-view debug overlay.
+
+### Road surface (near-plane clipping)
+
+`world.envelopes` polygons are drawn flat as dark asphalt. They are clipped only
+against the **near plane** (`#nearPlaneClip` — a Sutherland–Hodgman clip against
+a single line just ahead of the camera), **not** the frustum triangle. The
+triangle collapses to a point at the camera and drops the wedge right in front
+of it, which left a grass gap under/behind the car; the straight near plane
+fills the asphalt continuously up to the camera. Off-screen sides project
+harmlessly off the canvas; far envelopes are distance-culled by `range`.
+
+### Lane markings (mirrors the 2D map)
+
+Generated per `world.graph.segments`, matching `World.#drawLaneMarkings`:
+
+- `laneCount = seg.lanes ?? (seg.oneWay ? 1 : 2)`; road width = `laneCount * LANE_WIDTH_PX`.
+- **N−1 dividers** at each lane boundary. The **centre divider** is thicker with
+  longer dashes (solid on hard-`separated` roads); other lane lines are thin
+  dashes. **One-way** roads use thin dashes throughout. Roads with
+  `laneMarkings === false` are left bare.
+- **Parking lanes** (`parkingRight` / `parkingLeft`) get a solid boundary line at
+  the driving-lane edge plus **bay ticks** across the parking lane on the tagged
+  side(s) (`+perp` = right, matching the envelope's `lateralOffset` convention).
+
+Each line is emitted via `#emitRoadLine`, which frustum-clips it to its visible
+range (`#visibleRange`) and, for dashes, anchors the pattern to the segment's
+fixed world start (`dashSegmentAnchored`) so the paint stays world-locked
+instead of crawling as the camera moves.
+
+### Traffic lights
+
+`Light` markings become short colour-coded **gates** across the road: the
+marking's base polygon extruded to height 34, filled by the light's live
+`state` (green / yellow / red / off, read at draw time).
+
+### Zebra crossings
+
+`Crossing` markings render as individual white **stripes** (`zebraStripes`),
+matching the 2D `Crossing.draw` look: bars span the full crossing depth
+(`height`, along travel) and repeat across the road `width`.
+
+### Stop / yield paint
+
+`Stop` and `Yield` markings are painted like the 2D map: a white **line across
+the road** plus the **word** written on the tarmac via the `roadText.ts` stroke
+font (`textStrokeQuads`). The word runs across the road (reading horizontally for
+the approaching driver, `dir` flipped 180° so it stands upright) and the line
+sits just above it.
+
+### Flat-paint helpers (`extrusion.ts`)
+
+| Helper                            | Purpose                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------ |
+| `segmentToFlatQuad`               | A flat rectangular quad centred on a segment (lane lines, stop lines)                |
+| `dashSegmentAnchored`             | Dash quads within a `[tMin, tMax]` range, anchored to a fixed world start (no crawl) |
+| `zebraStripes`                    | The white bars of a zebra crossing                                                   |
+| `textStrokeQuads` (`roadText.ts`) | Stroke-font quads for a road word (STOP / YIELD)                                     |
 
 ---
 
