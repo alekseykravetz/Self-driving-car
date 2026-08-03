@@ -6,6 +6,7 @@
   "scripts": {
     "start": "concurrently \"npm run tsc:watch\" \"npm run serve\" \"npm run watch:fix\"",
     "serve": "serve -p 9090",
+    "generate:og": "node scripts/generate-og-image.mjs",
     "publish:site": "bash scripts/publish-site.sh",
     "tsc:watch": "tsc --watch",
     "clean": "rm -rf js",
