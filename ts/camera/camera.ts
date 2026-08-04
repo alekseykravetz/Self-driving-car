@@ -612,8 +612,9 @@ export class Camera implements ICameraPoint {
       } else if (type === 'stop' || type === 'yield') {
         // Painted like the 2D map: the word written across the road (reading
         // horizontally for the approaching driver) with a white line above it.
-        // `dir` is flipped 180° so the text stands upright for the driver.
-        const dir = scale(normalize(m.directionVector), -1);
+        // Canonical convention: `directionVector` is the travel direction, so
+        // the letters stand upright ALONG it for the approaching driver — no flip.
+        const dir = normalize(m.directionVector);
         const across = perpendicular(dir);
         const lineCenter = add(m.center, scale(dir, m.width * 0.24));
         const lineA = add(lineCenter, scale(across, m.width / 2));

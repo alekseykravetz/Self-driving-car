@@ -29,7 +29,7 @@ import type { Car } from '../../car/car.js';
 import type { IWorld } from '../../world/types.js';
 import { World } from '../../world/world.js';
 import { Light } from '../../world/markings/light.js';
-import { angle } from '../../math/utils.js';
+import { carAngleFromDirection } from '../../math/direction.js';
 import { buildRoadBorders } from '../spatialGridUtils.js';
 
 export class TrainingSimulator extends SimulatorShell {
@@ -189,7 +189,7 @@ export class TrainingSimulator extends SimulatorShell {
       ? startMarkings[0].directionVector
       : new Point(0, -1);
 
-    const startAngle = -angle(direction) + Math.PI / 2;
+    const startAngle = carAngleFromDirection(direction);
 
     return { x: startPoint.x, y: startPoint.y, angle: startAngle };
   }

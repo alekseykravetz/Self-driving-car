@@ -212,20 +212,18 @@ for each segment in graph.segments:
     p2 = segment.p2 + perpDir * offset
 
     if segment.oneWay:
-      guide = Segment(p2, p1)  // ALL lanes point opposite to traffic flow
+      guide = Segment(p1, p2)  // ALL lanes point WITH traffic flow
     else:
-      guide = even(k) ? Segment(p1, p2) : Segment(p2, p1)  // alternate
+      guide = even(k) ? Segment(p2, p1) : Segment(p1, p2)  // alternate
 ```
 
-Direction convention matches the car heading formula `-angle(dv)+π/2` (cars face
-OPPOSITE to dv):
+Canonical convention: `directionVector()` is the lane's true travel direction —
+cars face ALONG the guide (via `carAngleFromDirection`):
 
-- **Two-way roads**: even-indexed lanes (from the left) point p1→p2 (car goes
-  backward), odd-indexed lanes point p2→p1 (car goes forward). This preserves
-  the original 2-lane behavior where the right lane goes forward and the left
-  lane goes backward.
-- **One-way roads**: ALL lanes point p2→p1 (opposite to traffic flow), so cars
-  face forward (p1→p2, with traffic).
+- **Two-way roads**: even-indexed lanes (from the left) point p2→p1,
+  odd-indexed lanes point p1→p2. This preserves which physical lane travels
+  which way; only the stored orientation flips.
+- **One-way roads**: ALL lanes point p1→p2 (the traffic flow direction).
 
 The old half-width envelope union placed guides at ±¼-road-width — only correct
 for 2-lane roads.
@@ -528,11 +526,11 @@ the more-connected node, so the sign faces the neighbour most opposite to the
 highest-`degree` one (`degree` = how many way-endpoints reference the node); (4)
 `throughAxis` fallback when there is no junction cue (e.g. mid-block), whose sign
 is arbitrary. The placement then **negates** this vector so the emitted
-`directionVector` matches the lane-guide convention that `Stop`/`Yield` `draw()`
-expects — a manually placed marking passes the lane guide's `directionVector()`
-directly (the opposite orientation to `approachFacingDir`), so the negation
-makes an OSM-imported sign render identically to a hand-placed one. Width = half
-the road.
+`directionVector` holds the canonical travel direction (into the junction),
+matching what `Stop`/`Yield` `draw()` expects — a manually placed marking's
+`directionVector` is likewise its lane guide's true travel direction, so the
+negation makes an OSM-imported sign render identically to a hand-placed one.
+Width = half the road.
 
 `osm.ts` emits **one** stop/give-way seed per node (the direction above). Because
 a single centred marking can only face one travel direction, the world layer
@@ -546,11 +544,12 @@ per-lane guides with `laneGuidesForSegment()`, and keeps the approaching lanes:
 **two-way** roads → only the lanes on the driver's **right** of the road centre
 (the approaching side under Israel's right-hand traffic); the opposing lanes get
 none. **one-way** roads → **all** lanes (every lane flows into the junction).
-Every emitted marking faces **180° from the seed** travel direction (the seed's
-`directionVector` negated), so the painted text reads for the approaching
-driver. A degenerate node with no incident approach segment
-falls back to the single centred seed. An optional `STOP_LINE_SETBACK_PX`
-(default 0) nudges the marking upstream (against travel) of the junction.
+Every emitted marking keeps the same travel direction as the seed (the seed
+already stores the canonical travel direction into the junction), so the
+painted text reads for the approaching driver. A degenerate node with no
+incident approach segment falls back to the single centred seed. An optional
+`STOP_LINE_SETBACK_PX` (default 0) nudges the marking upstream (against travel)
+of the junction.
 
 **Traffic lights** are signal heads facing oncoming traffic, so `osm.ts` places
 each on its **approach arm, centred on the road, at the stop line** — matching
@@ -569,13 +568,15 @@ facing in priority order:
 3. **Straight-through** — an isolated signal (no cluster) uses `throughAxis`,
    drawn at the node.
 
-Once an arm is chosen, the light's `directionVector` is that neighbour's real
-centreline direction (strip spans across the road), and it slides **upstream
-along the centreline** (`center + roadDir * min(halfWidth, span/2)`) to the stop
-line. Moving along a real graph edge keeps it centred on the road width;
-`setAnchor` records ≈zero lateral so it stays centred through edits. The two
-tunables are `SIGNAL_CLUSTER_RADIUS_PX` and the upstream offset (road half-width,
-capped at half the edge span).
+Once an arm is chosen, the light slides **upstream along the centreline**
+(`center + roadDir * min(halfWidth, span/2)`) to the stop line — moving along a
+real graph edge keeps it centred on the road width; `setAnchor` records ≈zero
+lateral so it stays centred through edits. The **stored** `directionVector` is
+the canonical travel direction (into the junction) — the negation of the
+upstream slide direction; the slide geometry itself is unaffected (`Light.draw`
+is a symmetric perpendicular bar, so it renders the same regardless of which
+way `directionVector` points). The two tunables are `SIGNAL_CLUSTER_RADIUS_PX`
+and the upstream offset (road half-width, capped at half the edge span).
 
 ### Road name labels & speed signs
 

@@ -30,8 +30,8 @@ describe('expandDirectionalMarking', () => {
     const out = expandDirectionalMarking(node, SEED_DIR, graph);
     expect(out.length).toBe(2);
     for (const p of out) {
-      // Emitted facing is flipped 180° from the seed travel direction.
-      expect(dot(p.directionVector, SEED_DIR)).toBeLessThan(0);
+      // Emitted facing matches the seed travel direction.
+      expect(dot(p.directionVector, SEED_DIR)).toBeGreaterThan(0);
     }
   });
 
@@ -39,7 +39,7 @@ describe('expandDirectionalMarking', () => {
     const { graph, node } = makeRoad(false, 2);
     const out = expandDirectionalMarking(node, SEED_DIR, graph);
     expect(out.length).toBe(1);
-    expect(dot(out[0].directionVector, SEED_DIR)).toBeLessThan(0);
+    expect(dot(out[0].directionVector, SEED_DIR)).toBeGreaterThan(0);
   });
 
   it('two-way 4-lane road → half the lanes', () => {
@@ -47,7 +47,7 @@ describe('expandDirectionalMarking', () => {
     const out = expandDirectionalMarking(node, SEED_DIR, graph);
     expect(out.length).toBe(2);
     for (const p of out) {
-      expect(dot(p.directionVector, SEED_DIR)).toBeLessThan(0);
+      expect(dot(p.directionVector, SEED_DIR)).toBeGreaterThan(0);
     }
   });
 
@@ -55,7 +55,7 @@ describe('expandDirectionalMarking', () => {
     const { graph, node } = makeRoad(true, 3);
     const out = expandDirectionalMarking(node, SEED_DIR, graph);
     for (const p of out) {
-      expect(dot(p.directionVector, SEED_DIR)).toBeLessThan(0);
+      expect(dot(p.directionVector, SEED_DIR)).toBeGreaterThan(0);
     }
   });
 
@@ -83,9 +83,9 @@ describe('expandDirectionalMarking', () => {
     const out = expandDirectionalMarking(orphan, SEED_DIR, graph);
     expect(out.length).toBe(1);
     expect(out[0].center).toBe(orphan);
-    // Facing is flipped 180° from the seed.
-    expect(out[0].directionVector.x).toBeCloseTo(-SEED_DIR.x);
-    expect(out[0].directionVector.y).toBeCloseTo(-SEED_DIR.y);
+    // Facing matches the seed travel direction.
+    expect(out[0].directionVector.x).toBeCloseTo(SEED_DIR.x);
+    expect(out[0].directionVector.y).toBeCloseTo(SEED_DIR.y);
   });
 
   it('default setback constant is 0', () => {
@@ -127,7 +127,7 @@ describe('expandDirectionalMarking', () => {
     expect(Math.abs(out[0].center.y)).toBeCloseTo(25);
   });
 
-  it('every placement faces 180° from the seed travel direction', () => {
+  it('every placement faces the same direction as the seed travel direction', () => {
     for (const [oneWay, lanes] of [
       [false, 2],
       [true, 2],
@@ -135,8 +135,8 @@ describe('expandDirectionalMarking', () => {
     ] as [boolean, number][]) {
       const { graph, node } = makeRoad(oneWay, lanes);
       for (const p of expandDirectionalMarking(node, SEED_DIR, graph)) {
-        expect(p.directionVector.x).toBeCloseTo(-SEED_DIR.x);
-        expect(p.directionVector.y).toBeCloseTo(-SEED_DIR.y);
+        expect(p.directionVector.x).toBeCloseTo(SEED_DIR.x);
+        expect(p.directionVector.y).toBeCloseTo(SEED_DIR.y);
       }
     }
   });

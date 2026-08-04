@@ -1,6 +1,6 @@
 import { Marking } from './marking.js';
 import { Point } from '../../math/primitives/point.js';
-import { angle } from '../../math/utils.js';
+import { drawRotationFromDirection } from '../../math/direction.js';
 
 export class Start extends Marking {
   // Property to hold the car image element
@@ -40,10 +40,8 @@ export class Start extends Marking {
     // Move the origin to the center of the marking
     ctx.translate(this.center.x, this.center.y);
 
-    // Rotate the canvas to match the direction vector
-    // Subtracting PI/2 (90 degrees) assumes the car image faces upwards
-    // and needs to be rotated to align with the road direction. Adjust if needed.
-    ctx.rotate(angle(this.directionVector) - Math.PI / 2);
+    // Rotate the canvas so the (up-facing) car image faces the travel direction
+    ctx.rotate(drawRotationFromDirection(this.directionVector));
 
     // Draw the image centered at the translated and rotated origin
     // Only draw if the image has loaded (width will be > 0)

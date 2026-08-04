@@ -118,10 +118,10 @@ describe('World', () => {
   });
 
   describe('toJSON', () => {
-    it('serializes to v2 schema with decoration block', () => {
+    it('serializes to v3 schema with decoration block', () => {
       const world = new World(new Graph());
       const json = world.toJSON() as Record<string, unknown>;
-      expect(json.version).toBe(2);
+      expect(json.version).toBe(3);
       expect(json.graph).toBeDefined();
       expect(json.roadWidth).toBe(100);
       expect(json.decoration).toBeDefined();

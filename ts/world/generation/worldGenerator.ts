@@ -91,14 +91,12 @@ function getSegmentEnvelopeGeometry(segment: Segment): {
  * old half-width envelope union which only placed guides at ±¼-road-width —
  * correct only for 2-lane roads. Per-lane guides work for all lane counts.
  *
- * Direction convention (matches the `-angle(dv) + π/2` heading formula which
- * makes cars face OPPOSITE to dv):
- *   - Two-way roads: even-indexed lanes (from the left) point p1→p2
- *     (car goes backward), odd-indexed lanes point p2→p1 (car goes forward).
- *     This preserves the original 2-lane behavior where the right lane goes
- *     forward and the left lane goes backward.
- *   - One-way roads: ALL lanes point p2→p1 (opposite to traffic flow),
- *     so cars face forward (in the p1→p2 traffic direction).
+ * Canonical convention: `directionVector()` is the lane's true travel
+ * direction — cars face ALONG the guide (via `carAngleFromDirection`).
+ *   - One-way roads: ALL lanes point p1→p2 (the traffic flow direction).
+ *   - Two-way roads: even-indexed lanes (from the left) point p2→p1,
+ *     odd-indexed lanes point p1→p2. This preserves which physical lane
+ *     travels which way; only the stored orientation flips.
  */
 export function laneGuidesForSegment(segment: Segment): Segment[] {
   const guides: Segment[] = [];
@@ -115,15 +113,14 @@ export function laneGuidesForSegment(segment: Segment): Segment[] {
     const p2 = add(segment.p2, scale(perpDir, offset));
 
     if (segment.oneWay) {
-      // All lanes point p2→p1 (opposite to traffic flow) so that
-      // the car heading formula produces forward-facing cars.
-      guides.push(new Segment(p2, p1));
+      // All lanes point p1→p2 (the traffic flow direction).
+      guides.push(new Segment(p1, p2));
     } else {
-      // Two-way: even k = forward (p1→p2), odd k = backward (p2→p1)
+      // Two-way: even k = backward (p2→p1), odd k = forward (p1→p2)
       if (k % 2 === 0) {
-        guides.push(new Segment(p1, p2));
-      } else {
         guides.push(new Segment(p2, p1));
+      } else {
+        guides.push(new Segment(p1, p2));
       }
     }
   }

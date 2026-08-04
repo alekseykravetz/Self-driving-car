@@ -90,7 +90,7 @@ export interface OsmData {
  */
 export interface OsmMarkingPlacement {
   center: Point; // Placed position (approach stop line, or the node).
-  directionVector: Point; // Unit vector along the road at that point.
+  directionVector: Point; // Canonical travel direction at that point.
   width: number; // Strip width across the road.
   height?: number; // Strip length along the road (crossing/stop/yield only).
 }
@@ -527,10 +527,9 @@ export class Osm {
 
       if (kind === 'stop' || kind === 'yield') {
         // Directional: the painted text must read for the approaching driver.
-        // `approachFacingDir` points UPSTREAM (toward oncoming traffic); the
-        // marking `draw()` (shared with the manual editor) expects the lane-
-        // guide convention, which is the OPPOSITE orientation, so negate it to
-        // match how a lane-placed Stop/Yield renders.
+        // `approachFacingDir` points UPSTREAM (toward oncoming traffic);
+        // negating it gives the canonical travel direction (into the
+        // junction), which is what Stop/Yield draw() expects.
         const facing = approachFacingDir(entry);
         if (!facing) continue;
         const placement: OsmMarkingPlacement = {
@@ -646,14 +645,20 @@ function placeApproachMarking(
   // Slide upstream to the stop line, clamped so it stays on this edge.
   const span = distance(center, bestPoint);
   const placed = add(center, scale(bestUnit, Math.min(width, span * 0.5)));
-  return { center: placed, directionVector: bestUnit, width };
+  // Store the canonical travel direction (into the junction) — bestUnit itself
+  // points upstream, which is only used for the stop-line slide above.
+  return {
+    center: placed,
+    directionVector: normalize(new Point(-bestUnit.x, -bestUnit.y)),
+    width,
+  };
 }
 
 /**
  * Resolves the facing for a DIRECTIONAL painted marking (stop / give-way) whose
  * text must read for the approaching driver. Returns a unit vector pointing
- * back toward the oncoming traffic (matching the editor's lane-guide
- * convention: `directionVector` points opposite to travel). Priority:
+ * back toward the oncoming traffic (the caller negates this to get the
+ * canonical travel direction, into the junction). Priority:
  *   1. `directedApproach` — the node's `direction` tag.
  *   2. The single one-way approach neighbour (the upstream side) when the road
  *      is one-way (exactly one approach side, at least one non-approach side).

@@ -1,7 +1,7 @@
 /**
  * Expansion of OSM stop / give-way node "seeds" into per-lane marking
  * placements. `Osm.parseRoads()` emits ONE seed per stop/give-way node (centred
- * on the node with a single lane-guide-convention direction). On a two-way road
+ * on the node with a single canonical travel-direction). On a two-way road
  * that single centred marking can only face one travel direction, so it is
  * backwards for the opposing lane. This module expands each seed into one
  * placement per APPROACH lane, deriving lane geometry purely from the graph
@@ -56,12 +56,8 @@ export function expandDirectionalMarking(
   setback: number = STOP_LINE_SETBACK_PX,
   incident?: Segment[],
 ): DirectionalPlacement[] {
-  // Emit the marking flipped 180° from the seed travel direction so the painted
-  // text reads for the approaching driver. The seed points along travel (into
-  // the junction); the lane guide a hand-placed marking would sit on points the
-  // OPPOSITE way (cars face against their guide), so negating the seed makes the
-  // OSM sign face — and render — exactly like a hand-placed one.
-  const facing = (): Point => new Point(-directionVector.x, -directionVector.y);
+  // The seed already stores the canonical travel direction (into the
+  // junction), which is what Stop/Yield draw() expects — emit it as-is.
 
   // 1. Approach segment: incident to the node, road axis most collinear with
   //    the seed direction (either orientation). `incident` (optional) is the
@@ -79,7 +75,7 @@ export function expandDirectionalMarking(
       best = seg;
     }
   }
-  if (!best) return [{ center, directionVector: facing() }]; // fallback
+  if (!best) return [{ center, directionVector }]; // fallback
 
   // Driver's right (right-hand traffic): perpendicular to travel, +90° in the
   // y-down world. Used to keep only the approaching-side lanes on two-way roads.
@@ -96,7 +92,7 @@ export function expandDirectionalMarking(
       setback !== 0
         ? add(laneCenter, scale(directionVector, -setback))
         : laneCenter;
-    out.push({ center: placed, directionVector: facing() });
+    out.push({ center: placed, directionVector });
   }
-  return out.length > 0 ? out : [{ center, directionVector: facing() }]; // fallback
+  return out.length > 0 ? out : [{ center, directionVector }]; // fallback
 }

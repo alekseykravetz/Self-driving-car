@@ -23,7 +23,8 @@ import { Camera } from '../../camera/camera.js';
 import { SpatialHashGrid } from '../../math/spatialGrid.js';
 import type { GridSegment } from '../../math/spatialGrid.js';
 import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
-import { angle, scale } from '../../math/utils.js';
+import { scale } from '../../math/utils.js';
+import { carAngleFromDirection } from '../../math/direction.js';
 import { buildRoadBorders } from '../spatialGridUtils.js';
 import { queryBordersNearCar } from '../spatialGridUtils.js';
 import {
@@ -310,7 +311,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
     const direction = startMarkings.length
       ? startMarkings[0].directionVector
       : new Point(0, -1);
-    const startAngle = -angle(direction) + Math.PI / 2;
+    const startAngle = carAngleFromDirection(direction);
     return { x: startPoint.x, y: startPoint.y, angle: startAngle };
   }
 

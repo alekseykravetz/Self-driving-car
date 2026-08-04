@@ -910,7 +910,7 @@ spawns a car at the clicked world point:
 > mouse button, so painting cars never conflicts with panning the map.
 >
 > The spawn heading uses the same convention as the world-mode Start marking:
-> `angle = -angle(direction) + Math.PI / 2`.
+> `angle = carAngleFromDirection(direction)`.
 
 ### Car picker (unified Car selector)
 

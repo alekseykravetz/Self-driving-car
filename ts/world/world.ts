@@ -34,6 +34,8 @@ import {
   perpendicular,
   angle,
   mulberry32,
+  dot,
+  subtract,
 } from '../math/utils.js';
 import { drawEnvelope } from '../rendering/envelopeRenderer.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
@@ -223,6 +225,23 @@ export class World implements IWorld {
       world.buildings = (info.buildings ?? []).map((b) => Building.load(b));
     }
 
+    // Legacy saves (version < 3) stored marking directionVector opposite to
+    // the canonical travel direction — negate it and recompute anchor.flipped
+    // so reanchoring reproduces the corrected direction.
+    const infoVersion = (info as unknown as { version?: number }).version;
+    if (infoVersion !== 3) {
+      for (const m of world.markings) {
+        m.directionVector = new Point(
+          -m.directionVector.x,
+          -m.directionVector.y,
+        );
+        if (m.anchor) {
+          const segDir = normalize(subtract(m.anchor.p2, m.anchor.p1));
+          m.anchor.flipped = dot(m.directionVector, segDir) < 0;
+        }
+      }
+    }
+
     WorldGenerator.reanchorMarkings(world);
     world.trafficManager = new TrafficManager(world.graph, world.markings);
 
@@ -238,7 +257,7 @@ export class World implements IWorld {
    */
   toJSON(): object {
     return {
-      version: 2,
+      version: 3,
       graph: this.graph,
       roadWidth: this.roadWidth,
       roadRoundness: this.roadRoundness,

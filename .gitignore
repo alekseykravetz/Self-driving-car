@@ -4,6 +4,7 @@ tests/**/*.js
 vitest.config.js
 .herenow/
 store/world/_v1_backup/
+store/world/_predir_backup/
 graphify-out/
 coverage/
 test-results/

@@ -73,8 +73,8 @@ export class SimpleWorld implements IWorld {
     const startY = 100;
     const startX = this.getLaneCenter(1);
     const startCenter = new Point(startX, startY);
-    // Direction (0, 1) produces startAngle=0 via formula: -angle(dir) + π/2
-    const startDirection = new Point(0, 1);
+    // Direction (0, -1) produces startAngle=0 (up) via carAngleFromDirection.
+    const startDirection = new Point(0, -1);
     this.markings = [new Start(startCenter, startDirection, this.#width, 20)];
   }
 

@@ -103,11 +103,13 @@ describe('loadMarking', () => {
         p2: { x: 10, y: 0 },
         offset: 0.5,
         lateral: 2,
+        flipped: true,
       },
     });
     expect(marking).not.toBeNull();
     expect(marking!.anchor).toBeDefined();
     expect(marking!.anchor!.offset).toBe(0.5);
     expect(marking!.anchor!.lateral).toBe(2);
+    expect(marking!.anchor!.flipped).toBe(true);
   });
 });
