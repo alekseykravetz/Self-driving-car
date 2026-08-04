@@ -203,7 +203,7 @@ The task-planning workflow creates a git branch per task to isolate work:
 
 ## Testing
 
-The project has a **multi-phase test suite**: **81 test files, 1115 tests** (~70% statement coverage) across math, neural-network, car, world, simulator, panels, viewport, and store modules. Tests live in three directories:
+The project has a **multi-phase test suite**: **98 test files, 1402 tests** (~70% statement coverage) across math, neural-network, car, world, simulator, panels, viewport, and store modules. Tests live in three directories:
 
 | Directory        | Purpose                                                                                                                 |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------- |

@@ -175,7 +175,8 @@ export class CameraControls {
       return;
     }
 
-    // Draw mirrored video onto the main canvas
+    // Draw mirrored video onto the main canvas as a pixel buffer for marker
+    // detection below (getImageData) — not a visual render pass.
     this.ctx.save();
     this.ctx.translate(this.canvas.width, 0);
     this.ctx.scale(-1, 1); // Mirror horizontally
