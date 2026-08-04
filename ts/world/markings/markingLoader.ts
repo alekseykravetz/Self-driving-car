@@ -51,6 +51,7 @@ export function loadMarking(info: Marking): Marking | null {
       p2: new Point(info.anchor.p2.x, info.anchor.p2.y),
       offset: info.anchor.offset,
       lateral: info.anchor.lateral,
+      flipped: info.anchor.flipped,
     };
   }
   return marking;

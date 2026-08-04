@@ -25,7 +25,8 @@ import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
 import { Start } from '../../world/markings/start.js';
 import { Target } from '../../world/markings/target.js';
-import { angle, getNearestSegment, scale } from '../../math/utils.js';
+import { getNearestSegment, scale } from '../../math/utils.js';
+import { carAngleFromDirection } from '../../math/direction.js';
 
 import { loadPoolFromStorage } from '../training/genetics/storageManager.js';
 import { handleCollisionWithRoadBorders } from '../training/modes/borderCollision.js';
@@ -91,7 +92,7 @@ export class RaceSimulator extends SimulatorShell {
     const direction = startMarkings.length
       ? startMarkings[0].directionVector
       : new Point(0, -1);
-    const startAngle = -angle(direction) + Math.PI / 2;
+    const startAngle = carAngleFromDirection(direction);
 
     const pool = loadPoolFromStorage();
     const selected = StoreManager.getActiveCars();

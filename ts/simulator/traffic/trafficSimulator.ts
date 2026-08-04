@@ -26,7 +26,8 @@ import {
   buildTrafficControls,
   queryTrafficControlsNearCar,
 } from '../trafficControlUtils.js';
-import { getNearestSegment, scale, angle } from '../../math/utils.js';
+import { getNearestSegment, scale } from '../../math/utils.js';
+import { carAngleFromDirection } from '../../math/direction.js';
 import { Point } from '../../math/primitives/point.js';
 import type { BorderMode } from '../types.js';
 import { BODY_MARGIN_RATIO } from '../../car/config.js';
@@ -281,11 +282,9 @@ export class TrafficSimulator extends SimulatorShell {
       SEGMENT_SEARCH_RADIUS,
     );
     if (!segment) return 0;
-    // Base heading: opposite to the segment's directionVector.
-    let heading = -angle(segment.directionVector()) + Math.PI / 2;
-    // One-way roads: flip so the car faces IN the traffic-flow direction.
-    if (segment.oneWay) heading += Math.PI;
-    return heading;
+    const segDir = segment.directionVector();
+    const dir = segment.oneWay ? segDir : new Point(-segDir.x, -segDir.y);
+    return carAngleFromDirection(dir);
   }
 
   /** Spawn heading at `point`, flipped 180° while 'r' is held. */
@@ -539,7 +538,7 @@ export class TrafficSimulator extends SimulatorShell {
     return {
       x: startPoint.x,
       y: startPoint.y,
-      angle: -angle(direction) + Math.PI / 2,
+      angle: carAngleFromDirection(direction),
     };
   }
 }

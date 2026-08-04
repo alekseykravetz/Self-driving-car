@@ -5,6 +5,8 @@ import { Segment } from '../../../../ts/math/primitives/segment.js';
 import { WorldGenerator } from '../../../../ts/world/generation/worldGenerator.js';
 import { laneGuidesForSegment } from '../../../../ts/world/generation/worldGenerator.js';
 import type { WorldGeneratable } from '../../../../ts/world/generation/worldGenerator.js';
+import { carAngleFromDirection } from '../../../../ts/math/direction.js';
+import { normalize } from '../../../../ts/math/utils.js';
 
 function createEmptyWorld(): WorldGeneratable {
   return {
@@ -274,10 +276,10 @@ describe('WorldGenerator', () => {
     expect(world.corridors.length).toBe(1);
   });
 
-  it('one-way lane guides point opposite to segment direction (car heading convention)', () => {
-    // The car heading formula -angle(dv)+π/2 makes cars face OPPOSITE to dv.
-    // For one-way roads, ALL lane guides must point p2→p1 (opposite to the
-    // traffic flow) so that cars face forward (p1→p2, with traffic).
+  it('one-way lane guides point along segment direction (travel-direction convention)', () => {
+    // directionVector() is the canonical travel direction: cars face ALONG
+    // dv (via carAngleFromDirection). For one-way roads, ALL lane guides
+    // must point p1→p2 (with the traffic flow).
     const world = createEmptyWorld();
     const p1 = new Point(0, 0);
     const p2 = new Point(200, 0);
@@ -294,9 +296,9 @@ describe('WorldGenerator', () => {
       const gdx = guide.p2.x - guide.p1.x;
       const gdy = guide.p2.y - guide.p1.y;
       const dot = gdx * sdx + gdy * sdy;
-      // Guide direction must be OPPOSITE to segment (p2→p1 vs p1→p2)
+      // Guide direction must match segment (p1→p2)
       if (Math.abs(dot) > 0.1) {
-        expect(dot).toBeLessThan(0);
+        expect(dot).toBeGreaterThan(0);
       }
     }
   });
@@ -311,8 +313,8 @@ describe('WorldGenerator', () => {
 
     WorldGenerator.generateRoads(world);
 
-    // 2-lane road: lane 0 (left, even) = forward (p1→p2), dot > 0
-    // lane 1 (right, odd) = backward (p2→p1), dot < 0
+    // 2-lane road: lane 0 (left, even) = backward (p2→p1), dot < 0
+    // lane 1 (right, odd) = forward (p1→p2), dot > 0
     expect(world.laneGuides.length).toBe(2);
     let hasForward = false;
     let hasBackward = false;
@@ -332,7 +334,7 @@ describe('WorldGenerator', () => {
     expect(hasBackward).toBe(true);
   });
 
-  it('one-way multi-lane roads have all lanes pointing opposite to segment', () => {
+  it('one-way multi-lane roads have all lanes pointing along segment direction', () => {
     const world = createEmptyWorld();
     const p1 = new Point(0, 0);
     const p2 = new Point(200, 0);
@@ -349,11 +351,32 @@ describe('WorldGenerator', () => {
       const gdx = guide.p2.x - guide.p1.x;
       const gdy = guide.p2.y - guide.p1.y;
       const dot = gdx * sdx + gdy * sdy;
-      // All one-way lanes point opposite to segment (p2→p1)
+      // All one-way lanes point along segment (p1→p2)
       if (Math.abs(dot) > 0.1) {
-        expect(dot).toBeLessThan(0);
+        expect(dot).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('a car spawned via carAngleFromDirection moves from p1 toward p2 on a one-way lane', () => {
+    const world = createEmptyWorld();
+    const p1 = new Point(0, 0);
+    const p2 = new Point(200, 0);
+    world.graph.addPoint(p1);
+    world.graph.addPoint(p2);
+    world.graph.tryAddSegment(new Segment(p1, p2, true));
+
+    WorldGenerator.generateRoads(world);
+
+    expect(world.laneGuides.length).toBe(1);
+    const guide = world.laneGuides[0];
+    const dir = guide.directionVector();
+    const heading = carAngleFromDirection(dir);
+    // Car forward vector per carPhysics: (-sin θ, -cos θ)
+    const forward = new Point(-Math.sin(heading), -Math.cos(heading));
+    const travel = normalize(new Point(p2.x - p1.x, p2.y - p1.y));
+    expect(forward.x).toBeCloseTo(travel.x, 9);
+    expect(forward.y).toBeCloseTo(travel.y, 9);
   });
 });
 
@@ -375,9 +398,9 @@ describe('laneGuidesForSegment', () => {
     });
     const guides = laneGuidesForSegment(seg);
     expect(guides.length).toBe(3);
-    // one-way: all guides point p2→p1 (opposite to segment)
+    // one-way: all guides point p1→p2 (along segment)
     for (const g of guides) {
-      expect(g.p2.x - g.p1.x).toBeLessThan(0);
+      expect(g.p2.x - g.p1.x).toBeGreaterThan(0);
     }
   });
 
