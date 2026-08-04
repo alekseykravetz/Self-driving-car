@@ -192,7 +192,21 @@ correct), so visual baselines change.
 
 ## Open Item
 
-- **Sample OSM world for end-to-end verification:** user will specify the file
-  (a one-way + multi-lane junction with stop/yield/light/start is ideal). Until
-  then, `saves/ashkelon-osm-data.json` / `saves/kohav-hazafon-osm-data.json`
-  serve as fallbacks.
+- **Sample OSM world for end-to-end verification:** use
+  `saves/ashkelon-barnea-osm-data.json` (user-provided; contains traffic-signal
+  junctions and parking-tagged ways — exercises both special cases below).
+  Fallbacks: `saves/ashkelon-osm-data.json`, `saves/kohav-hazafon-osm-data.json`.
+
+## Special cases explicitly covered
+
+- **Traffic-light placement is preserved, only its stored facing is
+  canonicalized.** `placeApproachMarking` keeps its approach-arm resolution and
+  the upstream slide to the stop line; it now stores `directionVector` = travel
+  direction (into the junction) instead of the upstream vector. `Light.draw` is
+  a symmetric perpendicular bar, so the head looks the same — the fix is
+  convention consistency plus keeping the special placement intact.
+- **Parking (left/right lane) is out of scope and untouched.** Parking is
+  segment metadata (`parkingLeft` / `parkingRight`), not a marking, and its side
+  is derived from the raw `Segment.directionVector()` + `perpendicular`, which
+  this migration does not change. The offline/runtime migrations never read or
+  write parking metadata.

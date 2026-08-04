@@ -140,9 +140,20 @@ Replace every `-angle(direction) + Math.PI / 2` (and the traffic variant) with
     RETURN the travel direction directly (rename/clarify its doc; it currently
     returns "toward oncoming traffic"). The net effect: the emitted seed `dv`
     equals the approaching driver's travel direction.
-  - `placeApproachMarking` (L583+) for lights: ensure the emitted `directionVector`
-    is the approach travel direction (heads face oncoming traffic via the DRAW
-    helper, not via a stored flip). Remove any compensating negation.
+  - `placeApproachMarking` (L583+) for lights — **SPECIAL PLACEMENT, preserve
+    it.** Keep the approach-arm resolution (directedApproach → cluster radial →
+    `throughAxis`) and the UPSTREAM slide
+    `placed = center + bestUnit * min(width, span*0.5)` UNCHANGED: `bestUnit`
+    points from the node toward the approach neighbour = upstream = toward
+    oncoming traffic, and that stop-line geometry is correct. Only the STORED
+    facing changes — emit `directionVector = normalize(negate(bestUnit))` =
+    travel direction INTO the junction (canonical). There is NO existing negation
+    to remove here; you are ADDING one to convert the upstream `bestUnit` into
+    travel direction. `Light.draw` lays the head out with `perpendicular(dv)`
+    (a symmetric bar), so flipping `dv` does not change how the light looks —
+    this is convention consistency only. Do NOT change the isolated-signal
+    `throughAxis` branch geometry (only orient its sign toward the through road;
+    symmetric for the draw).
   - Update the file's direction-convention comments (L656+, and the L93 field
     doc) to the canonical rule.
 - `ts/world/osmDirectionalMarkings.ts` `expandDirectionalMarking`:
@@ -214,10 +225,13 @@ script skips them.
    - Draw a two-way road and a one-way road (multi-lane). Place `start`, `stop`,
      `yield` on several lanes. Confirm each glyph faces the lane's travel
      direction. Save, reload the page, confirm they still face correctly.
-   - Import the user-specified OSM sample (fallback:
-     `saves/ashkelon-osm-data.json`). Confirm stop/yield text reads for the
-     approaching driver and lights face oncoming traffic on one-way and
-     multi-lane junctions.
+   - Import `saves/ashkelon-barnea-osm-data.json` (the user's sample — has
+     traffic-signal junctions and parking-tagged ways). Confirm: stop/yield text
+     reads for the approaching driver; traffic lights sit on the correct
+     approach arm at the stop line (upstream slide preserved) and face oncoming
+     traffic on one-way and multi-lane junctions; parking "P" lanes appear on the
+     correct side (unchanged by this task). Fallbacks:
+     `saves/ashkelon-osm-data.json`, `saves/kohav-hazafon-osm-data.json`.
 2. In `simulator.html` / `traffic.html` / `human-training.html` / `race.html`:
    spawn from a `start` and confirm the car drives the direction the marking
    points (and one-way traffic cars flow `p1→p2`).
@@ -234,6 +248,26 @@ script skips them.
 - `graphify update .`.
 
 ---
+
+## Do NOT touch — parking side geometry (out of scope)
+
+Parking is **not** a marking and is **orthogonal** to this migration — leave it
+exactly as-is:
+
+- `parkingLeft` / `parkingRight` are **segment metadata**, not a marking
+  `directionVector`. The offline script (Step 8) and runtime migration (Step 7)
+  only negate marking `directionVector` + bump `version`; they must **never**
+  read or write segment parking metadata.
+- `getSegmentEnvelopeGeometry` (`worldGenerator.ts` L76) and `#drawParkingLanes`
+  (`world.ts` L487) derive the parking side from the **raw**
+  `segment.directionVector()` (p1→p2) and `perpendicular` (`+perp = right of
+p1→p2`). The migration changes lane-**guide** orientation and **marking**
+  `directionVector`, NOT `Segment.directionVector()` — so left/right parking is
+  unaffected. Do not "fix" it to match the new convention.
+- `hasParkingSide` in `osm.ts` (and its reverse-one-way side swap) is likewise
+  untouched.
+- The legacy `Parking` marking (manual `ParkingEditor`) is symmetric; the
+  uniform marking-dv negation is harmless (identical square). No special-case.
 
 ## Grep guardrails (should return ZERO after this task)
 
