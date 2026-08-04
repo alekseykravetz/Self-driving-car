@@ -14,6 +14,10 @@ runtime (`World.load`) and offline (`scripts/`). Backups written by the script.
 > **This is a large, fully-working app. Do the steps in order. After EACH step,
 > run `npm run test:fast` (or the named test) before moving on. Do NOT
 > regenerate visual baselines until Step 9, after manual verification.**
+>
+> **Line numbers below are indicative** (the tree may have drifted). Locate each
+> edit by the quoted code/symbol, not the line number. Read the surrounding code
+> before editing and confirm the direction it currently stores.
 
 ---
 
@@ -94,20 +98,25 @@ Import from `../../math/direction.js`; drop the now-unused `angle` import if it
 becomes unused. `crossing`, `target`, `parking`, `light` draws are symmetric or
 non-directional — leave them.
 
-## Step 4 — Uniform editor base (snap to lane guide)
+## Step 4 — Editor targets: verify, do NOT change the base default
 
-`ts/world/editors/markingEditor.ts` `#handleMouseMove` (L88–108): the generic
-`MarkingEditor` currently uses `segment.directionVector()` from
-`world.graph.segments`. Make the base target/snap to `world.laneGuides` (like
-`StartEditor`/`StopEditor`/`YieldEditor` already do) so ALL markings inherit the
-lane's travel direction. Confirm the subclasses that pass `world.laneGuides`
-still behave (they should be unchanged). Marking preview `directionVector` =
-`laneGuide.directionVector()`.
+**No code change is expected here — this is a verification step.** After Step 2
+flips lane-guide orientation to travel direction, the directional editors are
+already correct:
 
-> If any editor legitimately needs the raw segment (e.g. `LightEditor` places on
-> the road, not a lane), keep its target but ensure the emitted `dv` is the
-> travel direction. Verify each editor's `targetSegments` in
-> `ts/world/editors/*Editor.ts` before changing the base.
+- `StartEditor` / `StopEditor` / `YieldEditor` snap to `world.laneGuides`
+  (`ts/world/editors/*Editor.ts`), so their `directionVector =
+laneGuide.directionVector()` = travel direction automatically.
+- The generic `MarkingEditor` base, `LightEditor`, `CrossingEditor`,
+  `ParkingEditor`, `TargetEditor` snap to `world.graph.segments` (or are
+  non-directional). Their markings are **symmetric or road-spanning** (a plain
+  polygon / a bar across the full road), so `directionVector = segment.direction
+Vector()` is fine.
+
+> **Do NOT change the `MarkingEditor` base target to `world.laneGuides`.** > `LightEditor` and `CrossingEditor` must span the full road segment (a light bar
+> / a zebra crossing across all lanes); snapping them to a single lane guide
+> would shrink/mis-place them. Confirm each editor's `targetSegments` and leave
+> them as-is.
 
 ## Step 5 — Spawn sites use `carAngleFromDirection`
 
@@ -117,29 +126,47 @@ Replace every `-angle(direction) + Math.PI / 2` (and the traffic variant) with
 - `ts/simulator/training/trainingSimulator.ts` L192
 - `ts/simulator/humanTraining/humanBackpropSimulator.ts` L313
 - `ts/simulator/racing/raceSimulator.ts` L94
-- `ts/simulator/traffic/trafficSimulator.ts` L542 (`#getStartInfo`) and L285
-  (`#headingAt`). For `#headingAt`, the base heading becomes
-  `carAngleFromDirection(segment.directionVector())`; the one-way `+π` special
-  case (L293) is **removed** — with lane guides / segment direction now meaning
-  true travel, one-way cars already face flow. Re-verify with a one-way segment
-  that the spawned car drives `p1→p2`.
-- `ts/world/simple/simpleWorld.ts` L76: update the hard-coded start
-  `directionVector` so the simple-world car still faces up. Face-up means
-  `dir = (0,-1)` under the canonical rule (was `(0,1)`); update the value and the
-  comment.
+- `ts/simulator/traffic/trafficSimulator.ts` `#getStartInfo` (~L542) uses
+  `carAngleFromDirection(direction)`. `#headingAt` (~L276) currently computes
+  `heading = -angle(segment.directionVector()) + π/2` then, for one-way,
+  `heading += Math.PI` (~L288). Replace BOTH lines with a single
+  behaviour-preserving form: face along `segDir` for one-way (flow = p1→p2),
+  face along `-segDir` for two-way (the existing convention):
+
+  ```ts
+  const segDir = segment.directionVector();
+  const dir = segment.oneWay ? segDir : new Point(-segDir.x, -segDir.y);
+  return carAngleFromDirection(dir);
+  ```
+
+  This reproduces the current numbers exactly (verified) and removes the `+π`.
+  **Do NOT touch `#spawnAngle` (~L293)** — its `this.#reverseHeading ? Math.PI`
+  is the 'r'-key reverse toggle, unrelated to this migration.
+
+- `ts/world/simple/simpleWorld.ts` (~L76): update the hard-coded start
+  `directionVector` so the simple-world car still faces up. Face-up is
+  `dir = new Point(0, -1)` under the canonical rule (was `(0, 1)`); update the
+  value and the comment.
 
 **Test:** update simulator heading unit tests
 (`tests/unit/simulator/**` referencing the old formula) to the helper.
 
-## Step 6 — OSM emits true travel direction (delete negations)
+## Step 6 — OSM: store travel direction (remove the per-lane re-flip)
+
+> **Read this first — the seeds are NOT all in the same convention today:** > `osm.ts` already emits the stop/yield seed as `-approachFacingDir(...)` =
+> **travel direction** (into the junction). But it emits the LIGHT seed as
+> `bestUnit` = **upstream** (toward oncoming). So stop/yield need NO osm.ts
+> change; lights need one negation added. Verify each by reading the code before
+> editing.
 
 - `ts/math/osm-importer/osm.ts`:
-  - Stop/give-way seed (L530–538): stop negating `approachFacingDir(entry)`.
-    Emit `directionVector = approachFacingDir(entry)` **already pointing along
-    travel into the junction** — audit `approachFacingDir` (L666+) and make it
-    RETURN the travel direction directly (rename/clarify its doc; it currently
-    returns "toward oncoming traffic"). The net effect: the emitted seed `dv`
-    equals the approaching driver's travel direction.
+  - Stop/give-way seed (`kind === 'stop' || 'yield'`, ~L525–545): **leave the
+    seed direction as-is.** `directionVector: new Point(-facing.x, -facing.y)`
+    already equals the travel direction (into the junction). Do NOT touch
+    `approachFacingDir` (it correctly returns the upstream/toward-oncoming
+    vector; the call-site negation turns it into travel). Only update the nearby
+    comment that claims it targets the "lane-guide convention (opposite travel)"
+    — it now stores travel.
   - `placeApproachMarking` (L583+) for lights — **SPECIAL PLACEMENT, preserve
     it.** Keep the approach-arm resolution (directedApproach → cluster radial →
     `throughAxis`) and the UPSTREAM slide
@@ -157,16 +184,19 @@ Replace every `-angle(direction) + Math.PI / 2` (and the traffic variant) with
   - Update the file's direction-convention comments (L656+, and the L93 field
     doc) to the canonical rule.
 - `ts/world/osmDirectionalMarkings.ts` `expandDirectionalMarking`:
-  - `directionVector` is now the seed travel direction. Delete the `facing()`
-    negation (L60–65) — emit `directionVector = directionVector` (travel) for
-    every per-lane placement.
-  - Lane selection math (approach segment, driver's-right filter L88–94) stays,
-    but re-derive the "keep approaching lanes" test against the new lane-guide
-    orientation (guides now point ALONG travel, so `dot(guideDir, seed) > 0`
-    selects lanes flowing into the junction — mirror the archived per-lane logic,
-    inverted).
-  - Update `STOP_LINE_SETBACK_PX` usage: setback is UPSTREAM = `-directionVector`
-    (against travel) — verify sign after the convention flip.
+  - The incoming `directionVector` is the seed **travel** direction (into the
+    junction). Today the function re-flips it via a local
+    `facing = () => new Point(-dv.x, -dv.y)` (upstream) and emits `facing()`.
+    **Delete `facing()` and emit the travel `directionVector` directly** in ALL
+    THREE places: the no-approach-segment fallback, each per-lane `out.push`,
+    and the final empty-`out` fallback.
+  - **Leave the lane-selection and setback math unchanged.** `right = (-dv.y,
+dv.x)` and the `dot(laneCenter − center, right) <= 0` filter are already
+    computed from the travel `dv`, so they still select the approaching-side
+    lanes correctly. The setback `add(laneCenter, scale(dv, -setback))` is still
+    upstream (against travel). Only the EMITTED `directionVector` changes.
+  - `laneGuidesForSegment(best)` is used only for `guide.projectPoint(center)`
+    (a position, sign-independent), so the Step 2 guide flip does not affect it.
 
 **Test:** update `tests/unit/world/osmDirectionalMarkings.test.ts` and the
 OSM-direction cases in `tests/unit/math/osm-importer/osm.test.ts` (or wherever
@@ -272,19 +302,22 @@ p1→p2`). The migration changes lane-**guide** orientation and **marking**
 ## Grep guardrails (should return ZERO after this task)
 
 ```
--angle\(                     # spawn inversion
-angle\([^)]*\) [-+] Math\.PI / 2   # scattered draw/heading flips (outside direction.ts, envelope.ts)
-new Point\(-facing            # OSM negation
+-angle\(                          # spawn inversion (old heading formula)
+angle\([^)]*\) [-+] Math\.PI / 2  # scattered draw/heading flips
 ```
 
-Allowed remaining `± Math.PI / 2`: only `ts/math/direction.ts`,
-`ts/math/primitives/envelope.ts` (geometry, unrelated), and
-`ts/car/controls/phoneControls.ts` (gyroscope reference).
+Restrict both greps to `ts/world/markings`, `ts/world/editors`,
+`ts/simulator`, and `ts/math/osm-importer`. Allowed remaining `± Math.PI / 2`
+elsewhere: `ts/math/direction.ts` (the one helper), `ts/math/primitives/envelope.ts`
+(geometry), `ts/car/controls/phoneControls.ts` (gyroscope), and
+`ts/world/roadSignage.ts` L390 (upright label angle, unrelated).
+
+> **NOT a violation:** `new Point(-facing.x, -facing.y)` stays in `osm.ts`'s
+> stop/yield seed (it produces the travel direction — see Step 6). The light
+> path instead gains `normalize(negate(bestUnit))`. These are intentional.
 
 ## Order-of-work summary
 
-1. `direction.ts` + test → 2. lane guides → 3. marking draws →
-2. editor base → 5. spawn sites → 6. OSM → 7. version+runtime migration +
-   `flipped` → 8. offline script → 9. manual verify + baselines → 10. docs+graph.
+1. `direction.ts` + test → 2. lane guides → 3. marking draws → 4. verify editor targets (no change) → 5. spawn sites → 6. OSM → 7. version + runtime migration + `flipped` → 8. offline script → 9. manual verify + baselines → 10. docs + graph.
 
 Run `npm test` green before Step 9; regenerate baselines only in Step 9.

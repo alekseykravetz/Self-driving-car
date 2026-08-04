@@ -102,10 +102,13 @@ markings and OSM markings share one base. `dv` = the lane's travel direction.
 
 ### OSM emits the real travel direction
 
-`osm.ts` and `osmDirectionalMarkings.ts` emit `directionVector` =
-the approaching driver's travel direction (into the junction). **All negations
-removed.** Marking `draw()` uses `drawRotationFromDirection`, so the text reads
-for that driver automatically.
+The OSM pipeline stores `directionVector` = the approaching driver's travel
+direction (into the junction). Concretely: the stop/yield seed in `osm.ts`
+already yields travel direction and is unchanged; `osmDirectionalMarkings.ts`
+stops re-flipping it to upstream; and the traffic-light path negates its upstream
+`bestUnit` to store travel (its special placement/slide is preserved). Marking
+`draw()` uses `drawRotationFromDirection`, so the text reads for that driver
+automatically. See the task's Step 6 for the exact per-path changes.
 
 ### `flipped` fixed
 
