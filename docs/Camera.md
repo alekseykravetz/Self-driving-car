@@ -403,8 +403,9 @@ matching the 2D `Crossing.draw` look: bars span the full crossing depth
 `Stop` and `Yield` markings are painted like the 2D map: a white **line across
 the road** plus the **word** written on the tarmac via the `roadText.ts` stroke
 font (`textStrokeQuads`). The word runs across the road (reading horizontally for
-the approaching driver, `dir` flipped 180° so it stands upright) and the line
-sits just above it.
+the approaching driver). Per the canonical direction convention,
+`directionVector` is the travel direction, so the letters stand upright ALONG it
+directly — no 180° flip — and the line sits just above it.
 
 ### Flat-paint helpers (`extrusion.ts`)
 
