@@ -774,7 +774,7 @@ interface OsmWayElement {
  */
 interface OsmMarkingPlacement {
   center: Point; // Placed position (approach stop line, or the node)
-  directionVector: Point; // Unit vector along the road (strip spans across)
+  directionVector: Point; // Canonical travel direction at that point
   width: number; // Strip width across the road
   height?: number; // Strip length along the road (crossing/stop/yield only)
 }
@@ -856,20 +856,23 @@ class Osm {
        2. radial — cluster signals within SIGNAL_CLUSTER_RADIUS_PX = 400; arm =
           approach neighbour pointing most OUTWARD from the junction centroid
        3. throughAxis — straight-through road, drawn at the node (isolated)
-     Then slide UPSTREAM along the centreline (min(width, span/2)) so the light
-     stays centred on the road width.
+       Then slide UPSTREAM along the centreline (min(width, span/2)) so the light
+     stays centred on the road width; the STORED `directionVector` is negated
+     from the upstream slide direction so it holds the canonical travel
+     direction (into the junction) — the slide geometry itself is unaffected.
    CROSSINGS (symmetric zebra) — oriented across the road via throughAxis at the
      node; width = full road.
    STOPS / YIELDS (directional text) — approachFacingDir finds the upstream
      (oncoming) direction: direction tag → single one-way approach neighbour →
      two-way faces away from the junction (highest-degree neighbour) →
-     throughAxis fallback; the placement NEGATES it so directionVector matches
-     the lane-guide convention the Stop/Yield draw() expects (identical to a
-     hand-placed marking); width = half road. osm.ts emits ONE seed per node;
-     the seed is expanded PER APPROACH LANE downstream in the world layer
-     (expandDirectionalMarking + laneGuidesForSegment), one-way → all lanes,
-     two-way → the driver's-right (approaching) lanes only; every per-lane
-     marking faces 180° from the seed travel direction. Not one marking per node.
+     throughAxis fallback; the placement negates it so `directionVector` holds
+     the canonical travel direction (into the junction), matching what
+     Stop/Yield draw() expects (identical to a hand-placed marking); width =
+     half road. osm.ts emits ONE seed per node; the seed is expanded PER
+     APPROACH LANE downstream in the world layer (expandDirectionalMarking +
+     laneGuidesForSegment), one-way → all lanes, two-way → the driver's-right
+     (approaching) lanes only; every per-lane marking keeps the same travel
+     direction as the seed. Not one marking per node.
    PARKING (parking:* WAY-side attribute, NOT a node, NOT a marking) —
      hasParkingSide() reads parking:right*/parking:left*/parking:both* (and
      legacy parking:lane:*) on each way (value no/none = absent) and records

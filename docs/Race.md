@@ -100,7 +100,7 @@ generateCars(): Car[] {
   const startMarkings = world.markings.filter(m => m instanceof Start);
   const startPoint = startMarkings[0].center;
   const direction = startMarkings[0].directionVector;
-  const startAngle = -angle(direction) + Math.PI / 2;
+  const startAngle = carAngleFromDirection(direction);
 
   // Three independent AI car sources, all applied as-is (no mutation)
   const pool = loadPoolFromStorage();        // training results (read-only)
