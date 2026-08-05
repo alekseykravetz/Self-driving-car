@@ -6,12 +6,13 @@ The camera system in `ts/camera/` provides pseudo-3D perspective rendering by pr
 
 ## File Structure (`ts/camera/`)
 
-| File           | Responsibility                                                                                                 |
-| -------------- | -------------------------------------------------------------------------------------------------------------- |
-| `types.ts`     | Interfaces (`ICameraPoint`, `IColoredPolygon`, `ICameraRenderOptions`)                                         |
-| `extrusion.ts` | Pure geometry functions for 3D extrusion (buildings, cars, trees) and flat ground paint (quads, dashes, zebra) |
-| `roadText.ts`  | Tiny stroke vector font for painting road words (STOP / YIELD) flat on the tarmac                              |
-| `camera.ts`    | Camera class (movement, frustum, projection, filtering, rendering)                                             |
+| File               | Responsibility                                                                                                               |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `types.ts`         | Interfaces (`ICameraPoint`, `IColoredPolygon`, `ICameraRenderOptions`)                                                       |
+| `extrusion.ts`     | Pure geometry functions for 3D extrusion (buildings, cars, trees) and flat ground paint (quads, dashes, zebra)               |
+| `roadText.ts`      | Tiny stroke vector font for painting road words (STOP / YIELD) flat on the tarmac                                            |
+| `cameraFrustum.ts` | `CameraFrustum` — view-frustum/projection math (frustum points, point projection, visibility filtering, near-plane clipping) |
+| `camera.ts`        | Camera class (movement, scene assembly, rendering); delegates frustum/projection math to `CameraFrustum`                     |
 
 ---
 
@@ -74,7 +75,9 @@ move(target: ICameraPoint): void {
   this.x = lerp(this.x, target.x + this.distanceBehind * Math.sin(target.angle), t);
   this.y = lerp(this.y, target.y + this.distanceBehind * Math.cos(target.angle), t);
   this.angle = lerp(this.angle, target.angle, t);
-  this.#updateFrustumPoints();
+  // delegates to CameraFrustum#updateFrustumPoints, copying the result onto
+  // this.center/tip/left/right/polygon
+  this.#applyFrustumUpdate();
 }
 ```
 
@@ -90,9 +93,9 @@ The camera smoothly follows the target car with a lag factor of 0.15. The positi
 
 Sets position directly without interpolation — used for initial placement or teleportation to avoid the camera slowly drifting from a distant position.
 
-### Frustum Update (`#updateFrustumPoints`)
+### Frustum Update (`CameraFrustum#updateFrustumPoints`)
 
-After each position change, the view frustum triangle is recalculated:
+After each position change, `Camera` calls `CameraFrustum#updateFrustumPoints(x, y, z, angle, range)` and copies the result onto its own public `center`/`tip`/`left`/`right`/`polygon` fields (preserving the public API for external readers/tests). The view frustum triangle is recalculated as:
 
 ```
 center = (x, y)                           // Camera's position
@@ -113,12 +116,12 @@ The frustum is a triangle with 90° field of view. Everything outside this trian
 
 ---
 
-## View Frustum Culling (`#filter`)
+## View Frustum Culling (`CameraFrustum#filter`)
 
-Before rendering, all world polygons are tested against the camera's triangular view frustum:
+Before rendering, all world polygons are tested against the camera's triangular view frustum (`Camera` delegates via `this.#frustum.filter(...)`):
 
 ```typescript
-#filter(polygons: Polygon[]): Polygon[] {
+filter(polygons: Polygon[]): Polygon[] {
   const filtered: Polygon[] = [];
   for (const polygon of polygons) {
     if (this.polygon.containsPolygon(polygon)) {
@@ -139,12 +142,12 @@ This significantly reduces rendering work — only visible geometry reaches the 
 
 ---
 
-## 3D Projection (`#projectPoint`)
+## 3D Projection (`CameraFrustum#projectPoint`)
 
-Converts world 2D+Z coordinates to screen perspective coordinates:
+Converts world 2D+Z coordinates to screen perspective coordinates (`Camera` delegates via `this.#frustum.projectPoint(...)`):
 
 ```typescript
-#projectPoint(ctx: CanvasRenderingContext2D, p: Point): Point {
+projectPoint(ctx: CanvasRenderingContext2D, p: Point): Point {
   // 1. Project point onto camera's forward axis (center → tip)
   const segment = new Segment(this.center, this.tip);
   const { point: p1 } = segment.projectPoint(p);
@@ -302,11 +305,11 @@ camera.render(cameraCtx, world, {
    - world.roadBorders → border walls (height 10)
 
 2. Cull / clip:
-   - Discrete objects (buildings, cars, trees) → frustum triangle (#filter)
-   - Road surface → near plane only (#nearPlaneClip), so asphalt fills up
+   - Discrete objects (buildings, cars, trees) → frustum triangle (`CameraFrustum#filter`)
+   - Road surface → near plane only (`CameraFrustum#nearPlaneClip`), so asphalt fills up
      to the camera with no gap (the frustum triangle collapses at the apex)
    - Ground-level lines → frustum-clipped visible range with world-anchored
-     dashes (#emitRoadLine / #visibleRange), so paint stays put as the car moves
+     dashes (`Camera#emitRoadLine` / `CameraFrustum#visibleRange`), so paint stays put as the car moves
 
 3. Extrude / build:
    - Buildings: height 200, gray (#AAA sides, #BBB roof)
@@ -361,7 +364,7 @@ top-view debug overlay.
 ### Road surface (near-plane clipping)
 
 `world.envelopes` polygons are drawn flat as dark asphalt. They are clipped only
-against the **near plane** (`#nearPlaneClip` — a Sutherland–Hodgman clip against
+against the **near plane** (`CameraFrustum#nearPlaneClip` — a Sutherland–Hodgman clip against
 a single line just ahead of the camera), **not** the frustum triangle. The
 triangle collapses to a point at the camera and drops the wedge right in front
 of it, which left a grass gap under/behind the car; the straight near plane
@@ -381,8 +384,8 @@ Generated per `world.graph.segments`, matching `World.#drawLaneMarkings`:
   the driving-lane edge plus **bay ticks** across the parking lane on the tagged
   side(s) (`+perp` = right, matching the envelope's `lateralOffset` convention).
 
-Each line is emitted via `#emitRoadLine`, which frustum-clips it to its visible
-range (`#visibleRange`) and, for dashes, anchors the pattern to the segment's
+Each line is emitted via `Camera#emitRoadLine`, which frustum-clips it to its visible
+range (`CameraFrustum#visibleRange`) and, for dashes, anchors the pattern to the segment's
 fixed world start (`dashSegmentAnchored`) so the paint stays world-locked
 instead of crawling as the camera moves.
 

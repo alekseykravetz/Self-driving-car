@@ -594,7 +594,7 @@ The matching renderer (`ts/rendering/heatmapRenderer.ts`) lives in
 
 ---
 
-## Owner Grid — tree placement (`ts/world/generation/worldGenerator.ts`)
+## Owner Grid — tree placement (`ts/world/generation/ownerGrid.ts`)
 
 A fourth member of the spatial-grid family, private to world generation. Tree
 placement (`wgGenerateTrees`) rejects a candidate point if it is inside/near an
@@ -675,7 +675,7 @@ clears the draw-order cache afterwards. The synchronous `WorldGenerator.generate
 `drainGenerator` the same generators), so tests and non-UI callers are unchanged
 and produce **identical** output.
 
-### Grid-accelerated chunked union (`unionGen`)
+### Grid-accelerated chunked union (`unionGen`, `ts/world/generation/chunkedUnion.ts`)
 
 `Polygon.union` breaks overlapping polygon pairs with an **O(n²)** all-pairs
 bounding-box scan and runs with no yields — the dominant "finding places" freeze
@@ -693,7 +693,7 @@ Order preservation: candidate polygons are visited in ascending index order
 discards a segment iff some polygon contains its midpoint — identical to the
 linear scan, the grid just narrows the set of polygons that can.
 
-### Grid-indexed building footprint filter
+### Grid-indexed building footprint filter (`ts/world/generation/buildingGenerator.ts`)
 
 Building de-overlap kept a base iff no earlier-kept base overlapped it (or sat
 within `spacing`) — an **O(n²)** scan that dominated the "placing buildings"
