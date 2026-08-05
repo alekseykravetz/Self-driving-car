@@ -369,7 +369,9 @@ marking placement → road/building/tree generation — ran in one synchronous
 burst. It is now **cooperatively time-sliced** and driven by a full-screen
 progress overlay (`<generation-progress>`, `ts/ui/molecules/generationProgress.ts`):
 
-1. `WorldEditor.parseOsmData()` is `async`. It shows the overlay **first**
+1. `WorldEditor.parseOsmData()` is `async` (a thin delegate to the
+   `WorldEditorOsmImporter` collaborator, `ts/world/editors/worldEditorOsmImport.ts`,
+   which owns the OSM panel and import routine). It shows the overlay **first**
    (label "Reading data…"), yields a frame so it paints, then runs
    `JSON.parse` (native, unavoidably synchronous — the one remaining hard block
    for enormous pastes; a Web Worker would be needed to offload it).
