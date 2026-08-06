@@ -137,6 +137,7 @@ ts/
 - **Auto-regen items toggle** — The ♻️ button in `<world-layers-toolbar>` is a toggle, not a momentary action. When ON (`.active`), buildings/trees regenerate automatically on every graph change (synchronously in the draw loop, only when the graph hash changes). When OFF, graph edits trigger the orange `.stale` pulse animation. `setStale(true)` is suppressed when auto-regen is ON; `setStale(false)` always works so that toggling ON mid-edit clears the stale indicator. The state is `#autoRegen: boolean` in both `WorldLayersToolbarElement` and `WorldEditor`, stored as an editor-only runtime preference (not persisted).
 - **Controls frozen flag** — `Controls.frozen: boolean` (default `false`) makes the `document` keydown/keyup listeners no-op when `true`. Used by `Car.setAutopilot(true)` to prevent human keypresses from overwriting the brain's controls between frames in Human Backpropagation autopilot mode. Disengaging autopilot resets all controls to `false` so the car stops immediately. Existing KEYS cars are unaffected (frozen defaults to `false`).
 - **`latchOnly` toggle bindings** — `ShortcutBinding.latchOnly?: boolean` (default `false`) controls press-to-toggle vs held/latched behavior. When `true`, keydown calls `toggleLatch()` and keyup is a no-op (state persists after key release — used by the L learning toggle in Human Backpropagation). When `false` (default), keydown sets physical hold and keyup releases it (used by graph editor one-way/reverse, traffic G toggle).
+- **Google Fonts CDN required for font rendering** — all six HTML pages must include a `<link>` to `fonts.googleapis.com` loading Space Grotesk (weights 300–700) and JetBrains Mono (weights 400, 700). Without this link, pages fall back to system fonts (Arial/Courier New) which render differently on macOS vs Linux, breaking cross-platform visual tests. When adding a new HTML page, copy the `<link>` from any existing simulator page.
 
 ## Key commands
 
@@ -222,14 +223,14 @@ The project has a **multi-phase test suite**: **98 test files, 1402 tests** (~70
 - **Deterministic tests** — seed PRNGs where possible; avoid `Math.random` in test assertions.
 - **Import paths use `.js` extension** — match the production code convention even though files are `.ts`.
 - **Format + lint** — `npm run fix:all` before commit covers all files including tests.
-- **Visual regression** tests live in `tests/visual/` using Playwright (5 spec files: human-training, race, simulator, traffic, world).
+- **Visual regression** tests live in `tests/visual/` using Playwright (7 spec files: canvas-layout, human-training, landing, race, simulator, traffic, world).
 - Run `npm run test:visual` to execute visual tests.
 - Run `npm run test:visual:update` to update baseline screenshots.
 - Baselines are stored in `tests/visual/baselines/` and must be committed.
 - Visual tests start a local server on `:9090` automatically (Playwright webServer config).
 - **Chromium only** — no cross-browser visual testing yet.
 - **Config:** `tests/visual/playwright.config.ts` — single-worker, retries 2 in CI, snapshot path template.
-- **Test hook:** Append `?paused=1` to the URL to freeze the animation loop for deterministic screenshots. All spec files use this and mask all `<canvas>` elements via `page.locator('canvas')` so the pixel comparison covers only the stable HTML/CSS UI chrome. `maxDiffPixels: 5000` absorbs cross-OS font anti-aliasing differences.
+- **Test hook:** Append `?paused=1` to the URL to freeze the animation loop for deterministic screenshots. All spec files use this and mask all `<canvas>` elements via `page.locator('canvas')` so the pixel comparison covers only the stable HTML/CSS UI chrome. `maxDiffPixelRatio: 0.03` accommodates the ~2% cross-platform font anti-aliasing variance between macOS (CoreText) and Linux (FreeType).
 - **Phase 1 (pure-logic) test modules** now cover:
   - `ts/car/physics/sensorRaycaster.ts` — ray-casting math (castRays, getReading, getReadings, getTaggedReadings)
   - `ts/ui/atoms/latchedToggle.ts` — held/latched state machine (setPhysicalHold, toggleLatch, reset, onChange)

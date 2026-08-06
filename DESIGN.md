@@ -10,7 +10,7 @@ A dark, data-dense simulator environment that prioritizes clarity and legibility
 
 The canvas is the hero: a bright green-grass road surface (`#2a5`) where grey asphalt roads, white lane markings, and colored traffic elements create a clean, schematic viewport. Cars render as simple colored polygons with name labels, sensor rays glow yellow, and the neural network visualizer pulses beside the driving view. The aesthetic is intentionally hand-rolled — no WebGL, no Three.js, just Canvas 2D with filled polygons and matrix transforms. This "from scratch" quality is part of the identity: the UI signals that everything visible is something you could build yourself.
 
-A custom line-icon set (`<app-icon>`, rendered from an inline SVG registry) provides all iconography — a coherent, monochrome, animated set that inherits the surrounding text colour on the dark panels. Floating toolbars with subtly rounded corners and thin white borders (`1px solid rgba(255,255,255,0.15)`) hover over the canvas, while side panels dock at fixed widths (200px controls, 300px network view). The typographic palette is minimal: Arial for labels, monospace for data, and Inter for the landing page.
+A custom line-icon set (`<app-icon>`, rendered from an inline SVG registry) provides all iconography — a coherent, monochrome, animated set that inherits the surrounding text colour on the dark panels. Floating toolbars with subtly rounded corners and thin white borders (`1px solid rgba(255,255,255,0.15)`) hover over the canvas, while side panels dock at fixed widths (200px controls, 300px network view). The typographic palette uses Space Grotesk (a futuristic geometric sans from Google Fonts) for all UI and display text, and JetBrains Mono for monospace data — both loaded from CDN for consistent rendering across platforms.
 
 **Key Characteristics:**
 
@@ -117,10 +117,9 @@ A custom line-icon set (`<app-icon>`, rendered from an inline SVG registry) prov
 
 ### Font Families
 
-- **UI Labels**: Arial, sans-serif — all UI chrome, buttons, panels, section titles, controls
-- **Monospace Data**: Courier New, monospace — elapsed time, FPS, stat values, car name labels
-- **Landing Page**: Inter, sans-serif — body text on the main page only
-- **Canvas Text**: Arial — legacy in-world labels (STOP, YIELD, P markings)
+- **UI & Display**: Space Grotesk, sans-serif — all UI chrome, buttons, panels, headings, body text (loaded from Google Fonts CDN)
+- **Monospace Data**: JetBrains Mono, monospace — elapsed time, FPS, stat values, car name labels (loaded from Google Fonts CDN)
+- **Canvas Text**: Space Grotesk — in-world labels (STOP, YIELD, P markings)
 
 ### Principles
 
@@ -317,8 +316,8 @@ All values are defined in `styles/tokens.css`. When implementing, use `var(--tok
 | `--color-accent-green-strong` | `#5cb85c`                  | Status green, active indicators  |
 | `--color-accent-red`          | `#d9534f`                  | Danger states                    |
 | `--color-accent-yellow`       | `#f0ad4e`                  | Warning states                   |
-| `--font-ui`                   | `Arial, sans-serif`        | UI labels                        |
-| `--font-mono`                 | `'Courier New', monospace` | Numeric data                     |
+| `--font-ui`                   | `'Space Grotesk', sans-serif`  | UI labels                        |
+| `--font-mono`                 | `'JetBrains Mono', monospace`  | Numeric data                     |
 | `--space-1`                   | `4px`                      | Minimum gap/padding              |
 | `--space-2`                   | `8px`                      | Standard gap                     |
 | `--radius-sm`                 | `3px`                      | Key indicators                   |
@@ -351,4 +350,4 @@ All values are defined in `styles/tokens.css`. When implementing, use `var(--tok
 2. Use uppercase + letter-spacing for all labels — it's the most consistent visual pattern across the UI
 3. Keep the canvas dominant — UI chrome should never exceed 30% of viewport width
 4. Use the exact color tokens above — the palette is deliberately narrow and constrained
-5. `<app-icon>` for icons, monospace for numbers, Arial for everything else
+5. `<app-icon>` for icons, monospace for numbers, Space Grotesk for everything else
