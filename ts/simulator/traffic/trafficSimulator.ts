@@ -16,7 +16,7 @@ import { Graph } from '../../math/graph/graph.js';
 import type { CarInfo } from '../../car/car.js';
 import { Car } from '../../car/car.js';
 import type { SensorTrafficControl } from '../../car/sensors/sensor.js';
-import { Viewport, ZOOM_STEP_BUTTON } from '../../viewport/viewport.js';
+import { Viewport } from '../../viewport/viewport.js';
 import { Camera } from '../../camera/camera.js';
 import { MiniMap } from '../../mini-map/miniMap.js';
 import { StoreManager } from '../../store/storeManager.js';
@@ -119,6 +119,17 @@ export class TrafficSimulator extends SimulatorShell {
       () => (this.#hoverEvent = null),
     );
 
+    // Scroll-to-zoom the mini-map (the main viewport already zooms on wheel).
+    this.miniMapCanvas.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault();
+        if (e.deltaY < 0) this.miniMap?.zoomIn();
+        else if (e.deltaY > 0) this.miniMap?.zoomOut();
+      },
+      { passive: false },
+    );
+
     // 'R' (reverse heading) and 'G' (green wave) shortcuts are registered
     // via KeyboardManager in #initToolbar().
 
@@ -214,13 +225,6 @@ export class TrafficSimulator extends SimulatorShell {
       this.#statsPanel.setCars(this.#cars);
     });
     this.#statsPanel.setSpawnListener((count) => this.#spawnRandomCars(count));
-    this.#statsPanel.setZoomListener((direction) =>
-      this.viewport?.zoomBy(direction * ZOOM_STEP_BUTTON),
-    );
-    this.#statsPanel.setMiniMapZoomListener((direction) => {
-      if (direction > 0) this.miniMap?.zoomIn();
-      else this.miniMap?.zoomOut();
-    });
   }
 
   #loadWorld(worldInfo: World | null): void {
@@ -277,7 +281,7 @@ export class TrafficSimulator extends SimulatorShell {
       color: getRandomColor(),
     });
     car.load(info);
-    car.name = `Car ${++this.#spawnCount}`;
+    car.name = String(++this.#spawnCount);
 
     this.#cars.push(car);
     this.#statsPanel.setCars(this.#cars);
@@ -367,7 +371,7 @@ export class TrafficSimulator extends SimulatorShell {
         color: getRandomColor(),
       });
       car.load(info);
-      car.name = `Car ${++this.#spawnCount}`;
+      car.name = String(++this.#spawnCount);
       newCars.push(car);
     }
 

@@ -21,8 +21,6 @@ export type ViewportMode = 'mouse' | 'touchpad';
 const ZOOM_STEP_FAST = 0.3;
 /** Slow, fine-grained zoom increment used while Shift is held. */
 const ZOOM_STEP_SLOW = 0.1;
-/** Zoom increment applied per click of an explicit zoom-in/out button. */
-export const ZOOM_STEP_BUTTON = 1.5;
 /** Most zoomed-in value (smallest world slice visible). */
 const MIN_ZOOM = 0.8;
 /** Most zoomed-out value — raised so a whole city of spawned traffic fits on screen. */
@@ -170,16 +168,6 @@ export class Viewport {
 
   #clampZoom(zoom: number): number {
     return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
-  }
-
-  /** Steps the zoom level by `delta` (positive zooms out, negative zooms in). */
-  public zoomBy(delta: number): void {
-    this.zoom = this.#clampZoom(this.zoom + delta);
-  }
-
-  /** Sets the zoom level directly, clamped to the allowed range. */
-  public setZoom(zoom: number): void {
-    this.zoom = this.#clampZoom(zoom);
   }
 
   public drawScaleIndicator(

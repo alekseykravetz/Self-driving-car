@@ -1,21 +1,10 @@
+import { numInputRowHtml } from '../../../ui/molecules/numInputRow.js';
+
 export const TRAFFIC_PANEL_TEMPLATE = `
 <!-- ── Spawn ───────────────────────────────────────── -->
 <div class="panel-section">
   <div class="section-title"><span>Spawn Traffic</span></div>
-  <div class="ctrl">
-    <span class="ctrl-label"><app-icon name="car"></app-icon> Count</span>
-    <div class="num-input-row">
-      <input
-        type="number"
-        id="trafficSpawnCount"
-        min="1"
-        max="20000"
-        step="100"
-        value="1000"
-        title="Number of cars to spawn"
-      />
-    </div>
-  </div>
+  ${numInputRowHtml({ id: 'trafficSpawnCount', label: 'Count', icon: 'car', value: 1000, min: 1, max: 20000, step: 100, title: 'Number of cars to spawn' })}
   <div class="btn-row">
     <button
       id="trafficSpawn1kBtn"
@@ -40,41 +29,6 @@ export const TRAFFIC_PANEL_TEMPLATE = `
     >
       <app-icon name="car"></app-icon> Spawn
     </button>
-  </div>
-</div>
-
-<!-- ── View ────────────────────────────────────────── -->
-<div class="panel-section">
-  <div class="section-title"><span>View</span></div>
-  <div class="ctrl">
-    <span class="ctrl-label"><app-icon name="globe"></app-icon> World Zoom</span>
-    <div class="btn-row">
-      <button id="trafficZoomOutBtn" class="num-btn" title="Zoom out">
-        <app-icon name="minus"></app-icon>
-      </button>
-      <button id="trafficZoomInBtn" class="num-btn" title="Zoom in">
-        <app-icon name="plus"></app-icon>
-      </button>
-    </div>
-  </div>
-  <div class="ctrl">
-    <span class="ctrl-label"><app-icon name="map"></app-icon> Mini-map Zoom</span>
-    <div class="btn-row">
-      <button
-        id="trafficMiniMapZoomOutBtn"
-        class="num-btn"
-        title="Zoom mini-map out"
-      >
-        <app-icon name="minus"></app-icon>
-      </button>
-      <button
-        id="trafficMiniMapZoomInBtn"
-        class="num-btn"
-        title="Zoom mini-map in"
-      >
-        <app-icon name="plus"></app-icon>
-      </button>
-    </div>
   </div>
 </div>
 
@@ -112,6 +66,13 @@ export const TRAFFIC_PANEL_TEMPLATE = `
 <!-- ── Cars list ───────────────────────────────────── -->
 <div class="panel-section traffic-cars-section">
   <div class="section-title"><span>Cars</span></div>
+  <input
+    type="text"
+    id="trafficCarSearch"
+    class="traffic-car-search"
+    placeholder="Find car by name…"
+    title="Filter the list below by car name"
+  />
   <div id="trafficCarsList" class="traffic-cars-list"></div>
   <div id="trafficCarsEmpty" class="traffic-empty">
     Pick a car in the toolbar, then click the road to add traffic.

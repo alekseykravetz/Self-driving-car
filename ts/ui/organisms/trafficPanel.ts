@@ -1,5 +1,6 @@
 import { TRAFFIC_PANEL_TEMPLATE } from '../../simulator/traffic/templates/trafficPanelTemplate.js';
 import type { Car } from '../../car/car.js';
+import { wireNumInputRows } from '../molecules/numInputRow.js';
 import {
   formatKmhFromPxPerFrame,
   formatMetersFromWorldPixels,
@@ -25,8 +26,9 @@ import {
  *   - clear  (toolbar)      → drop all cars
  *   - pause  (toolbar)      → toggle the simulation
  *   - spawn (1K/2K/custom)  → bulk-spawn N cars at random road positions
- *   - zoom / mini-map zoom  → step the simulator's viewport / mini-map scale
  *   - unselect (button)     → clear the tracked car without removing it
+ *   - the search box filters the visible rows by car name (client-side only;
+ *     `#cars`/`#rows` are unaffected, so selection/removal still work as usual)
  */
 
 // File-scope helper (kept out of the class so the class name is never
@@ -74,8 +76,7 @@ export class TrafficPanelElement extends HTMLElement {
   #onClear: (() => void) | null = null;
   #onDeleteDamaged: (() => void) | null = null;
   #onSpawn: ((count: number) => void) | null = null;
-  #onZoom: ((direction: 1 | -1) => void) | null = null;
-  #onMiniMapZoom: ((direction: 1 | -1) => void) | null = null;
+  #filterQuery: string = '';
 
   constructor() {
     super();
@@ -104,6 +105,7 @@ export class TrafficPanelElement extends HTMLElement {
     ) as HTMLButtonElement | null;
     unselectBtn?.addEventListener('click', () => this.unselect());
 
+    wireNumInputRows(this);
     const spawnCountInput = this.querySelector(
       '#trafficSpawnCount',
     ) as HTMLInputElement | null;
@@ -123,25 +125,13 @@ export class TrafficPanelElement extends HTMLElement {
       if (Number.isFinite(count) && count > 0) this.#onSpawn?.(count);
     });
 
-    const zoomInBtn = this.querySelector(
-      '#trafficZoomInBtn',
-    ) as HTMLButtonElement | null;
-    zoomInBtn?.addEventListener('click', () => this.#onZoom?.(-1));
-    const zoomOutBtn = this.querySelector(
-      '#trafficZoomOutBtn',
-    ) as HTMLButtonElement | null;
-    zoomOutBtn?.addEventListener('click', () => this.#onZoom?.(1));
-
-    const miniMapZoomInBtn = this.querySelector(
-      '#trafficMiniMapZoomInBtn',
-    ) as HTMLButtonElement | null;
-    miniMapZoomInBtn?.addEventListener('click', () => this.#onMiniMapZoom?.(1));
-    const miniMapZoomOutBtn = this.querySelector(
-      '#trafficMiniMapZoomOutBtn',
-    ) as HTMLButtonElement | null;
-    miniMapZoomOutBtn?.addEventListener('click', () =>
-      this.#onMiniMapZoom?.(-1),
-    );
+    const searchInput = this.querySelector(
+      '#trafficCarSearch',
+    ) as HTMLInputElement | null;
+    searchInput?.addEventListener('input', () => {
+      this.#filterQuery = searchInput.value;
+      this.#applyFilter();
+    });
   }
 
   getSelectedCar(): Car | null {
@@ -176,16 +166,6 @@ export class TrafficPanelElement extends HTMLElement {
     this.#onSpawn = listener;
   }
 
-  /** direction: 1 = zoom out (further from the world), -1 = zoom in. */
-  setZoomListener(listener: (direction: 1 | -1) => void): void {
-    this.#onZoom = listener;
-  }
-
-  /** direction: 1 = zoom in, -1 = zoom out. */
-  setMiniMapZoomListener(listener: (direction: 1 | -1) => void): void {
-    this.#onMiniMapZoom = listener;
-  }
-
   /** Clears the current selection without removing any car. */
   unselect(): void {
     this.#selected = null;
@@ -216,6 +196,16 @@ export class TrafficPanelElement extends HTMLElement {
       this.#rows.push(this.#buildRow(car, list));
     }
     this.refresh();
+    this.#applyFilter();
+  }
+
+  /** Hides rows whose car name doesn't match the search box (client-side only). */
+  #applyFilter(): void {
+    const query = this.#filterQuery.trim().toLowerCase();
+    for (const { car, row } of this.#rows) {
+      const match = !query || (car.name ?? '').toLowerCase().includes(query);
+      row.style.display = match ? '' : 'none';
+    }
   }
 
   /** Update live values (status / speed / distance) without rebuilding rows.
