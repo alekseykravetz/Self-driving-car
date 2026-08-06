@@ -33,6 +33,7 @@ import type { BorderMode } from '../types.js';
 import { BODY_MARGIN_RATIO } from '../../car/config.js';
 import { Light } from '../../world/markings/light.js';
 import { Start } from '../../world/markings/start.js';
+import type { Segment } from '../../math/primitives/segment.js';
 
 /**
  * TrafficSimulator — the "Live Traffic Jam" simulator.
@@ -57,6 +58,8 @@ import { Start } from '../../world/markings/start.js';
  */
 const GRID_CELL_SIZE = 150;
 const SEGMENT_SEARCH_RADIUS = 200;
+/** Upper bound on a single bulk-spawn click, to keep the tab responsive. */
+const MAX_BULK_SPAWN = 20000;
 
 export class TrafficSimulator extends SimulatorShell {
   #world: World | null = null;
@@ -70,6 +73,11 @@ export class TrafficSimulator extends SimulatorShell {
   // stats panel is a pure view over this array).
   #cars: Car[] = [];
   #spawnCount: number = 0;
+
+  // Uniform grid of car indices keyed by cell, rebuilt once per update() step
+  // so per-car neighbour lookups (#collectCarObstacles) stay near-linear
+  // instead of the O(n^2) scan that chokes on bulk-spawned traffic (1k+ cars).
+  #carCellIndex: Map<string, number[]> = new Map();
 
   // Spawn preview: the last mouse event over the game canvas (null while the
   // cursor is off the canvas), whether the heading is flipped 180° (held 'r'),
@@ -109,6 +117,17 @@ export class TrafficSimulator extends SimulatorShell {
     this.gameCanvas.addEventListener(
       'mouseleave',
       () => (this.#hoverEvent = null),
+    );
+
+    // Scroll-to-zoom the mini-map (the main viewport already zooms on wheel).
+    this.miniMapCanvas.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault();
+        if (e.deltaY < 0) this.miniMap?.zoomIn();
+        else if (e.deltaY > 0) this.miniMap?.zoomOut();
+      },
+      { passive: false },
     );
 
     // 'R' (reverse heading) and 'G' (green wave) shortcuts are registered
@@ -205,6 +224,7 @@ export class TrafficSimulator extends SimulatorShell {
       this.#cars = this.#cars.filter((c) => !c.damaged);
       this.#statsPanel.setCars(this.#cars);
     });
+    this.#statsPanel.setSpawnListener((count) => this.#spawnRandomCars(count));
   }
 
   #loadWorld(worldInfo: World | null): void {
@@ -261,7 +281,7 @@ export class TrafficSimulator extends SimulatorShell {
       color: getRandomColor(),
     });
     car.load(info);
-    car.name = `Car ${++this.#spawnCount}`;
+    car.name = String(++this.#spawnCount);
 
     this.#cars.push(car);
     this.#statsPanel.setCars(this.#cars);
@@ -282,6 +302,11 @@ export class TrafficSimulator extends SimulatorShell {
       SEGMENT_SEARCH_RADIUS,
     );
     if (!segment) return 0;
+    return this.#headingForSegment(segment);
+  }
+
+  /** Angle that faces along `segment`'s direction of travel (see #headingAt). */
+  #headingForSegment(segment: Segment): number {
     const segDir = segment.directionVector();
     const dir = segment.oneWay ? segDir : new Point(-segDir.x, -segDir.y);
     return carAngleFromDirection(dir);
@@ -292,19 +317,95 @@ export class TrafficSimulator extends SimulatorShell {
     return this.#headingAt(point) + (this.#reverseHeading ? Math.PI : 0);
   }
 
+  /**
+   * Bulk-spawns `rawCount` cars (clamped to `MAX_BULK_SPAWN`) at random points
+   * along the world's road segments, using the car currently selected in the
+   * toolbar's car selector. Segments are picked length-weighted so spawn
+   * density matches road density instead of clustering on short segments.
+   * Two-way segments get a random travel direction per car; one-way segments
+   * always face the legal direction of travel.
+   */
+  #spawnRandomCars(rawCount: number): void {
+    if (!this.#world) return;
+
+    const segments = this.#world.graph.segments;
+    if (segments.length === 0) {
+      alert('This world has no roads to spawn cars on.');
+      return;
+    }
+
+    const info = this.toolbarPanel.getSelectedCars()[0] ?? null;
+    if (!info) {
+      alert('Pick a car in the Car selector before spawning traffic.');
+      return;
+    }
+
+    const count = Math.max(1, Math.min(MAX_BULK_SPAWN, Math.round(rawCount)));
+
+    // Cumulative segment-length prefix sums for a length-weighted random pick.
+    const prefix: number[] = new Array(segments.length);
+    let total = 0;
+    for (let i = 0; i < segments.length; i++) {
+      total += Math.max(segments[i].length(), 1);
+      prefix[i] = total;
+    }
+
+    const newCars: Car[] = [];
+    for (let i = 0; i < count; i++) {
+      const segment = segments[this.#pickWeightedSegment(prefix, total)];
+      const t = 0.05 + Math.random() * 0.9;
+      const p1 = segment.p1;
+      const p2 = segment.p2;
+      const point = new Point(
+        p1.x + (p2.x - p1.x) * t,
+        p1.y + (p2.y - p1.y) * t,
+      );
+      const flip = !segment.oneWay && Math.random() < 0.5;
+      const angle = this.#headingForSegment(segment) + (flip ? Math.PI : 0);
+
+      const car = new Car({
+        controlType: 'AI',
+        x: point.x,
+        y: point.y,
+        angle,
+        color: getRandomColor(),
+      });
+      car.load(info);
+      car.name = String(++this.#spawnCount);
+      newCars.push(car);
+    }
+
+    this.#cars.push(...newCars);
+    this.#statsPanel.setCars(this.#cars);
+  }
+
+  /** Length-weighted random segment index, picked via binary search over `prefix`. */
+  #pickWeightedSegment(prefix: number[], total: number): number {
+    const r = Math.random() * total;
+    let lo = 0;
+    let hi = prefix.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >>> 1;
+      if (prefix[mid] < r) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  }
+
   // ── Simulation step ──────────────────────────────────
 
   protected update(): void {
     if (!this.#world || !this.viewport) return;
 
     const borderMode = this.toolbarPanel.borderMode;
+    this.#rebuildCarGrid();
 
     for (let i = 0; i < this.#cars.length; i++) {
       const car = this.#cars[i];
       // Ghost wrecks: crashed cars stay frozen and invisible to everyone else.
       if (car.damaged) continue;
       const obstacles = this.#collectBorders(car, borderMode);
-      const carObstacles = this.#collectCarObstacles(car);
+      const carObstacles = this.#collectCarObstacles(car, i);
       const trafficControls: SensorTrafficControl[] = car.sensor?.stateAware
         ? queryTrafficControlsNearCar(this.#trafficGrid, car)
         : [];
@@ -335,10 +436,29 @@ export class TrafficSimulator extends SimulatorShell {
   }
 
   /**
-   * Other alive cars within sensor reach. Crashed cars are always excluded,
-   * so traffic flows around wrecks.
+   * Buckets alive cars by cell (keyed on `GRID_CELL_SIZE`) so
+   * #collectCarObstacles only scans nearby cells instead of every car —
+   * O(n) per step instead of O(n^2) once bulk-spawned traffic reaches into
+   * the thousands.
    */
-  #collectCarObstacles(car: Car): Point[][] {
+  #rebuildCarGrid(): void {
+    this.#carCellIndex.clear();
+    for (let i = 0; i < this.#cars.length; i++) {
+      const car = this.#cars[i];
+      if (car.damaged) continue;
+      const key = `${Math.floor(car.x / GRID_CELL_SIZE)},${Math.floor(car.y / GRID_CELL_SIZE)}`;
+      const bucket = this.#carCellIndex.get(key);
+      if (bucket) bucket.push(i);
+      else this.#carCellIndex.set(key, [i]);
+    }
+  }
+
+  /**
+   * Other alive cars within sensor reach. Crashed cars are always excluded,
+   * so traffic flows around wrecks. `index` is this car's position in
+   * `#cars`, used to skip itself without an identity check per candidate.
+   */
+  #collectCarObstacles(car: Car, index: number): Point[][] {
     const MIN_RANGE = 100;
     const rayLength = car.sensor?.rayLength ?? MIN_RANGE;
     const reach = Math.max(rayLength, MIN_RANGE);
@@ -346,14 +466,26 @@ export class TrafficSimulator extends SimulatorShell {
     const reachWithBody = reach + bodyMargin;
     const reachWithBodySq = reachWithBody * reachWithBody;
 
+    const minCx = Math.floor((car.x - reachWithBody) / GRID_CELL_SIZE);
+    const maxCx = Math.floor((car.x + reachWithBody) / GRID_CELL_SIZE);
+    const minCy = Math.floor((car.y - reachWithBody) / GRID_CELL_SIZE);
+    const maxCy = Math.floor((car.y + reachWithBody) / GRID_CELL_SIZE);
+
     const result: Point[][] = [];
-    for (let j = 0; j < this.#cars.length; j++) {
-      const other = this.#cars[j];
-      if (other === car || other.damaged) continue;
-      const dx = other.x - car.x;
-      const dy = other.y - car.y;
-      if (dx * dx + dy * dy <= reachWithBodySq) {
-        result.push(other.polygon);
+    for (let cx = minCx; cx <= maxCx; cx++) {
+      for (let cy = minCy; cy <= maxCy; cy++) {
+        const bucket = this.#carCellIndex.get(`${cx},${cy}`);
+        if (!bucket) continue;
+        for (let k = 0; k < bucket.length; k++) {
+          const j = bucket[k];
+          if (j === index) continue;
+          const other = this.#cars[j];
+          const dx = other.x - car.x;
+          const dy = other.y - car.y;
+          if (dx * dx + dy * dy <= reachWithBodySq) {
+            result.push(other.polygon);
+          }
+        }
       }
     }
     return result;

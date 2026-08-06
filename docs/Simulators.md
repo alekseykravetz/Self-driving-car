@@ -910,8 +910,9 @@ class TrafficSimulator extends SimulatorShell {
   #world: World | null;
   #roadBorders: GridSegment[];
   #borderGrid: SpatialHashGrid; // broad-phase border lookups (via queryBordersNearCar)
+  #carCellIndex: Map<string, number[]>; // car-vs-car broad phase, rebuilt once per update()
   #cars: Car[]; // single source of truth (panel is a view)
-  #spawnCount: number; // names cars "Car 1", "Car 2", …
+  #spawnCount: number; // names cars "1", "2", … (just the number, no "Car " prefix)
 
   protected update(): void; // step alive cars + follow selected car
   protected draw(time): void; // world + cars (wrecks greyed) + camera + stats
@@ -932,7 +933,7 @@ spawns a car at the clicked world point:
 3. heading = face the nearest graph segment  ← getNearestSegment(point, …, 200)
 4. car = new Car({ controlType: 'AI', x, y, angle, color: random })
          .load(selectedConfig)
-   car.name = `Car ${++spawnCount}`
+   car.name = String(++spawnCount)
 5. push to #cars and refresh the stats panel
 ```
 
@@ -941,6 +942,22 @@ spawns a car at the clicked world point:
 >
 > The spawn heading uses the same convention as the world-mode Start marking:
 > `angle = carAngleFromDirection(direction)`.
+
+### Bulk spawning
+
+The panel's "Spawn Traffic" section lets you drop many cars at once instead of
+one click at a time:
+
+- A `numInputRowHtml`/`wireNumInputRows` count field (the shared ±-button
+  numeric-input molecule, id `trafficSpawnCount`, 1–20,000) plus **1K** / **2K**
+  quick buttons and a **Spawn** button that reads the count field.
+- `#spawnRandomCars(count)` picks a road segment weighted by length, a random
+  point along it, and the correct heading (one-way segments always face their
+  direction; two-way segments pick a random side), so bulk-spawned cars start
+  out already obeying traffic direction.
+- `MAX_BULK_SPAWN = 20000` caps a single click; car-vs-car obstacle lookups use
+  the `#carCellIndex` grid (rebuilt once per `update()`) instead of an O(n²)
+  scan so large populations stay responsive.
 
 ### Car picker (unified Car selector)
 
@@ -969,11 +986,11 @@ other cars alike. The traffic simulator builds each alive car's obstacle set per
 frame via `queryBordersNearCar(this.#borderGrid, car)` (shared utility) and
 feeds it to `car.update(obstacles, trafficControls)`:
 
-| Obstacle source | Filtering                                                                     |
-| --------------- | ----------------------------------------------------------------------------- |
-| Road borders    | `SpatialHashGrid` broad phase + exact narrow-phase distance (sqrt-free)       |
-| Other cars      | Distance-filtered O(n²) scan (small populations) over **alive** cars          |
-| Traffic lights  | `TrafficControlGrid` broad phase + reach filter (only for traffic-aware cars) |
+| Obstacle source | Filtering                                                                          |
+| --------------- | ---------------------------------------------------------------------------------- |
+| Road borders    | `SpatialHashGrid` broad phase + exact narrow-phase distance (sqrt-free)            |
+| Other cars      | `#carCellIndex` grid broad phase (rebuilt once per `update()`) over **alive** cars |
+| Traffic lights  | `TrafficControlGrid` broad phase + reach filter (only for traffic-aware cars)      |
 
 The simulator owns a `TrafficControlGrid` rebuilt on world load (via
 `buildTrafficControls(world)`). Per frame, state-aware cars receive
@@ -989,18 +1006,19 @@ at all (free driving). When a car crashes it becomes **ghosted**:
 
 ### Statistics panel (`<traffic-panel>`)
 
-A side panel (`ts/simulator/traffic/trafficPanel.ts`) lists every placed car
+A side panel (`ts/ui/organisms/trafficPanel.ts`) lists every placed car
 and is a pure view over the simulator's `#cars` array:
 
 | Column / control | Content                                             |
 | ---------------- | --------------------------------------------------- |
 | Colour swatch    | Car colour (grey when crashed)                      |
-| Name             | `Car N`                                             |
+| Name             | Sequential number only (`car.name`, e.g. `1`, `2`)  |
 | Status           | 🟢 alive / 💥 crashed                               |
 | Speed            | Live `car.speed`                                    |
 | Distance         | `Math.round(car.fitness)` (accumulated travel)      |
 | Config (caret)   | Expandable, read-only view of the car's full config |
 | Remove (✕)       | Drops a single car                                  |
+| Unselect         | Clears the tracked car without removing it          |
 | Clear            | Drops all cars                                      |
 | Pause            | Toggles the simulation (drives `isPaused()`)        |
 
@@ -1008,14 +1026,30 @@ and is a pure view over the simulator's `#cars` array:
 clear); `refresh()` updates the live values in place every render frame without
 destroying expand state.
 
+A search input above the car list (`#trafficCarSearch`) filters the visible
+rows by name as you type — client-side only (`#applyFilter()` toggles each
+row's `display`), so it never touches `#cars`/removal/selection.
+
+### View controls
+
+There is no dedicated "View" panel section — both the main viewport and the
+mini-map zoom via mouse **scroll wheel**:
+
+- Main viewport: the usual `Viewport` wheel handler (see [Viewport.md](Viewport.md)).
+- Mini-map: a `wheel` listener on `this.miniMapCanvas` (added in the
+  `TrafficSimulator` constructor) calls `this.miniMap?.zoomIn()`/`zoomOut()`
+  based on `e.deltaY`'s sign.
+
 ### Interactions
 
-| Listener     | Effect                                                       |
-| ------------ | ------------------------------------------------------------ |
-| Select (row) | Track that car — viewport offset + `camera.move()` follow it |
-| Remove (✕)   | Splice the car out of `#cars` and rebuild the list           |
-| Clear        | Empty `#cars` and rebuild the list                           |
-| Pause        | Freeze `update()` (canvas keeps redrawing)                   |
+| Listener     | Effect                                                           |
+| ------------ | ---------------------------------------------------------------- |
+| Select (row) | Track that car — viewport offset + `camera.move()` follow it     |
+| Remove (✕)   | Splice the car out of `#cars` and rebuild the list               |
+| Unselect     | Clear the tracked car without removing it                        |
+| Clear        | Empty `#cars` and rebuild the list                               |
+| Pause        | Freeze `update()` (canvas keeps redrawing)                       |
+| Search       | Filter the visible rows by name (client-side, no `#cars` change) |
 
 ### Differences from the training simulator
 

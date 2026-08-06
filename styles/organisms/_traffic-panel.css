@@ -29,6 +29,24 @@
   padding: var(--space-1) 0;
 }
 
+.traffic-car-search {
+  width: 100%;
+  margin-bottom: var(--space-1\.5);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  padding: var(--radius-md) var(--space-1\.5);
+  font-size: var(--text-md);
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+}
+
+.traffic-car-search:focus {
+  outline: none;
+  border-color: var(--color-border-input-focus);
+  background: var(--color-bg-active);
+}
+
 .traffic-cars-list {
   display: flex;
   flex-direction: column;

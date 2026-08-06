@@ -218,7 +218,8 @@ scrolling **up/forward zooms in**, scrolling **down/back zooms out**. Because a
 higher `zoom` value means _more zoomed out_ (`ctx.scale(1/zoom, 1/zoom)`),
 scrolling up decreases `zoom` and scrolling down increases it.
 
-**Zoom range**: 0.8 (zoomed in) to 10 (zoomed out).
+**Zoom range**: 0.8 (zoomed in) to 30 (zoomed out — raised from 10 so a whole
+city of spawned traffic fits on screen; see the Live Traffic Jam simulator).
 
 ---
 
@@ -290,10 +291,16 @@ class MiniMap {
   canvas: HTMLCanvasElement;
   graph: Graph;
   size: number; // Canvas dimension (square)
-  scaler: number; // World-to-minimap scale factor (default: 0.05)
+  #scaler: number; // World-to-minimap scale factor (default: 0.05)
 
   constructor(canvas, graph, size, scaler?);
   draw(options: MiniMapDrawOptions): void;
+
+  // Scroll-to-zoom support (e.g. TrafficSimulator's wheel listener on the
+  // mini-map canvas). Clamped to [0.005, 0.3], stepped by ×1.25 per call.
+  getScaler(): number;
+  zoomIn(): void;
+  zoomOut(): void;
 }
 
 interface MiniMapDrawOptions {
