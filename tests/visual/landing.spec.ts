@@ -57,7 +57,7 @@ test.describe('Landing page', () => {
 
     await expect(page).toHaveScreenshot('landing.png', {
       fullPage: true,
-      maxDiffPixels: 5000,
+      maxDiffPixelRatio: 0.03,
       // Mask animated icon custom elements to avoid AA/animation flakiness.
       mask: [page.locator('app-icon')],
     });

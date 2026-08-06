@@ -78,9 +78,9 @@
   /* ══════════════════════════════════════════════
      Typography
      ══════════════════════════════════════════════ */
-  --font-ui: 'Inter', sans-serif;
+  --font-ui: 'Space Grotesk', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --font-display: 'Inter', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
 
   --text-xs: 9px;
   --text-sm: 10px;

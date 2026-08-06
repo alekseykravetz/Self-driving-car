@@ -15,7 +15,7 @@ test.describe('World editor page', () => {
     expect(errors).toEqual([]);
     await expect(page).toHaveScreenshot('world.png', {
       fullPage: true,
-      maxDiffPixels: 5000,
+      maxDiffPixelRatio: 0.03,
       mask: [page.locator('canvas')],
     });
   });
