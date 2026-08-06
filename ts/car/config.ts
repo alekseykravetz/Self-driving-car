@@ -18,3 +18,29 @@ export const DEFAULT_CAR_CONFIG = {
     rayOffset: 0,
   },
 };
+
+/**
+ * Selects the physics engine used to translate control input into
+ * speed/heading changes. 'arcade' is the original flat-friction,
+ * constant-turn-rate model (kept for backward compatibility with existing
+ * saved brains). 'realistic' adds speed-dependent steering, drag, braking,
+ * and an engine power curve. Cars/saves without an explicit value default to
+ * 'arcade' (see `Car` constructor and `load()`).
+ */
+export type PhysicsModel = 'arcade' | 'realistic';
+
+/**
+ * Bicycle-model turn-rate constant (rad per px/frame of speed): calibrated so
+ * a car at the default maxSpeed turns at the legacy STEERING_SPEED rate, but
+ * turn rate now scales with actual speed instead of being constant — this
+ * keeps the turning radius roughly fixed rather than making a slow car pivot
+ * in place like a tank.
+ */
+export const REALISTIC_STEER_RATE =
+  STEERING_SPEED / DEFAULT_CAR_CONFIG.maxSpeed;
+
+/** Braking (accel/reverse opposing current motion) is this many times stronger than engine acceleration. */
+export const REALISTIC_BRAKE_FORCE_RATIO = 3;
+
+/** Exponent controlling how sharply engine acceleration tapers off as speed nears maxSpeed. */
+export const REALISTIC_ENGINE_TAPER_EXPONENT = 2;

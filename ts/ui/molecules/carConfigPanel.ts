@@ -16,6 +16,7 @@ export class CarConfigPanel {
   #carRaySpreadInput: HTMLInputElement | null = null;
   #carRayOffsetInput: HTMLInputElement | null = null;
   #carStateAwareCheck: HTMLInputElement | null = null;
+  #carRealisticPhysicsCheck: HTMLInputElement | null = null;
   #carHiddenLayersInput: HTMLInputElement | null = null;
   #carConfigSection: HTMLElement | null = null;
   #carConfigToggle: HTMLElement | null = null;
@@ -45,6 +46,7 @@ export class CarConfigPanel {
     this.#carRaySpreadInput = host.querySelector('#carRaySpread');
     this.#carRayOffsetInput = host.querySelector('#carRayOffset');
     this.#carStateAwareCheck = host.querySelector('#carStateAware');
+    this.#carRealisticPhysicsCheck = host.querySelector('#carRealisticPhysics');
     this.#carHiddenLayersInput = host.querySelector('#carHiddenLayers');
     this.#carConfigSection = host.querySelector('#carConfigSection');
     this.#carConfigToggle = host.querySelector('#carConfigToggle');
@@ -100,6 +102,7 @@ export class CarConfigPanel {
       this.#carRayOffsetInput,
       this.#carHiddenLayersInput,
       this.#carStateAwareCheck,
+      this.#carRealisticPhysicsCheck,
     ];
     for (const input of carParamInputs) {
       if (input) {
@@ -160,6 +163,11 @@ export class CarConfigPanel {
         'State Aware',
         this.#carStateAwareCheck?.checked ? 'yes' : 'no',
       ],
+      [
+        'bolt',
+        'Physics',
+        this.#carRealisticPhysicsCheck?.checked ? 'realistic' : 'arcade',
+      ],
     ];
     this.#carConfigSummary.innerHTML = items
       .map(
@@ -197,6 +205,9 @@ export class CarConfigPanel {
         true,
       ),
       hiddenLayers,
+      physicsModel: this.#carRealisticPhysicsCheck?.checked
+        ? 'realistic'
+        : 'arcade',
       sensor: {
         rayCount: this.#readNumericInput(this.#carRayCountInput, 5, true),
         rayLength: this.#readNumericInput(this.#carRayLengthInput, 150, true),
@@ -238,6 +249,10 @@ export class CarConfigPanel {
       this.#carRayOffsetInput.value = String(info.sensor.rayOffset);
     if (this.#carStateAwareCheck) {
       this.#carStateAwareCheck.checked = info.sensor.stateAware ?? false;
+    }
+    if (this.#carRealisticPhysicsCheck) {
+      this.#carRealisticPhysicsCheck.checked =
+        info.physicsModel === 'realistic';
     }
     this.#updateCarConfigSummary();
   }

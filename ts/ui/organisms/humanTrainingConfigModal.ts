@@ -100,6 +100,12 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
     if (saCheck) {
       saCheck.checked = c.sensor.stateAware ?? false;
     }
+    const rpCheck = this.querySelector<HTMLInputElement>(
+      '#htcCarRealisticPhysics',
+    );
+    if (rpCheck) {
+      rpCheck.checked = c.physicsModel === 'realistic';
+    }
   }
 
   #readCarConfig(): CarInfo {
@@ -116,6 +122,11 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
       width: this.#num('#htcCarWidth', DEFAULT_CAR_CONFIG.width, true),
       height: this.#num('#htcCarHeight', DEFAULT_CAR_CONFIG.height, true),
       hiddenLayers: hidden,
+      physicsModel: this.querySelector<HTMLInputElement>(
+        '#htcCarRealisticPhysics',
+      )?.checked
+        ? 'realistic'
+        : 'arcade',
       sensor: {
         rayCount: this.#num('#htcCarRayCount', 5, true),
         rayLength: this.#num('#htcCarRayLength', 150, true),
@@ -141,6 +152,10 @@ export class HumanTrainingConfigModalElement extends HTMLElement {
     });
     const saCheck = this.querySelector<HTMLInputElement>('#htcCarStateAware');
     if (saCheck) saCheck.disabled = locked;
+    const rpCheck = this.querySelector<HTMLInputElement>(
+      '#htcCarRealisticPhysics',
+    );
+    if (rpCheck) rpCheck.disabled = locked;
   }
 
   #parseHiddenLayers(value: string): number[] {

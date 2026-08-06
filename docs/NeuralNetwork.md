@@ -269,7 +269,7 @@ starts fresh.
 
 A config modal (`<human-training-config-modal>`) shown on entry and via a
 "Config" button lets the user set all car/sensor parameters (height, width,
-hidden layers, max speed, accel, friction, ray count/length/spread/offset,
+hidden layers, max speed, accel, friction, physics model, ray count/length/spread/offset,
 state-aware checkbox). When a saved brain exists, the config is locked (brain
 topology is fixed by the saved sensor/hidden-layer dims); "Reset brain" unlocks
 it.

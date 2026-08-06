@@ -1,5 +1,5 @@
 import { TRAINING_INIT_MODAL_TEMPLATE } from './trainingInitModalTemplate.js';
-import { DEFAULT_CAR_CONFIG } from '../../car/config.js';
+import { DEFAULT_CAR_CONFIG, DEFAULT_HIDDEN_LAYERS } from '../../car/config.js';
 import type { CarInfo } from '../../car/car.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { CarLoader } from '../../car/loader/carLoader.js';
@@ -31,6 +31,8 @@ export interface TrainingInitResult {
 export interface TrainingInitOpenOptions {
   context: 'entry' | 'new';
   defaults: TrainingInitDefaults;
+  /** World-mode training (real OSM road scale) gets realistic-physics defaults on 'fresh'; simple mode keeps arcade defaults. */
+  isWorldMode: boolean;
   onStart: (result: TrainingInitResult) => void;
   onCancel: () => void;
 }
@@ -47,6 +49,7 @@ export class TrainingInitModalElement extends HTMLElement {
   #storedPool: CarInfo[] = [];
   #selectedCars: CarInfo[] = [];
   #keyboardManager: KeyboardManager | null = null;
+  #isWorldMode = true;
 
   constructor() {
     super();
@@ -62,6 +65,7 @@ export class TrainingInitModalElement extends HTMLElement {
   /** Show the modal, prefilled from `defaults`, and report the choice. */
   open(options: TrainingInitOpenOptions): void {
     this.#options = options;
+    this.#isWorldMode = options.isWorldMode;
 
     const titleEl = this.querySelector<HTMLElement>('#tiTitle');
     const subtitleEl = this.querySelector<HTMLElement>('#tiSubtitle');
@@ -156,6 +160,12 @@ export class TrainingInitModalElement extends HTMLElement {
     const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
     if (saCheck) {
       saCheck.checked = c.sensor.stateAware ?? false;
+    }
+    const rpCheck = this.querySelector<HTMLInputElement>(
+      '#tiCarRealisticPhysics',
+    );
+    if (rpCheck) {
+      rpCheck.checked = c.physicsModel === 'realistic';
     }
   }
 
@@ -301,8 +311,11 @@ export class TrainingInitModalElement extends HTMLElement {
     if (sourceConfig) {
       this.#fillCarConfig(sourceConfig);
       if (note) note.textContent = '(locked to brain source)';
-    } else if (note) {
-      note.textContent = '';
+    } else {
+      if (source === 'fresh' && this.#isWorldMode) {
+        this.#fillCarConfig(this.#freshCarDefaults());
+      }
+      if (note) note.textContent = '';
     }
 
     // Sync pool size to the number of cars in the chosen source.
@@ -313,6 +326,26 @@ export class TrainingInitModalElement extends HTMLElement {
     }
 
     this.#setConfigLocked(sourceConfig !== null);
+  }
+
+  /** Recommended config for a fresh brain in world mode: real OSM road scale calls for the realistic physics model. */
+  #freshCarDefaults(): CarInfo {
+    return {
+      maxSpeed: DEFAULT_CAR_CONFIG.maxSpeed,
+      acceleration: DEFAULT_CAR_CONFIG.acceleration,
+      friction: DEFAULT_CAR_CONFIG.friction,
+      width: DEFAULT_CAR_CONFIG.width,
+      height: DEFAULT_CAR_CONFIG.height,
+      hiddenLayers: DEFAULT_HIDDEN_LAYERS,
+      physicsModel: 'realistic',
+      sensor: {
+        rayCount: DEFAULT_CAR_CONFIG.sensor.rayCount,
+        rayLength: DEFAULT_CAR_CONFIG.sensor.rayLength,
+        raySpread: DEFAULT_CAR_CONFIG.sensor.raySpread,
+        rayOffset: DEFAULT_CAR_CONFIG.sensor.rayOffset,
+        stateAware: false,
+      },
+    };
   }
 
   #setConfigLocked(locked: boolean): void {
@@ -328,6 +361,10 @@ export class TrainingInitModalElement extends HTMLElement {
     });
     const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
     if (saCheck) saCheck.disabled = locked;
+    const rpCheck = this.querySelector<HTMLInputElement>(
+      '#tiCarRealisticPhysics',
+    );
+    if (rpCheck) rpCheck.disabled = locked;
   }
 
   // ── Result ───────────────────────────────────────────
@@ -379,6 +416,11 @@ export class TrainingInitModalElement extends HTMLElement {
       width: this.#num('#tiCarWidth', DEFAULT_CAR_CONFIG.width, true),
       height: this.#num('#tiCarHeight', DEFAULT_CAR_CONFIG.height, true),
       hiddenLayers: hidden,
+      physicsModel: this.querySelector<HTMLInputElement>(
+        '#tiCarRealisticPhysics',
+      )?.checked
+        ? 'realistic'
+        : 'arcade',
       sensor: {
         rayCount: this.#num('#tiCarRayCount', 5, true),
         rayLength: this.#num('#tiCarRayLength', 150, true),

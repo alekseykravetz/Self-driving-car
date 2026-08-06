@@ -1,4 +1,8 @@
-import { REVERSE_SPEED_RATIO } from '../config.js';
+import {
+  REVERSE_SPEED_RATIO,
+  REALISTIC_BRAKE_FORCE_RATIO,
+  REALISTIC_ENGINE_TAPER_EXPONENT,
+} from '../config.js';
 import { polysIntersect } from '../../math/collision.js';
 import type { Point } from '../../math/primitives/point.js';
 import type { CarState, ControlsState } from '../carState.js';
@@ -11,7 +15,11 @@ export class CarPhysics {
   ): boolean {
     if (state.damaged) return false;
 
-    this.#move(state, controls);
+    if (state.physicsModel === 'realistic') {
+      this.#moveRealistic(state, controls);
+    } else {
+      this.#move(state, controls);
+    }
     state.fitness += state.speed;
     state.polygon = this.createPolygon(state);
 
@@ -46,6 +54,58 @@ export class CarPhysics {
     }
     if (Math.abs(state.speed) < state.friction) {
       state.speed = 0;
+    }
+
+    state.x -= Math.sin(state.angle) * state.speed;
+    state.y -= Math.cos(state.angle) * state.speed;
+  }
+
+  /**
+   * Braking (moving against current motion) is stronger than the engine, and
+   * engine acceleration tapers off as speed nears its cap (real engines lose
+   * power near top speed). Drag is speed-dependent: a constant rolling-
+   * resistance term plus an aerodynamic term that grows with speed², scaled
+   * so it roughly matches rolling resistance at maxSpeed.
+   */
+  #moveRealistic(state: CarState, controls: ControlsState): void {
+    const reverseMax = state.maxSpeed * REVERSE_SPEED_RATIO;
+
+    if (controls.forward) {
+      if (state.speed < 0) {
+        state.speed += state.acceleration * REALISTIC_BRAKE_FORCE_RATIO;
+      } else {
+        const taper = Math.max(
+          0,
+          1 - (state.speed / state.maxSpeed) ** REALISTIC_ENGINE_TAPER_EXPONENT,
+        );
+        state.speed += state.acceleration * taper;
+      }
+    }
+    if (controls.reverse) {
+      if (state.speed > 0) {
+        state.speed -= state.acceleration * REALISTIC_BRAKE_FORCE_RATIO;
+      } else {
+        const taper = Math.max(
+          0,
+          1 - (-state.speed / reverseMax) ** REALISTIC_ENGINE_TAPER_EXPONENT,
+        );
+        state.speed -= state.acceleration * taper;
+      }
+    }
+
+    if (state.speed > state.maxSpeed) {
+      state.speed = state.maxSpeed;
+    }
+    if (state.speed < -reverseMax) {
+      state.speed = -reverseMax;
+    }
+
+    const aeroCoeff = state.friction / (state.maxSpeed * state.maxSpeed);
+    const drag = state.friction + aeroCoeff * state.speed * state.speed;
+    if (state.speed > 0) {
+      state.speed = Math.max(0, state.speed - drag);
+    } else if (state.speed < 0) {
+      state.speed = Math.min(0, state.speed + drag);
     }
 
     state.x -= Math.sin(state.angle) * state.speed;

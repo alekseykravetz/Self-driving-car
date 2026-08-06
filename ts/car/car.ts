@@ -15,6 +15,8 @@ import {
   DEFAULT_CAR_CONFIG,
   NN_OUTPUT_COUNT,
   DEFAULT_HIDDEN_LAYERS,
+  REALISTIC_STEER_RATE,
+  type PhysicsModel,
 } from './config.js';
 import type { Point } from '../math/primitives/point.js';
 import type { ControlsState } from './carState.js';
@@ -29,6 +31,7 @@ export interface CarInfo {
   width: number;
   height: number;
   hiddenLayers?: number[];
+  physicsModel?: PhysicsModel;
   sensor: {
     rayCount: number;
     raySpread: number;
@@ -50,6 +53,7 @@ export interface CarOptions {
   friction?: number;
   color?: string;
   hiddenLayers?: number[];
+  physicsModel?: PhysicsModel;
   sensor?: {
     rayCount?: number;
     raySpread?: number;
@@ -71,6 +75,7 @@ export class Car {
   color: string;
   useBrain: boolean;
   hiddenLayers: number[];
+  physicsModel: PhysicsModel;
 
   x: number;
   y: number;
@@ -120,6 +125,7 @@ export class Car {
 
     this.fitness = 0;
     this.hiddenLayers = opts.hiddenLayers ?? DEFAULT_HIDDEN_LAYERS;
+    this.physicsModel = opts.physicsModel ?? 'arcade';
 
     this.useBrain = opts.controlType === 'AI';
 
@@ -165,6 +171,9 @@ export class Car {
     }
     if (info.hiddenLayers) {
       this.hiddenLayers = [...info.hiddenLayers];
+    }
+    if (info.physicsModel) {
+      this.physicsModel = info.physicsModel;
     }
     const dimsChanged =
       (info.width && info.width !== this.width) ||
@@ -215,6 +224,7 @@ export class Car {
       width: this.width,
       height: this.height,
       hiddenLayers: [...this.hiddenLayers],
+      physicsModel: this.physicsModel,
       sensor: {
         rayCount: this.sensor?.rayCount ?? DEFAULT_CAR_CONFIG.sensor.rayCount,
         raySpread:
@@ -231,18 +241,23 @@ export class Car {
   #applySteering(): void {
     if (this.speed === 0) return;
 
+    const turnRate =
+      this.physicsModel === 'realistic'
+        ? REALISTIC_STEER_RATE * Math.abs(this.speed)
+        : STEERING_SPEED;
+
     if (
       this.controls instanceof CameraControls ||
       (this.controls instanceof PhoneControls && this.controls.tilt !== 0)
     ) {
-      this.angle -= this.controls.tilt * STEERING_SPEED;
+      this.angle -= this.controls.tilt * turnRate;
     } else {
       const flip = this.speed > 0 ? 1 : -1;
       if ((this.controls as Controls).left) {
-        this.angle += STEERING_SPEED * flip;
+        this.angle += turnRate * flip;
       }
       if ((this.controls as Controls).right) {
-        this.angle -= STEERING_SPEED * flip;
+        this.angle -= turnRate * flip;
       }
     }
   }

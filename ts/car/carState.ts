@@ -1,4 +1,5 @@
 import type { Point } from '../math/primitives/point.js';
+import type { PhysicsModel } from './config.js';
 
 export interface ControlsState {
   forward: boolean;
@@ -18,4 +19,5 @@ export interface CarState {
   damaged: boolean;
   fitness: number;
   polygon: Point[];
+  physicsModel: PhysicsModel;
 }

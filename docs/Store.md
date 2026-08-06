@@ -106,6 +106,7 @@ Pure JSON object matching the `CarInfo` interface:
   "acceleration": 0.08,
   "maxSpeed": 8,
   "friction": 0.04,
+  "physicsModel": "arcade",
   "sensor": { "rayCount": 2, "rayLength": 350, "raySpread": 0.8, "rayOffset": -0.4 },
   "brain": { "levels": [...] }
 }
