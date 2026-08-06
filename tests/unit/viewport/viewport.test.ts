@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Viewport } from '../../../ts/viewport/viewport.js';
+import { Point } from '../../../ts/math/primitives/point.js';
 
 /**
  * `getVisibleBounds()` is pure math over `this.canvas`, `this.zoom`, and
@@ -64,5 +65,41 @@ describe('Viewport.getVisibleBounds', () => {
     expect(bounds.maxX).toBe(700);
     expect(bounds.minY).toBe(-800);
     expect(bounds.maxY).toBe(200);
+  });
+});
+
+describe('Viewport.getZoom', () => {
+  it('returns the current zoom level', () => {
+    const self = { zoom: 3.5 };
+    expect(Viewport.prototype.getZoom.call(self as never)).toBe(3.5);
+  });
+});
+
+/**
+ * `getMouse()` doesn't touch the private `#drag` field unless
+ * `subtractDragOffset` is true, so the default-arg call path is safely
+ * exercised on a fake `this` without constructing a real Viewport.
+ */
+describe('Viewport.getMouse', () => {
+  it('converts a MouseEvent screen position to world coordinates', () => {
+    const self = {
+      center: new Point(400, 300),
+      zoom: 2,
+      offset: new Point(-50, 25),
+    };
+    const fakeEvent = { offsetX: 500, offsetY: 350 } as MouseEvent;
+    const p = Viewport.prototype.getMouse.call(self as never, fakeEvent);
+    // ((500 - 400) * 2) - (-50) = 200 + 50 = 250
+    expect(p.x).toBe(250);
+    // ((350 - 300) * 2) - 25 = 100 - 25 = 75
+    expect(p.y).toBe(75);
+  });
+});
+
+describe('Viewport.setMode', () => {
+  it('sets the mode field', () => {
+    const self: { mode: string } = { mode: 'mouse' };
+    Viewport.prototype.setMode.call(self as never, 'touchpad');
+    expect(self.mode).toBe('touchpad');
   });
 });
