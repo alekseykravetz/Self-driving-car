@@ -1,10 +1,10 @@
 import { Graph } from '../math/graph/graph.js';
 import { Point } from '../math/primitives/point.js';
-import { Viewport } from '../viewport/viewport.js';
 import { ScaleIndicator } from '../viewport/scaleIndicator.js';
 import { scale } from '../math/utils.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPoint } from '../rendering/pointRenderer.js';
+import { WORLD_PIXELS_PER_METER } from '../math/worldUnits.js';
 
 export interface IMiniMapCar {
   x: number;
@@ -19,8 +19,16 @@ export interface MiniMapDrawOptions {
   roadColor?: string;
   carColor?: string;
   backgroundColor?: string;
-  viewport?: Viewport;
+  /**
+   * Current zoom of the main top-down viewport. When provided, the mini-map
+   * follows the main viewport's zoom changes proportionally — a one-way sync:
+   * zooming the mini-map itself (via {@link MiniMap#zoomIn} /
+   * {@link MiniMap#zoomOut}) never affects the main viewport.
+   */
+  mainViewportZoom?: number;
   compactScaleIndicator?: boolean;
+  /** Whether to draw the scale-indicator overlay. Defaults to true. */
+  showScaleIndicator?: boolean;
 }
 
 /** Smallest world-to-minimap scale (most zoomed out). */
@@ -37,6 +45,9 @@ export class MiniMap {
   #scaler: number;
   #ctx: CanvasRenderingContext2D;
   #scaleIndicator: ScaleIndicator | null = null;
+  // Last main-viewport zoom seen by #syncToMainZoom, used to compute the
+  // proportional scaler change on the next call (one-way sync).
+  #lastMainZoom: number | null = null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -74,6 +85,18 @@ export class MiniMap {
     this.#setScaler(this.#scaler / SCALER_ZOOM_FACTOR);
   }
 
+  /**
+   * Follows the main viewport's zoom proportionally (one-way sync — never
+   * writes back to the main viewport). Call every frame with the main
+   * viewport's current `zoom`; the first call just records the baseline.
+   */
+  #syncToMainZoom(mainZoom: number): void {
+    if (this.#lastMainZoom !== null && mainZoom !== this.#lastMainZoom) {
+      this.#setScaler(this.#scaler * (this.#lastMainZoom / mainZoom));
+    }
+    this.#lastMainZoom = mainZoom;
+  }
+
   draw(options: MiniMapDrawOptions): void {
     const {
       viewPoint,
@@ -81,9 +104,14 @@ export class MiniMap {
       roadColor = 'white',
       carColor = 'blue',
       backgroundColor,
-      viewport,
+      mainViewportZoom,
       compactScaleIndicator = true,
+      showScaleIndicator = true,
     } = options;
+
+    if (mainViewportZoom !== undefined) {
+      this.#syncToMainZoom(mainViewportZoom);
+    }
 
     // When a backgroundColor is given, paint it onto the canvas itself rather
     // than leaving the pixels transparent and relying on the CSS background.
@@ -144,20 +172,23 @@ export class MiniMap {
       outline: true,
     });
 
-    if (viewport) {
+    if (showScaleIndicator) {
       if (!this.#scaleIndicator) {
+        // Adapter over the mini-map's own scaler — always live, so it needs
+        // no external Viewport instance and no stale multiplier options.
         this.#scaleIndicator = new ScaleIndicator(
           this.#size,
           this.#size,
-          viewport,
+          {
+            getZoom: () => this.#scaler,
+            getPixelsPerMeter: () => WORLD_PIXELS_PER_METER * this.#scaler,
+          },
           {
             paddingX: compactScaleIndicator ? 6 : 20,
             paddingY: compactScaleIndicator ? 6 : 20,
             fontSize: compactScaleIndicator ? 9 : 12,
             lineWidth: compactScaleIndicator ? 1 : 2,
             scaleInMeters: 100,
-            pixelsPerMeterMultiplier: this.#scaler,
-            zoomMultiplier: this.#scaler,
             inlineStats: compactScaleIndicator,
             statSeparator: ' • ',
           },
@@ -170,4 +201,26 @@ export class MiniMap {
       );
     }
   }
+}
+
+/**
+ * Wires scroll-wheel zoom on a mini-map canvas. Only ever changes the
+ * mini-map's own scale — the main viewport is synced the other way, via
+ * {@link MiniMap#draw}'s `mainViewportZoom` option, never from the mini-map.
+ * `getMiniMap` is called lazily so this keeps working across mini-map
+ * instances recreated on world/mode reload.
+ */
+export function wireMiniMapWheelZoom(
+  canvas: HTMLCanvasElement,
+  getMiniMap: () => MiniMap | null,
+): void {
+  canvas.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      if (e.deltaY < 0) getMiniMap()?.zoomIn();
+      else if (e.deltaY > 0) getMiniMap()?.zoomOut();
+    },
+    { passive: false },
+  );
 }

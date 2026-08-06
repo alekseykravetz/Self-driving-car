@@ -18,7 +18,7 @@ import { Car } from '../../car/car.js';
 import type { SensorTrafficControl } from '../../car/sensors/sensor.js';
 import { Viewport } from '../../viewport/viewport.js';
 import { Camera } from '../../camera/camera.js';
-import { MiniMap } from '../../mini-map/miniMap.js';
+import { MiniMap, wireMiniMapWheelZoom } from '../../mini-map/miniMap.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { getRandomColor } from '../../math/color.js';
 import { buildRoadBorders, queryBordersNearCar } from '../spatialGridUtils.js';
@@ -120,15 +120,7 @@ export class TrafficSimulator extends SimulatorShell {
     );
 
     // Scroll-to-zoom the mini-map (the main viewport already zooms on wheel).
-    this.miniMapCanvas.addEventListener(
-      'wheel',
-      (e) => {
-        e.preventDefault();
-        if (e.deltaY < 0) this.miniMap?.zoomIn();
-        else if (e.deltaY > 0) this.miniMap?.zoomOut();
-      },
-      { passive: false },
-    );
+    wireMiniMapWheelZoom(this.miniMapCanvas, () => this.miniMap);
 
     // 'R' (reverse heading) and 'G' (green wave) shortcuts are registered
     // via KeyboardManager in #initToolbar().
@@ -545,8 +537,9 @@ export class TrafficSimulator extends SimulatorShell {
             roadColor: '#BBB',
             carColor: 'red',
             backgroundColor: '#2a5',
+            mainViewportZoom: this.viewport.zoom,
           }
-        : { viewPoint, cars: this.#cars },
+        : { viewPoint, cars: this.#cars, mainViewportZoom: this.viewport.zoom },
     );
 
     this.drawNetworkVisualizer(

@@ -202,6 +202,10 @@
 /* ── human-training-panel ──────────────────────────────────────────── */
 human-training-panel {
   display: flex;
+  /* Match #rightPanel's order:10 so the panel sits at the far right of the
+     flex row (the inner #trainingManagerPanel order below is irrelevant to the
+     outer layout, since it is a child of this element, not of #simulatorLayout). */
+  order: 20;
 }
 
 human-training-panel #trainingManagerPanel {

@@ -1036,9 +1036,17 @@ There is no dedicated "View" panel section — both the main viewport and the
 mini-map zoom via mouse **scroll wheel**:
 
 - Main viewport: the usual `Viewport` wheel handler (see [Viewport.md](Viewport.md)).
-- Mini-map: a `wheel` listener on `this.miniMapCanvas` (added in the
-  `TrafficSimulator` constructor) calls `this.miniMap?.zoomIn()`/`zoomOut()`
-  based on `e.deltaY`'s sign.
+- Mini-map: scroll-to-zoom is wired by the shared `wireMiniMapWheelZoom(canvas,
+() => this.miniMap)` helper (`ts/mini-map/miniMap.ts`), called once in the
+  constructor of **every** simulator (training, human-backprop, traffic, race)
+  and the world editor. It calls `miniMap.zoomIn()`/`zoomOut()` on `e.deltaY`'s
+  sign and only ever changes the mini-map's own scale.
+
+Zoom sync is **one-way**: each `miniMap.draw()` call passes
+`mainViewportZoom: this.viewport.zoom`, so zooming the main viewport scales the
+mini-map proportionally, while zooming the mini-map never affects the main
+viewport. The mini-map's `ScaleIndicator` overlay is drawn by default on every
+simulator. See [Viewport.md](Viewport.md#one-way-zoom-sync) for details.
 
 ### Interactions
 

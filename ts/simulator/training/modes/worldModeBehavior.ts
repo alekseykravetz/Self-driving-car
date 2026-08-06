@@ -272,8 +272,9 @@ export class WorldTrainingStrategy {
             roadColor: '#BBB',
             carColor: 'red',
             backgroundColor: '#2a5',
+            mainViewportZoom: this.#parent.viewport.zoom,
           }
-        : { viewPoint, cars },
+        : { viewPoint, cars, mainViewportZoom: this.#parent.viewport.zoom },
     );
 
     const shownCar = keysCar ?? bestCar;

@@ -296,8 +296,8 @@ class MiniMap {
   constructor(canvas, graph, size, scaler?);
   draw(options: MiniMapDrawOptions): void;
 
-  // Scroll-to-zoom support (e.g. TrafficSimulator's wheel listener on the
-  // mini-map canvas). Clamped to [0.005, 0.3], stepped by ×1.25 per call.
+  // Scroll-to-zoom support (wired on every simulator + the world editor via
+  // `wireMiniMapWheelZoom`). Clamped to [0.005, 0.3], stepped by ×1.25 per call.
   getScaler(): number;
   zoomIn(): void;
   zoomOut(): void;
@@ -309,8 +309,9 @@ interface MiniMapDrawOptions {
   roadColor?: string;
   carColor?: string;
   backgroundColor?: string;
-  viewport?: Viewport; // When provided, draws a ScaleIndicator overlay
+  mainViewportZoom?: number; // Main viewport zoom for one-way sync (see below)
   compactScaleIndicator?: boolean; // true = inline mode (default), false = standard mode
+  showScaleIndicator?: boolean; // Draw the ScaleIndicator overlay (default: true)
 }
 ```
 
@@ -318,7 +319,39 @@ interface MiniMapDrawOptions {
 > rather than stored on the instance. `World.draw()` follows the same pattern —
 > cars/bestCar are `WorldDrawOptions` inputs, not `World` fields.
 
-When `viewport` is passed in `MiniMapDrawOptions`, a `ScaleIndicator` is lazy-initialized on first call and drawn in compact inline mode by default. The indicator uses the mini-map's own `scaler` as both `pixelsPerMeterMultiplier` and `zoomMultiplier` so the bar length and zoom text correctly reflect the mini-map scale.
+### Scale indicator (always on)
+
+The `ScaleIndicator` overlay is drawn by default (`showScaleIndicator` defaults
+to `true`) on **every** mini-map — all simulators (training, human-backprop,
+traffic, race) and the world editor — not just the world editor. It is
+lazy-initialized on first `draw()` and rendered in compact inline mode by
+default. The mini-map drives the indicator through a small `ZoomSource` adapter
+over its own live `#scaler` (`getZoom()` / `getPixelsPerMeter()`), so the bar
+length and zoom text always reflect the current mini-map scale — no external
+`Viewport` instance is needed.
+
+### One-way zoom sync
+
+Pass `mainViewportZoom` (the main top-down viewport's current `zoom`) every
+frame to keep the mini-map's scale following the main viewport **proportionally
+and one-way**:
+
+- Zooming the **main viewport** (scroll over the game canvas) scales the
+  mini-map by the same factor.
+- Zooming the **mini-map** (scroll over the mini-map canvas, via
+  `wireMiniMapWheelZoom`) only changes the mini-map's own scaler — it **never**
+  writes back to the main viewport.
+
+Internally, `#syncToMainZoom(mainZoom)` records the last main zoom it saw and, on
+the next differing value, multiplies the mini-map scaler by
+`lastMainZoom / mainZoom`. The first call just records the baseline. This holds
+identically in the world editor and all simulators.
+
+```typescript
+// Wire scroll-to-zoom once (constructor). getMiniMap is lazy so it survives
+// mini-map instances recreated on world/mode reload.
+wireMiniMapWheelZoom(this.miniMapCanvas, () => this.miniMap);
+```
 
 ### Rendering
 
@@ -362,7 +395,11 @@ draw(options: MiniMapDrawOptions): void {
 this.miniMap = new MiniMap(miniMapCanvas, world.graph, 300);
 
 // Each frame (cars passed in, not stored):
-this.miniMap.draw({ viewPoint, cars: this.trainingManager.cars });
+this.miniMap.draw({
+  viewPoint,
+  cars: this.trainingManager.cars,
+  mainViewportZoom: this.viewport.zoom,
+});
 ```
 
 ### Usage in Race
@@ -373,7 +410,11 @@ const miniMapGraph = new Graph([], world.corridor.skeleton);
 this.miniMap = new MiniMap(miniMapCanvas, miniMapGraph, 300, 0.1);
 
 // Each frame:
-this.miniMap.draw({ viewPoint, cars: this.cars });
+this.miniMap.draw({
+  viewPoint,
+  cars: this.cars,
+  mainViewportZoom: this.viewport.zoom,
+});
 ```
 
 ---
@@ -399,11 +440,18 @@ interface ScaleIndicatorOptions {
   statSeparator?: string; // Separator in inline mode (default: ' • ')
 }
 
+// A ScaleIndicator only needs a zoom source, not a full Viewport. `Viewport`
+// implements this; the mini-map supplies a small adapter over its own scaler.
+interface ZoomSource {
+  getZoom(): number;
+  getPixelsPerMeter(): number;
+}
+
 class ScaleIndicator {
   constructor(
     canvasWidth: number,
     canvasHeight: number,
-    viewport: Viewport,
+    viewport: ZoomSource,
     options?: ScaleIndicatorOptions,
   );
 
@@ -444,14 +492,17 @@ Zoom and scale on one line after the bar. Smaller font and padding.
 this.viewport.drawScaleIndicator(this.gameCtx);
 ```
 
-For mini-map, pass the mini-map's own viewport in draw options:
+The mini-map builds its own `ScaleIndicator` from a `ZoomSource` adapter over
+its live scaler (no separate `Viewport` needed). Callers just pass
+`mainViewportZoom` for the one-way sync; the indicator shows by default:
 
 ```typescript
 this.miniMap.draw({
   viewPoint,
   cars: [],
-  viewport: this.miniMapViewport,
+  mainViewportZoom: this.viewport.zoom,
   compactScaleIndicator: true,
+  // showScaleIndicator defaults to true — pass false to hide it
 });
 ```
 

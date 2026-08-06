@@ -1,4 +1,12 @@
-import { Viewport } from './viewport.js';
+/**
+ * Minimal interface required to drive a {@link ScaleIndicator}. Implemented by
+ * {@link Viewport}; the mini-map satisfies it with a small adapter over its
+ * own zoom scaler instead of needing a real `Viewport` instance.
+ */
+export interface ZoomSource {
+  getZoom(): number;
+  getPixelsPerMeter(): number;
+}
 
 export interface ScaleIndicatorOptions {
   paddingX?: number;
@@ -16,7 +24,7 @@ export interface ScaleIndicatorOptions {
 
 export class ScaleIndicator {
   #canvasHeight: number;
-  #viewport: Viewport;
+  #viewport: ZoomSource;
   #options: Required<ScaleIndicatorOptions>;
 
   public position = { x: 20, y: 20 };
@@ -27,7 +35,7 @@ export class ScaleIndicator {
   constructor(
     canvasWidth: number,
     canvasHeight: number,
-    viewport: Viewport,
+    viewport: ZoomSource,
     options: ScaleIndicatorOptions = {},
   ) {
     this.#canvasHeight = canvasHeight;

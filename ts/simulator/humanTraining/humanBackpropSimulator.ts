@@ -18,7 +18,7 @@ import { Graph } from '../../math/graph/graph.js';
 import { SimpleWorld } from '../../world/simple/simpleWorld.js';
 import { Start } from '../../world/markings/start.js';
 import { Viewport } from '../../viewport/viewport.js';
-import { MiniMap } from '../../mini-map/miniMap.js';
+import { MiniMap, wireMiniMapWheelZoom } from '../../mini-map/miniMap.js';
 import { Camera } from '../../camera/camera.js';
 import { SpatialHashGrid } from '../../math/spatialGrid.js';
 import type { GridSegment } from '../../math/spatialGrid.js';
@@ -86,6 +86,9 @@ export class HumanBackpropSimulator extends SimulatorShell {
     host: SimulatorPageHost,
   ) {
     super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+
+    // Scroll-to-zoom the mini-map (the main viewport already zooms on wheel).
+    wireMiniMapWheelZoom(this.miniMapCanvas, () => this.miniMap);
 
     this.#mode =
       new URLSearchParams(window.location.search).get('mode') === 'simple'
@@ -579,8 +582,13 @@ export class HumanBackpropSimulator extends SimulatorShell {
               roadColor: '#BBB',
               carColor: 'red',
               backgroundColor: '#2a5',
+              mainViewportZoom: this.viewport.zoom,
             }
-          : { viewPoint, cars: [this.#car] },
+          : {
+              viewPoint,
+              cars: [this.#car],
+              mainViewportZoom: this.viewport.zoom,
+            },
       );
     }
 
