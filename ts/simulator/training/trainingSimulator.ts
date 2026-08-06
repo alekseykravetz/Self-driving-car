@@ -300,7 +300,12 @@ export class TrainingSimulator extends SimulatorShell {
   }
 
   protected draw(time: number): void {
-    if (this.#modalOpen) return;
+    if (this.#modalOpen) {
+      // Keep the game canvas sized on first paint while the init modal blocks
+      // the real draw, otherwise the flex layout collapses it to 0px width.
+      this.resizeLayout();
+      return;
+    }
     this.#strategy.draw(time);
   }
 
