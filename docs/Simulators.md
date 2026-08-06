@@ -986,11 +986,11 @@ other cars alike. The traffic simulator builds each alive car's obstacle set per
 frame via `queryBordersNearCar(this.#borderGrid, car)` (shared utility) and
 feeds it to `car.update(obstacles, trafficControls)`:
 
-| Obstacle source | Filtering                                                                     |
-| --------------- | ----------------------------------------------------------------------------- |
-| Road borders    | `SpatialHashGrid` broad phase + exact narrow-phase distance (sqrt-free)       |
+| Obstacle source | Filtering                                                                          |
+| --------------- | ---------------------------------------------------------------------------------- |
+| Road borders    | `SpatialHashGrid` broad phase + exact narrow-phase distance (sqrt-free)            |
 | Other cars      | `#carCellIndex` grid broad phase (rebuilt once per `update()`) over **alive** cars |
-| Traffic lights  | `TrafficControlGrid` broad phase + reach filter (only for traffic-aware cars) |
+| Traffic lights  | `TrafficControlGrid` broad phase + reach filter (only for traffic-aware cars)      |
 
 The simulator owns a `TrafficControlGrid` rebuilt on world load (via
 `buildTrafficControls(world)`). Per frame, state-aware cars receive
@@ -1012,7 +1012,7 @@ and is a pure view over the simulator's `#cars` array:
 | Column / control | Content                                             |
 | ---------------- | --------------------------------------------------- |
 | Colour swatch    | Car colour (grey when crashed)                      |
-| Name             | Sequential number only (`car.name`, e.g. `1`, `2`)   |
+| Name             | Sequential number only (`car.name`, e.g. `1`, `2`)  |
 | Status           | 🟢 alive / 💥 crashed                               |
 | Speed            | Live `car.speed`                                    |
 | Distance         | `Math.round(car.fitness)` (accumulated travel)      |
@@ -1042,13 +1042,13 @@ mini-map zoom via mouse **scroll wheel**:
 
 ### Interactions
 
-| Listener     | Effect                                                       |
-| ------------ | ------------------------------------------------------------ |
-| Select (row) | Track that car — viewport offset + `camera.move()` follow it |
-| Remove (✕)   | Splice the car out of `#cars` and rebuild the list           |
-| Unselect     | Clear the tracked car without removing it                    |
-| Clear        | Empty `#cars` and rebuild the list                           |
-| Pause        | Freeze `update()` (canvas keeps redrawing)                   |
+| Listener     | Effect                                                           |
+| ------------ | ---------------------------------------------------------------- |
+| Select (row) | Track that car — viewport offset + `camera.move()` follow it     |
+| Remove (✕)   | Splice the car out of `#cars` and rebuild the list               |
+| Unselect     | Clear the tracked car without removing it                        |
+| Clear        | Empty `#cars` and rebuild the list                               |
+| Pause        | Freeze `update()` (canvas keeps redrawing)                       |
 | Search       | Filter the visible rows by name (client-side, no `#cars` change) |
 
 ### Differences from the training simulator
