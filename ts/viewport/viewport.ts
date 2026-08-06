@@ -21,6 +21,12 @@ export type ViewportMode = 'mouse' | 'touchpad';
 const ZOOM_STEP_FAST = 0.3;
 /** Slow, fine-grained zoom increment used while Shift is held. */
 const ZOOM_STEP_SLOW = 0.1;
+/** Zoom increment applied per click of an explicit zoom-in/out button. */
+export const ZOOM_STEP_BUTTON = 1.5;
+/** Most zoomed-in value (smallest world slice visible). */
+const MIN_ZOOM = 0.8;
+/** Most zoomed-out value — raised so a whole city of spawned traffic fits on screen. */
+const MAX_ZOOM = 30;
 
 /** Axis-aligned world-space rectangle currently visible on the canvas. */
 export interface VisibleWorldRect {
@@ -162,6 +168,20 @@ export class Viewport {
     return WORLD_PIXELS_PER_METER / this.zoom;
   }
 
+  #clampZoom(zoom: number): number {
+    return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
+  }
+
+  /** Steps the zoom level by `delta` (positive zooms out, negative zooms in). */
+  public zoomBy(delta: number): void {
+    this.zoom = this.#clampZoom(this.zoom + delta);
+  }
+
+  /** Sets the zoom level directly, clamped to the allowed range. */
+  public setZoom(zoom: number): void {
+    this.zoom = this.#clampZoom(zoom);
+  }
+
   public drawScaleIndicator(
     ctx: CanvasRenderingContext2D = this.#ctx,
     viewportWidth: number = this.canvas.width,
@@ -260,8 +280,7 @@ export class Viewport {
       // fine-grained step for precise framing.
       const direction = Math.sign(e.deltaY);
       const step = e.shiftKey ? ZOOM_STEP_SLOW : ZOOM_STEP_FAST;
-      this.zoom += direction * step;
-      this.zoom = Math.max(0.8, Math.min(10, this.zoom));
+      this.zoom = this.#clampZoom(this.zoom + direction * step);
     } else {
       // Two-finger scroll on trackpad → pan directly.
       this.offset = add(

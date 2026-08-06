@@ -23,6 +23,13 @@ export interface MiniMapDrawOptions {
   compactScaleIndicator?: boolean;
 }
 
+/** Smallest world-to-minimap scale (most zoomed out). */
+const MIN_SCALER = 0.005;
+/** Largest world-to-minimap scale (most zoomed in). */
+const MAX_SCALER = 0.3;
+/** Multiplicative step applied per zoom-in/out button click. */
+const SCALER_ZOOM_FACTOR = 1.25;
+
 export class MiniMap {
   #canvas: HTMLCanvasElement;
   #graph: Graph;
@@ -46,6 +53,25 @@ export class MiniMap {
     this.#canvas.height = size;
 
     this.#ctx = canvas.getContext('2d')!;
+  }
+
+  /** Current world-to-minimap scale. */
+  getScaler(): number {
+    return this.#scaler;
+  }
+
+  #setScaler(scaler: number): void {
+    this.#scaler = Math.max(MIN_SCALER, Math.min(MAX_SCALER, scaler));
+  }
+
+  /** Zooms the minimap in one step (clamped). */
+  zoomIn(): void {
+    this.#setScaler(this.#scaler * SCALER_ZOOM_FACTOR);
+  }
+
+  /** Zooms the minimap out one step (clamped). */
+  zoomOut(): void {
+    this.#setScaler(this.#scaler / SCALER_ZOOM_FACTOR);
   }
 
   draw(options: MiniMapDrawOptions): void {

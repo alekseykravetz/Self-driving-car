@@ -24,6 +24,9 @@ import {
  *   - remove (row ✕ button) → drop a single car
  *   - clear  (toolbar)      → drop all cars
  *   - pause  (toolbar)      → toggle the simulation
+ *   - spawn (1K/2K/custom)  → bulk-spawn N cars at random road positions
+ *   - zoom / mini-map zoom  → step the simulator's viewport / mini-map scale
+ *   - unselect (button)     → clear the tracked car without removing it
  */
 
 // File-scope helper (kept out of the class so the class name is never
@@ -70,6 +73,9 @@ export class TrafficPanelElement extends HTMLElement {
   #onRemove: ((car: Car) => void) | null = null;
   #onClear: (() => void) | null = null;
   #onDeleteDamaged: (() => void) | null = null;
+  #onSpawn: ((count: number) => void) | null = null;
+  #onZoom: ((direction: 1 | -1) => void) | null = null;
+  #onMiniMapZoom: ((direction: 1 | -1) => void) | null = null;
 
   constructor() {
     super();
@@ -92,6 +98,50 @@ export class TrafficPanelElement extends HTMLElement {
     deleteDamagedBtn?.addEventListener('click', () => {
       if (this.#onDeleteDamaged) this.#onDeleteDamaged();
     });
+
+    const unselectBtn = this.querySelector(
+      '#trafficUnselectBtn',
+    ) as HTMLButtonElement | null;
+    unselectBtn?.addEventListener('click', () => this.unselect());
+
+    const spawnCountInput = this.querySelector(
+      '#trafficSpawnCount',
+    ) as HTMLInputElement | null;
+    const spawn1kBtn = this.querySelector(
+      '#trafficSpawn1kBtn',
+    ) as HTMLButtonElement | null;
+    spawn1kBtn?.addEventListener('click', () => this.#onSpawn?.(1000));
+    const spawn2kBtn = this.querySelector(
+      '#trafficSpawn2kBtn',
+    ) as HTMLButtonElement | null;
+    spawn2kBtn?.addEventListener('click', () => this.#onSpawn?.(2000));
+    const spawnCustomBtn = this.querySelector(
+      '#trafficSpawnCustomBtn',
+    ) as HTMLButtonElement | null;
+    spawnCustomBtn?.addEventListener('click', () => {
+      const count = parseInt(spawnCountInput?.value ?? '', 10);
+      if (Number.isFinite(count) && count > 0) this.#onSpawn?.(count);
+    });
+
+    const zoomInBtn = this.querySelector(
+      '#trafficZoomInBtn',
+    ) as HTMLButtonElement | null;
+    zoomInBtn?.addEventListener('click', () => this.#onZoom?.(-1));
+    const zoomOutBtn = this.querySelector(
+      '#trafficZoomOutBtn',
+    ) as HTMLButtonElement | null;
+    zoomOutBtn?.addEventListener('click', () => this.#onZoom?.(1));
+
+    const miniMapZoomInBtn = this.querySelector(
+      '#trafficMiniMapZoomInBtn',
+    ) as HTMLButtonElement | null;
+    miniMapZoomInBtn?.addEventListener('click', () => this.#onMiniMapZoom?.(1));
+    const miniMapZoomOutBtn = this.querySelector(
+      '#trafficMiniMapZoomOutBtn',
+    ) as HTMLButtonElement | null;
+    miniMapZoomOutBtn?.addEventListener('click', () =>
+      this.#onMiniMapZoom?.(-1),
+    );
   }
 
   getSelectedCar(): Car | null {
@@ -120,6 +170,27 @@ export class TrafficPanelElement extends HTMLElement {
 
   setDeleteDamagedListener(listener: () => void): void {
     this.#onDeleteDamaged = listener;
+  }
+
+  setSpawnListener(listener: (count: number) => void): void {
+    this.#onSpawn = listener;
+  }
+
+  /** direction: 1 = zoom out (further from the world), -1 = zoom in. */
+  setZoomListener(listener: (direction: 1 | -1) => void): void {
+    this.#onZoom = listener;
+  }
+
+  /** direction: 1 = zoom in, -1 = zoom out. */
+  setMiniMapZoomListener(listener: (direction: 1 | -1) => void): void {
+    this.#onMiniMapZoom = listener;
+  }
+
+  /** Clears the current selection without removing any car. */
+  unselect(): void {
+    this.#selected = null;
+    this.refresh();
+    if (this.#onSelect) this.#onSelect(null);
   }
 
   /** Rebuild the car list. Call when cars are added or removed. */
