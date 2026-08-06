@@ -73,6 +73,11 @@ export class HumanBackpropSimulator extends SimulatorShell {
   #brainInspectorCounter = 0;
   #BRAIN_INSPECTOR_INTERVAL = 10;
 
+  // Suspend update()/draw() while the config modal is open, so brain training,
+  // canvas/camera redraw, and the periodic brain-inspector innerHTML rebuild
+  // don't run behind it (see TrainingSimulator's #modalOpen for the same fix).
+  #modalOpen = false;
+
   constructor(
     gameCanvas: HTMLCanvasElement,
     networkCanvas: HTMLCanvasElement,
@@ -195,12 +200,18 @@ export class HumanBackpropSimulator extends SimulatorShell {
         },
       };
     }
+    this.#modalOpen = true;
     this.#configModal.open({
       defaults,
       lockedToSavedBrain: false,
-      onStart: (result) =>
-        this.#applyConfigAndCreateCar(result.carConfig, savedInfo),
-      onCancel: () => this.#onConfigCancel(context),
+      onStart: (result) => {
+        this.#modalOpen = false;
+        this.#applyConfigAndCreateCar(result.carConfig, savedInfo);
+      },
+      onCancel: () => {
+        this.#modalOpen = false;
+        this.#onConfigCancel(context);
+      },
     });
   }
 
@@ -336,6 +347,10 @@ export class HumanBackpropSimulator extends SimulatorShell {
     if (this.camera) {
       this.camera.simpleMove(this.getStartInfo());
     }
+  }
+
+  protected isPaused(): boolean {
+    return this.#modalOpen || super.isPaused();
   }
 
   protected update(): void {
@@ -504,6 +519,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
   }
 
   protected draw(time: number): void {
+    if (this.#modalOpen) return;
+
     // Size the canvas layout first so the game canvas has a valid width even
     // before the car/world are ready (e.g. an idle/paused page on first load).
     this.resizeLayout();
