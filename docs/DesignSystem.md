@@ -110,23 +110,28 @@ Semantic accent colors with background and border variants for each:
 
 ### Typography
 
-| Token            | Value/Type            | Usage                 |
-| ---------------- | --------------------- | --------------------- |
-| `--font-ui`      | `Arial, sans-serif`   | General UI text       |
-| `--font-mono`    | `'Courier New', mono` | Code/monospace        |
-| `--font-display` | `'Inter', sans-serif` | Landing page headings |
-| `--text-xs`      | `9px`                 | Tiny labels           |
-| `--text-sm`      | `10px`                | Small stats, tooltips |
-| `--text-base`    | `11px`                | Default body          |
-| `--text-md`      | `12px`                | Section headers       |
-| `--text-lg`      | `13px`                | Prominent labels      |
-| `--text-xl`      | `14px`                | Sub-headings          |
-| `--text-2xl`     | `16px`                | Panel titles          |
-| `--text-3xl`     | `24px`                | Page headings         |
-| `--text-4xl`     | `40vmin`              | Landing hero text     |
+| Token            | Value/Type                    | Usage                 |
+| ---------------- | ----------------------------- | --------------------- |
+| `--font-ui`      | `'Space Grotesk', sans-serif` | General UI text       |
+| `--font-mono`    | `'JetBrains Mono', monospace` | Code/monospace        |
+| `--font-display` | `'Space Grotesk', sans-serif` | Landing page headings |
+| `--text-xs`      | `9px`                         | Tiny labels           |
+| `--text-sm`      | `10px`                        | Small stats, tooltips |
+| `--text-base`    | `11px`                        | Default body          |
+| `--text-md`      | `12px`                        | Section headers       |
+| `--text-lg`      | `13px`                        | Prominent labels      |
+| `--text-xl`      | `14px`                        | Sub-headings          |
+| `--text-2xl`     | `16px`                        | Panel titles          |
+| `--text-3xl`     | `24px`                        | Page headings         |
+| `--text-4xl`     | `40vmin`                      | Landing hero text     |
 
 Weights: `--weight-normal` (400), `--weight-medium` (500),
-`--weight-semibold` (600), `--weight-bold` (700), `--weight-extrabold` (800).
+`--weight-semibold` (600), `--weight-bold` (700), `--weight-extrabold` (800,
+maps to the font's maximum weight, 700 for Space Grotesk).
+
+All three font families are loaded from Google Fonts CDN via a `<link>` in each
+HTML page. This ensures identical rendering across macOS, Linux, and CI — without
+the CDN link, pages fall back to system fonts which differ per platform.
 
 Letter-spacing: `--tracking-wide` (0.5px), `--tracking-wider` (1px),
 `--tracking-widest` (0.05em).

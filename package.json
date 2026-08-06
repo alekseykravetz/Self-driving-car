@@ -26,7 +26,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:visual": "playwright test --config=tests/visual/playwright.config.ts",
-    "test:visual:update": "PLAYWRIGHT_UPDATE_SNAPSHOTS=1 playwright test --config=tests/visual/playwright.config.ts",
+    "test:visual:update": "playwright test --config=tests/visual/playwright.config.ts --update-snapshots",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build"
   },
