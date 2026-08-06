@@ -464,16 +464,22 @@ export class World implements IWorld {
     }
 
     // Rendered pseudo-3D buildings and trees (distance-sorted, painter's order).
+    // Culls/sorts by the cached footprint centroid (O(1) per item) instead of
+    // `Polygon.distanceToPoint` (O(edges) — up to 32 per tree canopy), which
+    // dominated frame time when scanning every building/tree in a big OSM city.
     const renderBuildings = layers.buildings ? this.buildings : [];
     const renderTrees = layers.trees ? this.trees : [];
     if (renderBuildings.length || renderTrees.length) {
+      const renderRadiusSq = renderRadius * renderRadius;
+      const distSq = (center: Point): number => {
+        const dx = center.x - viewPoint.x;
+        const dy = center.y - viewPoint.y;
+        return dx * dx + dy * dy;
+      };
       const items = [...renderBuildings, ...renderTrees].filter(
-        (i) => i.base.distanceToPoint(viewPoint) < renderRadius,
+        (i) => distSq(i.center) < renderRadiusSq,
       );
-      items.sort(
-        (a, b) =>
-          b.base.distanceToPoint(viewPoint) - a.base.distanceToPoint(viewPoint),
-      );
+      items.sort((a, b) => distSq(b.center) - distSq(a.center));
       for (const item of items) {
         item.draw(ctx, { viewPoint });
       }

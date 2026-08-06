@@ -7,10 +7,42 @@ import { BuildingFootprint, BuildingDrawOptions } from '../types.js';
 export class Building {
   readonly base: Polygon;
   readonly height: number;
+  /** Footprint centroid, cached so per-frame culling/sorting never has to
+   *  walk the polygon's edges (`Polygon.distanceToPoint`), which was the
+   *  dominant per-frame cost on large OSM imports. */
+  readonly center: Point;
+  /** Max distance from `center` to any footprint vertex — a cheap superset
+   *  radius used by the camera to reject far-away buildings before running
+   *  the expensive frustum intersection/clip math. */
+  readonly boundingRadius: number;
 
   constructor(polygon: Polygon, height: number = 200) {
     this.base = polygon;
     this.height = height;
+    this.center = Building.#computeCentroid(polygon.points);
+    this.boundingRadius = Building.#computeBoundingRadius(
+      polygon.points,
+      this.center,
+    );
+  }
+
+  static #computeCentroid(points: Point[]): Point {
+    let sx = 0;
+    let sy = 0;
+    for (const p of points) {
+      sx += p.x;
+      sy += p.y;
+    }
+    return new Point(sx / points.length, sy / points.length);
+  }
+
+  static #computeBoundingRadius(points: Point[], center: Point): number {
+    let max = 0;
+    for (const p of points) {
+      const d = Math.hypot(p.x - center.x, p.y - center.y);
+      if (d > max) max = d;
+    }
+    return max;
   }
 
   static load(info: Building): Building {

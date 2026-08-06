@@ -171,6 +171,18 @@ export class Camera implements ICameraPoint {
   }
 
   /**
+   * Cheap superset visibility test: true when a circle of `margin` around
+   * `center` could reach within the frustum's range of the camera. Used to
+   * reject far-away items before the expensive frustum intersection/clip math.
+   */
+  #withinRange(center: Point, margin: number): boolean {
+    const dx = center.x - this.x;
+    const dy = center.y - this.y;
+    const reach = this.range + margin;
+    return dx * dx + dy * dy < reach * reach;
+  }
+
+  /**
    * Gathers, filters, and extrudes all relevant polygons from the world for rendering.
    */
   #getPolygons(world: IWorld, options: ICameraRenderOptions = {}): Polygon[] {
@@ -183,10 +195,17 @@ export class Camera implements ICameraPoint {
       showBuildings = true,
     } = options;
 
-    // Buildings
+    // Buildings. Pre-filter by cached centroid distance before the expensive
+    // frustum intersectsPolygon/clip pass — on a whole-city OSM import this
+    // was the dominant per-frame cost (running full polygon math against
+    // every building/tree regardless of how far it is from the camera).
     const buildingPolygons: Polygon[] = showBuildings
       ? extrudePolygons(
-          this.#frustum.filter(world.buildings.map((b) => b.base)),
+          this.#frustum.filter(
+            world.buildings
+              .filter((b) => this.#withinRange(b.center, b.boundingRadius))
+              .map((b) => b.base),
+          ),
           200,
         )
       : [];
@@ -195,7 +214,9 @@ export class Camera implements ICameraPoint {
     const treePolygons: Polygon[] = showTrees
       ? extrudeTreeShapes(
           this.#frustum.filter(
-            world.trees.map((t) => t.base),
+            world.trees
+              .filter((t) => this.#withinRange(t.center, t.size))
+              .map((t) => t.base),
             false,
           ),
           200,
@@ -347,7 +368,11 @@ export class Camera implements ICameraPoint {
     const roadSurfacePolygons: Polygon[] = [];
     for (const env of world.envelopes ?? []) {
       const poly = env.polygon;
-      if (poly.distanceToPoint(this.center) > this.range) continue;
+      // Cheap single-segment distance check (env.skeleton) instead of
+      // poly.distanceToPoint, which walks every edge of the (rounded,
+      // multi-point) envelope polygon for every road segment in the world.
+      if (env.skeleton.distanceToPoint(this.center) > this.range + 300)
+        continue;
       const relevant =
         poly.intersectsPolygon(this.polygon) ||
         this.polygon.containsPolygon(poly) ||

@@ -163,14 +163,16 @@ describe('Camera', () => {
         new Point(50, 50),
         new Point(-50, 50),
       ]);
-      world.buildings = [{ base: buildingBase }];
+      world.buildings = [
+        { base: buildingBase, center: new Point(0, 0), boundingRadius: 71 },
+      ];
       const treeBase = new Polygon([
         new Point(-100, -100),
         new Point(-90, -100),
         new Point(-90, -90),
         new Point(-100, -90),
       ]);
-      world.trees = [{ base: treeBase }];
+      world.trees = [{ base: treeBase, center: new Point(-95, -95), size: 10 }];
 
       cam.render(mock.ctx, world as never);
 
@@ -214,6 +216,8 @@ describe('Camera', () => {
             new Point(50, 50),
             new Point(-50, 50),
           ]),
+          center: new Point(0, 0),
+          boundingRadius: 71,
         },
       ];
       world.trees = [
@@ -224,6 +228,8 @@ describe('Camera', () => {
             new Point(-90, -90),
             new Point(-100, -90),
           ]),
+          center: new Point(-95, -95),
+          size: 10,
         },
       ];
 
