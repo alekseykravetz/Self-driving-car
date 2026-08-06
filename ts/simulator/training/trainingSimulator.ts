@@ -39,6 +39,11 @@ export class TrainingSimulator extends SimulatorShell {
   roadBorders: Point[][] | null = null;
   trainingManager!: TrainingPanelElement;
   protected initModal: TrainingInitModalElement | null = null;
+  // While the init modal is open, the population (often thousands of cars) and
+  // the full canvas/minimap/camera/pool-table redraw would otherwise keep
+  // running behind it every animation frame, starving the main thread and
+  // making the modal's own inputs feel laggy. Suspend both while it's shown.
+  #modalOpen = false;
 
   constructor(
     gameCanvas: HTMLCanvasElement,
@@ -134,12 +139,17 @@ export class TrainingSimulator extends SimulatorShell {
       return;
     }
 
+    this.#modalOpen = true;
     this.initModal.open({
       context,
       defaults,
       isWorldMode: !(this.#strategy instanceof SimpleTrainingStrategy),
-      onStart: (result) => this.applyInitConfig(result),
+      onStart: (result) => {
+        this.#modalOpen = false;
+        this.applyInitConfig(result);
+      },
       onCancel: () => {
+        this.#modalOpen = false;
         if (context === 'entry') this.trainingManager.initializeCars();
       },
     });
@@ -277,15 +287,21 @@ export class TrainingSimulator extends SimulatorShell {
     });
   }
 
+  protected isPaused(): boolean {
+    return this.#modalOpen || super.isPaused();
+  }
+
   protected update(): void {
     this.#strategy.update();
   }
 
   protected draw(time: number): void {
+    if (this.#modalOpen) return;
     this.#strategy.draw(time);
   }
 
   protected onPausedRender(): void {
+    if (this.#modalOpen) return;
     this.trainingManager.updateBestCarAndPool();
   }
 }
