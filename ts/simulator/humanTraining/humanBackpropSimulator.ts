@@ -185,7 +185,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
         width: DEFAULT_CAR_CONFIG.width,
         height: DEFAULT_CAR_CONFIG.height,
         hiddenLayers: DEFAULT_HIDDEN_LAYERS,
-        physicsModel: 'arcade',
+        physicsModel: this.#mode === 'world' ? 'realistic' : 'arcade',
         sensor: {
           rayCount: DEFAULT_CAR_CONFIG.sensor.rayCount,
           rayLength: DEFAULT_CAR_CONFIG.sensor.rayLength,
@@ -290,7 +290,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
       width: DEFAULT_CAR_CONFIG.width,
       height: DEFAULT_CAR_CONFIG.height,
       hiddenLayers: DEFAULT_HIDDEN_LAYERS,
-      physicsModel: 'arcade',
+      physicsModel: this.#mode === 'world' ? 'realistic' : 'arcade',
       sensor: {
         rayCount: DEFAULT_CAR_CONFIG.sensor.rayCount,
         rayLength: DEFAULT_CAR_CONFIG.sensor.rayLength,

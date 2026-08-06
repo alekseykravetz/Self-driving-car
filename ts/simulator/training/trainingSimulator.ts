@@ -137,6 +137,7 @@ export class TrainingSimulator extends SimulatorShell {
     this.initModal.open({
       context,
       defaults,
+      isWorldMode: !(this.#strategy instanceof SimpleTrainingStrategy),
       onStart: (result) => this.applyInitConfig(result),
       onCancel: () => {
         if (context === 'entry') this.trainingManager.initializeCars();

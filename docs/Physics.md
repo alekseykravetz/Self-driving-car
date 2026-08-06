@@ -22,6 +22,7 @@ interface CarConstructorOptions {
   color?: string; // Body color
   hiddenLayers?: number[]; // Neural network hidden layers (default: [6])
   sensor?: SensorConfig; // Ray-casting config
+  physicsModel?: PhysicsModel; // 'arcade' (default) | 'realistic' — see "Physics Model" below
 }
 
 interface CarInfo {
@@ -33,7 +34,10 @@ interface CarInfo {
   height: number;
   hiddenLayers?: number[];
   sensor: SensorConfig;
+  physicsModel?: PhysicsModel; // Defaults to 'arcade'; omitted on legacy .car files
 }
+
+type PhysicsModel = 'arcade' | 'realistic';
 
 interface SensorConfig {
   rayCount: number;
@@ -56,6 +60,7 @@ class Car {
   maxSpeed: number; // Speed cap (forward)
   acceleration: number; // Speed gain per frame when accelerating
   friction: number; // Speed loss per frame (always applied)
+  physicsModel: PhysicsModel; // 'arcade' (default) | 'realistic'
   color: string; // Car body color
 
   // State
@@ -157,6 +162,25 @@ accuracy metrics:
 
 ## Movement Model
 
+Each car picks one of two physics models via the `physicsModel` field
+(`'arcade' | 'realistic'`, default `'arcade'`):
+
+- **`'arcade'`** — the original constant-rate model (constant acceleration,
+  constant friction, fixed steering rate, hard speed clamp). Every saved/trained
+  brain predates this field and loads as `'arcade'`, so existing `.car` files
+  and `bestPool` entries drive identically to before this feature existed.
+- **`'realistic'`** — opt-in model with engine power taper, dedicated braking,
+  speed-proportional steering, and quadratic aerodynamic drag (see
+  [Realistic Physics Model](#realistic-physics-model-physicsmodel-realistic)
+  below). It only changes the _formulas_ applied to a car's existing
+  `maxSpeed`/`acceleration`/`friction`/dimensions — no new numeric fields are
+  required, and the same `DEFAULT_CAR_CONFIG` values already represent
+  realistic real-world scale (see [Default Parameters](#default-parameters)).
+
+The brain interface (4 boolean NN outputs) is unaffected by the physics model,
+so a brain trained under one model can be swapped to the other — only the
+_feel_ of driving changes, not the network's input/output shape.
+
 ### World Units
 
 The world scale is defined in `ts/math/utils.ts`:
@@ -198,6 +222,8 @@ pxPerFrame = km/h * 0.0648148    // when WORLD_PIXELS_PER_METER = 14
 px/frame² = m/s² * WORLD_PIXELS_PER_METER / 60²
 px/frame² = m/s² * 0.0038889     // when WORLD_PIXELS_PER_METER = 14
 ```
+
+### Arcade Physics Model (`physicsModel: 'arcade'`, default)
 
 Each frame, `Car.#move()` executes this sequence:
 
@@ -256,17 +282,85 @@ y -= cos(angle) * speed    // Y-axis inverted (up = negative Y)
 - Because friction is always applied, the default forward net acceleration is
   `0.01 - 0.002 = 0.008 px/frame²` while the accelerator is held.
 
+### Realistic Physics Model (`physicsModel: 'realistic'`)
+
+Implemented by `CarPhysics.#moveRealistic()` (`ts/car/physics/carPhysics.ts`),
+with constants centralized in `ts/car/config.ts`. It replaces steps 1-4 above
+with:
+
+**1. Braking vs. accelerating.** Pressing the control that opposes the car's
+current direction of motion (e.g. reverse while still moving forward) applies
+a dedicated brake deceleration instead of the normal engine acceleration:
+
+```
+brakeDecel = acceleration * REALISTIC_BRAKE_FORCE_RATIO   // 3x acceleration
+```
+
+This models a driver stepping on the brake pedal rather than just lifting off
+the gas, so slowing from speed feels distinctly quicker than coasting.
+
+**2. Engine power taper.** When the control continues in the current direction
+of motion, the acceleration applied shrinks as the car approaches `maxSpeed`
+(engines make less usable power near their top speed):
+
+```
+taper = max(0, 1 - (|speed| / maxSpeed) ** REALISTIC_ENGINE_TAPER_EXPONENT)   // exponent = 2
+effectiveAcceleration = acceleration * taper
+```
+
+A car accelerates briskly from a stop and tapers off smoothly near `maxSpeed`,
+instead of accelerating at a constant rate right up to a hard clamp.
+
+**3. Quadratic aerodynamic drag.** Friction is no longer a flat per-frame
+constant; it grows with the square of speed, auto-scaled so the drag at
+`maxSpeed` is roughly double the base rolling resistance:
+
+```
+drag = friction + (friction / maxSpeed ** 2) * speed ** 2
+```
+
+**4. Speed-proportional steering.** `Car.#applySteering()` computes the turn
+rate from the car's current speed instead of a fixed constant:
+
+```
+REALISTIC_STEER_RATE = STEERING_SPEED / DEFAULT_CAR_CONFIG.maxSpeed   // ≈ 0.00926
+turnRate = REALISTIC_STEER_RATE * |speed|
+```
+
+This fixes the "unreal" feel of a car pivoting at the same rate whether
+crawling or at top speed — real cars turn more sharply at low speed and less
+sharply at high speed. `REALISTIC_STEER_RATE` is calibrated against the
+default `maxSpeed` so a car with the default config turns at roughly the same
+rate as the arcade model when driving at full speed.
+
+Speed capping (step 2) is unchanged — both models still hard-clamp to
+`maxSpeed` / `-maxSpeed / 2`.
+
 ### Default Parameters
 
-| Parameter      | Default | Real-world meaning                | Description               |
-| -------------- | ------- | --------------------------------- | ------------------------- |
-| `maxSpeed`     | 3.24    | ~50 km/h                          | Maximum forward velocity  |
-| `acceleration` | 0.01    | ~2.57 m/s² before friction        | Speed increase per frame  |
-| `friction`     | 0.002   | ~0.51 m/s² coast-down             | Speed decrease per frame  |
-| `width`        | 25      | ~1.8m                             | Car body width            |
-| `height`       | 63      | ~4.5m                             | Car body height           |
-| reverse limit  | 1.62    | ~25 km/h                          | `maxSpeed / 2` backward   |
-| net accel      | 0.008   | ~2.06 m/s² while pressing forward | `acceleration - friction` |
+| Parameter      | Default  | Real-world meaning                | Description                             |
+| -------------- | -------- | --------------------------------- | --------------------------------------- |
+| `maxSpeed`     | 3.24     | ~50 km/h                          | Maximum forward velocity                |
+| `acceleration` | 0.01     | ~2.57 m/s² before friction        | Speed increase per frame                |
+| `friction`     | 0.002    | ~0.51 m/s² coast-down             | Speed decrease per frame                |
+| `width`        | 25       | ~1.8m                             | Car body width                          |
+| `height`       | 63       | ~4.5m                             | Car body height                         |
+| `physicsModel` | `arcade` | —                                 | `'arcade'` (legacy) or `'realistic'`    |
+| reverse limit  | 1.62     | ~25 km/h                          | `maxSpeed / 2` backward                 |
+| net accel      | 0.008    | ~2.06 m/s² while pressing forward | `acceleration - friction` (arcade only) |
+
+> **What do I need to change to feel realistic physics?** Just flip
+> `physicsModel` to `'realistic'` — no other numeric field needs to change.
+> `maxSpeed`/`acceleration`/`friction`/`width`/`height` already represent
+> realistic real-world scale (see the Speed Reference Table below), and
+> `REALISTIC_STEER_RATE`/`REALISTIC_BRAKE_FORCE_RATIO`/
+> `REALISTIC_ENGINE_TAPER_EXPONENT` (`ts/car/config.ts`) are pre-tuned against
+> those same defaults. World-mode training (`html/simulator.html`, no
+> `?mode=simple`) auto-selects `'realistic'` for a fresh brain in the
+> Training-Init modal, since real OSM road scale benefits most from it; simple
+> mode (`?mode=simple`) keeps `'arcade'` since its fixed legacy road width
+> was tuned for the original constant-rate feel. See
+> [Simulators](Simulators.md#training-init-modal).
 
 ### Speed Reference Table
 
@@ -609,6 +703,7 @@ toInfo(): CarInfo {
     width: this.width,
     height: this.height,
     hiddenLayers: this.hiddenLayers,
+    physicsModel: this.physicsModel,
     sensor: {
       rayCount: this.sensor.rayCount,
       rayLength: this.sensor.rayLength,
@@ -637,8 +732,9 @@ Applies a `CarInfo` to an existing car instance (kept for backward compatibility
 1. Physics params (maxSpeed, acceleration, friction) are applied directly
 2. Size (width, height) override car dimensions if present
 3. Sensor config is applied to the sensor instance
-4. Brain is deserialized via `CarBrainAdapter.deserialize(info.brain, this)` (or undefined if no brain)
-5. If `hiddenLayers` changed or `rayCount` changed, the brain architecture must be rebuilt
+4. `physicsModel` is applied directly (defaults to `'arcade'` when absent, so legacy `.car` files without the field are unaffected)
+5. Brain is deserialized via `CarBrainAdapter.deserialize(info.brain, this)` (or undefined if no brain)
+6. If `hiddenLayers` changed or `rayCount` changed, the brain architecture must be rebuilt
 
 ### File Format (`.car` files)
 
@@ -652,6 +748,7 @@ Plain JSON matching the `CarInfo` interface:
   "width": 25,
   "height": 63,
   "hiddenLayers": [6],
+  "physicsModel": "arcade",
   "sensor": {
     "rayCount": 5,
     "rayLength": 150,

@@ -295,40 +295,51 @@ The modal collects, prefilled with current/default values:
 
 - **Training params** — car count, pool size, mutation rate, idle range.
 - **Car config** — height, width, hidden layers, max speed, accel, friction,
-  ray count / length / spread / offset.
+  ray count / length / spread / offset, physics model (arcade/realistic).
 - **Brain source** — `fresh` (discard pool), `pool` (keep stored `bestPool`), or
   `selected` (seed from the actively-selected store/loaded cars). Sources are
   enabled only when available and parameter-compatible (via `CarLoader.allParamsMatch`);
   choosing a non-`fresh` source **locks** the car-config fields to the source's
   params. Default preference order: `pool` > `selected` > `fresh`.
 
+> **World-mode realistic-physics default.** The modal is opened with an
+> `isWorldMode` flag (`true` unless the simulator was launched with
+> `?mode=simple`). Whenever the `fresh` source is selected — either
+> automatically (no stored pool/selected cars) or by clicking the radio — in
+> world mode, the car config is refilled with `physicsModel: 'realistic'`
+> (other fields at their `DEFAULT_CAR_CONFIG` values). Simple mode's fixed
+> legacy road width was tuned for the constant-rate arcade feel, so `fresh` in
+> simple mode is left untouched (`'arcade'`). See
+> [Physics § Realistic Physics Model](Physics.md#realistic-physics-model-physicsmodel-realistic).
+
 Start applies the params/config (`setTrainingParams` + `setCarSettings`), seeds
 the pool per the chosen source, then runs `newTraining()`.
 
 ### Control Panel UI
 
-| Control        | Type       | Range      | Purpose                                                            |
-| -------------- | ---------- | ---------- | ------------------------------------------------------------------ |
-| Car Count      | Number     | 0–5000     | Population per generation                                          |
-| Pool Size      | Number     | 1–20       | Number of elite survivors                                          |
-| Mutation Rate  | Number     | 0.001–1.0  | Randomization strength                                             |
-| Idle Range     | Number     | 200–20000  | Freeze cars farther than this from best car                        |
-| Save (💾)      | Button     | —          | Persist brains + car config to localStorage                        |
-| Discard (🗑️)   | Button     | —          | Clear all saved data from localStorage                             |
-| Pause (⏸️)     | Button     | —          | Toggle simulation pause                                            |
-| Next Gen (🧬)  | Button     | —          | Next generation (keeps top brains + mutates)                       |
-| New Train (🔄) | Button     | —          | Opens the Training-Init modal (params + car config + brain source) |
-| Max Speed      | Number     | 1–20       | Car maximum speed (change → new training)                          |
-| Accel          | Number     | 0.001–1    | Car acceleration (change → new training)                           |
-| Friction       | Number     | 0.001–0.5  | Car friction (change → new training)                               |
-| Width          | Number     | 10–100     | Car body width (change → new training)                             |
-| Height         | Number     | 20–150     | Car body height (change → new training)                            |
-| Rays           | Number     | 1–20       | Sensor ray count (change → new training)                           |
-| Ray Len        | Number     | 50–500     | Sensor ray length (change → new training)                          |
-| Ray Spread     | Number     | 0.1–6.28   | Sensor angular spread (change → new training)                      |
-| Ray Offset     | Number     | -3.14–3.14 | Sensor angular offset (change → new training)                      |
-| Save Car       | Button     | —          | Download best car as `.car` JSON file                              |
-| Load Car       | File input | .car/.json | Load car config (triggers new training)                            |
+| Control           | Type       | Range      | Purpose                                                                                      |
+| ----------------- | ---------- | ---------- | -------------------------------------------------------------------------------------------- |
+| Car Count         | Number     | 0–5000     | Population per generation                                                                    |
+| Pool Size         | Number     | 1–20       | Number of elite survivors                                                                    |
+| Mutation Rate     | Number     | 0.001–1.0  | Randomization strength                                                                       |
+| Idle Range        | Number     | 200–20000  | Freeze cars farther than this from best car                                                  |
+| Save (💾)         | Button     | —          | Persist brains + car config to localStorage                                                  |
+| Discard (🗑️)      | Button     | —          | Clear all saved data from localStorage                                                       |
+| Pause (⏸️)        | Button     | —          | Toggle simulation pause                                                                      |
+| Next Gen (🧬)     | Button     | —          | Next generation (keeps top brains + mutates)                                                 |
+| New Train (🔄)    | Button     | —          | Opens the Training-Init modal (params + car config + brain source)                           |
+| Max Speed         | Number     | 1–20       | Car maximum speed (change → new training)                                                    |
+| Accel             | Number     | 0.001–1    | Car acceleration (change → new training)                                                     |
+| Friction          | Number     | 0.001–0.5  | Car friction (change → new training)                                                         |
+| Width             | Number     | 10–100     | Car body width (change → new training)                                                       |
+| Height            | Number     | 20–150     | Car body height (change → new training)                                                      |
+| Rays              | Number     | 1–20       | Sensor ray count (change → new training)                                                     |
+| Ray Len           | Number     | 50–500     | Sensor ray length (change → new training)                                                    |
+| Ray Spread        | Number     | 0.1–6.28   | Sensor angular spread (change → new training)                                                |
+| Ray Offset        | Number     | -3.14–3.14 | Sensor angular offset (change → new training)                                                |
+| Realistic Physics | Checkbox   | —          | Toggle `physicsModel` between `'arcade'` (default) and `'realistic'` (change → new training) |
+| Save Car          | Button     | —          | Download best car as `.car` JSON file                                                        |
+| Load Car          | File input | .car/.json | Load car config (triggers new training)                                                      |
 
 > **Render interval** lives in the separate `<animation-loop-toolbar>` (not the
 > training panel): a `1 / N frames` number input (1–10, default 2) that throttles

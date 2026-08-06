@@ -50,6 +50,7 @@ The project uses two persistence mechanisms: browser localStorage for training s
     "width": 25,
     "height": 63,
     "hiddenLayers": [6],
+    "physicsModel": "arcade",
     "sensor": {
       "rayCount": 5,
       "rayLength": 150,
@@ -81,6 +82,8 @@ The project uses two persistence mechanisms: browser localStorage for training s
 Each entry is a complete `CarInfo` — physics config + sensor config + trained brain. This allows reproducing the exact car behavior.
 
 > The optional `sensor.stateAware` field (defaults to `false` when absent) enables unified state-aware sensor readings per ray, changing the brain's input-layer size (`rayCount*2 + 1` when true, else `rayCount + 1`). It is settable from the training UI via the "State Aware" checkbox in the init modal and the live training panel. Existing `.car` files without the field remain valid and drive identically; `brainsCompatible()` rejects brain swaps across the two input sizes. See [Physics](Physics.md#traffic-light-perception).
+
+> The optional `physicsModel` field (`'arcade' | 'realistic'`, defaults to `'arcade'` when absent) selects the movement formulas — braking, engine taper, drag, and steering — described in [Physics § Movement Model](Physics.md#movement-model). It does not change the brain's input/output shape, so a trained brain loads and drives identically regardless of which model is selected; only the driving _feel_ changes. Existing `.car`/`bestPool` files without the field remain valid and drive exactly as before (`'arcade'`).
 
 ---
 
@@ -221,6 +224,7 @@ const worldInfo = JSON.parse(content.trim());
   "width": 25,
   "height": 63,
   "hiddenLayers": [6],
+  "physicsModel": "arcade",
   "sensor": { "rayCount": 2, "rayLength": 350, "raySpread": 0.8, "rayOffset": -0.4 },
   "brain": { "levels": [...] }
 }
