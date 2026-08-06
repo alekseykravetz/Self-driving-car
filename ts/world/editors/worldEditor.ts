@@ -15,7 +15,7 @@ import { TargetEditor } from './targetEditor.js';
 import { YieldEditor } from './yieldEditor.js';
 import { Graph } from '../../math/graph/graph.js';
 import { Viewport } from '../../viewport/viewport.js';
-import { MiniMap } from '../../mini-map/miniMap.js';
+import { MiniMap, wireMiniMapWheelZoom } from '../../mini-map/miniMap.js';
 import { WorldEditorOsmImporter } from './worldEditorOsmImport.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { WorldSetupElement } from '../../ui/molecules/worldSetup.js';
@@ -67,7 +67,6 @@ export class WorldEditor {
   #world!: World;
   #viewport!: Viewport;
   #miniMap!: MiniMap;
-  #miniMapViewport!: Viewport;
   #editors!: Editors;
   #mode: EditorType = 'graph';
   #viewportMode: 'mouse' | 'touchpad' = 'mouse';
@@ -109,6 +108,7 @@ export class WorldEditor {
     this.#ctx = canvas.getContext('2d')!;
 
     this.#miniMapCanvas = miniMapCanvas;
+    wireMiniMapWheelZoom(this.#miniMapCanvas, () => this.#miniMap);
 
     this.#assignElementReferences();
     this.#keyboardManager = new KeyboardManager(this.#shortcutsToolbar);
@@ -328,9 +328,6 @@ export class WorldEditor {
       0.02, // Scaler
     );
 
-    this.#miniMapViewport = new Viewport(this.#miniMapCanvas);
-    this.#miniMapViewport.setMode(this.#viewportMode);
-
     // Wire brush state + metadata + editor toggle sync (after editors exist)
     this.#worldEditorPanel?.setBrushChangeListener((state) => {
       (this.#editors.graph as GraphEditor).setBrushState(state);
@@ -454,11 +451,10 @@ export class WorldEditor {
     }
   }
 
-  /* Sets the viewport wheel-input mode (mouse vs. touchpad) on both viewports. */
+  /* Sets the viewport wheel-input mode (mouse vs. touchpad) on the main viewport. */
   setViewportMode(mode: 'mouse' | 'touchpad'): void {
     this.#viewportMode = mode;
     this.#viewport?.setMode(mode);
-    this.#miniMapViewport?.setMode(mode);
   }
 
   save(): void {
@@ -623,17 +619,15 @@ export class WorldEditor {
 
     this.#viewport.drawScaleIndicator(this.#ctx);
 
-    // Update MiniMapViewPort
-    this.#miniMapViewport.reset();
-    // Draw the MiniMap
+    // Draw the MiniMap, synced one-way to the main viewport's zoom.
     this.#miniMap.draw({
       viewPoint,
       cars: [],
       roadColor: '#BBB',
       carColor: 'red',
-      viewport: this.#miniMapViewport,
+      mainViewportZoom: this.#viewport.zoom,
       compactScaleIndicator: true,
-    }); // Update minimap based on main viewpoint
+    });
   }
 
   /* Animation loop using requestAnimationFrame. */

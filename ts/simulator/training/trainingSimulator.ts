@@ -2,6 +2,7 @@ import { SimulatorShell } from '../core/simulatorShell.js';
 import type { SimulatorPageHost } from '../views/simulatorPageHost.js';
 import { SimpleTrainingStrategy } from './modes/simpleModeBehavior.js';
 import { WorldTrainingStrategy } from './modes/worldModeBehavior.js';
+import { wireMiniMapWheelZoom } from '../../mini-map/miniMap.js';
 import type { TrainingPanelElement } from '../../ui/organisms/trainingPanel.js';
 import type {
   TrainingInitModalElement,
@@ -53,6 +54,9 @@ export class TrainingSimulator extends SimulatorShell {
     host: SimulatorPageHost,
   ) {
     super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+
+    // Scroll-to-zoom the mini-map (the main viewport already zooms on wheel).
+    wireMiniMapWheelZoom(this.miniMapCanvas, () => this.miniMap);
 
     this.trainingManager = document.querySelector(
       'training-panel',

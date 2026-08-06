@@ -425,6 +425,7 @@ vi.mock('../../../../ts/mini-map/miniMap.js', () => ({
       },
     };
   },
+  wireMiniMapWheelZoom: vi.fn(),
 }));
 
 vi.mock('../../../../ts/store/storeManager.js', () => ({

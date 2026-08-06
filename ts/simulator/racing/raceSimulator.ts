@@ -12,7 +12,7 @@ import type { SensorTrafficControl } from '../../car/sensors/sensor.js';
 import { PhoneControls } from '../../car/controls/phoneControls.js';
 import { CameraControls } from '../../car/controls/cameraControls.js';
 import { Viewport } from '../../viewport/viewport.js';
-import { MiniMap } from '../../mini-map/miniMap.js';
+import { MiniMap, wireMiniMapWheelZoom } from '../../mini-map/miniMap.js';
 import { Camera } from '../../camera/camera.js';
 import { StoreManager } from '../../store/storeManager.js';
 import { getRandomColor } from '../../math/color.js';
@@ -54,6 +54,9 @@ export class RaceSimulator extends SimulatorShell {
     controls: CarControls | null = null,
   ) {
     super(gameCanvas, networkCanvas, miniMapCanvas, cameraCanvas, host);
+
+    // Scroll-to-zoom the mini-map (the main viewport already zooms on wheel).
+    wireMiniMapWheelZoom(this.miniMapCanvas, () => this.miniMap);
 
     this.controls = controls;
 
@@ -349,7 +352,11 @@ export class RaceSimulator extends SimulatorShell {
     });
     this.viewport.drawScaleIndicator(this.gameCtx);
     this.drawHeatmap(viewPoint);
-    this.miniMap.draw({ viewPoint, cars: this.#cars });
+    this.miniMap.draw({
+      viewPoint,
+      cars: this.#cars,
+      mainViewportZoom: this.viewport.zoom,
+    });
     const rotationTarget = trackTarget ?? this.#myCar;
     this.miniMapCanvas.style.transform = `rotate(${rotationTarget.angle}rad)`;
 
