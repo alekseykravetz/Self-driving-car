@@ -140,6 +140,23 @@ filter(polygons: Polygon[]): Polygon[] {
 
 This significantly reduces rendering work — only visible geometry reaches the projection stage.
 
+### Performance: distance pre-filter before frustum math
+
+`Polygon.intersectsPolygon`/`containsPolygon` have no bounding-box
+short-circuit — they run the full edge×edge intersection test regardless of
+how far the polygon is from the frustum. On a whole-city OSM import this made
+`#getPolygons` the dominant per-frame cost even with only a handful of cars
+training, since every building and every tree (a 32-vertex canopy polygon) in
+the world was pushed through `filter()`.
+
+`Camera#getPolygons` now pre-filters `world.buildings`/`world.trees` with a
+cheap O(1) squared-distance check against each item's cached centroid
+(`Building.center`/`Tree.center`) before calling `this.#frustum.filter(...)`
+(`Camera#withinRange(center, margin)`, margin = `boundingRadius`/`size`). Only
+items that could possibly reach within `range` of the camera pay for the
+expensive intersection/clip path. See
+[Math § Render-time distance culling](Math.md#render-time-distance-culling-for-buildingstreescamera-perf).
+
 ---
 
 ## 3D Projection (`CameraFrustum#projectPoint`)
@@ -369,7 +386,9 @@ a single line just ahead of the camera), **not** the frustum triangle. The
 triangle collapses to a point at the camera and drops the wedge right in front
 of it, which left a grass gap under/behind the car; the straight near plane
 fills the asphalt continuously up to the camera. Off-screen sides project
-harmlessly off the canvas; far envelopes are distance-culled by `range`.
+harmlessly off the canvas; far envelopes are distance-culled by checking the
+envelope's single-segment `skeleton` (O(1)) against `range` — cheaper than
+calling `distanceToPoint` on the (multi-point, rounded) `envelope.polygon`.
 
 ### Lane markings (mirrors the 2D map)
 

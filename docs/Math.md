@@ -639,6 +639,43 @@ that matters to the inside/near/close checks has a polygon edge within
 
 ---
 
+## Render-time distance culling for buildings/trees/camera (perf)
+
+The same `Polygon.distanceToPoint`-is-O(edges) trap that motivated `OwnerGrid`
+above also hit the **render** path once whole-city OSM imports were common:
+tree canopies are 32-vertex polygons (`TREE_VERTEX_COUNT` in
+`ts/world/items/tree.ts`), so calling `Polygon.distanceToPoint`/`intersectsPolygon`
+on every building/tree in the world, every frame, dominated frame time
+(profiled: `Segment.projectPoint` ~20%, `Polygon.intersectsPolygon` ~12%,
+`Polygon.distanceToPoint` ~12% self time on a big city with only 5 training cars).
+Neither `Polygon.intersectsPolygon` nor `distanceToPoint` has a bounding-box
+short-circuit, so every caller pays the full edge-by-edge cost regardless of
+how far away the polygon is.
+
+Fix: cache a cheap **centroid** (`center: Point`) on `Building` (mirroring
+`Tree`'s existing `center`/`size` fields) plus a `boundingRadius`, and use O(1)
+squared-distance checks against that centroid to reject far-away items BEFORE
+running the expensive polygon math:
+
+- `World.draw()`'s building/tree render-radius cull (see
+  [Viewport § Viewport Culling](Viewport.md#viewport-culling-getvisiblebounds))
+  now filters/sorts by squared centroid distance instead of
+  `Polygon.distanceToPoint`.
+- `Camera.#getPolygons()` (see [Camera § View Frustum Culling](Camera.md#view-frustum-culling-camerafrustumfilter))
+  pre-filters `world.buildings`/`world.trees` by squared centroid distance
+  (`Camera#withinRange(center, margin)`) before calling
+  `CameraFrustum.filter()`, and the road-surface loop checks the envelope's
+  single-segment `skeleton` (O(1)) instead of its multi-point `polygon`
+  (O(edges)).
+
+This is the render-time counterpart to `OwnerGrid`'s generation-time fix above:
+same root cause (no bbox short-circuit on `Polygon` methods), different phase
+of the pipeline. If this pattern resurfaces elsewhere, consider adding a bbox
+short-circuit directly to `Polygon.intersectsPolygon`/`distanceToPoint` instead
+of scattering per-caller centroid guards.
+
+---
+
 ## Time-sliced world generation (`ts/world/generation/`)
 
 Large OSM imports generate tens of thousands of segments/buildings. Running the

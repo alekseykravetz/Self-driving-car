@@ -79,6 +79,25 @@ on render frames. The shared `isPaused()` reads the play/pause toggle owned by
 instead of `update()`. Subclasses call `this.animate(0)` once at the end of their
 constructor to start the loop.
 
+### Blocking modal pause pattern
+
+`animate()` runs `update()`/`draw()` every frame regardless of any DOM modal
+covering the canvas — a blocking `<dialog role="modal">`-style custom element
+does **not** pause the shell's rAF loop by itself. `TrainingInitModalElement`
+(`TrainingSimulator`) and `HumanTrainingConfigModalElement`
+(`HumanBackpropSimulator`) are the two real blocking modals in the app; both
+follow the same fix so heavy population physics / world+minimap+camera redraw
+/ DOM-heavy panel refresh don't starve the main thread and lag the modal's own
+inputs while it's open:
+
+- a private `#modalOpen` flag, set `true` right before `modal.open({...})`
+- set back to `false` inside both the `onStart` and `onCancel` callbacks passed to `open()`
+- `protected isPaused(): boolean { return this.#modalOpen || super.isPaused(); }` — skips `update()`
+- an early return at the top of `protected draw()` when `#modalOpen` — skips the world/minimap/camera redraw and any DOM-heavy panel refresh
+
+Traffic/Race simulators have no blocking modals and are unaffected; their live
+panels already do per-row diffed DOM writes so no throttle is needed there.
+
 ### Animation Loop Toolbar (`ts/ui/molecules/animationLoopToolbar.ts`)
 
 The `<animation-loop-toolbar>` custom element provides real-time controls and monitoring:

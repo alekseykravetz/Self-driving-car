@@ -183,7 +183,13 @@ marking whose bounding box (expanded by `WORLD_CULL_MARGIN_PX = 300`) lies
 off-screen. On large OSM maps this is the single biggest render win — drawing
 drops from "the whole city" to "what's on screen." When `screenBounds` is
 omitted, nothing is culled (behavior-preserving fallback for tests / off-screen
-renders). Buildings and trees keep their orthogonal `renderRadius` distance cull.
+renders). Buildings and trees keep their orthogonal `renderRadius` distance
+cull, but it filters/sorts by each item's cached centroid
+(`Building.center`/`Tree.center`) with a plain O(1) squared-distance check
+rather than `Polygon.distanceToPoint` — the latter walks every edge of the
+footprint polygon (32 for a tree canopy) and was the dominant per-frame cost on
+big OSM imports (see
+[Math § Render-time distance culling](Math.md#render-time-distance-culling-for-buildingstreescamera-perf)).
 The math is unit-tested in `tests/unit/viewport/viewport.test.ts`.
 
 ---
