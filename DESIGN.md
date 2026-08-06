@@ -304,25 +304,25 @@ Depth is communicated through background opacity and thin white borders rather t
 
 All values are defined in `styles/tokens.css`. When implementing, use `var(--token-name)` instead of raw values.
 
-| Token                         | Value                      | Usage                            |
-| ----------------------------- | -------------------------- | -------------------------------- |
-| `--color-bg-app`              | `#0f0f14`                  | Main app background              |
-| `--color-bg-surface`          | `rgba(15,15,20,0.92)`      | Panel surfaces                   |
-| `--color-bg-overlay`          | `rgba(0,0,0,0.6)`          | Floating toolbars, overlays      |
-| `--color-bg-canvas`           | `#2a5`                     | Road/game canvas                 |
-| `--color-text-primary`        | `#e8e8e8`                  | Primary text                     |
-| `--color-text-secondary`      | `#888`                     | Muted labels                     |
-| `--color-accent-green`        | `#7ddf7d`                  | Primary actions, positive states |
-| `--color-accent-green-strong` | `#5cb85c`                  | Status green, active indicators  |
-| `--color-accent-red`          | `#d9534f`                  | Danger states                    |
-| `--color-accent-yellow`       | `#f0ad4e`                  | Warning states                   |
-| `--font-ui`                   | `'Space Grotesk', sans-serif`  | UI labels                        |
-| `--font-mono`                 | `'JetBrains Mono', monospace`  | Numeric data                     |
-| `--space-1`                   | `4px`                      | Minimum gap/padding              |
-| `--space-2`                   | `8px`                      | Standard gap                     |
-| `--radius-sm`                 | `3px`                      | Key indicators                   |
-| `--radius-md`                 | `5px`                      | Toolbar buttons                  |
-| `--radius-lg`                 | `8px`                      | Toolbar panels                   |
+| Token                         | Value                         | Usage                            |
+| ----------------------------- | ----------------------------- | -------------------------------- |
+| `--color-bg-app`              | `#0f0f14`                     | Main app background              |
+| `--color-bg-surface`          | `rgba(15,15,20,0.92)`         | Panel surfaces                   |
+| `--color-bg-overlay`          | `rgba(0,0,0,0.6)`             | Floating toolbars, overlays      |
+| `--color-bg-canvas`           | `#2a5`                        | Road/game canvas                 |
+| `--color-text-primary`        | `#e8e8e8`                     | Primary text                     |
+| `--color-text-secondary`      | `#888`                        | Muted labels                     |
+| `--color-accent-green`        | `#7ddf7d`                     | Primary actions, positive states |
+| `--color-accent-green-strong` | `#5cb85c`                     | Status green, active indicators  |
+| `--color-accent-red`          | `#d9534f`                     | Danger states                    |
+| `--color-accent-yellow`       | `#f0ad4e`                     | Warning states                   |
+| `--font-ui`                   | `'Space Grotesk', sans-serif` | UI labels                        |
+| `--font-mono`                 | `'JetBrains Mono', monospace` | Numeric data                     |
+| `--space-1`                   | `4px`                         | Minimum gap/padding              |
+| `--space-2`                   | `8px`                         | Standard gap                     |
+| `--radius-sm`                 | `3px`                         | Key indicators                   |
+| `--radius-md`                 | `5px`                         | Toolbar buttons                  |
+| `--radius-lg`                 | `8px`                         | Toolbar panels                   |
 
 ### Quick Color Reference
 

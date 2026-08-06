@@ -110,20 +110,20 @@ Semantic accent colors with background and border variants for each:
 
 ### Typography
 
-| Token            | Value/Type                     | Usage                     |
-| ---------------- | ------------------------------ | ------------------------- |
-| `--font-ui`      | `'Space Grotesk', sans-serif`  | General UI text           |
-| `--font-mono`    | `'JetBrains Mono', monospace`  | Code/monospace            |
-| `--font-display` | `'Space Grotesk', sans-serif`  | Landing page headings     |
-| `--text-xs`      | `9px`                 | Tiny labels           |
-| `--text-sm`      | `10px`                | Small stats, tooltips |
-| `--text-base`    | `11px`                | Default body          |
-| `--text-md`      | `12px`                | Section headers       |
-| `--text-lg`      | `13px`                | Prominent labels      |
-| `--text-xl`      | `14px`                | Sub-headings          |
-| `--text-2xl`     | `16px`                | Panel titles          |
-| `--text-3xl`     | `24px`                | Page headings         |
-| `--text-4xl`     | `40vmin`              | Landing hero text     |
+| Token            | Value/Type                    | Usage                 |
+| ---------------- | ----------------------------- | --------------------- |
+| `--font-ui`      | `'Space Grotesk', sans-serif` | General UI text       |
+| `--font-mono`    | `'JetBrains Mono', monospace` | Code/monospace        |
+| `--font-display` | `'Space Grotesk', sans-serif` | Landing page headings |
+| `--text-xs`      | `9px`                         | Tiny labels           |
+| `--text-sm`      | `10px`                        | Small stats, tooltips |
+| `--text-base`    | `11px`                        | Default body          |
+| `--text-md`      | `12px`                        | Section headers       |
+| `--text-lg`      | `13px`                        | Prominent labels      |
+| `--text-xl`      | `14px`                        | Sub-headings          |
+| `--text-2xl`     | `16px`                        | Panel titles          |
+| `--text-3xl`     | `24px`                        | Page headings         |
+| `--text-4xl`     | `40vmin`                      | Landing hero text     |
 
 Weights: `--weight-normal` (400), `--weight-medium` (500),
 `--weight-semibold` (600), `--weight-bold` (700), `--weight-extrabold` (800,
