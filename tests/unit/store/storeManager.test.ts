@@ -582,3 +582,192 @@ describe('StoreManager.getLocalStorageStates edge cases', () => {
     expect(states.some((s) => s.key === 'notTracked')).toBe(false);
   });
 });
+
+function mockResponse(body: unknown, ok = true, status = 200): Response {
+  return {
+    ok,
+    status,
+    json: async () => body,
+    text: async () => (typeof body === 'string' ? body : JSON.stringify(body)),
+  } as unknown as Response;
+}
+
+describe('StoreManager.init', () => {
+  beforeEach(() => {
+    for (const k in store) delete store[k];
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    installLocalStorageMock();
+  });
+
+  it('continues without store assets when the manifest fetch fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => mockResponse(null, false, 500)),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    const mgr = await Fresh.init();
+    expect(mgr.getWorlds()).toEqual([]);
+    expect(mgr.getCars()).toEqual([]);
+  });
+
+  it('loads worlds/cars from the manifest and skips failed fetches', async () => {
+    const worldData = { markings: [{ type: 'start' }] };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        if (url === '/store/manifest.json') {
+          return mockResponse({
+            worlds: ['good.world', 'bad.world'],
+            cars: ['good.car'],
+          });
+        }
+        if (url === '/store/world/good.world') {
+          return mockResponse(JSON.stringify(worldData));
+        }
+        if (url === '/store/world/bad.world') {
+          return mockResponse(null, false, 404);
+        }
+        if (url === '/store/car/good.car') {
+          return mockResponse(JSON.stringify({ brain: [], controls: [] }));
+        }
+        throw new Error(`unexpected fetch: ${url}`);
+      }),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    const mgr = await Fresh.init();
+    expect(mgr.getWorlds()).toEqual([
+      {
+        filename: 'good.world',
+        data: worldData,
+        hasStartMarker: true,
+        hasEndMarker: false,
+      },
+    ]);
+    expect(mgr.getCars()).toEqual([
+      { filename: 'good.car', data: { brain: [], controls: [] } },
+    ]);
+  });
+
+  it('auto-selects the first store world when nothing is active and no editor world exists', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        if (url === '/store/manifest.json') {
+          return mockResponse({ worlds: ['first.world'], cars: [] });
+        }
+        if (url === '/store/world/first.world') {
+          return mockResponse(JSON.stringify({ markings: [] }));
+        }
+        throw new Error(`unexpected fetch: ${url}`);
+      }),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    await Fresh.init();
+    expect(store['store:activeWorld']).toBe('store:first.world');
+  });
+
+  it('does not auto-select a store world when an editor world already exists', async () => {
+    store['editorWorld'] = JSON.stringify({ markings: [] });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        if (url === '/store/manifest.json') {
+          return mockResponse({ worlds: ['first.world'], cars: [] });
+        }
+        if (url === '/store/world/first.world') {
+          return mockResponse(JSON.stringify({ markings: [] }));
+        }
+        throw new Error(`unexpected fetch: ${url}`);
+      }),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    await Fresh.init();
+    expect(store['store:activeWorld']).toBeUndefined();
+  });
+
+  it('migrates the legacy `world` key to `editorWorld` when unset', async () => {
+    store['world'] = JSON.stringify({ legacy: true });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => mockResponse(null, false, 500)),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    const mgr = await Fresh.init();
+    expect(store['world']).toBeUndefined();
+    expect(JSON.parse(store['editorWorld'])).toEqual({ legacy: true });
+    expect(mgr.getEditorWorld()).toEqual({ legacy: true });
+  });
+
+  it('discards the legacy `world` key without overwriting an existing editorWorld', async () => {
+    store['world'] = JSON.stringify({ legacy: true });
+    store['editorWorld'] = JSON.stringify({ current: true });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => mockResponse(null, false, 500)),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    const mgr = await Fresh.init();
+    expect(store['world']).toBeUndefined();
+    expect(mgr.getEditorWorld()).toEqual({ current: true });
+  });
+
+  it('hydrates loadedWorlds and loadedCars from localStorage', async () => {
+    store['loadedWorlds'] = JSON.stringify([
+      { id: 'loaded:a', name: 'w1', data: {} },
+    ]);
+    store['loadedCars'] = JSON.stringify([
+      { id: 'loaded:b', name: 'c1', data: { brain: [], controls: [] } },
+    ]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => mockResponse(null, false, 500)),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    const mgr = await Fresh.init();
+    expect(mgr.getLoadedWorlds()).toEqual([
+      { id: 'loaded:a', name: 'w1', data: {} },
+    ]);
+    expect(mgr.getLoadedCars()).toEqual([
+      { id: 'loaded:b', name: 'c1', data: { brain: [], controls: [] } },
+    ]);
+  });
+
+  it('returns the same instance on repeated init() calls', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => mockResponse(null, false, 500)),
+    );
+    vi.resetModules();
+    const { StoreManager: Fresh } = await import(
+      '../../../ts/store/storeManager.js'
+    );
+    const mgr1 = await Fresh.init();
+    const mgr2 = await Fresh.init();
+    expect(mgr1).toBe(mgr2);
+    expect(Fresh.getInstance()).toBe(mgr1);
+  });
+});

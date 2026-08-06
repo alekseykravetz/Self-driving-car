@@ -119,6 +119,23 @@ describe('poolManager (edge coverage)', () => {
       expect(top[1].name).toBe('b');
       expect(top[2].name).toBe('c');
     });
+
+    it('shifts lower-ranked entries down when a later car outranks them', () => {
+      // Fed in ascending fitness order so each new car must shift into place,
+      // exercising the insertion-sort loop inside getTopAICars.
+      const cars = [
+        makeMockCar({ name: 'a' }),
+        makeMockCar({ name: 'b' }),
+        makeMockCar({ name: 'c' }),
+      ];
+      const fitness: Record<string, number> = { a: 1, b: 2, c: 3 };
+      const top = getTopAICars(
+        cars,
+        (c: unknown) => fitness[(c as MockCar).name ?? ''] ?? 0,
+        3,
+      );
+      expect(top.map((c) => c.name)).toEqual(['c', 'b', 'a']);
+    });
   });
 
   describe('applyPoolToCars', () => {

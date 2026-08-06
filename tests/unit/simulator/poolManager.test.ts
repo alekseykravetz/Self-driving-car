@@ -1,7 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { setupImageMock } from '../../helpers/setupImageMock.js';
+
+setupImageMock();
+
+import type { CarInfo } from '../../../ts/car/car.js';
 import {
   brainsCompatible,
   inferHiddenLayers,
+  createCarsForTraining,
   getTopAICars,
   getTopCarInfoPool,
 } from '../../../ts/simulator/training/genetics/poolManager.js';
@@ -28,6 +34,59 @@ function makeMockCar(
 }
 
 describe('poolManager', () => {
+  describe('createCarsForTraining', () => {
+    const config: CarInfo = {
+      maxSpeed: 3.24,
+      friction: 0.002,
+      acceleration: 0.01,
+      width: 25,
+      height: 63,
+      hiddenLayers: [6],
+      sensor: {
+        rayCount: 5,
+        raySpread: Math.PI / 2,
+        rayLength: 150,
+        rayOffset: 0,
+        stateAware: false,
+      },
+    };
+    const startInfo = { x: 10, y: 20, angle: 0.5 };
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('creates the requested number of cars', () => {
+      const cars = createCarsForTraining(3, 'AI', config, startInfo);
+      expect(cars.length).toBe(3);
+    });
+
+    it('AI cars are blue and numbered 1..count', () => {
+      const cars = createCarsForTraining(3, 'AI', config, startInfo);
+      for (const car of cars) expect(car.color).toBe('blue');
+      expect(cars.map((c) => c.name)).toEqual(['1', '2', '3']);
+    });
+
+    it('non-AI cars are red', () => {
+      const cars = createCarsForTraining(2, 'DUMMY', config, startInfo);
+      for (const car of cars) expect(car.color).toBe('red');
+    });
+
+    it('KEYS cars are all named "K"', () => {
+      // The KEYS control type registers document keyboard listeners.
+      vi.stubGlobal('document', { addEventListener: () => {} });
+      const cars = createCarsForTraining(2, 'KEYS', config, startInfo);
+      expect(cars.map((c) => c.name)).toEqual(['K', 'K']);
+    });
+
+    it('places cars at the given start position and angle', () => {
+      const cars = createCarsForTraining(1, 'AI', config, startInfo);
+      expect(cars[0].x).toBe(10);
+      expect(cars[0].y).toBe(20);
+      expect(cars[0].angle).toBe(0.5);
+    });
+  });
+
   describe('brainsCompatible', () => {
     it('same architecture -> true', () => {
       const a = new NeuralNetwork([6, 6, 4]);

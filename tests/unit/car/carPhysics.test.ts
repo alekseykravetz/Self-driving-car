@@ -17,6 +17,7 @@ function makeState(overrides: Partial<CarState> = {}): CarState {
     damaged: false,
     fitness: 0,
     polygon: [],
+    physicsModel: 'arcade',
     ...overrides,
   };
 }
@@ -75,6 +76,13 @@ describe('CarPhysics', () => {
       expect(state.speed).toBeGreaterThanOrEqual(-3.24 * 0.5);
     });
 
+    it('reverse speed is clamped at -maxSpeed*REVERSE_SPEED_RATIO when already beyond the cap', () => {
+      const physics = new CarPhysics();
+      const state = makeState({ speed: -10, friction: 0 });
+      physics.update(state, { forward: false, reverse: true });
+      expect(state.speed).toBe(-3.24 * 0.5);
+    });
+
     it('collision with polygon -> damaged, speed=0, returns true', () => {
       const physics = new CarPhysics();
       const state = makeState({ x: 0, y: 0, speed: 0 });
@@ -103,6 +111,111 @@ describe('CarPhysics', () => {
       ];
       const result = physics.update(state, noControls, [wall]);
       expect(result).toBe(false);
+    });
+  });
+
+  describe('update - realistic physics model', () => {
+    it('forward control accelerates from rest', () => {
+      const physics = new CarPhysics();
+      const state = makeState({ physicsModel: 'realistic', friction: 0 });
+      physics.update(state, { forward: true, reverse: false });
+      expect(state.speed).toBeCloseTo(state.acceleration, 5);
+    });
+
+    it('reverse control decelerates into negative speed from rest', () => {
+      const physics = new CarPhysics();
+      const state = makeState({ physicsModel: 'realistic', friction: 0 });
+      physics.update(state, { forward: false, reverse: true });
+      expect(state.speed).toBeCloseTo(-state.acceleration, 5);
+    });
+
+    it('engine tapers off as speed approaches maxSpeed', () => {
+      const physics = new CarPhysics();
+      const nearMax = makeState({
+        physicsModel: 'realistic',
+        friction: 0,
+        speed: 3.2,
+        maxSpeed: 3.24,
+      });
+      const atRest = makeState({ physicsModel: 'realistic', friction: 0 });
+      physics.update(nearMax, { forward: true, reverse: false });
+      physics.update(atRest, { forward: true, reverse: false });
+      const deltaNearMax = nearMax.speed - 3.2;
+      const deltaAtRest = atRest.speed;
+      expect(deltaNearMax).toBeLessThan(deltaAtRest);
+    });
+
+    it('forward control while moving in reverse brakes harder than the engine accelerates', () => {
+      const physics = new CarPhysics();
+      const state = makeState({
+        physicsModel: 'realistic',
+        friction: 0,
+        speed: -1,
+      });
+      physics.update(state, { forward: true, reverse: false });
+      expect(state.speed).toBeCloseTo(
+        -1 + state.acceleration * 3, // REALISTIC_BRAKE_FORCE_RATIO
+        5,
+      );
+    });
+
+    it('reverse control while moving forward brakes harder than the engine accelerates', () => {
+      const physics = new CarPhysics();
+      const state = makeState({
+        physicsModel: 'realistic',
+        friction: 0,
+        speed: 1,
+      });
+      physics.update(state, { forward: false, reverse: true });
+      expect(state.speed).toBeCloseTo(1 - state.acceleration * 3, 5);
+    });
+
+    it('speed is capped at maxSpeed', () => {
+      const physics = new CarPhysics();
+      const state = makeState({
+        physicsModel: 'realistic',
+        friction: 0,
+        speed: 3.24,
+        maxSpeed: 3.24,
+      });
+      physics.update(state, { forward: true, reverse: false });
+      expect(state.speed).toBe(3.24);
+    });
+
+    it('speed is capped at -maxSpeed*REVERSE_SPEED_RATIO', () => {
+      const physics = new CarPhysics();
+      const state = makeState({
+        physicsModel: 'realistic',
+        friction: 0,
+        speed: -1.62,
+        maxSpeed: 3.24,
+      });
+      physics.update(state, { forward: false, reverse: true });
+      expect(state.speed).toBe(-1.62);
+    });
+
+    it('drag decelerates a coasting car toward zero without controls', () => {
+      const physics = new CarPhysics();
+      const state = makeState({
+        physicsModel: 'realistic',
+        speed: 3,
+        friction: 0.05,
+      });
+      physics.update(state, noControls);
+      expect(state.speed).toBeLessThan(3);
+      expect(state.speed).toBeGreaterThanOrEqual(0);
+    });
+
+    it('drag decelerates a reverse-coasting car toward zero without controls', () => {
+      const physics = new CarPhysics();
+      const state = makeState({
+        physicsModel: 'realistic',
+        speed: -3,
+        friction: 0.05,
+      });
+      physics.update(state, noControls);
+      expect(state.speed).toBeGreaterThan(-3);
+      expect(state.speed).toBeLessThanOrEqual(0);
     });
   });
 

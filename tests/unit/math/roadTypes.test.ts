@@ -21,11 +21,17 @@ describe('roadTypes', () => {
     it('returns 2 for primary', () => {
       expect(defaultLaneCount('primary', false)).toBe(2);
     });
+    it('returns 2 for tertiary', () => {
+      expect(defaultLaneCount('tertiary', false)).toBe(2);
+    });
     it('returns 1 for service', () => {
       expect(defaultLaneCount('service', false)).toBe(1);
     });
     it('returns 1 for living_street', () => {
       expect(defaultLaneCount('living_street', false)).toBe(1);
+    });
+    it('returns 1 for track', () => {
+      expect(defaultLaneCount('track', false)).toBe(1);
     });
     it('returns 2 for undefined with oneWay=false', () => {
       expect(defaultLaneCount(undefined, false)).toBe(2);
