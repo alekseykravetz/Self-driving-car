@@ -37,6 +37,16 @@ export const HUMAN_TRAINING_CONFIG_MODAL_TEMPLATE = `
             state as a second value (2 inputs per ray instead of 1).
           </span>
         </div>
+        <div class="ctrl ctrl-wide ti-checkbox-ctrl">
+          <label class="ti-checkbox-label">
+            <input type="checkbox" id="htcCarRealisticPhysics" />
+            <span class="ctrl-label"><app-icon name="bolt"></app-icon> Realistic Physics</span>
+          </label>
+          <span class="ti-field-desc">
+            Speed-dependent steering, drag, braking, and engine power curve
+            instead of the flat-friction, constant-turn-rate arcade model.
+          </span>
+        </div>
       </div>
     </div>
 

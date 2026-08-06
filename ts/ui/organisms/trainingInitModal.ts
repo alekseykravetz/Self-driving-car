@@ -157,6 +157,12 @@ export class TrainingInitModalElement extends HTMLElement {
     if (saCheck) {
       saCheck.checked = c.sensor.stateAware ?? false;
     }
+    const rpCheck = this.querySelector<HTMLInputElement>(
+      '#tiCarRealisticPhysics',
+    );
+    if (rpCheck) {
+      rpCheck.checked = c.physicsModel === 'realistic';
+    }
   }
 
   /** Re-read the available brain sources and enable/disable the radios. */
@@ -328,6 +334,10 @@ export class TrainingInitModalElement extends HTMLElement {
     });
     const saCheck = this.querySelector<HTMLInputElement>('#tiCarStateAware');
     if (saCheck) saCheck.disabled = locked;
+    const rpCheck = this.querySelector<HTMLInputElement>(
+      '#tiCarRealisticPhysics',
+    );
+    if (rpCheck) rpCheck.disabled = locked;
   }
 
   // ── Result ───────────────────────────────────────────
@@ -379,6 +389,11 @@ export class TrainingInitModalElement extends HTMLElement {
       width: this.#num('#tiCarWidth', DEFAULT_CAR_CONFIG.width, true),
       height: this.#num('#tiCarHeight', DEFAULT_CAR_CONFIG.height, true),
       hiddenLayers: hidden,
+      physicsModel: this.querySelector<HTMLInputElement>(
+        '#tiCarRealisticPhysics',
+      )?.checked
+        ? 'realistic'
+        : 'arcade',
       sensor: {
         rayCount: this.#num('#tiCarRayCount', 5, true),
         rayLength: this.#num('#tiCarRayLength', 150, true),

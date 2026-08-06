@@ -23,6 +23,7 @@ export function createCarsForTraining(
       friction: config.friction,
       color,
       hiddenLayers: config.hiddenLayers,
+      physicsModel: config.physicsModel,
       sensor: config.sensor,
     });
     car.name = type === 'KEYS' ? 'K' : String(i);
