@@ -1007,6 +1007,27 @@ These keys are mirrored in the shared `<shortcuts-toolbar>` (top-left). `S` / `E
 latch** their mode on permanently (effective state = latched OR key-held). `T`
 belongs to the Corridor group and latches the open-ended (tunnel) corridor mode.
 
+**Touch interactions:**
+
+A drawing tool is always active in the editor, so the viewport runs in
+`two-finger-only` mode (`WorldEditor` calls `viewport.setTouchPanMode('two-finger-only')`):
+single-finger touches reach the editor, two-finger gestures pan/zoom the map.
+
+| Action               | Touch input                           |
+| -------------------- | ------------------------------------- |
+| Place / select point | Single tap                            |
+| Move point           | Single-finger drag                    |
+| Delete / deselect    | Long-press (500 ms) or two-finger tap |
+| Pan map              | Two-finger drag                       |
+| Zoom map             | Pinch                                 |
+
+The touch mapping reuses each editor's existing mouse handlers via a shared
+`createEditorGestures` helper (`ts/world/editors/editorPointerInput.ts`): a tap
+synthesizes a left `mousedown`, a long-press/two-finger tap synthesizes a right
+`mousedown`. `MarkingEditor` exposes a `handleTouchPrimary()` hook so
+`LightEditor` can intercept taps on existing lights (cycle override) before a
+new light is placed.
+
 **Visual feedback:**
 
 - Hovered point: highlighted with larger radius + outline

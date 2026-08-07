@@ -93,6 +93,35 @@ clicks via `setClickListener`.
 
 ---
 
+## Touch Gestures (`ts/input/pointerGestures.ts`)
+
+`PointerGestures` is a shared Pointer Events recognizer attached to interactive
+canvases (viewport, world editors, mini-maps). It ignores `mouse` pointers so
+desktop input keeps its existing `mousedown`/`wheel` path, and turns
+`touch`/`pen` pointers into high-level callbacks:
+
+| Callback               | Fired by                                                       |
+| ---------------------- | -------------------------------------------------------------- |
+| `onDragStart/Move/End` | One-finger drag (begins once movement passes tolerance)        |
+| `onTap`                | One-finger tap (no movement, short hold)                       |
+| `onPinch`              | Two-finger pinch (`scale` + focal midpoint)                    |
+| `onTwoFingerPan`       | Two-finger drag (canvas-px delta)                              |
+| `onSecondaryTap`       | Long-press (500 ms) or two-finger tap — right-click equivalent |
+
+Single-finger recognition is **deferred**: a stationary touch resolves to a tap
+(or long-press if held), and only crosses into a drag after moving past the
+tolerance — cleanly separating "tap to place", "drag to move", and "long-press
+to delete". `singleFingerDisabled()` lets a consumer suppress single-finger
+gestures so they flow elsewhere (the viewport uses this in `two-finger-only`
+mode while a world-editor tool is active). See [Viewport.md](Viewport.md) for
+the per-surface gesture routing and [WorldEditor.md](WorldEditor.md) for the
+editor touch mapping.
+
+Note: this is distinct from the race-only `PhoneControls` below, which reads
+device tilt + tap for driving, not map navigation.
+
+---
+
 ## Control Interface
 
 All control systems ultimately set these four boolean flags, consumed by `Car.#move()`:

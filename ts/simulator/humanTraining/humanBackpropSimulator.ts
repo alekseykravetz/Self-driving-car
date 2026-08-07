@@ -145,6 +145,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
         simpleWorld.graph,
         this.miniMapCanvas.width,
       );
+      this.miniMap.setOnRecenter((p) => this.viewport?.recenterOn(p));
+      this.miniMap.enableInput();
       const startInfo = this.getStartInfo();
       this.camera = new Camera(startInfo);
       this.#simpleState.traffic = generateInitialTraffic(
@@ -169,6 +171,8 @@ export class HumanBackpropSimulator extends SimulatorShell {
       this.world.graph,
       this.miniMapCanvas.width,
     );
+    this.miniMap.setOnRecenter((p) => this.viewport?.recenterOn(p));
+    this.miniMap.enableInput();
     const startInfo = this.getStartInfo();
     this.camera = new Camera(startInfo);
     this.updateRoadBorders();

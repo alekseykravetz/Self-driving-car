@@ -8,6 +8,8 @@ import type {
   KeyboardManager,
   ShortcutBinding,
 } from '../../input/keyboardManager.js';
+import { PointerGestures } from '../../input/pointerGestures.js';
+import { createEditorGestures } from './editorPointerInput.js';
 
 export class InspectEditor {
   #viewport: Viewport;
@@ -24,6 +26,7 @@ export class InspectEditor {
   #boundMouseDown: (event: MouseEvent) => void;
   #boundMouseMove: (event: MouseEvent) => void;
   #boundContextMenu: (event: MouseEvent) => void;
+  #gestures: PointerGestures;
 
   #bindings: ShortcutBinding[] = [
     {
@@ -50,6 +53,12 @@ export class InspectEditor {
     this.#boundMouseDown = this.#handleMouseDown.bind(this);
     this.#boundMouseMove = this.#handleMouseMove.bind(this);
     this.#boundContextMenu = (e: MouseEvent) => e.preventDefault();
+
+    this.#gestures = createEditorGestures(this.#canvas, {
+      hover: (e) => this.#handleMouseMove(e),
+      primary: (e) => this.#handleMouseDown(e),
+      secondary: (e) => this.#handleMouseDown(e),
+    });
   }
 
   bindKeyboard(km: KeyboardManager): void {
@@ -60,6 +69,7 @@ export class InspectEditor {
     this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.addEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.enable();
     this.#keyboardManager?.pushBindings(this.#bindings);
   }
 
@@ -67,6 +77,7 @@ export class InspectEditor {
     this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.removeEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.disable();
     this.#keyboardManager?.popBindings();
     this.#deselectSegment();
     this.#hoveredSegment = null;

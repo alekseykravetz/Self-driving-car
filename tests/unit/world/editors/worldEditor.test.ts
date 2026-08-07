@@ -394,6 +394,8 @@ vi.mock('../../../../ts/viewport/viewport.js', () => ({
       offset: { x: 0, y: 0 },
       mode: 'mouse',
       setMode: vi.fn(),
+      setTouchPanMode: vi.fn(),
+      recenterOn: vi.fn(),
       reset: vi.fn(),
       getOffset: vi.fn(() => ({ x: 0, y: 0 })),
       drawScaleIndicator: vi.fn(),
@@ -414,6 +416,9 @@ vi.mock('../../../../ts/mini-map/miniMap.js', () => ({
   MiniMap: function () {
     return {
       draw: vi.fn(),
+      setOnRecenter: vi.fn(),
+      enableInput: vi.fn(),
+      disableInput: vi.fn(),
       viewport: {
         canvas: { getContext: vi.fn() } as unknown as HTMLCanvasElement,
         zoom: 1,

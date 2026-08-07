@@ -10,6 +10,8 @@ import {
   KeyboardManager,
   ShortcutBinding,
 } from '../../input/keyboardManager.js';
+import { PointerGestures } from '../../input/pointerGestures.js';
+import { createEditorGestures } from './editorPointerInput.js';
 
 /**
  * Authoring tool for {@link Corridor} world objects.
@@ -40,6 +42,7 @@ export class CorridorEditor {
   #boundMouseDown: (event: MouseEvent) => void;
   #boundMouseMove: (event: MouseEvent) => void;
   #boundContextMenu: (event: MouseEvent) => void;
+  #gestures: PointerGestures;
 
   #bindings: ShortcutBinding[];
 
@@ -52,6 +55,12 @@ export class CorridorEditor {
     this.#boundMouseDown = this.#handleMouseDown.bind(this);
     this.#boundMouseMove = this.#handleMouseMove.bind(this);
     this.#boundContextMenu = (e: MouseEvent) => e.preventDefault();
+
+    this.#gestures = createEditorGestures(this.#canvas, {
+      hover: (e) => this.#handleMouseMove(e),
+      primary: (e) => this.#handleMouseDown(e),
+      secondary: (e) => this.#handleMouseDown(e),
+    });
 
     this.#bindings = this.#buildBindings();
   }
@@ -76,6 +85,7 @@ export class CorridorEditor {
     this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.addEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.enable();
     this.#keyboardManager?.pushBindings(this.#bindings);
   }
 
@@ -83,6 +93,7 @@ export class CorridorEditor {
     this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
     this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.removeEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.disable();
     this.#keyboardManager?.popBindings();
     this.#start = null;
     this.#hovered = null;

@@ -40,6 +40,19 @@ export class LightEditor extends MarkingEditor {
     this.#cycleLight(light);
   }
 
+  /**
+   * Touch primary: a tap on an existing light cycles its override; otherwise a
+   * new light is placed. Mirrors the mouse path's light-click interception.
+   */
+  protected override handleTouchPrimary(): void {
+    const light = this.mouse ? this.#findLightAt(this.mouse) : null;
+    if (light) {
+      this.#cycleLight(light);
+      return;
+    }
+    super.handleTouchPrimary();
+  }
+
   #findLightAt(point: Point): Light | null {
     for (const marking of this.markings) {
       if (marking instanceof Light && marking.polygon.containsPoint(point)) {
