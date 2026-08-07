@@ -2,6 +2,7 @@ import { Point } from '../math/primitives/point.js';
 import { ScaleIndicator } from './scaleIndicator.js';
 import { scale, subtract, add } from '../math/utils.js';
 import { WORLD_PIXELS_PER_METER } from '../math/worldUnits.js';
+import { PointerGestures } from '../input/pointerGestures.js';
 
 export interface DragState {
   start: Point;
@@ -16,6 +17,14 @@ export interface DragState {
  * - 'touchpad': two-finger scroll pans; pinch / Ctrl+scroll zooms.
  */
 export type ViewportMode = 'mouse' | 'touchpad';
+
+/**
+ * Controls how single-finger touch is routed:
+ * - 'one-finger': one finger pans the map (default; simulators/traffic).
+ * - 'two-finger-only': single-finger touches flow to another consumer (a
+ *   world-editor drawing tool), so only two-finger gestures pan/zoom here.
+ */
+export type TouchPanMode = 'one-finger' | 'two-finger-only';
 
 /** Default (fast) zoom increment applied per scroll-wheel notch. */
 const ZOOM_STEP_FAST = 0.3;
@@ -56,6 +65,9 @@ export class Viewport {
   #boundHandleMouseMove: (e: MouseEvent) => void;
   #boundHandleMouseUp: (e: MouseEvent) => void;
 
+  #touchPanMode: TouchPanMode = 'one-finger';
+  #gestures: PointerGestures;
+
   /**
    * Creates a Viewport instance.
    * @param canvas - The HTML canvas element to manage.
@@ -87,6 +99,18 @@ export class Viewport {
     this.#boundHandleMouseMove = this.#handleMouseMove.bind(this);
     this.#boundHandleMouseUp = this.#handleMouseUp.bind(this);
 
+    this.#gestures = new PointerGestures(
+      this.canvas,
+      {
+        onDragStart: (p) => this.#touchPanStart(p),
+        onDragMove: (p) => this.#touchPanMove(p),
+        onDragEnd: () => this.#touchPanEnd(),
+        onPinch: (s, focal) => this.#applyPinch(s, focal),
+        onTwoFingerPan: (dx, dy) => this.#applyTwoFingerPan(dx, dy),
+      },
+      { singleFingerDisabled: () => this.#touchPanMode === 'two-finger-only' },
+    );
+
     this.#addEventListeners();
   }
 
@@ -115,7 +139,10 @@ export class Viewport {
    * @param subtractDragOffset - If true, returns position ignoring temporary drag offset. Useful for visual elements that shouldn't move during drag.
    * @returns The calculated Point in world coordinates.
    */
-  public getMouse(e: MouseEvent, subtractDragOffset: boolean = false): Point {
+  public getMouse(
+    e: PointerEvent | MouseEvent,
+    subtractDragOffset: boolean = false,
+  ): Point {
     // Formula: ((mouseCanvasPos - canvasCenter) * zoom) - worldOffset
     const p = new Point(
       (e.offsetX - this.center.x) * this.zoom - this.offset.x,
@@ -186,6 +213,62 @@ export class Viewport {
     this.mode = mode;
   }
 
+  /**
+   * Sets how single-finger touch is routed. World editors switch to
+   * 'two-finger-only' while a drawing tool is active so single-finger touches
+   * reach the editor; simulators stay on 'one-finger'.
+   */
+  public setTouchPanMode(mode: TouchPanMode): void {
+    this.#touchPanMode = mode;
+  }
+
+  /** Recenters the viewport so `worldPoint` sits at the canvas center. */
+  public recenterOn(worldPoint: Point): void {
+    this.offset = scale(worldPoint, -1);
+  }
+
+  /** Converts canvas-offset coordinates to world coordinates (ignores drag). */
+  #screenToWorld(x: number, y: number): Point {
+    return new Point(
+      (x - this.center.x) * this.zoom - this.offset.x,
+      (y - this.center.y) * this.zoom - this.offset.y,
+    );
+  }
+
+  #touchPanStart(p: { x: number; y: number }): void {
+    this.#drag.start = this.#screenToWorld(p.x, p.y);
+    this.#drag.active = true;
+  }
+
+  #touchPanMove(p: { x: number; y: number }): void {
+    if (!this.#drag.active) return;
+    this.#drag.end = this.#screenToWorld(p.x, p.y);
+    this.#drag.offset = subtract(this.#drag.end, this.#drag.start);
+  }
+
+  #touchPanEnd(): void {
+    if (!this.#drag.active) return;
+    this.offset = add(this.offset, this.#drag.offset);
+    this.#resetDrag();
+  }
+
+  /** Zooms toward the pinch focal point, keeping that world point under the fingers. */
+  #applyPinch(scaleFactor: number, focal: { x: number; y: number }): void {
+    const worldBefore = this.#screenToWorld(focal.x, focal.y);
+    // Larger finger spread (scaleFactor > 1) zooms IN, which is a smaller zoom
+    // value here (zoom = world units per pixel).
+    const newZoom = this.#clampZoom(this.zoom / scaleFactor);
+    this.zoom = newZoom;
+    this.offset = new Point(
+      (focal.x - this.center.x) * newZoom - worldBefore.x,
+      (focal.y - this.center.y) * newZoom - worldBefore.y,
+    );
+  }
+
+  #applyTwoFingerPan(dx: number, dy: number): void {
+    this.offset = add(this.offset, new Point(dx * this.zoom, dy * this.zoom));
+  }
+
   #addEventListeners(): void {
     this.canvas.addEventListener('wheel', this.#boundHandleMouseWheel, {
       passive: false,
@@ -194,6 +277,7 @@ export class Viewport {
     this.canvas.addEventListener('mousemove', this.#boundHandleMouseMove);
     // Listen to mouseup on the window/document to catch cases where mouse is released outside canvas
     window.addEventListener('mouseup', this.#boundHandleMouseUp);
+    this.#gestures.enable();
   }
 
   // public removeEventListeners(): void {

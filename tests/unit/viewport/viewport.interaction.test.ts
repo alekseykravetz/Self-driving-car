@@ -210,3 +210,59 @@ describe('Viewport transform + derived getters', () => {
     expect(raw.y - adjusted.y).toBe(40);
   });
 });
+
+describe('Viewport touch gestures', () => {
+  const touch = (id: number, x: number, y: number) => ({
+    pointerId: id,
+    pointerType: 'touch',
+    offsetX: x,
+    offsetY: y,
+    preventDefault: () => {},
+  });
+
+  it('pans with a single finger drag in one-finger mode', () => {
+    const h = makeViewport(2);
+    const before = h.viewport.offset.x;
+    h.fire('pointerdown', touch(1, 100, 100));
+    h.fire('pointermove', touch(1, 150, 100)); // +50px → drag begins
+    h.fire('pointerup', touch(1, 150, 100));
+    // Content follows the finger: offset shifts by +dxWorld = +50 * zoom.
+    expect(h.viewport.offset.x - before).toBeCloseTo(50 * 2, 5);
+  });
+
+  it('ignores single-finger drag in two-finger-only mode', () => {
+    const h = makeViewport(2);
+    h.viewport.setTouchPanMode('two-finger-only');
+    const before = h.viewport.offset.x;
+    h.fire('pointerdown', touch(1, 100, 100));
+    h.fire('pointermove', touch(1, 150, 100));
+    h.fire('pointerup', touch(1, 150, 100));
+    expect(h.viewport.offset.x).toBe(before);
+  });
+
+  it('pinch zooms and keeps the focal world point under the fingers', () => {
+    const h = makeViewport(4);
+    const focal = { offsetX: 200, offsetY: 150 } as MouseEvent;
+    const worldBefore = h.viewport.getMouse(focal);
+    h.fire('pointerdown', touch(1, 150, 150));
+    h.fire('pointerdown', touch(2, 250, 150)); // dist=100, mid=(200,150)
+    h.fire('pointermove', touch(2, 350, 150)); // dist=200 → scale 2 → zoom in
+    // Zoom decreases (more zoomed in) by the pinch scale.
+    expect(h.viewport.zoom).toBeCloseTo(2, 5);
+    const worldAfter = h.viewport.getMouse(focal);
+    expect(worldAfter.x).toBeCloseTo(worldBefore.x, 4);
+    expect(worldAfter.y).toBeCloseTo(worldBefore.y, 4);
+  });
+
+  it('recenterOn places a world point at the screen center', () => {
+    const h = makeViewport(2);
+    h.viewport.recenterOn(new Point(300, -120));
+    // At the canvas center getMouse returns -offset = the recentered point.
+    const centered = h.viewport.getMouse({
+      offsetX: h.width / 2,
+      offsetY: h.height / 2,
+    } as MouseEvent);
+    expect(centered.x).toBeCloseTo(300, 5);
+    expect(centered.y).toBeCloseTo(-120, 5);
+  });
+});
