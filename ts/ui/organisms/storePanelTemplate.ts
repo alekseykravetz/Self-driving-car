@@ -6,9 +6,9 @@ export const STORE_PANEL_TEMPLATE = `
       Store Files
     </h3>
     <div class="store-tabs">
-      <button class="store-tab active" data-tab="worlds"><app-icon name="map"></app-icon> Worlds <span class="store-tab-count" data-count="worlds"></span></button>
-      <button class="store-tab" data-tab="cars"><app-icon name="car"></app-icon> Cars <span class="store-tab-count" data-count="cars"></span></button>
-      <button class="store-tab" data-tab="localStorage"><app-icon name="save"></app-icon> LocalStorage <span class="store-tab-count" data-count="localStorage"></span></button>
+      <button class="store-tab active" data-tab="worlds"><app-icon name="map"></app-icon> <span class="store-tab-label">Worlds</span> <span class="store-tab-count" data-count="worlds"></span></button>
+      <button class="store-tab" data-tab="cars"><app-icon name="car"></app-icon> <span class="store-tab-label">Cars</span> <span class="store-tab-count" data-count="cars"></span></button>
+      <button class="store-tab" data-tab="localStorage"><app-icon name="save"></app-icon> <span class="store-tab-label">LocalStorage</span> <span class="store-tab-count" data-count="localStorage"></span></button>
     </div>
   </div>
 
@@ -16,7 +16,7 @@ export const STORE_PANEL_TEMPLATE = `
     <table class="store-table">
       <thead>
         <tr>
-          <th class="sortable" data-sort-key="selected">Selected</th>
+          <th class="sortable store-th-selected" data-sort-key="selected"><span class="store-th-label">Selected</span><app-icon class="store-th-icon" name="check"></app-icon></th>
           <th class="sortable" data-sort-key="filename">Name</th>
           <th class="sortable" data-sort-key="source">Source</th>
           <th class="sortable" data-sort-key="start">Start</th>
@@ -34,7 +34,7 @@ export const STORE_PANEL_TEMPLATE = `
     <table class="store-table">
       <thead>
         <tr>
-          <th class="sortable" data-sort-key="selected">Selected</th>
+          <th class="sortable store-th-selected" data-sort-key="selected"><span class="store-th-label">Selected</span><app-icon class="store-th-icon" name="check"></app-icon></th>
           <th class="sortable" data-sort-key="filename">Name</th>
           <th class="sortable" data-sort-key="source">Source</th>
           <th class="sortable" data-sort-key="hiddenLayers">Hidden Layers</th>

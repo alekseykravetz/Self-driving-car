@@ -181,6 +181,12 @@ store-panel {
   user-select: none;
 }
 
+/* Selected-column header icon is desktop-hidden (text label shown instead);
+   revealed on mobile where the label is collapsed to save horizontal space. */
+.store-th-icon {
+  display: none;
+}
+
 .store-table th.sortable:hover {
   color: var(--color-text-muted);
 }

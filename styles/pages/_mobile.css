@@ -47,6 +47,30 @@
     display: none;
   }
 
+  /* Collapse the tab buttons to icon + count only (drop the text label). */
+  .store-tab-label {
+    display: none;
+  }
+
+  /* Selected column: swap the "Selected" text header for a compact icon and
+     shrink the column to just fit the radio button. */
+  .store-tab-content[data-content='worlds'] .store-th-selected,
+  .store-tab-content[data-content='cars'] .store-th-selected,
+  .store-tab-content[data-content='worlds'] .store-table td:first-child,
+  .store-tab-content[data-content='cars'] .store-table td:first-child {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+    padding-left: var(--space-1);
+    padding-right: var(--space-1);
+  }
+  .store-th-selected .store-th-label {
+    display: none;
+  }
+  .store-th-selected .store-th-icon {
+    display: inline-flex;
+  }
+
   .store-tab-content[data-content='localStorage'] .store-table th:nth-child(2),
   .store-tab-content[data-content='localStorage'] .store-table td:nth-child(2) {
     display: none;
