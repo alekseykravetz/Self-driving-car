@@ -1,5 +1,10 @@
 import { PointerGestures } from '../../input/pointerGestures.js';
 
+/** True when the MouseEvent was synthesized from a touch gesture (finger). */
+export function isTouchSynthEvent(e: MouseEvent): boolean {
+  return (e as { touchSynth?: boolean }).touchSynth === true;
+}
+
 /**
  * Actions a world-editor exposes so touch gestures can drive the same code
  * paths its mouse handlers use. Events passed here are synthesized from touch
@@ -35,6 +40,7 @@ export function createEditorGestures(
       offsetX: p.x,
       offsetY: p.y,
       button,
+      touchSynth: true,
       preventDefault: () => {},
     }) as unknown as MouseEvent;
 

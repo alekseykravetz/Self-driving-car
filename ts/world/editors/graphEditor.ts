@@ -21,7 +21,15 @@ import {
   ShortcutBinding,
 } from '../../input/keyboardManager.js';
 import { PointerGestures } from '../../input/pointerGestures.js';
-import { createEditorGestures } from './editorPointerInput.js';
+import {
+  createEditorGestures,
+  isTouchSynthEvent,
+} from './editorPointerInput.js';
+
+/** Hover hit-test radius (screen px) for precise mouse input. */
+const POINT_HIT_RADIUS_PX = 10;
+/** Larger hit-test radius (screen px) for imprecise finger taps. */
+const TOUCH_POINT_HIT_RADIUS_PX = 24;
 
 export class GraphEditor {
   #viewport: Viewport;
@@ -234,10 +242,16 @@ export class GraphEditor {
   // Handles mouse movement over the canvas. Updates hovered state and drags selected points.
   #handleMouseMove(e: MouseEvent): void {
     this.#mouse = this.#viewport.getMouse(e, true);
+    // Finger taps are far less precise than a mouse cursor, so give touch a
+    // larger hit-radius — this lets tapping/long-pressing an existing point
+    // select/delete it instead of dropping a new point beside it.
+    const hitRadiusPx = isTouchSynthEvent(e)
+      ? TOUCH_POINT_HIT_RADIUS_PX
+      : POINT_HIT_RADIUS_PX;
     this.#hovered = getNearestPoint(
       this.#mouse,
       this.#graph.points,
-      10 * this.#viewport.zoom, // Use dynamic threshold based on zoom
+      hitRadiusPx * this.#viewport.zoom, // Dynamic threshold based on zoom
     );
 
     if (this.#dragging && this.#selected) {
