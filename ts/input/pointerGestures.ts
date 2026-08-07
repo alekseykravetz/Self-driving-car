@@ -141,7 +141,27 @@ export class PointerGestures {
     }
   }
 
-  static #point(e: PointerEvent): GesturePoint {
+  /**
+   * Maps a pointer event to canvas-buffer coordinates.
+   *
+   * `offsetX/offsetY` are in CSS pixels relative to the element, but the drawing
+   * buffer uses `canvas.width/height`. On mobile (e.g. Android Chrome) the URL
+   * bar collapsing changes the canvas's CSS-rendered height while the buffer
+   * resolution lags, so `offsetY` no longer maps 1:1 and touches land at the
+   * wrong Y. Scaling `clientX/clientY - rect` by `buffer / rect` size keeps the
+   * mapping correct regardless of CSS scaling. Falls back to `offsetX/offsetY`
+   * when `getBoundingClientRect` is unavailable (e.g. unit-test mocks).
+   */
+  #point(e: PointerEvent): GesturePoint {
+    const rect = this.#canvas.getBoundingClientRect?.();
+    if (rect && rect.width > 0 && rect.height > 0) {
+      const sx = this.#canvas.width / rect.width;
+      const sy = this.#canvas.height / rect.height;
+      return {
+        x: (e.clientX - rect.left) * sx,
+        y: (e.clientY - rect.top) * sy,
+      };
+    }
     return { x: e.offsetX, y: e.offsetY };
   }
 
@@ -155,11 +175,12 @@ export class PointerGestures {
     }
 
     const now = performance.now();
+    const p = this.#point(e);
     this.#pointers.set(e.pointerId, {
-      x: e.offsetX,
-      y: e.offsetY,
-      startX: e.offsetX,
-      startY: e.offsetY,
+      x: p.x,
+      y: p.y,
+      startX: p.x,
+      startY: p.y,
       startT: now,
     });
 
@@ -167,7 +188,7 @@ export class PointerGestures {
       // Transition into a two-finger gesture: abandon any single-finger state.
       this.#clearLongPress();
       if (this.#dragActive) {
-        this.#cb.onDragEnd?.(PointerGestures.#point(e), e);
+        this.#cb.onDragEnd?.(this.#point(e), e);
         this.#dragActive = false;
       }
       this.#multiTouch = true;
@@ -188,7 +209,7 @@ export class PointerGestures {
           this.#longPressTimer = null;
           if (this.#pointers.size !== 1 || this.#dragActive) return;
           this.#gestureConsumed = true;
-          this.#cb.onSecondaryTap?.(PointerGestures.#point(e), e);
+          this.#cb.onSecondaryTap?.(this.#point(e), e);
         }, this.#longPressMs);
       }
     }
@@ -198,8 +219,9 @@ export class PointerGestures {
     if (e.pointerType === 'mouse') return;
     const rec = this.#pointers.get(e.pointerId);
     if (!rec) return;
-    rec.x = e.offsetX;
-    rec.y = e.offsetY;
+    const p = this.#point(e);
+    rec.x = p.x;
+    rec.y = p.y;
 
     if (this.#pointers.size >= 2) {
       this.#handleTwoFingerMove();
@@ -220,7 +242,7 @@ export class PointerGestures {
       this.#cb.onDragStart?.({ x: rec.startX, y: rec.startY }, e);
     }
 
-    this.#cb.onDragMove?.(PointerGestures.#point(e), e);
+    this.#cb.onDragMove?.(this.#point(e), e);
     e.preventDefault();
   }
 
@@ -285,7 +307,7 @@ export class PointerGestures {
     // Last finger up — resolve single-finger outcome.
     this.#clearLongPress();
     if (this.#dragActive) {
-      this.#cb.onDragEnd?.(PointerGestures.#point(e), e);
+      this.#cb.onDragEnd?.(this.#point(e), e);
     } else if (
       rec &&
       !this.#gestureConsumed &&
