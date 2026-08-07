@@ -54,8 +54,6 @@
 
   #topControls [data-group='selected'],
   #topControls [data-group='selected-sep'],
-  #topControls [data-group='tracking'],
-  #topControls [data-group='tracking-sep'],
   #topControls [data-group='viewport'],
   #topControls [data-group='viewport-sep'],
   #topControls [data-group='borders'],
@@ -65,12 +63,29 @@
     display: none;
   }
 
+  /* Training + traffic keep the Tracking section on mobile, but never the
+     keys-car option (there is no keyboard-driven car on touch devices). */
+  #topControls #trackModeKeys {
+    display: none;
+  }
+
+  /* Human Backpropagation has no pool tracking — hide the section there. */
+  body:has(human-training-panel) #topControls [data-group='tracking'],
+  body:has(human-training-panel) #topControls [data-group='tracking-sep'] {
+    display: none;
+  }
+
   /* Hide the shortcuts + world-layers toolbars across all simulators and the
      world editor on phone-sized screens. */
   #shortcutsToolbar,
   #worldLayersToolbar,
   #animationLoopToolbar {
     display: none;
+  }
+
+  /* Live Traffic Jam keeps a minimal shortcuts toolbar (Spawn → R only). */
+  body:has(traffic-panel) #shortcutsToolbar {
+    display: flex;
   }
 
   .landing-card a[href='html/race.html'],

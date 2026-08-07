@@ -5,6 +5,7 @@ import type { GridSegment } from '../../math/spatialGrid.js';
 import { TrafficControlGrid } from '../../math/trafficControlGrid.js';
 import type { TrafficPanelElement } from '../../ui/organisms/trafficPanel.js';
 import { KeyboardManager } from '../../input/keyboardManager.js';
+import type { ShortcutBinding } from '../../input/keyboardManager.js';
 import { zoomViewBindings } from '../../input/viewShortcuts.js';
 import {
   greenWaveBinding,
@@ -137,8 +138,12 @@ export class TrafficSimulator extends SimulatorShell {
 
   #initToolbar(): void {
     // Tracking is driven by the stats-panel selection, not the training pool,
-    // so the toolbar's pool-tracking group is irrelevant here.
-    this.toolbarPanel.hideGroups('tracking-sep', 'tracking');
+    // so the toolbar's pool-tracking group is irrelevant here — except on
+    // mobile, where it doubles as the free-drag / follow viewport control.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) {
+      this.toolbarPanel.hideGroups('tracking-sep', 'tracking');
+    }
 
     // Shortcuts toolbar: spawn-heading flip ('r'), green wave ('g'), and
     // viewport zoom modifier. All key routing is handled by KeyboardManager.
@@ -147,34 +152,43 @@ export class TrafficSimulator extends SimulatorShell {
     ) as ShortcutsToolbarElement | null;
     if (toolbar) {
       this.#keyboardManager = new KeyboardManager(toolbar);
-      this.#keyboardManager.setBindings([
-        {
-          id: 'keyR',
-          key: 'r',
-          label: 'R',
-          title:
-            'R — Flip spawn heading 180°. Hold while placing a car, or click to latch it on permanently.',
-          group: 'Spawn',
-          kind: 'toggle',
-          toggle: {
-            onActivate: () => {
-              this.#reverseHeading = true;
-            },
-            onDeactivate: () => {
-              this.#reverseHeading = false;
-            },
+      const reverseHeadingBinding: ShortcutBinding = {
+        id: 'keyR',
+        key: 'r',
+        label: 'R',
+        title:
+          'R — Flip spawn heading 180°. Hold while placing a car, or click to latch it on permanently.',
+        group: 'Spawn',
+        kind: 'toggle',
+        toggle: {
+          onActivate: () => {
+            this.#reverseHeading = true;
+          },
+          onDeactivate: () => {
+            this.#reverseHeading = false;
           },
         },
-        greenWaveBinding({
-          group: 'Spawn',
-          onActivate: () => this.#enableGreenWave(),
-          onDeactivate: () => this.#disableGreenWave(),
-        }),
-        // Shared Ctrl / Shift zoom-modifier indicators (traffic is always a
-        // full world view, so include the Shift fine-zoom key).
-        ...zoomViewBindings(),
-        visualizerDensityBinding(() => this.networkVisualizer.toggleDensity()),
-      ]);
+      };
+      // On mobile only the spawn-heading flip is useful; the desktop toolbar
+      // also exposes green-wave, zoom modifiers and the visualizer density key.
+      this.#keyboardManager.setBindings(
+        isMobile
+          ? [reverseHeadingBinding]
+          : [
+              reverseHeadingBinding,
+              greenWaveBinding({
+                group: 'Spawn',
+                onActivate: () => this.#enableGreenWave(),
+                onDeactivate: () => this.#disableGreenWave(),
+              }),
+              // Shared Ctrl / Shift zoom-modifier indicators (traffic is always
+              // a full world view, so include the Shift fine-zoom key).
+              ...zoomViewBindings(),
+              visualizerDensityBinding(() =>
+                this.networkVisualizer.toggleDensity(),
+              ),
+            ],
+      );
     }
 
     // Single-select car: the chosen car is painted on the next road click.
