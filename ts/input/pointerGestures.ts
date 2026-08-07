@@ -168,6 +168,12 @@ export class PointerGestures {
   #handleDown(e: PointerEvent): void {
     if (e.pointerType === 'mouse') return; // desktop mouse keeps its own path
 
+    // Cancel the touch pointerdown so the browser doesn't also fire the
+    // compatibility mouse events (mousedown/up) — otherwise the editors' raw
+    // mouse listeners would re-process the same touch at unscaled coordinates,
+    // dropping a duplicate ghost point.
+    if (e.cancelable) e.preventDefault();
+
     try {
       this.#canvas.setPointerCapture(e.pointerId);
     } catch {
