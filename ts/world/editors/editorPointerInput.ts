@@ -53,7 +53,7 @@ export function createEditorGestures(
       actions.hover(synth(p, 0));
       actions.primary(synth(p, 0));
     },
-    onDragMove: (_p, e) => (actions.drag ?? actions.hover)(e),
+    onDragMove: (p) => (actions.drag ?? actions.hover)(synth(p, 0)),
     onDragEnd: () => actions.dragEnd?.(),
     onSecondaryTap: (p) => {
       actions.hover(synth(p, 2));
