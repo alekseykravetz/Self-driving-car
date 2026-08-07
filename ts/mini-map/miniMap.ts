@@ -54,6 +54,11 @@ export class MiniMap {
   #lastViewPoint: Point = new Point(0, 0);
   #gestures: PointerGestures | null = null;
   #onRecenter: ((worldPoint: Point) => void) | null = null;
+  // Desktop mouse recenter (PointerGestures ignores mouse pointers).
+  #mouseDragging = false;
+  #boundMouseDown: ((e: MouseEvent) => void) | null = null;
+  #boundMouseMove: ((e: MouseEvent) => void) | null = null;
+  #boundMouseUp: (() => void) | null = null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -108,8 +113,9 @@ export class MiniMap {
   }
 
   /**
-   * Enables touch input: one-finger tap or drag recenters the main viewport on
-   * the touched location; pinch zooms the mini-map's own scale.
+   * Enables input: one-finger tap/drag (touch) or click/drag (mouse) recenters
+   * the main viewport on the chosen location; pinch zooms the mini-map's own
+   * scale.
    */
   enableInput(): void {
     if (this.#gestures) return;
@@ -123,12 +129,43 @@ export class MiniMap {
       onPinch: (s) => this.#setScaler(this.#scaler * s),
     });
     this.#gestures.enable();
+
+    // Desktop mouse: click or click-drag recenters (PointerGestures ignores
+    // mouse pointers, so wire it here directly).
+    this.#boundMouseDown = (e: MouseEvent) => {
+      this.#mouseDragging = true;
+      recenter({ x: e.offsetX, y: e.offsetY });
+    };
+    this.#boundMouseMove = (e: MouseEvent) => {
+      if (this.#mouseDragging) recenter({ x: e.offsetX, y: e.offsetY });
+    };
+    this.#boundMouseUp = () => {
+      this.#mouseDragging = false;
+    };
+    this.#canvas.addEventListener('mousedown', this.#boundMouseDown);
+    this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
+    window.addEventListener('mouseup', this.#boundMouseUp);
+    this.#canvas.style.cursor = 'pointer';
   }
 
-  /** Disables touch input. */
+  /** Disables input. */
   disableInput(): void {
     this.#gestures?.disable();
     this.#gestures = null;
+    if (this.#boundMouseDown) {
+      this.#canvas.removeEventListener('mousedown', this.#boundMouseDown);
+      this.#boundMouseDown = null;
+    }
+    if (this.#boundMouseMove) {
+      this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
+      this.#boundMouseMove = null;
+    }
+    if (this.#boundMouseUp) {
+      window.removeEventListener('mouseup', this.#boundMouseUp);
+      this.#boundMouseUp = null;
+    }
+    this.#mouseDragging = false;
+    this.#canvas.style.cursor = '';
   }
 
   /**
