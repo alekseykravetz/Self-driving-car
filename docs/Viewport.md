@@ -37,6 +37,10 @@ class Viewport {
   // Viewport culling
   getVisibleBounds(margin?): VisibleWorldRect; // Visible world-space AABB
 
+  // Touch / pointer
+  setTouchPanMode(mode: 'one-finger' | 'two-finger-only'): void;
+  recenterOn(worldPoint: Point): void; // Center the view on a world point
+
   // Scale indicator
   drawScaleIndicator(
     ctx?: CanvasRenderingContext2D, // defaults to this.ctx
@@ -239,6 +243,33 @@ city of spawned traffic fits on screen; see the Live Traffic Jam simulator).
 
 ---
 
+## Touch & Pointer Gestures
+
+Touch/pen input is handled by a `PointerGestures` recognizer
+(`ts/input/pointerGestures.ts`) attached alongside the mouse listeners. Mouse
+pointers are ignored by the recognizer, so desktop behavior is unchanged; only
+`touch`/`pen` pointers are turned into gestures:
+
+| Gesture                              | Result                                    |
+| ------------------------------------ | ----------------------------------------- |
+| One-finger drag                      | Pan (in `one-finger` mode)                |
+| Pinch (two fingers)                  | Zoom toward the finger midpoint           |
+| Two-finger drag                      | Pan                                       |
+| Long-press (500 ms) / two-finger tap | Secondary action (right-click equivalent) |
+
+`setTouchPanMode('two-finger-only')` suppresses single-finger pan so those
+touches flow to another consumer — the world editor uses this so a single
+finger draws/selects while two fingers pan/zoom. Simulators stay on
+`one-finger`. Pinch keeps the focal world point fixed under the fingers by
+recomputing `offset` after changing `zoom`. `recenterOn(worldPoint)` moves the
+view so a world point sits at the canvas center (used by mini-map tap-to-navigate).
+
+App-page canvases set `touch-action: none` (see `styles/atoms/_base.css`) and
+the 5 app HTML pages use `user-scalable=no` so the browser's own scroll/zoom
+never competes with these gestures.
+
+---
+
 ## Viewport in Simulator (Auto-Tracking)
 
 When tracking is enabled (best car or KEYS car), the simulator updates the viewport offset each frame:
@@ -352,6 +383,16 @@ identically in the world editor and all simulators.
 // mini-map instances recreated on world/mode reload.
 wireMiniMapWheelZoom(this.miniMapCanvas, () => this.miniMap);
 ```
+
+### Touch input (mobile)
+
+`miniMap.enableInput()` attaches a `PointerGestures` recognizer to the mini-map
+canvas. A one-finger **tap or drag** recenters the main viewport on the touched
+location (host wires `miniMap.setOnRecenter((p) => viewport.recenterOn(p))`),
+and a **pinch** zooms the mini-map's own scaler. The tapped pixel is converted
+back to a world coordinate with the inverse of `draw()`'s transform, using the
+last drawn `viewPoint`. Wired in the training (simple + world), traffic,
+human-backprop, and world-editor hosts (not race, whose view follows the car).
 
 ### Rendering
 

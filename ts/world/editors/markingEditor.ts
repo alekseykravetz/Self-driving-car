@@ -4,6 +4,8 @@ import { Point } from '../../math/primitives/point.js';
 import { Segment } from '../../math/primitives/segment.js';
 import { Marking } from '../markings/marking.js';
 import { getNearestSegment } from '../../math/utils.js';
+import { PointerGestures } from '../../input/pointerGestures.js';
+import { createEditorGestures } from './editorPointerInput.js';
 
 export class MarkingEditor {
   protected viewport: Viewport;
@@ -19,6 +21,7 @@ export class MarkingEditor {
   #boundMouseDown: (event: MouseEvent) => void;
   #boundMouseMove: (event: MouseEvent) => void;
   #boundContextMenu: (event: MouseEvent) => void;
+  #gestures: PointerGestures;
 
   constructor(
     viewport: Viewport,
@@ -38,6 +41,12 @@ export class MarkingEditor {
     this.#boundMouseDown = this.#handleMouseDown.bind(this);
     this.#boundMouseMove = this.#handleMouseMove.bind(this);
     this.#boundContextMenu = (e: MouseEvent) => e.preventDefault();
+
+    this.#gestures = createEditorGestures(this.canvas, {
+      hover: (e) => this.#handleMouseMove(e),
+      primary: () => this.handleTouchPrimary(),
+      secondary: () => this.removeMarkingAtMouse(),
+    });
   }
 
   /**
@@ -74,6 +83,7 @@ export class MarkingEditor {
     this.canvas.addEventListener('mousemove', this.#boundMouseMove);
     // Prevent default right-click menu
     this.canvas.addEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.enable();
   }
 
   /** Removes event listeners from the canvas. */
@@ -81,6 +91,7 @@ export class MarkingEditor {
     this.canvas.removeEventListener('mousedown', this.#boundMouseDown);
     this.canvas.removeEventListener('mousemove', this.#boundMouseMove);
     this.canvas.removeEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.disable();
   }
 
   /** Handles mouse movement to update the marking intent (preview). */
@@ -114,28 +125,45 @@ export class MarkingEditor {
 
     // Left click (Place marking)
     if (e.button === 0) {
-      if (this.intent) {
-        // Bind the marking to its road segment so it follows graph edits.
-        this.intent.setAnchor(this.world.graph);
-        // Add the current intent to the world's markings array
-        this.markings.push(this.intent);
-        this.intent = null; // Clear intent after placing
-      }
+      this.placeIntent();
     }
     // Right click (Remove marking)
     if (e.button === 2) {
-      // Iterate backwards for safe removal while looping
-      for (let i = this.markings.length - 1; i >= 0; i--) {
-        const poly = this.markings[i].polygon;
-        // Check if the mouse click is inside the marking's polygon
-        if (poly.containsPoint(this.mouse)) {
-          this.markings.splice(i, 1); // Remove the marking
-          // It's possible multiple markings overlap, maybe only remove one?
-          // Return here removes only the first one found under the cursor.
-          return;
-        }
+      this.removeMarkingAtMouse();
+    }
+  }
+
+  /** Places the current marking intent (if any) into the world. */
+  protected placeIntent(): void {
+    if (this.intent) {
+      // Bind the marking to its road segment so it follows graph edits.
+      this.intent.setAnchor(this.world.graph);
+      // Add the current intent to the world's markings array
+      this.markings.push(this.intent);
+      this.intent = null; // Clear intent after placing
+    }
+  }
+
+  /** Removes the first marking under the current cursor position, if any. */
+  protected removeMarkingAtMouse(): void {
+    if (!this.mouse) return;
+    // Iterate backwards for safe removal while looping
+    for (let i = this.markings.length - 1; i >= 0; i--) {
+      const poly = this.markings[i].polygon;
+      // Check if the mouse click is inside the marking's polygon
+      if (poly.containsPoint(this.mouse)) {
+        this.markings.splice(i, 1); // Remove the marking
+        return;
       }
     }
+  }
+
+  /**
+   * Primary touch action (tap/drag). Defaults to placing the intent; subclasses
+   * (e.g. {@link LightEditor}) override to intercept taps on existing markings.
+   */
+  protected handleTouchPrimary(): void {
+    this.placeIntent();
   }
 
   /** Displays the current marking intent (preview) on the canvas. */

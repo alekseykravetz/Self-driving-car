@@ -20,6 +20,8 @@ import {
   KeyboardManager,
   ShortcutBinding,
 } from '../../input/keyboardManager.js';
+import { PointerGestures } from '../../input/pointerGestures.js';
+import { createEditorGestures } from './editorPointerInput.js';
 
 export class GraphEditor {
   #viewport: Viewport;
@@ -46,6 +48,7 @@ export class GraphEditor {
   #boundMouseMove: (event: MouseEvent) => void;
   #boundMouseUp: () => void;
   #boundContextMenu: (event: MouseEvent) => void;
+  #gestures: PointerGestures;
 
   #bindings: ShortcutBinding[];
 
@@ -63,6 +66,16 @@ export class GraphEditor {
     };
     this.#boundContextMenu = (e: MouseEvent) => e.preventDefault();
 
+    this.#gestures = createEditorGestures(this.#canvas, {
+      hover: (e) => this.#handleMouseMove(e),
+      primary: (e) => this.#handleMouseDown(e),
+      secondary: (e) => this.#handleMouseDown(e),
+      drag: (e) => this.#handleMouseMove(e),
+      dragEnd: () => {
+        this.#dragging = false;
+      },
+    });
+
     this.#bindings = this.#buildBindings();
   }
 
@@ -71,6 +84,7 @@ export class GraphEditor {
     this.#canvas.addEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.addEventListener('mouseup', this.#boundMouseUp);
     this.#canvas.addEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.enable();
   }
 
   #removeEventListeners(): void {
@@ -78,6 +92,7 @@ export class GraphEditor {
     this.#canvas.removeEventListener('mousemove', this.#boundMouseMove);
     this.#canvas.removeEventListener('mouseup', this.#boundMouseUp);
     this.#canvas.removeEventListener('contextmenu', this.#boundContextMenu);
+    this.#gestures.disable();
   }
 
   public enable(): void {

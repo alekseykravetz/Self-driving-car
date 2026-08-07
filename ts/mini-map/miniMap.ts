@@ -5,6 +5,7 @@ import { scale } from '../math/utils.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
 import { drawPoint } from '../rendering/pointRenderer.js';
 import { WORLD_PIXELS_PER_METER } from '../math/worldUnits.js';
+import { PointerGestures } from '../input/pointerGestures.js';
 
 export interface IMiniMapCar {
   x: number;
@@ -48,6 +49,11 @@ export class MiniMap {
   // Last main-viewport zoom seen by #syncToMainZoom, used to compute the
   // proportional scaler change on the next call (one-way sync).
   #lastMainZoom: number | null = null;
+  // Last drawn view point (main-viewport center), needed to invert a tapped
+  // mini-map pixel back to a world coordinate.
+  #lastViewPoint: Point = new Point(0, 0);
+  #gestures: PointerGestures | null = null;
+  #onRecenter: ((worldPoint: Point) => void) | null = null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -86,6 +92,46 @@ export class MiniMap {
   }
 
   /**
+   * Registers a callback invoked when the user taps or drags the mini-map, so
+   * the host can recenter the main viewport on the chosen world location.
+   */
+  setOnRecenter(cb: (worldPoint: Point) => void): void {
+    this.#onRecenter = cb;
+  }
+
+  /** Converts a mini-map canvas pixel to a world coordinate (inverse of draw). */
+  #canvasToWorld(cx: number, cy: number): Point {
+    return new Point(
+      (cx - this.#size / 2) / this.#scaler + this.#lastViewPoint.x,
+      (cy - this.#size / 2) / this.#scaler + this.#lastViewPoint.y,
+    );
+  }
+
+  /**
+   * Enables touch input: one-finger tap or drag recenters the main viewport on
+   * the touched location; pinch zooms the mini-map's own scale.
+   */
+  enableInput(): void {
+    if (this.#gestures) return;
+    const recenter = (p: { x: number; y: number }) => {
+      this.#onRecenter?.(this.#canvasToWorld(p.x, p.y));
+    };
+    this.#gestures = new PointerGestures(this.#canvas, {
+      onTap: recenter,
+      onDragStart: recenter,
+      onDragMove: recenter,
+      onPinch: (s) => this.#setScaler(this.#scaler * s),
+    });
+    this.#gestures.enable();
+  }
+
+  /** Disables touch input. */
+  disableInput(): void {
+    this.#gestures?.disable();
+    this.#gestures = null;
+  }
+
+  /**
    * Follows the main viewport's zoom proportionally (one-way sync — never
    * writes back to the main viewport). Call every frame with the main
    * viewport's current `zoom`; the first call just records the baseline.
@@ -112,6 +158,8 @@ export class MiniMap {
     if (mainViewportZoom !== undefined) {
       this.#syncToMainZoom(mainViewportZoom);
     }
+
+    this.#lastViewPoint = viewPoint;
 
     // When a backgroundColor is given, paint it onto the canvas itself rather
     // than leaving the pixels transparent and relying on the CSS background.

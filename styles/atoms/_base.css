@@ -45,6 +45,13 @@ body:has(#simulatorLayout) {
   display: block;
 }
 
+/* App-page canvases own all pointer gestures (pan/zoom/draw). Disabling the
+   browser's default touch-action lets our pointer handlers preventDefault()
+   and suppress native scroll/pinch-zoom. Landing page is excluded. */
+body:not(.main-page) canvas {
+  touch-action: none;
+}
+
 body.main-page {
   background:
     radial-gradient(

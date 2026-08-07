@@ -314,6 +314,9 @@ export class WorldEditor {
       this.#world.offset,
     );
     this.#viewport.setMode(this.#viewportMode);
+    // A drawing tool is always active in the editor, so single-finger touches
+    // draw/select and only two-finger gestures pan/zoom the map.
+    this.#viewport.setTouchPanMode('two-finger-only');
 
     this.#editors = this.initializeEditors(this.#viewport, this.#world);
 
@@ -327,6 +330,8 @@ export class WorldEditor {
       this.#miniMapCanvas.width, // Use canvas width for size
       0.02, // Scaler
     );
+    this.#miniMap.setOnRecenter((p) => this.#viewport.recenterOn(p));
+    this.#miniMap.enableInput();
 
     // Wire brush state + metadata + editor toggle sync (after editors exist)
     this.#worldEditorPanel?.setBrushChangeListener((state) => {

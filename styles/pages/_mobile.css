@@ -78,6 +78,11 @@
     display: none;
   }
 
+  /* Human Backpropagation is not touch-friendly yet — hide its card on phones. */
+  .landing-card:has(a[href^='html/human-training.html']) {
+    display: none;
+  }
+
   #layoutToolbar {
     display: none;
   }

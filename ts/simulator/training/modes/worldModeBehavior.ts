@@ -124,6 +124,10 @@ export class WorldTrainingStrategy {
       this.#parent.world.graph,
       this.#parent.miniMapCanvas.width,
     );
+    this.#parent.miniMap.setOnRecenter((p) =>
+      this.#parent.viewport?.recenterOn(p),
+    );
+    this.#parent.miniMap.enableInput();
 
     const startInfo = this.#parent.getStartInfo();
     this.#parent.camera = new Camera(startInfo);
