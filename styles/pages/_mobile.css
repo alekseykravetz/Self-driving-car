@@ -153,6 +153,16 @@
     padding: var(--space-1) var(--space-1);
   }
 
+  #trafficStatsPanel {
+    min-width: 140px;
+    max-width: 140px;
+    width: 140px;
+  }
+  #trafficStatsPanel input[type='text'] {
+    font-size: var(--text-base);
+    padding: var(--space-1) var(--space-1);
+  }
+
   #topControls {
     flex-wrap: wrap;
     gap: var(--space-1);
