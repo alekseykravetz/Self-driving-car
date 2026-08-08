@@ -1070,6 +1070,18 @@ simulator. See [Viewport.md](Viewport.md#one-way-zoom-sync) for details.
 | Tracking       | Toolbar tracking mode (best/keys) | Stats-panel selection                    |
 | Toolbar extras | —                                 | Spawn Car picker; tracking group hidden  |
 
+**Mobile toolbar (≤ 768 px):** `#initToolbar()` reads
+`window.matchMedia('(max-width: 768px)')`. On desktop the pool-tracking group is
+hidden (`hideGroups('tracking-sep', 'tracking')`) and the shortcuts toolbar
+carries the spawn-heading flip (`R`), green wave (`G`), zoom modifiers, and the
+visualizer-density key. On **mobile** the tracking group is kept visible (it
+doubles as the free-drag / follow-viewport control) and the shortcuts toolbar is
+trimmed to just the `R` spawn-heading flip. `styles/pages/_mobile.css` mirrors
+this: `body:has(traffic-panel) #shortcutsToolbar` stays `flex` (unlike the other
+simulators, which hide it), and the keys-car tracking option (`#trackModeKeys`)
+is always hidden on touch (there is no keyboard-driven car). Human
+Backpropagation, which has no pool tracking, hides the tracking group on mobile.
+
 ---
 
 ## Human Backpropagation Simulator (`ts/simulator/humanTraining/humanBackpropSimulator.ts`)

@@ -117,6 +117,27 @@ mode while a world-editor tool is active). See [Viewport.md](Viewport.md) for
 the per-surface gesture routing and [WorldEditor.md](WorldEditor.md) for the
 editor touch mapping.
 
+### Canvas-buffer coordinate mapping
+
+`#point(e)` (an instance method — it needs the canvas reference) maps a pointer
+event to **drawing-buffer** coordinates rather than using `offsetX/offsetY`
+directly. `offsetX/offsetY` are CSS pixels relative to the element, but the
+canvas draws in `canvas.width/height` units. On mobile (e.g. Android Chrome) the
+collapsing URL bar changes the canvas's CSS-rendered height while the buffer
+resolution lags, so `offsetY` stops mapping 1:1 and touches land at the wrong Y.
+`#point` scales `clientX/clientY - rect` by `buffer / rect` size
+(`getBoundingClientRect`) to stay correct under any CSS scaling, falling back to
+`offsetX/offsetY` when `getBoundingClientRect` is unavailable (e.g. unit-test
+mocks).
+
+### Ghost-point prevention
+
+`#handleDown` calls `e.preventDefault()` on a cancelable touch `pointerdown` so
+the browser does **not** also fire the compatibility mouse events
+(`mousedown`/`mouseup`). Without this, the editors' raw mouse listeners would
+re-process the same touch at unscaled `offsetX/offsetY` coordinates, dropping a
+duplicate "ghost" point next to the intended one.
+
 Note: this is distinct from the race-only `PhoneControls` below, which reads
 device tilt + tap for driving, not map navigation.
 

@@ -384,15 +384,20 @@ identically in the world editor and all simulators.
 wireMiniMapWheelZoom(this.miniMapCanvas, () => this.miniMap);
 ```
 
-### Touch input (mobile)
+### Touch input (mobile) + desktop mouse recenter
 
 `miniMap.enableInput()` attaches a `PointerGestures` recognizer to the mini-map
 canvas. A one-finger **tap or drag** recenters the main viewport on the touched
 location (host wires `miniMap.setOnRecenter((p) => viewport.recenterOn(p))`),
-and a **pinch** zooms the mini-map's own scaler. The tapped pixel is converted
-back to a world coordinate with the inverse of `draw()`'s transform, using the
-last drawn `viewPoint`. Wired in the training (simple + world), traffic,
-human-backprop, and world-editor hosts (not race, whose view follows the car).
+and a **pinch** zooms the mini-map's own scaler. Because `PointerGestures`
+ignores `mouse` pointers, `enableInput()` **also** wires raw
+`mousedown`/`mousemove` (canvas) + `mouseup` (window) listeners directly so a
+desktop **click or click-drag** recenters the viewport too (cursor set to
+`pointer`); `disableInput()` tears both the gestures and the mouse listeners
+down. The tapped/clicked pixel is converted back to a world coordinate with the
+inverse of `draw()`'s transform, using the last drawn `viewPoint`. Wired in the
+training (simple + world), traffic, human-backprop, and world-editor hosts (not
+race, whose view follows the car).
 
 ### Rendering
 

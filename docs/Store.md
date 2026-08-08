@@ -168,6 +168,15 @@ happens in the World Setup toolbar, not here. It displays three tabs:
 | **Cars**         | Selected (✓), Name, Source, hidden layers, maxSpeed, acceleration, friction, rayCount, rayLength, raySpread                                                                                                                               |
 | **LocalStorage** | Key name, size, export/delete actions (tracks `bestPool`, `raceCars`, `editorWorld`, `loadedWorlds`, `loadedCars`, `humanTrainedCar`, `store:activeWorld`, `store:activeCar`, `sim:worldLayers`, `editor:worldLayers`, `markerThreshold`) |
 
+**Mobile layout (≤ 768 px, `styles/pages/_mobile.css`):** the tab buttons drop
+their text label (`.store-tab-label`) down to icon + count only, and the Worlds /
+Cars "Selected" column swaps its text header for a compact check icon
+(`.store-th-label` hidden, `.store-th-icon` shown) and shrinks to just fit the
+radio button. The template (`storePanelTemplate.ts`) wraps each tab caption in a
+`.store-tab-label` span and renders the Selected header as
+`<span class="store-th-label">Selected</span>` plus a desktop-hidden
+`<app-icon class="store-th-icon" name="check">`.
+
 ## Backward Compatibility
 
 - **WorldLoader** still parses old `const world = World.load({...})` format when loading files manually via file picker

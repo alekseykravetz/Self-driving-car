@@ -1023,10 +1023,13 @@ single-finger touches reach the editor, two-finger gestures pan/zoom the map.
 
 The touch mapping reuses each editor's existing mouse handlers via a shared
 `createEditorGestures` helper (`ts/world/editors/editorPointerInput.ts`): a tap
-synthesizes a left `mousedown`, a long-press/two-finger tap synthesizes a right
-`mousedown`. `MarkingEditor` exposes a `handleTouchPrimary()` hook so
-`LightEditor` can intercept taps on existing lights (cycle override) before a
-new light is placed.
+synthesizes a left `mousedown`, a single-finger drag synthesizes a `mousemove`
+at the (buffer-scaled) drag point, and a long-press/two-finger tap synthesizes a
+right `mousedown`. Because the gesture point is already mapped to canvas-buffer
+coordinates by `PointerGestures`, the synthesized event carries those scaled
+coordinates rather than the raw event's `offsetX/offsetY`. `MarkingEditor`
+exposes a `handleTouchPrimary()` hook so `LightEditor` can intercept taps on
+existing lights (cycle override) before a new light is placed.
 
 **Visual feedback:**
 
