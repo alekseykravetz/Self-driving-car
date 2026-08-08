@@ -10,6 +10,9 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
       </p>
     </div>
 
+    <div class="ti-body">
+    <div class="ti-col">
+
     <!-- ── Brain source ─────────────────────────────── -->
     <div class="ti-section">
       <div class="ti-section-title"><app-icon class="ti-section-icon" name="brain"></app-icon> Brain source</div>
@@ -58,6 +61,9 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
       </div>
     </div>
 
+    </div>
+    <div class="ti-col">
+
     <!-- ── Car config ───────────────────────────────── -->
     <div class="ti-section">
       <div class="ti-section-title">
@@ -99,6 +105,9 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
           </span>
         </div>
       </div>
+    </div>
+
+    </div>
     </div>
 
     <div class="ti-actions">

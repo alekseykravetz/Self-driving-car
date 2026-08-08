@@ -30,7 +30,7 @@ human-training-config-modal.open {
 }
 
 .ti-dialog {
-  width: min(560px, 100%);
+  width: min(820px, 100%);
   max-height: calc(100vh - var(--space-8));
   overflow-y: auto;
   background: var(--color-bg-app);
@@ -38,11 +38,11 @@ human-training-config-modal.open {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-modal);
-  padding: var(--space-5);
+  padding: var(--space-4) var(--space-5);
 }
 
 .ti-header {
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
 .ti-title {
@@ -56,8 +56,25 @@ human-training-config-modal.open {
   color: var(--color-text-dim);
 }
 
+/* ── Two-column body (collapses to one column on narrow screens) ── */
+.ti-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-5);
+  align-items: start;
+}
+
+.ti-col {
+  min-width: 0;
+}
+
 .ti-section {
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+/* First section in each column hugs the header / column top. */
+.ti-col > .ti-section:first-child {
+  margin-top: 0;
 }
 
 .ti-section-title {
@@ -95,7 +112,7 @@ human-training-config-modal.open {
   display: flex;
   align-items: center;
   gap: var(--space-2\.5);
-  padding: var(--space-2\.5);
+  padding: var(--space-2);
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -147,7 +164,7 @@ human-training-config-modal.open {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-2\.5);
-  margin-top: var(--space-5);
+  margin-top: var(--space-4);
 }
 
 /* ── Full-width grid cells (hidden layers, state-aware) ─────────── */
@@ -216,4 +233,38 @@ human-training-config-modal.open {
 
 .ti-car-list {
   max-height: 180px;
+}
+
+/* ── Narrow screens: single column + full-width bottom-sheet feel ─ */
+@media (max-width: 720px) {
+  .ti-overlay {
+    padding: var(--space-2);
+    align-items: flex-end;
+  }
+
+  .ti-dialog {
+    width: 100%;
+    max-height: calc(100vh - var(--space-4));
+    padding: var(--space-4);
+    border-radius: var(--radius-2xl);
+  }
+
+  .ti-body {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  /* Restore per-section spacing when stacked in a single column. */
+  .ti-col > .ti-section:first-child {
+    margin-top: var(--space-3);
+  }
+
+  .ti-actions {
+    flex-direction: column-reverse;
+  }
+
+  .ti-actions .btn-lg {
+    width: 100%;
+    justify-content: center;
+  }
 }
