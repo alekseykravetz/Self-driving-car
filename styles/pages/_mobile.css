@@ -52,6 +52,15 @@
     display: none;
   }
 
+  /* Tighten the tab row so icon + count buttons fit narrow screens. */
+  .store-tabs {
+    gap: var(--space-1);
+  }
+  .store-tab {
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-2\.5);
+  }
+
   /* Selected column: swap the "Selected" text header for a compact icon and
      shrink the column to just fit the radio button. */
   .store-tab-content[data-content='worlds'] .store-th-selected,
