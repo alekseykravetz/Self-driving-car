@@ -2,6 +2,11 @@
 	"acceleration": 0.08,
 	"maxSpeed": 8,
 	"friction": 0.04,
+	"width": 30,
+	"height": 50,
+	"hiddenLayers": [
+		4
+	],
 	"sensor": {
 		"rayCount": 2,
 		"rayLength": 350,
