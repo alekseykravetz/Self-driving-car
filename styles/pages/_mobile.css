@@ -116,9 +116,11 @@
     display: none;
   }
 
-  /* Live Traffic Jam keeps a minimal shortcuts toolbar (Spawn → R only). */
+  /* Live Traffic Jam keeps a minimal shortcuts toolbar (Spawn → R only). Match
+     the tighter padding used by #topControls so both toolbars share a height. */
   body:has(traffic-panel) #shortcutsToolbar {
     display: flex;
+    padding: var(--space-1) var(--space-1\.5);
   }
 
   .landing-card a[href='html/race.html'],
