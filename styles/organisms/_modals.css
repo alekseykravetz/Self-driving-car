@@ -240,11 +240,12 @@ human-training-config-modal.open {
   .ti-overlay {
     padding: var(--space-2);
     align-items: flex-end;
+    height: 100dvh;
   }
 
   .ti-dialog {
     width: 100%;
-    max-height: calc(100vh - var(--space-4));
+    max-height: calc(100dvh - var(--space-4));
     padding: var(--space-4);
     border-radius: var(--radius-2xl);
   }
