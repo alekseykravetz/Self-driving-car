@@ -73,6 +73,10 @@ export function loadTreeInstance(inst: TreeInstance, world: World): Tree {
 }
 
 export class World implements IWorld {
+  // Schema version of a live instance. Marks an already-loaded World as
+  // canonical (v3) so re-loading one via World.load() does not re-run the
+  // legacy marking-direction migration (which would flip every marking 180°).
+  readonly version = 3;
   graph: Graph;
   roadWidth: number;
   roadRoundness: number;
