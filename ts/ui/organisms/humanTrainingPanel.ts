@@ -2,7 +2,6 @@ import { HUMAN_TRAINING_PANEL_TEMPLATE } from '../../simulator/humanTraining/tem
 
 export class HumanTrainingPanelElement extends HTMLElement {
   #htMode: HTMLElement | null = null;
-  #htAutopilot: HTMLInputElement | null = null;
   #htAutopilotBanner: HTMLElement | null = null;
   #htAccuracyPct: HTMLElement | null = null;
   #htKeyEls: HTMLElement[] = [];
@@ -21,7 +20,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
 
   #learningActive: boolean = true;
 
-  #onAutopilotChange: ((enabled: boolean) => void) | null = null;
   #onLearningRateChange: ((v: number) => void) | null = null;
   #onConfig: (() => void) | null = null;
   #onDownload: (() => void) | null = null;
@@ -31,7 +29,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
   connectedCallback(): void {
     this.innerHTML = HUMAN_TRAINING_PANEL_TEMPLATE;
     this.#htMode = this.querySelector('#htMode');
-    this.#htAutopilot = this.querySelector('#htAutopilot');
     this.#htAutopilotBanner = this.querySelector('#htAutopilotBanner');
     this.#htAccuracyPct = this.querySelector('#htAccuracyPct');
     document
@@ -50,9 +47,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
     this.#htKeyRightPct = this.querySelector('#htKeyRightPct');
     this.#htKeyReversePct = this.querySelector('#htKeyReversePct');
 
-    this.#htAutopilot?.addEventListener('change', () => {
-      this.#onAutopilotChange?.(this.#htAutopilot!.checked);
-    });
     this.#htLearningRate?.addEventListener('input', () => {
       const v = parseFloat(this.#htLearningRate!.value);
       if (this.#htLearningRateVal)
@@ -76,14 +70,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
   setMode(mode: 'simple' | 'world'): void {
     if (this.#htMode)
       this.#htMode.textContent = mode === 'simple' ? 'Simple Road' : 'World';
-  }
-
-  setAutopilot(enabled: boolean): void {
-    if (this.#htAutopilot) this.#htAutopilot.checked = enabled;
-  }
-
-  get autopilotEnabled(): boolean {
-    return this.#htAutopilot?.checked ?? false;
   }
 
   get learningRate(): number {
@@ -113,9 +99,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
     if (this.#htStatus) this.#htStatus.textContent = text;
   }
 
-  set onAutopilotChange(cb: ((enabled: boolean) => void) | null) {
-    this.#onAutopilotChange = cb;
-  }
   set onLearningRateChange(cb: ((v: number) => void) | null) {
     this.#onLearningRateChange = cb;
   }

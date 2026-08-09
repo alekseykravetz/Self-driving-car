@@ -13,6 +13,14 @@ export class Controls {
   public reverse: boolean;
   public frozen: boolean = false;
 
+  // Raw human key holds, tracked independently of the effective controls above.
+  // While `frozen` (autopilot), the brain writes the effective controls, but the
+  // keyboard still updates these so DAgger can read the human's live corrections.
+  #humanForward: boolean = false;
+  #humanLeft: boolean = false;
+  #humanRight: boolean = false;
+  #humanReverse: boolean = false;
+
   constructor(type: ControlType | string) {
     this.forward = false;
     this.left = false;
@@ -43,46 +51,67 @@ export class Controls {
     }
   }
 
+  /** Raw human key state, unaffected by `frozen`. Used for DAgger corrections. */
+  get humanControls(): {
+    forward: boolean;
+    left: boolean;
+    right: boolean;
+    reverse: boolean;
+  } {
+    return {
+      forward: this.#humanForward,
+      left: this.#humanLeft,
+      right: this.#humanRight,
+      reverse: this.#humanReverse,
+    };
+  }
+
   #addKeyboardListeners(): void {
     document.addEventListener('keydown', (event: KeyboardEvent): void => {
-      if (this.frozen) return;
       switch (event.key) {
         case 'ArrowLeft':
         case 'a':
-          this.left = true;
+          this.#humanLeft = true;
+          if (!this.frozen) this.left = true;
           break;
         case 'ArrowRight':
         case 'd':
-          this.right = true;
+          this.#humanRight = true;
+          if (!this.frozen) this.right = true;
           break;
         case 'ArrowUp':
         case 'w':
-          this.forward = true;
+          this.#humanForward = true;
+          if (!this.frozen) this.forward = true;
           break;
         case 'ArrowDown':
         case 's':
-          this.reverse = true;
+          this.#humanReverse = true;
+          if (!this.frozen) this.reverse = true;
           break;
       }
     });
     document.addEventListener('keyup', (event: KeyboardEvent): void => {
-      if (this.frozen) return;
       switch (event.key) {
         case 'ArrowLeft':
         case 'a':
-          this.left = false;
+          this.#humanLeft = false;
+          if (!this.frozen) this.left = false;
           break;
         case 'ArrowRight':
         case 'd':
-          this.right = false;
+          this.#humanRight = false;
+          if (!this.frozen) this.right = false;
           break;
         case 'ArrowUp':
         case 'w':
-          this.forward = false;
+          this.#humanForward = false;
+          if (!this.frozen) this.forward = false;
           break;
         case 'ArrowDown':
         case 's':
-          this.reverse = false;
+          this.#humanReverse = false;
+          if (!this.frozen) this.reverse = false;
           break;
       }
     });

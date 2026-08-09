@@ -14,7 +14,7 @@ export const HUMAN_TRAINING_PANEL_TEMPLATE = `
         <p><strong>1. Drive</strong> \u2014 use arrow keys or WASD. The car\u2019s neural network watches your keypresses and the sensor readings.</p>
         <p><strong>2. Learn</strong> \u2014 each frame you press a key, the brain adjusts its weights to imitate you (backpropagation). Green = brain matches your key, red = mismatch. When learning is ON, the brain adapts within 1-2 frames, so expect mostly green once it has learned a pattern. Turn learning OFF to see the brain\u2019s actual predictions vs your input \u2014 red appears when you do something the brain hasn\u2019t learned.</p>
         <p><strong>3. Toggle learning</strong> \u2014 press <kbd>L</kbd> to pause/resume learning. Drive freely without training the brain.</p>
-        <p><strong>4. Autopilot</strong> \u2014 check the box to let the brain drive. Learning pauses. See if it can handle the road on its own.</p>
+        <p><strong>4. Autopilot</strong> \u2014 press <kbd>P</kbd> to let the brain drive. Press a drive key any time to correct it \u2014 your correction steers the car AND trains the brain (DAgger).</p>
         <p><strong>5. Save</strong> \u2014 the brain auto-saves to localStorage every second and on crash/close. Reload to resume training.</p>
       </div>
     </details>
@@ -22,21 +22,13 @@ export const HUMAN_TRAINING_PANEL_TEMPLATE = `
 
   <!-- Autopilot banner (hidden by default) -->
   <div id="htAutopilotBanner" class="ht-banner" style="display:none;">
-    AUTOPILOT ACTIVE \u2014 brain is driving
+    AUTOPILOT ACTIVE \u2014 brain is driving (press a drive key to correct)
   </div>
 
   <!-- Learning state -->
   <div class="panel-section">
     <div id="htLearningState" class="ht-learning-state learning">LEARNING</div>
-    <div class="ht-hint">Press L to toggle</div>
-  </div>
-
-  <!-- Autopilot toggle -->
-  <div class="panel-section">
-    <label class="ht-checkbox-label">
-      <input type="checkbox" id="htAutopilot" />
-      <span>Autopilot \u2014 let brain drive</span>
-    </label>
+    <div class="ht-hint">Press L to toggle \u00b7 P for autopilot</div>
   </div>
 
   <!-- Car info -->

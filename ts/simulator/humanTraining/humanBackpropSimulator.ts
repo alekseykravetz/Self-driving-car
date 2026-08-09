@@ -429,9 +429,15 @@ export class HumanBackpropSimulator extends SimulatorShell {
     this.#panel.setLearningState(enabled);
   }
 
+  #setAutopilot(enabled: boolean): void {
+    this.#car?.setAutopilot(enabled);
+    this.#panel.setAutopilotActive(enabled);
+    this.#accuracyWindow = [];
+  }
+
   #updateAccuracy(): void {
     if (!this.#car) return;
-    if (this.#panel.autopilotEnabled || this.#car.damaged) {
+    if (this.#car.autopilot || this.#car.damaged) {
       this.#currentMatch = [null, null, null, null];
       this.#panel.setAccuracy(this.#currentMatch, null);
       this.#panel.setPerChannelAccuracy([null, null, null, null]);
@@ -643,11 +649,6 @@ export class HumanBackpropSimulator extends SimulatorShell {
 
   #wirePanel(): void {
     const panel = this.#panel;
-    panel.onAutopilotChange = (enabled) => {
-      this.#car?.setAutopilot(enabled);
-      this.#panel.setAutopilotActive(enabled);
-      this.#accuracyWindow = [];
-    };
     panel.onLearningRateChange = (v) => {
       this.#car?.setLearningRate(v);
     };
@@ -724,6 +725,20 @@ export class HumanBackpropSimulator extends SimulatorShell {
         toggle: {
           onActivate: () => this.#setLearning(true),
           onDeactivate: () => this.#setLearning(false),
+        },
+      },
+      {
+        id: 'keyAutopilot',
+        key: 'p',
+        label: 'P',
+        title:
+          'P \u2014 Toggle autopilot (brain drives). Press a drive key to correct it \u2014 the correction also trains the brain.',
+        group: 'Training',
+        kind: 'toggle',
+        latchOnly: true,
+        toggle: {
+          onActivate: () => this.#setAutopilot(true),
+          onDeactivate: () => this.#setAutopilot(false),
         },
       },
       ...driveKeyBindings(),

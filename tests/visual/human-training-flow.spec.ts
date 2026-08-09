@@ -35,18 +35,17 @@ test.describe('Human training interaction flows', () => {
     page,
   }) => {
     await startSession(page);
-    const autopilot = page.locator('#htAutopilot');
     const banner = page.locator('#htAutopilotBanner');
     const state = page.locator('#htLearningState');
 
     await expect(banner).toBeHidden();
 
-    await autopilot.check();
+    await page.keyboard.press('p');
     await expect(banner).toBeVisible();
     // The car now drives itself, so human-imitation learning is paused.
     await expect(state).toHaveText('PAUSED');
 
-    await autopilot.uncheck();
+    await page.keyboard.press('p');
     await expect(banner).toBeHidden();
   });
 

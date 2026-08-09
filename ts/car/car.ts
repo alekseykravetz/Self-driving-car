@@ -315,42 +315,49 @@ export class Car {
         this.sensor.stateAware,
       );
       this.#learning.setLastBrainOutput(output);
-      if (
-        (this.useBrain || this.#autopilot) &&
-        this.controls instanceof Controls
-      ) {
-        this.controls.forward = output.forward;
-        this.controls.left = output.left;
-        this.controls.right = output.right;
-        this.controls.reverse = output.reverse;
-      }
-      if (
-        this.#learningFromHuman &&
-        !this.#autopilot &&
-        !this.damaged &&
-        this.controls instanceof Controls &&
-        (this.controls.forward ||
-          this.controls.left ||
-          this.controls.right ||
-          this.controls.reverse)
-      ) {
-        const inputVector = CarBrainAdapter.buildInput(
-          this.sensor.readings,
-          this.speed,
-          this.maxSpeed,
-          this.sensor.sensorReadings,
-          this.sensor.stateAware,
-        );
-        this.#learning.learn({
-          brain: this.brain,
-          inputs: inputVector,
-          controls: {
-            forward: this.controls.forward,
-            left: this.controls.left,
-            right: this.controls.right,
-            reverse: this.controls.reverse,
-          },
-        });
+      if (this.controls instanceof Controls) {
+        // Decide who drives the effective controls this frame.
+        if (this.#autopilot) {
+          // Autopilot: the brain drives, but a live human keypress is treated as
+          // a DAgger correction — it overrides the brain (and, below, becomes a
+          // training label) so the brain learns to recover from the states its
+          // own driving produces (fixes behavioral-cloning covariate shift).
+          const human = this.controls.humanControls;
+          const correcting =
+            human.forward || human.left || human.right || human.reverse;
+          const source = correcting ? human : output;
+          this.controls.forward = source.forward;
+          this.controls.left = source.left;
+          this.controls.right = source.right;
+          this.controls.reverse = source.reverse;
+        } else if (this.useBrain) {
+          this.controls.forward = output.forward;
+          this.controls.left = output.left;
+          this.controls.right = output.right;
+          this.controls.reverse = output.reverse;
+        }
+
+        // Imitation learning: mimic the human. In manual mode the effective
+        // controls already hold the human's keys; in autopilot we learn only
+        // while the human is actively correcting (never from the brain's own
+        // autopilot output).
+        if (this.#learningFromHuman && !this.damaged) {
+          const label = this.#autopilot
+            ? this.controls.humanControls
+            : {
+                forward: this.controls.forward,
+                left: this.controls.left,
+                right: this.controls.right,
+                reverse: this.controls.reverse,
+              };
+          if (label.forward || label.left || label.right || label.reverse) {
+            this.#learning.learn({
+              brain: this.brain,
+              inputs: this.#buildBrainInput(),
+              controls: label,
+            });
+          }
+        }
       }
     } else if (this.sensor) {
       this.sensor.update(
@@ -367,6 +374,16 @@ export class Car {
   #syncEngine(): void {
     if (!this.#callbacks?.onEngineUpdate) return;
     this.#callbacks.onEngineUpdate(this.speed, this.maxSpeed);
+  }
+
+  #buildBrainInput(): number[] {
+    return CarBrainAdapter.buildInput(
+      this.sensor!.readings,
+      this.speed,
+      this.maxSpeed,
+      this.sensor!.sensorReadings,
+      this.sensor!.stateAware,
+    );
   }
 
   toDrawData(): CarDrawData {
