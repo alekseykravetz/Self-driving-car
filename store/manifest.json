@@ -4,10 +4,7 @@
     "circle_corridor.world",
     "mirror.world",
     "mirror_corridor.world",
-    "ashkelon-kohav-hazafon.world",
-    "barnea.world",
-    "ir-hyain.world",
-    "new-osm-data.world"
+    "Ashkelon_city.world"
   ],
   "cars": [
     "best_b6_s3_rc5_rl150.car",
