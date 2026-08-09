@@ -76,7 +76,11 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
         ${numInputRowHtml({ id: 'tiCarMaxSpeed', label: 'Max Speed', icon: 'rocket', min: 1, max: 20, step: 0.01, title: 'Car maximum speed' })}
         <div class="ctrl">
           <span class="ctrl-label"><app-icon name="graph"></app-icon> Hidden Layers</span>
-          <input type="text" id="tiCarHiddenLayers" class="ti-text-input" title="Hidden layer sizes (comma-separated, e.g. 6 or 8,6)" />
+          <div class="num-input-row">
+            <span class="num-btn ti-btn-spacer" aria-hidden="true"></span>
+            <input type="text" id="tiCarHiddenLayers" class="ti-text-input" title="Hidden layer sizes (comma-separated, e.g. 6 or 8,6)" />
+            <span class="num-btn ti-btn-spacer" aria-hidden="true"></span>
+          </div>
         </div>
         ${numInputRowHtml({ id: 'tiCarAcceleration', label: 'Accel', icon: 'bolt', min: 0.001, max: 1, step: 0.001, title: 'Car acceleration' })}
         ${numInputRowHtml({ id: 'tiCarFriction', label: 'Friction', icon: 'tire', min: 0.001, max: 0.5, step: 0.001, title: 'Car friction' })}
