@@ -186,7 +186,12 @@ export class NeuralNetwork {
     const CLAMP = 1;
     const GAIN = 2; // sigmoid steepness — sharp decisions from small weights
     const LABEL_SMOOTH = 0.1; // targets → 0.1 / 0.9 instead of 0 / 1
-    const WEIGHT_DECAY = 0.002;
+    // Strong L2 pull toward 0. Sustained online SGD on correlated frames would
+    // otherwise slam weights into the ±1 clamp, where the sigmoid saturates,
+    // gradients vanish, and the network collapses to a degenerate policy (the
+    // "more training makes it worse" failure). Decay must be large enough to
+    // reach equilibrium against the per-frame gradients well before the clamp.
+    const WEIGHT_DECAY = 0.02;
     const clamp = (v: number): number => Math.max(-CLAMP, Math.min(CLAMP, v));
     const sigmoid = (z: number): number => 1 / (1 + Math.exp(-GAIN * z));
 

@@ -43,6 +43,19 @@ export class CarLearningManager {
   #batchSize: number = 16;
   #prevControlState: ControlSnapshot | null = null;
 
+  // Data-augmentation noise (σ) added to sensor inputs during training. Teaches
+  // the brain to map slightly-off states back to the human's action, so small
+  // autopilot drifts get corrected instead of compounding into a crash
+  // (mitigates the behavioral-cloning covariate-shift failure).
+  #inputNoiseSigma: number = 0.04;
+
+  // Minimum change (L∞) from the last stored frame required to record a new
+  // replay sample. Straight driving on a straight road produces near-constant
+  // inputs; without this a 1-second turn floods the buffer with ~60 duplicate
+  // frames and the brain memorizes them instead of generalizing.
+  #dedupThreshold: number = 0.02;
+  #lastStoredInputs: number[] | null = null;
+
   set learningRate(v: number) {
     this.#learningRate = v;
   }
@@ -100,10 +113,15 @@ export class CarLearningManager {
       reverse: controls.reverse,
     };
 
+    // Skip near-duplicate consecutive frames (straight driving) so the buffer
+    // stays diverse — but always keep decision points (turn onsets are rare).
     const isTurn = targets[1] === 1 || targets[2] === 1;
-    this.#replayBuffer.push({ inputs, targets, isTurn });
-    if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
-      this.#replayBuffer.shift();
+    if (isDecisionPoint || this.#isNovel(inputs)) {
+      this.#lastStoredInputs = inputs.slice();
+      this.#replayBuffer.push({ inputs, targets, isTurn });
+      if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
+        this.#replayBuffer.shift();
+      }
     }
 
     // Per-output learning rates. Turn channels (left/right) are rare relative
@@ -118,18 +136,35 @@ export class CarLearningManager {
       lr,
     ];
 
-    let changed = this.#trainBatch(brain, perOutputLR);
-
-    if (isDecisionPoint) {
-      for (let i = 0; i < 3; i++) {
-        if (CarBrainAdapter.trainStep(brain, inputs, targets, perOutputLR)) {
-          changed = true;
-        }
-      }
-    }
+    const changed = this.#trainBatch(brain, perOutputLR);
 
     this.#brainChangedThisFrame = changed;
     return changed;
+  }
+
+  /** True when `inputs` differs enough (L∞) from the last stored frame. */
+  #isNovel(inputs: number[]): boolean {
+    const last = this.#lastStoredInputs;
+    if (last === null) return true;
+    const n = Math.min(inputs.length, last.length);
+    for (let i = 0; i < n; i++) {
+      if (Math.abs(inputs[i] - last[i]) > this.#dedupThreshold) return true;
+    }
+    return inputs.length !== last.length;
+  }
+
+  /** Add zero-mean Gaussian noise (Box–Muller) to a copy of `inputs`. */
+  #augment(inputs: number[]): number[] {
+    const sigma = this.#inputNoiseSigma;
+    if (sigma <= 0) return inputs;
+    const out = new Array<number>(inputs.length);
+    for (let i = 0; i < inputs.length; i++) {
+      const u1 = Math.random() || 1e-9;
+      const u2 = Math.random();
+      const g = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      out[i] = inputs[i] + g * sigma;
+    }
+    return out;
   }
 
   #trainBatch(brain: Brain, lr: [number, number, number, number]): boolean {
@@ -142,7 +177,7 @@ export class CarLearningManager {
         if (
           CarBrainAdapter.trainStep(
             brain,
-            buffer[i].inputs,
+            this.#augment(buffer[i].inputs),
             buffer[i].targets,
             lr,
           )
@@ -196,7 +231,7 @@ export class CarLearningManager {
       if (
         CarBrainAdapter.trainStep(
           brain,
-          buffer[idx].inputs,
+          this.#augment(buffer[idx].inputs),
           buffer[idx].targets,
           lr,
         )
