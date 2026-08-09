@@ -192,6 +192,13 @@ human-training-config-modal.open {
   gap: var(--space-1);
 }
 
+/* Two toggle blocks: stacked on wide screens, side-by-side on mobile. */
+.ti-toggle-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .ti-checkbox-label {
   display: flex;
   align-items: center;
@@ -246,8 +253,13 @@ human-training-config-modal.open {
   .ti-dialog {
     width: 100%;
     max-height: calc(100dvh - var(--space-4));
-    padding: var(--space-4);
+    padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-2xl);
+  }
+
+  /* Drop the descriptive subtitle to reclaim vertical space. */
+  .ti-subtitle {
+    display: none;
   }
 
   .ti-body {
@@ -255,13 +267,84 @@ human-training-config-modal.open {
     gap: 0;
   }
 
+  /* Tighter section rhythm on phones. */
+  .ti-section {
+    margin-top: var(--space-2\.5);
+  }
+
   /* Restore per-section spacing when stacked in a single column. */
   .ti-col > .ti-section:first-child {
-    margin-top: var(--space-3);
+    margin-top: var(--space-2\.5);
+  }
+
+  /* Compact brain-source picker: a horizontal tab row (like the store tabs). */
+  .ti-source-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-1\.5);
+  }
+
+  .ti-source {
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-1);
+  }
+
+  /* The radio is implied by the active tab styling below. */
+  .ti-source > input[type='radio'] {
+    display: none;
+  }
+
+  .ti-source-icon {
+    font-size: 1.4rem;
+  }
+
+  .ti-source-name {
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+
+  /* Hide the long per-source description; the count badge still shows. */
+  .ti-source-desc {
+    display: none;
+  }
+
+  .ti-source:has(input:checked) {
+    background: var(--color-accent-green-bg);
+    border-color: var(--color-accent-green-border);
+  }
+
+  .ti-source:has(input:checked) .ti-source-icon {
+    color: var(--color-accent-green);
+  }
+
+  /* The in-modal car picker wraps onto its own full-width line below the tabs. */
+  .ti-car-selector {
+    flex: 1 1 100%;
+    margin-top: 0;
+  }
+
+  /* State Aware + Realistic Physics share a single row. */
+  .ti-toggle-row {
+    flex-direction: row;
+    gap: var(--space-3);
+  }
+
+  .ti-toggle-row .ti-checkbox-ctrl {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .ti-checkbox-ctrl .ti-field-desc {
+    display: none;
   }
 
   .ti-actions {
     flex-direction: column-reverse;
+    margin-top: var(--space-3);
   }
 
   .ti-actions .btn-lg {

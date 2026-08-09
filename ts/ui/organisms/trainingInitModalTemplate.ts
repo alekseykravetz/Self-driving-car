@@ -84,25 +84,27 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
         ${numInputRowHtml({ id: 'tiCarRayLength', label: 'Ray Len', icon: 'ruler', min: 50, max: 500, step: 10, title: 'Sensor ray length' })}
         ${numInputRowHtml({ id: 'tiCarRaySpread', label: 'Ray Spread', icon: 'flashlight', min: 0.1, max: 6.28, step: 0.1, title: 'Sensor ray spread (radians)' })}
         ${numInputRowHtml({ id: 'tiCarRayOffset', label: 'Ray Offset', icon: 'compass', min: -3.14, max: 3.14, step: 0.1, title: 'Sensor ray offset (radians)' })}
-        <div class="ctrl ctrl-wide ti-checkbox-ctrl">
-          <label class="ti-checkbox-label">
-            <input type="checkbox" id="tiCarStateAware" />
-            <span class="ctrl-label"><app-icon name="traffic-light"></app-icon> State Aware</span>
-          </label>
-          <span class="ti-field-desc">
-            Doubles the network inputs — each ray reports the nearby traffic-control
-            state as a second value (2 inputs per ray instead of 1).
-          </span>
-        </div>
-        <div class="ctrl ctrl-wide ti-checkbox-ctrl">
-          <label class="ti-checkbox-label">
-            <input type="checkbox" id="tiCarRealisticPhysics" />
-            <span class="ctrl-label"><app-icon name="bolt"></app-icon> Realistic Physics</span>
-          </label>
-          <span class="ti-field-desc">
-            Speed-dependent steering, drag, braking, and engine power curve
-            instead of the flat-friction, constant-turn-rate arcade model.
-          </span>
+        <div class="ti-toggle-row ctrl-wide">
+          <div class="ctrl ti-checkbox-ctrl">
+            <label class="ti-checkbox-label">
+              <input type="checkbox" id="tiCarStateAware" />
+              <span class="ctrl-label"><app-icon name="traffic-light"></app-icon> State Aware</span>
+            </label>
+            <span class="ti-field-desc">
+              Doubles the network inputs — each ray reports the nearby traffic-control
+              state as a second value (2 inputs per ray instead of 1).
+            </span>
+          </div>
+          <div class="ctrl ti-checkbox-ctrl">
+            <label class="ti-checkbox-label">
+              <input type="checkbox" id="tiCarRealisticPhysics" />
+              <span class="ctrl-label"><app-icon name="bolt"></app-icon> Realistic Physics</span>
+            </label>
+            <span class="ti-field-desc">
+              Speed-dependent steering, drag, braking, and engine power curve
+              instead of the flat-friction, constant-turn-rate arcade model.
+            </span>
+          </div>
         </div>
       </div>
     </div>
