@@ -1131,7 +1131,8 @@ class HumanBackpropSimulator extends SimulatorShell {
    locked to the saved brain's topology.
 2. `#applyConfigAndCreateCar` creates a single KEYS car with the chosen config,
    loading the saved brain if present (else a fresh random brain).
-3. `Car.setLearningFromHuman(true)` enables per-frame training.
+3. `Car.setLearningFromHuman(true)` enables training. Training runs only on
+   frames that actually change the situation (see "Novelty-gated training").
 4. On crash, `#onCrash` saves the brain and respawns the car at the start
    (keeping the brain).
 5. "Reset brain" clears the save and creates a fresh random brain. "Reset car"
@@ -1163,16 +1164,21 @@ Training improvements to address the class-imbalance problem
 
 #### Experience replay buffer
 
-A ring buffer (max **4096** entries) stores recent `{inputs, targets, isTurn}`
-pairs for every frame where the human presses at least one key. Instead of
-training on just the current frame, the system samples a balanced batch of
-**16** entries each frame from the buffer via `#trainBatch()`:
+A ring buffer (max **4096** entries) stores `{inputs, targets, isTurn}` pairs.
+A frame is stored only when it is **novel** — a new sensor state (input differs
+from the last stored frame by more than an L∞ threshold) or a control change —
+so a 1-second turn no longer floods the buffer with ~60 near-identical frames
+and straight cruising doesn't crowd out turns. Instead of training on just the
+current frame, the system samples a balanced batch of **16** entries each frame
+from the buffer via `#trainBatch()`:
 
 1. Buffer entries are separated into **turn** (left or right = 1) and **straight**
    (neither).
 2. A batch is sampled at **50/50 ratio** — 8 turn + 8 straight examples.
-3. Each sampled entry is replayed via `trainStep(brain, storedInputs, storedTargets, lr)`,
-   which runs its own sigmoid forward pass internally (no separate `feedForward`).
+3. Each sampled entry is replayed via `trainStep(brain, storedInputs, storedTargets, lr)`
+   with small **Gaussian input noise** (σ = 0.04) added to the stored inputs —
+   data augmentation that teaches the brain to map slightly-off states back to
+   the human's action (see "Input-noise augmentation").
 4. The batch is shuffled so the order doesn't bias which output gets updated
    first.
 
@@ -1198,15 +1204,36 @@ The per-output array only applies to the **last (output) level** of the network.
 Hidden layers use `lr[0]` (the forward rate) as a single scalar — see
 `NeuralNetwork.md` for the reasoning.
 
-#### Decision-point bonus
+#### Novelty-gated training
 
-Training on every frame causes turn learning to be immediately forgotten after
-the human releases the turn key. The decision-point mechanism detects when the
-human's control state **changes** (any of forward/left/right/reverse transitions
-between pressed and released). On these frames, the exact current input/target
-pair is trained an extra **3 iterations** on top of the balanced batch from the
-replay buffer. This amplifies the signal of conscious control decisions without
-overfitting to any single frame.
+Training runs **only when the situation changes** — a novel sensor state or a
+control change (decision point). Holding a steady input (cruising straight,
+idling, or simply holding forward to keep the car moving) does **not** retrain
+the same pattern every frame. Without this gate, hundreds of identical
+straight-driving updates per second over-fit/saturate the brain and erase
+previously-taught turns (the "it breaks my brain when I do nothing" failure).
+The gate lives in `CarLearningManager.learn()`: on a non-novel, non-decision
+frame it skips both storing and training and reports no weight change (so the
+brain-activity dot stays quiet while cruising).
+
+#### Input-noise augmentation
+
+Each replayed sample gets small zero-mean Gaussian noise (σ = 0.04, Box–Muller)
+added to its inputs before `trainStep`. This teaches the brain to map
+_slightly-off_ sensor states back to the human's action, so small autopilot
+drifts get corrected instead of compounding into a crash — the core mitigation
+for behavioral-cloning **covariate shift**.
+
+#### DAgger interactive correction
+
+While **autopilot** drives, any drive key the human presses is treated as a
+**correction**: it overrides the brain for that frame AND (when learning is ON)
+becomes a training label. The brain thus learns to recover from the exact
+off-center states its own driving produces — the states pure human demonstration
+never visits. `Controls` exposes the raw human key holds via `humanControls`
+(tracked even while `frozen`), so DAgger can read corrections while the brain
+still drives the effective controls. With no human input, autopilot never trains
+from its own output.
 
 #### Balanced sampling under-scores straight frames
 
@@ -1220,7 +1247,10 @@ categories regardless of their natural frequency.
 
 All `trainStep` updates have `isFinite()` guards on both `error` and
 `effectiveLR` to prevent NaN propagation, and all weights/biases are clamped to
-`[-1, 1]` after each update (matching the genetic cars' range).
+`[-1, 1]` after each update (matching the genetic cars' range). A strong L2
+**weight decay** (λ = 0.02) keeps weights off the clamp boundary — without it,
+sustained online SGD drives weights into the clamp where the sigmoid saturates,
+gradients vanish, and the brain collapses into a degenerate policy.
 
 ### Learning toggle (L key)
 
@@ -1230,6 +1260,16 @@ the forward pass still runs so the visualizer and accuracy display keep working.
 Learning is ON by default when the car is created. The panel shows LEARNING
 (green) or PAUSED (orange), and the shortcuts toolbar L indicator reflects the
 state.
+
+### Autopilot toggle (P key)
+
+Press **P** to let the brain drive (`Car.setAutopilot(true)`). The toggle lives
+on the shortcuts toolbar (a `KeyboardManager` `latchOnly` binding), not a
+checkbox — a checkbox stole focus from the canvas and broke the `L` shortcut
+until focus returned. While autopilot drives, press any drive key to **correct**
+it: the correction steers the car and (when learning is ON) trains the brain
+(DAgger — see above). The panel shows an "AUTOPILOT ACTIVE" banner; disengaging
+resets all controls to `false` so the car stops immediately.
 
 ### Panel info
 
@@ -1264,7 +1304,7 @@ The `<human-training-panel>` displays live training information:
 | Config UI             | `<training-init-modal>`      | `<human-training-config-modal>`    |
 | Gene pool/generations | Yes                          | No                                 |
 | Brain persistence     | `bestPool` (top-K CarInfo[]) | `humanTrainedCar` (single CarInfo) |
-| Autopilot toggle      | No                           | Yes (test trained brain)           |
+| Autopilot toggle      | No                           | Yes (P key; DAgger corrections)    |
 | Learning toggle (L)   | N/A                          | Yes (pause/resume training)        |
 | Accuracy display      | No                           | Match rings + rolling-window %     |
 

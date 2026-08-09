@@ -113,15 +113,22 @@ export class CarLearningManager {
       reverse: controls.reverse,
     };
 
-    // Skip near-duplicate consecutive frames (straight driving) so the buffer
-    // stays diverse — but always keep decision points (turn onsets are rare).
+    // Only train when the situation actually changes — a novel sensor state or
+    // a control change. Holding a steady input (e.g. cruising straight or idle)
+    // must NOT keep retraining the same pattern every frame; that over-fits and
+    // erases previously-taught turns (the "it breaks my brain when I do nothing"
+    // failure). On a static frame we skip both storing and training.
     const isTurn = targets[1] === 1 || targets[2] === 1;
-    if (isDecisionPoint || this.#isNovel(inputs)) {
-      this.#lastStoredInputs = inputs.slice();
-      this.#replayBuffer.push({ inputs, targets, isTurn });
-      if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
-        this.#replayBuffer.shift();
-      }
+    const shouldTrain = isDecisionPoint || this.#isNovel(inputs);
+    if (!shouldTrain) {
+      this.#brainChangedThisFrame = false;
+      return false;
+    }
+
+    this.#lastStoredInputs = inputs.slice();
+    this.#replayBuffer.push({ inputs, targets, isTurn });
+    if (this.#replayBuffer.length > this.#replayBufferMaxSize) {
+      this.#replayBuffer.shift();
     }
 
     // Per-output learning rates. Turn channels (left/right) are rare relative

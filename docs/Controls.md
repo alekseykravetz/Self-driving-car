@@ -51,10 +51,11 @@ The project supports multiple input methods for controlling cars. All control sy
 
 ### Human Backpropagation Training (`html/human-training.html`)
 
-| Key | Action                                                                 |
-| --- | ---------------------------------------------------------------------- |
-| `L` | Toggle learning on/off (latch-only — state persists after key release) |
-| `G` | Toggle global green wave — force all traffic lights green (world mode) |
+| Key | Action                                                                                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------- |
+| `L` | Toggle learning on/off (latch-only — state persists after key release)                                           |
+| `P` | Toggle autopilot (brain drives). Press a drive key to correct it (DAgger) — the correction also trains the brain |
+| `G` | Toggle global green wave — force all traffic lights green (world mode)                                           |
 
 ---
 
@@ -186,10 +187,13 @@ class Controls {
 
 #### KEYS Mode — Human keyboard input
 
-Registers `keydown` and `keyup` event listeners on `document`. When `frozen`
-is `true`, both listeners return immediately without changing any flags — used
-by `Car.setAutopilot(true)` in Human Backpropagation mode to prevent keyboard
-input from overwriting the brain's controls.
+Registers `keydown` and `keyup` event listeners on `document`. The listeners
+**always** update a set of raw human-key holds (exposed via the `humanControls`
+getter). When `frozen` is `false` they also mirror those holds into the
+_effective_ `forward`/`left`/`right`/`reverse` flags that physics reads. When
+`frozen` is `true` — set by `Car.setAutopilot(true)` in Human Backpropagation
+mode — the effective flags are left to the brain, but `humanControls` keeps
+tracking the human's keys so DAgger corrections can override and train the brain.
 
 ```typescript
 document.addEventListener('keydown', (e) => {

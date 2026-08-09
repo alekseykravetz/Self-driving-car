@@ -91,22 +91,27 @@ class Car {
 The `Car` class has additional private fields used by the Human Backpropagation
 mode (`html/human-training.html`):
 
-| Field                    | Type                                | Purpose                                                                                                       |
-| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `#learningFromHuman`     | `boolean`                           | When true, train the brain each frame to imitate human keypresses via `CarBrainAdapter.trainStep`             |
-| `#autopilot`             | `boolean`                           | When true, the brain drives the car (controls overwritten by brain output) and learning is paused             |
-| `#learningRate`          | `number`                            | Per-frame STE update rate (default 0.1, adjustable from the panel)                                            |
-| `#lastBrainOutput`       | `{ forward, left, right, reverse }` | The brain's most recent prediction, exposed for accuracy display                                              |
-| `#brainChangedThisFrame` | `boolean`                           | True when `trainStep` updated at least one weight/bias this frame; exposed for the panel's brain-activity dot |
+| Field                    | Type                                | Purpose                                                                                                               |
+| ------------------------ | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `#learningFromHuman`     | `boolean`                           | When true, train the brain each frame to imitate human keypresses via `CarBrainAdapter.trainStep`                     |
+| `#autopilot`             | `boolean`                           | When true, the brain drives the car; a live human keypress overrides it as a DAgger correction (and trains the brain) |
+| `#learningRate`          | `number`                            | Per-frame STE update rate (default 0.1, adjustable from the panel)                                                    |
+| `#lastBrainOutput`       | `{ forward, left, right, reverse }` | The brain's most recent prediction, exposed for accuracy display                                                      |
+| `#brainChangedThisFrame` | `boolean`                           | True when `trainStep` updated at least one weight/bias this frame; exposed for the panel's brain-activity dot         |
 
 The forward pass in `#processBrain()` **always** runs (so `#lastBrainOutput` is
 fresh for the visualizer/accuracy even in human mode). Brain output is applied
-to controls only when `useBrain` (AI) or `#autopilot` (KEYS car in test mode).
-`trainStep` is called only in human mode (not autopilot, not damaged, keys
-pressed, and learning not paused via the L-key toggle). When autopilot is
-engaged, `Car.setAutopilot(true)` also sets `controls.frozen = true` so the
-`Controls` keyboard listeners become no-op — without this, human keypresses
-would overwrite the brain's controls between frames. When autopilot is
+to controls when `useBrain` (AI) or `#autopilot` (KEYS car), except that in
+autopilot a live human keypress overrides the brain for that frame (a DAgger
+correction). `trainStep` (via `CarLearningManager.learn`) is called only when
+not damaged, learning is not paused (L-key toggle), and the frame is **novel**
+(a new sensor state or a control change) — steady cruising/idle frames are
+skipped so a held input never retrains the same pattern every frame. In
+autopilot, learning happens only while the human is actively correcting (never
+from the brain's own output). When autopilot is engaged, `Car.setAutopilot(true)`
+sets `controls.frozen = true` so the keyboard no longer writes the _effective_
+controls (the brain does), while `Controls` still tracks the raw human key holds
+via its `humanControls` getter so DAgger can read corrections. When autopilot is
 **disengaged**, `Car.setAutopilot(false)` resets all four controls to `false`
 so the car stops immediately (the brain's last output doesn't linger as
 phantom forward movement). See [NeuralNetwork.md § Online Imitation Learning](NeuralNetwork.md#online-imitation-learning-networktrainstep).

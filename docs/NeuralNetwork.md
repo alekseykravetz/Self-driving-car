@@ -153,8 +153,12 @@ well-behaved at that small scale:
   `0 / 1`, so cross-entropy no longer drives the sigmoid to fully saturate. This
   is what stops the weights from blowing up (fully saturating a sigmoid requires
   ever-larger weights).
-- **Weight decay** (`λ = 0.002`) — a gentle L2 pull toward 0 keeping weights off
-  the clamp boundary.
+- **Weight decay** (`λ = 0.02`) — a strong L2 pull toward 0 that keeps weights
+  off the `[-1, 1]` clamp boundary. Sustained online SGD on correlated frames
+  would otherwise slam weights into the clamp, where the sigmoid saturates,
+  gradients vanish, and the network collapses into a degenerate policy (the
+  "more training makes it worse" failure). The decay must be large enough to
+  reach equilibrium against the per-frame gradients well before the clamp.
 
 Steps:
 
@@ -186,9 +190,18 @@ becomes `bias += lr · δ` (with `δ = ∂L/∂z`). Equivalently, the bias is
 ### Guards (applied in `Car.#processBrain`)
 
 - **Not when damaged** — don't learn from crashes.
-- **Not when no keys are pressed** — skip idle frames so "release keys" frames
-  don't overwrite lessons via recency bias.
-- **Not in autopilot mode** — the brain is driving, not learning.
+- **Only when the situation changes** — training runs only on a **novel sensor
+  state** (input differs from the last stored frame by more than an L∞
+  threshold) or a **control change** (decision point). Holding a steady input
+  (cruising straight, idling) does **not** retrain the same pattern every frame
+  — repeatedly hammering one pattern over-fits and erases previously-taught
+  turns (the "it breaks my brain when I do nothing" failure). This gating lives
+  in `CarLearningManager.learn()`.
+- **Autopilot uses DAgger** — when the brain is driving, a live human keypress
+  is treated as a **correction**: it overrides the brain AND becomes a training
+  label, so the brain learns to recover from the off-center states its own
+  driving produces. With no human input, autopilot does **not** train (it never
+  learns from its own output).
 - **Not when learning is paused** — the L-key toggle sets `#learningFromHuman`
   to `false`, halting all weight updates while still allowing the forward pass
   (so the visualizer and accuracy display keep working).
@@ -222,9 +235,10 @@ population, no generations.
 2. Each frame, the forward pass runs (populating `level.inputs[]`/`outputs[]`
    for the visualizer), and the brain's output is compared to the human's actual
    keypresses.
-3. When the human is driving (not in autopilot, not damaged, keys pressed, and
-   learning is ON), `CarBrainAdapter.trainStep` nudges the brain's weights toward
-   the human's actions. The return value (`boolean`) indicates whether any
+3. When the human is driving (not damaged, learning is ON) and the frame is
+   **novel** (a new sensor state or a control change), `CarBrainAdapter.trainStep`
+   nudges the brain's weights toward the human's actions. Steady cruising/idle
+   frames are skipped. The return value (`boolean`) indicates whether any
    weights changed — used to pulse the panel's brain-activity dot.
 4. The network visualizer shows **match rings** on output neurons: green when
    the brain's output agrees with the human's key, red when it disagrees.
@@ -244,18 +258,25 @@ is created. The L key uses `latchOnly: true` on the `KeyboardManager` toggle
 binding — each keydown flips the state (press-to-toggle), and keyup is a no-op
 so the state persists after releasing the key.
 
-### Autopilot toggle
+### Autopilot toggle (P key)
 
-The panel's "Autopilot" checkbox switches the car to brain-driven driving
-(`Car.#autopilot = true`): the brain's output controls the car, learning pauses,
-and the accuracy display shows `—`. To prevent the human's keyboard from
-overwriting the brain's controls between frames, `Car.setAutopilot(true)` also
-sets `controls.frozen = true` on the `Controls` instance — the keyboard
-listeners become no-op while frozen. The panel shows an "AUTOPILOT ACTIVE"
-banner. Switch back to resume human driving and restore the previous learning
-state. When autopilot is disengaged, all four controls are reset to `false` so
-the car stops immediately (no phantom forward movement from the brain's last
-output).
+Press **P** to switch the car to brain-driven driving (`Car.#autopilot = true`):
+the brain's output controls the car and the accuracy display shows `—`. The
+toggle lives on the shortcuts toolbar (a `KeyboardManager` `latchOnly` binding),
+not a checkbox, so it never steals focus from the canvas (an HTML checkbox did,
+which broke the `L` shortcut until focus returned to the canvas).
+
+**DAgger correction** — while autopilot drives, any drive key you press is a
+**correction**: it overrides the brain for that frame AND (when learning is ON)
+trains the brain on that state → your-action pair. This is the key to robust
+imitation learning — the brain learns to recover from the exact states its own
+driving produces, instead of only the clean states the human demonstrated.
+`Car.setAutopilot(true)` sets `controls.frozen = true` so the keyboard no longer
+writes the _effective_ controls directly (the brain does), but `Controls` still
+tracks the raw human key holds via its `humanControls` getter so DAgger can read
+your corrections. The panel shows an "AUTOPILOT ACTIVE" banner. When autopilot is
+disengaged, all four controls are reset to `false` so the car stops immediately
+(no phantom forward movement from the brain's last output).
 
 ### Persistence
 

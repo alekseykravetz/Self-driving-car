@@ -160,5 +160,36 @@ describe('CarLearningManager', () => {
         m.learn({ brain, inputs: INPUTS, controls: forwardControls() }),
       ).not.toThrow();
     });
+
+    it('skips training on a static repeated frame', () => {
+      const m = new CarLearningManager();
+      const brain = makeBrain();
+      // First (novel) frame trains; an identical repeat is skipped.
+      m.learn({ brain, inputs: INPUTS, controls: forwardControls() });
+      expect(
+        m.learn({ brain, inputs: INPUTS, controls: forwardControls() }),
+      ).toBe(false);
+      expect(m.brainChangedThisFrame).toBe(false);
+    });
+
+    it('trains again when the sensor state changes (novel frame)', () => {
+      const m = new CarLearningManager();
+      const brain = makeBrain();
+      m.learn({ brain, inputs: INPUTS, controls: forwardControls() });
+      const novel = INPUTS.map((v, i) => (i === 0 ? v + 0.5 : v));
+      expect(
+        m.learn({ brain, inputs: novel, controls: forwardControls() }),
+      ).toBe(true);
+    });
+
+    it('trains on a control change even if the sensor state is unchanged', () => {
+      const m = new CarLearningManager();
+      const brain = makeBrain();
+      m.learn({ brain, inputs: INPUTS, controls: forwardControls() });
+      // Same inputs, but the human now also steers left → decision point.
+      expect(m.learn({ brain, inputs: INPUTS, controls: leftControls() })).toBe(
+        true,
+      );
+    });
   });
 });

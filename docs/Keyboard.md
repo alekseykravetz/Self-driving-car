@@ -184,14 +184,18 @@ TrafficSimulator.#initToolbar():
 HumanBackpropSimulator.#initKeyboardManager():
   → new KeyboardManager(toolbar)
   → km.setBindings([
-       keyL,
+       keyL,                // learning on/off (latchOnly)
+       keyP,                // autopilot on/off (latchOnly; DAgger corrections)
        ...driveKeyBindings(),
        ...zoomViewBindings(this.#mode !== 'simple'),
        visualizerDensityBinding(...),
      ])
 ```
 
-As with training, the `Shift` fine-zoom indicator is hidden in simple mode.
+Both `L` (learning) and `P` (autopilot) are `latchOnly` toggle bindings. `P`
+replaces the old autopilot checkbox, which stole focus from the canvas and broke
+the `L` shortcut. As with training, the `Shift` fine-zoom indicator is hidden in
+simple mode.
 
 ---
 
@@ -255,7 +259,7 @@ page.
 | `ts/world/editors/corridorEditor.ts`                   | Defines shortcut bindings for T key, calls `pushBindings`/`popBindings`                                |
 | `ts/simulator/training/trainingSimulator.ts`           | Creates `KeyboardManager` with training simulator bindings (arrows, G, Ctrl/Shift)                     |
 | `ts/simulator/traffic/trafficSimulator.ts`             | Creates `KeyboardManager` with traffic simulator bindings (R, G, Ctrl/Shift)                           |
-| `ts/simulator/humanTraining/humanBackpropSimulator.ts` | Creates `KeyboardManager` with Human Backpropagation bindings (L, arrows, Ctrl/Shift)                  |
+| `ts/simulator/humanTraining/humanBackpropSimulator.ts` | Creates `KeyboardManager` with Human Backpropagation bindings (L, P, arrows, Ctrl/Shift)               |
 
 ---
 
@@ -263,9 +267,10 @@ page.
 
 1. **No direct `window` keydown/keyup.** All keyboard routing goes through
    `KeyboardManager`. The only exception is `controls.ts` (arrow/WASD for car
-   driving — though `controls.frozen` can suppress them when the brain is in
-   autopilot), which has no toolbar indicator and is not part of the shortcut
-   system.
+   driving — while `controls.frozen` the brain drives the effective controls, but
+   the listeners still track raw human key holds via `humanControls` for DAgger
+   corrections in autopilot), which has no toolbar indicator and is not part of
+   the shortcut system.
 
 2. **Toolbar is presentation-only.** `ShortcutsToolbarElement` has no key listeners
    and knows nothing about what the shortcuts do. It only renders indicators and

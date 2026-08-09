@@ -30,17 +30,22 @@ function makeTurnBrain(): unknown {
 }
 
 describe('Human backprop pipeline integration', () => {
-  it('Car trains brain via trainStep when controls change', () => {
+  it('trains on a novel frame but skips an identical repeat frame', () => {
     const car = new Car({ x: 0, y: 0, controlType: 'AI' });
     car.brain = makeKnownForwardBrain();
     car.setLearningFromHuman(true);
 
+    // First frame is novel → it trains.
     car.update([], [], []);
+    expect(car.brainChangedThisFrame).toBe(true);
     const nn = car.brain as NeuralNetwork;
     const outputBias0 = nn.levels[1].biases[0];
 
+    // An identical, unchanging frame must NOT retrain (holding a steady input
+    // no longer hammers the same pattern every frame).
     car.update([], [], []);
-    expect(nn.levels[1].biases[0]).not.toBe(outputBias0);
+    expect(car.brainChangedThisFrame).toBe(false);
+    expect(nn.levels[1].biases[0]).toBe(outputBias0);
   });
 
   it('Replay buffer stores (inputs, targets) pairs and replays them', () => {
