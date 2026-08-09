@@ -73,11 +73,11 @@ export const TRAINING_INIT_MODAL_TEMPLATE = `
       <div class="ti-param-grid" id="tiCarConfigGrid">
         ${numInputRowHtml({ id: 'tiCarHeight', label: 'Height', icon: 'height', min: 20, max: 150, step: 5, title: 'Car height' })}
         ${numInputRowHtml({ id: 'tiCarWidth', label: 'Width', icon: 'width', min: 10, max: 100, step: 5, title: 'Car width' })}
-        <div class="ctrl ctrl-wide">
-          <span class="ctrl-label"><app-icon name="graph"></app-icon> Hidden Layers</span>
-          <input type="text" id="tiCarHiddenLayers" title="Hidden layer sizes (comma-separated, e.g. 6 or 8,6)" />
-        </div>
         ${numInputRowHtml({ id: 'tiCarMaxSpeed', label: 'Max Speed', icon: 'rocket', min: 1, max: 20, step: 0.01, title: 'Car maximum speed' })}
+        <div class="ctrl">
+          <span class="ctrl-label"><app-icon name="graph"></app-icon> Hidden Layers</span>
+          <input type="text" id="tiCarHiddenLayers" class="ti-text-input" title="Hidden layer sizes (comma-separated, e.g. 6 or 8,6)" />
+        </div>
         ${numInputRowHtml({ id: 'tiCarAcceleration', label: 'Accel', icon: 'bolt', min: 0.001, max: 1, step: 0.001, title: 'Car acceleration' })}
         ${numInputRowHtml({ id: 'tiCarFriction', label: 'Friction', icon: 'tire', min: 0.001, max: 0.5, step: 0.001, title: 'Car friction' })}
         ${numInputRowHtml({ id: 'tiCarRayCount', label: 'Rays', icon: 'antenna', min: 1, max: 20, step: 1, title: 'Sensor ray count' })}
