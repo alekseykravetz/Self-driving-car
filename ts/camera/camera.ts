@@ -223,13 +223,21 @@ export class Camera implements ICameraPoint {
         )
       : [];
 
-    // Road borders
+    // Road borders. Distance-pre-filter before allocating a Polygon per
+    // segment and running the frustum intersectsPolygon test on each — on a
+    // whole-city OSM import this unfiltered path (thousands of border
+    // segments) dominated both CPU (intersectsPolygon) and GC. The frustum
+    // triangle's farthest point is exactly `range` from the camera centre, so
+    // any segment that can intersect it has a point within `range` of centre;
+    // pre-rejecting by that distance is a correct superset (no popping).
     const roadSegments: Segment[] = world.corridors.length
       ? world.corridors.flatMap((c: Corridor) => c.borders)
       : world.roadBorders || [];
     const roadPolygons: Polygon[] = extrudePolygons(
       this.#frustum.filter(
-        roadSegments.map((s: Segment) => new Polygon([s.p1, s.p2])),
+        roadSegments
+          .filter((s) => s.distanceToPoint(this.center) <= this.range + 1)
+          .map((s: Segment) => new Polygon([s.p1, s.p2])),
       ),
       10,
     );
@@ -470,6 +478,9 @@ export class Camera implements ICameraPoint {
     for (const m of world.markings) {
       if (!m.polygon) continue;
       const type = (m as { type?: string }).type;
+      // Cheap centroid distance pre-filter before the frustum intersectsPolygon
+      // test (markings can number in the thousands on a full-city import).
+      if (!this.#withinRange(m.center, m.width)) continue;
       if (!this.#frustum.inFront(m.center)) continue;
       if (
         !this.polygon.containsPoint(m.center) &&
