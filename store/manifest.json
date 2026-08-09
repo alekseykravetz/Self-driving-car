@@ -4,7 +4,8 @@
     "circle_corridor.world",
     "mirror.world",
     "mirror_corridor.world",
-    "Ashkelon_city.world"
+    "Ashkelon_city.world",
+    "Ashkelon_part.world"
   ],
   "cars": [
     "best_b6_s3_rc5_rl150.car",
