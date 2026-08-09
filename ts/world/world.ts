@@ -36,8 +36,10 @@ import { sortEnvelopesByTier } from './roadTiers.js';
 import { getRoadFillColor } from '../math/roadTypes.js';
 import {
   pointInView,
-  polygonInView,
   segmentInView,
+  polygonBounds,
+  aabbInView,
+  type Aabb,
 } from './worldViewCulling.js';
 
 /** Reconstructs corridors from a saved world, accepting both the new
@@ -115,6 +117,10 @@ export class World implements IWorld {
     hash: string;
     count: number;
     envelopes: Envelope[];
+    // Envelope AABBs, parallel to `envelopes`, computed once per hash change so
+    // per-frame viewport culling is an O(1) box test instead of re-walking
+    // every (rounded, many-point) envelope polygon each frame.
+    bounds: Aabb[];
   } | null = null;
   // The graph hash computed once at the top of the current draw() frame. Lets
   // internal helpers (bridge shadows/details) reuse it instead of triggering a
@@ -364,8 +370,11 @@ export class World implements IWorld {
     if (layers.roads) {
       // Draw road envelopes (asphalt style, more wider then road borders itself)
       // Tier-sorted: higher-class roads paint on top of lower-class at overlaps.
-      for (const env of this.#getDrawOrderedEnvelopes(graphHash)) {
-        if (screenBounds && !polygonInView(env.polygon, screenBounds)) {
+      const ordered = this.#getDrawOrderedEnvelopes(graphHash);
+      const orderedBounds = this.#drawOrderCache!.bounds;
+      for (let i = 0; i < ordered.length; i++) {
+        const env = ordered[i];
+        if (screenBounds && !aabbInView(orderedBounds[i], screenBounds)) {
           continue;
         }
         const seg = env.skeleton;
@@ -511,10 +520,12 @@ export class World implements IWorld {
       this.#drawOrderCache.hash !== graphHash ||
       this.#drawOrderCache.count !== this.envelopes.length
     ) {
+      const envelopes = sortEnvelopesByTier(this.envelopes);
       this.#drawOrderCache = {
         hash: graphHash,
         count: this.envelopes.length,
-        envelopes: sortEnvelopesByTier(this.envelopes),
+        envelopes,
+        bounds: envelopes.map((e) => polygonBounds(e.polygon)),
       };
     }
     return this.#drawOrderCache.envelopes;

@@ -94,10 +94,10 @@ export class WorldBridgeRenderer {
     }
 
     for (const env of envelopes) {
+      if (!env.skeleton.bridge) continue;
       if (screenBounds && !polygonInView(env.polygon, screenBounds)) {
         continue;
       }
-      if (!env.skeleton.bridge) continue;
 
       const seg = env.skeleton;
       const dirVec = seg.directionVector();

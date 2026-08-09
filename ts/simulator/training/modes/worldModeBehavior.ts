@@ -78,6 +78,9 @@ export class WorldTrainingStrategy {
   #parent: TrainingSimulator;
   #borderGrid: SpatialHashGrid = new SpatialHashGrid(150);
   #trafficGrid: TrafficControlGrid = new TrafficControlGrid(150);
+  // The training world graph is static, so its O(n) hash is computed once at
+  // load and reused every frame instead of recomputing it in each draw.
+  #worldGraphHash: string | null = null;
 
   constructor(parent: TrainingSimulator) {
     this.#parent = parent;
@@ -112,6 +115,7 @@ export class WorldTrainingStrategy {
     this.#parent.world = worldInfo
       ? World.load(worldInfo)
       : new World(new Graph());
+    this.#worldGraphHash = this.#parent.world.graph.hash();
 
     this.#parent.viewport = new Viewport(
       this.#parent.gameCanvas,
@@ -230,6 +234,7 @@ export class WorldTrainingStrategy {
       showStartMarkings: false,
       layers: this.#parent.worldLayers,
       screenBounds: this.#parent.viewport.getVisibleBounds(),
+      graphHash: this.#worldGraphHash ?? undefined,
     });
     this.#parent.viewport.drawScaleIndicator(this.#parent.gameCtx);
 

@@ -57,3 +57,34 @@ export function polygonInView(
   }
   return maxX >= b.minX && minX <= b.maxX && maxY >= b.minY && minY <= b.maxY;
 }
+
+/** Axis-aligned bounding box in world space. */
+export interface Aabb {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+/** Computes a polygon's AABB by walking its points once. Callers cache the
+ * result for static geometry so per-frame culling doesn't re-walk points. */
+export function polygonBounds(poly: { points: Point[] }): Aabb {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const p of poly.points) {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+/** True if a precomputed AABB overlaps the visible rect (O(1), no point walk). */
+export function aabbInView(a: Aabb, b: VisibleWorldRect): boolean {
+  return (
+    a.maxX >= b.minX && a.minX <= b.maxX && a.maxY >= b.minY && a.minY <= b.maxY
+  );
+}
