@@ -157,6 +157,19 @@ items that could possibly reach within `range` of the camera pay for the
 expensive intersection/clip path. See
 [Math § Render-time distance culling](Math.md#render-time-distance-culling-for-buildingstreescamera-perf).
 
+The same pattern was extended to the two remaining unfiltered inputs:
+
+- **Road-border segments** were mapped straight to `new Polygon([p1, p2])` and
+  run through `filter()` (allocating a polygon + an `intersectsPolygon` test
+  per border, every frame). They are now pre-rejected by
+  `s.distanceToPoint(this.center) <= this.range + 1`. The frustum triangle's
+  farthest point is exactly `range` from the camera centre, so any segment that
+  can intersect it has a point within `range` — the distance test is a correct
+  superset (no popping).
+- **Painted markings** (`world.markings`) are pre-filtered by
+  `#withinRange(m.center, m.width)` before the frustum `intersectsPolygon`
+  test, so thousands of city markings no longer each pay the polygon test.
+
 ---
 
 ## 3D Projection (`CameraFrustum#projectPoint`)
@@ -165,11 +178,13 @@ Converts world 2D+Z coordinates to screen perspective coordinates (`Camera` dele
 
 ```typescript
 projectPoint(ctx: CanvasRenderingContext2D, p: Point): Point {
-  // 1. Project point onto camera's forward axis (center → tip)
-  const segment = new Segment(this.center, this.tip);
-  const { point: p1 } = segment.projectPoint(p);
+  // 1. Project point onto the camera's forward axis (center → tip). The
+  //    Segment is cached per-frame in updateFrustumPoints (#projSegment) so
+  //    projecting N points allocates one Segment, not N.
+  const { point: p1 } = this.#projSegment.projectPoint(p);
 
-  // 2. Calculate lateral offset via 2D cross product
+  // 2. Calculate lateral offset via 2D cross product. The camera position
+  //    equals the frustum centre, so reuse #center instead of a fresh Point.
   const c = cross(subtract(p1, this.center), subtract(p, this.center));
   const x = (Math.sign(c) * distance(p, p1)) / distance(this.center, p1);
 
@@ -190,6 +205,22 @@ projectPoint(ctx: CanvasRenderingContext2D, p: Point): Point {
 - Objects to the left/right of camera direction are offset horizontally
 - Z coordinate provides vertical displacement (buildings rise up, ground is flat)
 - The `scaler` normalizes to canvas dimensions
+
+### Performance: per-frame allocation & depth-fade
+
+Two hot spots surfaced once the geometry-culling above landed and the profile
+became projection-bound:
+
+- `projectPoint` previously allocated a `new Segment(center, tip)` **and** a
+  `new Point(x, y)` on **every** projected vertex. The forward axis only
+  changes when the camera moves, so it is now built once per frame in
+  `updateFrustumPoints` (`#projSegment`), and the camera position is reused
+  from `#center` (they are the same coordinates).
+- `Camera.render()` computed each polygon's depth (for the alpha fade) with
+  `Polygon.distanceToPoint`, which projects the camera onto **every edge** and
+  spreads an array — per polygon, per frame. It now uses the nearest **vertex**
+  distance (a plain O(points) squared-distance scan, no allocation), which is
+  visually equivalent for the fade.
 
 ---
 

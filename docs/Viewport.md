@@ -196,6 +196,33 @@ big OSM imports (see
 [Math § Render-time distance culling](Math.md#render-time-distance-culling-for-buildingstreescamera-perf)).
 The math is unit-tested in `tests/unit/viewport/viewport.test.ts`.
 
+### Cached envelope AABBs & signage culling
+
+Two follow-up wins removed the remaining per-frame `O(all geometry)` scans that
+still ran even with `screenBounds`:
+
+- **Envelope AABBs are cached, not recomputed.** The road-envelope cull used
+  `polygonInView(env.polygon, …)`, which re-walked every (rounded, many-point)
+  envelope polygon each frame. `World.#drawOrderCache` now stores a parallel
+  `bounds: Aabb[]` (via `polygonBounds`), computed once per `Graph.hash()`
+  change, and the asphalt loop culls with the O(1) `aabbInView(bounds[i], …)`.
+- **Signage is viewport-culled.** One-way arrows, road-name labels, speed-limit
+  signs, road shields, and gantry exit signs previously drew **every** cached
+  placement regardless of view. Each `WorldSignageRenderer.draw*` method now
+  takes `screenBounds` and skips placements outside it via `pointInView` (which
+  accepts any `{ x, y }`). One-way arrows alone were ~10% of a whole-city frame.
+
+### Static-world hash caching
+
+`Graph.hash()` is `O(segments × metadata)` and `World.draw()` runs it once per
+frame. In the **world editor** that is unavoidable (the graph is being edited),
+but a **training/traffic** simulator world never mutates while running, so
+`WorldTrainingStrategy` computes `world.graph.hash()` once in
+`initializeSimulator` (`#worldGraphHash`) and threads it as
+`WorldDrawOptions.graphHash`. This skips the per-frame hash entirely while
+keeping the traffic-manager, signage, and draw-order caches valid (their keys
+never change because the world is static).
+
 ---
 
 ## Zoom (Scroll Wheel)

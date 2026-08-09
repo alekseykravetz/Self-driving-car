@@ -22,6 +22,8 @@ import {
   ONE_WAY_ARROW_HEAD_ANGLE,
 } from './oneWayArrows.js';
 import type { OneWayArrowPlacement } from './oneWayArrows.js';
+import { pointInView } from './worldViewCulling.js';
+import type { VisibleWorldRect } from '../viewport/viewport.js';
 
 /**
  * Renders the road-signage subsystem for a {@link World}: one-way direction
@@ -118,7 +120,11 @@ export class WorldSignageRenderer {
   }
 
   /** Draw one-way direction arrows from cached chain-aware placements. */
-  drawOneWayArrows(ctx: CanvasRenderingContext2D, graph: Graph): void {
+  drawOneWayArrows(
+    ctx: CanvasRenderingContext2D,
+    graph: Graph,
+    screenBounds?: VisibleWorldRect,
+  ): void {
     const arrows = this.#getOneWayArrows(graph);
     const totalLen = ONE_WAY_ARROW_SHAFT_PX + ONE_WAY_ARROW_HEAD_PX;
     const originalLineCap = ctx.lineCap;
@@ -128,6 +134,7 @@ export class WorldSignageRenderer {
     ctx.lineWidth = 2;
     ctx.lineCap = 'butt';
     for (const arrow of arrows) {
+      if (screenBounds && !pointInView(arrow, screenBounds)) continue;
       const tip = new Point(arrow.x, arrow.y);
       const back = new Point(-Math.cos(arrow.angle), -Math.sin(arrow.angle));
       const shaftStart = add(tip, scale(back, totalLen));
@@ -162,6 +169,7 @@ export class WorldSignageRenderer {
     ctx: CanvasRenderingContext2D,
     graph: Graph,
     zoom: number | undefined,
+    screenBounds?: VisibleWorldRect,
   ): void {
     if (!zoom || zoom < MIN_SIGNAGE_ZOOM) return;
 
@@ -174,6 +182,7 @@ export class WorldSignageRenderer {
     ctx.textBaseline = 'middle';
 
     for (const s of this.#getRoadShields(graph)) {
+      if (screenBounds && !pointInView(s, screenBounds)) continue;
       const type = s.highwayType ?? '';
       const blue =
         type === 'motorway' ||
@@ -219,6 +228,7 @@ export class WorldSignageRenderer {
     ctx: CanvasRenderingContext2D,
     graph: Graph,
     zoom: number | undefined,
+    screenBounds?: VisibleWorldRect,
   ): void {
     if (!zoom || zoom < MIN_SIGNAGE_ZOOM) return;
 
@@ -227,6 +237,7 @@ export class WorldSignageRenderer {
     ctx.textBaseline = 'middle';
 
     for (const s of this.#getExitSigns(graph)) {
+      if (screenBounds && !pointInView(s, screenBounds)) continue;
       const dests = s.destination
         .split(';')
         .map((d) => d.trim())
@@ -296,6 +307,7 @@ export class WorldSignageRenderer {
     ctx: CanvasRenderingContext2D,
     graph: Graph,
     zoom: number | undefined,
+    screenBounds?: VisibleWorldRect,
   ): void {
     if (!zoom || zoom < MIN_SIGNAGE_ZOOM) return;
 
@@ -304,6 +316,7 @@ export class WorldSignageRenderer {
     ctx.textBaseline = 'middle';
 
     for (const label of this.#getSignage(graph).labels) {
+      if (screenBounds && !pointInView(label, screenBounds)) continue;
       ctx.save();
       ctx.translate(label.x, label.y);
       ctx.rotate(label.angle);
@@ -323,12 +336,14 @@ export class WorldSignageRenderer {
     ctx: CanvasRenderingContext2D,
     graph: Graph,
     zoom: number | undefined,
+    screenBounds?: VisibleWorldRect,
   ): void {
     if (!zoom || zoom < MIN_SIGNAGE_ZOOM) return;
 
     const signRadius = 16;
 
     for (const sign of this.#getSignage(graph).signs) {
+      if (screenBounds && !pointInView(sign, screenBounds)) continue;
       // Draw red ring
       ctx.beginPath();
       ctx.arc(sign.x, sign.y, signRadius, 0, Math.PI * 2);

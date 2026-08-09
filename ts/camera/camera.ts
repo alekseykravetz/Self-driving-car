@@ -592,9 +592,18 @@ export class Camera implements ICameraPoint {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    const thisPoint = new Point(this.x, this.y);
     for (let i = 0; i < projectedPolygons.length; i++) {
-      const dist: number = polygons[i].distanceToPoint(thisPoint);
+      // Depth fade uses the nearest vertex distance (cheap O(points) squared
+      // distance) rather than Polygon.distanceToPoint, which projected the
+      // camera onto every edge (and spread an array) per polygon each frame.
+      let minDistSq = Infinity;
+      for (const pt of polygons[i].points) {
+        const dx = pt.x - this.x;
+        const dy = pt.y - this.y;
+        const d = dx * dx + dy * dy;
+        if (d < minDistSq) minDistSq = d;
+      }
+      const dist: number = Math.sqrt(minDistSq);
       ctx.globalAlpha = Math.max(0, (1 - dist / this.range) ** 2);
 
       const { fill, stroke } = polygons[i] as IColoredPolygon;

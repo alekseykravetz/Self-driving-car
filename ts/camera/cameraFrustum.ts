@@ -19,6 +19,9 @@ export class CameraFrustum {
   #left!: Point;
   #right!: Point;
   #polygon!: Polygon;
+  // Camera centre→tip projection axis, rebuilt only when the camera moves so
+  // projectPoint() doesn't allocate a new Segment per projected point.
+  #projSegment!: Segment;
 
   /**
    * Recomputes the frustum points from the camera's current position/angle.
@@ -55,6 +58,7 @@ export class CameraFrustum {
       y - range * Math.cos(angle + Math.PI / 4),
     );
     this.#polygon = new Polygon([this.#center, this.#left, this.#right]);
+    this.#projSegment = new Segment(this.#center, this.#tip);
 
     return {
       center: this.#center,
@@ -69,11 +73,12 @@ export class CameraFrustum {
    * Projects a 3D point onto the 2D canvas based on the camera's perspective.
    */
   projectPoint(ctx: CanvasRenderingContext2D, p: Point): Point {
-    const segment: Segment = new Segment(this.#center, this.#tip);
     const { point: p1 }: { point: Point; offset: number } =
-      segment.projectPoint(p);
+      this.#projSegment.projectPoint(p);
 
-    const thisPoint = new Point(this.#x, this.#y);
+    // The camera position equals the frustum centre, so reuse it directly
+    // instead of allocating a fresh Point per projected point.
+    const thisPoint = this.#center;
     const c: number = cross(subtract(p1, thisPoint), subtract(p, thisPoint));
     const x: number =
       (Math.sign(c) * distance(p, p1)) / distance(thisPoint, p1);

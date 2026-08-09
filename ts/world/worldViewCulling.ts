@@ -9,7 +9,7 @@ export const WORLD_CULL_MARGIN_PX = 300;
 
 /** True if a point lies within the visible rect, expanded by a margin. */
 export function pointInView(
-  p: Point,
+  p: { x: number; y: number },
   b: VisibleWorldRect,
   margin: number = WORLD_CULL_MARGIN_PX,
 ): boolean {

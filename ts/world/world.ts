@@ -410,7 +410,7 @@ export class World implements IWorld {
       );
 
       // Draw one-way arrows
-      this.#signageRenderer.drawOneWayArrows(ctx, this.graph);
+      this.#signageRenderer.drawOneWayArrows(ctx, this.graph, screenBounds);
 
       // Draw bridge deck details: concrete overlay, parapet railings,
       // guardrail posts, and expansion joints.
@@ -421,14 +421,34 @@ export class World implements IWorld {
       );
 
       // Draw road name labels
-      this.#signageRenderer.drawRoadNames(ctx, this.graph, this.zoom);
+      this.#signageRenderer.drawRoadNames(
+        ctx,
+        this.graph,
+        this.zoom,
+        screenBounds,
+      );
 
       // Draw speed limit signs
-      this.#signageRenderer.drawSpeedLimits(ctx, this.graph, this.zoom);
+      this.#signageRenderer.drawSpeedLimits(
+        ctx,
+        this.graph,
+        this.zoom,
+        screenBounds,
+      );
 
       // Draw road shield badges (ref) and gantry exit signs (destination)
-      this.#signageRenderer.drawRoadShields(ctx, this.graph, this.zoom);
-      this.#signageRenderer.drawExitSigns(ctx, this.graph, this.zoom);
+      this.#signageRenderer.drawRoadShields(
+        ctx,
+        this.graph,
+        this.zoom,
+        screenBounds,
+      );
+      this.#signageRenderer.drawExitSigns(
+        ctx,
+        this.graph,
+        this.zoom,
+        screenBounds,
+      );
     }
 
     // Draw road markings (yield, stop, start, crosswalks, lights)
