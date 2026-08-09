@@ -1156,8 +1156,11 @@ the mismatches instead of being diluted by hundreds of forward-only frames.
 Per-channel accuracy (↑/←/→/↓ each with their own %) makes it clear which
 controls the brain has learned and which it still struggles with.
 
-In autopilot mode, accuracy shows `—` and rings disappear (the brain is
-driving, not being compared).
+Accuracy compares the brain's prediction against the human's **raw** key holds
+(`Controls.humanControls`), not the effective controls the brain drives, so it
+stays meaningful both when driving manually and when correcting the brain during
+autopilot (DAgger). On idle frames (no keys held) the display freezes; it clears
+to `—` only when the car is damaged.
 
 Training improvements to address the class-imbalance problem
 (turn-learning washed out by dominant forward-only frames):
@@ -1283,7 +1286,9 @@ The `<human-training-panel>` displays live training information:
 - **Accuracy** — rolling-window % + per-channel % under each key indicator.
 - **Brain activity** — a dot that pulses green on frames where `trainStep`
   actually changed weights (learning is on, keys pressed, non-zero error).
-- **Training frames** — total frames where learning was active this session.
+- **Training frames** — count of frames where the brain actually trained
+  (`brainChangedThisFrame`: a novel/decision frame that changed weights,
+  including DAgger corrections in autopilot) — not every idle frame.
 - **Learning rate** — slider (0.01–0.5).
 - **Buttons** — Config, Download .car, Reset brain, Reset car.
 - **Status** — "Brain: fresh" or "Brain: loaded from save".

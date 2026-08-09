@@ -261,10 +261,12 @@ so the state persists after releasing the key.
 ### Autopilot toggle (P key)
 
 Press **P** to switch the car to brain-driven driving (`Car.#autopilot = true`):
-the brain's output controls the car and the accuracy display shows `—`. The
-toggle lives on the shortcuts toolbar (a `KeyboardManager` `latchOnly` binding),
-not a checkbox, so it never steals focus from the canvas (an HTML checkbox did,
-which broke the `L` shortcut until focus returned to the canvas).
+the brain's output controls the car. The learning indicator is **not** changed
+by autopilot — it reflects only the `L` toggle, because DAgger corrections keep
+training while autopilot drives. The toggle lives on the shortcuts toolbar (a
+`KeyboardManager` `latchOnly` binding), not a checkbox, so it never steals focus
+from the canvas (an HTML checkbox did, which broke the `L` shortcut until focus
+returned to the canvas).
 
 **DAgger correction** — while autopilot drives, any drive key you press is a
 **correction**: it overrides the brain for that frame AND (when learning is ON)

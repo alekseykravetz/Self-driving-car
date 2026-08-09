@@ -18,8 +18,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
   #htKeyRightPct: HTMLElement | null = null;
   #htKeyReversePct: HTMLElement | null = null;
 
-  #learningActive: boolean = true;
-
   #onLearningRateChange: ((v: number) => void) | null = null;
   #onConfig: (() => void) | null = null;
   #onDownload: (() => void) | null = null;
@@ -122,7 +120,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
   }
 
   setLearningState(active: boolean): void {
-    this.#learningActive = active;
     if (this.#htLearningState) {
       this.#htLearningState.textContent = active ? 'LEARNING' : 'PAUSED';
       this.#htLearningState.className =
@@ -133,11 +130,6 @@ export class HumanTrainingPanelElement extends HTMLElement {
   setAutopilotActive(active: boolean): void {
     if (this.#htAutopilotBanner) {
       this.#htAutopilotBanner.style.display = active ? 'block' : 'none';
-    }
-    if (active) {
-      this.setLearningState(false);
-    } else {
-      this.setLearningState(this.#learningActive);
     }
   }
 

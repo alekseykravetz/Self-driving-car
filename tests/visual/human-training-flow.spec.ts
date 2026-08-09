@@ -31,7 +31,7 @@ test.describe('Human training interaction flows', () => {
     await expect(state).toHaveText('LEARNING');
   });
 
-  test('enabling autopilot shows the banner and suspends learning', async ({
+  test('enabling autopilot shows the banner without changing learning state', async ({
     page,
   }) => {
     await startSession(page);
@@ -39,14 +39,17 @@ test.describe('Human training interaction flows', () => {
     const state = page.locator('#htLearningState');
 
     await expect(banner).toBeHidden();
+    await expect(state).toHaveText('LEARNING');
 
     await page.keyboard.press('p');
     await expect(banner).toBeVisible();
-    // The car now drives itself, so human-imitation learning is paused.
-    await expect(state).toHaveText('PAUSED');
+    // Autopilot no longer pauses learning — DAgger corrections still train the
+    // brain, so the L-driven learning state is unchanged.
+    await expect(state).toHaveText('LEARNING');
 
     await page.keyboard.press('p');
     await expect(banner).toBeHidden();
+    await expect(state).toHaveText('LEARNING');
   });
 
   test('driving forward increases the reported speed', async ({ page }) => {

@@ -399,11 +399,10 @@ export class HumanBackpropSimulator extends SimulatorShell {
 
     this.#updateAccuracy();
 
-    if (
-      this.#car.learningFromHuman &&
-      !this.#car.autopilot &&
-      !this.#car.damaged
-    ) {
+    // Count only frames where the brain actually trained (a novel/decision
+    // frame that changed weights, including DAgger corrections in autopilot) —
+    // not every idle frame just because learning is enabled.
+    if (this.#car.brainChangedThisFrame) {
       this.#trainingFrames++;
     }
 
@@ -437,7 +436,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
 
   #updateAccuracy(): void {
     if (!this.#car) return;
-    if (this.#car.autopilot || this.#car.damaged) {
+    if (this.#car.damaged) {
       this.#currentMatch = [null, null, null, null];
       this.#panel.setAccuracy(this.#currentMatch, null);
       this.#panel.setPerChannelAccuracy([null, null, null, null]);
@@ -445,14 +444,16 @@ export class HumanBackpropSimulator extends SimulatorShell {
       return;
     }
 
-    const human = this.#car.controls as Controls;
+    // Compare the brain's prediction against what the HUMAN wants — the raw key
+    // holds, not the effective controls (which the brain drives in autopilot).
+    // This keeps accuracy meaningful both when driving manually and when
+    // correcting the brain during autopilot (DAgger).
+    const human = (this.#car.controls as Controls).humanControls;
 
-    // Accuracy compares the brain's prediction against the keys you're actually
-    // pressing. On idle frames (no keys held) there is nothing meaningful to
-    // compare — the trained brain still "wants" to drive forward — so freeze the
-    // display instead of feeding brain-vs-idle mismatches into the rolling
-    // window (which would otherwise drag the number to 0% whenever you stop
-    // driving, even with learning turned off).
+    // On idle frames (no keys held) there is nothing meaningful to compare — the
+    // trained brain still "wants" to drive forward — so freeze the display
+    // instead of feeding brain-vs-idle mismatches into the rolling window (which
+    // would otherwise drag the number to 0% whenever you stop driving).
     const driving = human.forward || human.left || human.right || human.reverse;
     if (!driving) {
       this.#currentMatch = [null, null, null, null];

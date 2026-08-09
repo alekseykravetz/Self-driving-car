@@ -146,22 +146,24 @@ conditions — when the user switches from forward-only to dodging traffic
 instead of being diluted by hundreds of forward-only frames. Per-channel
 accuracy (↑/←/→/↓ each with their own %) is shown under each key indicator in
 the panel, making it clear which controls the brain has learned and which it
-still struggles with. In autopilot or crash mode, accuracy shows `—` and the
-window clears.
+still struggles with. Accuracy compares the brain's prediction to the human's
+raw key holds, so it keeps updating while you correct the brain during autopilot
+(DAgger); it freezes on idle frames and clears to `—` only when the car is
+damaged.
 
 ### Panel info displays
 
 The `<human-training-panel>` shows live training information beyond the
 accuracy metrics:
 
-| Display          | Source                          | Update frequency |
-| ---------------- | ------------------------------- | ---------------- |
-| Car speed        | `pxPerFrameToKmh(car.speed)`    | Every frame      |
-| Brain activity   | `car.brainChangedThisFrame`     | Every frame      |
-| Training frames  | Session counter (not persisted) | Every frame      |
-| Per-channel %    | Rolling 120-frame window        | Every frame      |
-| Learning state   | `car.learningFromHuman`         | On toggle (L)    |
-| Autopilot banner | `car.autopilot`                 | On toggle        |
+| Display          | Source                                                      | Update frequency |
+| ---------------- | ----------------------------------------------------------- | ---------------- |
+| Car speed        | `pxPerFrameToKmh(car.speed)`                                | Every frame      |
+| Brain activity   | `car.brainChangedThisFrame`                                 | Every frame      |
+| Training frames  | Frames the brain actually trained (`brainChangedThisFrame`) | On training      |
+| Per-channel %    | Rolling 120-frame window                                    | Every frame      |
+| Learning state   | `car.learningFromHuman`                                     | On toggle (L)    |
+| Autopilot banner | `car.autopilot`                                             | On toggle        |
 
 ---
 
