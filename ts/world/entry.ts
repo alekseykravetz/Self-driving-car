@@ -1,4 +1,5 @@
 import '../ui/atoms/appIcon.js';
+import '../ui/atoms/tooltip.js';
 import { StoreManager } from '../store/storeManager.js';
 import { WorldEditor } from './editors/worldEditor.js';
 

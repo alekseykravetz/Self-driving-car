@@ -17,12 +17,6 @@
   flex: 0 0 auto;
 }
 
-/* Tooltip direction override for world-layers toolbar (world/styles.css) */
-#worldLayersToolbar .toolbar-btn[data-tooltip]:hover::after {
-  bottom: auto;
-  top: calc(100% + var(--space-2));
-}
-
 @keyframes worldLayersPulse {
   0%,
   100% {

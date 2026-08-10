@@ -1,0 +1,33 @@
+/* ── Global tooltip ────────────────────────────────────────────────
+   Single shared element (see ts/ui/atoms/tooltip.ts) appended to <body>,
+   so tooltips escape scrollable panels and never clip or spawn scrollbars.
+   Positioned imperatively via inline left/top; only appearance lives here. */
+
+.app-tooltip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  max-width: 280px;
+  padding: var(--space-1\.5) var(--space-2\.5);
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: normal;
+  line-height: 1.3;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.12s ease,
+    visibility 0.12s ease;
+}
+
+.app-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+}

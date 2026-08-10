@@ -45,24 +45,3 @@
   border-color: var(--color-accent-orange);
   box-shadow: var(--shadow-amber);
 }
-
-.key-indicator[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  top: calc(100% + var(--space-2));
-  left: 0;
-  transform: none;
-  background-color: var(--color-bg-dark);
-  color: var(--color-text-primary);
-  font-size: var(--text-base);
-  font-family: var(--font-ui);
-  font-weight: normal;
-  padding: var(--space-1\.5) var(--space-2\.5);
-  border-radius: var(--radius-sm);
-  white-space: normal;
-  max-width: 280px;
-  width: max-content;
-  z-index: 200;
-  pointer-events: none;
-  line-height: 1.3;
-}

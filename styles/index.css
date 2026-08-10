@@ -15,6 +15,7 @@
 @import './atoms/_key-indicator.css';
 @import './atoms/_toolbar-btn.css';
 @import './atoms/_icon.css';
+@import './atoms/_tooltip.css';
 
 /* ── Molecules ──────────────────────────────────────────────────── */
 @import './molecules/_stat-row.css';
