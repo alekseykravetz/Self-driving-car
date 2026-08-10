@@ -75,7 +75,7 @@ export const WORLD_EDITOR_PANEL_TEMPLATE = `
           <label class="wep-field-label">Max Speed</label>
           <div class="num-input-row num-input-row-sm">
             <button type="button" class="num-btn" id="wepMaxSpeedDec">−</button>
-            <input type="number" id="wepMaxSpeed" min="0" step="5" placeholder="km/h">
+            <input type="number" id="wepMaxSpeed" min="0" step="any" placeholder="km/h">
             <button type="button" class="num-btn" id="wepMaxSpeedInc">+</button>
             <button type="button" class="num-btn wep-clear-btn" id="wepMaxSpeedClear" title="Clear max speed (unset)"><app-icon name="close"></app-icon></button>
           </div>

@@ -68,7 +68,8 @@ export const TRAINING_PANEL_TEMPLATE = `
           value="1000"
           min="200"
           max="20000"
-          step="200"
+          step="any"
+          data-step="200"
           title="Cars farther than this distance from the best car are frozen (idle) to save performance"
         />
         <button class="num-btn num-btn-inc" data-target="idleRange"><app-icon name="plus"></app-icon></button>
@@ -141,7 +142,8 @@ export const TRAINING_PANEL_TEMPLATE = `
           value="500"
           min="0"
           max="5000"
-          step="500"
+          step="any"
+          data-step="500"
           title="Number of AI cars in the population"
         />
         <button class="num-btn num-btn-inc" data-target="carCount"><app-icon name="plus"></app-icon></button>
@@ -155,7 +157,8 @@ export const TRAINING_PANEL_TEMPLATE = `
           type="number"
           id="threshold"
           value="0.2"
-          step="0.05"
+          step="any"
+          data-step="0.05"
           min="0.001"
           max="1"
           title="Mutation amount applied each generation"
@@ -173,7 +176,8 @@ export const TRAINING_PANEL_TEMPLATE = `
           value="1"
           min="1"
           max="20"
-          step="1"
+          step="any"
+          data-step="1"
           title="Number of top cars kept in the best pool"
         />
         <button class="num-btn num-btn-inc" data-target="poolCount"><app-icon name="plus"></app-icon></button>

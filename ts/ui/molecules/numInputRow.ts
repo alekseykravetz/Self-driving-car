@@ -24,7 +24,9 @@ export function numInputRowHtml(o: NumInputRowOptions): string {
   const attrs = [
     o.min !== undefined ? `min="${o.min}"` : '',
     o.max !== undefined ? `max="${o.max}"` : '',
-    o.step !== undefined ? `step="${o.step}"` : '',
+    // `step="any"` disables native step-mismatch validation (whose popup is a
+    // browser-default tooltip); the +/- buttons read the real step from data-step.
+    o.step !== undefined ? `step="any" data-step="${o.step}"` : '',
     o.value !== undefined ? `value="${o.value}"` : '',
     o.title ? `title="${o.title}"` : '',
   ]
@@ -53,7 +55,7 @@ export function wireNumInputRows(root: ParentNode): void {
       if (!targetId) return;
       const input = root.querySelector<HTMLInputElement>(`#${targetId}`);
       if (!input || input.disabled) return;
-      const step = parseFloat(input.step) || 1;
+      const step = parseFloat(input.dataset.step ?? '') || 1;
       const min = parseFloat(input.min);
       const max = parseFloat(input.max);
       let val = parseFloat(input.value) || 0;

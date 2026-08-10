@@ -225,7 +225,7 @@ export class TrainingPanelElement extends HTMLElement {
         if (!targetId) return;
         const input = this.querySelector<HTMLInputElement>(`#${targetId}`);
         if (!input) return;
-        const step = parseFloat(input.step) || 1;
+        const step = parseFloat(input.dataset.step ?? '') || 1;
         const min = parseFloat(input.min);
         const max = parseFloat(input.max);
         let val = parseFloat(input.value) || 0;
