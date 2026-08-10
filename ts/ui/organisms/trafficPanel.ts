@@ -35,6 +35,10 @@ import {
 // referenced inside its own body — that makes tsc emit a global `var _a`
 // alias that can collide with other globally-loaded classes' aliases).
 
+/** Live-value refresh throttle: the stats list updates a few times per second
+ * instead of every animation frame, so a large fleet doesn't thrash layout. */
+const TRAFFIC_REFRESH_INTERVAL_MS = 200;
+
 /** Read-only HTML for a car's full configuration. */
 function tpConfigHtml(car: Car): string {
   const rows: [string, string | number][] = [
@@ -62,6 +66,10 @@ export class TrafficPanelElement extends HTMLElement {
   #selected: Car | null = null;
 
   // Per-car row references, parallel to `#cars`, used for in-place refresh.
+  // The `last*` fields cache the values last written to the DOM so `refresh()`
+  // only touches a node when its value actually changed — writing textContent /
+  // style / classList unconditionally on 1000 rows every frame thrashed style
+  // recalc + flex layout (the dominant cost with a large fleet).
   #rows: {
     car: Car;
     row: HTMLElement;
@@ -69,7 +77,18 @@ export class TrafficPanelElement extends HTMLElement {
     speed: HTMLElement;
     dist: HTMLElement;
     swatch: HTMLElement;
+    lastSpeed?: string;
+    lastDist?: string;
+    lastSwatch?: string;
+    lastCrashed?: boolean;
+    lastSelected?: boolean;
+    lastOrder?: string;
   }[] = [];
+
+  // Live-value refresh is throttled: the per-frame draw loop calls refresh()
+  // at 60 Hz, but the stats list only needs a few updates per second. Structural
+  // changes (select / setCars / unselect) bypass the throttle via refresh(true).
+  #lastRefreshTs = 0;
 
   #onSelect: ((car: Car | null) => void) | null = null;
   #onRemove: ((car: Car) => void) | null = null;
@@ -169,7 +188,7 @@ export class TrafficPanelElement extends HTMLElement {
   /** Clears the current selection without removing any car. */
   unselect(): void {
     this.#selected = null;
-    this.refresh();
+    this.refresh(true);
     if (this.#onSelect) this.#onSelect(null);
   }
 
@@ -195,7 +214,7 @@ export class TrafficPanelElement extends HTMLElement {
     for (const car of cars) {
       this.#rows.push(this.#buildRow(car, list));
     }
-    this.refresh();
+    this.refresh(true);
     this.#applyFilter();
   }
 
@@ -211,8 +230,20 @@ export class TrafficPanelElement extends HTMLElement {
   /** Update live values (status / speed / distance) without rebuilding rows.
    * Also re-orders the list: alive cars first (highest distance first),
    * then crashed cars (highest distance first).
+   *
+   * Throttled to a few updates per second (the draw loop calls this at 60 Hz).
+   * Pass `force` to bypass the throttle for structural changes (selection,
+   * membership) that must reflect immediately. Every DOM write is guarded by a
+   * cached previous value so unchanged rows touch no nodes.
    */
-  refresh(): void {
+  refresh(force = false): void {
+    const now =
+      typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (!force && now - this.#lastRefreshTs < TRAFFIC_REFRESH_INTERVAL_MS) {
+      return;
+    }
+    this.#lastRefreshTs = now;
+
     for (const entry of this.#rows) {
       const { car, row, status, speed, dist, swatch } = entry;
       const crashed = car.damaged;
@@ -220,13 +251,32 @@ export class TrafficPanelElement extends HTMLElement {
       if (status.dataset.icon !== wantStatus) {
         status.dataset.icon = wantStatus;
         status.innerHTML = `<app-icon name="${wantStatus}"></app-icon>`;
+        status.title = crashed ? 'Crashed' : 'Driving';
       }
-      status.title = crashed ? 'Crashed' : 'Driving';
-      speed.textContent = formatKmhFromPxPerFrame(car.speed);
-      dist.textContent = formatMetersFromWorldPixels(car.fitness);
-      swatch.style.background = crashed ? '#777' : car.color;
-      row.classList.toggle('crashed', crashed);
-      row.classList.toggle('selected', car === this.#selected);
+      const speedText = formatKmhFromPxPerFrame(car.speed);
+      if (entry.lastSpeed !== speedText) {
+        speed.textContent = speedText;
+        entry.lastSpeed = speedText;
+      }
+      const distText = formatMetersFromWorldPixels(car.fitness);
+      if (entry.lastDist !== distText) {
+        dist.textContent = distText;
+        entry.lastDist = distText;
+      }
+      const bg = crashed ? '#777' : car.color;
+      if (entry.lastSwatch !== bg) {
+        swatch.style.background = bg;
+        entry.lastSwatch = bg;
+      }
+      if (entry.lastCrashed !== crashed) {
+        row.classList.toggle('crashed', crashed);
+        entry.lastCrashed = crashed;
+      }
+      const selected = car === this.#selected;
+      if (entry.lastSelected !== selected) {
+        row.classList.toggle('selected', selected);
+        entry.lastSelected = selected;
+      }
     }
 
     // Re-sort rows visually: alive (desc distance) then crashed (desc distance).
@@ -234,6 +284,8 @@ export class TrafficPanelElement extends HTMLElement {
     // listeners — stay stable. Moving nodes with appendChild every frame races
     // with mousedown/mouseup across animation frame boundaries and swallows
     // clicks (same issue fixed in the training panel via delegated listeners).
+    // `order` is only written when it changed, so a stable list triggers no
+    // flex re-layout.
     if (this.#rows.length === 0) return;
     const sorted = [...this.#rows].sort((a, b) => {
       const aDead = a.car.damaged ? 1 : 0;
@@ -242,7 +294,11 @@ export class TrafficPanelElement extends HTMLElement {
       return b.car.fitness - a.car.fitness;
     });
     for (let i = 0; i < sorted.length; i++) {
-      sorted[i].row.style.order = String(i);
+      const order = String(i);
+      if (sorted[i].lastOrder !== order) {
+        sorted[i].row.style.order = order;
+        sorted[i].lastOrder = order;
+      }
     }
   }
 
@@ -318,7 +374,7 @@ export class TrafficPanelElement extends HTMLElement {
 
   #select(car: Car): void {
     this.#selected = car;
-    this.refresh();
+    this.refresh(true);
     if (this.#onSelect) this.#onSelect(car);
   }
 }

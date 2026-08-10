@@ -1026,6 +1026,17 @@ and is a pure view over the simulator's `#cars` array:
 clear); `refresh()` updates the live values in place every render frame without
 destroying expand state.
 
+> **Perf (large fleets):** the draw loop calls `refresh()` at 60 Hz, but on a
+> 1000-car fleet writing `textContent` / `style` / `classList` on every row each
+> frame dominated the frame with **Recalculate Style + Layout + Pre-paint** (the
+> flex `order` re-sort forced a full re-layout). `refresh()` is now **throttled**
+> to `TRAFFIC_REFRESH_INTERVAL_MS` (200 ms ≈ 5 Hz), and every DOM write is
+> **change-guarded** against a cached previous value (`lastSpeed`/`lastDist`/
+> `lastSwatch`/`lastCrashed`/`lastSelected`/`lastOrder`) so unchanged rows touch
+> no nodes and `style.order` is only rewritten when the sort order actually
+> changes. Structural changes (select / `setCars` / `unselect`) call
+> `refresh(true)` to bypass the throttle and update immediately.
+
 A search input above the car list (`#trafficCarSearch`) filters the visible
 rows by name as you type — client-side only (`#applyFilter()` toggles each
 row's `display`), so it never touches `#cars`/removal/selection.
