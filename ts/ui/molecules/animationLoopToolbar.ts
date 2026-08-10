@@ -67,7 +67,7 @@ export class AnimationLoopToolbarElement extends HTMLElement {
       );
     }
 
-    makeToolbarCollapsible(this, 'Anim');
+    makeToolbarCollapsible(this, 'Animation');
   }
 
   /** Whether the simulation step is currently paused. */

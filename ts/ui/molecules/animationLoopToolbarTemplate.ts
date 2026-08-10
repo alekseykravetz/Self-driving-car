@@ -16,7 +16,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
     <div class="controls-separator"></div>
 
     <div class="controls-group">
-      <span class="controls-group-label">Render frames</span>
+      <span class="controls-group-label">Frames</span>
       <div
         class="num-input-row num-input-row-sm"
         data-tooltip="Draw 1 of every N frames (physics always runs at full rate). Higher = fewer redraws = faster sim with choppier visuals."
