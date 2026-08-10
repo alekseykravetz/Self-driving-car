@@ -8,6 +8,11 @@
  * horizontal scrollbars — the failure mode of the old CSS `::after` tooltips,
  * which were laid out inside their host element's box.
  *
+ * Native `title` attributes are adopted on first hover/focus (moved into
+ * `data-tooltip`, then removed) so every browser-default tooltip in the app —
+ * including dynamically-rendered lists — gets the same styled, delayed
+ * presentation and the browser's own bare tooltip never appears.
+ *
  * Behaviour:
  *  - Shown after a short hover delay (mouse/pen) or immediately on focus.
  *  - Positioned below the target, flipped above when it would overflow the
@@ -42,10 +47,18 @@ class TooltipController {
 
   #targetFrom(node: EventTarget | null): HTMLElement | null {
     if (!(node instanceof Element)) return null;
-    const el = node.closest('[data-tooltip]');
-    return el instanceof HTMLElement && el.getAttribute('data-tooltip')
-      ? el
-      : null;
+    const el = node.closest('[data-tooltip], [title]');
+    if (!(el instanceof HTMLElement)) return null;
+    // Adopt a native `title` so the browser's own tooltip never shows and the
+    // hint renders through this single styled, delayed presentation instead.
+    if (!el.hasAttribute('data-tooltip')) {
+      const title = el.getAttribute('title');
+      if (title) {
+        el.setAttribute('data-tooltip', title);
+        el.removeAttribute('title');
+      }
+    }
+    return el.getAttribute('data-tooltip') ? el : null;
   }
 
   #onPointerOver = (e: PointerEvent): void => {
