@@ -3,16 +3,18 @@ import type { IconName } from '../atoms/iconRegistry.js';
 export interface NumInputRowOptions {
   /** The id assigned to the `<input>` (also used as the buttons' data-target). */
   id: string;
-  /** Human-readable label shown above the control. */
-  label: string;
+  /** Human-readable label shown above the control. Omit for a bare row. */
+  label?: string;
   /** Icon rendered before the label. */
-  icon: IconName;
+  icon?: IconName;
   min?: number | string;
   max?: number | string;
   step?: number | string;
   /** Optional initial value for the `<input>`. */
   value?: number | string;
   title?: string;
+  /** Render the compact `.num-input-row-sm` variant. */
+  small?: boolean;
 }
 
 /**
@@ -32,14 +34,18 @@ export function numInputRowHtml(o: NumInputRowOptions): string {
   ]
     .filter(Boolean)
     .join(' ');
-  return `
-    <div class="ctrl">
-      <span class="ctrl-label"><app-icon name="${o.icon}"></app-icon> ${o.label}</span>
-      <div class="num-input-row">
+  const rowClass = o.small ? 'num-input-row num-input-row-sm' : 'num-input-row';
+  const iconHtml = o.icon ? `<app-icon name="${o.icon}"></app-icon> ` : '';
+  const row = `
+      <div class="${rowClass}">
         <button type="button" class="num-btn num-btn-dec" data-target="${o.id}"><app-icon name="minus"></app-icon></button>
         <input type="number" id="${o.id}" ${attrs} />
         <button type="button" class="num-btn num-btn-inc" data-target="${o.id}"><app-icon name="plus"></app-icon></button>
-      </div>
+      </div>`;
+  if (o.label === undefined) return row;
+  return `
+    <div class="ctrl">
+      <span class="ctrl-label">${iconHtml}${o.label}</span>${row}
     </div>`;
 }
 

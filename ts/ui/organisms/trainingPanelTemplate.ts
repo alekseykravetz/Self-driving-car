@@ -60,20 +60,7 @@ export const TRAINING_PANEL_TEMPLATE = `
       <span class="stat-value" id="stat-frozen">0</span>
     </div>
     <div class="idle-range-wrap" id="idleRangeWrap" title="Cars farther than this distance from the best car are frozen (idle) to save performance">
-      <div class="num-input-row num-input-row-sm">
-        <button class="num-btn num-btn-dec" data-target="idleRange"><app-icon name="minus"></app-icon></button>
-        <input
-          type="number"
-          id="idleRange"
-          value="1000"
-          min="200"
-          max="20000"
-          step="any"
-          data-step="200"
-          title="Cars farther than this distance from the best car are frozen (idle) to save performance"
-        />
-        <button class="num-btn num-btn-inc" data-target="idleRange"><app-icon name="plus"></app-icon></button>
-      </div>
+      ${numInputRowHtml({ id: 'idleRange', small: true, value: 1000, min: 200, max: 20000, step: 200, title: 'Cars farther than this distance from the best car are frozen (idle) to save performance' })}
     </div>
   </div>
 </div>
@@ -132,57 +119,9 @@ export const TRAINING_PANEL_TEMPLATE = `
 <div class="panel-section">
   <div class="section-title">Training Params</div>
   <div class="param-grid">
-    <div class="ctrl">
-      <span class="ctrl-label">Cars</span>
-      <div class="num-input-row">
-        <button class="num-btn num-btn-dec" data-target="carCount"><app-icon name="minus"></app-icon></button>
-        <input
-          type="number"
-          id="carCount"
-          value="500"
-          min="0"
-          max="5000"
-          step="any"
-          data-step="500"
-          title="Number of AI cars in the population"
-        />
-        <button class="num-btn num-btn-inc" data-target="carCount"><app-icon name="plus"></app-icon></button>
-      </div>
-    </div>
-    <div class="ctrl">
-      <span class="ctrl-label">Mutation</span>
-      <div class="num-input-row">
-        <button class="num-btn num-btn-dec" data-target="threshold"><app-icon name="minus"></app-icon></button>
-        <input
-          type="number"
-          id="threshold"
-          value="0.2"
-          step="any"
-          data-step="0.05"
-          min="0.001"
-          max="1"
-          title="Mutation amount applied each generation"
-        />
-        <button class="num-btn num-btn-inc" data-target="threshold"><app-icon name="plus"></app-icon></button>
-      </div>
-    </div>
-    <div class="ctrl">
-      <span class="ctrl-label">Pool</span>
-      <div class="num-input-row">
-        <button class="num-btn num-btn-dec" data-target="poolCount"><app-icon name="minus"></app-icon></button>
-        <input
-          type="number"
-          id="poolCount"
-          value="1"
-          min="1"
-          max="20"
-          step="any"
-          data-step="1"
-          title="Number of top cars kept in the best pool"
-        />
-        <button class="num-btn num-btn-inc" data-target="poolCount"><app-icon name="plus"></app-icon></button>
-      </div>
-    </div>
+    ${numInputRowHtml({ id: 'carCount', label: 'Cars', value: 500, min: 0, max: 5000, step: 500, title: 'Number of AI cars in the population' })}
+    ${numInputRowHtml({ id: 'threshold', label: 'Mutation', value: 0.2, min: 0.001, max: 1, step: 0.05, title: 'Mutation amount applied each generation' })}
+    ${numInputRowHtml({ id: 'poolCount', label: 'Pool', value: 1, min: 1, max: 20, step: 1, title: 'Number of top cars kept in the best pool' })}
   </div>
 </div>
 
