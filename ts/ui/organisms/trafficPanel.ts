@@ -4,6 +4,7 @@ import { wireNumInputRows } from '../molecules/numInputRow.js';
 import {
   formatKmhFromPxPerFrame,
   formatMetersFromWorldPixels,
+  pxPerFrameToKmh,
 } from '../../math/worldUnits.js';
 
 /**
@@ -38,6 +39,11 @@ import {
 /** Live-value refresh throttle: the stats list updates a few times per second
  * instead of every animation frame, so a large fleet doesn't thrash layout. */
 const TRAFFIC_REFRESH_INTERVAL_MS = 200;
+
+/** Speed display deadband (km/h): the shown speed is only repainted when it
+ * moves by at least this much, so small 1-2 km/h engine jitter stays readable
+ * instead of flickering. A car reaching a full stop always repaints to 0. */
+const SPEED_UPDATE_THRESHOLD_KMH = 2;
 
 /** Read-only HTML for a car's full configuration. */
 function tpConfigHtml(car: Car): string {
@@ -77,7 +83,7 @@ export class TrafficPanelElement extends HTMLElement {
     speed: HTMLElement;
     dist: HTMLElement;
     swatch: HTMLElement;
-    lastSpeed?: string;
+    lastSpeedKmh?: number;
     lastDist?: string;
     lastSwatch?: string;
     lastCrashed?: boolean;
@@ -253,10 +259,16 @@ export class TrafficPanelElement extends HTMLElement {
         status.innerHTML = `<app-icon name="${wantStatus}"></app-icon>`;
         status.title = crashed ? 'Crashed' : 'Driving';
       }
-      const speedText = formatKmhFromPxPerFrame(car.speed);
-      if (entry.lastSpeed !== speedText) {
-        speed.textContent = speedText;
-        entry.lastSpeed = speedText;
+      const speedKmh = pxPerFrameToKmh(car.speed);
+      // Deadband: repaint only on a meaningful change (or a full stop), so
+      // small engine jitter of a km/h or two doesn't flicker the readout.
+      if (
+        entry.lastSpeedKmh === undefined ||
+        (speedKmh === 0 && entry.lastSpeedKmh !== 0) ||
+        Math.abs(speedKmh - entry.lastSpeedKmh) >= SPEED_UPDATE_THRESHOLD_KMH
+      ) {
+        speed.textContent = formatKmhFromPxPerFrame(car.speed);
+        entry.lastSpeedKmh = speedKmh;
       }
       const distText = formatMetersFromWorldPixels(car.fitness);
       if (entry.lastDist !== distText) {

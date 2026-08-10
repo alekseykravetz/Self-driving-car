@@ -674,6 +674,32 @@ of the pipeline. If this pattern resurfaces elsewhere, consider adding a bbox
 short-circuit directly to `Polygon.intersectsPolygon`/`distanceToPoint` instead
 of scattering per-caller centroid guards.
 
+### Follow-up culling passes
+
+Later profiles on the same whole-city imports surfaced the remaining
+unfiltered per-frame scans; all were fixed with the same "cheap reject before
+expensive math / cache what doesn't change" principle:
+
+- **Camera road borders & markings** — `Camera.#getPolygons()` mapped every
+  road-border segment to a `Polygon` and ran the frustum `intersectsPolygon`
+  test on each; markings ran it per in-front marking. Both now distance-reject
+  first (`Segment.distanceToPoint(center) <= range + 1` for borders,
+  `Camera#withinRange(m.center, m.width)` for markings). The frustum triangle's
+  farthest point is exactly `range` from the camera centre, so the border test
+  is a correct superset (no popping). See
+  [Camera § View Frustum Culling](Camera.md#view-frustum-culling-camerafrustumfilter).
+- **Camera projection allocation** — `CameraFrustum.projectPoint()` built a
+  `Segment`+`Point` per projected vertex (now cached per frame in
+  `updateFrustumPoints`), and `Camera.render()`'s depth fade used
+  `Polygon.distanceToPoint` per polygon (now a nearest-vertex squared-distance
+  scan). See [Camera § 3D Projection](Camera.md#3d-projection-camerafrustumprojectpoint).
+- **Envelope AABB cache & viewport-culled signage** — `World.#drawOrderCache`
+  now stores each envelope's precomputed AABB (`polygonBounds` /
+  `aabbInView` in `ts/world/worldViewCulling.ts`) so the asphalt cull is an
+  O(1) box test, and every `WorldSignageRenderer.draw*` method skips off-screen
+  placements via `pointInView`. See
+  [Viewport § Viewport Culling](Viewport.md#viewport-culling-getvisiblebounds).
+
 ---
 
 ## Time-sliced world generation (`ts/world/generation/`)

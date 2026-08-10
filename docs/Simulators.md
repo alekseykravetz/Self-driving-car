@@ -609,6 +609,15 @@ interface WorldDrawOptions {
 }
 ```
 
+> **Static-world hash (perf).** The training world graph never mutates while
+> training runs, so `WorldTrainingStrategy` computes `world.graph.hash()` once
+> in `initializeSimulator` (`#worldGraphHash`) and passes it as
+> `graphHash` every frame — skipping the per-frame O(n) hash while keeping the
+> traffic-manager / signage / draw-order caches valid. It also passes
+> `screenBounds: viewport.getVisibleBounds()` so off-screen roads/markings/
+> signage are culled (see
+> [Viewport § Viewport Culling](Viewport.md#viewport-culling-getvisiblebounds)).
+
 ### Border Modes
 
 Three radio-button options in `<world-setup>`:
@@ -1031,11 +1040,16 @@ destroying expand state.
 > frame dominated the frame with **Recalculate Style + Layout + Pre-paint** (the
 > flex `order` re-sort forced a full re-layout). `refresh()` is now **throttled**
 > to `TRAFFIC_REFRESH_INTERVAL_MS` (200 ms ≈ 5 Hz), and every DOM write is
-> **change-guarded** against a cached previous value (`lastSpeed`/`lastDist`/
+> **change-guarded** against a cached previous value (`lastSpeedKmh`/`lastDist`/
 > `lastSwatch`/`lastCrashed`/`lastSelected`/`lastOrder`) so unchanged rows touch
 > no nodes and `style.order` is only rewritten when the sort order actually
 > changes. Structural changes (select / `setCars` / `unselect`) call
 > `refresh(true)` to bypass the throttle and update immediately.
+>
+> The **speed** readout additionally uses a deadband
+> (`SPEED_UPDATE_THRESHOLD_KMH` = 2 km/h): it is repainted only when the value
+> moves by at least the threshold (or the car reaches a full stop → 0), so small
+> engine jitter of a km/h or two stays readable instead of flickering.
 
 A search input above the car list (`#trafficCarSearch`) filters the visible
 rows by name as you type — client-side only (`#applyFilter()` toggles each
