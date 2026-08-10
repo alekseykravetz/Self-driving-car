@@ -502,7 +502,8 @@ export class Camera implements ICameraPoint {
     const lightPolygons: Polygon[] = [];
     for (const m of world.markings) {
       if (!m.polygon) continue;
-      const type = (m as { type?: string }).type;
+      const view = m as { type?: string; state?: string };
+      const type = view.type;
       // Cheap centroid distance pre-filter before the frustum intersectsPolygon
       // test (markings can number in the thousands on a full-city import).
       if (!this.#withinRange(m.center, m.width)) continue;
@@ -514,7 +515,7 @@ export class Camera implements ICameraPoint {
         continue;
       }
       if (type === 'light') {
-        const state = (m as unknown as { state?: string }).state ?? 'off';
+        const state = view.state ?? 'off';
         const color = LIGHT_STATE_COLORS[state] ?? LIGHT_STATE_COLORS.off;
         const base = new Polygon(
           m.polygon.points.map((p) => new Point(p.x, p.y)),

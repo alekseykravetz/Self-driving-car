@@ -83,7 +83,7 @@ import '../ui/molecules/generationProgress.js';
   });
 
   worldEditor.animate();
-  (window as unknown as { __sim: unknown }).__sim = worldEditor;
+  window.__sim = worldEditor;
   if (new URLSearchParams(window.location.search).has('paused')) {
     worldEditor.pause?.();
   }

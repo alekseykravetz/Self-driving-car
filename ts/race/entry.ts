@@ -121,8 +121,7 @@ import '../simulator/racing/racePanel.js';
       'none';
     controls = new PhoneControls(cameraCanvas);
     document.addEventListener('click', () => {
-      const el = document.body as unknown as { requestFullscreen?: () => void };
-      el.requestFullscreen?.();
+      document.body.requestFullscreen?.();
     });
   } else {
     gameCanvas.height = window.innerHeight / 2;
@@ -140,8 +139,8 @@ import '../simulator/racing/racePanel.js';
     host,
     controls,
   );
-  (window as unknown as { __sim: unknown }).__sim = sim;
+  window.__sim = sim;
   if (params.has('paused')) {
-    (sim as unknown as { pause: () => void }).pause?.();
+    sim.pause();
   }
 })();

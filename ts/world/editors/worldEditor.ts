@@ -569,6 +569,7 @@ export class WorldEditor {
       }
     } catch (err) {
       console.error('World generation failed:', err);
+      alert(`World generation failed: ${err}`);
     } finally {
       overlay?.finish();
       this.#worldLayersToolbar?.setBusy(false);

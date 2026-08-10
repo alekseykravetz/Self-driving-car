@@ -42,14 +42,20 @@ import {
   type Aabb,
 } from './worldViewCulling.js';
 
+/** Optional legacy/versioned fields a saved world may carry that are not part
+ * of the live {@link World} shape. All optional, so a `World` is assignable. */
+interface LegacyWorldInfo {
+  corridors?: Corridor[];
+  corridor?: Corridor | null;
+  decoration?: WorldDecoration;
+  version?: number;
+}
+
 /** Reconstructs corridors from a saved world, accepting both the new
  * `corridors` array and the legacy single `corridor` field.
  * @internal Exported for testing only. */
 export function loadWorldCorridors(info: World): Corridor[] {
-  const legacy = info as unknown as {
-    corridors?: Corridor[];
-    corridor?: Corridor | null;
-  };
+  const legacy = info as LegacyWorldInfo;
   if (legacy.corridors) {
     return legacy.corridors.map((c) => Corridor.load(c));
   }
@@ -181,8 +187,7 @@ export class World implements IWorld {
     // recomputed rather than trusted even for v1 files — it is deterministic).
     WorldGenerator.generateRoads(world);
 
-    const decoration = (info as unknown as { decoration?: WorldDecoration })
-      .decoration;
+    const decoration = (info as LegacyWorldInfo).decoration;
     if (decoration) {
       // --- v2 lean format: compact decoration + reproducible prototypes ---
       world.treeSeed = decoration.treeSeed ?? DEFAULT_TREE_SEED;
@@ -229,7 +234,7 @@ export class World implements IWorld {
     // Legacy saves (version < 3) stored marking directionVector opposite to
     // the canonical travel direction — negate it and recompute anchor.flipped
     // so reanchoring reproduces the corrected direction.
-    const infoVersion = (info as unknown as { version?: number }).version;
+    const infoVersion = (info as LegacyWorldInfo).version;
     if (infoVersion !== 3) {
       for (const m of world.markings) {
         m.directionVector = new Point(
