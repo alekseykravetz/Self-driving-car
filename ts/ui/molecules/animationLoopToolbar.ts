@@ -78,7 +78,7 @@ export class AnimationLoopToolbarElement extends HTMLElement {
   /**
    * How many animation frames pass per rendered frame. Physics always runs at
    * full rate; only the (heavier) draw pass is throttled by this value.
-   * Clamped to [1, 10]; 1 = draw every frame.
+   * Clamped to [1, 60]; 1 = draw every frame.
    */
   get renderInterval(): number {
     return this.#cachedRenderInterval;
@@ -86,7 +86,7 @@ export class AnimationLoopToolbarElement extends HTMLElement {
 
   #clampInterval(value: string): number {
     const v = Math.round(Number(value));
-    return Number.isFinite(v) ? Math.min(10, Math.max(1, v)) : 1;
+    return Number.isFinite(v) ? Math.min(60, Math.max(1, v)) : 1;
   }
 
   /** Record one animation frame. Called by SimulatorShell.animate(). */

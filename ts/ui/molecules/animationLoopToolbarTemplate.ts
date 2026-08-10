@@ -28,7 +28,7 @@ export const ANIMATION_LOOP_TOOLBAR_TEMPLATE = `
           type="number"
           id="renderInterval"
           min="1"
-          max="10"
+          max="60"
           step="1"
           value="1"
         />
