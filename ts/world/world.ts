@@ -517,11 +517,6 @@ export class World implements IWorld {
         item.draw(ctx, { viewPoint });
       }
     }
-
-    // Optional: Draw lane guides for debugging
-    // for (const seg of this.laneGuides) {
-    //   drawSegment(ctx, seg, { color: 'cyan', width: 1 });
-    // }
   }
 
   /**

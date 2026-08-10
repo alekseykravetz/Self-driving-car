@@ -49,6 +49,23 @@ const MARKING_FLAT_COLORS: Record<string, string> = {
 /** White used for painted road lines/words. */
 const ROAD_PAINT = 'rgba(240, 240, 240, 0.9)';
 
+/** Extrusion height (world px) for building volumes in the 3D view. */
+const EXTRUDE_BUILDING_HEIGHT_PX = 200;
+/** Extrusion height (world px) for tree volumes in the 3D view. */
+const EXTRUDE_TREE_HEIGHT_PX = 200;
+/** Extrusion height (world px) for road-border walls in the 3D view. */
+const EXTRUDE_ROAD_HEIGHT_PX = 10;
+/** Body height (world px) used when extruding traffic cars. */
+const TRAFFIC_CAR_EXTRUDE_HEIGHT_PX = 12;
+/** Wheel radius (world px) used when extruding traffic cars. */
+const TRAFFIC_CAR_WHEEL_RADIUS_PX = 4;
+/** Distance (world px) the ground trapezoid's near corners sit in front of the camera. */
+const FOV_NEAR_PLANE_DISTANCE_PX = 20;
+/** Extra distance (world px) beyond camera range kept when culling road surfaces. */
+const ROAD_SURFACE_CULL_MARGIN_PX = 300;
+/** Fraction of a lane width within which a divider counts as the road centre line. */
+const CENTER_LINE_HALF_FRACTION = 0.6;
+
 export class Camera implements ICameraPoint {
   public x!: number;
   public y!: number;
@@ -206,7 +223,7 @@ export class Camera implements ICameraPoint {
               .filter((b) => this.#withinRange(b.center, b.boundingRadius))
               .map((b) => b.base),
           ),
-          200,
+          EXTRUDE_BUILDING_HEIGHT_PX,
         )
       : [];
 
@@ -219,7 +236,7 @@ export class Camera implements ICameraPoint {
               .map((t) => t.base),
             false,
           ),
-          200,
+          EXTRUDE_TREE_HEIGHT_PX,
         )
       : [];
 
@@ -239,7 +256,7 @@ export class Camera implements ICameraPoint {
           .filter((s) => s.distanceToPoint(this.center) <= this.range + 1)
           .map((s: Segment) => new Polygon([s.p1, s.p2])),
       ),
-      10,
+      EXTRUDE_ROAD_HEIGHT_PX,
     );
 
     // Key car (always extruded as detailed 3D car)
@@ -277,7 +294,11 @@ export class Camera implements ICameraPoint {
           false,
         );
         if (filteredBase.length) {
-          const carPolys = extrudeCarShape(filteredBase[0], 12, 4);
+          const carPolys = extrudeCarShape(
+            filteredBase[0],
+            TRAFFIC_CAR_EXTRUDE_HEIGHT_PX,
+            TRAFFIC_CAR_WHEEL_RADIUS_PX,
+          );
           carPolys.forEach((poly) => {
             const cPoly = poly as IColoredPolygon;
             cPoly.fill = car.color || 'rgba(200, 50, 50, 0.5)';
@@ -347,7 +368,7 @@ export class Camera implements ICameraPoint {
     // bottom (a triangle would leave the lower corners empty).
     const groundPolygons: Polygon[] = [];
     {
-      const near = 20;
+      const near = FOV_NEAR_PLANE_DISTANCE_PX;
       const nearLeft = new Point(
         this.x - near * Math.sin(this.angle - Math.PI / 4),
         this.y - near * Math.cos(this.angle - Math.PI / 4),
@@ -379,7 +400,10 @@ export class Camera implements ICameraPoint {
       // Cheap single-segment distance check (env.skeleton) instead of
       // poly.distanceToPoint, which walks every edge of the (rounded,
       // multi-point) envelope polygon for every road segment in the world.
-      if (env.skeleton.distanceToPoint(this.center) > this.range + 300)
+      if (
+        env.skeleton.distanceToPoint(this.center) >
+        this.range + ROAD_SURFACE_CULL_MARGIN_PX
+      )
         continue;
       const relevant =
         poly.intersectsPolygon(this.polygon) ||
@@ -414,7 +438,8 @@ export class Camera implements ICameraPoint {
         for (let i = 0; i < laneCount - 1; i++) {
           const offset = (i + 1 - laneCount / 2) * LANE_WIDTH_PX;
           if (Math.abs(offset) >= roadWidth / 2 - 1) continue;
-          const isCenter = Math.abs(offset) < LANE_WIDTH_PX * 0.6;
+          const isCenter =
+            Math.abs(offset) < LANE_WIDTH_PX * CENTER_LINE_HALF_FRACTION;
           const a = add(seg.p1, scale(perp, offset));
           const b = add(seg.p2, scale(perp, offset));
           if (!seg.oneWay && seg.separated && isCenter) {

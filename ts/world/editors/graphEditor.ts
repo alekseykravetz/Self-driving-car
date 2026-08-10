@@ -348,7 +348,6 @@ export class GraphEditor {
     this.#endPoint = null;
   }
 
-  // todo: change name to draw in all editors
   // Renders the graph and editor-specific visuals (hovered, selected points, intent line) onto the canvas.
   public display(): void {
     for (const seg of this.#graph.segments) {
