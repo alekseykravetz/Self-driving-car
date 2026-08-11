@@ -71,6 +71,8 @@ export interface IWorld {
   corridors: Corridor[];
   buildings: Building[];
   trees: Tree[];
+  /** Provenance of `buildings`; OSM footprints render with flat roofs. */
+  buildingSource?: BuildingSource;
   zoom?: number;
   offset?: Point;
   generateCorridor(start: Point, end: Point): void;
