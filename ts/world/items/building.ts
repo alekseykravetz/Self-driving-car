@@ -9,12 +9,14 @@ const BUILDING_CEILING_HEIGHT_RATIO = 0.6;
 /** Minimum footprint vertices required for the pitched-roof geometry. */
 const MIN_BUILDING_BASE_POINTS = 4;
 
-/** Flat-roof (OSM-imported) building colors — a muted grey rooftop with a
- *  darker outline reads as a real roof from the top-down view, instead of the
- *  solid-white blob that reusing the wall white produced. */
-const FLAT_ROOF_FILL = '#C8C8C2';
-const FLAT_ROOF_STROKE = '#9A9A94';
-const FLAT_ROOF_WALL_FILL = '#E4E4DE';
+/** Flat-roof (OSM-imported) building colors — a light warm-grey rooftop with a
+ *  soft outline reads as a real roof from the top-down view, instead of the
+ *  solid-white blob that reusing the wall white produced. Kept lighter/warmer
+ *  than the grey asphalt so roofs don't read as roads. Exported so the 3D
+ *  camera renders imported buildings with the same palette. */
+export const FLAT_ROOF_FILL = '#E0DDD4';
+export const FLAT_ROOF_STROKE = '#BEBAAE';
+export const FLAT_ROOF_WALL_FILL = '#F0EEE7';
 
 export class Building {
   readonly base: Polygon;

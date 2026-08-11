@@ -14,6 +14,10 @@ import { Polygon } from '../math/primitives/polygon.js';
 import { IWorld } from '../world/types.js';
 import { Corridor } from '../world/corridor.js';
 import {
+  FLAT_ROOF_FILL,
+  FLAT_ROOF_WALL_FILL,
+} from '../world/items/building.js';
+import {
   lerp,
   distance,
   normalize,
@@ -241,7 +245,17 @@ export class Camera implements ICameraPoint {
         c.stroke = BUILDING_WALL_FILL;
       }
       if (flatRoof) {
-        // Walls already include the flat ceiling; drop the pitched roof.
+        // Walls already include the flat ceiling (last polygon). Colour the
+        // walls + ceiling with the same top-view flat-roof palette so imported
+        // buildings match the 2D view instead of a translucent grey block.
+        for (const w of walls) {
+          const c = w as IColoredPolygon;
+          c.fill = FLAT_ROOF_WALL_FILL;
+          c.stroke = FLAT_ROOF_WALL_FILL;
+        }
+        const ceiling = walls[walls.length - 1] as IColoredPolygon;
+        ceiling.fill = FLAT_ROOF_FILL;
+        ceiling.stroke = FLAT_ROOF_FILL;
         out.push(...walls);
         continue;
       }
