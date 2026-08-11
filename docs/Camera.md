@@ -226,34 +226,43 @@ became projection-bound:
 
 ## 3D Extrusion
 
-### Buildings (`#extrude`)
+### Buildings (`extrudeBuildingShape`)
 
-Converts flat 2D polygons into 3D prisms (sides + ceiling):
+`Camera#buildBuildingPolygons` extrudes each footprint into a **house** — grey
+walls + a flat ceiling + a red **pitched (gable) roof** — via
+`extrudeBuildingShape(base, height, wallRatio)` in `ts/camera/extrusion.ts`.
+This mirrors the 2D top-view `Building.draw()` recipe so the 3D camera reads as
+houses, not featureless grey blocks.
 
 ```typescript
-#extrude(polygons: Polygon[], height: number = 200): Polygon[] {
-  const result: Polygon[] = [];
-  for (const polygon of polygons) {
-    // 1. Create ceiling by copying points with z = -height
-    const ceiling = polygon.points.map(p => new Point(p.x, p.y, -height));
-
-    // 2. Create side quads connecting base edges to ceiling edges
-    for (let i = 0; i < polygon.points.length; i++) {
-      const next = (i + 1) % polygon.points.length;
-      result.push(new Polygon([
-        polygon.points[i], polygon.points[next],
-        ceiling[next], ceiling[i]
-      ]));
-    }
-
-    // 3. Add ceiling polygon
-    result.push(new Polygon(ceiling));
-  }
-  return result;
+extrudeBuildingShape(
+  base: Polygon,
+  height = 200,          // per-building height (see below)
+  wallRatio = 0.6,       // BUILDING_WALL_HEIGHT_RATIO
+): { walls: Polygon[]; roof: Polygon[] } {
+  // walls rise to height * wallRatio; the flat ceiling caps them
+  // roof ridge (4-point footprints only) peaks at the FULL height,
+  //   built from the midpoints of base edges 0→1 and 2→3
 }
 ```
 
-Default building height: 200 units. Buildings appear as gray rectangular prisms.
+- **Per-building height.** The camera now uses `building.height` (falling back
+  to `EXTRUDE_BUILDING_HEIGHT_PX = 200`) instead of a single fixed height, so
+  OSM-imported buildings with real heights render at varied heights.
+- **Roof only for rectangles.** The pitched roof is defined only for a 4-point
+  base; any other footprint keeps the flat ceiling (matching the 2D fallback).
+- **OSM footprints stay flat-roofed.** When `world.buildingSource === 'osm'`
+  (arbitrary real outlines that don't suit a gable), `#buildBuildingPolygons`
+  drops the roof and draws walls + flat ceiling only.
+- **Colours** are named constants: `BUILDING_WALL_FILL` (grey walls/ceiling),
+  `BUILDING_ROOF_FILL` (`#D44`), `BUILDING_ROOF_STROKE` (`#C44`).
+- **Draw order** per building is walls (incl. ceiling) → roof, so the roof
+  paints on top (painter's algorithm).
+- **Unclipped whole-building draw.** Footprints are frustum-filtered with
+  `filter([base], false)` (no near-edge clipping) so a rectangle keeps its 4
+  points and still yields a pitched roof at the frustum edge; a building is only
+  emitted when `CameraFrustum#fullyInFront(footprint)` is true, so a footprint
+  straddling the camera doesn't project off-view walls as a floating artifact.
 
 ### Trees (`#extrudeTrees`)
 
@@ -360,7 +369,8 @@ camera.render(cameraCtx, world, {
      dashes (`Camera#emitRoadLine` / `CameraFrustum#visibleRange`), so paint stays put as the car moves
 
 3. Extrude / build:
-   - Buildings: height 200, gray (#AAA sides, #BBB roof)
+   - Buildings: per-building height, grey walls + flat ceiling + red pitched
+     roof (`extrudeBuildingShape`); OSM footprints keep a flat roof
    - Trees: trunk + cone canopy, green
    - Roads (borders): height 10, dark gray walls
    - Traffic lights: short colour-coded gates by live state
@@ -386,7 +396,7 @@ camera.render(cameraCtx, world, {
 4. Painted markings (zebra crossings, stop/yield paint + words, target)
 5. Car shadows (flat, dark, on ground)
 6. Road border walls
-7. Building polygons (sides then roof)
+7. Building polygons (walls + ceiling, then pitched roof)
 8. Tree polygons
 9. Traffic-light gates
 10. Traffic car polygons

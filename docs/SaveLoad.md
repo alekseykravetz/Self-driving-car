@@ -159,6 +159,7 @@ polygons. This shrinks files ~10–70× (e.g. `barnea` ~25 MB → ~0.35 MB).
   "graph": { "points": [...], "segments": [...] }, // must-have (source of truth)
   "roadWidth": 100, "roadRoundness": 10,
   "buildingWidth": 150, "buildingMinLength": 150, "spacing": 50, "treeSize": 160,
+  "buildingSource": "generated", // "osm" when buildings are real OSM footprints
   "markings": [...],      // authored, must-have
   "corridors": [...],     // authored, must-have
   "zoom": 1, "offset": { "x": 0, "y": 0 },
@@ -184,6 +185,11 @@ polygons. This shrinks files ~10–70× (e.g. `barnea` ~25 MB → ~0.35 MB).
   `1` conifer, `2` broadleaf cluster). No 32-point polygon is stored per tree.
 - **Buildings**: `{ poly, h }` — footprint points + height; the `Polygon`
   (and its internal `segments`) is rebuilt on load via `Building.loadFootprint`.
+- **`buildingSource`**: `'osm'` when the buildings are real OSM footprints (from
+  an import), else `'generated'`. Additive — absent on legacy/v1 files → loaded
+  as `'generated'`. When `'osm'`, `World.load()` keeps the saved footprints and
+  generation never regenerates buildings (roads/trees may still rebuild). See
+  [WorldEditor → Real building footprints](WorldEditor.md#real-building-footprints).
 - Serialization is driven by `World.toJSON()`; loading by `World.load()`.
 
 #### v1 (legacy) — still loadable

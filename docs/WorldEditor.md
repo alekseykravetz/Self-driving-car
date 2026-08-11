@@ -395,6 +395,40 @@ Regenerate items** action uses the same `World.generateAsync` path
 (`{ roads: false, buildings: true, trees: true }`). A `#generating` guard blocks
 re-entrant runs, and the overlay blocks interaction while active.
 
+### Real building footprints
+
+When the Overpass export includes `building=*` ways, the importer uses the
+**real building outlines** instead of the procedurally-generated road-frontage
+boxes:
+
+- **Overpass query.** The **Copy Filter** button copies a query whose union now
+  includes `way["building"]({{bbox}})` alongside the drivable-road ways, and
+  ends with `>; out body;` recursion so every way's nodes (and thus footprint
+  coordinates) are present. Parsing tolerates exports with **no** building ways
+  (older filters) — then the world falls back to generated buildings.
+- **Math-layer parse.** `Osm.parseRoadsChunked` emits
+  `OsmBuildingFootprint { points, height? }` primitives (no `Building` import —
+  math-layer isolation). Only closed rings (first node == last, or ≥3 distinct
+  points) are kept. `height` is derived in world px from the `height` tag
+  (metres → px) or `building:levels` × a per-level constant, else `undefined`
+  (caller uses `Building`'s default). Multipolygon `relation[building]` holes
+  and `building:part` are out of scope (v1).
+- **`World.buildingSource: 'osm' | 'generated'`.** After parsing, if any
+  footprints were returned, `WorldEditorOsmImporter.parse()` sets
+  `world.buildings` from them and flags `world.buildingSource = 'osm'`; with no
+  building ways it stays `'generated'`. This flag is serialized in the world
+  save (additive — absent → `'generated'` on load) so imported footprints
+  survive save/reload without regeneration.
+- **Source-aware generation.** All building-generation entry points
+  (`World.generate`, `World.generateAsync`, `WorldGenerator.generateBuildings`,
+  the editor's ♻️ Regenerate-items / auto-regen path) **skip building
+  generation when `buildingSource === 'osm'`** — so editing a road after an OSM
+  import never wipes the real footprints (roads/trees still regenerate). Only
+  unbuilt trees mark the Regenerate button stale for an OSM world.
+- **Buildings stay decorative** — cars collide only with road borders, never
+  buildings, so this is purely visual (2D map + 3D race camera, which renders
+  imported footprints flat-roofed; see [Camera → Buildings](Camera.md#buildings-extrudebuildingshape)).
+
 ### Per-way metadata
 
 | Tag               | Segment field    | Notes                                                                                                                 |
