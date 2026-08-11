@@ -13,6 +13,8 @@ export interface WorldItemsDrawOptions {
   showItemBases: boolean;
   showBuildings: boolean;
   showTrees: boolean;
+  /** Render buildings with flat roofs (imported OSM footprints). */
+  flatRoofs?: boolean;
 }
 
 /**
@@ -32,6 +34,7 @@ export class WorldItemsRenderer {
       showItemBases,
       showBuildings,
       showTrees,
+      flatRoofs,
     } = opts;
 
     // Flat item placeholders (cheap outlines) for inspection on big maps.
@@ -70,8 +73,10 @@ export class WorldItemsRenderer {
       (i) => distSq(i.center) < renderRadiusSq,
     );
     items.sort((a, b) => distSq(b.center) - distSq(a.center));
+    // Trees ignore the extra `flatRoof` option; buildings honour it.
+    const drawOpts = { viewPoint, flatRoof: flatRoofs };
     for (const item of items) {
-      item.draw(ctx, { viewPoint });
+      item.draw(ctx, drawOpts);
     }
   }
 }

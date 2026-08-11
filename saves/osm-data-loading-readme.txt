@@ -10,6 +10,7 @@ OSM FILTER:
   ["highway" !~"pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no"]
   ["access" !~"private"]
   ({{bbox}});
+  way["building"]({{bbox}});
 );
 out body;
 >;

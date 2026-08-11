@@ -4,6 +4,7 @@ import {
   METERS_PER_DEGREE_LATITUDE,
   WORLD_PIXELS_PER_METER,
   LANE_WIDTH_PX,
+  metersToWorldPixels,
 } from '../worldUnits.js';
 import { invLerp, degToRad, normalize } from '../utils.js';
 import { defaultLaneCount } from '../roadTypes.js';
@@ -46,6 +47,10 @@ interface OsmWayTags {
   'name:he': string;
   'name:ar': string;
   'name:ru': string;
+  // Building footprint tags (imported as decorative building outlines).
+  building: string;
+  height: string;
+  'building:levels': string;
   [key: string]: string; // Allow for other unspecified tags
 }
 
@@ -89,6 +94,18 @@ export interface OsmMarkingPlacement {
   height?: number; // Strip length along the road (crossing/stop/yield only).
 }
 
+/**
+ * A real building outline imported from an OSM `building=*` closed way. Kept as
+ * plain math primitives (points + optional height) so this math-layer module
+ * never imports the world-layer `Building` class — the caller constructs it.
+ * `height` is in world pixels (matching `Building.height`); `undefined` when
+ * the way carries no `height`/`building:levels` tags (caller uses its default).
+ */
+export interface OsmBuildingFootprint {
+  points: Point[];
+  height?: number;
+}
+
 // Interface for the return type of parseRoads
 interface ParsedRoads {
   points: Point[]; // Array of created Point instances
@@ -97,6 +114,47 @@ interface ParsedRoads {
   crossings: OsmMarkingPlacement[]; // highway=crossing (zebra)
   stops: OsmMarkingPlacement[]; // highway=stop
   yields: OsmMarkingPlacement[]; // highway=give_way
+  buildings: OsmBuildingFootprint[]; // building=* closed ways
+}
+
+/** Assumed storey height (metres) when deriving building height from levels. */
+const METRES_PER_BUILDING_LEVEL = 3;
+
+/**
+ * Derives a building height in WORLD PIXELS from OSM tags, in priority order:
+ * explicit `height` (metres) → `building:levels` × storey height → `undefined`
+ * (caller falls back to the `Building` default). Ignores non-positive/NaN tags.
+ */
+function osmBuildingHeightPx(tags: Record<string, string>): number | undefined {
+  const heightM = parseFloat(tags.height);
+  if (!isNaN(heightM) && heightM > 0) return metersToWorldPixels(heightM);
+  const levels = parseFloat(tags['building:levels']);
+  if (!isNaN(levels) && levels > 0) {
+    return metersToWorldPixels(levels * METRES_PER_BUILDING_LEVEL);
+  }
+  return undefined;
+}
+
+/**
+ * Builds a closed-ring footprint polygon from a building way's node ids. Drops
+ * the duplicate closing node (OSM rings repeat the first node last), needs ≥3
+ * distinct points, and returns `null` for degenerate/open rings.
+ */
+function buildOsmBuildingFootprint(
+  nodeIds: number[],
+  nodeMap: Map<number | string, Point>,
+  tags: Record<string, string>,
+): OsmBuildingFootprint | null {
+  const n = nodeIds.length;
+  const closed = n >= 2 && nodeIds[0] === nodeIds[n - 1];
+  const limit = closed ? n - 1 : n;
+  const points: Point[] = [];
+  for (let i = 0; i < limit; i++) {
+    const p = nodeMap.get(nodeIds[i]);
+    if (p) points.push(new Point(p.x, p.y));
+  }
+  if (points.length < 3) return null;
+  return { points, height: osmBuildingHeightPx(tags) };
 }
 
 /**
@@ -191,6 +249,7 @@ export class Osm {
         crossings: [],
         stops: [],
         yields: [],
+        buildings: [],
       };
     }
 
@@ -210,9 +269,13 @@ export class Osm {
     const avgLat = (minLat + maxLat) / 2;
     const width = height * ar * Math.cos(degToRad(avgLat));
 
-    const points: Point[] = []; // To store created Point objects
+    const points: Point[] = []; // Road/marking graph points (see below)
     // Use a Map for efficient lookup of points by their original OSM ID
     const nodeMap = new Map<number | string, Point>();
+    // Node ids referenced by highway ways (or their markings). Only these
+    // become graph points; building-outline nodes stay out of the graph so
+    // they don't render as editor dots.
+    const roadNodeIds = new Set<number>();
 
     // Convert nodes to Point objects
     for (let ni = 0; ni < nodes.length; ni++) {
@@ -228,7 +291,6 @@ export class Osm {
 
       const point = new Point(x, y) as OsmPoint;
       point.id = node.id; // Attach OSM ID to the Point object (requires Point class modification)
-      points.push(point);
       nodeMap.set(node.id, point); // Store in map for quick lookup
       // Node conversion is O(nodes); yield through the ~0.15→0.3 progress band.
       if ((ni & 4095) === 0) {
@@ -237,6 +299,9 @@ export class Osm {
     }
 
     const segments: Segment[] = []; // To store created Segment objects
+    // Real building outlines (building=* closed ways), extracted in the ways
+    // loop below alongside road segments.
+    const buildings: OsmBuildingFootprint[] = [];
 
     // Collect tagged nodes that become road markings. All lie ON highway ways,
     // so `out body;` output carries their tags. Directional markings (lights,
@@ -292,6 +357,19 @@ export class Osm {
         yield 0.3 + (0.6 * wi) / Math.max(ways.length, 1);
       }
       const nodeIds = way.nodes;
+
+      // Building footprint ways (`building=*`, excluding `no`): extract a
+      // closed-ring polygon and skip road processing. Any remaining non-highway
+      // way is ignored (only highways become road segments).
+      const buildingTag = way.tags.building;
+      if (buildingTag && buildingTag.toLowerCase() !== 'no') {
+        const footprint = buildOsmBuildingFootprint(nodeIds, nodeMap, way.tags);
+        if (footprint) buildings.push(footprint);
+        continue;
+      }
+      if (!way.tags.highway) continue;
+      // This is a road way — its nodes become graph points.
+      for (const nid of nodeIds) roadNodeIds.add(nid);
 
       // Way-level metadata (constant across all sub-segments of this way).
       const oneWayTag = String(way.tags.oneway ?? 'no').toLowerCase(); // Default to 'no' if undefined
@@ -465,6 +543,17 @@ export class Osm {
       }
     }
 
+    // Build the graph point set from road nodes only, preserving node order.
+    // Building-outline nodes are intentionally excluded (they live in the
+    // `buildings` footprints, not the graph, so they don't render as dots).
+    for (let ni = 0; ni < nodes.length; ni++) {
+      const node = nodes[ni];
+      if (roadNodeIds.has(node.id)) {
+        const p = nodeMap.get(node.id);
+        if (p) points.push(p);
+      }
+    }
+
     // --- Assemble markings from tagged nodes ---
     // Lights are signal HEADS facing oncoming traffic on one approach, so they
     // use approach placement (`placeApproachMarking`): pick the approach arm and
@@ -533,6 +622,6 @@ export class Osm {
     }
 
     // Return the processed points, segments and node markings.
-    return { points, segments, lights, crossings, stops, yields };
+    return { points, segments, lights, crossings, stops, yields, buildings };
   }
 }

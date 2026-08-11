@@ -217,6 +217,9 @@ export class Camera implements ICameraPoint {
   #buildBuildingPolygons(world: IWorld, show: boolean): Polygon[] {
     if (!show) return [];
     const out: Polygon[] = [];
+    // Imported OSM footprints keep a flat roof (their arbitrary outlines don't
+    // suit the pitched gable), mirroring the 2D top view.
+    const flatRoof = world.buildingSource === 'osm';
     for (const b of world.buildings) {
       if (!this.#withinRange(b.center, b.boundingRadius)) continue;
       // `clip: false` keeps the footprint's point count intact (like cars/trees)
@@ -236,6 +239,11 @@ export class Camera implements ICameraPoint {
         const c = w as IColoredPolygon;
         c.fill = BUILDING_WALL_FILL;
         c.stroke = BUILDING_WALL_FILL;
+      }
+      if (flatRoof) {
+        // Walls already include the flat ceiling; drop the pitched roof.
+        out.push(...walls);
+        continue;
       }
       for (const r of roof) {
         const c = r as IColoredPolygon;

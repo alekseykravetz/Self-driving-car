@@ -380,6 +380,51 @@ describe('WorldGenerator', () => {
   });
 });
 
+describe('WorldGenerator building source', () => {
+  it('generateBuildings runs for a generated world', () => {
+    const world = createWorldWithRoad();
+    WorldGenerator.generateRoads(world);
+    world.buildingSource = 'generated';
+    WorldGenerator.generateBuildings(world);
+    expect(world.buildings.length).toBeGreaterThan(0);
+  });
+
+  it('generateBuildings runs when buildingSource is undefined (default)', () => {
+    const world = createWorldWithRoad();
+    WorldGenerator.generateRoads(world);
+    WorldGenerator.generateBuildings(world);
+    expect(world.buildings.length).toBeGreaterThan(0);
+  });
+
+  it('generateBuildings skips OSM worlds (imported footprints preserved)', () => {
+    const world = createWorldWithRoad();
+    WorldGenerator.generateRoads(world);
+    world.buildingSource = 'osm';
+    const imported = world.buildings; // sentinel reference
+    WorldGenerator.generateBuildings(world);
+    expect(world.buildings).toBe(imported);
+  });
+
+  it('generate({buildings:true}) does not overwrite OSM buildings', () => {
+    const world = createWorldWithRoad();
+    world.buildingSource = 'osm';
+    const imported = world.buildings;
+    WorldGenerator.generate(world, { buildings: true, trees: false });
+    expect(world.buildings).toBe(imported);
+  });
+
+  it('generateAsync({buildings:true}) does not overwrite OSM buildings', async () => {
+    const world = createWorldWithRoad();
+    world.buildingSource = 'osm';
+    const imported = world.buildings;
+    await WorldGenerator.generateAsync(world, {
+      buildings: true,
+      trees: false,
+    });
+    expect(world.buildings).toBe(imported);
+  });
+});
+
 describe('laneGuidesForSegment', () => {
   it('returns one guide per lane pointing both ways on a 2-lane two-way road', () => {
     const seg = new Segment(new Point(0, 0), new Point(200, 0), false, false, {

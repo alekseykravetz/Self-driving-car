@@ -20,6 +20,10 @@ export interface CarDrawOptions {
 
 export interface BuildingDrawOptions {
   viewPoint: Point;
+  /** Draw a flat roof (just the ceiling) instead of the decorative pitched
+   * red roof. Used for imported OSM footprints, whose arbitrary shapes don't
+   * suit the rectangular pitched-roof geometry. */
+  flatRoof?: boolean;
 }
 
 /** Compact serialized building: footprint points + height (no `segments`). */
@@ -27,6 +31,11 @@ export interface BuildingFootprint {
   poly: number[][];
   h: number;
 }
+
+/** Where a world's buildings come from. `'generated'` (default) means the
+ * procedural road-frontage generator owns them; `'osm'` means they are real
+ * imported OSM footprints that generation must never overwrite. */
+export type BuildingSource = 'osm' | 'generated';
 
 /** The compact decoration block stored in a v2 world file. */
 export interface WorldDecoration {
@@ -62,6 +71,8 @@ export interface IWorld {
   corridors: Corridor[];
   buildings: Building[];
   trees: Tree[];
+  /** Provenance of `buildings`; OSM footprints render with flat roofs. */
+  buildingSource?: BuildingSource;
   zoom?: number;
   offset?: Point;
   generateCorridor(start: Point, end: Point): void;
