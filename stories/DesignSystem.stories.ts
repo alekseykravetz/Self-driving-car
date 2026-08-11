@@ -102,7 +102,18 @@ const TEXT_SIZES = [
   '--text-lg',
   '--text-xl',
   '--text-2xl',
+  '--text-2\\.5xl',
   '--text-3xl',
+  '--text-landing-h2',
+  '--text-landing-title',
+];
+
+const WEIGHTS = [
+  '--weight-normal',
+  '--weight-medium',
+  '--weight-semibold',
+  '--weight-bold',
+  '--weight-extrabold',
 ];
 
 export const Typography: StoryObj = {
@@ -112,13 +123,13 @@ export const Typography: StoryObj = {
       ${sectionTitle('Font families')}
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="font-family:var(--font-ui);font-size:16px">
-          Arial UI — <code>--font-ui</code> · The quick brown fox 0123
+          Space Grotesk — <code>--font-ui</code> · The quick brown fox 0123
         </div>
         <div style="font-family:var(--font-mono);font-size:16px">
-          Courier Mono — <code>--font-mono</code> · The quick brown fox 0123
+          JetBrains Mono — <code>--font-mono</code> · The quick brown fox 0123
         </div>
         <div style="font-family:var(--font-display);font-size:16px">
-          Inter Display — <code>--font-display</code> · The quick brown fox 0123
+          Space Grotesk — <code>--font-display</code> · The quick brown fox 0123
         </div>
       </div>
       ${sectionTitle('Type scale')}
@@ -127,10 +138,26 @@ export const Typography: StoryObj = {
           (t) => html`
             <div style="display:flex;align-items:baseline;gap:14px">
               <code
-                style="width:110px;font-size:11px;color:var(--color-text-secondary)"
-                >${t}</code
+                style="width:140px;font-size:11px;color:var(--color-text-secondary)"
+                >${t.replace('\\', '')}</code
               >
               <span style="font-size:var(${t})"
+                >Self-driving car simulator</span
+              >
+            </div>
+          `,
+        )}
+      </div>
+      ${sectionTitle('Font weights')}
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${WEIGHTS.map(
+          (w) => html`
+            <div style="display:flex;align-items:baseline;gap:14px">
+              <code
+                style="width:140px;font-size:11px;color:var(--color-text-secondary)"
+                >${w}</code
+              >
+              <span style="font-size:16px;font-weight:var(${w})"
                 >Self-driving car simulator</span
               >
             </div>

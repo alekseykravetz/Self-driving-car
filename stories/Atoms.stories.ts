@@ -193,17 +193,17 @@ export const BadgesAndChips: StoryObj = {
       ${sectionTitle('Config chips (.cfg-chip)')}
       ${row(html`
         <span class="cfg-chip">
-          <span class="cfg-chip-emoji">🚗</span>
+          <span class="cfg-chip-emoji"><app-icon name="car"></app-icon></span>
           <span class="cfg-chip-value">4</span>
         </span>
         <span class="cfg-chip">
-          <span class="cfg-chip-emoji">🧠</span>
+          <span class="cfg-chip-emoji"><app-icon name="brain"></app-icon></span>
           <span class="cfg-chip-value">6,6</span>
         </span>
       `)}
       ${sectionTitle('Selected info (.selected-*)')}
       <div class="selected-row">
-        <span class="selected-tag">🌍</span>
+        <span class="selected-tag"><app-icon name="globe"></app-icon></span>
         <span class="selected-name">Ashkelon OSM</span>
       </div>
     `),
