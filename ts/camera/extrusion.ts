@@ -79,6 +79,68 @@ export function extrudePolygons(
 }
 
 /**
+ * Extrudes a building base into walls + a flat ceiling + a pitched (gable) roof,
+ * mirroring the 2D top-view `Building.draw()` recipe so the 3D view reads as a
+ * house instead of a grey block. Walls rise to `height * wallRatio`; the roof
+ * ridge peaks at the full `height`. The roof is only defined for a 4-point
+ * (rectangular) footprint — anything else keeps the flat ceiling only (matching
+ * the 2D fallback). Returns walls and roof separately so the caller can colour
+ * them (grey walls, red roof).
+ */
+export function extrudeBuildingShape(
+  base: Polygon,
+  height: number = 200,
+  wallRatio: number = 0.6,
+): { walls: Polygon[]; roof: Polygon[] } {
+  const wallHeight = height * wallRatio;
+  const ceiling: Polygon = new Polygon(
+    base.points.map((p: Point) => new Point(p.x, p.y, -wallHeight)),
+  );
+
+  const walls: Polygon[] = [];
+  for (let i = 0; i < base.points.length; i++) {
+    const next = (i + 1) % base.points.length;
+    walls.push(
+      new Polygon([
+        base.points[i],
+        base.points[next],
+        ceiling.points[next],
+        ceiling.points[i],
+      ]),
+    );
+  }
+  walls.push(ceiling);
+
+  const roof: Polygon[] = [];
+  if (base.points.length >= 4) {
+    // Ridge along the midpoints of edges 0→1 and 2→3, raised to full height.
+    const baseMidpoints: Point[] = [
+      average(base.points[0], base.points[1]),
+      average(base.points[2], base.points[3]),
+    ];
+    const topMidpoints: Point[] = baseMidpoints.map(
+      (p: Point) => new Point(p.x, p.y, -height),
+    );
+    roof.push(
+      new Polygon([
+        ceiling.points[0],
+        ceiling.points[3],
+        topMidpoints[1],
+        topMidpoints[0],
+      ]),
+      new Polygon([
+        ceiling.points[2],
+        ceiling.points[1],
+        topMidpoints[0],
+        topMidpoints[1],
+      ]),
+    );
+  }
+
+  return { walls, roof };
+}
+
+/**
  * Extrudes a car shape with detail, including wheel wells and a sloped roof.
  * @param polygon - The base 2D Polygon of the car.
  * @param height - The main height of the car body. Defaults to 15.

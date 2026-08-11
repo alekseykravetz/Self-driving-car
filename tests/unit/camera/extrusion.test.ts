@@ -5,6 +5,7 @@ import {
   extrudePolygons,
   extrudeTreeShapes,
   extrudeCarShape,
+  extrudeBuildingShape,
   movePointsInward,
   getCentroid,
 } from '../../../ts/camera/extrusion.js';
@@ -17,6 +18,32 @@ function makeQuad(x: number, y: number, w: number, h: number): Polygon {
     new Point(x, y + h),
   ]);
 }
+
+describe('extrudeBuildingShape', () => {
+  it('builds walls + ceiling + a pitched roof for a 4-point base', () => {
+    const base = makeQuad(0, 0, 10, 10);
+    const { walls, roof } = extrudeBuildingShape(base, 200, 0.6);
+    // 4 side quads + 1 ceiling
+    expect(walls).toHaveLength(5);
+    const ceiling = walls[4];
+    expect(ceiling.points.every((p) => p.z === -120)).toBe(true); // 200 * 0.6
+    // Two slanted gable polygons whose ridge sits at the full height.
+    expect(roof).toHaveLength(2);
+    const ridgeZs = roof.flatMap((r) => r.points.map((p) => p.z));
+    expect(ridgeZs).toContain(-200);
+  });
+
+  it('omits the roof for a non-rectangular (triangle) base', () => {
+    const tri = new Polygon([
+      new Point(0, 0),
+      new Point(10, 0),
+      new Point(5, 10),
+    ]);
+    const { walls, roof } = extrudeBuildingShape(tri, 200);
+    expect(walls).toHaveLength(4); // 3 sides + ceiling
+    expect(roof).toHaveLength(0);
+  });
+});
 
 describe('extrudePolygons', () => {
   it('extrudes a quad into 5 polygons (4 sides + ceiling)', () => {

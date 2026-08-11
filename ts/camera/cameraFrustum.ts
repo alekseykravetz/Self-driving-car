@@ -145,6 +145,17 @@ export class CameraFrustum {
   }
 
   /**
+   * True when every vertex of `poly` lies in front of the camera. Discrete
+   * objects drawn whole (unclipped, `filter(..., false)`) keep their full point
+   * count so extrusion stays correct, but a vertex beside/behind the camera
+   * projects into visible screen space as a floating artifact. Callers use this
+   * to drop such objects instead of drawing them broken.
+   */
+  fullyInFront(poly: Polygon): boolean {
+    return poly.points.every((p: Point) => this.inFront(p));
+  }
+
+  /**
    * Clips a flat polygon against the camera's near plane (a line just in front
    * of the camera, perpendicular to the view direction), keeping only the part
    * ahead of it. Unlike clipping to the full frustum triangle — which collapses
