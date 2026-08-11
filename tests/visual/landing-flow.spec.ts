@@ -36,6 +36,11 @@ const DESTINATIONS: Destination[] = [
     urlPart: 'race.html',
   },
   { label: 'World editor', href: 'html/world.html', urlPart: 'world.html' },
+  {
+    label: 'Import from OpenStreetMap',
+    href: 'html/world.html?import=osm',
+    urlPart: 'world.html',
+  },
 ];
 
 test.describe('Landing page launch flows', () => {

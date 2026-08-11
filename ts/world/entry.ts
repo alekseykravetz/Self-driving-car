@@ -84,7 +84,14 @@ import '../ui/molecules/generationProgress.js';
 
   worldEditor.animate();
   window.__sim = worldEditor;
-  if (new URLSearchParams(window.location.search).has('paused')) {
+  const params = new URLSearchParams(window.location.search);
+  // Deep-link from the landing page: start with a fresh graph and open the OSM
+  // import panel immediately (?import=osm).
+  if (params.get('import') === 'osm') {
+    worldEditor.dispose();
+    worldEditor.openOsmPanel();
+  }
+  if (params.has('paused')) {
     worldEditor.pause?.();
   }
 })();

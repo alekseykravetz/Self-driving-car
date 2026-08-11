@@ -361,6 +361,13 @@ The OSM importer (`ts/math/osm-importer/osm.ts`) converts raw OpenStreetMap JSON
 `Point`/`Segment` graph. In addition to the road geometry, it now extracts and
 stores **per-way metadata** on each `Segment`:
 
+> **Landing-page deep link.** The World Editor card on `index.html` has an
+> **Import from OpenStreetMap** button linking to `html/world.html?import=osm`.
+> When that query param is present, `ts/world/entry.ts` starts a fresh graph
+> (`worldEditor.dispose()`) and opens the OSM import panel immediately
+> (`worldEditor.openOsmPanel()`), so users can paste Overpass data without first
+> opening the editor and finding the toolbar button.
+
 ### Non-blocking import (time-sliced generation + progress overlay)
 
 Large OSM imports used to freeze the tab (and trip the browser's "page
@@ -1287,4 +1294,5 @@ panels:
   `WorldEditor`.
 
 The OSM text-area panel (`#osmPanel`) stays in `world.html`; only its open button
-moved into the shared toolbar.
+moved into the shared toolbar. The landing page can also open it directly via the
+`html/world.html?import=osm` deep link (see [OSM Import](#osm-import--lane-metadata)).
