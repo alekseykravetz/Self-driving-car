@@ -29,7 +29,9 @@ export class TrafficManager {
   #crossroadsKey: string | null = null;
 
   constructor(graph: Graph, markings: Marking[] = []) {
-    this.graph = graph; // todo: avoid serializing the graph object during save world as it a part of it already
+    // NOTE: the graph is also serialized as part of the world on save, so this
+    // reference is redundant on disk (kept for the live control-center logic).
+    this.graph = graph;
     this.markings = markings;
     this.frameCount = 0;
 
@@ -105,9 +107,7 @@ export class TrafficManager {
 
     const crossroadPoints = this.#getCrossroads(graphHash);
     if (crossroadPoints.length === 0) {
-      // Maybe handle lights not at intersections differently or log a warning
-      // console.warn("No intersections found to control lights.");
-      // For now, we'll just stop if no intersections exist.
+      // No intersections to control; nothing to do.
       return;
     }
 

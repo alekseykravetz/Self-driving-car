@@ -27,6 +27,10 @@ import { KeyboardManager } from '../../input/keyboardManager.js';
 import { zoomViewBindings } from '../../input/viewShortcuts.js';
 import { safeJsonParse } from '../../store/serialization.js';
 import { scale } from '../../math/utils.js';
+import {
+  segmentToMetadata,
+  applyMetadataToSegment,
+} from './segmentMetadata.js';
 import type {
   WorldEditorPanelElement,
   SegmentMetadata,
@@ -372,27 +376,9 @@ export class WorldEditor {
 
     // Wire inspect editor segment-selected callback
     inspectEditor.setOnSegmentSelected((segment) => {
-      if (segment) {
-        this.#worldEditorPanel.showSegmentMetadata({
-          highwayType: segment.highwayType,
-          lanes: segment.lanes,
-          oneWay: segment.oneWay,
-          separated: segment.separated,
-          name: segment.name,
-          nameEn: segment.nameEn,
-          nameHe: segment.nameHe,
-          nameAr: segment.nameAr,
-          nameRu: segment.nameRu,
-          maxSpeed: segment.maxSpeed,
-          ref: segment.ref,
-          bridge: segment.bridge,
-          laneMarkings: segment.laneMarkings,
-          parkingLeft: segment.parkingLeft,
-          parkingRight: segment.parkingRight,
-        });
-      } else {
-        this.#worldEditorPanel.showSegmentMetadata(null);
-      }
+      this.#worldEditorPanel.showSegmentMetadata(
+        segment ? segmentToMetadata(segment) : null,
+      );
     });
 
     const tools: Editors = {
@@ -429,24 +415,7 @@ export class WorldEditor {
   #applyMetadataToSelectedSegment(meta: Partial<SegmentMetadata>): void {
     const seg = this.#inspectEditor.getSelectedSegment();
     if (!seg) return;
-    // In inspect mode the panel always sends the segment's complete state, so
-    // apply every field directly (including toggling bridge / lane markings
-    // back off). `undefined` is a meaningful value here, not "leave unchanged".
-    seg.highwayType = meta.highwayType || undefined;
-    if (meta.lanes !== undefined) seg.lanes = meta.lanes;
-    seg.oneWay = meta.oneWay ?? false;
-    seg.separated = meta.separated ?? false;
-    seg.name = meta.name || undefined;
-    seg.nameEn = meta.nameEn || undefined;
-    seg.nameHe = meta.nameHe || undefined;
-    seg.nameAr = meta.nameAr || undefined;
-    seg.nameRu = meta.nameRu || undefined;
-    seg.maxSpeed = meta.maxSpeed;
-    seg.ref = meta.ref || undefined;
-    seg.bridge = meta.bridge ? true : undefined;
-    seg.laneMarkings = meta.laneMarkings === false ? false : undefined;
-    seg.parkingLeft = meta.parkingLeft ? true : undefined;
-    seg.parkingRight = meta.parkingRight ? true : undefined;
+    applyMetadataToSegment(seg, meta);
   }
 
   /* Disables all editor tools and resets button styles. */
@@ -569,6 +538,7 @@ export class WorldEditor {
       }
     } catch (err) {
       console.error('World generation failed:', err);
+      alert(`World generation failed: ${err}`);
     } finally {
       overlay?.finish();
       this.#worldLayersToolbar?.setBusy(false);

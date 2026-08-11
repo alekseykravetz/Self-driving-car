@@ -6,13 +6,24 @@ export function taDaa(): void {
   setTimeout(() => beep(600, 'sawtooth'), 200);
 }
 
+/** Window shape including the Safari-prefixed AudioContext constructor. */
+interface WebkitWindow extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
+/** Creates an AudioContext, falling back to the Safari-prefixed constructor. */
+function createAudioContext(): AudioContext {
+  const Ctor =
+    window.AudioContext ?? (window as WebkitWindow).webkitAudioContext;
+  if (!Ctor) throw new Error('Web Audio API is not supported in this browser.');
+  return new Ctor();
+}
+
 /**
  * Creates a multi-oscillator explosion sound effect.
  */
 export function explode(): void {
-  const audioContext: AudioContext = new (window.AudioContext ||
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).webkitAudioContext)();
+  const audioContext: AudioContext = createAudioContext();
   const numOscillators: number = 10;
 
   for (let i = 0; i < numOscillators; i++) {
@@ -44,9 +55,7 @@ export function beep(
   frequency: number,
   waveType: OscillatorType = 'sine',
 ): void {
-  const audioContext: AudioContext = new (window.AudioContext ||
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).webkitAudioContext)();
+  const audioContext: AudioContext = createAudioContext();
   const osc: OscillatorNode = audioContext.createOscillator();
   const envelope: GainNode = audioContext.createGain();
   const currentTime = audioContext.currentTime;
@@ -78,9 +87,7 @@ export class SoundEngine {
   public frequency: AudioParam;
 
   constructor() {
-    this.#audioContext = new (window.AudioContext ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).webkitAudioContext)();
+    this.#audioContext = createAudioContext();
     const currentTime = this.#audioContext.currentTime;
 
     this.#osc = this.#audioContext.createOscillator();

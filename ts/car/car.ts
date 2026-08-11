@@ -94,7 +94,7 @@ export class Car {
   brain?: Brain;
   controls: CarControls;
 
-  //todo: fix this
+  // Race-only fields, absent for training/traffic cars.
   finishTime?: number;
   progress?: number;
 

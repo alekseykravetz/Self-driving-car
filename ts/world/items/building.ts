@@ -4,6 +4,11 @@ import { average, getFake3dPoint } from '../../math/utils.js';
 import { drawPolygon } from '../../rendering/polygonRenderer.js';
 import { BuildingFootprint, BuildingDrawOptions } from '../types.js';
 
+/** Fraction of building height used for the wall/ceiling top (roof peak uses full height). */
+const BUILDING_CEILING_HEIGHT_RATIO = 0.6;
+/** Minimum footprint vertices required for the pitched-roof geometry. */
+const MIN_BUILDING_BASE_POINTS = 4;
+
 export class Building {
   readonly base: Polygon;
   readonly height: number;
@@ -78,8 +83,7 @@ export class Building {
     const { viewPoint } = options;
     // Calculate the points for the top of the building (ceiling)
     const topPoints: Point[] = this.base.points.map((p) =>
-      // Using 0.6 * height for the main walls/top points
-      getFake3dPoint(p, viewPoint, this.height * 0.6),
+      getFake3dPoint(p, viewPoint, this.height * BUILDING_CEILING_HEIGHT_RATIO),
     );
     const ceiling = new Polygon(topPoints);
 
@@ -105,7 +109,10 @@ export class Building {
     // --- Roof Generation (Assumes 4-point base for specific roof shape) ---
     let roofPolys: Polygon[] = [];
     // Check if the base has enough points for the assumed roof logic
-    if (this.base.points.length >= 4 && ceiling.points.length >= 4) {
+    if (
+      this.base.points.length >= MIN_BUILDING_BASE_POINTS &&
+      ceiling.points.length >= MIN_BUILDING_BASE_POINTS
+    ) {
       // Calculate midpoints of specific base edges (assumes rectangular-like base)
       const baseMidpoints: Point[] = [
         average(this.base.points[0], this.base.points[1]),
@@ -138,10 +145,9 @@ export class Building {
         (a, b) => b.distanceToPoint(viewPoint) - a.distanceToPoint(viewPoint),
       );
     } else {
-      console.warn(
-        'Building base does not have >= 4 points; specific roof style skipped.',
-      );
-      // todo: Could potentially draw just the flat ceiling here if desired for other shapes
+      // Non-rectangular footprints keep the flat ceiling only (no pitched
+      // roof). Generated buildings are always 4-point rectangles, so this
+      // branch is effectively unreachable in practice.
     }
 
     // --- Draw all parts ---

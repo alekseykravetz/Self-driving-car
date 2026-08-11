@@ -94,8 +94,8 @@ import '../simulator/core/simulatorShell.js';
     cameraCanvas,
     host,
   );
-  (window as unknown as { __sim: unknown }).__sim = sim;
+  window.__sim = sim;
   if (new URLSearchParams(window.location.search).has('paused')) {
-    (sim as unknown as { pause: () => void }).pause?.();
+    sim.pause();
   }
 })();

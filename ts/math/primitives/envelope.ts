@@ -33,9 +33,8 @@ export class Envelope {
   }
 
   static load(info: Envelope, width: number = 10, roundness: number = 1) {
-    const d = info as unknown as { skeleton: Segment; polygon: Polygon };
-    const skeleton = new Segment(d.skeleton.p1, d.skeleton.p2);
-    const polygon = Polygon.load(d.polygon);
+    const skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
+    const polygon = Polygon.load(info.polygon);
     const env = new Envelope(skeleton, width, roundness, polygon);
     return env;
   }
