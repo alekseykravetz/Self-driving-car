@@ -11,7 +11,8 @@ import '../ts/ui/molecules/layoutToolbar.js';
 import '../ts/ui/molecules/animationLoopToolbar.js';
 import '../ts/ui/molecules/worldLayersToolbar.js';
 import '../ts/ui/molecules/worldSetup.js';
-import '../ts/ui/molecules/worldToolbar.js';
+import '../ts/ui/molecules/generationProgress.js';
+import type { GenerationProgressElement } from '../ts/ui/molecules/generationProgress.js';
 import {
   numInputRowHtml,
   wireNumInputRows,
@@ -215,20 +216,7 @@ export const WorldSetup: StoryObj = {
   render: () =>
     stage(
       make('world-setup'),
-      'The simulator setup toolbar: border mode (none / damage / collision), camera tracking, viewport mode and the world/car asset selectors.',
-      'canvas',
-    ),
-};
-
-// ══════════════════════════════════════════════════════════════
-//  World toolbar — the world-editor's collapsible setup toolbar.
-// ══════════════════════════════════════════════════════════════
-export const WorldToolbar: StoryObj = {
-  name: 'World Toolbar',
-  render: () =>
-    stage(
-      make('world-toolbar'),
-      'The world-editor / camera-view setup toolbar (border, tracking and viewport modes plus asset selectors), wrapped in a collapsible “Setup” container.',
+      'The simulator / world-editor setup toolbar: border mode (none / damage / collision), camera tracking, viewport mode and the world/car asset selectors. Self-wraps in a collapsible “Setup” container via <code>makeToolbarCollapsible</code>.',
       'canvas',
     ),
 };
@@ -267,5 +255,31 @@ export const NumberInputRow: StoryObj = {
       box,
       'Built by <code>numInputRowHtml()</code> and wired with <code>wireNumInputRows()</code>. The +/- buttons step the value, clamped to min/max, and dispatch a <code>change</code> event.',
     );
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  Generation progress — full-screen overlay shown during OSM import /
+//  "Regenerate items" while the time-sliced world generator runs.
+// ═══════════════════════════════════════════════════════════════════
+export const GenerationProgress: StoryObj = {
+  name: 'Generation Progress',
+  render: () => {
+    const el = make('generation-progress') as GenerationProgressElement;
+    // connectedCallback hides the overlay by default; drive it into a mid-run
+    // state so the story shows the dialog, label and progress bar.
+    requestAnimationFrame(() => {
+      el.start('Importing OSM map…');
+      el.update({
+        stage: 'buildings',
+        label: 'Placing buildings…',
+        fraction: 0.62,
+      });
+    });
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText =
+      'position:relative;min-height:100vh;background:linear-gradient(var(--color-accent-sky), white 70%)';
+    wrapper.appendChild(el);
+    return wrapper;
   },
 };

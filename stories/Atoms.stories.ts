@@ -2,6 +2,9 @@ import { html, type TemplateResult } from 'lit';
 import type { Meta, StoryObj } from '@storybook/web-components';
 
 // <app-icon> is registered globally in preview.ts.
+// The global tooltip controller self-registers its document listeners on import
+// so the `[data-tooltip]` demo below is live.
+import '../ts/ui/atoms/tooltip.js';
 
 /**
  * Atoms — the smallest building blocks of the design system: buttons, inputs,
@@ -256,5 +259,42 @@ export const Icon: StoryObj = {
         <app-icon name="road" animate></app-icon>
         <app-icon name="trophy" animate></app-icon>
       </div>
+    `),
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  Tooltip — the shared global [data-tooltip] hint controller.
+// ═══════════════════════════════════════════════════════════════════
+export const Tooltip: StoryObj = {
+  render: () =>
+    wrap(html`
+      <h2 style="margin:0 0 8px">Tooltip (<code>[data-tooltip]</code>)</h2>
+      <p
+        style="margin:0 0 20px;color:var(--color-text-secondary);font-size:12px;max-width:560px"
+      >
+        A single <code>.app-tooltip</code> element appended to
+        <code>&lt;body&gt;</code> is shared by every target, so hints escape any
+        scrollable panel instead of being clipped. Shown after a short hover
+        delay (or immediately on keyboard focus). Native <code>title</code>
+        attributes are adopted automatically. Hover or tab to the controls
+        below.
+      </p>
+      ${row(html`
+        <button class="btn-sm" data-tooltip="Runs the training simulation">
+          Hover me
+        </button>
+        <button class="toolbar-btn" data-tooltip="Graph editor (G)">
+          <app-icon name="graph"></app-icon>
+        </button>
+        <span
+          class="key-indicator"
+          data-tooltip="Toggle the network visualizer"
+          tabindex="0"
+          >V</span
+        >
+        <button class="btn-sm" title="Adopted from a native title attribute">
+          Native title
+        </button>
+      `)}
     `),
 };
