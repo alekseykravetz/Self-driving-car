@@ -54,6 +54,30 @@ describe('CameraFrustum.forward / inFront', () => {
   });
 });
 
+describe('CameraFrustum.fullyInFront', () => {
+  it('is true when every vertex is ahead of the camera', () => {
+    const f = frustumAtOrigin();
+    const poly = new Polygon([
+      new Point(-10, -40),
+      new Point(10, -40),
+      new Point(10, -60),
+      new Point(-10, -60),
+    ]);
+    expect(f.fullyInFront(poly)).toBe(true);
+  });
+
+  it('is false when the footprint straddles the camera (a vertex behind)', () => {
+    const f = frustumAtOrigin();
+    const poly = new Polygon([
+      new Point(-10, -10),
+      new Point(10, -10),
+      new Point(10, 20), // behind the camera
+      new Point(-10, 20),
+    ]);
+    expect(f.fullyInFront(poly)).toBe(false);
+  });
+});
+
 describe('CameraFrustum.nearPlaneClip', () => {
   it('keeps a polygon fully ahead of the near plane intact', () => {
     const f = frustumAtOrigin();

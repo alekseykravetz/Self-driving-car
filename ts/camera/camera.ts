@@ -223,6 +223,10 @@ export class Camera implements ICameraPoint {
       // so a rectangular base still yields a pitched roof at the frustum edge.
       const filtered = this.#frustum.filter([b.base], false);
       if (!filtered.length) continue;
+      // Drawn whole, a building whose footprint straddles the camera (a corner
+      // beside/behind it) projects its off-view walls/roof into visible space as
+      // a floating artifact. Only draw it when the entire footprint is in front.
+      if (!this.#frustum.fullyInFront(filtered[0])) continue;
       const { walls, roof } = extrudeBuildingShape(
         filtered[0],
         b.height ?? EXTRUDE_BUILDING_HEIGHT_PX,
@@ -247,15 +251,17 @@ export class Camera implements ICameraPoint {
   /** Trees extruded whole (even when partially in view so the top stays stable). */
   #buildTreePolygons(world: IWorld, show: boolean): Polygon[] {
     if (!show) return [];
-    return extrudeTreeShapes(
-      this.#frustum.filter(
+    const bases = this.#frustum
+      .filter(
         world.trees
           .filter((t) => this.#withinRange(t.center, t.size))
           .map((t) => t.base),
         false,
-      ),
-      EXTRUDE_TREE_HEIGHT_PX,
-    );
+      )
+      // Skip trees straddling the camera so an off-view base doesn't project a
+      // floating canopy into the visible frame (same reason as buildings).
+      .filter((base) => this.#frustum.fullyInFront(base));
+    return extrudeTreeShapes(bases, EXTRUDE_TREE_HEIGHT_PX);
   }
 
   /**
