@@ -145,10 +145,9 @@ export class Building {
         (a, b) => b.distanceToPoint(viewPoint) - a.distanceToPoint(viewPoint),
       );
     } else {
-      console.warn(
-        'Building base does not have >= 4 points; specific roof style skipped.',
-      );
-      // Non-rectangular footprints keep the flat ceiling only (no pitched roof).
+      // Non-rectangular footprints keep the flat ceiling only (no pitched
+      // roof). Generated buildings are always 4-point rectangles, so this
+      // branch is effectively unreachable in practice.
     }
 
     // --- Draw all parts ---
