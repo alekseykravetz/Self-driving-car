@@ -27,6 +27,7 @@ import {
   extrudePolygons,
   extrudeTreeShapes,
   extrudeCarShape,
+  extrudeBuildingShape,
   segmentToFlatQuad,
   dashSegmentAnchored,
   zebraStripes,
@@ -52,6 +53,13 @@ const ROAD_PAINT = 'rgba(240, 240, 240, 0.9)';
 
 /** Extrusion height (world px) for building volumes in the 3D view. */
 const EXTRUDE_BUILDING_HEIGHT_PX = 200;
+/** Fraction of a building's height used for its walls (roof ridge uses full height). */
+const BUILDING_WALL_HEIGHT_RATIO = 0.6;
+/** Translucent grey used for building walls + flat ceiling in the 3D view. */
+const BUILDING_WALL_FILL = 'rgba(150, 150, 150, 0.2)';
+/** Red fill/stroke for the pitched building roof, mirroring the 2D top view. */
+const BUILDING_ROOF_FILL = '#D44';
+const BUILDING_ROOF_STROKE = '#C44';
 /** Extrusion height (world px) for tree volumes in the 3D view. */
 const EXTRUDE_TREE_HEIGHT_PX = 200;
 /** Extrusion height (world px) for road-border walls in the 3D view. */
@@ -208,20 +216,32 @@ export class Camera implements ICameraPoint {
    */
   #buildBuildingPolygons(world: IWorld, show: boolean): Polygon[] {
     if (!show) return [];
-    const polygons = extrudePolygons(
-      this.#frustum.filter(
-        world.buildings
-          .filter((b) => this.#withinRange(b.center, b.boundingRadius))
-          .map((b) => b.base),
-      ),
-      EXTRUDE_BUILDING_HEIGHT_PX,
-    );
-    for (const poly of polygons) {
-      const c = poly as IColoredPolygon;
-      c.fill = 'rgba(150, 150, 150, 0.2)';
-      c.stroke = 'rgba(150, 150, 150, 0.2)';
+    const out: Polygon[] = [];
+    for (const b of world.buildings) {
+      if (!this.#withinRange(b.center, b.boundingRadius)) continue;
+      // `clip: false` keeps the footprint's point count intact (like cars/trees)
+      // so a rectangular base still yields a pitched roof at the frustum edge.
+      const filtered = this.#frustum.filter([b.base], false);
+      if (!filtered.length) continue;
+      const { walls, roof } = extrudeBuildingShape(
+        filtered[0],
+        b.height ?? EXTRUDE_BUILDING_HEIGHT_PX,
+        BUILDING_WALL_HEIGHT_RATIO,
+      );
+      for (const w of walls) {
+        const c = w as IColoredPolygon;
+        c.fill = BUILDING_WALL_FILL;
+        c.stroke = BUILDING_WALL_FILL;
+      }
+      for (const r of roof) {
+        const c = r as IColoredPolygon;
+        c.fill = BUILDING_ROOF_FILL;
+        c.stroke = BUILDING_ROOF_STROKE;
+      }
+      // Walls (incl. ceiling) first, roof last so the roof paints on top.
+      out.push(...walls, ...roof);
     }
-    return polygons;
+    return out;
   }
 
   /** Trees extruded whole (even when partially in view so the top stays stable). */
