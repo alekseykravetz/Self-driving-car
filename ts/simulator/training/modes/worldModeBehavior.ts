@@ -234,6 +234,7 @@ export class WorldTrainingStrategy {
       showStartMarkings: false,
       layers: this.#parent.worldLayers,
       screenBounds: this.#parent.viewport.getVisibleBounds(),
+      renderRadius: this.#parent.viewport.getRenderRadius(),
       graphHash: this.#worldGraphHash ?? undefined,
     });
     this.#parent.viewport.drawScaleIndicator(this.#parent.gameCtx);

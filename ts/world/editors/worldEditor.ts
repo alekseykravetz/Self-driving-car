@@ -591,6 +591,7 @@ export class WorldEditor {
       layers: this.#layerVisibility,
       graphHash: currentGraphHash,
       screenBounds: this.#viewport.getVisibleBounds(),
+      renderRadius: this.#viewport.getRenderRadius(),
     });
 
     // Draw editor previews (e.g., marking intent) with transparency. In inspect

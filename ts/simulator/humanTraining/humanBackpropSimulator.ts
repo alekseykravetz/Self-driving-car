@@ -551,6 +551,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
         showStartMarkings: false,
         layers: this.worldLayers,
         screenBounds: this.viewport.getVisibleBounds(),
+        renderRadius: this.viewport.getRenderRadius(),
       });
       this.viewport.drawScaleIndicator(this.gameCtx);
     } else {

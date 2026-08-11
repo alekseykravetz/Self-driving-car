@@ -349,6 +349,7 @@ export class RaceSimulator extends SimulatorShell {
       carAlpha: 1,
       showCarNames: true,
       screenBounds: this.viewport.getVisibleBounds(),
+      renderRadius: this.viewport.getRenderRadius(),
     });
     this.viewport.drawScaleIndicator(this.gameCtx);
     this.drawHeatmap(viewPoint);

@@ -35,6 +35,15 @@ const MIN_ZOOM = 0.8;
 /** Most zoomed-out value — raised so a whole city of spawned traffic fits on screen. */
 const MAX_ZOOM = 30;
 
+/** Default radius (world px) of the buildings/trees render circle. */
+const DEFAULT_RENDER_RADIUS = 1000;
+/** Amount the render radius changes per Alt+scroll notch. */
+const RENDER_RADIUS_STEP = 500;
+/** Smallest allowed render radius. */
+const MIN_RENDER_RADIUS = 500;
+/** Largest render radius — big enough to cover a whole imported city. */
+const MAX_RENDER_RADIUS = 40000;
+
 /** Axis-aligned world-space rectangle currently visible on the canvas. */
 export interface VisibleWorldRect {
   minX: number;
@@ -52,6 +61,9 @@ export class Viewport {
   public center: Point; // Center of the canvas element itself
   public offset: Point; // Offset of the world origin relative to the scaled canvas center
   public mode: ViewportMode = 'mouse'; // Wheel behavior (mouse vs. touchpad)
+  // Radius (world px) of the circle in which buildings/trees render, adjusted
+  // with Alt+scroll so a zoomed-out view can still show distant decoration.
+  #renderRadius: number = DEFAULT_RENDER_RADIUS;
   // Internal state for handling panning/dragging
   #drag: DragState = {
     start: new Point(0, 0), // Position where drag started
@@ -168,6 +180,14 @@ export class Viewport {
   }
 
   /**
+   * The radius (world px) of the circle in which buildings and trees render.
+   * Adjusted with Alt+scroll; pass to {@link World.draw} as `renderRadius`.
+   */
+  public getRenderRadius(): number {
+    return this.#renderRadius;
+  }
+
+  /**
    * The world-space rectangle currently visible on the canvas, used for
    * viewport culling. Mirrors the transform applied in {@link reset}: the
    * screen center maps to `-getOffset()` in world space, and one canvas pixel
@@ -195,6 +215,10 @@ export class Viewport {
 
   #clampZoom(zoom: number): number {
     return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
+  }
+
+  #clampRenderRadius(radius: number): number {
+    return Math.max(MIN_RENDER_RADIUS, Math.min(MAX_RENDER_RADIUS, radius));
   }
 
   public drawScaleIndicator(
@@ -342,6 +366,17 @@ export class Viewport {
    */
   #handleMouseWheel(e: WheelEvent): void {
     e.preventDefault();
+
+    // Alt+scroll adjusts the buildings/trees render radius instead of zooming,
+    // so a zoomed-out view can still show distant decoration. Scrolling up
+    // (deltaY < 0) grows the circle, scrolling down shrinks it.
+    if (e.altKey) {
+      const direction = Math.sign(e.deltaY);
+      this.#renderRadius = this.#clampRenderRadius(
+        this.#renderRadius - direction * RENDER_RADIUS_STEP,
+      );
+      return;
+    }
 
     // In mouse mode the wheel always zooms. In touchpad mode only a pinch
     // gesture or an explicit Ctrl+scroll zooms; plain scrolling pans.
