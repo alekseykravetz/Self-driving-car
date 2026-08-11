@@ -18,9 +18,17 @@ export const FLAT_ROOF_FILL = '#E0DDD4';
 export const FLAT_ROOF_STROKE = '#BEBAAE';
 export const FLAT_ROOF_WALL_FILL = '#F0EEE7';
 
+/** Only render a building's house number when zoomed in at least this close
+ *  (smaller zoom = closer); avoids cluttering the overview with tiny text. */
+const HOUSE_NUMBER_MAX_ZOOM = 6;
+/** House-number label size in world pixels (scales with the viewport zoom). */
+const HOUSE_NUMBER_FONT_PX = 40;
+
 export class Building {
   readonly base: Polygon;
   readonly height: number;
+  /** OSM `addr:housenumber`, drawn on the roof when zoomed in. */
+  readonly houseNumber?: string;
   /** Footprint centroid, cached so per-frame culling/sorting never has to
    *  walk the polygon's edges (`Polygon.distanceToPoint`), which was the
    *  dominant per-frame cost on large OSM imports. */
@@ -30,9 +38,10 @@ export class Building {
    *  the expensive frustum intersection/clip math. */
   readonly boundingRadius: number;
 
-  constructor(polygon: Polygon, height: number = 200) {
+  constructor(polygon: Polygon, height: number = 200, houseNumber?: string) {
     this.base = polygon;
     this.height = height;
+    this.houseNumber = houseNumber;
     this.center = Building.#computeCentroid(polygon.points);
     this.boundingRadius = Building.#computeBoundingRadius(
       polygon.points,
@@ -61,7 +70,7 @@ export class Building {
 
   static load(info: Building): Building {
     const basePolygon = Polygon.load(info.base);
-    return new Building(basePolygon, info.height);
+    return new Building(basePolygon, info.height, info.houseNumber);
   }
 
   /**
@@ -70,7 +79,7 @@ export class Building {
    */
   static loadFootprint(info: BuildingFootprint): Building {
     const points = info.poly.map(([x, y]) => new Point(x, y));
-    return new Building(new Polygon(points), info.h ?? 200);
+    return new Building(new Polygon(points), info.h ?? 200, info.n);
   }
 
   /**
@@ -85,11 +94,12 @@ export class Building {
         Math.round(p.y * 10) / 10,
       ]),
       h: this.height,
+      ...(this.houseNumber ? { n: this.houseNumber } : {}),
     };
   }
 
   draw(ctx: CanvasRenderingContext2D, options: BuildingDrawOptions): void {
-    const { viewPoint, flatRoof } = options;
+    const { viewPoint, flatRoof, zoom } = options;
     // Calculate the points for the top of the building (ceiling)
     const topPoints: Point[] = this.base.points.map((p) =>
       getFake3dPoint(p, viewPoint, this.height * BUILDING_CEILING_HEIGHT_RATIO),
@@ -199,5 +209,29 @@ export class Building {
         join: 'round', // Use round line joins for roof edges
       });
     }
+
+    // House number on the roof (only when zoomed in close enough to read it).
+    if (
+      this.houseNumber &&
+      zoom !== undefined &&
+      zoom <= HOUSE_NUMBER_MAX_ZOOM
+    ) {
+      this.#drawHouseNumber(ctx, topPoints);
+    }
+  }
+
+  /** Draws the OSM house number centered on the (flat/ceiling) roof top. */
+  #drawHouseNumber(ctx: CanvasRenderingContext2D, roofPoints: Point[]): void {
+    const c = Building.#computeCentroid(roofPoints);
+    ctx.save();
+    ctx.font = `600 ${HOUSE_NUMBER_FONT_PX}px "JetBrains Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = HOUSE_NUMBER_FONT_PX / 6;
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.strokeText(this.houseNumber!, c.x, c.y);
+    ctx.fillStyle = '#333';
+    ctx.fillText(this.houseNumber!, c.x, c.y);
+    ctx.restore();
   }
 }

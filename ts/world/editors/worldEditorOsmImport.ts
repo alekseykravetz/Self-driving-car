@@ -296,7 +296,7 @@ export class WorldEditorOsmImporter {
       // the procedural building generator runs as before.
       if (result.buildings.length > 0) {
         world.buildings = result.buildings.map(
-          (b) => new Building(new Polygon(b.points), b.height),
+          (b) => new Building(new Polygon(b.points), b.height, b.houseNumber),
         );
         world.buildingSource = 'osm';
       } else {

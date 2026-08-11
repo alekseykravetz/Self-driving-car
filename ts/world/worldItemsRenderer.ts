@@ -15,6 +15,8 @@ export interface WorldItemsDrawOptions {
   showTrees: boolean;
   /** Render buildings with flat roofs (imported OSM footprints). */
   flatRoofs?: boolean;
+  /** Current viewport zoom, forwarded to buildings for roof house-numbers. */
+  zoom?: number;
 }
 
 /**
@@ -74,7 +76,7 @@ export class WorldItemsRenderer {
     );
     items.sort((a, b) => distSq(b.center) - distSq(a.center));
     // Trees ignore the extra `flatRoof` option; buildings honour it.
-    const drawOpts = { viewPoint, flatRoof: flatRoofs };
+    const drawOpts = { viewPoint, flatRoof: flatRoofs, zoom: opts.zoom };
     for (const item of items) {
       item.draw(ctx, drawOpts);
     }

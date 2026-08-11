@@ -24,12 +24,17 @@ export interface BuildingDrawOptions {
    * red roof. Used for imported OSM footprints, whose arbitrary shapes don't
    * suit the rectangular pitched-roof geometry. */
   flatRoof?: boolean;
+  /** Current viewport zoom (world units per canvas pixel). Used to gate the
+   * roof house-number label so it only shows when zoomed in close enough. */
+  zoom?: number;
 }
 
-/** Compact serialized building: footprint points + height (no `segments`). */
+/** Compact serialized building: footprint points + height (no `segments`).
+ * `n` is the OSM house number (`addr:housenumber`), when present. */
 export interface BuildingFootprint {
   poly: number[][];
   h: number;
+  n?: string;
 }
 
 /** Where a world's buildings come from. `'generated'` (default) means the

@@ -418,6 +418,7 @@ export class World implements IWorld {
       showBuildings: layers.buildings,
       showTrees: layers.trees,
       flatRoofs: this.buildingSource === 'osm',
+      zoom: this.zoom,
     });
   }
 

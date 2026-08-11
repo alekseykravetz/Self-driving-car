@@ -51,6 +51,7 @@ interface OsmWayTags {
   building: string;
   height: string;
   'building:levels': string;
+  'addr:housenumber': string;
   [key: string]: string; // Allow for other unspecified tags
 }
 
@@ -100,10 +101,12 @@ export interface OsmMarkingPlacement {
  * never imports the world-layer `Building` class — the caller constructs it.
  * `height` is in world pixels (matching `Building.height`); `undefined` when
  * the way carries no `height`/`building:levels` tags (caller uses its default).
+ * `houseNumber` is the `addr:housenumber` tag (rendered on the roof), if any.
  */
 export interface OsmBuildingFootprint {
   points: Point[];
   height?: number;
+  houseNumber?: string;
 }
 
 // Interface for the return type of parseRoads
@@ -154,7 +157,8 @@ function buildOsmBuildingFootprint(
     if (p) points.push(new Point(p.x, p.y));
   }
   if (points.length < 3) return null;
-  return { points, height: osmBuildingHeightPx(tags) };
+  const houseNumber = tags['addr:housenumber']?.trim() || undefined;
+  return { points, height: osmBuildingHeightPx(tags), houseNumber };
 }
 
 /**
