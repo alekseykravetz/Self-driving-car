@@ -37,10 +37,19 @@ export function* wgGenerateTreesGen(
   ];
   if (points.length === 0) return [];
 
-  const left = Math.min(...points.map((p) => p.x));
-  const right = Math.max(...points.map((p) => p.x));
-  const top = Math.min(...points.map((p) => p.y));
-  const bottom = Math.max(...points.map((p) => p.y));
+  // Compute bounds with a loop, not `Math.min(...points)` — spreading a
+  // whole-city point set (hundreds of thousands of points) as function
+  // arguments overflows the call stack.
+  let left = Infinity;
+  let right = -Infinity;
+  let top = Infinity;
+  let bottom = -Infinity;
+  for (const p of points) {
+    if (p.x < left) left = p.x;
+    if (p.x > right) right = p.x;
+    if (p.y < top) top = p.y;
+    if (p.y > bottom) bottom = p.y;
+  }
 
   const illegalPolygons = [
     ...world.buildings.map((b) => b.base),
