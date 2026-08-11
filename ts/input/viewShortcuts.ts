@@ -14,7 +14,9 @@ import type { ShortcutBinding } from './keyboardManager.js';
  *
  * @param includeShift - Whether to include the Shift fine-zoom indicator.
  *   Pass `false` for simple-mode simulators (the flat, vertically-scrolling
- *   road) where fine-zoom framing is not useful.
+ *   road) where fine-zoom framing is not useful. The Alt render-radius
+ *   indicator is gated on the same flag — the simple road has no
+ *   buildings/trees, so its render circle is meaningless there.
  */
 export function zoomViewBindings(
   includeShift: boolean = true,
@@ -40,6 +42,16 @@ export function zoomViewBindings(
       group: 'View',
       kind: 'display',
       keys: ['Shift'],
+    });
+    bindings.push({
+      id: 'keyAlt',
+      key: '',
+      label: 'Alt',
+      title:
+        'Alt + scroll wheel — Grow/shrink the buildings & trees render zone',
+      group: 'View',
+      kind: 'display',
+      keys: ['Alt'],
     });
   }
 
