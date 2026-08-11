@@ -6,6 +6,7 @@ import {
   IColoredPolygon,
   ICameraRenderOptions,
 } from './types.js';
+import type { Car } from '../car/car.js';
 import { Point } from '../math/primitives/point.js';
 import { Segment } from '../math/primitives/segment.js';
 import { Polygon } from '../math/primitives/polygon.js';
@@ -200,57 +201,57 @@ export class Camera implements ICameraPoint {
   }
 
   /**
-   * Gathers, filters, and extrudes all relevant polygons from the world for rendering.
+   * Buildings extruded to 3D volumes. Pre-filter by cached centroid distance
+   * before the expensive frustum intersectsPolygon/clip pass — on a whole-city
+   * OSM import this was the dominant per-frame cost (running full polygon math
+   * against every building regardless of how far it is from the camera).
    */
-  #getPolygons(world: IWorld, options: ICameraRenderOptions = {}): Polygon[] {
-    const {
-      keyCar,
-      bestCar,
-      cars = [],
-      traffic,
-      showTrees = true,
-      showBuildings = true,
-    } = options;
+  #buildBuildingPolygons(world: IWorld, show: boolean): Polygon[] {
+    if (!show) return [];
+    const polygons = extrudePolygons(
+      this.#frustum.filter(
+        world.buildings
+          .filter((b) => this.#withinRange(b.center, b.boundingRadius))
+          .map((b) => b.base),
+      ),
+      EXTRUDE_BUILDING_HEIGHT_PX,
+    );
+    for (const poly of polygons) {
+      const c = poly as IColoredPolygon;
+      c.fill = 'rgba(150, 150, 150, 0.2)';
+      c.stroke = 'rgba(150, 150, 150, 0.2)';
+    }
+    return polygons;
+  }
 
-    // Buildings. Pre-filter by cached centroid distance before the expensive
-    // frustum intersectsPolygon/clip pass — on a whole-city OSM import this
-    // was the dominant per-frame cost (running full polygon math against
-    // every building/tree regardless of how far it is from the camera).
-    const buildingPolygons: Polygon[] = showBuildings
-      ? extrudePolygons(
-          this.#frustum.filter(
-            world.buildings
-              .filter((b) => this.#withinRange(b.center, b.boundingRadius))
-              .map((b) => b.base),
-          ),
-          EXTRUDE_BUILDING_HEIGHT_PX,
-        )
-      : [];
+  /** Trees extruded whole (even when partially in view so the top stays stable). */
+  #buildTreePolygons(world: IWorld, show: boolean): Polygon[] {
+    if (!show) return [];
+    return extrudeTreeShapes(
+      this.#frustum.filter(
+        world.trees
+          .filter((t) => this.#withinRange(t.center, t.size))
+          .map((t) => t.base),
+        false,
+      ),
+      EXTRUDE_TREE_HEIGHT_PX,
+    );
+  }
 
-    // Trees (drawn whole even when partially in view so the top stays stable)
-    const treePolygons: Polygon[] = showTrees
-      ? extrudeTreeShapes(
-          this.#frustum.filter(
-            world.trees
-              .filter((t) => this.#withinRange(t.center, t.size))
-              .map((t) => t.base),
-            false,
-          ),
-          EXTRUDE_TREE_HEIGHT_PX,
-        )
-      : [];
-
-    // Road borders. Distance-pre-filter before allocating a Polygon per
-    // segment and running the frustum intersectsPolygon test on each — on a
-    // whole-city OSM import this unfiltered path (thousands of border
-    // segments) dominated both CPU (intersectsPolygon) and GC. The frustum
-    // triangle's farthest point is exactly `range` from the camera centre, so
-    // any segment that can intersect it has a point within `range` of centre;
-    // pre-rejecting by that distance is a correct superset (no popping).
+  /**
+   * Road borders extruded to low walls. Distance-pre-filter before allocating a
+   * Polygon per segment and running the frustum intersectsPolygon test on each —
+   * on a whole-city OSM import this unfiltered path (thousands of border
+   * segments) dominated both CPU (intersectsPolygon) and GC. The frustum
+   * triangle's farthest point is exactly `range` from the camera centre, so any
+   * segment that can intersect it has a point within `range` of centre;
+   * pre-rejecting by that distance is a correct superset (no popping).
+   */
+  #buildRoadBorderPolygons(world: IWorld): Polygon[] {
     const roadSegments: Segment[] = world.corridors.length
       ? world.corridors.flatMap((c: Corridor) => c.borders)
       : world.roadBorders || [];
-    const roadPolygons: Polygon[] = extrudePolygons(
+    return extrudePolygons(
       this.#frustum.filter(
         roadSegments
           .filter((s) => s.distanceToPoint(this.center) <= this.range + 1)
@@ -258,87 +259,45 @@ export class Camera implements ICameraPoint {
       ),
       EXTRUDE_ROAD_HEIGHT_PX,
     );
+  }
 
-    // Key car (always extruded as detailed 3D car)
-    let keyCarPolygons: Polygon[] = [];
-    if (keyCar && keyCar.polygon.length >= 4) {
-      const filteredKeyCar: Polygon[] = this.#frustum.filter(
-        [
-          new Polygon(
-            keyCar.polygon.map((point: Point) => new Point(point.x, point.y)),
-          ),
-        ],
-        false,
-      );
-      if (filteredKeyCar.length) {
-        keyCarPolygons = extrudeCarShape(filteredKeyCar[0]);
-        keyCarPolygons.forEach((poly) => {
-          const cPoly = poly as IColoredPolygon;
-          cPoly.fill = keyCar.color || 'rgba(0, 100, 255, 0.6)';
-          cPoly.stroke = 'rgba(0, 0, 0, 0.4)';
-        });
-      }
+  /**
+   * Extrudes a single car into a styled detailed 3D shape. Returns `[]` when the
+   * car has too few polygon points or is fully outside the frustum. `height`/
+   * `wheelRadius` default (via `extrudeCarShape`) to the detailed key/best-car
+   * size; pass the smaller traffic-car values for background traffic.
+   */
+  #buildCarPolygons(
+    car: Car,
+    opts: {
+      fill: string;
+      stroke: string;
+      height?: number;
+      wheelRadius?: number;
+    },
+  ): Polygon[] {
+    if (!car.polygon || car.polygon.length < 4) return [];
+    const filtered = this.#frustum.filter(
+      [new Polygon(car.polygon.map((p: Point) => new Point(p.x, p.y)))],
+      false,
+    );
+    if (!filtered.length) return [];
+    const polys = extrudeCarShape(filtered[0], opts.height, opts.wheelRadius);
+    for (const poly of polys) {
+      const c = poly as IColoredPolygon;
+      c.fill = opts.fill;
+      c.stroke = opts.stroke;
     }
+    return polys;
+  }
 
-    // Traffic cars
-    let trafficPolygons: Polygon[] = [];
-    if (traffic && traffic.length > 0) {
-      for (const car of traffic) {
-        if (!car.polygon || car.polygon.length < 4) continue;
-        const filteredBase: Polygon[] = this.#frustum.filter(
-          [
-            new Polygon(
-              car.polygon.map((point: Point) => new Point(point.x, point.y)),
-            ),
-          ],
-          false,
-        );
-        if (filteredBase.length) {
-          const carPolys = extrudeCarShape(
-            filteredBase[0],
-            TRAFFIC_CAR_EXTRUDE_HEIGHT_PX,
-            TRAFFIC_CAR_WHEEL_RADIUS_PX,
-          );
-          carPolys.forEach((poly) => {
-            const cPoly = poly as IColoredPolygon;
-            cPoly.fill = car.color || 'rgba(200, 50, 50, 0.5)';
-            cPoly.stroke = 'rgba(0, 0, 0, 0.3)';
-          });
-          trafficPolygons.push(...carPolys);
-        }
-      }
-    }
-
-    // Best car (highlighted, separate from keyCar)
-    let bestCarPolygons: Polygon[] = [];
-    const bestCarSource = bestCar ?? null;
-    if (
-      bestCarSource &&
-      bestCarSource !== keyCar &&
-      bestCarSource.polygon.length >= 4
-    ) {
-      const filteredCarBase: Polygon[] = this.#frustum.filter(
-        [
-          new Polygon(
-            bestCarSource.polygon.map(
-              (point: Point) => new Point(point.x, point.y),
-            ),
-          ),
-        ],
-        false,
-      );
-      if (filteredCarBase.length) {
-        bestCarPolygons = extrudeCarShape(filteredCarBase[0]);
-        bestCarPolygons.forEach((poly) => {
-          const cPoly = poly as IColoredPolygon;
-          cPoly.fill = 'rgba(255, 200, 0, 0.6)';
-          cPoly.stroke = 'rgba(0, 0, 0, 0.4)';
-        });
-      }
-    }
-
-    // Car shadows (flat projections)
-    const carShadowBases: Polygon[] = this.#frustum.filter(
+  /** Flat dark shadow quads for every car other than the key and best cars. */
+  #buildCarShadowPolygons(
+    cars: Car[],
+    keyCar: Car | undefined,
+    bestCarSource: Car | null,
+  ): Polygon[] {
+    const bases = this.#frustum.filter(
       cars
         .filter((c) => c !== keyCar && c !== bestCarSource)
         .map(
@@ -349,52 +308,51 @@ export class Camera implements ICameraPoint {
         ),
       false,
     );
-    carShadowBases.forEach((poly) => {
-      const cPoly = poly as IColoredPolygon;
-      cPoly.fill = 'rgba(0, 0, 0, 0.25)';
-      cPoly.stroke = 'rgba(0, 0, 0, 0)';
-    });
-
-    // Style buildings
-    buildingPolygons.forEach((poly) => {
-      const cPoly = poly as IColoredPolygon;
-      cPoly.fill = 'rgba(150, 150, 150, 0.2)';
-      cPoly.stroke = 'rgba(150, 150, 150, 0.2)';
-    });
-
-    // Ground plane: a flat trapezoid covering the whole field of view (grass),
-    // drawn first so everything else sits on top. Near corners are placed just
-    // in front of the camera at the FOV edges so the ground fills the screen
-    // bottom (a triangle would leave the lower corners empty).
-    const groundPolygons: Polygon[] = [];
-    {
-      const near = FOV_NEAR_PLANE_DISTANCE_PX;
-      const nearLeft = new Point(
-        this.x - near * Math.sin(this.angle - Math.PI / 4),
-        this.y - near * Math.cos(this.angle - Math.PI / 4),
-        0,
-      );
-      const nearRight = new Point(
-        this.x - near * Math.sin(this.angle + Math.PI / 4),
-        this.y - near * Math.cos(this.angle + Math.PI / 4),
-        0,
-      );
-      const ground = new Polygon([
-        nearLeft,
-        new Point(this.left.x, this.left.y, 0),
-        new Point(this.right.x, this.right.y, 0),
-        nearRight,
-      ]) as IColoredPolygon;
-      ground.fill = 'rgba(58, 74, 52, 1)';
-      ground.stroke = 'rgba(58, 74, 52, 1)';
-      ground.skipDebug = true;
-      groundPolygons.push(ground);
+    for (const poly of bases) {
+      const c = poly as IColoredPolygon;
+      c.fill = 'rgba(0, 0, 0, 0.25)';
+      c.stroke = 'rgba(0, 0, 0, 0)';
     }
+    return bases;
+  }
 
-    // Road surface: envelope polygons drawn flat, clipped only against the near
-    // plane (not the collapsing frustum triangle) so the asphalt stays filled
-    // right up to the camera — no grass gap under/behind the car.
-    const roadSurfacePolygons: Polygon[] = [];
+  /**
+   * Ground plane: a flat trapezoid covering the whole field of view (grass),
+   * drawn first so everything else sits on top. Near corners are placed just in
+   * front of the camera at the FOV edges so the ground fills the screen bottom
+   * (a triangle would leave the lower corners empty).
+   */
+  #buildGroundPolygons(): Polygon[] {
+    const near = FOV_NEAR_PLANE_DISTANCE_PX;
+    const nearLeft = new Point(
+      this.x - near * Math.sin(this.angle - Math.PI / 4),
+      this.y - near * Math.cos(this.angle - Math.PI / 4),
+      0,
+    );
+    const nearRight = new Point(
+      this.x - near * Math.sin(this.angle + Math.PI / 4),
+      this.y - near * Math.cos(this.angle + Math.PI / 4),
+      0,
+    );
+    const ground = new Polygon([
+      nearLeft,
+      new Point(this.left.x, this.left.y, 0),
+      new Point(this.right.x, this.right.y, 0),
+      nearRight,
+    ]) as IColoredPolygon;
+    ground.fill = 'rgba(58, 74, 52, 1)';
+    ground.stroke = 'rgba(58, 74, 52, 1)';
+    ground.skipDebug = true;
+    return [ground];
+  }
+
+  /**
+   * Road surface: envelope polygons drawn flat, clipped only against the near
+   * plane (not the collapsing frustum triangle) so the asphalt stays filled
+   * right up to the camera — no grass gap under/behind the car.
+   */
+  #buildRoadSurfacePolygons(world: IWorld): Polygon[] {
+    const out: Polygon[] = [];
     for (const env of world.envelopes ?? []) {
       const poly = env.polygon;
       // Cheap single-segment distance check (env.skeleton) instead of
@@ -416,15 +374,20 @@ export class Camera implements ICameraPoint {
       const c = clipped as IColoredPolygon;
       c.fill = 'rgba(45, 45, 50, 1)';
       c.stroke = 'rgba(45, 45, 50, 1)';
-      roadSurfacePolygons.push(clipped);
+      out.push(clipped);
     }
+    return out;
+  }
 
-    // Lane markings, mirroring the 2D map: N-1 white dividers per road (thicker,
-    // longer dashes for the centre divider — solid on hard-separated roads —
-    // and thin dashes for the rest; one-way roads get thin dashes throughout),
-    // plus a solid boundary line and bay ticks for each parking lane. Every line
-    // is frustum-clipped with world-anchored dashes so it stays locked in place.
-    const laneMarkingPolygons: Polygon[] = [];
+  /**
+   * Lane markings, mirroring the 2D map: N-1 white dividers per road (thicker,
+   * longer dashes for the centre divider — solid on hard-separated roads — and
+   * thin dashes for the rest; one-way roads get thin dashes throughout), plus a
+   * solid boundary line and bay ticks for each parking lane. Every line is
+   * frustum-clipped with world-anchored dashes so it stays locked in place.
+   */
+  #buildLaneMarkingPolygons(world: IWorld): Polygon[] {
+    const out: Polygon[] = [];
     for (const seg of world.graph?.segments ?? []) {
       if (seg.distanceToPoint(this.center) > this.range) continue;
       if (!this.#frustum.inFront(seg.p1) && !this.#frustum.inFront(seg.p2))
@@ -443,13 +406,13 @@ export class Camera implements ICameraPoint {
           const a = add(seg.p1, scale(perp, offset));
           const b = add(seg.p2, scale(perp, offset));
           if (!seg.oneWay && seg.separated && isCenter) {
-            this.#emitRoadLine(a, b, laneMarkingPolygons, {
+            this.#emitRoadLine(a, b, out, {
               color: ROAD_PAINT,
               width: 4,
               dashed: false,
             });
           } else if (!seg.oneWay && isCenter) {
-            this.#emitRoadLine(a, b, laneMarkingPolygons, {
+            this.#emitRoadLine(a, b, out, {
               color: ROAD_PAINT,
               width: 4,
               dashed: true,
@@ -457,7 +420,7 @@ export class Camera implements ICameraPoint {
               gapLen: 30,
             });
           } else {
-            this.#emitRoadLine(a, b, laneMarkingPolygons, {
+            this.#emitRoadLine(a, b, out, {
               color: ROAD_PAINT,
               width: 2,
               dashed: true,
@@ -480,7 +443,7 @@ export class Camera implements ICameraPoint {
           this.#emitRoadLine(
             add(seg.p1, scale(perp, innerHalf * s)),
             add(seg.p2, scale(perp, innerHalf * s)),
-            laneMarkingPolygons,
+            out,
             { color: ROAD_PAINT, width: 2, dashed: false },
           );
           for (let i = 0; i <= bays; i++) {
@@ -488,18 +451,27 @@ export class Camera implements ICameraPoint {
             this.#emitRoadLine(
               add(alongPt, scale(perp, innerHalf * s)),
               add(alongPt, scale(perp, outerHalf * s)),
-              laneMarkingPolygons,
+              out,
               { color: ROAD_PAINT, width: 2, dashed: false },
             );
           }
         }
       }
     }
+    return out;
+  }
 
-    // Painted markings (crossings, stop/yield lines, target) and traffic
-    // lights (short colour-coded gates across the road).
-    const paintedMarkingPolygons: Polygon[] = [];
-    const lightPolygons: Polygon[] = [];
+  /**
+   * Painted markings (crossings, stop/yield lines, target) and traffic lights
+   * (short colour-coded gates across the road). Returns the painted-flat and the
+   * extruded-light polygons separately so the caller can layer lights above cars.
+   */
+  #buildMarkingPolygons(world: IWorld): {
+    painted: Polygon[];
+    lights: Polygon[];
+  } {
+    const painted: Polygon[] = [];
+    const lights: Polygon[] = [];
     for (const m of world.markings) {
       if (!m.polygon) continue;
       const view = m as { type?: string; state?: string };
@@ -524,7 +496,7 @@ export class Camera implements ICameraPoint {
           const c = wall as IColoredPolygon;
           c.fill = color;
           c.stroke = 'rgba(0, 0, 0, 0.25)';
-          lightPolygons.push(wall);
+          lights.push(wall);
         }
       } else if (type === 'crossing') {
         // Real zebra bars instead of a solid white slab.
@@ -537,7 +509,7 @@ export class Camera implements ICameraPoint {
           const c = stripe as IColoredPolygon;
           c.fill = 'rgba(240, 240, 240, 0.9)';
           c.stroke = 'rgba(0, 0, 0, 0)';
-          paintedMarkingPolygons.push(stripe);
+          painted.push(stripe);
         }
       } else if (type === 'stop' || type === 'yield') {
         // Painted like the 2D map: the word written across the road (reading
@@ -554,7 +526,7 @@ export class Camera implements ICameraPoint {
           const c = line as IColoredPolygon;
           c.fill = ROAD_PAINT;
           c.stroke = 'rgba(0, 0, 0, 0)';
-          paintedMarkingPolygons.push(line);
+          painted.push(line);
         }
         const word = type === 'stop' ? 'STOP' : 'YIELD';
         for (const glyph of textStrokeQuads(
@@ -569,7 +541,7 @@ export class Camera implements ICameraPoint {
           const c = glyph as IColoredPolygon;
           c.fill = ROAD_PAINT;
           c.stroke = 'rgba(0, 0, 0, 0)';
-          paintedMarkingPolygons.push(glyph);
+          painted.push(glyph);
         }
       } else if (type && MARKING_FLAT_COLORS[type]) {
         const flat = new Polygon(
@@ -577,9 +549,69 @@ export class Camera implements ICameraPoint {
         ) as IColoredPolygon;
         flat.fill = MARKING_FLAT_COLORS[type];
         flat.stroke = 'rgba(0, 0, 0, 0)';
-        paintedMarkingPolygons.push(flat);
+        painted.push(flat);
       }
     }
+    return { painted, lights };
+  }
+
+  /**
+   * Gathers, filters, and extrudes all relevant polygons from the world for
+   * rendering. The concatenation order at the end is load-bearing — it is the
+   * back-to-front painter's-algorithm draw order.
+   */
+  #getPolygons(world: IWorld, options: ICameraRenderOptions = {}): Polygon[] {
+    const {
+      keyCar,
+      bestCar,
+      cars = [],
+      traffic,
+      showTrees = true,
+      showBuildings = true,
+    } = options;
+    const bestCarSource = bestCar ?? null;
+
+    const buildingPolygons = this.#buildBuildingPolygons(world, showBuildings);
+    const treePolygons = this.#buildTreePolygons(world, showTrees);
+    const roadPolygons = this.#buildRoadBorderPolygons(world);
+
+    const keyCarPolygons = keyCar
+      ? this.#buildCarPolygons(keyCar, {
+          fill: keyCar.color || 'rgba(0, 100, 255, 0.6)',
+          stroke: 'rgba(0, 0, 0, 0.4)',
+        })
+      : [];
+
+    const trafficPolygons: Polygon[] = [];
+    for (const car of traffic ?? []) {
+      trafficPolygons.push(
+        ...this.#buildCarPolygons(car, {
+          fill: car.color || 'rgba(200, 50, 50, 0.5)',
+          stroke: 'rgba(0, 0, 0, 0.3)',
+          height: TRAFFIC_CAR_EXTRUDE_HEIGHT_PX,
+          wheelRadius: TRAFFIC_CAR_WHEEL_RADIUS_PX,
+        }),
+      );
+    }
+
+    const bestCarPolygons =
+      bestCarSource && bestCarSource !== keyCar
+        ? this.#buildCarPolygons(bestCarSource, {
+            fill: 'rgba(255, 200, 0, 0.6)',
+            stroke: 'rgba(0, 0, 0, 0.4)',
+          })
+        : [];
+
+    const carShadowBases = this.#buildCarShadowPolygons(
+      cars,
+      keyCar,
+      bestCarSource,
+    );
+    const groundPolygons = this.#buildGroundPolygons();
+    const roadSurfacePolygons = this.#buildRoadSurfacePolygons(world);
+    const laneMarkingPolygons = this.#buildLaneMarkingPolygons(world);
+    const { painted: paintedMarkingPolygons, lights: lightPolygons } =
+      this.#buildMarkingPolygons(world);
 
     return [
       ...groundPolygons,
