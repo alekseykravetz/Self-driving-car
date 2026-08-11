@@ -53,6 +53,9 @@ export interface WorldGeneratable {
   trees: Tree[];
   markings: Marking[];
   corridors: Corridor[];
+  // Absent → treated as `'generated'`. When `'osm'`, building generation is
+  // skipped so imported real footprints are never overwritten.
+  buildingSource?: 'osm' | 'generated';
 }
 
 /** Compute road width for a segment based on its lane count. */
@@ -194,8 +197,10 @@ export class WorldGenerator {
     drainGenerator(wgGenerateRoadsGen(world));
   }
 
-  /** Expensive building placement (O(n²) footprint collision filter). */
+  /** Expensive building placement (O(n²) footprint collision filter). Skipped
+   * for OSM worlds so imported real footprints are never overwritten. */
   static generateBuildings(world: WorldGeneratable): void {
+    if (world.buildingSource === 'osm') return;
     world.buildings = wgGenerateBuildings(world);
   }
 
@@ -274,10 +279,13 @@ export class WorldGenerator {
   ): Promise<void> {
     const { roads = true, buildings = true, trees = true, onProgress } = opts;
 
+    // OSM worlds keep their imported footprints — never regenerate buildings.
+    const doBuildings = buildings && world.buildingSource !== 'osm';
+
     // Split the [0, 1] progress range evenly across the active stages.
     const stages: GenerationProgress['stage'][] = [];
     if (roads) stages.push('roads');
-    if (buildings) stages.push('buildings');
+    if (doBuildings) stages.push('buildings');
     if (trees) stages.push('trees');
     const bandCount = stages.length || 1;
 
@@ -301,7 +309,7 @@ export class WorldGenerator {
       );
     }
 
-    if (buildings) {
+    if (doBuildings) {
       report('buildings', 'Placing buildings…', 0);
       await yieldToBrowser();
       world.buildings = await runChunkedGenerator(

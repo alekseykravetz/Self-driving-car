@@ -24,6 +24,7 @@ import {
   WorldDecoration,
   WorldLayerVisibility,
   DEFAULT_LAYER_VISIBILITY,
+  type BuildingSource,
 } from './types.js';
 import { lerp, mulberry32, dot, subtract, normalize } from '../math/utils.js';
 import { drawEnvelope } from '../rendering/envelopeRenderer.js';
@@ -49,6 +50,7 @@ interface LegacyWorldInfo {
   corridor?: Corridor | null;
   decoration?: WorldDecoration;
   version?: number;
+  buildingSource?: BuildingSource;
 }
 
 /** Reconstructs corridors from a saved world, accepting both the new
@@ -106,6 +108,11 @@ export class World implements IWorld {
   buildings: Building[];
   trees: Tree[];
   laneGuides: Segment[];
+
+  // Whether buildings come from real OSM footprints (`'osm'`) or the procedural
+  // generator (`'generated'`, default). OSM buildings are never overwritten by
+  // building generation, so editing roads after an import keeps real footprints.
+  buildingSource: BuildingSource = 'generated';
 
   markings: Marking[];
   trafficManager: TrafficManager;
@@ -183,6 +190,9 @@ export class World implements IWorld {
     world.corridors = loadWorldCorridors(info);
     world.zoom = info.zoom;
     world.offset = info.offset;
+    // Building provenance (additive; absent → generated for legacy saves).
+    world.buildingSource =
+      (info as LegacyWorldInfo).buildingSource ?? 'generated';
 
     // Rebuild cheap road geometry from the graph (dropped from v2 files, and
     // recomputed rather than trusted even for v1 files — it is deterministic).
@@ -276,6 +286,7 @@ export class World implements IWorld {
       corridors: this.corridors,
       zoom: this.zoom,
       offset: this.offset,
+      buildingSource: this.buildingSource,
       decoration: {
         treeSeed: this.treeSeed,
         treePrototypeCount: this.treePrototypeCount,

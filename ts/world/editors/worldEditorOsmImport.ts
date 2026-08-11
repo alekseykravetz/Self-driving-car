@@ -1,8 +1,10 @@
 import { World } from '../world.js';
 import { Viewport } from '../../viewport/viewport.js';
 import { Point } from '../../math/primitives/point.js';
+import { Polygon } from '../../math/primitives/polygon.js';
 import { Segment } from '../../math/primitives/segment.js';
 import { Osm, OsmData } from '../../math/osm-importer/osm.js';
+import { Building } from '../items/building.js';
 import { Light } from '../markings/light.js';
 import { Crossing } from '../markings/crossing.js';
 import { Stop } from '../markings/stop.js';
@@ -18,13 +20,17 @@ import {
   runChunkedGenerator,
 } from '../generation/generationProgress.js';
 
-/** Overpass QL filter used to query drivable roads from OpenStreetMap. */
+/** Overpass QL filter used to query drivable roads (and building footprints)
+ * from OpenStreetMap. The `way["building"]` clause fetches real building
+ * outlines; the trailing `>; out body;` recursion pulls every way's nodes with
+ * coordinates so footprints (and road geometry) reconstruct fully. */
 const OSM_FILTER = `[out:json];
 (
   way["highway"]
   ["highway" !~"pedestrian|footway|cycleway|path|service|corridor|track|steps|raceway|bridleway|proposed|construction|elevator|bus_guideway|no"]
   ["access" !~"private"]
   ({{bbox}});
+  way["building"]({{bbox}});
 );
 out body;
 >;
@@ -284,6 +290,20 @@ export class WorldEditorOsmImporter {
 
       this.closePanel(); // Close panel on success
 
+      // Real OSM building footprints (if the query returned any) become the
+      // world's buildings and flag it as OSM-sourced so generation never
+      // overwrites them. With no building ways the world stays `generated` and
+      // the procedural building generator runs as before.
+      if (result.buildings.length > 0) {
+        world.buildings = result.buildings.map(
+          (b) => new Building(new Polygon(b.points), b.height),
+        );
+        world.buildingSource = 'osm';
+      } else {
+        world.buildings = [];
+        world.buildingSource = 'generated';
+      }
+
       // Generate road (and, when auto-regen is on, item) geometry time-sliced
       // with the visible progress overlay so a large import never freezes the
       // tab. Claim the current graph hash *now* so the draw loop's synchronous
@@ -292,6 +312,8 @@ export class WorldEditorOsmImporter {
       this.#opts.onGraphHashUpdated(world.graph.hash());
       await world.generateAsync({
         roads: true,
+        // OSM footprints are preserved by generateAsync's source guard; for a
+        // generated world this follows the auto-regen preference as before.
         buildings: autoRegen,
         trees: autoRegen,
         onProgress: (p) => overlay?.update(p),

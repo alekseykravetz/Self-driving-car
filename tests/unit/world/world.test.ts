@@ -138,6 +138,11 @@ describe('World', () => {
       expect(json.markings).toHaveLength(1);
     });
 
+    it('serializes buildingSource (defaults to generated)', () => {
+      const json = new World(new Graph()).toJSON() as Record<string, unknown>;
+      expect(json.buildingSource).toBe('generated');
+    });
+
     it('decoration includes tree instances and building footprints', () => {
       // Create a world with a graph that produces buildings and trees
       const graph = new Graph();
@@ -323,6 +328,33 @@ describe('World', () => {
       expect(loaded.buildings[0].height).toBe(200);
       expect(loaded.trees.length).toBe(1);
       expect(loaded.trees[0].center.x).toBe(50);
+    });
+
+    it('round-trips buildingSource=osm without regenerating buildings', () => {
+      const world = new World(new Graph());
+      world.buildingSource = 'osm';
+      const buildingPoly = new Polygon([
+        new Point(0, 0),
+        new Point(100, 0),
+        new Point(100, 100),
+        new Point(0, 100),
+      ]);
+      world.buildings = [new Building(buildingPoly, 140)];
+
+      const json = world.toJSON() as unknown as World;
+      const loaded = World.load(json);
+
+      expect(loaded.buildingSource).toBe('osm');
+      expect(loaded.buildings.length).toBe(1);
+      expect(loaded.buildings[0].height).toBe(140);
+    });
+
+    it('legacy world without buildingSource defaults to generated', () => {
+      const world = new World(new Graph());
+      const json = world.toJSON() as unknown as Record<string, unknown>;
+      delete json.buildingSource;
+      const loaded = World.load(json as unknown as World);
+      expect(loaded.buildingSource).toBe('generated');
     });
   });
 

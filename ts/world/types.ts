@@ -28,6 +28,11 @@ export interface BuildingFootprint {
   h: number;
 }
 
+/** Where a world's buildings come from. `'generated'` (default) means the
+ * procedural road-frontage generator owns them; `'osm'` means they are real
+ * imported OSM footprints that generation must never overwrite. */
+export type BuildingSource = 'osm' | 'generated';
+
 /** The compact decoration block stored in a v2 world file. */
 export interface WorldDecoration {
   treeSeed: number;

@@ -450,6 +450,7 @@ vi.mock('../../../../ts/math/osm-importer/osm.js', () => {
     crossings: [],
     stops: [],
     yields: [],
+    buildings: [],
   };
   return {
     Osm: {
@@ -791,6 +792,7 @@ describe('WorldEditor', () => {
           },
         ],
         yields: [],
+        buildings: [],
       };
       vi.mocked(Osm.parseRoadsChunked).mockReturnValueOnce(
         (function* () {

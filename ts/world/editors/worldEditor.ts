@@ -499,8 +499,12 @@ export class WorldEditor {
     this.#osmImporter.copyFilter();
   }
 
-  /* Rebuilds the expensive item placement (buildings + trees) on demand. */
+  /* Rebuilds the expensive item placement (buildings + trees) on demand.
+   * This is also the escape hatch that converts an OSM-imported world back to
+   * procedurally-generated buildings: it clears the `'osm'` source so the
+   * generator replaces the imported footprints with generated ones. */
   regenerateItems(): void {
+    this.#world.buildingSource = 'generated';
     void this.#runGeneration({ roads: false, buildings: true, trees: true });
   }
 
