@@ -11,6 +11,7 @@ import '../ts/ui/molecules/layoutToolbar.js';
 import '../ts/ui/molecules/animationLoopToolbar.js';
 import '../ts/ui/molecules/worldLayersToolbar.js';
 import '../ts/ui/molecules/worldSetup.js';
+import type { WorldSetupElement } from '../ts/ui/molecules/worldSetup.js';
 import '../ts/ui/molecules/generationProgress.js';
 import type { GenerationProgressElement } from '../ts/ui/molecules/generationProgress.js';
 import {
@@ -213,12 +214,22 @@ export const WorldLayersToolbar: StoryObj = {
 // ═══════════════════════════════════════════════════════════════════
 export const WorldSetup: StoryObj = {
   name: 'World Setup Toolbar',
-  render: () =>
-    stage(
-      make('world-setup'),
-      'The simulator / world-editor setup toolbar: border mode (none / damage / collision), camera tracking, viewport mode and the world/car asset selectors. Self-wraps in a collapsible “Setup” container via <code>makeToolbarCollapsible</code>.',
+  render: () => {
+    const el = make('world-setup') as WorldSetupElement;
+    // configureSelectors() wires the world/car asset-picker popups and reveals
+    // the “Selected” group; without it the picker buttons are inert and the
+    // selected rows stay hidden. showWorldEditorActions() surfaces the editor
+    // Storage + Import-from-OSM buttons so the story matches the world editor.
+    requestAnimationFrame(() => {
+      el.showWorldEditorActions();
+      el.configureSelectors({ carMode: 'multi' });
+    });
+    return stage(
+      el,
+      'The simulator / world-editor setup toolbar: border mode (none / damage / collision), camera tracking, viewport mode and the world/car asset selectors. Click the <strong>globe</strong> or <strong>car</strong> button to open its picker popup; chosen assets appear under <strong>Selected</strong>. Self-wraps in a collapsible “Setup” container via <code>makeToolbarCollapsible</code>.',
       'canvas',
-    ),
+    );
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════════

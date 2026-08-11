@@ -119,6 +119,10 @@ const FEATURE_CARDS = `
         <span class="btn-icon"><app-icon name="edit" animate></app-icon></span>
         <span><strong>Open Editor</strong><small>Create and edit worlds</small></span>
       </a>
+      <a class="card-btn" href="html/world.html?import=osm">
+        <span class="btn-icon"><app-icon name="map" animate></app-icon></span>
+        <span><strong>Import from OpenStreetMap</strong><small>Build a world from real map data</small></span>
+      </a>
     </div>
   </section>
 `;
