@@ -21,6 +21,12 @@ import { TreeDrawOptions } from '../types.js';
 /** Number of vertices in a canopy level / footprint polygon. */
 const TREE_VERTEX_COUNT = 32;
 
+/** Height as a multiple of the (scaled) canopy diameter, per render type:
+ *  classic ~1.25 (keeps the legacy 160→200 default), conifers tall & narrow,
+ *  broadleaf clusters squat & wide. Gives realistic per-tree height variation
+ *  (driven by each instance's scaled size) instead of one fixed height. */
+const TREE_HEIGHT_RATIO = [1.25, 1.9, 1.0]; // [classic, conifer, cluster]
+
 /** Default seed + prototype count used when a world does not specify its own. */
 export const DEFAULT_TREE_SEED = 123456;
 export const DEFAULT_TREE_PROTOTYPE_COUNT = 8;
@@ -108,7 +114,8 @@ export class Tree {
    * @param prototypeIndex Index of `prototype` in the world's prototype set.
    * @param type Render style: 0 classic, 1 conifer, 2 broadleaf cluster.
    * @param scale Per-instance scale multiplier.
-   * @param height Approximate tree height. Defaults to 200.
+   * @param height Approximate tree height. Defaults to a type-aware multiple of
+   *   the scaled canopy size (conifers tall, clusters squat).
    */
   constructor(
     center: Point,
@@ -117,12 +124,13 @@ export class Tree {
     prototypeIndex: number = 0,
     type: number = 0,
     scale: number = 1,
-    height: number = 200,
+    height?: number,
   ) {
     this.center = center;
     this.scale = scale;
     this.size = size * scale;
-    this.height = height;
+    this.height =
+      height ?? this.size * (TREE_HEIGHT_RATIO[type] ?? TREE_HEIGHT_RATIO[0]);
     this.type = type;
     this.prototypeIndex = prototypeIndex;
     this.prototype = prototype;

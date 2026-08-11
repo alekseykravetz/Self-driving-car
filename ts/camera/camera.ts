@@ -64,8 +64,6 @@ const BUILDING_WALL_FILL = 'rgba(150, 150, 150, 0.2)';
 /** Red fill/stroke for the pitched building roof, mirroring the 2D top view. */
 const BUILDING_ROOF_FILL = '#D44';
 const BUILDING_ROOF_STROKE = '#C44';
-/** Extrusion height (world px) for tree volumes in the 3D view. */
-const EXTRUDE_TREE_HEIGHT_PX = 200;
 /** Extrusion height (world px) for road-border walls in the 3D view. */
 const EXTRUDE_ROAD_HEIGHT_PX = 10;
 /** Body height (world px) used when extruding traffic cars. */
@@ -273,17 +271,17 @@ export class Camera implements ICameraPoint {
   /** Trees extruded whole (even when partially in view so the top stays stable). */
   #buildTreePolygons(world: IWorld, show: boolean): Polygon[] {
     if (!show) return [];
-    const bases = this.#frustum
-      .filter(
-        world.trees
-          .filter((t) => this.#withinRange(t.center, t.size))
-          .map((t) => t.base),
-        false,
-      )
+    const out: Polygon[] = [];
+    for (const t of world.trees) {
+      if (!this.#withinRange(t.center, t.size)) continue;
+      const filtered = this.#frustum.filter([t.base], false);
+      if (!filtered.length) continue;
       // Skip trees straddling the camera so an off-view base doesn't project a
       // floating canopy into the visible frame (same reason as buildings).
-      .filter((base) => this.#frustum.fullyInFront(base));
-    return extrudeTreeShapes(bases, EXTRUDE_TREE_HEIGHT_PX);
+      if (!this.#frustum.fullyInFront(filtered[0])) continue;
+      out.push(...extrudeTreeShapes([filtered[0]], t.height));
+    }
+    return out;
   }
 
   /**
