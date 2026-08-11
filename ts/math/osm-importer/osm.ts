@@ -269,9 +269,13 @@ export class Osm {
     const avgLat = (minLat + maxLat) / 2;
     const width = height * ar * Math.cos(degToRad(avgLat));
 
-    const points: Point[] = []; // To store created Point objects
+    const points: Point[] = []; // Road/marking graph points (see below)
     // Use a Map for efficient lookup of points by their original OSM ID
     const nodeMap = new Map<number | string, Point>();
+    // Node ids referenced by highway ways (or their markings). Only these
+    // become graph points; building-outline nodes stay out of the graph so
+    // they don't render as editor dots.
+    const roadNodeIds = new Set<number>();
 
     // Convert nodes to Point objects
     for (let ni = 0; ni < nodes.length; ni++) {
@@ -287,7 +291,6 @@ export class Osm {
 
       const point = new Point(x, y) as OsmPoint;
       point.id = node.id; // Attach OSM ID to the Point object (requires Point class modification)
-      points.push(point);
       nodeMap.set(node.id, point); // Store in map for quick lookup
       // Node conversion is O(nodes); yield through the ~0.15→0.3 progress band.
       if ((ni & 4095) === 0) {
@@ -365,6 +368,8 @@ export class Osm {
         continue;
       }
       if (!way.tags.highway) continue;
+      // This is a road way — its nodes become graph points.
+      for (const nid of nodeIds) roadNodeIds.add(nid);
 
       // Way-level metadata (constant across all sub-segments of this way).
       const oneWayTag = String(way.tags.oneway ?? 'no').toLowerCase(); // Default to 'no' if undefined
@@ -535,6 +540,17 @@ export class Osm {
             `Points for segment in way ${way.id} not found (nodes ${nodeIds[i - 1]} -> ${nodeIds[i]})`,
           );
         }
+      }
+    }
+
+    // Build the graph point set from road nodes only, preserving node order.
+    // Building-outline nodes are intentionally excluded (they live in the
+    // `buildings` footprints, not the graph, so they don't render as dots).
+    for (let ni = 0; ni < nodes.length; ni++) {
+      const node = nodes[ni];
+      if (roadNodeIds.has(node.id)) {
+        const p = nodeMap.get(node.id);
+        if (p) points.push(p);
       }
     }
 

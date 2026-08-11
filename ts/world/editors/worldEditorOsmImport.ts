@@ -319,11 +319,15 @@ export class WorldEditorOsmImporter {
         onProgress: (p) => overlay?.update(p),
       });
       this.#opts.onGraphHashUpdated(world.graph.hash());
-      if (!autoRegen && (world.buildings.length || world.trees.length)) {
-        worldLayersToolbar?.setStale(true);
-      } else {
-        worldLayersToolbar?.setStale(false);
-      }
+      // Only unbuilt items make the "regenerate" button pulse. For OSM worlds
+      // the real footprints are always up to date, so they never count as
+      // stale — only ungenerated trees would (which don't exist right after a
+      // roads-only import), preventing a misleading blink.
+      const staleItems =
+        world.buildingSource === 'osm'
+          ? world.trees.length > 0
+          : world.buildings.length > 0 || world.trees.length > 0;
+      worldLayersToolbar?.setStale(!autoRegen && staleItems);
     } catch (error) {
       alert(`Error processing OSM data: ${error}`);
       console.error('Error processing OSM data:', error);

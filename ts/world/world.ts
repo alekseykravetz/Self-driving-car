@@ -417,6 +417,7 @@ export class World implements IWorld {
       showItemBases: layers.itemBases,
       showBuildings: layers.buildings,
       showTrees: layers.trees,
+      flatRoofs: this.buildingSource === 'osm',
     });
   }
 

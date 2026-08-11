@@ -20,6 +20,10 @@ export interface CarDrawOptions {
 
 export interface BuildingDrawOptions {
   viewPoint: Point;
+  /** Draw a flat roof (just the ceiling) instead of the decorative pitched
+   * red roof. Used for imported OSM footprints, whose arbitrary shapes don't
+   * suit the rectangular pitched-roof geometry. */
+  flatRoof?: boolean;
 }
 
 /** Compact serialized building: footprint points + height (no `segments`). */

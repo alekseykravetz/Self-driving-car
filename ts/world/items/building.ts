@@ -80,7 +80,7 @@ export class Building {
   }
 
   draw(ctx: CanvasRenderingContext2D, options: BuildingDrawOptions): void {
-    const { viewPoint } = options;
+    const { viewPoint, flatRoof } = options;
     // Calculate the points for the top of the building (ceiling)
     const topPoints: Point[] = this.base.points.map((p) =>
       getFake3dPoint(p, viewPoint, this.height * BUILDING_CEILING_HEIGHT_RATIO),
@@ -108,8 +108,11 @@ export class Building {
 
     // --- Roof Generation (Assumes 4-point base for specific roof shape) ---
     let roofPolys: Polygon[] = [];
-    // Check if the base has enough points for the assumed roof logic
+    // Imported OSM footprints keep a flat roof (their arbitrary outlines don't
+    // suit the rectangular pitched-roof geometry). Only our own generated
+    // rectangular buildings get the decorative pitched roof.
     if (
+      !flatRoof &&
       this.base.points.length >= MIN_BUILDING_BASE_POINTS &&
       ceiling.points.length >= MIN_BUILDING_BASE_POINTS
     ) {

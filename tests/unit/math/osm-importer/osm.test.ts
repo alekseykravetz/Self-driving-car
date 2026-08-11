@@ -665,6 +665,13 @@ describe('Osm', () => {
       expect(result.segments.length).toBe(0);
     });
 
+    it('building-only nodes are excluded from graph points', () => {
+      // A lone building way: its corner nodes must NOT become graph points
+      // (they would otherwise render as editor dots).
+      const result = Osm.parseRoads(buildingData({}));
+      expect(result.points.length).toBe(0);
+    });
+
     it('building=no is ignored', () => {
       const result = Osm.parseRoads(buildingData({ building: 'no' }));
       expect(result.buildings.length).toBe(0);
@@ -736,6 +743,31 @@ describe('Osm', () => {
       });
       expect(result.segments.length).toBe(1);
       expect(result.buildings.length).toBe(1);
+    });
+
+    it('only road nodes become graph points (building nodes excluded)', () => {
+      // Road uses nodes 1,2; building adds corners 3,4. Only 1,2 are graph pts.
+      const result = Osm.parseRoads({
+        elements: [
+          { type: 'node', id: 1, lat: 48.85, lon: 2.35 },
+          { type: 'node', id: 2, lat: 48.851, lon: 2.35 },
+          { type: 'node', id: 3, lat: 48.851, lon: 2.351 },
+          { type: 'node', id: 4, lat: 48.85, lon: 2.351 },
+          {
+            type: 'way',
+            id: 100,
+            nodes: [1, 2],
+            tags: { highway: 'residential' },
+          },
+          {
+            type: 'way',
+            id: 200,
+            nodes: [1, 2, 3, 4, 1],
+            tags: { building: 'yes' },
+          },
+        ],
+      });
+      expect(result.points.length).toBe(2);
     });
   });
 });

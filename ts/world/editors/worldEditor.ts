@@ -499,13 +499,21 @@ export class WorldEditor {
     this.#osmImporter.copyFilter();
   }
 
-  /* Rebuilds the expensive item placement (buildings + trees) on demand.
-   * This is also the escape hatch that converts an OSM-imported world back to
-   * procedurally-generated buildings: it clears the `'osm'` source so the
-   * generator replaces the imported footprints with generated ones. */
+  /* Rebuilds the expensive item placement on demand. For OSM-imported worlds
+   * this regenerates only trees — the real building footprints are preserved
+   * (building generation is skipped for the `'osm'` source). */
   regenerateItems(): void {
-    this.#world.buildingSource = 'generated';
     void this.#runGeneration({ roads: false, buildings: true, trees: true });
+  }
+
+  /* Whether generated items are now out of date with the roads (drives the
+   * "regenerate" pulse). OSM footprints are real and road-independent, so they
+   * never count — only generated trees can go stale for an OSM world. */
+  #itemsBecameStale(): boolean {
+    if (this.#world.buildingSource === 'osm') {
+      return this.#world.trees.length > 0;
+    }
+    return this.#world.buildings.length > 0 || this.#world.trees.length > 0;
   }
 
   /**
@@ -564,7 +572,7 @@ export class WorldEditor {
       this.#oldGraphHash = currentGraphHash;
       if (this.#autoRegen) {
         this.#world.generate({ roads: false, buildings: true, trees: true });
-      } else if (this.#world.buildings.length || this.#world.trees.length) {
+      } else if (this.#itemsBecameStale()) {
         this.#worldLayersToolbar?.setStale(true);
       }
     }
