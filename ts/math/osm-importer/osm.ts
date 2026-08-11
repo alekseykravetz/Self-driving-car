@@ -122,11 +122,15 @@ interface ParsedRoads {
 
 /** Assumed storey height (metres) when deriving building height from levels. */
 const METRES_PER_BUILDING_LEVEL = 3;
+/** Bounds for the footprint-area height estimate (levels) used when OSM has no
+ *  explicit `height`/`building:levels` tags — most residential buildings. */
+const ESTIMATED_MIN_LEVELS = 1;
+const ESTIMATED_MAX_LEVELS = 8;
 
 /**
  * Derives a building height in WORLD PIXELS from OSM tags, in priority order:
  * explicit `height` (metres) → `building:levels` × storey height → `undefined`
- * (caller falls back to the `Building` default). Ignores non-positive/NaN tags.
+ * (caller falls back to an area estimate). Ignores non-positive/NaN tags.
  */
 function osmBuildingHeightPx(tags: Record<string, string>): number | undefined {
   const heightM = parseFloat(tags.height);
@@ -136,6 +140,30 @@ function osmBuildingHeightPx(tags: Record<string, string>): number | undefined {
     return metersToWorldPixels(levels * METRES_PER_BUILDING_LEVEL);
   }
   return undefined;
+}
+
+/**
+ * Estimates a building height (WORLD PIXELS) from its footprint when OSM gives
+ * no explicit height — larger footprints get more storeys, plus a deterministic
+ * ±1-level jitter (hashed from the first vertex) so equal-area buildings still
+ * differ. Keeps the map from rendering every untagged building at one height.
+ */
+function estimateBuildingHeightPx(points: Point[]): number {
+  let area2 = 0; // Twice the signed shoelace area (world px²).
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % points.length];
+    area2 += a.x * b.y - b.x * a.y;
+  }
+  const areaM2 =
+    Math.abs(area2) / 2 / (WORLD_PIXELS_PER_METER * WORLD_PIXELS_PER_METER);
+  const base = Math.round(Math.sqrt(areaM2) / 8);
+  const jitter = (Math.floor(Math.abs(points[0].x + points[0].y)) % 3) - 1;
+  const levels = Math.max(
+    ESTIMATED_MIN_LEVELS,
+    Math.min(ESTIMATED_MAX_LEVELS, base + jitter),
+  );
+  return metersToWorldPixels(levels * METRES_PER_BUILDING_LEVEL);
 }
 
 /**
@@ -158,7 +186,8 @@ function buildOsmBuildingFootprint(
   }
   if (points.length < 3) return null;
   const houseNumber = tags['addr:housenumber']?.trim() || undefined;
-  return { points, height: osmBuildingHeightPx(tags), houseNumber };
+  const height = osmBuildingHeightPx(tags) ?? estimateBuildingHeightPx(points);
+  return { points, height, houseNumber };
 }
 
 /**

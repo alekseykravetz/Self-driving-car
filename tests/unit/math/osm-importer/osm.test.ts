@@ -694,9 +694,12 @@ describe('Osm', () => {
       expect(result.buildings[0].height).toBe(140);
     });
 
-    it('no height/levels tags leaves height undefined', () => {
+    it('no height/levels tags falls back to a footprint-area estimate', () => {
       const result = Osm.parseRoads(buildingData({}));
-      expect(result.buildings[0].height).toBeUndefined();
+      const h = result.buildings[0].height;
+      // Estimated (not undefined), a positive multiple of the 3 m storey height.
+      expect(h).toBeGreaterThan(0);
+      expect((h ?? 0) % (3 * 14)).toBe(0);
     });
 
     it('open ring with fewer than 3 points is skipped', () => {
