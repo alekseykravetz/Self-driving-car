@@ -9,6 +9,13 @@ const BUILDING_CEILING_HEIGHT_RATIO = 0.6;
 /** Minimum footprint vertices required for the pitched-roof geometry. */
 const MIN_BUILDING_BASE_POINTS = 4;
 
+/** Flat-roof (OSM-imported) building colors — a muted grey rooftop with a
+ *  darker outline reads as a real roof from the top-down view, instead of the
+ *  solid-white blob that reusing the wall white produced. */
+const FLAT_ROOF_FILL = '#C8C8C2';
+const FLAT_ROOF_STROKE = '#9A9A94';
+const FLAT_ROOF_WALL_FILL = '#E4E4DE';
+
 export class Building {
   readonly base: Polygon;
   readonly height: number;
@@ -164,11 +171,22 @@ export class Building {
 
     // Draw sorted sides
     for (const side of sides) {
-      drawPolygon(ctx, side, { fill: 'white', stroke: '#AAA' });
+      drawPolygon(ctx, side, {
+        fill: flatRoof ? FLAT_ROOF_WALL_FILL : 'white',
+        stroke: '#AAA',
+      });
     }
 
-    // Draw ceiling polygon
-    drawPolygon(ctx, ceiling, { fill: 'white', stroke: 'white', lineWidth: 6 });
+    // Draw ceiling polygon. Flat-roof (OSM) buildings get a muted grey rooftop
+    // with a darker outline so they don't read as solid-white blobs; pitched
+    // buildings keep the white ceiling under their red roof.
+    drawPolygon(
+      ctx,
+      ceiling,
+      flatRoof
+        ? { fill: FLAT_ROOF_FILL, stroke: FLAT_ROOF_STROKE, lineWidth: 6 }
+        : { fill: 'white', stroke: 'white', lineWidth: 6 },
+    );
 
     // Draw sorted roof polygons (if generated)
     for (const poly of roofPolys) {
