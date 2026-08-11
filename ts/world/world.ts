@@ -28,10 +28,10 @@ import {
 import { lerp, mulberry32, dot, subtract, normalize } from '../math/utils.js';
 import { drawEnvelope } from '../rendering/envelopeRenderer.js';
 import { drawSegment } from '../rendering/segmentRenderer.js';
-import { drawPolygon } from '../rendering/polygonRenderer.js';
 import { WorldSignageRenderer } from './worldSignageRenderer.js';
 import { WorldRoadMarkingsRenderer } from './worldRoadMarkingsRenderer.js';
 import { WorldBridgeRenderer } from './worldBridgeRenderer.js';
+import { WorldItemsRenderer } from './worldItemsRenderer.js';
 import { sortEnvelopesByTier } from './roadTiers.js';
 import { getRoadFillColor } from '../math/roadTypes.js';
 import {
@@ -119,6 +119,7 @@ export class World implements IWorld {
   #signageRenderer = new WorldSignageRenderer();
   #roadMarkingsRenderer = new WorldRoadMarkingsRenderer();
   #bridgeRenderer = new WorldBridgeRenderer();
+  #itemsRenderer = new WorldItemsRenderer();
   #drawOrderCache: {
     hash: string;
     count: number;
@@ -373,99 +374,12 @@ export class World implements IWorld {
     this.trafficManager.update(graphHash);
 
     if (layers.roads) {
-      // Draw road envelopes (asphalt style, more wider then road borders itself)
-      // Tier-sorted: higher-class roads paint on top of lower-class at overlaps.
-      const ordered = this.#getDrawOrderedEnvelopes(graphHash);
-      const orderedBounds = this.#drawOrderCache!.bounds;
-      for (let i = 0; i < ordered.length; i++) {
-        const env = ordered[i];
-        if (screenBounds && !aabbInView(orderedBounds[i], screenBounds)) {
-          continue;
-        }
-        const seg = env.skeleton;
-        const fill = getRoadFillColor(seg.highwayType);
-        drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
-      }
-
-      // Draw bridge elevation shadows (under borders, above asphalt fills).
-      this.#bridgeRenderer.drawShadows(
-        ctx,
-        this.#getDrawOrderedEnvelopes(graphHash),
-        screenBounds,
-      );
-
-      // Draw road borders (solid white lines)
-      for (const seg of this.roadBorders) {
-        if (screenBounds && !segmentInView(seg, screenBounds)) continue;
-        drawSegment(ctx, seg, { color: 'white', width: 4 });
-      }
-
-      // Draw lane separators or direction arrows
-      this.#roadMarkingsRenderer.drawLaneMarkings(
-        ctx,
-        this.graph.segments,
-        screenBounds,
-      );
-
-      // Draw parking-lane 'P' markings (from segment metadata)
-      this.#roadMarkingsRenderer.drawParkingLanes(
-        ctx,
-        this.graph.segments,
-        screenBounds,
-      );
-
-      // Draw one-way arrows
-      this.#signageRenderer.drawOneWayArrows(ctx, this.graph, screenBounds);
-
-      // Draw bridge deck details: concrete overlay, parapet railings,
-      // guardrail posts, and expansion joints.
-      this.#bridgeRenderer.drawDetails(
-        ctx,
-        this.#getDrawOrderedEnvelopes(graphHash),
-        screenBounds,
-      );
-
-      // Draw road name labels
-      this.#signageRenderer.drawRoadNames(
-        ctx,
-        this.graph,
-        this.zoom,
-        screenBounds,
-      );
-
-      // Draw speed limit signs
-      this.#signageRenderer.drawSpeedLimits(
-        ctx,
-        this.graph,
-        this.zoom,
-        screenBounds,
-      );
-
-      // Draw road shield badges (ref) and gantry exit signs (destination)
-      this.#signageRenderer.drawRoadShields(
-        ctx,
-        this.graph,
-        this.zoom,
-        screenBounds,
-      );
-      this.#signageRenderer.drawExitSigns(
-        ctx,
-        this.graph,
-        this.zoom,
-        screenBounds,
-      );
+      this.#drawRoadLayer(ctx, graphHash, screenBounds);
     }
 
     // Draw road markings (yield, stop, start, crosswalks, lights)
     if (layers.markings) {
-      for (const marking of this.markings) {
-        if (screenBounds && !pointInView(marking.center, screenBounds)) {
-          continue;
-        }
-        if (!(marking instanceof Start) || showStartMarkings) {
-          marking.draw(ctx);
-        }
-      }
+      this.#drawMarkingLayer(ctx, screenBounds, showStartMarkings);
     }
 
     // Draw corridors (consistent style, owned by Corridor.draw)
@@ -483,43 +397,120 @@ export class World implements IWorld {
       bestCar.draw(ctx, { showSensor: true, showName: showCarNames });
     }
 
-    // Flat item placeholders (cheap outlines) for inspection on big maps.
-    if (layers.itemBases) {
-      for (const building of this.buildings) {
-        drawPolygon(ctx, building.base, {
-          fill: 'rgba(150,150,150,0.25)',
-          stroke: 'rgba(0,0,0,0.35)',
-          lineWidth: 2,
-        });
+    // Decorative items: flat placeholders and distance-sorted pseudo-3D.
+    this.#itemsRenderer.draw(ctx, {
+      buildings: this.buildings,
+      trees: this.trees,
+      viewPoint,
+      renderRadius,
+      showItemBases: layers.itemBases,
+      showBuildings: layers.buildings,
+      showTrees: layers.trees,
+    });
+  }
+
+  /** Roads layer: tier-sorted asphalt, bridges, borders, lane/parking marks,
+   *  one-way arrows, and all road signage. */
+  #drawRoadLayer(
+    ctx: CanvasRenderingContext2D,
+    graphHash: string,
+    screenBounds: WorldDrawOptions['screenBounds'],
+  ): void {
+    // Draw road envelopes (asphalt style, more wider then road borders itself)
+    // Tier-sorted: higher-class roads paint on top of lower-class at overlaps.
+    const ordered = this.#getDrawOrderedEnvelopes(graphHash);
+    const orderedBounds = this.#drawOrderCache!.bounds;
+    for (let i = 0; i < ordered.length; i++) {
+      const env = ordered[i];
+      if (screenBounds && !aabbInView(orderedBounds[i], screenBounds)) {
+        continue;
       }
-      for (const tree of this.trees) {
-        drawPolygon(ctx, tree.base, {
-          fill: 'rgba(30,150,70,0.2)',
-          stroke: 'rgba(0,90,40,0.5)',
-          lineWidth: 2,
-        });
-      }
+      const seg = env.skeleton;
+      const fill = getRoadFillColor(seg.highwayType);
+      drawEnvelope(ctx, env, { fill, stroke: fill, lineWidth: 15 });
     }
 
-    // Rendered pseudo-3D buildings and trees (distance-sorted, painter's order).
-    // Culls/sorts by the cached footprint centroid (O(1) per item) instead of
-    // `Polygon.distanceToPoint` (O(edges) — up to 32 per tree canopy), which
-    // dominated frame time when scanning every building/tree in a big OSM city.
-    const renderBuildings = layers.buildings ? this.buildings : [];
-    const renderTrees = layers.trees ? this.trees : [];
-    if (renderBuildings.length || renderTrees.length) {
-      const renderRadiusSq = renderRadius * renderRadius;
-      const distSq = (center: Point): number => {
-        const dx = center.x - viewPoint.x;
-        const dy = center.y - viewPoint.y;
-        return dx * dx + dy * dy;
-      };
-      const items = [...renderBuildings, ...renderTrees].filter(
-        (i) => distSq(i.center) < renderRadiusSq,
-      );
-      items.sort((a, b) => distSq(b.center) - distSq(a.center));
-      for (const item of items) {
-        item.draw(ctx, { viewPoint });
+    // Draw bridge elevation shadows (under borders, above asphalt fills).
+    this.#bridgeRenderer.drawShadows(
+      ctx,
+      this.#getDrawOrderedEnvelopes(graphHash),
+      screenBounds,
+    );
+
+    // Draw road borders (solid white lines)
+    for (const seg of this.roadBorders) {
+      if (screenBounds && !segmentInView(seg, screenBounds)) continue;
+      drawSegment(ctx, seg, { color: 'white', width: 4 });
+    }
+
+    // Draw lane separators or direction arrows
+    this.#roadMarkingsRenderer.drawLaneMarkings(
+      ctx,
+      this.graph.segments,
+      screenBounds,
+    );
+
+    // Draw parking-lane 'P' markings (from segment metadata)
+    this.#roadMarkingsRenderer.drawParkingLanes(
+      ctx,
+      this.graph.segments,
+      screenBounds,
+    );
+
+    // Draw one-way arrows
+    this.#signageRenderer.drawOneWayArrows(ctx, this.graph, screenBounds);
+
+    // Draw bridge deck details: concrete overlay, parapet railings,
+    // guardrail posts, and expansion joints.
+    this.#bridgeRenderer.drawDetails(
+      ctx,
+      this.#getDrawOrderedEnvelopes(graphHash),
+      screenBounds,
+    );
+
+    // Draw road name labels
+    this.#signageRenderer.drawRoadNames(
+      ctx,
+      this.graph,
+      this.zoom,
+      screenBounds,
+    );
+
+    // Draw speed limit signs
+    this.#signageRenderer.drawSpeedLimits(
+      ctx,
+      this.graph,
+      this.zoom,
+      screenBounds,
+    );
+
+    // Draw road shield badges (ref) and gantry exit signs (destination)
+    this.#signageRenderer.drawRoadShields(
+      ctx,
+      this.graph,
+      this.zoom,
+      screenBounds,
+    );
+    this.#signageRenderer.drawExitSigns(
+      ctx,
+      this.graph,
+      this.zoom,
+      screenBounds,
+    );
+  }
+
+  /** Markings layer: yield/stop/start/crossing/light markings, viewport-culled. */
+  #drawMarkingLayer(
+    ctx: CanvasRenderingContext2D,
+    screenBounds: WorldDrawOptions['screenBounds'],
+    showStartMarkings: boolean,
+  ): void {
+    for (const marking of this.markings) {
+      if (screenBounds && !pointInView(marking.center, screenBounds)) {
+        continue;
+      }
+      if (!(marking instanceof Start) || showStartMarkings) {
+        marking.draw(ctx);
       }
     }
   }
