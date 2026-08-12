@@ -21,10 +21,13 @@ import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.j
 const REVEAL_FRAC = 0.25;
 
 /** Fraction of a viewport spent collapsing the header before the pill sequence. */
-const HEADER_PHASE_FRAC = 0.5;
+const HEADER_PHASE_FRAC = 0.2;
 
 /** Duration (ms) of the programmatic page slide — longer = gentler glide. */
 const SLIDE_MS = 1600;
+
+/** How long the fully-revealed pill lingers before the page auto-slides. */
+const DWELL_MS = 750;
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -45,12 +48,24 @@ export function initLandingPreview(): void {
   let ticking = false;
   let running = false;
   let locked = false; // suppress auto-slide re-triggers during a programmatic scroll
+  let dwelling = false; // holding the fully-revealed pill before an auto-slide
   let unlockTimer = 0;
+  let dwellTimer = 0;
   let slideRaf = 0;
   let lastY = window.scrollY;
   let lastHeaderH = -1;
   let lastGridPin = Number.NaN;
   let lastFromTop: boolean | null = null;
+
+  // Current scroll position inside the gate/slide coordinate (0 = page 1).
+  const measureScrolled = (): number => {
+    const vh2 = window.innerHeight;
+    const H2 = track.offsetHeight;
+    const P2 = HEADER_PHASE_FRAC * vh2;
+    const top2 = track.getBoundingClientRect().top;
+    const raw2 = Math.min(Math.max(vh2 - top2, 0), H2);
+    return Math.max(0, raw2 - P2);
+  };
 
   // Custom scroll animation so the slide duration is explicit (native smooth
   // scroll gives no control) and gentle both ways.
@@ -125,6 +140,7 @@ export function initLandingPreview(): void {
       fromTop = true;
     }
     if (locked) pill = 0; // hide during the programmatic slide
+    if (dwelling) pill = 1; // keep it fully shown while it lingers
 
     // Slide the pill in from just off the screen edge — opacity stays constant
     // (only the glow animates), so it “pops” from the very bottom / very top.
@@ -147,7 +163,7 @@ export function initLandingPreview(): void {
       splash.classList.toggle('is-from-top', fromTop);
       lastFromTop = fromTop;
     }
-    splash.classList.toggle('is-active', pill >= 0.95 && !locked);
+    splash.classList.toggle('is-active', pill >= 0.9 && (!locked || dwelling));
 
     // Card slides up from below into place (tracks scroll, incl. auto-scroll).
     scene.style.transform = `translateY(${(1 - slide) * 100}%)`;
@@ -168,12 +184,26 @@ export function initLandingPreview(): void {
       sim.deactivate();
     }
 
-    // Auto-slide: never rest inside the slide zone — snap to page 1 or 2
-    // depending on the scroll direction. Release the lock at either end.
+    // Auto-slide: never rest inside the slide zone. When a pill is fully
+    // revealed, let it linger (dwell) so it reads before the page glides.
     if (locked && (scrolled <= 2 || scrolled >= usable - 2)) locked = false;
-    if (!locked && scrolled > r && scrolled < usable - r) {
-      const goDown = dir > 0 || (dir === 0 && scrolled >= usable / 2);
-      snapTo(goDown ? usable : 0, scrolled);
+    if (!locked && !dwelling) {
+      const inSlide = scrolled > r && scrolled < usable - r;
+      if (inSlide) {
+        const goDown = dir > 0 || (dir === 0 && scrolled >= usable / 2);
+        snapTo(goDown ? usable : 0, scrolled);
+      } else if (pill >= 0.9) {
+        // Settle on the fully-shown pill, then advance in its lead direction.
+        dwelling = true;
+        const gateRest = fromTop ? usable - r : r;
+        const goDown = !fromTop;
+        snapTo(gateRest, scrolled);
+        window.clearTimeout(dwellTimer);
+        dwellTimer = window.setTimeout(() => {
+          dwelling = false;
+          snapTo(goDown ? usable : 0, measureScrolled());
+        }, DWELL_MS);
+      }
     }
   };
 
