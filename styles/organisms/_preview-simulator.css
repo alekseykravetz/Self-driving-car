@@ -5,6 +5,12 @@
    screen under the sticky header. All scroll-linked (symmetric both ways).
    ═══════════════════════════════════════════════════════════════════ */
 
+/* Disable scroll anchoring: header slim/grow changes document height, and the
+   browser's anchor adjustment would nudge scrollTop and make the header shake. */
+html {
+  overflow-anchor: none;
+}
+
 /* Grid freezes showing its bottom once fully scrolled, so it stays visible
    behind the rising pop-up instead of leaving a blank gap. The pin offset
    (`100vh − gridHeight`, always ≤ 0) is published from JS so a tall grid
@@ -15,10 +21,10 @@
   z-index: 1;
 }
 
-/* Pure scroll budget for the pinned sequence (half a screen reveal, then a
-   short auto-slide zone that the JS snaps through). */
+/* Scroll budget for the pinned sequence: a bottom reveal gate, an auto-slide
+   zone, and a top reveal gate (for the symmetric way back). */
 .preview-track {
-  height: 100vh;
+  height: 150vh;
 }
 
 /* ── Live-preview card — matches the grid's width + side padding ─────── */
@@ -31,8 +37,9 @@
   z-index: 60;
   display: flex;
   padding: var(--space-5) var(--space-6);
-  /* Opaque so the frozen grid never bleeds through the card as it slides. */
-  background: var(--color-bg-app);
+  /* Same backdrop as page 1 (glowing corners), fixed so it aligns seamlessly. */
+  background: var(--main-page-bg);
+  background-attachment: fixed;
   /* Slide is set inline per scroll frame — no CSS easing so it tracks 1:1. */
   transition: none;
   transform: translateY(100%);
@@ -75,13 +82,14 @@ preview-simulator {
   pointer-events: none;
 }
 
-/* ── Pop-up pill: outer positioner (JS sets rise/opacity), inner pill
-   carries the visuals + activation animation ─────────────────────────── */
+/* ── Pop-up pill: outer positioner (JS sets rise/opacity + top/bottom),
+   inner pill carries the visuals + activation animation ──────────────── */
 .preview-splash {
   position: fixed;
   left: 50%;
   bottom: 16vh;
-  z-index: 50;
+  /* Above the card so it shows over page 2 during the way-back reveal. */
+  z-index: 70;
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%);

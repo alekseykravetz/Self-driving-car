@@ -53,7 +53,9 @@ body:not(.main-page) canvas {
 }
 
 body.main-page {
-  background:
+  /* Shared page background (glowing corners) — reused by the live-preview
+     scene so both "pages" sit on the same backdrop. */
+  --main-page-bg:
     radial-gradient(
       ellipse 60% 50% at 12% -5%,
       rgba(125, 223, 125, 0.14),
@@ -70,6 +72,7 @@ body.main-page {
       transparent 60%
     ),
     var(--color-bg-app);
+  background: var(--main-page-bg);
   background-attachment: fixed;
   color: var(--color-text-primary);
   font-family: var(--font-display);
