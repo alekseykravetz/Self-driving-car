@@ -1639,7 +1639,7 @@ default, so pseudo-3D buildings and trees fill the whole preview instead of a
 central disc. When the page is loaded with `?paused` (the visual-test hook)
 `activate()` paints exactly one deterministic frame and skips the loop.
 
-### Landing scroll sequence (`ts/store/landingPreview.ts`)
+### Landing scroll sequence (`ts/landing/landingPreview.ts`)
 
 `initLandingPreview()` wires a **pinned, symmetric reveal + auto-slide**
 scroll-transition between the mode-card grid (page 1) and the Live Preview card

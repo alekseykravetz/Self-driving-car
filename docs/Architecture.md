@@ -102,7 +102,7 @@ import { Envelope } from '../math/primitives/envelope.js';
 | `html/race.html`           | `ts/race/entry.ts`                                     |
 | `html/world.html`          | `ts/world/entry.ts`                                    |
 | `html/human-training.html` | `ts/simulator/humanTraining/humanBackpropSimulator.ts` |
-| `index.html`               | `ts/store/entry.ts`                                    |
+| `index.html`               | `ts/landing/entry.ts`                                  |
 
 ### Dependency Graph (Import Order)
 
