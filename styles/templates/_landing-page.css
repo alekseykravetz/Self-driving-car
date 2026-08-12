@@ -6,8 +6,7 @@
   text-align: center;
   transition:
     padding var(--transition-normal) ease,
-    background var(--transition-normal) ease,
-    border-color var(--transition-normal) ease;
+    background var(--transition-normal) ease;
 }
 
 /* Slim, glassy bar once the user leaves the very top (toggled from JS). */
@@ -15,7 +14,6 @@ body.scrolled .landing-header {
   padding: var(--space-2) var(--space-5);
   background: color-mix(in srgb, var(--color-bg-app) 82%, transparent);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .landing-header h1 {
