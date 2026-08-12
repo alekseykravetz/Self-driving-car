@@ -196,6 +196,26 @@ big OSM imports (see
 [Math § Render-time distance culling](Math.md#render-time-distance-culling-for-buildingstreescamera-perf)).
 The math is unit-tested in `tests/unit/viewport/viewport.test.ts`.
 
+### Render radius (Alt + scroll)
+
+Buildings and trees are drawn only within a circle of `getRenderRadius()` world
+px around the view centre (passed to `World.draw()` as `renderRadius`). This is
+an independent, per-viewport control separate from zoom/pan:
+
+- **`#renderRadius`** starts at `DEFAULT_RENDER_RADIUS = 1000` and is clamped to
+  `[MIN_RENDER_RADIUS = 500, MAX_RENDER_RADIUS = 40000]` (large enough to cover
+  a whole imported city).
+- **Alt + scroll** adjusts it instead of zooming: `#handleMouseWheel` checks
+  `e.altKey` first — scroll up grows the circle, scroll down shrinks it, by
+  `RENDER_RADIUS_STEP = 500` per notch — then returns before the zoom/pan path.
+  This lets a zoomed-out view still reveal distant decoration.
+- **`getRenderRadius()`** is threaded into every world-drawing site
+  (`WorldEditor`, the training world-mode strategy, traffic, race, human-backprop,
+  and the landing preview, which overrides it to cover the whole card). The
+  `Alt` indicator appears in the View group via `zoomViewBindings()`, gated on
+  the same `includeShift` flag (the simple road has no buildings/trees). See
+  [Keyboard → View / zoom](Keyboard.md#view--zoom-tsinputviewshortcutsts).
+
 ### Cached envelope AABBs & signage culling
 
 Two follow-up wins removed the remaining per-frame `O(all geometry)` scans that

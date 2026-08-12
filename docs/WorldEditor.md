@@ -414,12 +414,18 @@ boxes:
   coordinates) are present. Parsing tolerates exports with **no** building ways
   (older filters) — then the world falls back to generated buildings.
 - **Math-layer parse.** `Osm.parseRoadsChunked` emits
-  `OsmBuildingFootprint { points, height? }` primitives (no `Building` import —
-  math-layer isolation). Only closed rings (first node == last, or ≥3 distinct
-  points) are kept. `height` is derived in world px from the `height` tag
-  (metres → px) or `building:levels` × a per-level constant, else `undefined`
-  (caller uses `Building`'s default). Multipolygon `relation[building]` holes
-  and `building:part` are out of scope (v1).
+  `OsmBuildingFootprint { points, height?, houseNumber? }` primitives (no
+  `Building` import — math-layer isolation). Only closed rings (first node ==
+  last, or ≥3 distinct points) are kept. `height` is derived in world px from
+  the `height` tag (metres → px) or `building:levels` × a per-level constant; if
+  **neither tag is present** it falls back to `estimateBuildingHeightPx()` — a
+  footprint-area estimate (bigger footprint → more storeys, clamped to
+  `[1, 8]` levels, plus a deterministic ±1-level jitter hashed from the first
+  vertex) so untagged buildings don't all render at one height. `houseNumber`
+  is the trimmed `addr:housenumber` tag, drawn centred on the roof by
+  `Building.draw()` only when zoomed in past `HOUSE_NUMBER_MAX_ZOOM = 6`.
+  Multipolygon `relation[building]` holes and `building:part` are out of scope
+  (v1).
 - **`World.buildingSource: 'osm' | 'generated'`.** After parsing, if any
   footprints were returned, `WorldEditorOsmImporter.parse()` sets
   `world.buildings` from them and flags `world.buildingSource = 'osm'`; with no

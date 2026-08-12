@@ -169,8 +169,8 @@ polygons. This shrinks files ~10–70× (e.g. `barnea` ~25 MB → ~0.35 MB).
     "treePrototypeCount": 8,     // N prototypes generated from the seed
     // instances: position + prototype index (p) + scale (s) + render type (t)
     "trees": [ { "x": 5712.6, "y": 3738.9, "p": 3, "s": 1.04, "t": 0 }, ... ],
-    // footprint points + height only (no redundant polygon `segments`)
-    "buildings": [ { "poly": [[x,y],[x,y],...], "h": 200 }, ... ]
+    // footprint points + height; `n` = OSM house number (optional)
+    "buildings": [ { "poly": [[x,y],[x,y],...], "h": 200, "n": "12" }, ... ]
   }
 }
 ```
@@ -185,6 +185,8 @@ polygons. This shrinks files ~10–70× (e.g. `barnea` ~25 MB → ~0.35 MB).
   `1` conifer, `2` broadleaf cluster). No 32-point polygon is stored per tree.
 - **Buildings**: `{ poly, h }` — footprint points + height; the `Polygon`
   (and its internal `segments`) is rebuilt on load via `Building.loadFootprint`.
+  OSM-imported buildings also carry `n` (the `addr:housenumber` string) when
+  present, drawn on the roof at close zoom.
 - **`buildingSource`**: `'osm'` when the buildings are real OSM footprints (from
   an import), else `'generated'`. Additive — absent on legacy/v1 files → loaded
   as `'generated'`. When `'osm'`, `World.load()` keeps the saved footprints and

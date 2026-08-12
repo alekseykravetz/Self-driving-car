@@ -253,7 +253,10 @@ extrudeBuildingShape(
   base; any other footprint keeps the flat ceiling (matching the 2D fallback).
 - **OSM footprints stay flat-roofed.** When `world.buildingSource === 'osm'`
   (arbitrary real outlines that don't suit a gable), `#buildBuildingPolygons`
-  drops the roof and draws walls + flat ceiling only.
+  drops the roof and draws walls + flat ceiling only, coloured with the 2D
+  top-view flat-roof palette (`FLAT_ROOF_WALL_FILL` walls, `FLAT_ROOF_FILL`
+  ceiling, imported from `building.ts`) so they match the top view instead of a
+  translucent grey block.
 - **Colours** are named constants: `BUILDING_WALL_FILL` (grey walls/ceiling),
   `BUILDING_ROOF_FILL` (`#D44`), `BUILDING_ROOF_STROKE` (`#C44`).
 - **Draw order** per building is walls (incl. ceiling) → roof, so the roof
@@ -266,26 +269,17 @@ extrudeBuildingShape(
 
 ### Trees (`#extrudeTrees`)
 
-Creates cone shapes from base polygons to a single centroid peak:
+Creates cone shapes from base polygons to a single centroid peak. Each tree is
+filtered and extruded **individually** (`Camera#buildTreePolygons` loops per
+tree rather than batch-filtering) so it can be extruded to its own
+`tree.height` — there is no longer a single `EXTRUDE_TREE_HEIGHT_PX` constant.
+Heights vary per instance by render type via `TREE_HEIGHT_RATIO` (`tree.ts`):
+classic ≈ 1.25× the scaled canopy size (preserving the legacy ~200 px default),
+conifers tall & narrow (1.9×), broadleaf clusters squat & wide (1.0×).
 
 ```typescript
-#extrudeTrees(polygons: Polygon[], height: number = 200): Polygon[] {
-  const result: Polygon[] = [];
-  for (const polygon of polygons) {
-    // Calculate centroid of base as the peak point
-    const centroid = getCentroid(polygon.points);
-    centroid.z = -height;
-
-    // Create triangular faces from each base edge to the peak
-    for (let i = 0; i < polygon.points.length; i++) {
-      const next = (i + 1) % polygon.points.length;
-      result.push(new Polygon([
-        polygon.points[i], polygon.points[next], centroid
-      ]));
-    }
-  }
-  return result;
-}
+// per tree: filter its base, skip if it straddles the camera, then
+extrudeTreeShapes([base], tree.height); // cone from base edges to a centroid peak
 ```
 
 This approach is robust regardless of how many base points survive frustum clipping — even with 2 base points, a valid triangle is formed.

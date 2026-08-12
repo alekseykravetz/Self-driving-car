@@ -210,21 +210,23 @@ are never shared with another's), then spread into each page's root set.
 Every page with a pannable/zoomable `Viewport` shows the same two scroll-wheel
 modifier indicators in the **View** group:
 
-| Key     | Behavior                                                           |
-| ------- | ------------------------------------------------------------------ |
-| `Ctrl`  | Hold + scroll wheel to zoom in touchpad mode.                      |
-| `Shift` | Hold + scroll wheel for slow, fine-grained zoom (default is fast). |
+| Key     | Behavior                                                              |
+| ------- | --------------------------------------------------------------------- |
+| `Ctrl`  | Hold + scroll wheel to zoom in touchpad mode.                         |
+| `Shift` | Hold + scroll wheel for slow, fine-grained zoom (default is fast).    |
+| `Alt`   | Hold + scroll wheel to grow/shrink the buildings & trees render zone. |
 
 ```typescript
 km.setBindings([
   ...otherBindings,
-  ...zoomViewBindings(includeShift), // Ctrl (+ Shift when includeShift)
+  ...zoomViewBindings(includeShift), // Ctrl (+ Shift & Alt when includeShift)
 ]);
 ```
 
 Pass `includeShift: false` for **simple-mode** simulators (the flat,
 vertically-scrolling road), where fine-zoom framing is not useful — so the
-`Shift` indicator is hidden there.
+`Shift` and `Alt` indicators are hidden there (the simple road has no
+buildings/trees, so the render-zone control is meaningless).
 
 ### Simulator gameplay (`ts/input/simulatorShortcuts.ts`)
 
