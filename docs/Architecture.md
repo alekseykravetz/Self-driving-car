@@ -403,18 +403,17 @@ into three layers under `ts/ui/`:
 
 **Organism-level panels:**
 
-| Module                         | Tag                             | Responsibility                                                           |
-| ------------------------------ | ------------------------------- | ------------------------------------------------------------------------ |
-| `trainingPanel.ts`             | `<training-panel>`              | Training UI + genetic algorithm + car generation                         |
-| `trainingPanelTemplate.ts`     | —                               | HTML template for the training panel                                     |
-| `trainingInitModal.ts`         | `<training-init-modal>`         | Training init modal (params + car config + brain source)                 |
-| `trainingInitModalTemplate.ts` | —                               | HTML template for the init modal                                         |
-| `humanTrainingPanel.ts`        | `<human-training-panel>`        | Human backpropagation training info display                              |
-| `humanTrainingConfigModal.ts`  | `<human-training-config-modal>` | Car config modal for human backprop mode                                 |
-| `trafficPanel.ts`              | `<traffic-panel>`               | Live Traffic Jam: per-car list, select/remove/clear/pause                |
-| `storePanel.ts`                | `<store-panel>`                 | Landing-page read-only viewer/manager                                    |
-| `storePanelTemplate.ts`        | —                               | HTML template for the store panel                                        |
-| `assetSelectors.ts`            | —                               | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding |
+| Module                         | Tag                             | Responsibility                                            |
+| ------------------------------ | ------------------------------- | --------------------------------------------------------- | --- | --------------------- | --------------------- | ----------------------------------------------------------------------- | --- | ------------------- | --- | ------------------------------------------------------------------------ |
+| `trainingPanel.ts`             | `<training-panel>`              | Training UI + genetic algorithm + car generation          |
+| `trainingPanelTemplate.ts`     | —                               | HTML template for the training panel                      |
+| `trainingInitModal.ts`         | `<training-init-modal>`         | Training init modal (params + car config + brain source)  |
+| `trainingInitModalTemplate.ts` | —                               | HTML template for the init modal                          |
+| `humanTrainingPanel.ts`        | `<human-training-panel>`        | Human backpropagation training info display               |
+| `humanTrainingConfigModal.ts`  | `<human-training-config-modal>` | Car config modal for human backprop mode                  |
+| `trafficPanel.ts`              | `<traffic-panel>`               | Live Traffic Jam: per-car list, select/remove/clear/pause |
+| `storePanel.ts`                | `<store-panel>`                 | Landing-page read-only viewer/manager                     |
+| `storePanelTemplate.ts`        | —                               | HTML template for the store panel                         |     | `previewSimulator.ts` | `<preview-simulator>` | Landing-page live-preview showcase (own RAF loop, not `SimulatorShell`) |     | `assetSelectors.ts` | —   | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding |
 
 > All UI components live under `ts/ui/` following Atomic Design. `worldSetup.ts`
 > is a **molecule** reused by the simulator, race, Live Traffic Jam, and
