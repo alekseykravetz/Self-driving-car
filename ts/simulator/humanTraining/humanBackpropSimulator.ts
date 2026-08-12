@@ -268,6 +268,11 @@ export class HumanBackpropSimulator extends SimulatorShell {
     this.#panel.setLearningState(true);
     this.#keyboardManager?.setToggleActive('keyLearn', true);
 
+    // Mirror the applied config into the inline Car Config section and mark the
+    // brain as not-yet-saved (the periodic auto-save flips the dot to green).
+    this.#panel.setCarSettings(carConfig);
+    this.#panel.setSaveState(false);
+
     this.#snapCameraToStart();
     this.animationLoopToolbar.setPaused(false);
   }
@@ -409,6 +414,12 @@ export class HumanBackpropSimulator extends SimulatorShell {
     this.#panel.setSpeed(pxPerFrameToKmh(Math.abs(this.#car.speed)));
     this.#panel.setWeightChangePulse(this.#car.brainChangedThisFrame);
     this.#panel.setTrainingFrames(this.#trainingFrames);
+
+    // A weight change means the live brain now differs from what is persisted;
+    // flag the Storage dot orange until the next auto-save (or manual Save).
+    if (this.#car.brainChangedThisFrame) {
+      this.#panel.setSaveState(false);
+    }
 
     this.#brainInspectorCounter++;
     if (this.#brainInspectorCounter >= this.#BRAIN_INSPECTOR_INTERVAL) {
@@ -647,6 +658,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
   #saveCar(): void {
     if (!this.#car) return;
     localStorage.setItem('humanTrainedCar', JSON.stringify(this.#car.toInfo()));
+    this.#panel.setSaveState(true);
   }
 
   #wirePanel(): void {
@@ -654,16 +666,25 @@ export class HumanBackpropSimulator extends SimulatorShell {
     panel.onLearningRateChange = (v) => {
       this.#car?.setLearningRate(v);
     };
-    panel.onConfig = () => {
-      this.#openConfigModal('config');
+    panel.onCarParamsChanged = () => {
+      this.#applyInlineConfig();
+    };
+    panel.onSave = () => {
+      this.#saveCar();
+      this.#panel.setStatus('Brain: saved');
+    };
+    panel.onClear = () => {
+      localStorage.removeItem('humanTrainedCar');
+      this.#panel.setStatus('Brain: not saved (cleared)');
+      this.#panel.setSaveState(false);
     };
     panel.onDownload = () => {
       if (this.#car) downloadCarFiles([{ car: this.#car, poolPosition: 0 }]);
     };
-    panel.onResetBrain = () => {
+    panel.onNewBrain = () => {
       this.#resetBrain();
     };
-    panel.onResetCar = () => {
+    panel.onRestartDrive = () => {
       this.#car?.respawn(this.getStartInfo());
       if (this.#car && this.viewport) {
         this.viewport.offset.x = -this.#car.x;
@@ -674,6 +695,16 @@ export class HumanBackpropSimulator extends SimulatorShell {
       this.#accuracyWindow = [];
       this.#trainingFrames = 0;
     };
+  }
+
+  // Rebuild the car from the inline Car Config edits, preserving the live brain
+  // when the network topology (rays / state-aware / hidden layers) is unchanged
+  // and starting a fresh brain otherwise.
+  #applyInlineConfig(): void {
+    const cfg = this.#panel.getCarSettings();
+    if (!cfg) return;
+    const currentInfo = this.#car ? this.#car.toInfo() : null;
+    this.#applyConfigAndCreateCar(cfg, currentInfo);
   }
 
   #resetBrain(): void {
@@ -695,6 +726,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
     }
     this.#regenTraffic();
     this.#panel.setStatus('Brain: fresh');
+    this.#panel.setSaveState(false);
     this.#accuracyWindow = [];
     this.#trainingFrames = 0;
   }

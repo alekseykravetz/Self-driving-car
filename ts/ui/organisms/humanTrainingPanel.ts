@@ -1,4 +1,6 @@
 import { HUMAN_TRAINING_PANEL_TEMPLATE } from '../../simulator/humanTraining/templates/humanTrainingPanelTemplate.js';
+import type { CarInfo } from '../../car/car.js';
+import { CarConfigPanel } from '../molecules/carConfigPanel.js';
 
 export class HumanTrainingPanelElement extends HTMLElement {
   #htMode: HTMLElement | null = null;
@@ -8,6 +10,7 @@ export class HumanTrainingPanelElement extends HTMLElement {
   #htLearningRate: HTMLInputElement | null = null;
   #htLearningRateVal: HTMLElement | null = null;
   #htStatus: HTMLElement | null = null;
+  #htStorageDot: HTMLElement | null = null;
   #htSpeed: HTMLElement | null = null;
   #htLearningState: HTMLElement | null = null;
   #htWeightIndicator: HTMLElement | null = null;
@@ -17,16 +20,23 @@ export class HumanTrainingPanelElement extends HTMLElement {
   #htKeyLeftPct: HTMLElement | null = null;
   #htKeyRightPct: HTMLElement | null = null;
   #htKeyReversePct: HTMLElement | null = null;
+  #carConfigPanel: CarConfigPanel | null = null;
 
   #onLearningRateChange: ((v: number) => void) | null = null;
-  #onConfig: (() => void) | null = null;
+  #onSave: (() => void) | null = null;
+  #onClear: (() => void) | null = null;
   #onDownload: (() => void) | null = null;
-  #onResetBrain: (() => void) | null = null;
-  #onResetCar: (() => void) | null = null;
+  #onNewBrain: (() => void) | null = null;
+  #onRestartDrive: (() => void) | null = null;
+  #onCarParamsChanged: (() => void) | null = null;
 
   connectedCallback(): void {
     this.innerHTML = HUMAN_TRAINING_PANEL_TEMPLATE;
     this.#htMode = this.querySelector('#htMode');
+    this.#htStorageDot = this.querySelector('#htStorageDot');
+    this.#carConfigPanel = new CarConfigPanel(this, () =>
+      this.#onCarParamsChanged?.(),
+    );
     this.#htAutopilotBanner = this.querySelector('#htAutopilotBanner');
     this.#htAccuracyPct = this.querySelector('#htAccuracyPct');
     document
@@ -51,18 +61,38 @@ export class HumanTrainingPanelElement extends HTMLElement {
         this.#htLearningRateVal.textContent = v.toFixed(2);
       this.#onLearningRateChange?.(v);
     });
-    this.querySelector('#htConfig')?.addEventListener('click', () =>
-      this.#onConfig?.(),
+    this.querySelector('#htSave')?.addEventListener('click', () =>
+      this.#onSave?.(),
+    );
+    this.querySelector('#htClear')?.addEventListener('click', () =>
+      this.#onClear?.(),
     );
     this.querySelector('#htDownload')?.addEventListener('click', () =>
       this.#onDownload?.(),
     );
-    this.querySelector('#htResetBrain')?.addEventListener('click', () =>
-      this.#onResetBrain?.(),
+    this.querySelector('#htNewBrain')?.addEventListener('click', () =>
+      this.#onNewBrain?.(),
     );
-    this.querySelector('#htResetCar')?.addEventListener('click', () =>
-      this.#onResetCar?.(),
+    this.querySelector('#htRestartDrive')?.addEventListener('click', () =>
+      this.#onRestartDrive?.(),
     );
+  }
+
+  /** Read the current car/sensor settings from the inline Car Config section. */
+  getCarSettings(): CarInfo | null {
+    return this.#carConfigPanel?.getCarSettings() ?? null;
+  }
+
+  /** Write car/sensor settings into the inline Car Config section. */
+  setCarSettings(info: CarInfo): void {
+    this.#carConfigPanel?.setCarSettings(info);
+  }
+
+  /** Green dot = brain matches localStorage; orange = unsaved changes. */
+  setSaveState(saved: boolean): void {
+    if (!this.#htStorageDot) return;
+    this.#htStorageDot.classList.toggle('green', saved);
+    this.#htStorageDot.classList.toggle('orange', !saved);
   }
 
   setMode(mode: 'simple' | 'world'): void {
@@ -100,17 +130,23 @@ export class HumanTrainingPanelElement extends HTMLElement {
   set onLearningRateChange(cb: ((v: number) => void) | null) {
     this.#onLearningRateChange = cb;
   }
-  set onConfig(cb: (() => void) | null) {
-    this.#onConfig = cb;
+  set onSave(cb: (() => void) | null) {
+    this.#onSave = cb;
+  }
+  set onClear(cb: (() => void) | null) {
+    this.#onClear = cb;
   }
   set onDownload(cb: (() => void) | null) {
     this.#onDownload = cb;
   }
-  set onResetBrain(cb: (() => void) | null) {
-    this.#onResetBrain = cb;
+  set onNewBrain(cb: (() => void) | null) {
+    this.#onNewBrain = cb;
   }
-  set onResetCar(cb: (() => void) | null) {
-    this.#onResetCar = cb;
+  set onRestartDrive(cb: (() => void) | null) {
+    this.#onRestartDrive = cb;
+  }
+  set onCarParamsChanged(cb: (() => void) | null) {
+    this.#onCarParamsChanged = cb;
   }
 
   setSpeed(kmh: number): void {
