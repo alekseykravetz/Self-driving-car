@@ -62,6 +62,12 @@ export const ICON_META: Partial<Record<IconName, IconMeta>> = {
     idle: 'Gentle sway',
     hover: 'Sway (faster)',
   },
+  'osm-import': {
+    category: GEO,
+    desc: 'Folded map with a download arrow — import from OpenStreetMap',
+    idle: 'Map sways · arrow drops in (import loop)',
+    hover: 'Sway + arrow drop (faster)',
+  },
   globe: {
     category: GEO,
     desc: 'Globe with meridian lines',

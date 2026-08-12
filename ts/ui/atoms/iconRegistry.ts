@@ -23,6 +23,7 @@ export type IconName =
   | 'dna'
   // Geo / navigation
   | 'map'
+  | 'osm-import'
   | 'globe'
   | 'graph'
   | 'compass'
@@ -130,6 +131,15 @@ export const ICON_REGISTRY: Record<IconName, string> = {
     <g class="ic-map" ${S}>
       <path d="M9 4 3.5 6.2v13.3L9 17.3l6 2.2 5.5-2.2V4L15 6.2 9 4z" />
       <path d="M9 4v13.3M15 6.2v13.3" />
+    </g>`,
+
+  'osm-import': `
+    <g class="ic-osm-import" ${S}>
+      <g class="ic-osm-map">
+        <path d="M8.5 3 4 4.8v8.4L8.5 11.4l5 1.8 4.5-1.8V3L13.5 4.8 8.5 3z" />
+        <path d="M8.5 3v8.4M13.5 4.8v8.4" />
+      </g>
+      <path class="ic-osm-arrow" d="M11 15v5M8.5 17.5 11 20l2.5-2.5" />
     </g>`,
 
   globe: `

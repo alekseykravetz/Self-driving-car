@@ -47,7 +47,7 @@ export const WORLD_SETUP_TEMPLATE = `
           data-tooltip="Import from OSM — Paste OpenStreetMap data to generate roads"
           style="display: none"
         >
-          <app-icon name="map"></app-icon>
+          <app-icon name="osm-import"></app-icon>
         </button>
       </div>
     </div>
