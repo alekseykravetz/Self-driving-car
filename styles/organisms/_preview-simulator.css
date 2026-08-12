@@ -21,10 +21,17 @@ html {
   z-index: 1;
 }
 
-/* Scroll budget for the pinned sequence: a bottom reveal gate, an auto-slide
-   zone, and a top reveal gate (for the symmetric way back). */
+/* Once page 2 fully covers the viewport, hide page 1 so the transparent scene
+   reveals only the body's fixed (stationary) glow — not the page-1 cards.
+   `visibility` keeps the sticky element's box so scroll layout doesn't shift. */
+body.preview-page2 .landing-sections {
+  visibility: hidden;
+}
+
+/* Scroll budget for the pinned sequence: a leading header-collapse phase, a
+   bottom reveal gate, an auto-slide zone, and a top reveal gate (way back). */
 .preview-track {
-  height: 150vh;
+  height: 200vh;
 }
 
 /* ── Live-preview card — matches the grid's width + side padding ─────── */
@@ -53,6 +60,15 @@ html {
   max-width: calc(1500px - 2 * var(--space-6));
   margin: 0 auto;
   min-height: 0;
+  /* Own opaque backdrop (translucent card sheen over solid app bg) so page-1
+     content never bleeds through the card while it slides in. */
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    ),
+    var(--color-bg-app);
 }
 
 /* The card fills the viewport, so the grid's hover lift is dropped. */

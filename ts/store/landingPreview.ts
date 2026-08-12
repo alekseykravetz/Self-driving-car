@@ -20,6 +20,9 @@ import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.j
 /** Fraction of a viewport of scroll each reveal gate consumes. */
 const REVEAL_FRAC = 0.25;
 
+/** Fraction of a viewport spent collapsing the header before the pill sequence. */
+const HEADER_PHASE_FRAC = 0.5;
+
 /** Duration (ms) of the programmatic page slide — longer = gentler glide. */
 const SLIDE_MS = 1600;
 
@@ -97,37 +100,44 @@ export function initLandingPreview(): void {
       lastGridPin = gridPin;
     }
 
-    // Scroll consumed within the pinned track, split into three zones:
-    //   [0, r]      bottom reveal gate  (page 1 frozen, pill from bottom)
-    //   [r, H-r]    slide zone          (card slides; auto-snapped)
-    //   [H-r, H]    top reveal gate     (page 2 frozen, pill from top)
+    // Scroll consumed within the pinned track. A leading header-phase budget
+    // (P) is spent only collapsing the header, then the gate/slide zones:
+    //   [0, P]        header phase        (page 1, header collapses, no pill)
+    //   [P, P+r]      bottom reveal gate  (page 1 frozen, pill from bottom)
+    //   [.., H-r]     slide zone          (card slides; auto-snapped)
+    //   [H-r, H]      top reveal gate     (page 2 frozen, pill from top)
     const H = track.offsetHeight;
+    const P = HEADER_PHASE_FRAC * vh;
+    const usable = Math.max(1, H - P);
     const r = REVEAL_FRAC * vh;
     const trackTop = track.getBoundingClientRect().top;
-    const scrolled = Math.min(Math.max(vh - trackTop, 0), H);
-    const slide = clamp01((scrolled - r) / Math.max(1, H - 2 * r));
+    const raw = Math.min(Math.max(vh - trackTop, 0), H);
+    const scrolled = Math.max(0, raw - P); // 0 throughout the header phase
+    const slide = clamp01((scrolled - r) / Math.max(1, usable - 2 * r));
 
     // Which pill (if any) is revealing, and how far.
     let pill = 0;
     let fromTop = false;
     if (scrolled < r)
       pill = scrolled / r; // bottom gate
-    else if (scrolled > H - r) {
-      pill = (H - scrolled) / r; // top gate
+    else if (scrolled > usable - r) {
+      pill = (usable - scrolled) / r; // top gate
       fromTop = true;
     }
     if (locked) pill = 0; // hide during the programmatic slide
 
-    const rise = (1 - pill) * 64;
-    splash.style.opacity = String(pill);
+    // Slide the pill in from just off the screen edge — opacity stays constant
+    // (only the glow animates), so it “pops” from the very bottom / very top.
+    const rise = (1 - pill) * 180;
+    splash.style.opacity = '1';
     splash.style.visibility = pill <= 0.001 ? 'hidden' : 'visible';
     if (fromTop) {
-      splash.style.top = '16vh';
+      splash.style.top = 'calc(var(--header-h, 0px) + var(--space-4))';
       splash.style.bottom = 'auto';
       splash.style.transform = `translate(-50%, ${-rise}px)`;
     } else {
       splash.style.top = 'auto';
-      splash.style.bottom = '16vh';
+      splash.style.bottom = 'var(--space-7)';
       splash.style.transform = `translate(-50%, ${rise}px)`;
     }
     // Swap label + chevron direction depending on which way the pill leads.
@@ -142,6 +152,11 @@ export function initLandingPreview(): void {
     // Card slides up from below into place (tracks scroll, incl. auto-scroll).
     scene.style.transform = `translateY(${(1 - slide) * 100}%)`;
 
+    // Once page 2 fully covers the viewport, hide page 1 so the transparent
+    // scene reveals the body's fixed glow backdrop (stationary) instead of the
+    // page-1 cards bleeding through.
+    document.body.classList.toggle('preview-page2', slide >= 0.99);
+
     // Run the sim only while the card is (partly) on screen.
     const shouldRun = slide > 0.02;
     scene.classList.toggle('preview-active', shouldRun);
@@ -155,10 +170,10 @@ export function initLandingPreview(): void {
 
     // Auto-slide: never rest inside the slide zone — snap to page 1 or 2
     // depending on the scroll direction. Release the lock at either end.
-    if (locked && (scrolled <= 2 || scrolled >= H - 2)) locked = false;
-    if (!locked && scrolled > r && scrolled < H - r) {
-      const goDown = dir > 0 || (dir === 0 && scrolled >= H / 2);
-      snapTo(goDown ? H : 0, scrolled);
+    if (locked && (scrolled <= 2 || scrolled >= usable - 2)) locked = false;
+    if (!locked && scrolled > r && scrolled < usable - r) {
+      const goDown = dir > 0 || (dir === 0 && scrolled >= usable / 2);
+      snapTo(goDown ? usable : 0, scrolled);
     }
   };
 
