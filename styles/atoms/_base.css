@@ -74,7 +74,9 @@ body.main-page {
   color: var(--color-text-primary);
   font-family: var(--font-display);
   min-height: 100vh;
-  overflow-x: hidden;
+  /* `clip` (not `hidden`) so body doesn't become a scroll container — that
+     would break `position: sticky` on landing children (header + grid pin). */
+  overflow-x: clip;
 }
 
 label {

@@ -54,10 +54,14 @@ test.describe('Landing page', () => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
 
-    // Hide the live-preview transition zone so the baseline stays
-    // pixel-identical to the card grid (and free of the live canvas).
+    // Neutralize the live-preview transition so the baseline stays
+    // pixel-identical to the card grid: hide the overlays + scroll runway and
+    // drop the sticky positioning that only matters mid-transition.
     await page.addStyleTag({
-      content: '.preview-scene, .preview-splash { display: none !important; }',
+      content: `
+        .preview-track, .preview-scene, .preview-splash { display: none !important; }
+        .landing-sections, .landing-header { position: static !important; }
+      `,
     });
     await page.waitForTimeout(500);
 

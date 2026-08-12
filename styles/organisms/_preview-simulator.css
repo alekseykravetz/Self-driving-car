@@ -1,34 +1,47 @@
 /* ═══════════════════════════════════════════════════════════════════
    Preview Simulator — landing page live-traffic showcase (index.html)
-   The big live-preview card sits directly after the grid (no gap). Native
-   CSS scroll-snap gives the smooth "full slide" into and out of it; the
-   "Watch them drive" panel just fades in during the transition.
+   Pinned reveal + slide: the grid freezes (sticky bottom) while a pop-up
+   panel rises over it, then a wide live-preview card slides up to fill the
+   screen under the sticky header. All scroll-linked (symmetric both ways).
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Gentle proximity snap: the grid scrolls freely, but the top of the page
-   and the preview card each pull into full view when you get close. */
-html {
-  scroll-snap-type: y proximity;
-  scroll-behavior: smooth;
+/* Grid freezes showing its bottom once fully scrolled, so it stays visible
+   behind the rising pop-up instead of leaving a blank gap. The pin offset
+   (`100vh − gridHeight`, always ≤ 0) is published from JS so a tall grid
+   sticks with its bottom edge at the viewport bottom. */
+.landing-sections {
+  position: sticky;
+  top: var(--grid-pin, 0px);
+  z-index: 1;
 }
 
-.landing-header {
-  scroll-snap-align: start;
+/* Pure scroll budget for the pinned sequence (~1 screen reveal + 1 slide). */
+.preview-track {
+  height: 200vh;
 }
 
-/* ── Live-preview card — standard card styling, only full-size ───────── */
+/* ── Wide live-preview card — fixed overlay, wider than the grid ──────── */
 .preview-scene {
-  min-height: 100vh;
+  position: fixed;
+  top: var(--header-h, 0px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
   display: flex;
-  align-items: stretch;
-  padding: var(--space-6);
-  scroll-snap-align: center;
+  padding: var(--space-5);
+  /* Opaque so the frozen grid never bleeds through the card as it slides. */
+  background: var(--color-bg-app);
+  /* Slide is set inline per scroll frame — no CSS easing so it tracks 1:1. */
+  transition: none;
+  transform: translateY(100%);
+  will-change: transform;
 }
 
 .preview-card {
   flex: 1;
-  max-width: 1500px;
   width: 100%;
+  max-width: 1760px;
   margin: 0 auto;
   min-height: 0;
 }
@@ -60,42 +73,72 @@ preview-simulator {
   pointer-events: none;
 }
 
-/* ── Pop-up panel (opacity driven by JS inline style during the slide) ── */
+/* ── Pop-up pill: outer positioner (JS sets rise/opacity), inner pill
+   carries the visuals + activation animation ─────────────────────────── */
 .preview-splash {
   position: fixed;
   left: 50%;
-  bottom: 12vh;
-  z-index: 30;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: var(--weight-semibold);
-  letter-spacing: 0.01em;
-  color: var(--color-text-primary);
-  background: linear-gradient(
-    135deg,
-    var(--color-accent-green-bg),
-    var(--color-accent-cyan-bg)
-  );
-  border: 1px solid var(--color-accent-green-border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-md);
+  bottom: 16vh;
+  z-index: 50;
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
+.preview-splash-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3\.5) var(--space-7);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+  background:
+    linear-gradient(var(--color-bg-surface), var(--color-bg-surface))
+      padding-box,
+    linear-gradient(135deg, var(--color-accent-green), var(--color-accent-cyan))
+      border-box;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Soft glow halo behind the pill. */
+.preview-splash-glow {
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    closest-side,
+    var(--color-accent-green-bg),
+    transparent 75%
+  );
+  opacity: 0.9;
+}
+
+.preview-splash-label {
+  background: linear-gradient(
+    100deg,
+    var(--color-accent-green),
+    var(--color-accent-cyan)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Downward chevron drawn from borders (points toward the card below). */
 .preview-splash-chevron {
   width: var(--space-3);
   height: var(--space-3);
-  border-right: 2px solid var(--color-accent-green);
-  border-bottom: 2px solid var(--color-accent-green);
+  border-right: 2px solid var(--color-accent-cyan);
+  border-bottom: 2px solid var(--color-accent-cyan);
   transform: rotate(45deg);
   animation: preview-chevron-bob 1.6s ease-in-out infinite;
 }
@@ -110,12 +153,59 @@ preview-simulator {
   }
 }
 
+/* Activation flourish once the pill is fully revealed (end of phase B):
+   a springy pop, a glow ring pulse, and the label shimmering. */
+.preview-splash.is-active .preview-splash-pill {
+  animation: preview-splash-pop 0.5s cubic-bezier(0.22, 1.4, 0.4, 1);
+}
+
+.preview-splash.is-active .preview-splash-label {
+  animation: preview-label-shimmer 1.6s linear infinite;
+}
+
+.preview-splash.is-active .preview-splash-glow {
+  animation: preview-splash-ring 1.6s ease-out infinite;
+}
+
+@keyframes preview-splash-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes preview-label-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes preview-splash-ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.9);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
 /* ── Reduced motion ──────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  .preview-splash-chevron {
+  .preview-splash-chevron,
+  .preview-splash.is-active .preview-splash-pill,
+  .preview-splash.is-active .preview-splash-label,
+  .preview-splash.is-active .preview-splash-glow {
     animation: none;
   }
 }

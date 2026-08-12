@@ -242,9 +242,12 @@
       <store-panel></store-panel>
     </main>
 
-    <!-- Live-preview card sits directly after the grid (no gap). Native
-         scroll-snap slides it fully into view; the panel just fades in during
-         the slide. -->
+    <!-- Scroll budget for the pinned reveal + slide sequence (grid stays
+         frozen behind while this scrolls). -->
+    <div class="preview-track" aria-hidden="true"></div>
+
+    <!-- Wide live-preview card — fixed overlay that slides up over the frozen
+         grid during the second phase of the sequence. -->
     <section class="preview-scene" aria-label="Live preview simulator">
       <article class="landing-card preview-card">
         <div class="card-header">
@@ -261,10 +264,13 @@
       </article>
     </section>
 
-    <!-- Fades in mid-transition (opacity driven by scroll progress). -->
+    <!-- Pop-up hint — fixed; rises over the frozen grid, then a full slide. -->
     <div class="preview-splash" aria-hidden="true">
-      <span class="preview-splash-chevron"></span>
-      <span class="preview-splash-label">Watch them drive</span>
+      <div class="preview-splash-pill">
+        <span class="preview-splash-glow" aria-hidden="true"></span>
+        <span class="preview-splash-label">Watch them drive</span>
+        <span class="preview-splash-chevron"></span>
+      </div>
     </div>
 
     <script type="module" src="/js/store/entry.js"></script>
