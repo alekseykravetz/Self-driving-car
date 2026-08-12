@@ -15,12 +15,13 @@
   z-index: 1;
 }
 
-/* Pure scroll budget for the pinned sequence (~1 screen reveal + 1 slide). */
+/* Pure scroll budget for the pinned sequence (half a screen reveal, then a
+   short auto-slide zone that the JS snaps through). */
 .preview-track {
-  height: 200vh;
+  height: 100vh;
 }
 
-/* ── Wide live-preview card — fixed overlay, wider than the grid ──────── */
+/* ── Live-preview card — matches the grid's width + side padding ─────── */
 .preview-scene {
   position: fixed;
   top: var(--header-h, 0px);
@@ -29,7 +30,7 @@
   bottom: 0;
   z-index: 60;
   display: flex;
-  padding: var(--space-5);
+  padding: var(--space-5) var(--space-6);
   /* Opaque so the frozen grid never bleeds through the card as it slides. */
   background: var(--color-bg-app);
   /* Slide is set inline per scroll frame — no CSS easing so it tracks 1:1. */
@@ -41,7 +42,8 @@
 .preview-card {
   flex: 1;
   width: 100%;
-  max-width: 1760px;
+  /* Same content box as the grid: 1500px cap minus the grid's side padding. */
+  max-width: calc(1500px - 2 * var(--space-6));
   margin: 0 auto;
   min-height: 0;
 }
