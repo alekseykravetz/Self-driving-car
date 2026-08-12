@@ -52,7 +52,12 @@ const frame = (
 `;
 
 export const Landing: StoryObj = {
-  render: () => frame('Landing', '/index.html'),
+  render: () =>
+    frame(
+      'Landing',
+      '/index.html',
+      'Scroll down to play the main → live-preview transition.',
+    ),
 };
 export const Simulator: StoryObj = {
   render: () => frame('Training Simulator', '/html/simulator.html'),

@@ -201,6 +201,13 @@ export const LivePreview: StoryObj = {
   render: () => {
     const root = landingStage(`
       <main class="landing-sections" style="display:block;padding-top:var(--space-6)">
+        <p style="max-width:640px;margin:0 auto var(--space-6);text-align:center;font-size:12px;color:var(--color-text-secondary)">
+          Static preview of the second-screen card + reveal pills. The
+          scroll-linked <strong>main → preview transition</strong> is driven by
+          <code>initLandingPreview()</code> (hijacks window scroll + body state)
+          and only runs on the real page — see <strong>Project Views →
+          Landing</strong>.
+        </p>
         <article class="landing-card preview-card"
                  style="height:520px;display:flex;flex-direction:column;max-width:960px">
           <div class="card-header">
