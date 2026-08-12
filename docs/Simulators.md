@@ -1600,21 +1600,28 @@ when the card is at least ~2 % on screen and `deactivate()` when it leaves.
 
 ### World & car selection (from the store)
 
-- **World:** the active store world if it has roads; otherwise the first
-  `PREFERRED_WORLDS` match (`Ashkelon_city.world`, then `Ashkelon_part.world`);
-  otherwise the first store world with any road segments. If none has roads the
-  canvas stays blank and `activate()` is a no-op.
+- **World:** the first `PREFERRED_WORLDS` match (`Ashkelon_part.world` — a
+  compact map — then `Ashkelon_city.world`); otherwise the active store world if
+  it has roads; otherwise the first store world with any road segments. The
+  curated maps win over the active selection so the showcase always frames a
+  road-dense neighbourhood. If none has roads the canvas stays blank and
+  `activate()` is a no-op.
 - **Cars:** all store cars (bundled + user-loaded), falling back to the active
   car set. Each spawned car loads a random config from this list.
 
 ### Simulation loop
 
-`PREVIEW_CAR_COUNT` (20) cars are spawned at random points along random road
-segments, facing the segment's travel direction (two-way segments may flip
-direction at random). Each frame `#update()`:
+At init a random **anchor** segment is chosen and the road network is filtered
+to the segments within `CLUSTER_RADIUS` (2000 world px) of it
+(`#buildCluster()`, falling back to the whole network if fewer than
+`MIN_CLUSTER_SEGMENTS` are nearby). `PREVIEW_CAR_COUNT` (20) cars spawn — **and
+respawn** — only on those cluster segments, facing the segment's travel
+direction (two-way segments may flip at random). Clustering keeps the swarm
+together so the camera never drifts to an empty part of a large map. Each frame
+`#update()`:
 
-1. **Respawns wrecks** — a `damaged` car is replaced by a fresh one elsewhere so
-   the scene never empties out.
+1. **Respawns wrecks** — a `damaged` car is replaced by a fresh one elsewhere in
+   the cluster so the scene never empties out.
 2. **Feeds sensors** — road borders (`queryBordersNearCar` over a
    `SpatialHashGrid`), the other cars' polygons (an O(n²) neighbour scan,
    trivial at 20 cars), and — for state-aware brains only — nearby traffic
@@ -1625,9 +1632,12 @@ direction at random). Each frame `#update()`:
    (`CAMERA_EASE = 0.06` per frame) so the view drifts with the pack.
 
 `#draw()` resets the viewport and draws the world (with `showStartMarkings:
-false`, viewport culling, and render-radius culling) then the alive cars with
-their collision masks. When the page is loaded with `?paused` (the visual-test
-hook) `activate()` paints exactly one deterministic frame and skips the loop.
+false` and viewport culling) then the alive cars with their collision masks. The
+render radius is **sized to the card** (`#fullViewRenderRadius()` = the visible
+bounds' half-diagonal + `RENDER_RADIUS_MARGIN`) rather than the viewport's
+default, so pseudo-3D buildings and trees fill the whole preview instead of a
+central disc. When the page is loaded with `?paused` (the visual-test hook)
+`activate()` paints exactly one deterministic frame and skips the loop.
 
 ### Landing scroll sequence (`ts/store/landingPreview.ts`)
 

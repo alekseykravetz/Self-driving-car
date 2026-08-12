@@ -30,7 +30,16 @@ const PREVIEW_BORDER_COLLISION = true;
 /** How quickly the camera eases toward the swarm centroid (0..1 per frame). */
 const CAMERA_EASE = 0.06;
 /** Store worlds preferred for the showcase, most-preferred first. */
-const PREFERRED_WORLDS = ['Ashkelon_city.world', 'Ashkelon_part.world'];
+const PREFERRED_WORLDS = ['Ashkelon_part.world', 'Ashkelon_city.world'];
+/** Cars spawn (and respawn) only on road segments within this radius (world px)
+ * of a randomly chosen anchor, so the swarm stays clustered on screen instead
+ * of scattering across a whole city map. */
+const CLUSTER_RADIUS = 2000;
+/** Fall back to the whole road network if the anchor cluster is too sparse. */
+const MIN_CLUSTER_SEGMENTS = 4;
+/** Extra world px added to the render circle so items straddling the card's
+ * corners still draw. */
+const RENDER_RADIUS_MARGIN = 400;
 
 /**
  * PreviewSimulator — a self-contained, non-interactive "live traffic" showcase
@@ -59,6 +68,7 @@ export class PreviewSimulatorElement extends HTMLElement {
   #borderGrid = new SpatialHashGrid(GRID_CELL_SIZE);
   #trafficGrid = new TrafficControlGrid(GRID_CELL_SIZE);
 
+  #clusterSegments: Segment[] = [];
   #camera = new Point(0, 0);
   #rafId = -1;
   #initialized = false;
@@ -137,6 +147,7 @@ export class PreviewSimulatorElement extends HTMLElement {
     this.#borderGrid.build(this.#roadBorders);
     this.#trafficGrid.rebuild(buildTrafficControls(this.#world));
 
+    this.#clusterSegments = this.#buildCluster();
     this.#spawnCars();
 
     const c = this.#swarmCentroid();
@@ -145,18 +156,42 @@ export class PreviewSimulatorElement extends HTMLElement {
     this.#viewport.offset.y = -c.y;
   }
 
+  /** Road segments within {@link CLUSTER_RADIUS} of a random anchor segment, so
+   * spawned traffic stays together in view; falls back to all segments when the
+   * chosen neighbourhood is too sparse. */
+  #buildCluster(): Segment[] {
+    const segments = this.#world?.graph.segments ?? [];
+    if (segments.length === 0) return [];
+
+    const anchor = segments[Math.floor(Math.random() * segments.length)];
+    const ax = (anchor.p1.x + anchor.p2.x) / 2;
+    const ay = (anchor.p1.y + anchor.p2.y) / 2;
+    const r2 = CLUSTER_RADIUS * CLUSTER_RADIUS;
+    const near = segments.filter((s) => {
+      const mx = (s.p1.x + s.p2.x) / 2;
+      const my = (s.p1.y + s.p2.y) / 2;
+      const dx = mx - ax;
+      const dy = my - ay;
+      return dx * dx + dy * dy <= r2;
+    });
+    return near.length >= MIN_CLUSTER_SEGMENTS ? near : segments;
+  }
+
   /** Pick a store world with roads, preferring the curated city maps. */
   #pickWorld(): object | null {
-    const active = StoreManager.getActiveWorld();
-    if (active && this.#hasRoads(active)) return active;
-
     const worlds = StoreManager.getAllWorlds();
+    // The curated maps make the best showcase, so they win over whatever world
+    // happens to be the active store selection.
     for (const name of PREFERRED_WORLDS) {
       const match = worlds.find(
         (w) => w.name === name && this.#hasRoads(w.data),
       );
       if (match) return match.data;
     }
+
+    const active = StoreManager.getActiveWorld();
+    if (active && this.#hasRoads(active)) return active;
+
     return worlds.find((w) => this.#hasRoads(w.data))?.data ?? null;
   }
 
@@ -185,7 +220,7 @@ export class PreviewSimulatorElement extends HTMLElement {
   /** Build one car at a random road point, or null if the world has no roads. */
   #makeCar(): Car | null {
     if (!this.#world || this.#configs.length === 0) return null;
-    const segments = this.#world.graph.segments;
+    const segments = this.#clusterSegments;
     if (segments.length === 0) return null;
 
     const segment = segments[Math.floor(Math.random() * segments.length)];
@@ -289,13 +324,22 @@ export class PreviewSimulatorElement extends HTMLElement {
       viewPoint,
       showStartMarkings: false,
       screenBounds: this.#viewport.getVisibleBounds(),
-      renderRadius: this.#viewport.getRenderRadius(),
+      renderRadius: this.#fullViewRenderRadius(),
     });
 
     for (const car of this.#cars) {
       if (car.damaged) continue;
       car.draw(this.#ctx, { showMask: true });
     }
+  }
+
+  /** Render circle sized to reach the card's farthest corner, so pseudo-3D
+   * buildings and trees fill the whole preview instead of a central disc. */
+  #fullViewRenderRadius(): number {
+    const b = this.#viewport!.getVisibleBounds();
+    const halfW = (b.maxX - b.minX) / 2;
+    const halfH = (b.maxY - b.minY) / 2;
+    return Math.hypot(halfW, halfH) + RENDER_RADIUS_MARGIN;
   }
 
   #resize(): void {
