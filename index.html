@@ -242,16 +242,9 @@
       <store-panel></store-panel>
     </main>
 
-    <!-- Scroll transition: a gap that reveals a rising splash, then a full
-         slide carries the view down to the big live-preview card. -->
-    <div class="preview-gap" aria-hidden="true">
-      <div class="preview-splash">
-        <span class="preview-splash-chevron"></span>
-        <span class="preview-splash-label">Watch them drive</span>
-      </div>
-    </div>
-
-    <!-- Big live-preview card — same card styling as the grid, only full-size. -->
+    <!-- Live-preview card sits directly after the grid (no gap). Native
+         scroll-snap slides it fully into view; the panel just fades in during
+         the slide. -->
     <section class="preview-scene" aria-label="Live preview simulator">
       <article class="landing-card preview-card">
         <div class="card-header">
@@ -267,6 +260,12 @@
         <preview-simulator></preview-simulator>
       </article>
     </section>
+
+    <!-- Fades in mid-transition (opacity driven by scroll progress). -->
+    <div class="preview-splash" aria-hidden="true">
+      <span class="preview-splash-chevron"></span>
+      <span class="preview-splash-label">Watch them drive</span>
+    </div>
 
     <script type="module" src="/js/store/entry.js"></script>
   </body>

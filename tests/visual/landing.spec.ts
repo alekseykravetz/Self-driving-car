@@ -54,10 +54,10 @@ test.describe('Landing page', () => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
 
-    // Hide the reveal gap + live-preview scene so the baseline stays
+    // Hide the live-preview transition zone so the baseline stays
     // pixel-identical to the card grid (and free of the live canvas).
     await page.addStyleTag({
-      content: '.preview-gap, .preview-scene { display: none !important; }',
+      content: '.preview-scene, .preview-splash { display: none !important; }',
     });
     await page.waitForTimeout(500);
 
@@ -75,7 +75,10 @@ test.describe('Landing page', () => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
 
-    await page.locator('.preview-scene').scrollIntoViewIfNeeded();
+    // Scroll to the end so the sticky-pinned card is fully slid into view.
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.body.scrollHeight }),
+    );
     await expect(page.locator('.preview-scene')).toHaveClass(/preview-active/);
     await expect(page.locator('preview-simulator canvas')).toBeVisible();
 

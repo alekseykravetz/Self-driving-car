@@ -1,75 +1,30 @@
 /* ═══════════════════════════════════════════════════════════════════
    Preview Simulator — landing page live-traffic showcase (index.html)
-   A single continuous scroll: the card grid, a short reveal "gap" with a
-   rising splash, then one full slide onto a big live-preview card that
-   reuses the standard card styling.
+   The big live-preview card sits directly after the grid (no gap). Native
+   CSS scroll-snap gives the smooth "full slide" into and out of it; the
+   "Watch them drive" panel just fades in during the transition.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ── Reveal gap: pure scroll budget for the rising splash ────────────── */
-.preview-gap {
-  position: relative;
-  height: 70vh;
+/* Gentle proximity snap: the grid scrolls freely, but the top of the page
+   and the preview card each pull into full view when you get close. */
+html {
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
 }
 
-/* ── Rising splash (reveal + fade driven by JS inline transform/opacity) ─ */
-.preview-splash {
-  position: fixed;
-  left: 50%;
-  bottom: var(--space-8);
-  z-index: 30;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: var(--weight-semibold);
-  letter-spacing: 0.01em;
-  color: var(--color-text-primary);
-  background: linear-gradient(
-    135deg,
-    var(--color-accent-green-bg),
-    var(--color-accent-cyan-bg)
-  );
-  border: 1px solid var(--color-accent-green-border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-md);
-  opacity: 0;
-  visibility: hidden;
-  transform: translate(-50%, 48px);
-  pointer-events: none;
+.landing-header {
+  scroll-snap-align: start;
 }
 
-/* Downward chevron drawn from borders (points toward the card below). */
-.preview-splash-chevron {
-  width: var(--space-3);
-  height: var(--space-3);
-  border-right: 2px solid var(--color-accent-green);
-  border-bottom: 2px solid var(--color-accent-green);
-  transform: rotate(45deg);
-  animation: preview-chevron-bob 1.6s ease-in-out infinite;
-}
-
-@keyframes preview-chevron-bob {
-  0%,
-  100% {
-    transform: translateY(0) rotate(45deg);
-  }
-  50% {
-    transform: translateY(var(--space-1)) rotate(45deg);
-  }
-}
-
-/* ── Scene: full-viewport stage that holds the big card ──────────────── */
+/* ── Live-preview card — standard card styling, only full-size ───────── */
 .preview-scene {
   min-height: 100vh;
   display: flex;
   align-items: stretch;
   padding: var(--space-6);
+  scroll-snap-align: center;
 }
 
-/* ── Big live-preview card — standard card styling, only full-size ───── */
 .preview-card {
   flex: 1;
   max-width: 1500px;
@@ -78,7 +33,7 @@
   min-height: 0;
 }
 
-/* The card fills the stage, so the hover lift used in the grid is dropped. */
+/* The card fills the viewport, so the grid's hover lift is dropped. */
 .preview-card:hover {
   transform: none;
 }
@@ -105,8 +60,61 @@ preview-simulator {
   pointer-events: none;
 }
 
+/* ── Pop-up panel (opacity driven by JS inline style during the slide) ── */
+.preview-splash {
+  position: fixed;
+  left: 50%;
+  bottom: 12vh;
+  z-index: 30;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green-bg),
+    var(--color-accent-cyan-bg)
+  );
+  border: 1px solid var(--color-accent-green-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Downward chevron drawn from borders (points toward the card below). */
+.preview-splash-chevron {
+  width: var(--space-3);
+  height: var(--space-3);
+  border-right: 2px solid var(--color-accent-green);
+  border-bottom: 2px solid var(--color-accent-green);
+  transform: rotate(45deg);
+  animation: preview-chevron-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes preview-chevron-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(45deg);
+  }
+  50% {
+    transform: translateY(var(--space-1)) rotate(45deg);
+  }
+}
+
 /* ── Reduced motion ──────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   .preview-splash-chevron {
     animation: none;
   }
