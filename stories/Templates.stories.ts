@@ -4,6 +4,8 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 // preview.ts. The landing-card markup below mirrors index.html exactly so the
 // story stays a faithful preview of the real main page.
 import '../ts/ui/organisms/storePanel.js';
+import '../ts/ui/organisms/previewSimulator.js';
+import type { PreviewSimulatorElement } from '../ts/ui/organisms/previewSimulator.js';
 
 /**
  * Templates — full page layouts assembled from organisms. These mirror the
@@ -174,4 +176,56 @@ export const FeatureCards: StoryObj = {
   name: 'Feature Cards',
   render: () =>
     landingStage(`<main class="landing-sections">${FEATURE_CARDS}</main>`),
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  Live Preview — the second-screen showcase card (mirrors index.html):
+//  the wide "Live Preview" card with the running <preview-simulator>, plus
+//  the reveal pill in both scroll directions.
+// ═══════════════════════════════════════════════════════════════════
+
+/** One reveal pill (JS toggles `is-from-top` + the label at runtime). */
+const splashPill = (fromTop: boolean): string => `
+  <div class="preview-splash${fromTop ? ' is-from-top' : ''}"
+       style="position:static;opacity:1;visibility:visible;transform:none;inset:auto">
+    <div class="preview-splash-pill">
+      <span class="preview-splash-glow" aria-hidden="true"></span>
+      <span class="preview-splash-label">${fromTop ? 'Back to main' : 'Watch them drive'}</span>
+      <span class="preview-splash-chevron"></span>
+    </div>
+  </div>
+`;
+
+export const LivePreview: StoryObj = {
+  name: 'Live Preview',
+  render: () => {
+    const root = landingStage(`
+      <main class="landing-sections" style="display:block;padding-top:var(--space-6)">
+        <article class="landing-card preview-card"
+                 style="height:520px;display:flex;flex-direction:column;max-width:960px">
+          <div class="card-header">
+            <div class="card-icon"><app-icon name="traffic-light" animate></app-icon></div>
+            <h2>Live Preview</h2>
+          </div>
+          <p class="card-desc">
+            Twenty trained cars driving themselves across a real map — ray-casting
+            sensors, hand-built neural nets, and live traffic lights.
+          </p>
+          <preview-simulator></preview-simulator>
+        </article>
+        <div style="display:flex;gap:var(--space-8);justify-content:center;flex-wrap:wrap;padding:var(--space-8) 0">
+          ${splashPill(false)}
+          ${splashPill(true)}
+        </div>
+      </main>
+    `);
+    // Kick off the live showcase loop once the element is connected. It loads a
+    // bundled store world/cars (served via Storybook `staticDirs`).
+    requestAnimationFrame(() => {
+      const sim =
+        root.querySelector<PreviewSimulatorElement>('preview-simulator');
+      sim?.activate();
+    });
+    return root;
+  },
 };

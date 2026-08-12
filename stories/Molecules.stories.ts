@@ -134,6 +134,15 @@ const SAMPLE_SHORTCUTS: ShortcutDef[] = [
     display: true,
     keys: ['Control'],
   },
+  {
+    id: 'sbAlt',
+    label: 'Alt',
+    title: 'Grow/shrink buildings & trees render zone',
+    group: 'View',
+    kind: 'display',
+    display: true,
+    keys: ['Alt'],
+  },
 ];
 
 export const ShortcutsToolbar: StoryObj = {

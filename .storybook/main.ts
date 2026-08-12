@@ -20,6 +20,13 @@ const config: StorybookConfig = {
     name: '@storybook/web-components-vite',
     options: {},
   },
+  // Serve the bundled store assets + images so live stories (the Live Preview
+  // simulator, the Store panel, the landing logo) can load real data the same
+  // way index.html does, instead of rendering empty.
+  staticDirs: [
+    { from: '../store', to: '/store' },
+    { from: '../assets', to: '/assets' },
+  ],
   core: { disableTelemetry: true },
   async viteFinal(viteConfig) {
     viteConfig.plugins = viteConfig.plugins ?? [];

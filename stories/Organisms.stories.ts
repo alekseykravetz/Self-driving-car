@@ -8,8 +8,10 @@ import '../ts/ui/organisms/storePanel.js';
 import '../ts/ui/organisms/worldEditorPanel.js';
 import '../ts/ui/organisms/trainingInitModal.js';
 import '../ts/ui/organisms/humanTrainingConfigModal.js';
+import '../ts/ui/organisms/previewSimulator.js';
 import type { TrainingInitModalElement } from '../ts/ui/organisms/trainingInitModal.js';
 import type { HumanTrainingConfigModalElement } from '../ts/ui/organisms/humanTrainingConfigModal.js';
+import type { PreviewSimulatorElement } from '../ts/ui/organisms/previewSimulator.js';
 import type { TrainingPanelElement } from '../ts/ui/organisms/trainingPanel.js';
 import { DEFAULT_CAR_CONFIG } from '../ts/car/config.js';
 
@@ -171,8 +173,24 @@ export const TrainingInitModal: StoryObj = {
 };
 
 // ═══════════════════════════════════════════════════════════════════
-//  Human-training config modal — car-config dialog for Human Backprop.
+//  Preview simulator — landing-page live-traffic showcase.
 // ═══════════════════════════════════════════════════════════════════
+export const PreviewSimulator: StoryObj = {
+  name: 'Preview Simulator',
+  render: () => {
+    const el = make('preview-simulator') as PreviewSimulatorElement;
+    // The element canvas fills its box; give it an explicit size here (in
+    // production it flexes to fill the sliding Live Preview card).
+    el.style.cssText =
+      'display:block;width:100%;max-width:960px;height:460px;border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--color-border-subtle)';
+    // Start the live loop once connected. It loads a bundled store world/cars
+    // (served via Storybook `staticDirs`); blank if none are available.
+    requestAnimationFrame(() => void el.activate());
+    return stage(el, {
+      note: 'The landing page’s live "traffic showcase": ~20 trained cars driving a real store map on their own, crashing and respawning, with the camera easing toward the swarm. Runs its own tiny RAF loop (not <code>SimulatorShell</code>) and is inert until <code>activate()</code>.',
+    });
+  },
+};
 export const HumanTrainingConfigModal: StoryObj = {
   name: 'Human Training Config Modal',
   render: () => {

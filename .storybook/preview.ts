@@ -12,6 +12,9 @@ import '../styles/organisms/_world-editor-panel.css';
 // the store panel header) live outside index.css's "common" set, so pull them
 // in explicitly for the landing-page and store-panel stories.
 import '../styles/templates/_landing-page.css';
+// The landing live-preview simulator + reveal-pill styles (also outside the
+// "common" set) — needed by the Preview Simulator / Live Preview stories.
+import '../styles/organisms/_preview-simulator.css';
 
 // Register the <app-icon> custom element (self-registers on import).
 import '../ts/ui/atoms/appIcon.js';
