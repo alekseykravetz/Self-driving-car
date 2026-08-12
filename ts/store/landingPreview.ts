@@ -18,9 +18,15 @@ import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.j
  */
 
 /** Fraction of a viewport of scroll each reveal gate consumes. */
-const REVEAL_FRAC = 0.5;
+const REVEAL_FRAC = 0.25;
+
+/** Duration (ms) of the programmatic page slide — longer = gentler glide. */
+const SLIDE_MS = 1600;
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
+
+const easeInOutQuad = (t: number): number =>
+  t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 
 export function initLandingPreview(): void {
   const header = document.querySelector<HTMLElement>('.landing-header');
@@ -28,6 +34,7 @@ export function initLandingPreview(): void {
   const track = document.querySelector<HTMLElement>('.preview-track');
   const scene = document.querySelector<HTMLElement>('.preview-scene');
   const splash = document.querySelector<HTMLElement>('.preview-splash');
+  const label = document.querySelector<HTMLElement>('.preview-splash-label');
   const sim =
     document.querySelector<PreviewSimulatorElement>('preview-simulator');
   if (!header || !grid || !track || !scene || !splash || !sim) return;
@@ -36,18 +43,34 @@ export function initLandingPreview(): void {
   let running = false;
   let locked = false; // suppress auto-slide re-triggers during a programmatic scroll
   let unlockTimer = 0;
+  let slideRaf = 0;
   let lastY = window.scrollY;
   let lastHeaderH = -1;
   let lastGridPin = Number.NaN;
+  let lastFromTop: boolean | null = null;
+
+  // Custom scroll animation so the slide duration is explicit (native smooth
+  // scroll gives no control) and gentle both ways.
+  const glideTo = (targetY: number): void => {
+    const startY = window.scrollY;
+    const dist = targetY - startY;
+    if (Math.abs(dist) < 1) return;
+    const start = performance.now();
+    cancelAnimationFrame(slideRaf);
+    const step = (now: number): void => {
+      const t = clamp01((now - start) / SLIDE_MS);
+      window.scrollTo(0, startY + dist * easeInOutQuad(t));
+      if (t < 1) slideRaf = requestAnimationFrame(step);
+      else locked = false;
+    };
+    slideRaf = requestAnimationFrame(step);
+  };
 
   const snapTo = (targetScrolled: number, scrolled: number): void => {
     locked = true;
-    window.scrollTo({
-      top: window.scrollY + (targetScrolled - scrolled),
-      behavior: 'smooth',
-    });
+    glideTo(window.scrollY + (targetScrolled - scrolled));
     window.clearTimeout(unlockTimer);
-    unlockTimer = window.setTimeout(() => (locked = false), 1200);
+    unlockTimer = window.setTimeout(() => (locked = false), SLIDE_MS + 400);
   };
 
   const apply = (): void => {
@@ -106,6 +129,13 @@ export function initLandingPreview(): void {
       splash.style.top = 'auto';
       splash.style.bottom = '16vh';
       splash.style.transform = `translate(-50%, ${rise}px)`;
+    }
+    // Swap label + chevron direction depending on which way the pill leads.
+    if (fromTop !== lastFromTop) {
+      if (label)
+        label.textContent = fromTop ? 'Back to main' : 'Watch them drive';
+      splash.classList.toggle('is-from-top', fromTop);
+      lastFromTop = fromTop;
     }
     splash.classList.toggle('is-active', pill >= 0.95 && !locked);
 
