@@ -216,39 +216,36 @@ preview-simulator {
   background-clip: text;
 }
 
-/* Downward chevron drawn from borders (points toward the card below). */
+/* Downward chevron drawn from borders (points toward the card below). The
+   L-shaped ink lands off the box centre once rotated, so --chev-nudge lifts it
+   to the optical centre (the up variant flips the sign). */
 .preview-splash-chevron {
+  --chev-nudge: calc(-0.25 * var(--space-3));
+  --chev-rot: 45deg;
   width: var(--space-3);
   height: var(--space-3);
   border-right: 2px solid var(--color-accent-cyan);
   border-bottom: 2px solid var(--color-accent-cyan);
-  transform: rotate(45deg);
+  transform: translateY(var(--chev-nudge)) rotate(var(--chev-rot));
   animation: preview-chevron-bob 1.6s ease-in-out infinite;
 }
 
 /* Way-back pill (page 2 → page 1): chevron points up toward the main page. */
 .preview-splash.is-from-top .preview-splash-chevron {
-  transform: rotate(-135deg);
-  animation: preview-chevron-bob-up 1.6s ease-in-out infinite;
+  --chev-nudge: calc(0.25 * var(--space-3));
+  --chev-rot: -135deg;
 }
 
-@keyframes preview-chevron-bob-up {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-135deg);
-  }
-  50% {
-    transform: translateY(calc(-1 * var(--space-1))) rotate(-135deg);
-  }
-}
-
+/* Symmetric bob: equal travel above and below the optically-centred rest. */
 @keyframes preview-chevron-bob {
   0%,
   100% {
-    transform: translateY(0) rotate(45deg);
+    transform: translateY(calc(var(--chev-nudge) - 0.5 * var(--space-1)))
+      rotate(var(--chev-rot));
   }
   50% {
-    transform: translateY(var(--space-1)) rotate(45deg);
+    transform: translateY(calc(var(--chev-nudge) + 0.5 * var(--space-1)))
+      rotate(var(--chev-rot));
   }
 }
 
