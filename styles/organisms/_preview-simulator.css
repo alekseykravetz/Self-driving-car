@@ -21,6 +21,15 @@ html {
   z-index: 1;
 }
 
+/* When page 1 fits the viewport, pin the grid directly UNDER the header (not at
+   top:0) so the first scroll never slides it up behind the header — only the
+   header collapses in place, and the grid follows it up as `--header-h` shrinks.
+   Tall grids keep the negative `--grid-pin` so they still scroll (small
+   screens). Set from JS via the `grid-fits` body class. */
+body.grid-fits .landing-sections {
+  top: var(--header-h, 0px);
+}
+
 /* Once page 2 fully covers the viewport, hide page 1 so the transparent scene
    reveals only the body's fixed (stationary) glow — not the page-1 cards.
    `visibility` keeps the sticky element's box so scroll layout doesn't shift. */

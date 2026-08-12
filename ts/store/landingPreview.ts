@@ -122,10 +122,12 @@ export function initLandingPreview(): void {
     const dir = y - lastY; // >0 scrolling down
     lastY = y;
 
-    // Slim the header, with hysteresis so it never flip-flops near the top.
+    // Slim the header on the very first scroll, with hysteresis so it never
+    // flip-flops near the top. Low threshold so the collapse is tied to the
+    // first wheel step (the grid is pinned, so only the header visibly moves).
     const slim = document.body.classList.contains('scrolled');
-    if (!slim && y > 60) document.body.classList.add('scrolled');
-    else if (slim && y < 12) document.body.classList.remove('scrolled');
+    if (!slim && y > 8) document.body.classList.add('scrolled');
+    else if (slim && y < 4) document.body.classList.remove('scrolled');
 
     // Publish the header height + grid pin offset (only when they change).
     const headerH = Math.round(header.getBoundingClientRect().height);
@@ -138,6 +140,9 @@ export function initLandingPreview(): void {
       document.documentElement.style.setProperty('--grid-pin', `${gridPin}px`);
       lastGridPin = gridPin;
     }
+    // When page 1 fits, pin the grid under the header (see CSS) so the first
+    // scroll collapses the header in place instead of sliding the grid.
+    document.body.classList.toggle('grid-fits', gridPin === 0);
 
     // Scroll consumed within the pinned track. A leading header-phase budget
     // (P) is spent only collapsing the header, then the gate/slide zones:
