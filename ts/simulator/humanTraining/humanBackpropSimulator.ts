@@ -31,11 +31,7 @@ import {
   buildTrafficControls,
   queryTrafficControlsNearCar,
 } from '../trafficControlUtils.js';
-import {
-  DEFAULT_CAR_CONFIG,
-  NN_OUTPUT_COUNT,
-  DEFAULT_HIDDEN_LAYERS,
-} from '../../car/config.js';
+import { DEFAULT_CAR_CONFIG, DEFAULT_HIDDEN_LAYERS } from '../../car/config.js';
 import {
   SIMPLE_MODE_CONFIG,
   SimpleSimState,
@@ -54,7 +50,6 @@ export class HumanBackpropSimulator extends SimulatorShell {
   #mode: 'simple' | 'world';
   #panel: HumanTrainingPanelElement;
   #configModal: HumanTrainingConfigModalElement;
-  #carConfig: CarInfo | null = null;
   #car: CarClass | null = null;
   world: IWorld | null = null;
   roadBorders: Point[][] | null = null;
@@ -180,7 +175,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
     this.#snapCameraToStart();
   }
 
-  #openConfigModal(context: 'entry' | 'config'): void {
+  #openConfigModal(context: 'entry' | 'new-brain'): void {
     const savedInfo = safeJsonParse<CarInfo>(
       localStorage.getItem('humanTrainedCar'),
     );
@@ -213,7 +208,14 @@ export class HumanBackpropSimulator extends SimulatorShell {
       lockedToSavedBrain: false,
       onStart: (result) => {
         this.#modalOpen = false;
-        this.#applyConfigAndCreateCar(result.carConfig, savedInfo);
+        // "New brain" always starts from random weights; entry reuses the saved
+        // brain when its topology matches the chosen config.
+        if (context === 'new-brain') {
+          this.#accuracyWindow = [];
+          this.#applyConfigAndCreateCar(result.carConfig, null);
+        } else {
+          this.#applyConfigAndCreateCar(result.carConfig, savedInfo);
+        }
       },
       onCancel: () => {
         this.#modalOpen = false;
@@ -226,7 +228,6 @@ export class HumanBackpropSimulator extends SimulatorShell {
     carConfig: CarInfo,
     savedInfo: CarInfo | null,
   ): void {
-    this.#carConfig = carConfig;
     this.#trainingFrames = 0;
     const startInfo = this.getStartInfo();
     const opts = {
@@ -277,7 +278,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
     this.animationLoopToolbar.setPaused(false);
   }
 
-  #onConfigCancel(context: 'entry' | 'config'): void {
+  #onConfigCancel(context: 'entry' | 'new-brain'): void {
     if (context === 'entry' && !this.#car) {
       this.#applyConfigAndCreateCar(this.#defaultCarInfo(), null);
     }
@@ -682,7 +683,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
       if (this.#car) downloadCarFiles([{ car: this.#car, poolPosition: 0 }]);
     };
     panel.onNewBrain = () => {
-      this.#resetBrain();
+      this.#openConfigModal('new-brain');
     };
     panel.onRestartDrive = () => {
       this.#car?.respawn(this.getStartInfo());
@@ -705,30 +706,6 @@ export class HumanBackpropSimulator extends SimulatorShell {
     if (!cfg) return;
     const currentInfo = this.#car ? this.#car.toInfo() : null;
     this.#applyConfigAndCreateCar(cfg, currentInfo);
-  }
-
-  #resetBrain(): void {
-    localStorage.removeItem('humanTrainedCar');
-    if (this.#car && this.#car.sensor) {
-      this.#car.brain = CarBrainAdapter.createBrain([
-        CarBrainAdapter.inputLayerSize(
-          this.#car.sensor.rayCount,
-          this.#car.sensor.stateAware,
-        ),
-        ...(this.#carConfig?.hiddenLayers ?? this.#car.hiddenLayers),
-        NN_OUTPUT_COUNT,
-      ]);
-    }
-    this.#car?.respawn(this.getStartInfo());
-    if (this.#car && this.viewport) {
-      this.viewport.offset.x = -this.#car.x;
-      this.viewport.offset.y = -this.#car.y;
-    }
-    this.#regenTraffic();
-    this.#panel.setStatus('Brain: fresh');
-    this.#panel.setSaveState(false);
-    this.#accuracyWindow = [];
-    this.#trainingFrames = 0;
   }
 
   #initPauseToggleClicks(): void {
