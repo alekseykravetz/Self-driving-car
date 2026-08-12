@@ -1,0 +1,239 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Preview Simulator — landing page "second screen" (index.html)
+   A hard two-page swap: the card grid slides up to reveal a full-screen
+   live traffic showcase, with the header morphed into a compact toolbar.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Bottom splash: reveals near the end of the grid ─────────────────── */
+.preview-splash {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-6);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2\.5);
+  padding: var(--space-3) var(--space-6);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green-bg),
+    var(--color-accent-cyan-bg)
+  );
+  border: 1px solid var(--color-accent-green-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  opacity: 0;
+  transform: translate(-50%, calc(100% + var(--space-6)));
+  transition:
+    opacity var(--transition-normal),
+    transform var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+body.at-bottom:not(.preview-open) .preview-splash {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  animation: preview-splash-bob 2s ease-in-out infinite;
+}
+
+.preview-splash:hover {
+  border-color: var(--color-accent-green);
+}
+
+.preview-splash-chevron {
+  display: inline-flex;
+  font-size: 1.15rem;
+}
+
+@keyframes preview-splash-bob {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, calc(-1 * var(--space-1\.5)));
+  }
+}
+
+/* ── Page 2: full-screen live showcase ───────────────────────────────── */
+.preview-page {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-app);
+  transform: translateY(100%);
+  visibility: hidden;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.5s;
+}
+
+body.preview-open .preview-page {
+  transform: translateY(0);
+  visibility: visible;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
+}
+
+/* Fade the tall landing header away as the toolbar takes over. */
+body.preview-open .landing-header {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--space-8)));
+  transition:
+    opacity var(--transition-normal),
+    transform var(--transition-normal);
+}
+
+/* ── Morphed header → compact toolbar ────────────────────────────────── */
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-6);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-surface);
+}
+
+.preview-toolbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.preview-toolbar-logo {
+  width: var(--space-8);
+  height: var(--space-8);
+  filter: drop-shadow(0 2px 8px rgba(125, 223, 125, 0.45));
+}
+
+.preview-toolbar-title {
+  font-size: 1.1rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+  background: linear-gradient(
+    115deg,
+    var(--color-accent-green) 0%,
+    var(--color-accent-cyan) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.preview-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition:
+    background var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+.preview-back-btn:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-accent-green-border);
+}
+
+/* ── Stage + showcase card ───────────────────────────────────────────── */
+.preview-stage {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  padding: var(--space-6);
+}
+
+.preview-card {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  max-width: 1500px;
+  margin: 0 auto;
+  width: 100%;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+preview-simulator {
+  position: relative;
+  flex: 1;
+  display: block;
+  min-height: 0;
+}
+
+.preview-sim-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: var(--color-bg-canvas);
+  touch-action: none;
+}
+
+/* ── Return splash (bottom of page 2) ────────────────────────────────── */
+.preview-return {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-6);
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2\.5);
+  padding: var(--space-2\.5) var(--space-5);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  background: var(--color-bg-toolbar);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-2xl);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-normal),
+    background var(--transition-normal);
+}
+
+.preview-return:hover {
+  border-color: var(--color-accent-green);
+}
+
+.preview-return-chevron {
+  width: var(--space-2\.5);
+  height: var(--space-2\.5);
+  border-left: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .preview-page,
+  .preview-splash,
+  body.preview-open .landing-header {
+    transition: none;
+  }
+  body.at-bottom:not(.preview-open) .preview-splash {
+    animation: none;
+  }
+}

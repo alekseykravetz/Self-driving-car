@@ -53,6 +53,12 @@ test.describe('Landing page', () => {
   test('matches the visual baseline', async ({ page }) => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
+
+    // Hide the (off-screen) preview second-screen chrome so the baseline stays
+    // pixel-identical to the card grid and free of the splash's bob animation.
+    await page.addStyleTag({
+      content: '.preview-splash, .preview-page { display: none !important; }',
+    });
     await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('landing.png', {
@@ -61,5 +67,19 @@ test.describe('Landing page', () => {
       // Mask animated icon custom elements to avoid AA/animation flakiness.
       mask: [page.locator('app-icon')],
     });
+  });
+
+  test('the preview second screen opens and mounts a live sim canvas', async ({
+    page,
+  }) => {
+    await page.goto('/index.html');
+    await page.waitForSelector('main.landing-sections', { timeout: 15000 });
+
+    await page.locator('.preview-splash').click({ force: true });
+    await expect(page.locator('body')).toHaveClass(/preview-open/);
+    await expect(page.locator('preview-simulator canvas')).toBeVisible();
+
+    await page.locator('.preview-back-btn').click();
+    await expect(page.locator('body')).not.toHaveClass(/preview-open/);
   });
 });
