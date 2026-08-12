@@ -7,3 +7,7 @@ import './types.js';
 import './storeManager.js';
 import '../ui/organisms/storePanelTemplate.js';
 import '../ui/organisms/storePanel.js';
+import '../ui/organisms/previewSimulator.js';
+import { initLandingPreview } from './landingPreview.js';
+
+initLandingPreview();

@@ -53,6 +53,16 @@ test.describe('Landing page', () => {
   test('matches the visual baseline', async ({ page }) => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
+
+    // Neutralize the live-preview transition so the baseline stays
+    // pixel-identical to the card grid: hide the overlays + scroll runway and
+    // drop the sticky positioning that only matters mid-transition.
+    await page.addStyleTag({
+      content: `
+        .preview-track, .preview-scene, .preview-splash { display: none !important; }
+        .landing-sections, .landing-header { position: static !important; }
+      `,
+    });
     await page.waitForTimeout(500);
 
     await expect(page).toHaveScreenshot('landing.png', {
@@ -61,5 +71,24 @@ test.describe('Landing page', () => {
       // Mask animated icon custom elements to avoid AA/animation flakiness.
       mask: [page.locator('app-icon')],
     });
+  });
+
+  test('scrolling to the preview scene mounts and activates a live sim', async ({
+    page,
+  }) => {
+    await page.goto('/index.html');
+    await page.waitForSelector('main.landing-sections', { timeout: 15000 });
+
+    // Scroll to the end so the sticky-pinned card is fully slid into view.
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.body.scrollHeight }),
+    );
+    await expect(page.locator('.preview-scene')).toHaveClass(/preview-active/);
+    await expect(page.locator('preview-simulator canvas')).toBeVisible();
+
+    await page.evaluate(() => window.scrollTo({ top: 0 }));
+    await expect(page.locator('.preview-scene')).not.toHaveClass(
+      /preview-active/,
+    );
   });
 });

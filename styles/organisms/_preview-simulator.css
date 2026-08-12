@@ -1,0 +1,310 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Preview Simulator — landing page live-traffic showcase (index.html)
+   Pinned reveal + slide: the grid freezes (sticky bottom) while a pop-up
+   panel rises over it, then a wide live-preview card slides up to fill the
+   screen under the sticky header. All scroll-linked (symmetric both ways).
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Disable scroll anchoring: header slim/grow changes document height, and the
+   browser's anchor adjustment would nudge scrollTop and make the header shake. */
+html {
+  overflow-anchor: none;
+}
+
+/* Grid freezes showing its bottom once fully scrolled, so it stays visible
+   behind the rising pop-up instead of leaving a blank gap. The pin offset
+   (`100vh − gridHeight`, always ≤ 0) is published from JS so a tall grid
+   sticks with its bottom edge at the viewport bottom. */
+.landing-sections {
+  position: sticky;
+  top: var(--grid-pin, 0px);
+  z-index: 1;
+}
+
+/* When page 1 fits the viewport, pin the grid directly UNDER the header (not at
+   top:0) so the first scroll never slides it up behind the header — only the
+   header collapses in place, and the grid follows it up as `--header-h` shrinks.
+   Tall grids keep the negative `--grid-pin` so they still scroll (small
+   screens). Set from JS via the `grid-fits` body class. */
+body.grid-fits .landing-sections {
+  top: var(--header-h, 0px);
+}
+
+/* Once page 2 fully covers the viewport, hide page 1 so the transparent scene
+   reveals only the body's fixed (stationary) glow — not the page-1 cards.
+   `visibility` keeps the sticky element's box so scroll layout doesn't shift. */
+body.preview-page2 .landing-sections {
+  visibility: hidden;
+}
+
+/* Scroll budget for the pinned sequence: a leading header-collapse phase, a
+   bottom reveal gate, an auto-slide zone, and a top reveal gate (way back). */
+.preview-track {
+  height: 200vh;
+}
+
+/* ── Live-preview card — matches the grid's width + side padding ─────── */
+.preview-scene {
+  position: fixed;
+  top: var(--header-h, 0px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  padding: var(--space-5) var(--space-6);
+  /* Transparent so the frozen page-1 backdrop shows through unchanged — no
+     duplicate corner glow appears to “move” with the sliding second page. */
+  background: transparent;
+  /* Slide is set inline per scroll frame — no CSS easing so it tracks 1:1. */
+  transition: none;
+  transform: translateY(100%);
+  will-change: transform;
+}
+
+.preview-card {
+  flex: 1;
+  width: 100%;
+  /* Same content box as the grid: 1500px cap minus the grid's side padding. */
+  max-width: calc(1500px - 2 * var(--space-6));
+  margin: 0 auto;
+  min-height: 0;
+  /* Own opaque backdrop (translucent card sheen over solid app bg) so page-1
+     content never bleeds through the card while it slides in. */
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    ),
+    var(--color-bg-app);
+}
+
+/* The card fills the viewport, so the grid's hover lift is dropped. */
+.preview-card:hover {
+  transform: none;
+}
+
+preview-simulator {
+  position: relative;
+  flex: 1;
+  display: block;
+  min-height: 0;
+  margin-top: var(--space-4);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.preview-sim-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: var(--color-bg-canvas);
+  /* Purely visual — let wheel/scroll pass through to the page. */
+  pointer-events: none;
+}
+
+/* ── Pop-up pill: outer positioner (JS sets rise/opacity + top/bottom),
+   inner pill carries the visuals + activation animation ──────────────── */
+.preview-splash {
+  position: fixed;
+  left: 50%;
+  bottom: 16vh;
+  /* Above the card AND the fixed header so the top-gate pill drops in over the
+     header instead of being clipped behind it on the page-2 → page-1 reveal. */
+  z-index: 110;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.preview-splash-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3\.5) var(--space-7);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+  background:
+    linear-gradient(
+        color-mix(in srgb, var(--color-bg-surface) 78%, transparent),
+        color-mix(in srgb, var(--color-bg-surface) 78%, transparent)
+      )
+      padding-box,
+    linear-gradient(135deg, var(--color-accent-green), var(--color-accent-cyan))
+      border-box;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  /* Frosted-glass body + layered accent glow for a modern floating pill. */
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow:
+    0 8px 24px -6px
+      color-mix(in srgb, var(--color-accent-cyan) 55%, transparent),
+    0 2px 10px -2px
+      color-mix(in srgb, var(--color-accent-green) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  animation: preview-pill-float 3.6s ease-in-out infinite;
+}
+
+@keyframes preview-pill-float {
+  0%,
+  100% {
+    box-shadow:
+      0 8px 24px -6px
+        color-mix(in srgb, var(--color-accent-cyan) 55%, transparent),
+      0 2px 10px -2px
+        color-mix(in srgb, var(--color-accent-green) 45%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+  50% {
+    box-shadow:
+      0 12px 34px -6px
+        color-mix(in srgb, var(--color-accent-cyan) 75%, transparent),
+      0 4px 16px -2px
+        color-mix(in srgb, var(--color-accent-green) 60%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Soft glow halo behind the pill — always breathing for a lively feel. */
+.preview-splash-glow {
+  position: absolute;
+  inset: -55%;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-accent-cyan) 55%, transparent),
+    var(--color-accent-green-bg) 45%,
+    transparent 78%
+  );
+  opacity: 0.85;
+  filter: blur(4px);
+  animation: preview-glow-breathe 3.6s ease-in-out infinite;
+}
+
+@keyframes preview-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.06);
+  }
+}
+
+.preview-splash-label {
+  background: linear-gradient(
+    100deg,
+    var(--color-accent-green),
+    var(--color-accent-cyan)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Downward chevron drawn from borders (points toward the card below). The
+   L-shaped ink lands off the box centre once rotated, so --chev-nudge lifts it
+   to the optical centre (the up variant flips the sign). */
+.preview-splash-chevron {
+  --chev-nudge: calc(-0.25 * var(--space-3));
+  --chev-rot: 45deg;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-right: 2px solid var(--color-accent-cyan);
+  border-bottom: 2px solid var(--color-accent-cyan);
+  transform: translateY(var(--chev-nudge)) rotate(var(--chev-rot));
+  animation: preview-chevron-bob 1.6s ease-in-out infinite;
+}
+
+/* Way-back pill (page 2 → page 1): chevron points up toward the main page. */
+.preview-splash.is-from-top .preview-splash-chevron {
+  --chev-nudge: calc(0.25 * var(--space-3));
+  --chev-rot: -135deg;
+}
+
+/* Symmetric bob: equal travel above and below the optically-centred rest. */
+@keyframes preview-chevron-bob {
+  0%,
+  100% {
+    transform: translateY(calc(var(--chev-nudge) - 0.5 * var(--space-1)))
+      rotate(var(--chev-rot));
+  }
+  50% {
+    transform: translateY(calc(var(--chev-nudge) + 0.5 * var(--space-1)))
+      rotate(var(--chev-rot));
+  }
+}
+
+/* Activation flourish once the pill is fully revealed (end of phase B):
+   a springy pop, a glow ring pulse, and the label shimmering. */
+.preview-splash.is-active .preview-splash-pill {
+  animation: preview-splash-pop 0.5s cubic-bezier(0.22, 1.4, 0.4, 1);
+}
+
+.preview-splash.is-active .preview-splash-label {
+  animation: preview-label-shimmer 1.6s linear infinite;
+}
+
+.preview-splash.is-active .preview-splash-glow {
+  animation: preview-splash-ring 1.6s ease-out infinite;
+}
+
+@keyframes preview-splash-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes preview-label-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes preview-splash-ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.9);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .preview-splash-chevron,
+  .preview-splash.is-from-top .preview-splash-chevron,
+  .preview-splash-pill,
+  .preview-splash-glow,
+  .preview-splash.is-active .preview-splash-pill,
+  .preview-splash.is-active .preview-splash-label,
+  .preview-splash.is-active .preview-splash-glow {
+    animation: none;
+  }
+}

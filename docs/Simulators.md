@@ -1548,3 +1548,129 @@ no `bestPool` exists. With multi-select store cars, the panel uses
 - If all selected cars share identical params (`CarLoader.allParamsMatch`), the
   whole selection seeds the pool (`savePoolToStorage(activeCars)`).
 - Otherwise it alerts and seeds only the first selected car.
+
+---
+
+## Preview Simulator (landing page)
+
+### Purpose
+
+A self-contained, **non-interactive** "live traffic" showcase rendered on a
+single canvas as the landing page's second screen. It gives visitors a live
+glimpse of the trained cars driving a real map before they pick a mode. It is
+not a training tool — there is no gene pool, no panel, no toolbars, no network
+visualizer, and no mini-map.
+
+### Access
+
+`index.html` only. It has no URL of its own — scroll down past the mode-card
+grid and the wide **Live Preview** card slides up over the frozen grid (see the
+landing scroll sequence below).
+
+### Architecture
+
+`PreviewSimulatorElement` (`ts/ui/organisms/previewSimulator.ts`, the
+`<preview-simulator>` custom element) reuses the real `World` / `Car` /
+`Viewport` stack — the same driving brains and physics as the Live Traffic Jam
+simulator — but owns a **tiny purpose-built RAF loop** instead of extending
+`SimulatorShell`. This keeps the landing page light: no scaffolding, no panels,
+and the loop is inert until scrolled into view.
+
+```typescript
+class PreviewSimulatorElement extends HTMLElement {
+  activate(): Promise<void>; // lazy-init the world, then start the RAF loop
+  deactivate(): void; // stop the loop (last frame stays painted)
+}
+```
+
+### Lifecycle
+
+- **Inert by default.** `connectedCallback()` only creates the canvas + a
+  `ResizeObserver`; no world is built. The showcase costs nothing while the
+  mode-card grid is on screen.
+- **Lazy init on first `activate()`.** `#init()` runs `StoreManager.init()`,
+  picks a world and car configs from the store (below), builds the `World`, a
+  standalone `Viewport`, the border/traffic spatial grids, spawns the cars, and
+  centres the camera on the swarm.
+- **`deactivate()`** cancels the RAF loop and leaves the last frame painted.
+- `disconnectedCallback()` deactivates and disconnects the observer.
+
+The landing scroll controller (`initLandingPreview`, below) calls `activate()`
+when the card is at least ~2 % on screen and `deactivate()` when it leaves.
+
+### World & car selection (from the store)
+
+- **World:** the first `PREFERRED_WORLDS` match (`Ashkelon_part.world` — a
+  compact map — then `Ashkelon_city.world`); otherwise the active store world if
+  it has roads; otherwise the first store world with any road segments. The
+  curated maps win over the active selection so the showcase always frames a
+  road-dense neighbourhood. If none has roads the canvas stays blank and
+  `activate()` is a no-op.
+- **Cars:** all store cars (bundled + user-loaded), falling back to the active
+  car set. Each spawned car loads a random config from this list.
+
+### Simulation loop
+
+At init a random **anchor** segment is chosen and the road network is filtered
+to the segments within `CLUSTER_RADIUS` (2000 world px) of it
+(`#buildCluster()`, falling back to the whole network if fewer than
+`MIN_CLUSTER_SEGMENTS` are nearby). `PREVIEW_CAR_COUNT` (20) cars spawn — **and
+respawn** — only on those cluster segments, facing the segment's travel
+direction (two-way segments may flip at random). Clustering keeps the swarm
+together so the camera never drifts to an empty part of a large map. Each frame
+`#update()`:
+
+1. **Respawns wrecks** — a `damaged` car is replaced by a fresh one elsewhere in
+   the cluster so the scene never empties out.
+2. **Feeds sensors** — road borders (`queryBordersNearCar` over a
+   `SpatialHashGrid`), the other cars' polygons (an O(n²) neighbour scan,
+   trivial at 20 cars), and — for state-aware brains only — nearby traffic
+   controls (`queryTrafficControlsNearCar` over a `TrafficControlGrid`). Cars
+   crash into road borders as well as each other
+   (`PREVIEW_BORDER_COLLISION = true`).
+3. **Eases the camera** toward the centroid of the alive swarm
+   (`CAMERA_EASE = 0.06` per frame) so the view drifts with the pack.
+
+`#draw()` resets the viewport and draws the world (with `showStartMarkings:
+false` and viewport culling) then the alive cars with their collision masks. The
+render radius is **sized to the card** (`#fullViewRenderRadius()` = the visible
+bounds' half-diagonal + `RENDER_RADIUS_MARGIN`) rather than the viewport's
+default, so pseudo-3D buildings and trees fill the whole preview instead of a
+central disc. When the page is loaded with `?paused` (the visual-test hook)
+`activate()` paints exactly one deterministic frame and skips the loop.
+
+### Landing scroll sequence (`ts/store/landingPreview.ts`)
+
+`initLandingPreview()` wires a **pinned, symmetric reveal + auto-slide**
+scroll-transition between the mode-card grid (page 1) and the Live Preview card
+(page 2). It is a DOM/CSS controller only — it does not touch the simulator
+beyond `activate()` / `deactivate()`.
+
+The scroll runway is a hidden `.preview-track` spacer; scroll consumed inside it
+maps to gate/slide zones:
+
+| Zone         | Scroll span  | Behaviour                                    |
+| ------------ | ------------ | -------------------------------------------- |
+| Header phase | `[0, P]`     | Page 1 frozen, header collapses, no pill     |
+| Bottom gate  | `[P, P+r]`   | Page 1 frozen, "Watch them drive" pill rises |
+| Slide zone   | `[P+r, H−r]` | Card slides up; auto-snapped, never rests    |
+| Top gate     | `[H−r, H]`   | Page 2 frozen, "Back to main" pill drops in  |
+
+where `P = HEADER_PHASE_FRAC · vh` and `r = REVEAL_FRAC · vh`. Key behaviours:
+
+- **Never rests half-way.** Inside the slide zone the controller `snapTo()`s
+  whichever page you're heading toward, using a custom `glideTo()` RAF animation
+  (`SLIDE_MS` / longer `DOWN_SLIDE_MS` for the page-1 → page-2 glide) instead of
+  native smooth scroll for explicit, gentle timing.
+- **Dwell.** A fully-revealed pill lingers `DWELL_MS` before the page
+  auto-slides in the pill's lead direction.
+- **Header hysteresis.** `body.scrolled` is toggled with a low add / lower
+  remove threshold so the slim-header transition never flip-flops near the top;
+  the grid is pinned (`--grid-pin`) so the first scroll collapses the header in
+  place. Scroll anchoring is disabled in CSS so header height changes don't
+  shake the layout.
+- **Springy card entry.** On the way IN the card uses `easeOutBack` (a small
+  ~3 % overshoot); on the way OUT it stays linear so the exit reads smooth.
+- **Sim gating.** The sim runs only while the card is `> 2 %` on screen; page 1
+  is hidden (`body.preview-page2`) once page 2 fully covers the viewport so the
+  body's fixed glow backdrop shows through the transparent scene.

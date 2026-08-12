@@ -408,6 +408,7 @@ vi.mock('../../../../ts/viewport/viewport.js', () => ({
         maxX: 1000,
         maxY: 1000,
       })),
+      getRenderRadius: vi.fn(() => 1000),
     };
   },
 }));

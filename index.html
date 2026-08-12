@@ -242,6 +242,37 @@
       <store-panel></store-panel>
     </main>
 
+    <!-- Scroll budget for the pinned reveal + slide sequence (grid stays
+         frozen behind while this scrolls). -->
+    <div class="preview-track" aria-hidden="true"></div>
+
+    <!-- Wide live-preview card — fixed overlay that slides up over the frozen
+         grid during the second phase of the sequence. -->
+    <section class="preview-scene" aria-label="Live preview simulator">
+      <article class="landing-card preview-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <app-icon name="traffic-light" animate></app-icon>
+          </div>
+          <h2>Live Preview</h2>
+        </div>
+        <p class="card-desc">
+          Twenty trained cars driving themselves across a real map — ray-casting
+          sensors, hand-built neural nets, and live traffic lights.
+        </p>
+        <preview-simulator></preview-simulator>
+      </article>
+    </section>
+
+    <!-- Pop-up hint — fixed; rises over the frozen grid, then a full slide. -->
+    <div class="preview-splash" aria-hidden="true">
+      <div class="preview-splash-pill">
+        <span class="preview-splash-glow" aria-hidden="true"></span>
+        <span class="preview-splash-label">Watch them drive</span>
+        <span class="preview-splash-chevron"></span>
+      </div>
+    </div>
+
     <script type="module" src="/js/store/entry.js"></script>
   </body>
 </html>

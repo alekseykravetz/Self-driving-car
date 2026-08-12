@@ -297,16 +297,17 @@ Compound groups — composed from atoms to form reusable UI patterns.
 
 Full feature panel styles — complex compositions with their own layout and state.
 
-| File                      | Tag / Component                                           |
-| ------------------------- | --------------------------------------------------------- |
-| `_toolbar-panel.css`      | `<world-setup>` — the shared floating toolbar             |
-| `_modals.css`             | `<training-init-modal>`, `<human-training-config-modal>`  |
-| `_training-panel.css`     | `<training-panel>` — full training UI                     |
-| `_traffic-panel.css`      | `<traffic-panel>` — Live Traffic Jam stats panel          |
-| `_store-panel.css`        | `<store-panel>` — landing page asset viewer               |
-| `_human-training.css`     | `<human-training-panel>` — human backprop panel           |
-| `_world-layers.css`       | `<world-layers-toolbar>` — layer visibility controls      |
-| `_world-editor-panel.css` | `<world-editor-panel>` — road-type / metadata brush panel |
+| File                      | Tag / Component                                            |
+| ------------------------- | ---------------------------------------------------------- |
+| `_toolbar-panel.css`      | `<world-setup>` — the shared floating toolbar              |
+| `_modals.css`             | `<training-init-modal>`, `<human-training-config-modal>`   |
+| `_training-panel.css`     | `<training-panel>` — full training UI                      |
+| `_traffic-panel.css`      | `<traffic-panel>` — Live Traffic Jam stats panel           |
+| `_store-panel.css`        | `<store-panel>` — landing page asset viewer                |
+| `_human-training.css`     | `<human-training-panel>` — human backprop panel            |
+| `_world-layers.css`       | `<world-layers-toolbar>` — layer visibility controls       |
+| `_world-editor-panel.css` | `<world-editor-panel>` — road-type / metadata brush panel  |
+| `_preview-simulator.css`  | `<preview-simulator>` — landing-page live-preview showcase |
 
 ---
 
