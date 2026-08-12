@@ -21,7 +21,7 @@ import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.j
 const REVEAL_FRAC = 0.25;
 
 /** Fraction of a viewport spent collapsing the header before the pill sequence. */
-const HEADER_PHASE_FRAC = 0.2;
+const HEADER_PHASE_FRAC = 0.1;
 
 /** Duration (ms) of the programmatic page slide — longer = gentler glide. */
 const SLIDE_MS = 1600;
@@ -141,6 +141,7 @@ export function initLandingPreview(): void {
     }
     if (locked) pill = 0; // hide during the programmatic slide
     if (dwelling) pill = 1; // keep it fully shown while it lingers
+    if (y < 24) pill = 0; // never reveal at rest, whatever the grid height
 
     // Slide the pill in from just off the screen edge — opacity stays constant
     // (only the glow animates), so it “pops” from the very bottom / very top.
