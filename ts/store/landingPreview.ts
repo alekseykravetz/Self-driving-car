@@ -26,8 +26,12 @@ const HEADER_PHASE_FRAC = 0.1;
 /** Duration (ms) of the programmatic page slide — longer = gentler glide. */
 const SLIDE_MS = 1600;
 
+/** The page-1 → page-2 card slide gets extra time so it doesn't feel rushed
+ * (the up-slide already glides all the way to the top, so it reads longer). */
+const DOWN_SLIDE_MS = 2600;
+
 /** How long the fully-revealed pill lingers before the page auto-slides. */
-const DWELL_MS = 750;
+const DWELL_MS = 850;
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -36,6 +40,14 @@ const easeInOutQuad = (t: number): number =>
 
 /** Ease-out so the pill rushes most of the way into view early in the reveal. */
 const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
+
+/** Springy ease-out that overshoots then settles — gives the card a bump.
+ * A gentle back constant keeps the overshoot to a small sliver (~3%). */
+const easeOutBack = (t: number): number => {
+  const c1 = 0.9;
+  const c3 = c1 + 1;
+  return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;
+};
 
 export function initLandingPreview(): void {
   const header = document.querySelector<HTMLElement>('.landing-header');
@@ -59,6 +71,7 @@ export function initLandingPreview(): void {
   let lastHeaderH = -1;
   let lastGridPin = Number.NaN;
   let lastFromTop: boolean | null = null;
+  let lastSlide = 0; // previous card-slide fraction (for entry-only bump)
 
   // Current scroll position inside the gate/slide coordinate (0 = page 1).
   const measureScrolled = (): number => {
@@ -72,14 +85,14 @@ export function initLandingPreview(): void {
 
   // Custom scroll animation so the slide duration is explicit (native smooth
   // scroll gives no control) and gentle both ways.
-  const glideTo = (targetY: number): void => {
+  const glideTo = (targetY: number, duration = SLIDE_MS): void => {
     const startY = window.scrollY;
     const dist = targetY - startY;
     if (Math.abs(dist) < 1) return;
     const start = performance.now();
     cancelAnimationFrame(slideRaf);
     const step = (now: number): void => {
-      const t = clamp01((now - start) / SLIDE_MS);
+      const t = clamp01((now - start) / duration);
       window.scrollTo(0, startY + dist * easeInOutQuad(t));
       if (t < 1) slideRaf = requestAnimationFrame(step);
       else locked = false;
@@ -87,15 +100,19 @@ export function initLandingPreview(): void {
     slideRaf = requestAnimationFrame(step);
   };
 
-  const snapTo = (targetScrolled: number, scrolled: number): void => {
+  const snapTo = (
+    targetScrolled: number,
+    scrolled: number,
+    duration = SLIDE_MS,
+  ): void => {
     locked = true;
     // Heading back to page 1 glides all the way to the very top of the page
     // (not just the start of the gate zone), so the main page rests flush.
     const targetY =
       targetScrolled <= 0 ? 0 : window.scrollY + (targetScrolled - scrolled);
-    glideTo(targetY);
+    glideTo(targetY, duration);
     window.clearTimeout(unlockTimer);
-    unlockTimer = window.setTimeout(() => (locked = false), SLIDE_MS + 400);
+    unlockTimer = window.setTimeout(() => (locked = false), duration + 400);
   };
 
   const apply = (): void => {
@@ -176,7 +193,13 @@ export function initLandingPreview(): void {
     splash.classList.toggle('is-active', pill >= 0.9 && (!locked || dwelling));
 
     // Card slides up from below into place (tracks scroll, incl. auto-scroll).
-    scene.style.transform = `translateY(${(1 - slide) * 100}%)`;
+    // On the way IN (slide growing) a springy ease overshoots slightly so the
+    // card lands with a bump; on the way OUT it stays linear so the smooth
+    // page-2 → page-1 exit is undisturbed.
+    const entering = slide >= lastSlide;
+    const springSlide = entering && slide < 1 ? easeOutBack(slide) : slide;
+    lastSlide = slide;
+    scene.style.transform = `translateY(${(1 - springSlide) * 100}%)`;
 
     // Once page 2 fully covers the viewport, hide page 1 so the transparent
     // scene reveals the body's fixed glow backdrop (stationary) instead of the
@@ -211,7 +234,13 @@ export function initLandingPreview(): void {
         window.clearTimeout(dwellTimer);
         dwellTimer = window.setTimeout(() => {
           dwelling = false;
-          snapTo(goDown ? usable : 0, measureScrolled());
+          // The down (page-1 → page-2) card slide gets the longer duration so
+          // its second half doesn't feel rushed or jumpy.
+          snapTo(
+            goDown ? usable : 0,
+            measureScrolled(),
+            goDown ? DOWN_SLIDE_MS : SLIDE_MS,
+          );
         }, DWELL_MS);
       }
     }
