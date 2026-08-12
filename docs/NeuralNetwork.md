@@ -284,18 +284,20 @@ disengaged, all four controls are reset to `false` so the car stops immediately
 
 The brain is auto-saved to localStorage key `humanTrainedCar` (a single
 `CarInfo` JSON) every ~60 frames, on crash, and on page unload. Reloading the
-page restores the trained brain and resumes training. A "Download .car" button
-exports the brain as a standard `.car` file; "Reset brain" clears the save and
-starts fresh.
+page restores the trained brain and resumes training. The panel's **Storage**
+section makes this visible with a saved (green) / unsaved (orange) status dot and
+explicit **Save** / **Download .car** / **Clear** buttons; **New brain** starts
+fresh (via the config modal).
 
 ### Car configuration
 
-A config modal (`<human-training-config-modal>`) shown on entry and via a
-"Config" button lets the user set all car/sensor parameters (height, width,
-hidden layers, max speed, accel, friction, physics model, ray count/length/spread/offset,
-state-aware checkbox). When a saved brain exists, the config is locked (brain
-topology is fixed by the saved sensor/hidden-layer dims); "Reset brain" unlocks
-it.
+A config modal (`<human-training-config-modal>`) shown on entry (and reopened by
+the **New brain** button) lets the user set all car/sensor parameters (height,
+width, hidden layers, max speed, accel, friction, physics model, ray
+count/length/spread/offset, state-aware checkbox); it is pre-filled from the
+saved brain's `CarInfo` when one exists. Day-to-day tweaks use the panel's inline
+**Car Config** section instead, which rebuilds the car live and keeps the trained
+brain when the network topology is unchanged.
 
 ### Crash behavior
 

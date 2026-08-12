@@ -1140,7 +1140,6 @@ class HumanBackpropSimulator extends SimulatorShell {
   #panel: HumanTrainingPanelElement;
   #configModal: HumanTrainingConfigModalElement;
   #car: Car | null; // single KEYS car
-  #carConfig: CarInfo; // active car config
   world: IWorld | null;
   roadBorders: Point[][] | null;
 
@@ -1152,16 +1151,23 @@ class HumanBackpropSimulator extends SimulatorShell {
 ### Car lifecycle
 
 1. On entry, the config modal (`<human-training-config-modal>`) collects car
-   parameters. If a saved brain exists in `humanTrainedCar`, the config is
-   locked to the saved brain's topology.
+   parameters, pre-filled from the saved brain's `CarInfo` when one exists in
+   `humanTrainedCar` (the fields are editable, not locked). Its car-config
+   controls match the training-init modal's layout and input styles.
 2. `#applyConfigAndCreateCar` creates a single KEYS car with the chosen config,
-   loading the saved brain if present (else a fresh random brain).
+   reusing the saved brain when its topology matches (else a fresh random
+   brain — status shows "config changed, brain reset"). The chosen config is
+   mirrored into the panel's inline Car Config section.
 3. `Car.setLearningFromHuman(true)` enables training. Training runs only on
    frames that actually change the situation (see "Novelty-gated training").
 4. On crash, `#onCrash` saves the brain and respawns the car at the start
    (keeping the brain).
-5. "Reset brain" clears the save and creates a fresh random brain. "Reset car"
-   respawns without touching the brain. "Config" reopens the modal.
+5. The inline **Car Config** section rebuilds the car live on any edit,
+   preserving the brain when the network topology (rays / state-aware / hidden
+   layers) is unchanged and starting a fresh one otherwise. **Restart drive**
+   respawns the car without touching the brain; **New brain** reopens the config
+   modal and starts a fresh random brain (like the training simulator's "New
+   Training").
 
 ### Accuracy display
 
@@ -1315,14 +1321,26 @@ The `<human-training-panel>` displays live training information:
   (`brainChangedThisFrame`: a novel/decision frame that changed weights,
   including DAgger corrections in autopilot) — not every idle frame.
 - **Learning rate** — slider (0.01–0.5).
-- **Buttons** — Config, Download .car, Reset brain, Reset car.
-- **Status** — "Brain: fresh" or "Brain: loaded from save".
+- **Storage** — a section (matching the training panel's) with **Save** /
+  **Clear** / **Download .car** buttons and a status dot showing the brain is
+  **saved** (green) or has **unsaved** changes (orange). The dot flips orange the
+  moment training changes a weight and back to green on the next auto-save.
+- **Car Config** — a collapsible section (the shared `CarConfigPanel`, same as
+  the training panel) for live car/sensor edits; changing a param rebuilds the
+  car (see Car lifecycle step 5).
+- **Session** — **Restart drive** (respawn, keep brain) and **New brain**
+  (reopen the config modal for a fresh brain).
+- **Status** — "Brain: fresh", "Brain: loaded from save", or "Brain: saved".
 
 ### Persistence
 
 | Key               | Content                                                                                       |
 | ----------------- | --------------------------------------------------------------------------------------------- |
 | `humanTrainedCar` | Single `CarInfo` (brain + config), auto-saved every ~60 frames + on crash + on `beforeunload` |
+
+Auto-save is kept but made visible: the panel's Storage status dot shows saved
+(green) vs unsaved (orange), and **Save** persists immediately while **Clear**
+deletes the saved brain (the live brain keeps driving).
 
 ### Differences from the training simulator
 
