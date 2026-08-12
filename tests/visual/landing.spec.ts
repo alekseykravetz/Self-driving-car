@@ -54,10 +54,10 @@ test.describe('Landing page', () => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
 
-    // Hide the (off-screen) preview second-screen chrome so the baseline stays
-    // pixel-identical to the card grid and free of the splash's bob animation.
+    // Hide the reveal gap + live-preview scene so the baseline stays
+    // pixel-identical to the card grid (and free of the live canvas).
     await page.addStyleTag({
-      content: '.preview-splash, .preview-page { display: none !important; }',
+      content: '.preview-gap, .preview-scene { display: none !important; }',
     });
     await page.waitForTimeout(500);
 
@@ -69,17 +69,19 @@ test.describe('Landing page', () => {
     });
   });
 
-  test('the preview second screen opens and mounts a live sim canvas', async ({
+  test('scrolling to the preview scene mounts and activates a live sim', async ({
     page,
   }) => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
 
-    await page.locator('.preview-splash').click({ force: true });
-    await expect(page.locator('body')).toHaveClass(/preview-open/);
+    await page.locator('.preview-scene').scrollIntoViewIfNeeded();
+    await expect(page.locator('.preview-scene')).toHaveClass(/preview-active/);
     await expect(page.locator('preview-simulator canvas')).toBeVisible();
 
-    await page.locator('.preview-back-btn').click();
-    await expect(page.locator('body')).not.toHaveClass(/preview-open/);
+    await page.evaluate(() => window.scrollTo({ top: 0 }));
+    await expect(page.locator('.preview-scene')).not.toHaveClass(
+      /preview-active/,
+    );
   });
 });

@@ -1,128 +1,104 @@
 import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.js';
 
 /**
- * Landing "second screen" controller.
+ * Landing scroll-transition controller.
  *
- * Drives a hard two-page swap between the regular card grid (page 1) and the
- * full-screen Preview Simulator (page 2). A splash button fades in at the
- * bottom of page 1 once the user scrolls to the end of the grid; activating it
- * (click, wheel-down, PageDown/ArrowDown, or swipe-up) slides page 2 up. On
- * page 2 a wheel-up, swipe-down, Escape/ArrowUp, or the Back control slides it
- * back down. The landing header morphs into a compact toolbar while page 2 is
- * open (driven purely by the `preview-open` body class in CSS).
+ * One continuous scroll for the whole page. After the card grid comes a short
+ * "gap" section: as the user keeps scrolling, a splash rises from the bottom
+ * (its reveal tied directly to scroll progress through the gap). Once the
+ * splash is fully revealed a single smooth slide (one viewport tall) carries
+ * the view down onto the big live-preview card. Scrolling back up mirrors it —
+ * a full slide up to the splash, then the reveal reverses back into the grid.
  *
- * The Preview Simulator loop only runs while page 2 is open (activate on open,
- * deactivate on close) so the landing grid stays cheap.
+ * The Preview Simulator loop only runs while its card is on screen
+ * (activate/deactivate driven by an IntersectionObserver).
  */
 
-/** Distance (px) from the bottom of page 1 that reveals the down splash. */
-const BOTTOM_REVEAL_PX = 120;
-/** Minimum vertical swipe (px) that counts as a page-swap gesture. */
-const SWIPE_THRESHOLD_PX = 60;
-/** Cooldown (ms) after a swap before another gesture can fire. */
-const SWAP_COOLDOWN_MS = 700;
+/** ms after a programmatic slide during which triggers are suppressed. */
+const SLIDE_LOCK_MS = 750;
+
+const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
 export function initLandingPreview(): void {
-  const body = document.body;
-  const previewPage = document.querySelector<HTMLElement>('.preview-page');
+  const gap = document.querySelector<HTMLElement>('.preview-gap');
+  const scene = document.querySelector<HTMLElement>('.preview-scene');
+  const splash = document.querySelector<HTMLElement>('.preview-splash');
   const sim =
     document.querySelector<PreviewSimulatorElement>('preview-simulator');
-  const downSplash = document.querySelector<HTMLElement>('.preview-splash');
-  const backControls = document.querySelectorAll<HTMLElement>(
-    '[data-preview-back]',
-  );
-  if (!previewPage || !sim || !downSplash) return;
+  if (!gap || !scene || !splash || !sim) return;
 
-  let open = false;
-  let lastSwap = 0;
+  let locked = false;
+  let lastY = window.scrollY;
+  let ticking = false;
 
-  const canSwap = (): boolean => Date.now() - lastSwap > SWAP_COOLDOWN_MS;
-
-  const openPreview = (): void => {
-    if (open) return;
-    open = true;
-    lastSwap = Date.now();
-    body.classList.add('preview-open');
-    void sim.activate();
+  const lock = (): void => {
+    locked = true;
+    window.setTimeout(() => (locked = false), SLIDE_LOCK_MS);
   };
 
-  const closePreview = (): void => {
-    if (!open) return;
-    open = false;
-    lastSwap = Date.now();
-    body.classList.remove('preview-open');
-    sim.deactivate();
+  const slideTo = (docY: number): void => {
+    lock();
+    window.scrollTo({ top: docY, behavior: 'smooth' });
   };
 
-  // Reveal the down splash near the bottom of the grid.
-  const updateSplash = (): void => {
-    if (open) return;
-    const atBottom =
-      window.innerHeight + window.scrollY >=
-      document.body.scrollHeight - BOTTOM_REVEAL_PX;
-    body.classList.toggle('at-bottom', atBottom);
+  const apply = (): void => {
+    ticking = false;
+    const y = window.scrollY;
+    const vh = window.innerHeight;
+    const dir = y - lastY; // >0 scrolling down
+    lastY = y;
+
+    const gapRect = gap.getBoundingClientRect();
+    const sceneRect = scene.getBoundingClientRect();
+    const gapTopDoc = gapRect.top + y;
+    const sceneTopDoc = sceneRect.top + y;
+    const span = Math.max(1, sceneTopDoc - gapTopDoc); // gap height in px
+
+    // reveal: 0 as the gap first peeks in at the bottom, 1 once fully scrolled
+    // through — at which point the scene's top sits exactly at the viewport
+    // bottom, ready for a one-viewport slide.
+    const reveal = clamp01((y - (gapTopDoc - vh)) / span);
+    // sceneFill: 0 when the scene top is at the viewport bottom, 1 when it
+    // reaches the top (the card fills the screen).
+    const sceneFill = clamp01((y - (sceneTopDoc - vh)) / vh);
+
+    // Splash rises with the reveal, then fades as the scene slides over it.
+    const opacity = clamp01(reveal - sceneFill);
+    splash.style.opacity = String(opacity);
+    splash.style.transform = `translate(-50%, ${(1 - reveal) * 48}px)`;
+    splash.style.visibility = opacity <= 0.001 ? 'hidden' : 'visible';
+
+    if (locked) return;
+
+    // Reveal complete → full slide down onto the card.
+    if (dir > 0 && reveal >= 0.999 && sceneFill < 0.02) {
+      slideTo(sceneTopDoc);
+    } else if (dir < 0 && sceneFill >= 0.999) {
+      // Leaving the card upward → full slide up to the fully-revealed splash.
+      slideTo(sceneTopDoc - vh);
+    }
   };
-  window.addEventListener('scroll', updateSplash, { passive: true });
-  window.addEventListener('resize', updateSplash);
-  updateSplash();
 
-  // Splash + back affordances.
-  downSplash.addEventListener('click', openPreview);
-  backControls.forEach((el) => el.addEventListener('click', closePreview));
+  const onScroll = (): void => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(apply);
+  };
 
-  // Wheel: down at the bottom opens, up on page 2 closes.
-  window.addEventListener(
-    'wheel',
-    (e) => {
-      if (!canSwap()) return;
-      if (open) {
-        if (e.deltaY < 0) closePreview();
-      } else if (e.deltaY > 0 && body.classList.contains('at-bottom')) {
-        openPreview();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  apply();
+
+  // Run the sim only while its card is visible.
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        scene.classList.toggle('preview-active', entry.isIntersecting);
+        if (entry.isIntersecting) void sim.activate();
+        else sim.deactivate();
       }
     },
-    { passive: true },
+    { threshold: 0.15 },
   );
-
-  // Keyboard.
-  window.addEventListener('keydown', (e) => {
-    if (open) {
-      if (e.key === 'Escape' || e.key === 'ArrowUp' || e.key === 'PageUp') {
-        closePreview();
-      }
-      return;
-    }
-    if (
-      (e.key === 'ArrowDown' || e.key === 'PageDown') &&
-      body.classList.contains('at-bottom') &&
-      canSwap()
-    ) {
-      openPreview();
-    }
-  });
-
-  // Touch: swipe up at the bottom opens, swipe down on page 2 closes.
-  let touchStartY = 0;
-  window.addEventListener(
-    'touchstart',
-    (e) => (touchStartY = e.touches[0]?.clientY ?? 0),
-    { passive: true },
-  );
-  window.addEventListener(
-    'touchend',
-    (e) => {
-      if (!canSwap()) return;
-      const endY = e.changedTouches[0]?.clientY ?? touchStartY;
-      const dy = endY - touchStartY;
-      if (open) {
-        if (dy > SWIPE_THRESHOLD_PX) closePreview();
-      } else if (
-        dy < -SWIPE_THRESHOLD_PX &&
-        body.classList.contains('at-bottom')
-      ) {
-        openPreview();
-      }
-    },
-    { passive: true },
-  );
+  io.observe(scene);
 }

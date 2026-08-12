@@ -242,57 +242,30 @@
       <store-panel></store-panel>
     </main>
 
-    <!-- Bottom splash: fades in near the end of the grid, slides to page 2 -->
-    <button
-      type="button"
-      class="preview-splash"
-      aria-label="Open the live preview simulator"
-    >
-      <span class="preview-splash-label">Watch them drive</span>
-      <span class="preview-splash-chevron" aria-hidden="true">
-        <app-icon name="car" animate></app-icon>
-      </span>
-    </button>
-
-    <!-- Page 2: full-screen live Preview Simulator -->
-    <section class="preview-page" aria-label="Live preview simulator">
-      <header class="preview-toolbar">
-        <div class="preview-toolbar-brand">
-          <img
-            class="preview-toolbar-logo"
-            src="/assets/logo.svg"
-            alt=""
-            width="32"
-            height="32"
-          />
-          <span class="preview-toolbar-title">Live Preview</span>
-        </div>
-        <button
-          type="button"
-          class="preview-back-btn"
-          data-preview-back
-          aria-label="Back to the main page"
-        >
-          <app-icon name="road" animate></app-icon>
-          <span>Back</span>
-        </button>
-      </header>
-
-      <div class="preview-stage">
-        <div class="preview-card">
-          <preview-simulator></preview-simulator>
-        </div>
+    <!-- Scroll transition: a gap that reveals a rising splash, then a full
+         slide carries the view down to the big live-preview card. -->
+    <div class="preview-gap" aria-hidden="true">
+      <div class="preview-splash">
+        <span class="preview-splash-chevron"></span>
+        <span class="preview-splash-label">Watch them drive</span>
       </div>
+    </div>
 
-      <button
-        type="button"
-        class="preview-return"
-        data-preview-back
-        aria-label="Back to the main page"
-      >
-        <span class="preview-return-chevron" aria-hidden="true"></span>
-        <span>Back to top</span>
-      </button>
+    <!-- Big live-preview card — same card styling as the grid, only full-size. -->
+    <section class="preview-scene" aria-label="Live preview simulator">
+      <article class="landing-card preview-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <app-icon name="traffic-light" animate></app-icon>
+          </div>
+          <h2>Live Preview</h2>
+        </div>
+        <p class="card-desc">
+          Twenty trained cars driving themselves across a real map — ray-casting
+          sensors, hand-built neural nets, and live traffic lights.
+        </p>
+        <preview-simulator></preview-simulator>
+      </article>
     </section>
 
     <script type="module" src="/js/store/entry.js"></script>
