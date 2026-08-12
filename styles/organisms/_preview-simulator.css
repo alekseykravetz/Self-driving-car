@@ -104,8 +104,9 @@ preview-simulator {
   position: fixed;
   left: 50%;
   bottom: 16vh;
-  /* Above the card so it shows over page 2 during the way-back reveal. */
-  z-index: 70;
+  /* Above the card AND the fixed header so the top-gate pill drops in over the
+     header instead of being clipped behind it on the page-2 → page-1 reveal. */
+  z-index: 110;
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%);

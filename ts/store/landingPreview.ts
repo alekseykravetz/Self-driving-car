@@ -34,6 +34,9 @@ const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 const easeInOutQuad = (t: number): number =>
   t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 
+/** Ease-out so the pill rushes most of the way into view early in the reveal. */
+const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
+
 export function initLandingPreview(): void {
   const header = document.querySelector<HTMLElement>('.landing-header');
   const grid = document.querySelector<HTMLElement>('.landing-sections');
@@ -86,7 +89,11 @@ export function initLandingPreview(): void {
 
   const snapTo = (targetScrolled: number, scrolled: number): void => {
     locked = true;
-    glideTo(window.scrollY + (targetScrolled - scrolled));
+    // Heading back to page 1 glides all the way to the very top of the page
+    // (not just the start of the gate zone), so the main page rests flush.
+    const targetY =
+      targetScrolled <= 0 ? 0 : window.scrollY + (targetScrolled - scrolled);
+    glideTo(targetY);
     window.clearTimeout(unlockTimer);
     unlockTimer = window.setTimeout(() => (locked = false), SLIDE_MS + 400);
   };
@@ -145,7 +152,9 @@ export function initLandingPreview(): void {
 
     // Slide the pill in from just off the screen edge — opacity stays constant
     // (only the glow animates), so it “pops” from the very bottom / very top.
-    const rise = (1 - pill) * 180;
+    // Ease-out the travel so it clears the screen edge (and, on the top gate,
+    // the fixed header) early in the reveal instead of lingering half-hidden.
+    const rise = (1 - easeOutCubic(pill)) * 180;
     splash.style.opacity = '1';
     splash.style.visibility = pill <= 0.001 ? 'hidden' : 'visible';
     if (fromTop) {
