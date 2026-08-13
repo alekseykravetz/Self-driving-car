@@ -529,20 +529,20 @@ Use only if smaller variants cannot produce stable behavior. Treat this as a red
 
 Record one row after each experiment.
 
-| Variant  | Browser / viewport | Jitter 0-5 | Lag 0-5 | Longest frame | Main finding | Keep? |
-| -------- | ------------------ | ---------: | ------: | ------------: | ------------ | ----- |
-| Baseline |                    |            |         |               |              |       |
-| 0        |                    |            |         |               |              |       |
-| 1        | Chromium, desktop + narrow | not measured | not measured | not measured | Header layout footprint is now stable; landing visual and scroll activation tests pass. Manual interaction/performance scoring still required. | Candidate |
-| 2        |                    |            |         |               |              |       |
-| 3        |                    |            |         |               |              |       |
-| 4        |                    |            |         |               |              |       |
-| 5        |                    |            |         |               |              |       |
-| 6        |                    |            |         |               |              |       |
-| 7        |                    |            |         |               |              |       |
-| 8        |                    |            |         |               |              |       |
-| 9        |                    |            |         |               |              |       |
-| 10       |                    |            |         |               |              |       |
+| Variant  | Browser / viewport         |   Jitter 0-5 |      Lag 0-5 | Longest frame | Main finding                                                                                                                                   | Keep?     |
+| -------- | -------------------------- | -----------: | -----------: | ------------: | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Baseline |                            |              |              |               |                                                                                                                                                |           |
+| 0        |                            |              |              |               |                                                                                                                                                |           |
+| 1        | Chromium, desktop + narrow | not measured | not measured |  not measured | Header layout footprint is now stable; landing visual and scroll activation tests pass. Manual interaction/performance scoring still required. | Candidate |
+| 2        |                            |              |              |               |                                                                                                                                                |           |
+| 3        |                            |              |              |               |                                                                                                                                                |           |
+| 4        |                            |              |              |               |                                                                                                                                                |           |
+| 5        |                            |              |              |               |                                                                                                                                                |           |
+| 6        |                            |              |              |               |                                                                                                                                                |           |
+| 7        |                            |              |              |               |                                                                                                                                                |           |
+| 8        |                            |              |              |               |                                                                                                                                                |           |
+| 9        |                            |              |              |               |                                                                                                                                                |           |
+| 10       |                            |              |              |               |                                                                                                                                                |           |
 
 ## Acceptance Criteria For The Final Change
 
