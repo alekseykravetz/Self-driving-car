@@ -4,6 +4,14 @@
   z-index: 100;
   padding: var(--space-8) var(--space-5) var(--space-4);
   text-align: center;
+  transition: opacity var(--transition-normal) ease;
+}
+
+/* Hide the fixed header while the first page transitions away. Its layout
+   footprint remains unchanged so scroll geometry stays stable. */
+body.header-hidden .landing-header {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .landing-header h1 {

@@ -184,6 +184,11 @@ export function initLandingPreview(): void {
     lastSlide = slide;
     scene.style.transform = `translateY(${(1 - springSlide) * 100}%)`;
 
+    // Keep the fixed header out of the way while page 1 moves under the
+    // transition, then bring it back once page 2 has fully arrived. Opacity
+    // changes do not affect the stable header geometry.
+    document.body.classList.toggle('header-hidden', y >= 24 && slide < 0.99);
+
     // Once page 2 fully covers the viewport, hide page 1 so the transparent
     // scene reveals the body's fixed glow backdrop (stationary) instead of the
     // page-1 cards bleeding through.
