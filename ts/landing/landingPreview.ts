@@ -51,14 +51,13 @@ const easeOutBack = (t: number): number => {
 
 export function initLandingPreview(): void {
   const header = document.querySelector<HTMLElement>('.landing-header');
-  const grid = document.querySelector<HTMLElement>('.landing-sections');
   const track = document.querySelector<HTMLElement>('.preview-track');
   const scene = document.querySelector<HTMLElement>('.preview-scene');
   const splash = document.querySelector<HTMLElement>('.preview-splash');
   const label = document.querySelector<HTMLElement>('.preview-splash-label');
   const sim =
     document.querySelector<PreviewSimulatorElement>('preview-simulator');
-  if (!header || !grid || !track || !scene || !splash || !sim) return;
+  if (!header || !track || !scene || !splash || !sim) return;
 
   let ticking = false;
   let running = false;
@@ -69,7 +68,6 @@ export function initLandingPreview(): void {
   let slideRaf = 0;
   let lastY = window.scrollY;
   let lastHeaderH = -1;
-  let lastGridPin = Number.NaN;
   let lastFromTop: boolean | null = null;
   let lastSlide = 0; // previous card-slide fraction (for entry-only bump)
 
@@ -121,23 +119,14 @@ export function initLandingPreview(): void {
     const dir = y - lastY; // >0 scrolling down
     lastY = y;
 
-    // Publish the header height + grid pin offset (only when they change).
+    // Publish the stable header height (only when it changes).
     const headerH = Math.round(header.getBoundingClientRect().height);
     if (headerH !== lastHeaderH) {
       document.documentElement.style.setProperty('--header-h', `${headerH}px`);
       lastHeaderH = headerH;
     }
-    const gridPin = Math.min(0, vh - grid.offsetHeight);
-    if (gridPin !== lastGridPin) {
-      document.documentElement.style.setProperty('--grid-pin', `${gridPin}px`);
-      lastGridPin = gridPin;
-    }
-    // When page 1 fits, pin the grid under the header (see CSS) so the first
-    // scroll collapses the header in place instead of sliding the grid.
-    document.body.classList.toggle('grid-fits', gridPin === 0);
-
-    // Scroll consumed within the pinned track. The gate/slide zones are:
-    //   [0, r]        bottom reveal gate  (page 1 frozen, pill from bottom)
+    // Scroll consumed within the preview track. The gate/slide zones are:
+    //   [0, r]        bottom reveal gate  (page 1, pill from bottom)
     //   [.., H-r]     slide zone          (card slides; auto-snapped)
     //   [H-r, H]      top reveal gate     (page 2 frozen, pill from top)
     const H = track.offsetHeight;
