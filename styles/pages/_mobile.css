@@ -33,6 +33,16 @@
     padding: var(--space-6) var(--space-5);
   }
 
+  /* Keep this card's description at three lines. Font metrics differ between
+     macOS and the Linux CI runner; an extra wrapped line otherwise changes
+     the full-page visual snapshot height by one line. */
+  .landing-sections > .landing-card:nth-child(5) .card-desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+
   store-panel {
     grid-column: span 1;
   }

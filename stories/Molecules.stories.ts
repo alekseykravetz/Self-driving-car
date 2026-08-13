@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import type { ShortcutDef } from '../ts/input/types.js';
+import { StoreManager } from '../ts/store/storeManager.js';
 import type { ShortcutsToolbarElement } from '../ts/ui/molecules/shortcutsToolbar.js';
 
 // Bare side-effect imports guarantee each custom element self-registers even
@@ -229,13 +230,16 @@ export const WorldSetup: StoryObj = {
     // the “Selected” group; without it the picker buttons are inert and the
     // selected rows stay hidden. showWorldEditorActions() surfaces the editor
     // Storage + Import-from-OSM buttons so the story matches the world editor.
-    requestAnimationFrame(() => {
+    requestAnimationFrame(async () => {
+      // StoreManager loads the real manifest and assets from Storybook's
+      // `/store` static directory, just as the application entry points do.
+      await StoreManager.init();
       el.showWorldEditorActions();
       el.configureSelectors({ carMode: 'multi' });
     });
     return stage(
       el,
-      'The simulator / world-editor setup toolbar: border mode (none / damage / collision), camera tracking, viewport mode and the world/car asset selectors. Click the <strong>globe</strong> or <strong>car</strong> button to open its picker popup; chosen assets appear under <strong>Selected</strong>. Self-wraps in a collapsible “Setup” container via <code>makeToolbarCollapsible</code>.',
+      'The simulator / world-editor setup toolbar: border mode (none / damage / collision), camera tracking, viewport mode and world/car asset selection. Click the <strong>globe</strong> or <strong>car</strong> button to open its picker popup; chosen assets appear under <strong>Selected</strong>. Self-wraps in a collapsible “Setup” container via <code>makeToolbarCollapsible</code>.',
       'canvas',
     );
   },

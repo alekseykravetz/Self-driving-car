@@ -54,7 +54,7 @@ import '../ui/molecules/worldSetupTemplate.js';
 import '../ui/molecules/shortcutsToolbarTemplate.js';
 import '../ui/molecules/worldLayersToolbarTemplate.js';
 import '../ui/molecules/modeControls.js';
-import '../ui/organisms/assetSelectors.js';
+import '../ui/molecules/assetSelectors.js';
 import '../ui/molecules/worldSetup.js';
 import '../ui/molecules/shortcutsToolbar.js';
 import '../ui/molecules/worldLayersToolbar.js';
