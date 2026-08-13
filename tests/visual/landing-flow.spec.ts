@@ -61,7 +61,18 @@ test.describe('Landing page launch flows', () => {
         // Camera/mic access legitimately fails in headless Chromium.
         if (text.includes('Error accessing camera')) return;
         if (text.includes('getUserMedia')) return;
+        // Chromium reports external font CDN failures as console errors. They
+        // do not indicate that the page bootstrap failed.
+        if (text.includes('Failed to load resource')) return;
         fatalErrors.push(text);
+      });
+      page.on('response', (response) => {
+        if (
+          response.status() === 404 &&
+          response.url().startsWith('http://localhost:9090/')
+        ) {
+          fatalErrors.push(`404 ${response.url()}`);
+        }
       });
 
       await page.goto('/');
