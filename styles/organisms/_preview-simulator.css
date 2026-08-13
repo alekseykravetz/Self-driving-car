@@ -19,7 +19,7 @@ body.preview-page2 .landing-sections {
 /* Scroll budget for the bottom reveal gate, auto-slide zone, and top reveal
    gate (way back). */
 .preview-track {
-  height: 200vh;
+  height: 125vh;
 }
 
 /* ── Live-preview card — matches the grid's width + side padding ─────── */

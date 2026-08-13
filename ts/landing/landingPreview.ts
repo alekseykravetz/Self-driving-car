@@ -18,10 +18,10 @@ import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.j
  */
 
 /** Fraction of a viewport of scroll each reveal gate consumes. */
-const REVEAL_FRAC = 0.3;
+const REVEAL_FRAC = 0.2;
 
 /** Distance the pill travels from outside the viewport into its resting spot. */
-const PILL_TRAVEL_PX = 240;
+const PILL_TRAVEL_PX = 90;
 
 /** Duration (ms) of the programmatic page slide — longer = gentler glide. */
 const SLIDE_MS = 1600;
