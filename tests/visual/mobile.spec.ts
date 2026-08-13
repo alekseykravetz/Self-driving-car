@@ -31,6 +31,12 @@ test.describe('Mobile layout', () => {
 
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
+    // The landing page uses a remote font and a scroll-driven header. Wait for
+    // the font/layout pass so full-page capture cannot race the first paint.
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      window.scrollTo(0, 0);
+    });
     await page.waitForTimeout(500);
 
     expect(errors).toEqual([]);
