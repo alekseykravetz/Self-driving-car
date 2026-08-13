@@ -79,16 +79,16 @@ The pill and preview use:
 
 ## Hypotheses
 
-| ID | Hypothesis | Symptom explained | Confidence |
-| --- | --- | --- | --- |
-| H1 | Header height changes during scroll cause layout corrections. | Page/header/grid visibly shake, especially at the first scroll and near the top. | High |
-| H2 | Dynamic sticky offsets and repeated geometry reads/writes cause forced layout work. | Small jumps and inconsistent scroll response. | High |
-| H3 | `window.scrollTo()` animation feeds back into the scroll listener. | Auto-slide can feel uneven or fight the user when direction changes. | High |
-| H4 | The live simulator competes with scroll rendering on the main thread. | Transition becomes laggy only when the preview appears. | High |
-| H5 | First-time preview initialization causes a one-off hitch. | The first reveal is worse than later reveals. | High |
-| H6 | Backdrop blur, animated shadows, and glow filters cause compositor pressure. | Pill/card movement is worse on slower GPUs or mobile browsers. | Medium |
-| H7 | The intentional `easeOutBack` overshoot looks like accidental shaking. | Card landing has a bump or overshoot, especially on reverse direction. | Medium |
-| H8 | Scroll and programmatic animation use separate RAF loops. | Timing can become uneven under load. | Medium |
+| ID  | Hypothesis                                                                          | Symptom explained                                                                | Confidence |
+| --- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------- |
+| H1  | Header height changes during scroll cause layout corrections.                       | Page/header/grid visibly shake, especially at the first scroll and near the top. | High       |
+| H2  | Dynamic sticky offsets and repeated geometry reads/writes cause forced layout work. | Small jumps and inconsistent scroll response.                                    | High       |
+| H3  | `window.scrollTo()` animation feeds back into the scroll listener.                  | Auto-slide can feel uneven or fight the user when direction changes.             | High       |
+| H4  | The live simulator competes with scroll rendering on the main thread.               | Transition becomes laggy only when the preview appears.                          | High       |
+| H5  | First-time preview initialization causes a one-off hitch.                           | The first reveal is worse than later reveals.                                    | High       |
+| H6  | Backdrop blur, animated shadows, and glow filters cause compositor pressure.        | Pill/card movement is worse on slower GPUs or mobile browsers.                   | Medium     |
+| H7  | The intentional `easeOutBack` overshoot looks like accidental shaking.              | Card landing has a bump or overshoot, especially on reverse direction.           | Medium     |
+| H8  | Scroll and programmatic animation use separate RAF loops.                           | Timing can become uneven under load.                                             | Medium     |
 
 ## Baseline Protocol
 
@@ -529,20 +529,20 @@ Use only if smaller variants cannot produce stable behavior. Treat this as a red
 
 Record one row after each experiment.
 
-| Variant | Browser / viewport | Jitter 0-5 | Lag 0-5 | Longest frame | Main finding | Keep? |
-| --- | --- | ---: | ---: | ---: | --- | --- |
-| Baseline |  |  |  |  |  |  |
-| 0 |  |  |  |  |  |  |
-| 1 |  |  |  |  |  |  |
-| 2 |  |  |  |  |  |  |
-| 3 |  |  |  |  |  |  |
-| 4 |  |  |  |  |  |  |
-| 5 |  |  |  |  |  |  |
-| 6 |  |  |  |  |  |  |
-| 7 |  |  |  |  |  |  |
-| 8 |  |  |  |  |  |  |
-| 9 |  |  |  |  |  |  |
-| 10 |  |  |  |  |  |  |
+| Variant  | Browser / viewport | Jitter 0-5 | Lag 0-5 | Longest frame | Main finding | Keep? |
+| -------- | ------------------ | ---------: | ------: | ------------: | ------------ | ----- |
+| Baseline |                    |            |         |               |              |       |
+| 0        |                    |            |         |               |              |       |
+| 1        | Chromium, desktop + narrow | not measured | not measured | not measured | Header layout footprint is now stable; landing visual and scroll activation tests pass. Manual interaction/performance scoring still required. | Candidate |
+| 2        |                    |            |         |               |              |       |
+| 3        |                    |            |         |               |              |       |
+| 4        |                    |            |         |               |              |       |
+| 5        |                    |            |         |               |              |       |
+| 6        |                    |            |         |               |              |       |
+| 7        |                    |            |         |               |              |       |
+| 8        |                    |            |         |               |              |       |
+| 9        |                    |            |         |               |              |       |
+| 10       |                    |            |         |               |              |       |
 
 ## Acceptance Criteria For The Final Change
 
