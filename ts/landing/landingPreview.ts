@@ -13,15 +13,15 @@ import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.j
  *
  * The slide zone between the two gates never rests half-way — it snaps to
  * whichever page you're heading toward. The pill is hidden during the
- * programmatic slide. Header slimming uses hysteresis and the page disables
- * scroll anchoring (CSS) so header height changes don't shake the layout.
+ * programmatic slide. The header remains unchanged throughout the sequence,
+ * and the page disables scroll anchoring (CSS) for stable layout geometry.
  */
 
 /** Fraction of a viewport of scroll each reveal gate consumes. */
-const REVEAL_FRAC = 0.25;
+const REVEAL_FRAC = 0.3;
 
-/** Fraction of a viewport spent collapsing the header before the pill sequence. */
-const HEADER_PHASE_FRAC = 0.1;
+/** Distance the pill travels from outside the viewport into its resting spot. */
+const PILL_TRAVEL_PX = 240;
 
 /** Duration (ms) of the programmatic page slide — longer = gentler glide. */
 const SLIDE_MS = 1600;
@@ -77,10 +77,9 @@ export function initLandingPreview(): void {
   const measureScrolled = (): number => {
     const vh2 = window.innerHeight;
     const H2 = track.offsetHeight;
-    const P2 = HEADER_PHASE_FRAC * vh2;
     const top2 = track.getBoundingClientRect().top;
     const raw2 = Math.min(Math.max(vh2 - top2, 0), H2);
-    return Math.max(0, raw2 - P2);
+    return raw2;
   };
 
   // Custom scroll animation so the slide duration is explicit (native smooth
@@ -122,13 +121,6 @@ export function initLandingPreview(): void {
     const dir = y - lastY; // >0 scrolling down
     lastY = y;
 
-    // Slim the header on the very first scroll, with hysteresis so it never
-    // flip-flops near the top. Low threshold so the collapse is tied to the
-    // first wheel step (the grid is pinned, so only the header visibly moves).
-    const slim = document.body.classList.contains('scrolled');
-    if (!slim && y > 8) document.body.classList.add('scrolled');
-    else if (slim && y < 4) document.body.classList.remove('scrolled');
-
     // Publish the header height + grid pin offset (only when they change).
     const headerH = Math.round(header.getBoundingClientRect().height);
     if (headerH !== lastHeaderH) {
@@ -144,19 +136,16 @@ export function initLandingPreview(): void {
     // scroll collapses the header in place instead of sliding the grid.
     document.body.classList.toggle('grid-fits', gridPin === 0);
 
-    // Scroll consumed within the pinned track. A leading header-phase budget
-    // (P) is spent only collapsing the header, then the gate/slide zones:
-    //   [0, P]        header phase        (page 1, header collapses, no pill)
-    //   [P, P+r]      bottom reveal gate  (page 1 frozen, pill from bottom)
+    // Scroll consumed within the pinned track. The gate/slide zones are:
+    //   [0, r]        bottom reveal gate  (page 1 frozen, pill from bottom)
     //   [.., H-r]     slide zone          (card slides; auto-snapped)
     //   [H-r, H]      top reveal gate     (page 2 frozen, pill from top)
     const H = track.offsetHeight;
-    const P = HEADER_PHASE_FRAC * vh;
-    const usable = Math.max(1, H - P);
+    const usable = Math.max(1, H);
     const r = REVEAL_FRAC * vh;
     const trackTop = track.getBoundingClientRect().top;
     const raw = Math.min(Math.max(vh - trackTop, 0), H);
-    const scrolled = Math.max(0, raw - P); // 0 throughout the header phase
+    const scrolled = raw;
     const slide = clamp01((scrolled - r) / Math.max(1, usable - 2 * r));
 
     // Which pill (if any) is revealing, and how far.
@@ -176,7 +165,7 @@ export function initLandingPreview(): void {
     // (only the glow animates), so it “pops” from the very bottom / very top.
     // Ease-out the travel so it clears the screen edge (and, on the top gate,
     // the fixed header) early in the reveal instead of lingering half-hidden.
-    const rise = (1 - easeOutCubic(pill)) * 180;
+    const rise = (1 - easeOutCubic(pill)) * PILL_TRAVEL_PX;
     splash.style.opacity = '1';
     splash.style.visibility = pill <= 0.001 ? 'hidden' : 'visible';
     if (fromTop) {
