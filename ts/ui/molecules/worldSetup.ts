@@ -2,7 +2,7 @@ import type { BorderMode } from '../../simulator/types.js';
 import { ToolbarModeControls } from './modeControls.js';
 import type { TrackingMode } from '../../simulator/types.js';
 import type { ToolbarViewportMode } from './modeControls.js';
-import { ToolbarAssetSelectors } from '../organisms/assetSelectors.js';
+import { ToolbarAssetSelectors } from './assetSelectors.js';
 import type { UnifiedWorldEntry } from '../../store/types.js';
 import type { CarInfo } from '../../car/car.js';
 import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';

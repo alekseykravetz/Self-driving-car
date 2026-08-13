@@ -1,4 +1,4 @@
-import type { EditorType } from '../../simulator/types.js';
+import type { EditorType } from '../../world/types.js';
 import { makeToolbarCollapsible } from '../atoms/collapsibleToolbar.js';
 import { EDITOR_TOOLBAR_TEMPLATE } from './editorToolbarTemplate.js';
 
