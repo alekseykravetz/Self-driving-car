@@ -4,8 +4,8 @@
 
 Find the smallest change that makes the landing page scroll transition feel stable and responsive without removing its intended behavior:
 
-- The header slims after the first scroll.
-- The landing grid remains pinned during the transition.
+- The header keeps a stable layout footprint and fades while page 1 moves away.
+- The landing grid remains in normal document flow during the transition.
 - The hint pill reveals at the gate.
 - The live-preview card slides into view.
 - The preview simulator runs only while the preview is visible.
@@ -39,29 +39,30 @@ Do not edit generated `js/` files directly.
 `apply()` currently does all of the following in one frame:
 
 - Reads `window.scrollY`, `window.innerHeight`, `track.offsetHeight`, and multiple bounding rectangles.
-- Toggles `body.scrolled`, `body.grid-fits`, and `body.preview-page2`.
-- Updates `--header-h` and `--grid-pin` CSS variables.
+- Toggles `body.header-hidden` and `body.preview-page2`.
+- Updates the stable `--header-h` CSS variable.
 - Computes reveal, slide, direction, dwell, and lock state.
 - Writes pill `top`, `bottom`, `transform`, `opacity`, and `visibility`.
 - Writes the preview scene `transform`.
 - Starts or stops the simulator.
 - May call `window.scrollTo()` indirectly through `snapTo()` / `glideTo()`.
 
-### Header layout changes
+### Header layout
 
-The `body.scrolled` class changes:
+The header no longer changes its layout during the transition. There is no
+`body.scrolled` state, no dynamic `--grid-pin`, and no collapsing title/logo or
+subtitle. The `body.header-hidden` class changes only opacity and pointer events,
+so the header's geometry remains stable.
 
-- Header padding.
-- Logo width and height.
-- Title font size and margin.
-- Subtitle `max-height` and opacity.
-- Header background and backdrop blur.
-
-The header is sticky, so changing its height while scrolling changes layout and the geometry used by the scroll controller.
+The header remains sticky, but its height is measured as a stable value for the
+fixed preview scene rather than being changed by scrolling.
 
 ### Programmatic scroll
 
-`glideTo()` uses a second `requestAnimationFrame` loop and calls `window.scrollTo()` every frame. Those calls produce scroll events, which schedule the main `apply()` loop.
+`glideTo()` stores the active motion in the same RAF scheduler that applies
+scroll state and calls `window.scrollTo()` every frame. Manual wheel, touch/pen,
+or scroll-key input cancels the active glide and dwell. After 140 ms without a
+new scroll event, the controller resumes from the actual release position.
 
 ### Preview simulator
 
@@ -524,6 +525,23 @@ Use only if smaller variants cannot produce stable behavior. Treat this as a red
 9. Variant 8: Consolidate RAF scheduling.
 10. Variant 9: Prewarm initialization.
 11. Variant 10: Consider CSS/native scroll snapping only if necessary.
+
+## Current Branch Outcome
+
+The current branch keeps the smallest structural simplifications that remove the
+most unstable layout feedback:
+
+- The header no longer resizes or changes sticky offsets while scrolling.
+- The grid is no longer sticky/pinned.
+- The header fades during the card transition instead of collapsing into a new
+  visual style.
+- The runway is `125vh` with two reveal gates and one auto-slide zone.
+- The pill travel distance is reduced to `90px` and the pill content owns its
+  activation pop so the frosted surface does not scale.
+
+Manual performance scores and frame timings were not recorded in this branch.
+The release-point handoff is implemented, but should still be checked manually
+on desktop wheel, trackpad, and touch scrolling.
 
 ## Results Log
 

@@ -542,13 +542,13 @@ fitness = distance traveled along corridor/road
 
 ## HTML Entry Points
 
-| File                       | Key Modules                                                                                       | Purpose                          |
-| -------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `index.html`               | None (static links only)                                                                          | Landing page with mode selection |
-| `simulator.html`           | Full stack + SimpleWorld + TrafficFactory + SimpleModeBehavior                                    | AI training (both modes)         |
-| `race.html`                | Full stack + RaceSimulator + SimulatorShell + Sound + WorldLoader + CarLoader + Controls          | All race modes via URL params    |
-| `world.html`               | World + Editors + Viewport + WorldLoader + OSM importer                                           | Map creation & editing           |
-| `html/human-training.html` | Full stack + HumanBackpropSimulator + SimulatorShell + NetworkVisualizer + ConfigModal + Controls | Human Backpropagation training   |
+| File                       | Key Modules                                                                                       | Purpose                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `index.html`               | `ts/landing/entry.ts`                                                                             | Landing page mode selection + live preview showcase |
+| `simulator.html`           | Full stack + SimpleWorld + TrafficFactory + SimpleModeBehavior                                    | AI training (both modes)                            |
+| `race.html`                | Full stack + RaceSimulator + SimulatorShell + Sound + WorldLoader + CarLoader + Controls          | All race modes via URL params                       |
+| `world.html`               | World + Editors + Viewport + WorldLoader + OSM importer                                           | Map creation & editing                              |
+| `html/human-training.html` | Full stack + HumanBackpropSimulator + SimulatorShell + NetworkVisualizer + ConfigModal + Controls | Human Backpropagation training                      |
 
 ---
 

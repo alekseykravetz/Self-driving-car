@@ -1582,7 +1582,7 @@ visualizer, and no mini-map.
 ### Access
 
 `index.html` only. It has no URL of its own — scroll down past the mode-card
-grid and the wide **Live Preview** card slides up over the frozen grid (see the
+grid and the wide **Live Preview** card slides up as a fixed overlay (see the
 landing scroll sequence below).
 
 ### Architecture
@@ -1659,22 +1659,22 @@ central disc. When the page is loaded with `?paused` (the visual-test hook)
 
 ### Landing scroll sequence (`ts/landing/landingPreview.ts`)
 
-`initLandingPreview()` wires a **pinned, symmetric reveal + auto-slide**
+`initLandingPreview()` wires a **symmetric reveal + auto-slide**
 scroll-transition between the mode-card grid (page 1) and the Live Preview card
 (page 2). It is a DOM/CSS controller only — it does not touch the simulator
 beyond `activate()` / `deactivate()`.
 
-The scroll runway is a hidden `.preview-track` spacer; scroll consumed inside it
-maps to gate/slide zones:
+The scroll runway is a hidden `.preview-track` spacer (`125vh`); scroll consumed
+inside it maps directly to gate/slide zones. The grid remains in normal document
+flow, and the header keeps a stable layout footprint throughout:
 
-| Zone         | Scroll span  | Behaviour                                    |
-| ------------ | ------------ | -------------------------------------------- |
-| Header phase | `[0, P]`     | Page 1 frozen, header collapses, no pill     |
-| Bottom gate  | `[P, P+r]`   | Page 1 frozen, "Watch them drive" pill rises |
-| Slide zone   | `[P+r, H−r]` | Card slides up; auto-snapped, never rests    |
-| Top gate     | `[H−r, H]`   | Page 2 frozen, "Back to main" pill drops in  |
+| Zone        | Scroll span | Behaviour                                 |
+| ----------- | ----------- | ----------------------------------------- |
+| Bottom gate | `[0, r]`    | Page 1, "Watch them drive" pill rises     |
+| Slide zone  | `[r, H−r]`  | Card slides up; auto-snapped, never rests |
+| Top gate    | `[H−r, H]`  | Page 2, "Back to main" pill drops in      |
 
-where `P = HEADER_PHASE_FRAC · vh` and `r = REVEAL_FRAC · vh`. Key behaviours:
+where `r = REVEAL_FRAC · vh` and `REVEAL_FRAC = 0.2`. Key behaviours:
 
 - **Never rests half-way.** Inside the slide zone the controller `snapTo()`s
   whichever page you're heading toward, using a custom `glideTo()` RAF animation
@@ -1682,13 +1682,25 @@ where `P = HEADER_PHASE_FRAC · vh` and `r = REVEAL_FRAC · vh`. Key behaviours:
   native smooth scroll for explicit, gentle timing.
 - **Dwell.** A fully-revealed pill lingers `DWELL_MS` before the page
   auto-slides in the pill's lead direction.
-- **Header hysteresis.** `body.scrolled` is toggled with a low add / lower
-  remove threshold so the slim-header transition never flip-flops near the top;
-  the grid is pinned (`--grid-pin`) so the first scroll collapses the header in
-  place. Scroll anchoring is disabled in CSS so header height changes don't
-  shake the layout.
-- **Springy card entry.** On the way IN the card uses `easeOutBack` (a small
-  ~3 % overshoot); on the way OUT it stays linear so the exit reads smooth.
+- **Stable header geometry.** The header does not resize, collapse, or change
+  sticky offsets during scrolling. It fades out while page 1 is moving under
+  the preview and returns when page 2 has fully arrived; `--header-h` is only
+  published for the fixed preview position.
+- **Monotonic card motion.** The card transform follows the clamped slide
+  fraction directly in both directions, so reverse scrolling cannot produce a
+  bump or brief visual reversal.
 - **Sim gating.** The sim runs only while the card is `> 2 %` on screen; page 1
   is hidden (`body.preview-page2`) once page 2 fully covers the viewport so the
   body's fixed glow backdrop shows through the transparent scene.
+- **Endpoint tolerance.** The pill is hidden within `PAGE_EDGE_EPSILON_PX` of
+  either page endpoint to absorb fractional layout rounding at the maximum
+  scroll position.
+
+### Manual interruption
+
+Manual wheel, touch/pen, or scroll-key input cancels the active glide and dwell.
+The card follows the actual scroll position while input continues. After
+`MANUAL_IDLE_MS` (140 ms) without another scroll event, the controller resumes
+the normal gate/slide decision from that real release position. The glide and
+scroll-state updates share one RAF scheduler, so programmatic `window.scrollTo()`
+calls cannot fight a newer manual position.

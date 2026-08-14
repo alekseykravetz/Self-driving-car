@@ -315,13 +315,13 @@ Full feature panel styles — complex compositions with their own layout and sta
 
 Page-level layout shells — define the grid/flex arrangement for each page type.
 
-| File                    | Used by             | Layout                              |
-| ----------------------- | ------------------- | ----------------------------------- |
-| `_simulator-layout.css` | simulator, traffic, | Canvases + toolbar + side panels    |
-|                         | human-training      |                                     |
-| `_landing-page.css`     | index.html          | Centered hero with mode cards       |
-| `_race-layout.css`      | race.html           | Canvases + toolbar + race HUD       |
-| `_world-editor.css`     | world.html          | Full-screen canvas + editor toolbar |
+| File                    | Used by             | Layout                                           |
+| ----------------------- | ------------------- | ------------------------------------------------ |
+| `_simulator-layout.css` | simulator, traffic, | Canvases + toolbar + side panels                 |
+|                         | human-training      |                                                  |
+| `_landing-page.css`     | index.html          | Centered hero with mode cards and landing layout |
+| `_race-layout.css`      | race.html           | Canvases + toolbar + race HUD                    |
+| `_world-editor.css`     | world.html          | Full-screen canvas + editor toolbar              |
 
 ---
 
@@ -339,13 +339,13 @@ Page-specific overrides and responsive rules.
 
 Each page loads a single entry CSS that imports the shared core plus its template:
 
-| Entry CSS       | Page(s)                       | Imports                               |
-| --------------- | ----------------------------- | ------------------------------------- |
-| `simulator.css` | simulator.html, traffic.html, | `index.css` + `_simulator-layout.css` |
-|                 | human-training.html           |                                       |
-| `landing.css`   | index.html                    | `index.css` + `_landing-page.css`     |
-| `race.css`      | race.html                     | `index.css` + `_race-layout.css`      |
-| `world.css`     | world.html                    | `index.css` + `_world-editor.css`     |
+| Entry CSS       | Page(s)                       | Imports                                                                |
+| --------------- | ----------------------------- | ---------------------------------------------------------------------- |
+| `simulator.css` | simulator.html, traffic.html, | `index.css` + `_simulator-layout.css`                                  |
+|                 | human-training.html           |                                                                        |
+| `landing.css`   | index.html                    | `index.css` + landing template, preview organism, and mobile overrides |
+| `race.css`      | race.html                     | `index.css` + `_race-layout.css`                                       |
+| `world.css`     | world.html                    | `index.css` + `_world-editor.css`                                      |
 
 `index.css` is the shared core — it imports tokens (first), then all atoms,
 all molecules, all common organisms, and page overrides. The template CSS is

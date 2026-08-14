@@ -79,16 +79,75 @@ test.describe('Landing page', () => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
 
-    // Scroll to the end so the sticky-pinned card is fully slid into view.
+    // Scroll to the end so the fixed preview card is fully slid into view.
     await page.evaluate(() =>
       window.scrollTo({ top: document.body.scrollHeight }),
     );
     await expect(page.locator('.preview-scene')).toHaveClass(/preview-active/);
     await expect(page.locator('preview-simulator canvas')).toBeVisible();
+    await expect(page.locator('.preview-splash')).toBeHidden();
 
     await page.evaluate(() => window.scrollTo({ top: 0 }));
     await expect(page.locator('.preview-scene')).not.toHaveClass(
       /preview-active/,
     );
+  });
+
+  test('manual scrolling hands the glide back from the release point', async ({
+    page,
+  }) => {
+    await page.goto('/index.html');
+    await page.waitForSelector('main.landing-sections', { timeout: 15000 });
+
+    const scrollIntoSlide = await page.evaluate(() => {
+      const track = document.querySelector<HTMLElement>('.preview-track')!;
+      const reveal = window.innerHeight * 0.2;
+      const desiredScrolled = reveal + (track.offsetHeight - 2 * reveal) * 0.35;
+      return Math.ceil(
+        track.getBoundingClientRect().top +
+          desiredScrolled -
+          window.innerHeight +
+          100,
+      );
+    });
+    await page.mouse.wheel(0, scrollIntoSlide);
+    await page.waitForTimeout(50);
+
+    await page.evaluate(() => {
+      document.documentElement.dataset.landingTestWheel = '0';
+      document.documentElement.dataset.landingTestScroll = '';
+      window.addEventListener(
+        'wheel',
+        () => {
+          document.documentElement.dataset.landingTestWheel = '1';
+        },
+        { capture: true, once: true, passive: true },
+      );
+      window.addEventListener(
+        'scroll',
+        () => {
+          const root = document.documentElement;
+          if (root.dataset.landingTestWheel === '1') {
+            root.dataset.landingTestScroll = String(window.scrollY);
+          }
+        },
+        { capture: true, passive: true, once: true },
+      );
+    });
+    await page.mouse.wheel(0, 20);
+    await page.waitForFunction(
+      () => document.documentElement.dataset.landingTestScroll !== '',
+    );
+    const releaseY = await page.evaluate(() =>
+      Number(document.documentElement.dataset.landingTestScroll),
+    );
+
+    await page.waitForTimeout(60);
+    const pausedY = await page.evaluate(() => window.scrollY);
+    expect(Math.abs(pausedY - releaseY)).toBeLessThan(2);
+
+    await page.waitForTimeout(300);
+    const resumedY = await page.evaluate(() => window.scrollY);
+    expect(resumedY).toBeGreaterThan(releaseY);
   });
 });

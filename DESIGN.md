@@ -213,7 +213,15 @@ body.main-page
   └── main.landing-sections (CSS Grid, auto-fit, minmax(340px, 1fr))
       ├── .landing-card x4
       └── <store-panel> (grid-column: span 2)
+  ├── .preview-track (hidden scroll runway)
+  ├── .preview-scene (fixed live-preview overlay)
+  └── .preview-splash (reveal hint pill)
 ```
+
+The landing preview is a scroll-linked second screen. The grid stays in normal
+document flow while the fixed preview scene slides over it; the header keeps its
+layout footprint and only fades during the transition. See the landing scroll
+sequence in [Simulators](docs/Simulators.md#landing-scroll-sequence-tslandinglandingpreviewts).
 
 ### Race Page Layout
 
@@ -288,7 +296,8 @@ Depth is communicated through background opacity and thin white borders rather t
 - **Store Tables**: Collapse to 2 columns (Active + Filename) on mobile
 - **World Editor**: `<editor-toolbar>` hidden entirely on mobile
 - **Race Page**: Keyboard/camera links hidden, phone tilt controls shown instead
-- **Landing Page**: Cards stack in single column, card padding reduces
+- **Landing Page**: Cards stack in single column, card padding reduces, and the
+  fixed preview overlay remains sized to the viewport
 - **Toolbar Groups**: Viewport and Borders groups hidden on mobile simulator toolbar
 
 ### Collapsing Strategy

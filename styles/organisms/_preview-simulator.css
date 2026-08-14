@@ -1,46 +1,25 @@
 /* ═══════════════════════════════════════════════════════════════════
    Preview Simulator — landing page live-traffic showcase (index.html)
-   Pinned reveal + slide: the grid freezes (sticky bottom) while a pop-up
-   panel rises over it, then a wide live-preview card slides up to fill the
-   screen under the sticky header. All scroll-linked (symmetric both ways).
+   Scroll-linked reveal + slide: a pop-up panel rises over the landing grid,
+   then a wide live-preview card slides up to fill the screen under the sticky
+   header. All scroll-linked (symmetric both ways).
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Disable scroll anchoring: header slim/grow changes document height, and the
-   browser's anchor adjustment would nudge scrollTop and make the header shake. */
+/* Keep browser scroll anchoring from changing the scroll-linked scene position. */
 html {
   overflow-anchor: none;
 }
 
-/* Grid freezes showing its bottom once fully scrolled, so it stays visible
-   behind the rising pop-up instead of leaving a blank gap. The pin offset
-   (`100vh − gridHeight`, always ≤ 0) is published from JS so a tall grid
-   sticks with its bottom edge at the viewport bottom. */
-.landing-sections {
-  position: sticky;
-  top: var(--grid-pin, 0px);
-  z-index: 1;
-}
-
-/* When page 1 fits the viewport, pin the grid directly UNDER the header (not at
-   top:0) so the first scroll never slides it up behind the header — only the
-   header collapses in place, and the grid follows it up as `--header-h` shrinks.
-   Tall grids keep the negative `--grid-pin` so they still scroll (small
-   screens). Set from JS via the `grid-fits` body class. */
-body.grid-fits .landing-sections {
-  top: var(--header-h, 0px);
-}
-
 /* Once page 2 fully covers the viewport, hide page 1 so the transparent scene
-   reveals only the body's fixed (stationary) glow — not the page-1 cards.
-   `visibility` keeps the sticky element's box so scroll layout doesn't shift. */
+   reveals only the body's fixed (stationary) glow — not the page-1 cards. */
 body.preview-page2 .landing-sections {
   visibility: hidden;
 }
 
-/* Scroll budget for the pinned sequence: a leading header-collapse phase, a
-   bottom reveal gate, an auto-slide zone, and a top reveal gate (way back). */
+/* Scroll budget for the bottom reveal gate, auto-slide zone, and top reveal
+   gate (way back). */
 .preview-track {
-  height: 200vh;
+  height: 125vh;
 }
 
 /* ── Live-preview card — matches the grid's width + side padding ─────── */
@@ -126,7 +105,6 @@ preview-simulator {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
   padding: var(--space-3\.5) var(--space-7);
   font-family: inherit;
   font-size: 1.05rem;
@@ -153,6 +131,12 @@ preview-simulator {
       color-mix(in srgb, var(--color-accent-green) 45%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   animation: preview-pill-float 3.6s ease-in-out infinite;
+}
+
+.preview-splash-pill-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 @keyframes preview-pill-float {
@@ -252,6 +236,12 @@ preview-simulator {
 /* Activation flourish once the pill is fully revealed (end of phase B):
    a springy pop, a glow ring pulse, and the label shimmering. */
 .preview-splash.is-active .preview-splash-pill {
+  animation: preview-pill-float 3.6s ease-in-out infinite;
+}
+
+/* Keep the backdrop-filter surface geometrically stable. Scaling that surface
+   makes the browser repaint the page behind it during the landing transition. */
+.preview-splash.is-active .preview-splash-pill-content {
   animation: preview-splash-pop 0.5s cubic-bezier(0.22, 1.4, 0.4, 1);
 }
 
@@ -301,6 +291,7 @@ preview-simulator {
   .preview-splash-chevron,
   .preview-splash.is-from-top .preview-splash-chevron,
   .preview-splash-pill,
+  .preview-splash-pill-content,
   .preview-splash-glow,
   .preview-splash.is-active .preview-splash-pill,
   .preview-splash.is-active .preview-splash-label,

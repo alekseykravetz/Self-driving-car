@@ -3,25 +3,25 @@ import type { PreviewSimulatorElement } from '../ui/organisms/previewSimulator.j
 /**
  * Landing scroll-transition controller.
  *
- * A pinned, symmetric reveal + auto-slide sequence:
- *   - Bottom gate (leaving page 1, scrolling down): the grid freezes and the
- *     "Watch them drive" pill rises from the bottom; once revealed a smooth
- *     programmatic scroll slides the live-preview card fully in.
- *   - Top gate (leaving page 2, scrolling up): the card freezes and the pill
- *     drops in from the top; once revealed a smooth scroll takes you back to
- *     page 1. Same three beats, mirrored.
+ * A symmetric reveal + auto-slide sequence:
+ *   - Bottom gate (leaving page 1, scrolling down): the "Watch them drive"
+ *     pill rises from the bottom; once revealed a smooth programmatic scroll
+ *     slides the live-preview card fully in.
+ *   - Top gate (leaving page 2, scrolling up): the pill drops in from the top;
+ *     once revealed a smooth scroll takes you back to page 1. Same three
+ *     beats, mirrored.
  *
  * The slide zone between the two gates never rests half-way — it snaps to
  * whichever page you're heading toward. The pill is hidden during the
- * programmatic slide. Header slimming uses hysteresis and the page disables
- * scroll anchoring (CSS) so header height changes don't shake the layout.
+ * programmatic slide. The header remains unchanged throughout the sequence,
+ * and the page disables scroll anchoring (CSS) for stable layout geometry.
  */
 
 /** Fraction of a viewport of scroll each reveal gate consumes. */
-const REVEAL_FRAC = 0.25;
+const REVEAL_FRAC = 0.2;
 
-/** Fraction of a viewport spent collapsing the header before the pill sequence. */
-const HEADER_PHASE_FRAC = 0.1;
+/** Distance the pill travels from outside the viewport into its resting spot. */
+const PILL_TRAVEL_PX = 90;
 
 /** Duration (ms) of the programmatic page slide — longer = gentler glide. */
 const SLIDE_MS = 1600;
@@ -33,6 +33,22 @@ const DOWN_SLIDE_MS = 2600;
 /** How long the fully-revealed pill lingers before the page auto-slides. */
 const DWELL_MS = 850;
 
+/** How long scrolling must be quiet before the controller resumes auto-slide. */
+const MANUAL_IDLE_MS = 140;
+
+/** Accounts for fractional viewport/layout rounding at either page endpoint. */
+const PAGE_EDGE_EPSILON_PX = 2;
+
+const SCROLL_KEYS = new Set([
+  'ArrowDown',
+  'ArrowUp',
+  'PageDown',
+  'PageUp',
+  'Home',
+  'End',
+  ' ',
+]);
+
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
 const easeInOutQuad = (t: number): number =>
@@ -41,46 +57,49 @@ const easeInOutQuad = (t: number): number =>
 /** Ease-out so the pill rushes most of the way into view early in the reveal. */
 const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
 
-/** Springy ease-out that overshoots then settles — gives the card a bump.
- * A gentle back constant keeps the overshoot to a small sliver (~3%). */
-const easeOutBack = (t: number): number => {
-  const c1 = 0.9;
-  const c3 = c1 + 1;
-  return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;
-};
-
 export function initLandingPreview(): void {
   const header = document.querySelector<HTMLElement>('.landing-header');
-  const grid = document.querySelector<HTMLElement>('.landing-sections');
   const track = document.querySelector<HTMLElement>('.preview-track');
   const scene = document.querySelector<HTMLElement>('.preview-scene');
   const splash = document.querySelector<HTMLElement>('.preview-splash');
   const label = document.querySelector<HTMLElement>('.preview-splash-label');
   const sim =
     document.querySelector<PreviewSimulatorElement>('preview-simulator');
-  if (!header || !grid || !track || !scene || !splash || !sim) return;
+  if (!header || !track || !scene || !splash || !sim) return;
 
-  let ticking = false;
   let running = false;
   let locked = false; // suppress auto-slide re-triggers during a programmatic scroll
   let dwelling = false; // holding the fully-revealed pill before an auto-slide
-  let unlockTimer = 0;
   let dwellTimer = 0;
-  let slideRaf = 0;
+  let manualIdleTimer = 0;
+  let manualInputActive = false;
+  let frameRaf = 0;
+  let inFrame = false;
+  let glide: {
+    startY: number;
+    targetY: number;
+    startedAt: number;
+    duration: number;
+  } | null = null;
   let lastY = window.scrollY;
+  let lastDirection = 0;
   let lastHeaderH = -1;
-  let lastGridPin = Number.NaN;
   let lastFromTop: boolean | null = null;
-  let lastSlide = 0; // previous card-slide fraction (for entry-only bump)
 
   // Current scroll position inside the gate/slide coordinate (0 = page 1).
   const measureScrolled = (): number => {
     const vh2 = window.innerHeight;
     const H2 = track.offsetHeight;
-    const P2 = HEADER_PHASE_FRAC * vh2;
     const top2 = track.getBoundingClientRect().top;
     const raw2 = Math.min(Math.max(vh2 - top2, 0), H2);
-    return Math.max(0, raw2 - P2);
+    return raw2;
+  };
+
+  // Schedule scroll-state updates and glides through one RAF loop. This keeps
+  // programmatic scroll and the visual state from running on competing clocks.
+  const requestFrame = (): void => {
+    if (inFrame || frameRaf) return;
+    frameRaf = requestAnimationFrame(runFrame);
   };
 
   // Custom scroll animation so the slide duration is explicit (native smooth
@@ -88,16 +107,18 @@ export function initLandingPreview(): void {
   const glideTo = (targetY: number, duration = SLIDE_MS): void => {
     const startY = window.scrollY;
     const dist = targetY - startY;
-    if (Math.abs(dist) < 1) return;
-    const start = performance.now();
-    cancelAnimationFrame(slideRaf);
-    const step = (now: number): void => {
-      const t = clamp01((now - start) / duration);
-      window.scrollTo(0, startY + dist * easeInOutQuad(t));
-      if (t < 1) slideRaf = requestAnimationFrame(step);
-      else locked = false;
+    if (Math.abs(dist) < 1) {
+      glide = null;
+      locked = false;
+      return;
+    }
+    glide = {
+      startY,
+      targetY,
+      startedAt: performance.now(),
+      duration,
     };
-    slideRaf = requestAnimationFrame(step);
+    requestFrame();
   };
 
   const snapTo = (
@@ -111,52 +132,51 @@ export function initLandingPreview(): void {
     const targetY =
       targetScrolled <= 0 ? 0 : window.scrollY + (targetScrolled - scrolled);
     glideTo(targetY, duration);
-    window.clearTimeout(unlockTimer);
-    unlockTimer = window.setTimeout(() => (locked = false), duration + 400);
+  };
+
+  const cancelAutoMotion = (): void => {
+    glide = null;
+    locked = false;
+    dwelling = false;
+    window.clearTimeout(dwellTimer);
+    if (frameRaf) {
+      cancelAnimationFrame(frameRaf);
+      frameRaf = 0;
+    }
+  };
+
+  const scheduleManualSettle = (): void => {
+    window.clearTimeout(manualIdleTimer);
+    manualIdleTimer = window.setTimeout(() => {
+      manualInputActive = false;
+      requestFrame();
+    }, MANUAL_IDLE_MS);
   };
 
   const apply = (): void => {
-    ticking = false;
     const vh = window.innerHeight;
     const y = window.scrollY;
-    const dir = y - lastY; // >0 scrolling down
+    const delta = y - lastY;
+    const dir = delta === 0 ? lastDirection : delta; // >0 scrolling down
+    if (delta !== 0) lastDirection = delta;
     lastY = y;
 
-    // Slim the header on the very first scroll, with hysteresis so it never
-    // flip-flops near the top. Low threshold so the collapse is tied to the
-    // first wheel step (the grid is pinned, so only the header visibly moves).
-    const slim = document.body.classList.contains('scrolled');
-    if (!slim && y > 8) document.body.classList.add('scrolled');
-    else if (slim && y < 4) document.body.classList.remove('scrolled');
-
-    // Publish the header height + grid pin offset (only when they change).
+    // Publish the stable header height (only when it changes).
     const headerH = Math.round(header.getBoundingClientRect().height);
     if (headerH !== lastHeaderH) {
       document.documentElement.style.setProperty('--header-h', `${headerH}px`);
       lastHeaderH = headerH;
     }
-    const gridPin = Math.min(0, vh - grid.offsetHeight);
-    if (gridPin !== lastGridPin) {
-      document.documentElement.style.setProperty('--grid-pin', `${gridPin}px`);
-      lastGridPin = gridPin;
-    }
-    // When page 1 fits, pin the grid under the header (see CSS) so the first
-    // scroll collapses the header in place instead of sliding the grid.
-    document.body.classList.toggle('grid-fits', gridPin === 0);
-
-    // Scroll consumed within the pinned track. A leading header-phase budget
-    // (P) is spent only collapsing the header, then the gate/slide zones:
-    //   [0, P]        header phase        (page 1, header collapses, no pill)
-    //   [P, P+r]      bottom reveal gate  (page 1 frozen, pill from bottom)
+    // Scroll consumed within the preview track. The gate/slide zones are:
+    //   [0, r]        bottom reveal gate  (page 1, pill from bottom)
     //   [.., H-r]     slide zone          (card slides; auto-snapped)
     //   [H-r, H]      top reveal gate     (page 2 frozen, pill from top)
     const H = track.offsetHeight;
-    const P = HEADER_PHASE_FRAC * vh;
-    const usable = Math.max(1, H - P);
+    const usable = Math.max(1, H);
     const r = REVEAL_FRAC * vh;
     const trackTop = track.getBoundingClientRect().top;
     const raw = Math.min(Math.max(vh - trackTop, 0), H);
-    const scrolled = Math.max(0, raw - P); // 0 throughout the header phase
+    const scrolled = raw;
     const slide = clamp01((scrolled - r) / Math.max(1, usable - 2 * r));
 
     // Which pill (if any) is revealing, and how far.
@@ -168,6 +188,10 @@ export function initLandingPreview(): void {
       pill = (usable - scrolled) / r; // top gate
       fromTop = true;
     }
+    // The browser can clamp the final scroll position a fractional pixel
+    // before the track's exact endpoint. Treat that small gap as page 2 so the
+    // top-gate pill does not remain visible at rest.
+    if (scrolled >= usable - PAGE_EDGE_EPSILON_PX) pill = 0;
     if (locked) pill = 0; // hide during the programmatic slide
     if (dwelling) pill = 1; // keep it fully shown while it lingers
     if (y < 24) pill = 0; // never reveal at rest, whatever the grid height
@@ -176,7 +200,7 @@ export function initLandingPreview(): void {
     // (only the glow animates), so it “pops” from the very bottom / very top.
     // Ease-out the travel so it clears the screen edge (and, on the top gate,
     // the fixed header) early in the reveal instead of lingering half-hidden.
-    const rise = (1 - easeOutCubic(pill)) * 180;
+    const rise = (1 - easeOutCubic(pill)) * PILL_TRAVEL_PX;
     splash.style.opacity = '1';
     splash.style.visibility = pill <= 0.001 ? 'hidden' : 'visible';
     if (fromTop) {
@@ -198,13 +222,14 @@ export function initLandingPreview(): void {
     splash.classList.toggle('is-active', pill >= 0.9 && (!locked || dwelling));
 
     // Card slides up from below into place (tracks scroll, incl. auto-scroll).
-    // On the way IN (slide growing) a springy ease overshoots slightly so the
-    // card lands with a bump; on the way OUT it stays linear so the smooth
-    // page-2 → page-1 exit is undisturbed.
-    const entering = slide >= lastSlide;
-    const springSlide = entering && slide < 1 ? easeOutBack(slide) : slide;
-    lastSlide = slide;
-    scene.style.transform = `translateY(${(1 - springSlide) * 100}%)`;
+    // Keep this monotonic in both directions so the page-2 card cannot bump or
+    // briefly reverse while the user scrolls back to page 1.
+    scene.style.transform = `translateY(${(1 - slide) * 100}%)`;
+
+    // Keep the fixed header out of the way while page 1 moves under the
+    // transition, then bring it back once page 2 has fully arrived. Opacity
+    // changes do not affect the stable header geometry.
+    document.body.classList.toggle('header-hidden', y >= 24 && slide < 0.99);
 
     // Once page 2 fully covers the viewport, hide page 1 so the transparent
     // scene reveals the body's fixed glow backdrop (stationary) instead of the
@@ -225,7 +250,7 @@ export function initLandingPreview(): void {
     // Auto-slide: never rest inside the slide zone. When a pill is fully
     // revealed, let it linger (dwell) so it reads before the page glides.
     if (locked && (scrolled <= 2 || scrolled >= usable - 2)) locked = false;
-    if (!locked && !dwelling) {
+    if (!locked && !dwelling && !manualInputActive) {
       const inSlide = scrolled > r && scrolled < usable - r;
       if (inSlide) {
         const goDown = dir > 0 || (dir === 0 && scrolled >= usable / 2);
@@ -251,13 +276,57 @@ export function initLandingPreview(): void {
     }
   };
 
+  const runFrame = (now: number): void => {
+    frameRaf = 0;
+    inFrame = true;
+
+    if (glide) {
+      const motion = glide;
+      const t = clamp01((now - motion.startedAt) / motion.duration);
+      window.scrollTo(
+        0,
+        motion.startY + (motion.targetY - motion.startY) * easeInOutQuad(t),
+      );
+      if (t >= 1) {
+        glide = null;
+        locked = false;
+      }
+    }
+
+    apply();
+    inFrame = false;
+    if (glide) requestFrame();
+  };
+
   const onScroll = (): void => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(apply);
+    if (manualInputActive) scheduleManualSettle();
+    requestFrame();
+  };
+
+  const onManualInput = (event: Event): void => {
+    if (event.type === 'keydown') {
+      const key = (event as KeyboardEvent).key;
+      if (!SCROLL_KEYS.has(key)) return;
+    }
+    if (event.type === 'pointerdown') {
+      const pointerType = (event as PointerEvent).pointerType;
+      if (pointerType === 'mouse') return;
+    }
+    cancelAutoMotion();
+    manualInputActive = true;
+    scheduleManualSettle();
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
+  window.addEventListener('wheel', onManualInput, {
+    passive: true,
+    capture: true,
+  });
+  window.addEventListener('pointerdown', onManualInput, {
+    passive: true,
+    capture: true,
+  });
+  window.addEventListener('keydown', onManualInput, true);
   apply();
 }
