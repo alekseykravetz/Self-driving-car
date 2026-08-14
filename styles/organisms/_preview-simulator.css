@@ -105,7 +105,6 @@ preview-simulator {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
   padding: var(--space-3\.5) var(--space-7);
   font-family: inherit;
   font-size: 1.05rem;
@@ -132,6 +131,12 @@ preview-simulator {
       color-mix(in srgb, var(--color-accent-green) 45%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   animation: preview-pill-float 3.6s ease-in-out infinite;
+}
+
+.preview-splash-pill-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 @keyframes preview-pill-float {
@@ -231,6 +236,12 @@ preview-simulator {
 /* Activation flourish once the pill is fully revealed (end of phase B):
    a springy pop, a glow ring pulse, and the label shimmering. */
 .preview-splash.is-active .preview-splash-pill {
+  animation: preview-pill-float 3.6s ease-in-out infinite;
+}
+
+/* Keep the backdrop-filter surface geometrically stable. Scaling that surface
+   makes the browser repaint the page behind it during the landing transition. */
+.preview-splash.is-active .preview-splash-pill-content {
   animation: preview-splash-pop 0.5s cubic-bezier(0.22, 1.4, 0.4, 1);
 }
 
@@ -280,6 +291,7 @@ preview-simulator {
   .preview-splash-chevron,
   .preview-splash.is-from-top .preview-splash-chevron,
   .preview-splash-pill,
+  .preview-splash-pill-content,
   .preview-splash-glow,
   .preview-splash.is-active .preview-splash-pill,
   .preview-splash.is-active .preview-splash-label,
