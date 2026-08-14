@@ -79,7 +79,7 @@ test.describe('Landing page', () => {
     await page.goto('/index.html');
     await page.waitForSelector('main.landing-sections', { timeout: 15000 });
 
-    // Scroll to the end so the sticky-pinned card is fully slid into view.
+    // Scroll to the end so the fixed preview card is fully slid into view.
     await page.evaluate(() =>
       window.scrollTo({ top: document.body.scrollHeight }),
     );
