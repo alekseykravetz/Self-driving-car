@@ -59,7 +59,10 @@ fixed preview scene rather than being changed by scrolling.
 
 ### Programmatic scroll
 
-`glideTo()` uses a second `requestAnimationFrame` loop and calls `window.scrollTo()` every frame. Those calls produce scroll events, which schedule the main `apply()` loop. Manual input is not currently treated as a cancellation/rebase signal, so a gesture during the glide can compete with the programmatic scroll.
+`glideTo()` stores the active motion in the same RAF scheduler that applies
+scroll state and calls `window.scrollTo()` every frame. Manual wheel, touch/pen,
+or scroll-key input cancels the active glide and dwell. After 140 ms without a
+new scroll event, the controller resumes from the actual release position.
 
 ### Preview simulator
 
@@ -536,9 +539,9 @@ most unstable layout feedback:
 - The pill travel distance is reduced to `90px` and the pill content owns its
   activation pop so the frosted surface does not scale.
 
-Manual performance scores and frame timings were not recorded in this branch;
-the remaining user-interruption behavior is documented as a follow-up rather
-than claimed as solved.
+Manual performance scores and frame timings were not recorded in this branch.
+The release-point handoff is implemented, but should still be checked manually
+on desktop wheel, trackpad, and touch scrolling.
 
 ## Results Log
 

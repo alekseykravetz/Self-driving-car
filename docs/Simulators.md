@@ -1686,24 +1686,21 @@ where `r = REVEAL_FRAC · vh` and `REVEAL_FRAC = 0.2`. Key behaviours:
   sticky offsets during scrolling. It fades out while page 1 is moving under
   the preview and returns when page 2 has fully arrived; `--header-h` is only
   published for the fixed preview position.
-- **Springy card entry.** On the way IN the card uses `easeOutBack` (a small
-  ~3 % overshoot); on the way OUT it stays linear so the exit reads smooth.
+- **Monotonic card motion.** The card transform follows the clamped slide
+  fraction directly in both directions, so reverse scrolling cannot produce a
+  bump or brief visual reversal.
 - **Sim gating.** The sim runs only while the card is `> 2 %` on screen; page 1
   is hidden (`body.preview-page2`) once page 2 fully covers the viewport so the
   body's fixed glow backdrop shows through the transparent scene.
+- **Endpoint tolerance.** The pill is hidden within `PAGE_EDGE_EPSILON_PX` of
+  either page endpoint to absorb fractional layout rounding at the maximum
+  scroll position.
 
 ### Manual interruption
 
-The current controller does not hand the automatic glide back to the user. A
-wheel or touch gesture during `glideTo()` can compete with its programmatic
-`window.scrollTo()` calls until the glide finishes; this is a known limitation
-of the intentionally small state machine.
-
-A release-point handoff is feasible, but it should be implemented as an explicit
-interaction change rather than by simply changing the easing: cancel and rebase
-the active glide on user input, wait for a short scroll-idle/debounce window (or
-`scrollend` where available), then start the next glide from the actual scroll
-position. A single scheduler should own both manual-scroll state and automatic
-glide state so the two RAF loops cannot fight. This preserves the smooth feel
-seen when a user stops inside the reveal while avoiding the laggy feedback loop
-caused by continuing to animate from an outdated target.
+Manual wheel, touch/pen, or scroll-key input cancels the active glide and dwell.
+The card follows the actual scroll position while input continues. After
+`MANUAL_IDLE_MS` (140 ms) without another scroll event, the controller resumes
+the normal gate/slide decision from that real release position. The glide and
+scroll-state updates share one RAF scheduler, so programmatic `window.scrollTo()`
+calls cannot fight a newer manual position.
