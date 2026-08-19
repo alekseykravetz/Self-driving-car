@@ -60,6 +60,48 @@ editor-toolbar .controls-group {
   align-items: center;
 }
 
+.tracking-car-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-0\.5);
+  min-height: var(--space-6);
+}
+
+.tracking-car-btn {
+  width: var(--space-5);
+  height: var(--space-5);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.tracking-car-btn:hover:not(:disabled) {
+  background: var(--color-bg-hover-strong);
+  color: var(--color-text-primary);
+}
+
+.tracking-car-btn:disabled {
+  color: var(--color-text-dim);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tracking-car-label {
+  min-width: var(--space-14);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-align: center;
+  white-space: nowrap;
+}
+
 /* Match the render-frames control height to sibling groups so its
    input + buttons sit vertically centred within the section. */
 #animationLoopToolbar .num-input-row {

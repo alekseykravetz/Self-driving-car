@@ -327,7 +327,7 @@ export class SimpleTrainingStrategy {
     const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
     this.#parent.drawHeatmap(heatViewPoint);
 
-    const shownCar = keysCar ?? bestCar;
+    const shownCar = keysCar ?? this.#parent.getBestTrackingCar(bestCar);
     this.#parent.drawNetworkVisualizer(
       time,
       shownCar?.brain ?? bestCar.brain,
@@ -353,7 +353,7 @@ export class SimpleTrainingStrategy {
       );
     }
 
-    this.#parent.renderCameraView(bestCar, {
+    this.#parent.renderCameraView(this.#parent.getBestTrackingCar(bestCar), {
       traffic: this.#simpleState.traffic,
     });
   }

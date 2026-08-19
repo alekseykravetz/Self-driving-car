@@ -287,7 +287,7 @@ export class WorldTrainingStrategy {
         : { viewPoint, cars, mainViewportZoom: this.#parent.viewport.zoom },
     );
 
-    const shownCar = keysCar ?? bestCar;
+    const shownCar = keysCar ?? this.#parent.getBestTrackingCar(bestCar);
     this.#parent.drawNetworkVisualizer(
       time,
       shownCar?.brain ?? bestCar.brain,
@@ -296,6 +296,8 @@ export class WorldTrainingStrategy {
     const debugCtx = this.#parent.toolbarPanel.showCameraDebug
       ? this.#parent.gameCtx
       : undefined;
-    this.#parent.renderCameraView(bestCar, { debugCtx });
+    this.#parent.renderCameraView(this.#parent.getBestTrackingCar(bestCar), {
+      debugCtx,
+    });
   }
 }
