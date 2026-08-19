@@ -60,12 +60,19 @@ editor-toolbar .controls-group {
   align-items: center;
 }
 
+.tracking-mode-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--space-8);
+}
+
 .tracking-car-picker {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-0\.5);
-  min-height: var(--space-6);
+  height: var(--space-8);
 }
 
 .tracking-car-btn {
