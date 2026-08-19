@@ -630,13 +630,32 @@ Three radio-button options in `<world-setup>`:
 
 ### Tracking Modes
 
-Radio-button group in `<world-setup>`:
+Radio-button group in `<world-setup>` (wired by `ToolbarModeControls` in
+`modeControls.ts`):
 
 | Mode     | Icon | Behavior                                                                                                                                                                 |
 | -------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | No track | ✋   | Viewport stays in place; user pans freely                                                                                                                                |
-| Best car | 🏆   | Viewport + camera follow best-fitness car (default)                                                                                                                      |
+| Best car | 🏆   | Viewport + camera follow a selected car from the ranked best pool (default: rank #1 / best fitness)                                                                      |
 | Keys car | 🎮   | Viewport + camera follow user-controlled KEYS car; the KEYS car is drawn with `showSensor: true` and the network visualizer shows its brain instead of the best AI car's |
+
+#### Best-pool car picker
+
+When tracking mode is **Best car**, a small prev/next picker appears beside the
+mode buttons (`#bestTrackingCarPicker`):
+
+- Label format: `CarName · rank/count` (e.g. `Car 7 · 1/5`).
+- ← / → step through `trainingManager.bestPool` by rank index (`0` = current #1).
+- Arrows clamp at the ends and are disabled outside **Best** mode (or when the
+  pool is empty — the whole picker stays `hidden` until the pool has cars).
+- Each training-frame stats refresh calls `setTrackingCarDisplay(index, pool.length, name)`
+  so the label stays in sync when the pool reorders.
+
+`TrainingSimulator.getBestTrackingCar(bestCar)` resolves
+`bestPool[trackingCarIndex] ?? bestCar`. That car is the track target, the 3D
+camera subject, the network-visualizer brain, and the car whose sensor rays are
+drawn (via the optional `sensorCar` arg to `drawSimulatorCars`). Keys mode still
+overrides: when tracking is **Keys**, the KEYS car wins for all of the above.
 
 ### Animation Loop (Pseudocode)
 
@@ -1428,7 +1447,7 @@ floating mini-map style).
 
 ## Car Renderer (`ts/simulator/training/rendering/carRenderer.ts`)
 
-### `drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor, prevPoolCars, prevPoolColor, viewportLeft, viewportRight, keysShowSensor)`
+### `drawSimulatorCars(ctx, cars, bestPool, viewportTop, viewportBottom, drawMasks, poolColor, prevPoolCars, prevPoolColor, viewportLeft, viewportRight, keysShowSensor, sensorCar?)`
 
 Draws cars in layered order for visual clarity. Each car's `draw()` method is called with `CarDrawOptions` — no external state mutation:
 
@@ -1442,6 +1461,10 @@ interface CarDrawOptions {
 }
 ```
 
+Optional trailing `sensorCar` selects which pool car draws sensor rays. When
+omitted, rank #1 (`bestPool[0]`) keeps the legacy default. Training modes pass
+the tracked car from `getBestTrackingCar` (or the KEYS car when tracking keys).
+
 ```
 Layer 1: Regular AI cars
   - globalAlpha set to 0.2 ONCE for the whole batch (not per car)
@@ -1454,8 +1477,8 @@ Layer 2: Previous pool cars (from last generation)
   - Skip cars that are also in current pool
 
 Layer 3: Current pool cars
-  - car.draw(ctx, { colorOverride: 'gold', showMask: true, showName: true, showSensor: isBest })
-  - Only best car (#1) gets sensor ray rendering
+  - car.draw(ctx, { colorOverride: 'gold', showMask: true, showName: true, showSensor })
+  - Sensor rays on `sensorCar` when provided, else only rank #1
   - Drawn lowest-rank first so best is on top
 
 Layer 4: KEYS car (if present)

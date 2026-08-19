@@ -284,7 +284,7 @@ Compound groups — composed from atoms to form reusable UI patterns.
 | `_num-input-row.css`     | Label + number input rows (parameter editors)                    |
 | `_btn-group.css`         | Button groups (radio-style toolbar groups, mode selectors)       |
 | `_param-grid.css`        | Grid layout for parameter columns                                |
-| `_controls-group.css`    | Control group wrappers (border/tracking mode groups)             |
+| `_controls-group.css`    | Control group wrappers (border/tracking mode groups + best-car picker) |
 | `_asset-picker.css`      | World/car asset picker popovers                                  |
 | `_collapsible.css`       | Collapsible section (`.collapsible-header`, `.collapsible-body`) |
 | `_view-toggles.css`      | Viewport mode toggles (mouse vs touchpad)                        |

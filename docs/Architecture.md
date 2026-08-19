@@ -384,9 +384,9 @@ into three layers under `ts/ui/`:
 
 | Module                  | Tag             | Responsibility                                                           |
 | ----------------------- | --------------- | ------------------------------------------------------------------------ |
-| `worldSetup.ts`         | `<world-setup>` | Composition root: file I/O, border/tracking mode, camera debug toggle    |
-| `worldSetupTemplate.ts` | —               | HTML template for the toolbar                                            |
-| `modeControls.ts`       | —               | `ToolbarModeControls` — border/tracking/viewport mode button wiring      |
+| `worldSetup.ts`         | `<world-setup>` | Composition root: file I/O, border/tracking mode (+ best-pool car picker), camera debug toggle |
+| `worldSetupTemplate.ts` | —               | HTML template for the toolbar                                                                  |
+| `modeControls.ts`       | —               | `ToolbarModeControls` — border/tracking/viewport modes + best-pool track-car index             |
 | `assetSelectors.ts`     | —               | `ToolbarAssetSelectors` — world/car picker popovers and file I/O binding |
 
 <!-- assetSelectors.ts moved from organisms to molecules (2026-08-13) -->
