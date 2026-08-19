@@ -277,19 +277,19 @@ have been replaced by this single, coherent set.
 
 Compound groups — composed from atoms to form reusable UI patterns.
 
-| File                     | Components / Usage                                               |
-| ------------------------ | ---------------------------------------------------------------- |
-| `_stat-row.css`          | Label + value rows (training panel stats)                        |
-| `_toggle-row.css`        | Label + toggle switch rows                                       |
-| `_num-input-row.css`     | Label + number input rows (parameter editors)                    |
-| `_btn-group.css`         | Button groups (radio-style toolbar groups, mode selectors)       |
-| `_param-grid.css`        | Grid layout for parameter columns                                |
+| File                     | Components / Usage                                                     |
+| ------------------------ | ---------------------------------------------------------------------- |
+| `_stat-row.css`          | Label + value rows (training panel stats)                              |
+| `_toggle-row.css`        | Label + toggle switch rows                                             |
+| `_num-input-row.css`     | Label + number input rows (parameter editors)                          |
+| `_btn-group.css`         | Button groups (radio-style toolbar groups, mode selectors)             |
+| `_param-grid.css`        | Grid layout for parameter columns                                      |
 | `_controls-group.css`    | Control group wrappers (border/tracking mode groups + best-car picker) |
-| `_asset-picker.css`      | World/car asset picker popovers                                  |
-| `_collapsible.css`       | Collapsible section (`.collapsible-header`, `.collapsible-body`) |
-| `_view-toggles.css`      | Viewport mode toggles (mouse vs touchpad)                        |
-| `_shortcuts-keys.css`    | Shortcut key cap display (keyboard toolbar)                      |
-| `_world-layers-keys.css` | World layer visibility key indicators                            |
+| `_asset-picker.css`      | World/car asset picker popovers                                        |
+| `_collapsible.css`       | Collapsible section (`.collapsible-header`, `.collapsible-body`)       |
+| `_view-toggles.css`      | Viewport mode toggles (mouse vs touchpad)                              |
+| `_shortcuts-keys.css`    | Shortcut key cap display (keyboard toolbar)                            |
+| `_world-layers-keys.css` | World layer visibility key indicators                                  |
 
 ---
 
