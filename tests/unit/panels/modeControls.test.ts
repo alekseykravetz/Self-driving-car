@@ -11,6 +11,11 @@ function createMockHost(): HTMLDivElement {
     <button id="trackModeNone" data-mode="none">✋</button>
     <button id="trackModeBest" data-mode="best">🏆</button>
     <button id="trackModeKeys" data-mode="keys">🎮</button>
+    <div id="bestTrackingCarPicker">
+      <button id="bestTrackingCarPrev"></button>
+      <span id="bestTrackingCarLabel"></span>
+      <button id="bestTrackingCarNext"></button>
+    </div>
     <button id="viewportModeMouse" data-mode="mouse">🖱️</button>
     <button id="viewportModeTouchpad" data-mode="touchpad">☝️</button>
   `;
@@ -81,6 +86,46 @@ describe('ToolbarModeControls', () => {
       host.querySelector<HTMLButtonElement>('#viewportModeTouchpad')!.click();
       expect(listener).toHaveBeenCalledWith('touchpad');
       expect(controls.viewportMode).toBe('touchpad');
+    });
+  });
+
+  describe('best tracking car picker', () => {
+    it('changes the selected car within the ranked pool', () => {
+      const host = createMockHost();
+      const controls = new ToolbarModeControls(host);
+      const listener = vi.fn();
+      listener.mockImplementation((index: number) =>
+        controls.setTrackingCarDisplay(index, 3, `Car ${index + 8}`),
+      );
+      controls.setTrackingCarListener(listener);
+      controls.init();
+      controls.setTrackingCarDisplay(0, 3, 'Car 7');
+
+      host.querySelector<HTMLButtonElement>('#bestTrackingCarNext')!.click();
+
+      expect(controls.trackingCarIndex).toBe(1);
+      expect(listener).toHaveBeenCalledWith(1);
+      expect(host.querySelector('#bestTrackingCarLabel')!.textContent).toBe(
+        'Car 9 · 2/3',
+      );
+    });
+
+    it('clamps arrows at the first and last car', () => {
+      const host = createMockHost();
+      const controls = new ToolbarModeControls(host);
+      controls.init();
+      controls.setTrackingCarDisplay(0, 2, 'Car 1');
+
+      expect(
+        host.querySelector<HTMLButtonElement>('#bestTrackingCarPrev')!.disabled,
+      ).toBe(true);
+      host.querySelector<HTMLButtonElement>('#bestTrackingCarNext')!.click();
+      host.querySelector<HTMLButtonElement>('#bestTrackingCarNext')!.click();
+
+      expect(controls.trackingCarIndex).toBe(1);
+      expect(
+        host.querySelector<HTMLButtonElement>('#bestTrackingCarNext')!.disabled,
+      ).toBe(true);
     });
   });
 

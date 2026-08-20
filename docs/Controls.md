@@ -444,7 +444,9 @@ createCarsForTraining(count, 'AI', config, startInfo); // AI population
 This allows the user to:
 
 - Drive manually alongside AI cars
-- Switch camera tracking to follow the KEYS car
+- Switch camera tracking to follow the KEYS car (toolbar **Keys** mode)
+- In **Best** mode, step through the ranked best-pool with the prev/next picker
+  (viewport, 3D camera, sensor rays, and network visualizer follow that car)
 - Compare human vs AI performance in real-time
 
 The KEYS car is never subject to genetic algorithm operations (selection, mutation, crossover) — it's purely for the human player.

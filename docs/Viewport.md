@@ -323,13 +323,16 @@ When tracking is enabled (best car or KEYS car), the simulator updates the viewp
 
 ```typescript
 // In animate():
-const target = getTrackTarget(trackingMode, bestCar, keysCar);
+const target = this.getTrackTarget(bestCar); // best → getBestTrackingCar(bestCar); keys → KEYS car
 if (target && this.viewport) {
   this.viewport.offset = new Point(-target.x, -target.y);
 }
 ```
 
-This centers the viewport on the tracked car. When tracking is disabled (`none`), the offset is not updated, allowing free manual navigation.
+In **Best** mode the target is the pool car at `toolbarPanel.trackingCarIndex`
+(not always fitness #1) — see [Simulators.md](Simulators.md) “Best-pool car
+picker”. This centers the viewport on the tracked car. When tracking is disabled
+(`none`), the offset is not updated, allowing free manual navigation.
 
 ---
 

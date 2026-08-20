@@ -122,28 +122,49 @@ export const WORLD_SETUP_TEMPLATE = `
 
     <div class="controls-group" data-group="tracking">
       <span class="controls-group-label">Tracking</span>
-      <div class="border-mode-group">
-        <button
-          id="trackModeNone"
-          class="toolbar-btn"
-          data-tooltip="No tracking (free drag)"
-        >
-          <app-icon name="hand"></app-icon>
-        </button>
-        <button
-          id="trackModeBest"
-          class="toolbar-btn active"
-          data-tooltip="Track best car"
-        >
-          <app-icon name="trophy"></app-icon>
-        </button>
-        <button
-          id="trackModeKeys"
-          class="toolbar-btn"
-          data-tooltip="Track user-controlled car"
-        >
-          <app-icon name="gamepad"></app-icon>
-        </button>
+      <div class="tracking-mode-controls">
+        <div class="border-mode-group">
+          <button
+            id="trackModeNone"
+            class="toolbar-btn"
+            data-tooltip="No tracking (free drag)"
+          >
+            <app-icon name="hand"></app-icon>
+          </button>
+          <button
+            id="trackModeBest"
+            class="toolbar-btn active"
+            data-tooltip="Track best car"
+          >
+            <app-icon name="trophy"></app-icon>
+          </button>
+          <button
+            id="trackModeKeys"
+            class="toolbar-btn"
+            data-tooltip="Track user-controlled car"
+          >
+            <app-icon name="gamepad"></app-icon>
+          </button>
+        </div>
+        <div id="bestTrackingCarPicker" class="tracking-car-picker" hidden>
+          <button
+            id="bestTrackingCarPrev"
+            class="tracking-car-btn"
+            type="button"
+            aria-label="Track previous best car"
+          >
+            &larr;
+          </button>
+          <span id="bestTrackingCarLabel" class="tracking-car-label">&mdash;</span>
+          <button
+            id="bestTrackingCarNext"
+            class="tracking-car-btn"
+            type="button"
+            aria-label="Track next best car"
+          >
+            &rarr;
+          </button>
+        </div>
       </div>
     </div>
 

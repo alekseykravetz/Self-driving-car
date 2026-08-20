@@ -253,6 +253,7 @@ export class WorldTrainingStrategy {
     const keysCar = trackingKeys
       ? cars.find((c) => c.type === 'KEYS')
       : undefined;
+    const trackedCar = keysCar ?? this.#parent.getBestTrackingCar(bestCar);
 
     drawSimulatorCars(
       this.#parent.gameCtx,
@@ -267,6 +268,7 @@ export class WorldTrainingStrategy {
       viewportLeft,
       viewportRight,
       trackingKeys,
+      trackedCar,
     );
 
     this.#parent.drawHeatmap(viewPoint);
@@ -287,7 +289,7 @@ export class WorldTrainingStrategy {
         : { viewPoint, cars, mainViewportZoom: this.#parent.viewport.zoom },
     );
 
-    const shownCar = keysCar ?? bestCar;
+    const shownCar = trackedCar;
     this.#parent.drawNetworkVisualizer(
       time,
       shownCar?.brain ?? bestCar.brain,
@@ -296,6 +298,6 @@ export class WorldTrainingStrategy {
     const debugCtx = this.#parent.toolbarPanel.showCameraDebug
       ? this.#parent.gameCtx
       : undefined;
-    this.#parent.renderCameraView(bestCar, { debugCtx });
+    this.#parent.renderCameraView(trackedCar, { debugCtx });
   }
 }

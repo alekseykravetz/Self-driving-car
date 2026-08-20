@@ -19,6 +19,7 @@ import type { Car } from '../../../car/car.js';
  * @param prevPoolColor - The color to highlight prev pool cars (default: 'deepskyblue').
  * @param viewportLeft - The left x-boundary of the visible viewport (default: no cull).
  * @param viewportRight - The right x-boundary of the visible viewport (default: no cull).
+ * @param sensorCar - The car whose sensor rays should be shown.
  */
 export function drawSimulatorCars(
   ctx: CanvasRenderingContext2D,
@@ -33,6 +34,7 @@ export function drawSimulatorCars(
   viewportLeft: number = -Infinity,
   viewportRight: number = Infinity,
   keysShowSensor: boolean = false,
+  sensorCar?: Car,
 ): void {
   const poolSet = new Set<Car>(bestPool);
   const prevPoolSet = new Set<Car>(prevPoolCars);
@@ -69,13 +71,12 @@ export function drawSimulatorCars(
     }
   }
 
-  // 3. Current pool cars — full opacity, mask + name, rays only for #1 best car
+  // 3. Current pool cars — full opacity, mask + name, rays for the selected car.
   for (let i = bestPool.length - 1; i >= 0; i--) {
     const car = bestPool[i];
     if (car.y > viewportTop && car.y < viewportBottom) {
-      const isBest = i === 0;
       car.draw(ctx, {
-        showSensor: isBest,
+        showSensor: sensorCar ? car === sensorCar : i === 0,
         showMask: true,
         showName: true,
         colorOverride: poolColor,

@@ -61,6 +61,14 @@ export class TrainingSimulator extends SimulatorShell {
     this.trainingManager = document.querySelector(
       'training-panel',
     ) as TrainingPanelElement;
+    this.toolbarPanel.setTrackingCarListener((index) => {
+      const pool = this.trainingManager.bestPool;
+      this.toolbarPanel.setTrackingCarDisplay(
+        index,
+        pool.length,
+        pool[index]?.name,
+      );
+    });
 
     this.initModal = document.querySelector(
       'training-init-modal',
@@ -229,12 +237,19 @@ export class TrainingSimulator extends SimulatorShell {
     }
   }
 
+  getBestTrackingCar(bestCar: Car): Car {
+    return (
+      this.trainingManager.bestPool[this.toolbarPanel.trackingCarIndex] ??
+      bestCar
+    );
+  }
+
   getTrackTarget(bestCar: Car): Car | null {
     switch (this.toolbarPanel.trackingMode) {
       case 'none':
         return null;
       case 'best':
-        return bestCar;
+        return this.getBestTrackingCar(bestCar);
       case 'keys': {
         const keysCar = this.trainingManager.cars.find(
           (c) => c.type === 'KEYS',
@@ -258,6 +273,13 @@ export class TrainingSimulator extends SimulatorShell {
   ): void {
     this.trainingManager.updateDistance(distance);
     this.trainingManager.updateBestCarAndPool();
+    const trackingIndex = this.toolbarPanel.trackingCarIndex;
+    const trackingCar = this.trainingManager.bestPool[trackingIndex];
+    this.toolbarPanel.setTrackingCarDisplay(
+      trackingIndex,
+      this.trainingManager.bestPool.length,
+      trackingCar?.name,
+    );
     this.trainingManager.updateStatsDisplay(
       aliveCount,
       deadCount,

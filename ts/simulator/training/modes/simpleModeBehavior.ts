@@ -308,6 +308,7 @@ export class SimpleTrainingStrategy {
     const keysCar = trackingKeys
       ? cars.find((c) => c.type === 'KEYS')
       : undefined;
+    const trackedCar = keysCar ?? this.#parent.getBestTrackingCar(bestCar);
 
     drawSimulatorCars(
       this.#parent.gameCtx,
@@ -322,12 +323,13 @@ export class SimpleTrainingStrategy {
       -Infinity,
       Infinity,
       trackingKeys,
+      trackedCar,
     );
 
     const heatViewPoint = scale(this.#parent.viewport.getOffset(), -1);
     this.#parent.drawHeatmap(heatViewPoint);
 
-    const shownCar = keysCar ?? bestCar;
+    const shownCar = trackedCar;
     this.#parent.drawNetworkVisualizer(
       time,
       shownCar?.brain ?? bestCar.brain,
@@ -353,7 +355,7 @@ export class SimpleTrainingStrategy {
       );
     }
 
-    this.#parent.renderCameraView(bestCar, {
+    this.#parent.renderCameraView(trackedCar, {
       traffic: this.#simpleState.traffic,
     });
   }

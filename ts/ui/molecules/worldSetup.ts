@@ -45,6 +45,10 @@ export class WorldSetupElement extends HTMLElement {
     return this.#modeControls.trackingMode;
   }
 
+  get trackingCarIndex(): number {
+    return this.#modeControls.trackingCarIndex;
+  }
+
   get viewportMode(): ToolbarViewportMode {
     return this.#modeControls.viewportMode;
   }
@@ -63,6 +67,14 @@ export class WorldSetupElement extends HTMLElement {
 
   setTrackingModeListener(listener: (mode: TrackingMode) => void): void {
     this.#modeControls.setTrackingModeListener(listener);
+  }
+
+  setTrackingCarListener(listener: (index: number) => void): void {
+    this.#modeControls.setTrackingCarListener(listener);
+  }
+
+  setTrackingCarDisplay(index: number, count: number, name?: string): void {
+    this.#modeControls.setTrackingCarDisplay(index, count, name);
   }
 
   setTrackingMode(mode: TrackingMode): void {
