@@ -46,7 +46,8 @@
 }
 
 .num-input-row-sm input[type='number'] {
-  width: var(--space-12);
+  height: var(--size-checkbox-lg);
+  width: var(--space-8);
   flex: 0 0 auto;
   padding: var(--space-0\.5) var(--space-1);
   font-size: var(--text-base);

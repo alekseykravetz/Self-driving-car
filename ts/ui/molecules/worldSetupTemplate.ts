@@ -132,18 +132,18 @@ export const WORLD_SETUP_TEMPLATE = `
             <app-icon name="hand"></app-icon>
           </button>
           <button
-            id="trackModeBest"
-            class="toolbar-btn active"
-            data-tooltip="Track best car"
-          >
-            <app-icon name="trophy"></app-icon>
-          </button>
-          <button
             id="trackModeKeys"
             class="toolbar-btn"
             data-tooltip="Track user-controlled car"
           >
             <app-icon name="gamepad"></app-icon>
+          </button>
+          <button
+            id="trackModeBest"
+            class="toolbar-btn active"
+            data-tooltip="Track best car"
+          >
+            <app-icon name="trophy"></app-icon>
           </button>
         </div>
         <div
