@@ -321,9 +321,8 @@ Self-driving-car/
 │   ├── world/                  # Pre-built world files (*.world)
 │   └── car/                    # Pre-trained car brains (*.car)
 │
-├── saves/                      # Exported brains and OSM data
-│   ├── bestBrain*.txt          # Exported neural networks
-│   └── *-osm-data.json        # OpenStreetMap import data
+├── saves/                      # Retained OpenStreetMap import fixture
+│   └── tel-aviv-osm-data.json  # Tel Aviv Overpass export
 │
 └── docs/                       # Technical documentation
     ├── ProjectGoal.md          # Vision, city-scale traffic simulation goals

@@ -455,24 +455,13 @@ The Training Manager panel shows colored dots indicating localStorage sync state
 
 ## Saved Files Reference (`saves/`)
 
-| File                                        | Type  | Description                            |
-| ------------------------------------------- | ----- | -------------------------------------- |
-| `big_with_target.world`                     | World | Large map with start + target markings |
-| `big.world`                                 | World | Large map without target               |
-| `barnea.world`                              | World | Barnea neighborhood map                |
-| `ir-hyain.world`                            | World | Ir HaYain map                          |
-| `kohav-hazafon.world`                       | World | Kohav HaZafon neighborhood             |
-| `kohav-hazafon-with-target.world`           | World | Same + race target                     |
-| `ashkelon.world`                            | World | Ashkelon city roads                    |
-| `path_finding.world`                        | World | Pathfinding demo map                   |
-| `right_hand_rule.car`                       | Car   | Trained car (right-hand-rule behavior) |
-| `right_hand_rule_racer.car`                 | Car   | Racing variant                         |
-| `202606032130_stops_30x50_s3_rc5_rl150.car` | Car   | Trained with specific config in name   |
-| `bestBrain.txt` / `bestBrain-new.txt`       | Brain | Legacy brain-only files                |
-| `bestBrains.txt` / `bestBrains-top.txt`     | Brain | Legacy multi-brain pools               |
-| `ashkelon-osm-data.json`                    | OSM   | Raw OpenStreetMap data (Ashkelon)      |
-| `kohav-hazafon-osm-data.json`               | OSM   | Raw OpenStreetMap data (Kohav HaZafon) |
-| `tel-aviv-osm-data.json`                    | OSM   | Raw OpenStreetMap data (Tel Aviv)      |
+The repository retains one raw OSM import fixture in this folder. World and car
+assets are bundled under `store/`, while user-created files can be loaded
+manually through the file picker.
+
+| File                     | Type | Description                       |
+| ------------------------ | ---- | --------------------------------- |
+| `tel-aviv-osm-data.json` | OSM  | Raw OpenStreetMap data (Tel Aviv) |
 
 ---
 

@@ -273,7 +273,8 @@ The project has a **multi-phase test suite**: **98 test files, 1402 tests** (~70
   - `Controls` KEYS type (`document.addEventListener`) — tested that it throws in Node
   - All `draw()` methods across all classes (Canvas-dependent — visual/Playwright tests deferred)
 - **Current coverage:** ~70% overall statements (non-draw logic: ~91% for tested modules; draw methods excluded), ~61% branches, ~77% functions
-- World files in `saves/` use v2 schema (`version: 2`, `decoration` instead of baked tree/building arrays).
+- The retained `saves/tel-aviv-osm-data.json` file is raw Overpass OSM data, not a
+  serialized world; bundled world files live under `store/world/`.
 
 ## Persistence
 

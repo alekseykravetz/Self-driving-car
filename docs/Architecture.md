@@ -534,11 +534,9 @@ fitness = distance traveled along corridor/road
 
 ### File System (`saves/`)
 
-| Extension | Content                                             | Example                  |
-| --------- | --------------------------------------------------- | ------------------------ |
-| `.world`  | Complete world state (graph, roads, markings, zoom) | `big_with_target.world`  |
-| `.car`    | Car configuration as JSON (`CarInfo` with brain)    | `right_hand_rule.car`    |
-| `.json`   | Raw OpenStreetMap data for import                   | `ashkelon-osm-data.json` |
+The repository retains one raw OSM import fixture in this folder:
+`saves/tel-aviv-osm-data.json`. World and car assets are bundled under
+`store/`; user-created files are loaded manually through the file picker.
 
 ---
 

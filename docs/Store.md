@@ -181,5 +181,6 @@ radio button. The template (`storePanelTemplate.ts`) wraps each tab caption in a
 
 - **WorldLoader** still parses old `const world = World.load({...})` format when loading files manually via file picker
 - **CarLoader** still parses old `let carInfo = {...}` format when loading files manually
-- The `/saves/` folder is preserved for user-saved files (loaded manually via file picker)
+- The `/saves/` folder contains the retained `tel-aviv-osm-data.json` OSM import
+  fixture; user-saved files can still be loaded manually via the file picker
 - The legacy `world` localStorage key is migrated to `editorWorld` on first init

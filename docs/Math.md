@@ -988,7 +988,8 @@ metadata default to 2 lanes (100px), preserving the original look.
 1. Go to [Overpass Turbo](https://overpass-turbo.eu/)
 2. Query roads in an area (e.g., `way["highway"~"primary|secondary|tertiary"]`)
 3. Export as JSON
-4. Save to `saves/` directory (e.g., `ashkelon-osm-data.json`)
+4. Save to the `saves/` directory (the repository includes
+   `tel-aviv-osm-data.json` as a repeatable example)
 5. In World Editor: load the JSON file → OSM importer creates the graph
 6. World generates roads from the graph automatically
 
@@ -1065,7 +1066,6 @@ Delegates to `drawPolygon(ctx, envelope.polygon, options)`.
 
 ### Saved Examples
 
-| File                          | Area                       |
-| ----------------------------- | -------------------------- |
-| `ashkelon-osm-data.json`      | Ashkelon, Israel           |
-| `kohav-hazafon-osm-data.json` | Kohav HaZafon neighborhood |
+| File                     | Area          |
+| ------------------------ | ------------- |
+| `tel-aviv-osm-data.json` | Tel Aviv area |
