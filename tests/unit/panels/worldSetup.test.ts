@@ -107,4 +107,22 @@ describe('WorldSetupElement', () => {
     ) as HTMLElement;
     expect(trackingGroup.style.display).toBe('none');
   });
+
+  it('showOnlyGroups hides every other group', () => {
+    el.showOnlyGroups('viewport');
+
+    const viewportGroup = el.querySelector(
+      '[data-group="viewport"]',
+    ) as HTMLElement;
+    const bordersGroup = el.querySelector(
+      '[data-group="borders"]',
+    ) as HTMLElement;
+    const trackingSeparator = el.querySelector(
+      '[data-group="tracking-sep"]',
+    ) as HTMLElement;
+
+    expect(viewportGroup.style.display).toBe('');
+    expect(bordersGroup.style.display).toBe('none');
+    expect(trackingSeparator.style.display).toBe('none');
+  });
 });

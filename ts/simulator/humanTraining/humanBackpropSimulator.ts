@@ -114,13 +114,15 @@ export class HumanBackpropSimulator extends SimulatorShell {
         onWorldSelected: (entry) =>
           this.#initWorld((entry?.data as World | null) ?? null),
       });
+      this.toolbarPanel.hideGroups('car', 'tracking', 'tracking-sep');
+      this.toolbarPanel.hideSelectedCarRow();
       const storeWorld =
         StoreManager.getActiveWorld() ?? StoreManager.getEditorWorld();
       this.#initWorld((storeWorld as World | null) ?? null);
     } else {
       this.toolbarPanel.hideGroups('world', 'borders', 'borders-sep');
       this.toolbarPanel.configureSelectors({ carMode: 'single' });
-      this.toolbarPanel.hideSelectedWorldRow();
+      this.toolbarPanel.showOnlyGroups('viewport');
       this.toolbarPanel.hideCameraDebug();
       this.layoutToolbar.setDefaultLayoutMode('camera-big');
 

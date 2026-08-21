@@ -131,6 +131,15 @@ export class WorldSetupElement extends HTMLElement {
     }
   }
 
+  showOnlyGroups(...groups: string[]): void {
+    const visibleGroups = new Set(groups);
+    this.querySelectorAll<HTMLElement>('[data-group]').forEach((el) => {
+      el.style.display = visibleGroups.has(el.dataset.group ?? '')
+        ? ''
+        : 'none';
+    });
+  }
+
   static readonly template = WORLD_SETUP_TEMPLATE;
 }
 

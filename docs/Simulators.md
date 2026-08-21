@@ -1144,6 +1144,14 @@ Navigate to `/html/human-training` (Full World) or
 `/html/human-training?mode=simple` (Simple Road), or click the "Human
 Backpropagation" `graduation` card on the landing page.
 
+### World Setup Toolbar
+
+The shared `<world-setup>` toolbar is trimmed for this single-car simulator:
+
+- **Simple mode** shows only the Viewport section.
+- **World mode** hides the Car picker, the selected-car row, and Tracking; the
+  World and Viewport sections remain available.
+
 ### Architecture
 
 `HumanBackpropSimulator extends SimulatorShell` — reuses the shared scaffolding
