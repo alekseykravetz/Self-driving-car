@@ -331,7 +331,7 @@ export class TrainingInitModalElement extends HTMLElement {
   /** Fresh-brain defaults, with a smaller/faster car for the simple road. */
   #freshCarDefaults(): CarInfo {
     return {
-      maxSpeed: DEFAULT_CAR_CONFIG.maxSpeed,
+      maxSpeed: this.#isWorldMode ? DEFAULT_CAR_CONFIG.maxSpeed : 3.5,
       acceleration: this.#isWorldMode ? DEFAULT_CAR_CONFIG.acceleration : 0.2,
       friction: this.#isWorldMode ? DEFAULT_CAR_CONFIG.friction : 0.05,
       width: this.#isWorldMode ? DEFAULT_CAR_CONFIG.width : 30,

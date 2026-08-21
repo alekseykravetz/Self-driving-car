@@ -180,27 +180,14 @@ export class HumanBackpropSimulator extends SimulatorShell {
       localStorage.getItem('humanTrainedCar'),
     );
     let defaults: CarInfo;
-    if (this.#car) {
+    if (context === 'new-brain') {
+      defaults = this.#defaultCarInfo();
+    } else if (this.#car) {
       defaults = this.#car.toInfo();
     } else if (savedInfo) {
       defaults = savedInfo;
     } else {
-      defaults = {
-        maxSpeed: DEFAULT_CAR_CONFIG.maxSpeed,
-        acceleration: DEFAULT_CAR_CONFIG.acceleration,
-        friction: DEFAULT_CAR_CONFIG.friction,
-        width: DEFAULT_CAR_CONFIG.width,
-        height: DEFAULT_CAR_CONFIG.height,
-        hiddenLayers: DEFAULT_HIDDEN_LAYERS,
-        physicsModel: this.#mode === 'world' ? 'realistic' : 'arcade',
-        sensor: {
-          rayCount: DEFAULT_CAR_CONFIG.sensor.rayCount,
-          rayLength: DEFAULT_CAR_CONFIG.sensor.rayLength,
-          raySpread: DEFAULT_CAR_CONFIG.sensor.raySpread,
-          rayOffset: DEFAULT_CAR_CONFIG.sensor.rayOffset,
-          stateAware: false,
-        },
-      };
+      defaults = this.#defaultCarInfo();
     }
     this.#modalOpen = true;
     this.#configModal.open({
@@ -307,12 +294,13 @@ export class HumanBackpropSimulator extends SimulatorShell {
   }
 
   #defaultCarInfo(): CarInfo {
+    const isSimpleMode = this.#mode === 'simple';
     return {
-      maxSpeed: DEFAULT_CAR_CONFIG.maxSpeed,
-      acceleration: DEFAULT_CAR_CONFIG.acceleration,
-      friction: DEFAULT_CAR_CONFIG.friction,
-      width: DEFAULT_CAR_CONFIG.width,
-      height: DEFAULT_CAR_CONFIG.height,
+      maxSpeed: isSimpleMode ? 3.5 : DEFAULT_CAR_CONFIG.maxSpeed,
+      acceleration: isSimpleMode ? 0.2 : DEFAULT_CAR_CONFIG.acceleration,
+      friction: isSimpleMode ? 0.05 : DEFAULT_CAR_CONFIG.friction,
+      width: isSimpleMode ? 30 : DEFAULT_CAR_CONFIG.width,
+      height: isSimpleMode ? 50 : DEFAULT_CAR_CONFIG.height,
       hiddenLayers: DEFAULT_HIDDEN_LAYERS,
       physicsModel: this.#mode === 'world' ? 'realistic' : 'arcade',
       sensor: {
