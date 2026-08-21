@@ -84,7 +84,7 @@ describe('Start', () => {
   it('constructor creates image reference', () => {
     const s = new Start(makeCenter(), makeDirection(), 50, 30);
     expect(s.image).toBeDefined();
-    expect(s.image.src).toContain('car.png');
+    expect(s.image.src).toContain('/assets/car.png');
   });
 
   it('rebuildGeometry() works', () => {

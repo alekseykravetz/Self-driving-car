@@ -2,6 +2,9 @@ import { Marking } from './marking.js';
 import { Point } from '../../math/primitives/point.js';
 import { drawRotationFromDirection } from '../../math/direction.js';
 
+const START_SPRITE_WIDTH = 30;
+const START_SPRITE_HEIGHT = 50;
+
 export class Start extends Marking {
   // Property to hold the car image element
   image: HTMLImageElement;
@@ -24,7 +27,7 @@ export class Start extends Marking {
     super(center, directionVector, width, height);
 
     this.image = new Image();
-    this.image.src = '/assets/world/car.png';
+    this.image.src = '/assets/car.png';
     this.image.onerror = () => {
       console.error(`Failed to load start marking image: ${this.image.src}`);
     };
@@ -49,8 +52,10 @@ export class Start extends Marking {
       // Use naturalWidth for loaded check
       ctx.drawImage(
         this.image,
-        -this.image.naturalWidth / 2, // Center image horizontally
-        -this.image.naturalHeight / 2, // Center image vertically
+        -START_SPRITE_WIDTH / 2,
+        -START_SPRITE_HEIGHT / 2,
+        START_SPRITE_WIDTH,
+        START_SPRITE_HEIGHT,
       );
     }
 
