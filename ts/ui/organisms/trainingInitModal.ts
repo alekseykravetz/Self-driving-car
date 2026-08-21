@@ -312,7 +312,7 @@ export class TrainingInitModalElement extends HTMLElement {
       this.#fillCarConfig(sourceConfig);
       if (note) note.textContent = '(locked to brain source)';
     } else {
-      if (source === 'fresh' && this.#isWorldMode) {
+      if (source === 'fresh') {
         this.#fillCarConfig(this.#freshCarDefaults());
       }
       if (note) note.textContent = '';
@@ -328,14 +328,14 @@ export class TrainingInitModalElement extends HTMLElement {
     this.#setConfigLocked(sourceConfig !== null);
   }
 
-  /** Recommended config for a fresh brain in world mode: real OSM road scale calls for the realistic physics model. */
+  /** Fresh-brain defaults, with a smaller/faster car for the simple road. */
   #freshCarDefaults(): CarInfo {
     return {
       maxSpeed: DEFAULT_CAR_CONFIG.maxSpeed,
-      acceleration: DEFAULT_CAR_CONFIG.acceleration,
-      friction: DEFAULT_CAR_CONFIG.friction,
-      width: DEFAULT_CAR_CONFIG.width,
-      height: DEFAULT_CAR_CONFIG.height,
+      acceleration: this.#isWorldMode ? DEFAULT_CAR_CONFIG.acceleration : 0.2,
+      friction: this.#isWorldMode ? DEFAULT_CAR_CONFIG.friction : 0.05,
+      width: this.#isWorldMode ? DEFAULT_CAR_CONFIG.width : 30,
+      height: this.#isWorldMode ? DEFAULT_CAR_CONFIG.height : 50,
       hiddenLayers: DEFAULT_HIDDEN_LAYERS,
       physicsModel: 'realistic',
       sensor: {
