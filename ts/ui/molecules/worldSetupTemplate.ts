@@ -146,10 +146,14 @@ export const WORLD_SETUP_TEMPLATE = `
             <app-icon name="gamepad"></app-icon>
           </button>
         </div>
-        <div id="bestTrackingCarPicker" class="tracking-car-picker" hidden>
+        <div
+          id="bestTrackingCarPicker"
+          class="tracking-car-picker num-input-row num-input-row-sm"
+          hidden
+        >
           <button
             id="bestTrackingCarPrev"
-            class="tracking-car-btn"
+            class="num-btn"
             type="button"
             aria-label="Track previous best car"
           >
@@ -158,7 +162,7 @@ export const WORLD_SETUP_TEMPLATE = `
           <span id="bestTrackingCarLabel" class="tracking-car-label">&mdash;</span>
           <button
             id="bestTrackingCarNext"
-            class="tracking-car-btn"
+            class="num-btn"
             type="button"
             aria-label="Track next best car"
           >

@@ -12,9 +12,9 @@ function createMockHost(): HTMLDivElement {
     <button id="trackModeBest" data-mode="best">🏆</button>
     <button id="trackModeKeys" data-mode="keys">🎮</button>
     <div id="bestTrackingCarPicker">
-      <button id="bestTrackingCarPrev"></button>
+      <button id="bestTrackingCarPrev" class="num-btn"></button>
       <span id="bestTrackingCarLabel"></span>
-      <button id="bestTrackingCarNext"></button>
+      <button id="bestTrackingCarNext" class="num-btn"></button>
     </div>
     <button id="viewportModeMouse" data-mode="mouse">🖱️</button>
     <button id="viewportModeTouchpad" data-mode="touchpad">☝️</button>
