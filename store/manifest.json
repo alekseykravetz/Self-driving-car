@@ -8,13 +8,11 @@
     "Ashkelon_part.world"
   ],
   "cars": [
-    "best_b6_s3_rc5_rl150.car",
-    "best-1_b6_s3.5_rc5_rl150.car",
-    "best-2_b6_s3.5_rc5_rl150.car",
-    "best_b16_s5_rc11_rl150.car",
-    "best-2_b16_s5_rc11_rl150.car.car",
-    "best_b16x16_s8_rc15_rl200.car",
-    "best-rw_b16x16_s8_rc15_rl400.car",
+    "best_b6_s45_r5-150.car",
+    "best_b6_s53_r5-150.car",
+    "best_b16_s70_r11-150.car",
+    "real1_b6_s50_r5-300.car",
+    "real2_b6_s50_r5-300.car",
     "right_hand_rule.car",
     "right_hand_rule_racer.car",
     "right_hand_rule_racer2.car"
