@@ -11,6 +11,8 @@ The Self-Driving Car project is a browser-based autonomous vehicle simulation pl
 - ES module imports/exports — all files use `module: "nodenext"` with `.js` import extensions
 - Canvas 2D rendering with custom 3D projection for camera views
 
+For the practical Overpass Turbo workflow, see [OpenStreetMap Import](OSMImport.md).
+
 ---
 
 ## Build Pipeline

@@ -328,6 +328,7 @@ Self-driving-car/
 └── docs/                       # Technical documentation
     ├── ProjectGoal.md          # Vision, city-scale traffic simulation goals
     ├── Architecture.md         # System overview & module graph
+    ├── OSMImport.md             # Downloading and importing Overpass data
     ├── Math.md                 # Geometric primitives & algorithms
     ├── Physics.md              # Car dynamics & sensor system
     ├── Units.md                # Unified unit system, conversions & formulas
@@ -395,6 +396,7 @@ Detailed technical documentation is maintained in the `docs/` directory:
 | --------------------------------------- | ---------------------------------------------------------- |
 | [Project Goal](docs/ProjectGoal.md)     | Vision, city-scale traffic simulation goals, performance   |
 | [Architecture](docs/Architecture.md)    | System overview, module graph, data flow, design patterns  |
+| [OSM Import](docs/OSMImport.md)         | Downloading and importing OpenStreetMap data               |
 | [Math](docs/Math.md)                    | Geometric primitives, polygon union, graph, OSM import     |
 | [Physics](docs/Physics.md)              | Car dynamics, sensors, collision detection & response      |
 | [Units](docs/Units.md)                  | Unified unit system, conversions, formulas, and examples   |

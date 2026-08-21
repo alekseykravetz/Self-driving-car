@@ -87,7 +87,7 @@ export class WorldEditorOsmImporter {
       },
       () => {
         alert(
-          'Could not copy automatically. Select and copy the filter from saves/osm-data-loading-readme.txt',
+          'Could not copy automatically. Select and copy the filter from docs/OSMImport.md',
         );
       },
     );

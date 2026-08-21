@@ -472,6 +472,7 @@ The Training Manager panel shows colored dots indicating localStorage sync state
 | `bestBrains.txt` / `bestBrains-top.txt`     | Brain | Legacy multi-brain pools               |
 | `ashkelon-osm-data.json`                    | OSM   | Raw OpenStreetMap data (Ashkelon)      |
 | `kohav-hazafon-osm-data.json`               | OSM   | Raw OpenStreetMap data (Kohav HaZafon) |
+| `tel-aviv-osm-data.json`                    | OSM   | Raw OpenStreetMap data (Tel Aviv)      |
 
 ---
 

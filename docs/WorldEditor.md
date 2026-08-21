@@ -356,6 +356,9 @@ center line that cars cannot cross), modelled like the existing one-way flag:
 
 ## OSM Import & Lane Metadata
 
+For the step-by-step Overpass Turbo workflow and a reusable raw-data example,
+see [OpenStreetMap Import](OSMImport.md).
+
 The OSM importer (`ts/math/osm-importer/osm.ts`) converts raw OpenStreetMap JSON
 (from [Overpass Turbo](https://overpass-turbo.eu/)) into the project's
 `Point`/`Segment` graph. In addition to the road geometry, it now extracts and
