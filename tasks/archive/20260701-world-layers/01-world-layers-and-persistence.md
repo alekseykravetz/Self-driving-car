@@ -319,9 +319,8 @@ Do **not** hand-hack the giant JSON. Provide a **repeatable migration script**:
   (and optionally `saves/*.world`): parses v1, rebuilds the lean v2 structure by (a) dropping
   `envelopes`/`roadBorders`/`laneGuides`/`separatorBorders`, (b) converting each v1 tree
   (`center`,`size`) into a compact instance with an assigned `type`/`prototype`/`scale`, choosing a
-  single `treeSeed`, (c) converting buildings to footprint-only, and writes v2 in place (back up the
-  original alongside, e.g. `*.world.v1.bak`, or to a `store/world/_v1_backup/` dir — **ask before
-  overwriting**; keep backups since these are shared assets).
+  single `treeSeed`, (c) converting buildings to footprint-only, and writes v2 in place. Run the
+  dry mode first and confirm the files before overwriting, since these are shared assets.
 - The script must produce files that load **identically-looking** worlds through the new loader
   (spot-check `circle`, `mirror`, `barnea`). Because v1 tree canopies were fully baked, exact tree
   _shapes_ will differ slightly after migration (they become prototype-based) — that is acceptable
@@ -330,7 +329,7 @@ Do **not** hand-hack the giant JSON. Provide a **repeatable migration script**:
 - Because migrated files are much smaller, the eager `StoreManager.init()` fetch cost drops sharply;
   a lazy per-world fetch is **optional** and can be a follow-up.
 
-> Treat `store/` files as shared/committed assets: create backups and confirm before overwriting.
+> Treat `store/` files as shared/committed assets: confirm the dry-run output before overwriting.
 
 ---
 
@@ -378,8 +377,8 @@ Work in phases; each ends with a green build (`npx tsc --noEmit` → `npx tsc` �
    template + eslint globals + html scripts + CSS); persist visibility to `editor:worldLayers`; wire
    graph-change to `generateRoads`+`reanchorMarkings` only; add ♻️ Regenerate items action with a
    busy state and a stale indicator.
-7. **Migration script** `scripts/migrate-worlds.mjs` + backups; migrate `store/world/*` (confirm
-   before overwrite). Spot-check load of each migrated world in editor, simulator, race, traffic.
+7. **Migration script** `scripts/migrate-worlds.mjs`; migrate `store/world/*` (confirm before
+   overwrite). Spot-check load of each migrated world in editor, simulator, race, traffic.
 8. **Docs**: update [docs/WorldEditor.md](../../docs/WorldEditor.md) (layers, lazy generation, new
    tree types) and [docs/SaveLoad.md](../../docs/SaveLoad.md) (v2 schema, back-compat, migration).
    Update the repo memory notes (project-overview) with the new layer/generation/persistence facts.
@@ -406,7 +405,7 @@ Work in phases; each ends with a green build (`npx tsc --noEmit` → `npx tsc` �
 - `styles/world/styles.css` / `styles/style.css` — panel button styling.
 - `eslint.config.mjs` — add `WorldLayersPanelElement`, `WORLD_LAYERS_PANEL_TEMPLATE`, `mulberry32`
   (as needed) to both `allowedUnusedVars` and `myGlobals.globals`.
-- `scripts/migrate-worlds.mjs` — **new**; `store/world/*.world` migrated (+ backups).
+- `scripts/migrate-worlds.mjs` — **new**; `store/world/*.world` migrated.
 - `docs/WorldEditor.md`, `docs/SaveLoad.md` — documentation.
 
 ---

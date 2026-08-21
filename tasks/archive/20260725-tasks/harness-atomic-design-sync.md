@@ -26,7 +26,7 @@ No `ts/` application code is touched. This is a harness/docs/config change only.
 - `/Users/alex/Code/Self-driving-car/.opencode/commands/` — `test.md`, `fix.md`, `start.md`. Adding `graphify.md` here.
 - `/Users/alex/Code/Self-driving-car/DESIGN.md` (424 lines, root) — high-level design brief + DUPLICATED token tables (§2 Color Palette, §3 Typography, §4 Component Stylings overlap with `docs/DesignSystem.md`).
 - `/Users/alex/Code/Self-driving-car/docs/DesignSystem.md` (279 lines) — token + CSS architecture reference (the canonical token tables).
-- `/Users/alex/Code/Self-driving-car/.gitignore` — currently ignores `node_modules/`, `saves/*.world`, `tests/**/*.js`, `vitest.config.js`, `.herenow/`, `store/world/_v1_backup/`, `graphify-out/`, `coverage/`, `test-results/`, `playwright-report/`. Missing: `.DS_Store`, `.playwright-mcp/`.
+- `/Users/alex/Code/Self-driving-car/.gitignore` — currently ignores `node_modules/`, `saves/*.world`, `tests/**/*.js`, `vitest.config.js`, `.herenow/`, `store/world/_predir_backup/`, `graphify-out/`, `coverage/`, `test-results/`, `playwright-report/`. Missing: `.DS_Store`, `.playwright-mcp/`.
 - `/Users/alex/Code/Self-driving-car/vitest.config.js` — 6-line stale compiled artifact (gitignored, NOT tracked). `vitest.config.ts` is the source of truth. The `.js` should be deleted from the working tree to avoid confusion.
 - `/Users/alex/Code/Self-driving-car/.graphifyignore` — contains `js/`. No change.
 

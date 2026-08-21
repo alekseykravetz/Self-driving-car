@@ -206,12 +206,12 @@ slightly after conversion; positions and counts are preserved.
 #### Migration script
 
 `scripts/migrate-worlds.mjs` (Node, no deps) converts committed `store/world/*.world`
-files from v1 to v2 in place, backing up each original to
-`store/world/_v1_backup/<name>.v1.bak`. Idempotent (skips files already v2).
+files from v1 to v2 in place. Run the dry mode first to preview the changes; the
+script is idempotent and skips files already at v2.
 
 ```bash
 node scripts/migrate-worlds.mjs --dry   # preview size reductions
-node scripts/migrate-worlds.mjs         # migrate in place (creates backups)
+node scripts/migrate-worlds.mjs         # migrate in place
 ```
 
 **Parsing** (WorldLoader):

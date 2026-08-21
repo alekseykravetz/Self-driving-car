@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * migrate-worlds.mjs — converts legacy (v1) `.world` files to the lean v2
- * schema in place, backing up each original alongside.
+ * schema in place.
  *
  * v1 → v2:
  *   - drops derived geometry: envelopes, roadBorders, laneGuides,
@@ -17,17 +17,11 @@
  *
  * Usage:
  *   node scripts/migrate-worlds.mjs [--dir <dir>] [--dry]
- * Defaults to store/world. Originals are backed up to <dir>/_v1_backup/.
+ * Defaults to store/world. Use --dry to preview changes before overwriting.
  */
 
-import {
-  readFileSync,
-  writeFileSync,
-  readdirSync,
-  mkdirSync,
-  existsSync,
-} from 'node:fs';
-import { join, dirname, basename } from 'node:path';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -111,7 +105,6 @@ function main() {
     process.exit(1);
   }
 
-  const backupDir = join(dir, '_v1_backup');
   const files = readdirSync(dir).filter((f) => f.endsWith('.world'));
 
   let migrated = 0;
@@ -146,9 +139,6 @@ function main() {
     );
 
     if (!dry) {
-      if (!existsSync(backupDir)) mkdirSync(backupDir, { recursive: true });
-      const backupPath = join(backupDir, basename(file) + '.v1.bak');
-      if (!existsSync(backupPath)) writeFileSync(backupPath, raw);
       writeFileSync(path, out);
     }
     migrated++;
@@ -156,7 +146,7 @@ function main() {
 
   console.log(
     `\n${dry ? '[dry run] ' : ''}Done. Migrated ${migrated}, skipped ${skipped}.` +
-      (dry ? '' : `\nBackups in ${join(relDir, '_v1_backup')}.`),
+      (dry ? '' : '\nLegacy files were overwritten.'),
   );
 }
 
