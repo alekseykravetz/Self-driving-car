@@ -10,7 +10,7 @@ import {
   lerp2D,
 } from '../math/utils.js';
 import { LANE_WIDTH_PX, PARKING_LANE_WIDTH_PX } from '../math/worldUnits.js';
-import type { VisibleWorldRect } from '../viewport/viewport.js';
+import type { VisibleWorldRect } from '../math/primitives/rect.js';
 import { segmentInView } from './worldViewCulling.js';
 
 /**

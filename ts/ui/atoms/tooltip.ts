@@ -42,6 +42,10 @@ class TooltipController {
       capture: true,
       passive: true,
     });
+    // Sanctioned exception: this is a global UI controller active on ALL pages
+    // (including the landing page, which has no KeyboardManager instance).
+    // The Escape-to-dismiss handler is a capture-phase accessibility behavior,
+    // not a simulator shortcut. See AGENTS.md § "Known exceptions".
     window.addEventListener('keydown', this.#onKeyDown, true);
   }
 

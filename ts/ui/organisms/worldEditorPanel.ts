@@ -4,7 +4,7 @@ import {
   ROAD_TYPE_LABELS,
   applyRoadTypeDefaults,
 } from '../../math/roadTypes.js';
-import { LatchedToggle } from '../atoms/latchedToggle.js';
+import { LatchedToggle } from '../../input/latchedToggle.js';
 import {
   getSignageLanguage,
   setSignageLanguage,

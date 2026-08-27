@@ -327,6 +327,10 @@ export function initLandingPreview(): void {
     passive: true,
     capture: true,
   });
+  // Sanctioned exception: the landing page does not instantiate a
+  // KeyboardManager. This listener detects scroll-key input (arrows, space,
+  // PageDown, etc.) to cancel the auto-slide animation — it is not a simulator
+  // shortcut. See AGENTS.md § "Known exceptions".
   window.addEventListener('keydown', onManualInput, true);
   apply();
 }

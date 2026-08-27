@@ -92,6 +92,21 @@ Semantic accent colors with background and border variants for each:
 | `--color-accent-cyan-bg`       | `rgba(78,205,196,0.08)` | Cyan background      |
 | `--color-accent-sky`           | `#8cf`                  | Sky/camera canvas bg |
 
+### Colors — Decorative glows & gradients
+
+| Token                             | Value/Type                | Usage                        |
+| --------------------------------- | ------------------------- | ---------------------------- |
+| `--gradient-card-sheen`           | Linear gradient           | Landing/store card sheen     |
+| `--color-bg-link`                 | `rgba(255,255,255,0.025)` | Landing card links           |
+| `--color-glow-green-radial`       | `rgba(125,223,125,0.14)`  | Main-page background glow    |
+| `--color-glow-cyan-radial`        | `rgba(78,205,196,0.12)`   | Main-page background glow    |
+| `--color-glow-green-radial-faint` | `rgba(92,184,92,0.08)`    | Main-page background glow    |
+| `--color-glow-green-inset`        | `rgba(125,223,125,0.1)`   | Card icon inset              |
+| `--color-glow-green-inset-strong` | `rgba(125,223,125,0.18)`  | Hover icon inset             |
+| `--color-glow-green-outer`        | `rgba(125,223,125,0.25)`  | Hover icon glow              |
+| `--color-highlight-inset`         | `rgba(255,255,255,0.14)`  | Preview pill highlight       |
+| `--color-highlight-inset-strong`  | `rgba(255,255,255,0.2)`   | Preview pill hover highlight |
+
 ### Colors — Misc
 
 | Token           | Value  | Usage          |
@@ -175,16 +190,18 @@ Letter-spacing: `--tracking-wide` (0.5px), `--tracking-wider` (1px),
 
 ### Shadows
 
-| Token                        | Value                             |
-| ---------------------------- | --------------------------------- |
-| `--shadow-sm`                | `0 0 3px rgba(92,184,92,0.6)`     |
-| `--shadow-md`                | `0 6px 18px rgba(0,0,0,0.5)`      |
-| `--shadow-green`             | `0 0 6px rgba(76,223,76,0.6)`     |
-| `--shadow-amber`             | `0 0 6px rgba(255,176,64,0.6)`    |
-| `--shadow-modal`             | `0 18px 50px rgba(0,0,0,0.55)`    |
-| `--shadow-red`               | `0 0 3px rgba(217,83,79,0.6)`     |
-| `--shadow-orange`            | `0 0 3px rgba(240,173,78,0.6)`    |
-| `--color-accent-cyan-shadow` | `0 2px 8px rgba(78,205,196,0.35)` |
+| Token                        | Value                               |
+| ---------------------------- | ----------------------------------- |
+| `--shadow-sm`                | `0 0 3px rgba(92,184,92,0.6)`       |
+| `--shadow-md`                | `0 6px 18px rgba(0,0,0,0.5)`        |
+| `--shadow-green`             | `0 0 6px rgba(76,223,76,0.6)`       |
+| `--shadow-amber`             | `0 0 6px rgba(255,176,64,0.6)`      |
+| `--shadow-modal`             | `0 18px 50px rgba(0,0,0,0.55)`      |
+| `--shadow-red`               | `0 0 3px rgba(217,83,79,0.6)`       |
+| `--shadow-orange`            | `0 0 3px rgba(240,173,78,0.6)`      |
+| `--shadow-card-hover`        | `0 12px 30px rgba(0,0,0,0.35)`      |
+| `--shadow-logo-glow`         | `0 4px 14px rgba(125,223,125,0.45)` |
+| `--color-accent-cyan-shadow` | `0 2px 8px rgba(78,205,196,0.35)`   |
 
 ### Transitions
 

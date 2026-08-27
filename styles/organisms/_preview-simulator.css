@@ -50,13 +50,7 @@ body.preview-page2 .landing-sections {
   min-height: 0;
   /* Own opaque backdrop (translucent card sheen over solid app bg) so page-1
      content never bleeds through the card while it slides in. */
-  background:
-    linear-gradient(
-      160deg,
-      rgba(255, 255, 255, 0.055) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    ),
-    var(--color-bg-app);
+  background: var(--gradient-card-sheen), var(--color-bg-app);
 }
 
 /* The card fills the viewport, so the grid's hover lift is dropped. */
@@ -129,7 +123,7 @@ preview-simulator {
       color-mix(in srgb, var(--color-accent-cyan) 55%, transparent),
     0 2px 10px -2px
       color-mix(in srgb, var(--color-accent-green) 45%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    inset 0 1px 0 var(--color-highlight-inset);
   animation: preview-pill-float 3.6s ease-in-out infinite;
 }
 
@@ -147,7 +141,7 @@ preview-simulator {
         color-mix(in srgb, var(--color-accent-cyan) 55%, transparent),
       0 2px 10px -2px
         color-mix(in srgb, var(--color-accent-green) 45%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      inset 0 1px 0 var(--color-highlight-inset);
   }
   50% {
     box-shadow:
@@ -155,7 +149,7 @@ preview-simulator {
         color-mix(in srgb, var(--color-accent-cyan) 75%, transparent),
       0 4px 16px -2px
         color-mix(in srgb, var(--color-accent-green) 60%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      inset 0 1px 0 var(--color-highlight-inset-strong);
   }
 }
 

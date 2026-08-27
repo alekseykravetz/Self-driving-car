@@ -98,7 +98,7 @@ Example — a toggle key:
 
 ---
 
-## LatchedToggle (`ts/ui/atoms/latchedToggle.ts`)
+## LatchedToggle (`ts/input/latchedToggle.ts`)
 
 A reusable state machine that replaces four copies of identical held/latched
 boilerplate (previously in `GraphEditor`, `CorridorEditor`, and `TrafficSimulator`).
@@ -253,7 +253,7 @@ page.
 | `ts/input/keyboardManager.ts`                          | Central orchestrator — owns window listeners, routing, LatchedToggle management, toolbar sync          |
 | `ts/input/viewShortcuts.ts`                            | `zoomViewBindings()` — shared Ctrl / Shift View-group zoom indicators reused by every page             |
 | `ts/input/simulatorShortcuts.ts`                       | `driveKeyBindings()` / `greenWaveBinding()` / `visualizerDensityBinding()` — shared simulator bindings |
-| `ts/ui/atoms/latchedToggle.ts`                         | Held/latched state machine (extracted from 4 prior copies)                                             |
+| `ts/input/latchedToggle.ts`                            | Held/latched state machine (extracted from 4 prior copies)                                             |
 | `ts/ui/molecules/shortcutsToolbar.ts`                  | `<shortcuts-toolbar>` custom element — purely presentational rendering of key indicators               |
 | `ts/ui/molecules/shortcutsToolbarTemplate.ts`          | Static HTML template for the toolbar                                                                   |
 | `ts/world/editors/worldEditor.ts`                      | Creates `KeyboardManager`, sets root bindings, passes to editors                                       |
@@ -267,12 +267,11 @@ page.
 
 ## Architecture rules
 
-1. **No direct `window` keydown/keyup.** All keyboard routing goes through
-   `KeyboardManager`. The only exception is `controls.ts` (arrow/WASD for car
-   driving — while `controls.frozen` the brain drives the effective controls, but
-   the listeners still track raw human key holds via `humanControls` for DAgger
-   corrections in autopilot), which has no toolbar indicator and is not part of
-   the shortcut system.
+1. **No direct `window` keydown/keyup.** All simulator shortcut routing goes
+   through `KeyboardManager`. Sanctioned exceptions are `controls.ts` (arrow/WASD
+   for car driving), `tooltip.ts` (global capture-phase Escape dismissal), and
+   `landingPreview.ts` (landing-page scroll-key detection). The latter two are
+   page-level accessibility/navigation behaviors, not simulator shortcuts.
 
 2. **Toolbar is presentation-only.** `ShortcutsToolbarElement` has no key listeners
    and knows nothing about what the shortcuts do. It only renders indicators and

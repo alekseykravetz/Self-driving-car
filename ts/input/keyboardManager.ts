@@ -1,5 +1,5 @@
 import type { ShortcutDef, ToolbarUpdater } from './types.js';
-import { LatchedToggle } from '../ui/atoms/latchedToggle.js';
+import { LatchedToggle } from './latchedToggle.js';
 
 /**
  * A binding extends the visual {@link ShortcutDef} with the physical key

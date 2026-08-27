@@ -374,13 +374,15 @@ into three layers under `ts/ui/`:
 
 **Atom-level files:**
 
-| Module             | Responsibility                                                                                  |
-| ------------------ | ----------------------------------------------------------------------------------------------- |
-| `latchedToggle.ts` | Held/latched state machine (replaces 4 prior copies)                                            |
-| `appIcon.ts`       | `<app-icon>` custom element — inlines registry SVG, `currentColor` + `.ic-*` animations         |
-| `iconRegistry.ts`  | Central SVG icon registry (`ICON_REGISTRY`, `IconName`) — single source of truth for every icon |
+| Module            | Responsibility                                                                                  |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| `appIcon.ts`      | `<app-icon>` custom element — inlines registry SVG, `currentColor` + `.ic-*` animations         |
+| `iconRegistry.ts` | Central SVG icon registry (`ICON_REGISTRY`, `IconName`) — single source of truth for every icon |
 
-> `KeyboardManager` lives in `ts/input/keyboardManager.ts` — it is a cross-cutting singleton outside the Atomic Design tree (used by both UI molecules and domain logic). See [Keyboard.md](Keyboard.md) for details.
+> `KeyboardManager` and its pure `LatchedToggle` state machine live in `ts/input/`
+> — they are cross-cutting input utilities outside the Atomic Design tree (used
+> by both UI molecules and domain logic). See [Keyboard.md](Keyboard.md) for
+> details.
 
 **Molecule-level components:**
 
@@ -406,18 +408,22 @@ into three layers under `ts/ui/`:
 
 **Organism-level panels:**
 
-| Module                         | Tag                             | Responsibility                                                          |
-| ------------------------------ | ------------------------------- | ----------------------------------------------------------------------- |
-| `trainingPanel.ts`             | `<training-panel>`              | Training UI + genetic algorithm + car generation                        |
-| `trainingPanelTemplate.ts`     | —                               | HTML template for the training panel                                    |
-| `trainingInitModal.ts`         | `<training-init-modal>`         | Training init modal (params + car config + brain source)                |
-| `trainingInitModalTemplate.ts` | —                               | HTML template for the init modal                                        |
-| `humanTrainingPanel.ts`        | `<human-training-panel>`        | Human backpropagation training info display                             |
-| `humanTrainingConfigModal.ts`  | `<human-training-config-modal>` | Car config modal for human backprop mode                                |
-| `trafficPanel.ts`              | `<traffic-panel>`               | Live Traffic Jam: per-car list, select/remove/clear/pause               |
-| `storePanel.ts`                | `<store-panel>`                 | Landing-page read-only viewer/manager                                   |
-| `storePanelTemplate.ts`        | —                               | HTML template for the store panel                                       |
-| `previewSimulator.ts`          | `<preview-simulator>`           | Landing-page live-preview showcase (own RAF loop, not `SimulatorShell`) |
+| Module                         | Tag                             | Responsibility                                            |
+| ------------------------------ | ------------------------------- | --------------------------------------------------------- |
+| `trainingPanel.ts`             | `<training-panel>`              | Training UI + genetic algorithm + car generation          |
+| `trainingPanelTemplate.ts`     | —                               | HTML template for the training panel                      |
+| `trainingInitModal.ts`         | `<training-init-modal>`         | Training init modal (params + car config + brain source)  |
+| `trainingInitModalTemplate.ts` | —                               | HTML template for the init modal                          |
+| `humanTrainingPanel.ts`        | `<human-training-panel>`        | Human backpropagation training info display               |
+| `humanTrainingConfigModal.ts`  | `<human-training-config-modal>` | Car config modal for human backprop mode                  |
+| `trafficPanel.ts`              | `<traffic-panel>`               | Live Traffic Jam: per-car list, select/remove/clear/pause |
+| `storePanel.ts`                | `<store-panel>`                 | Landing-page read-only viewer/manager                     |
+| `storePanelTemplate.ts`        | —                               | HTML template for the store panel                         |
+| `previewSimulator.ts`          | `<preview-simulator>`           | Landing-page canvas lifecycle shell                       |
+
+The landing preview's simulation state and RAF loop live in the plain
+`ts/landing/previewSimulatorEngine.ts` engine. The custom element only creates
+the canvas, delegates activation/deactivation, and responds to resize events.
 
 > All UI components live under `ts/ui/` following Atomic Design. `worldSetup.ts`
 > is a **molecule** reused by the simulator, race, Live Traffic Jam, and

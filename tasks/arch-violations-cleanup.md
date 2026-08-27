@@ -110,7 +110,11 @@ Fix the 6 architecture violations found by the architect audit: simulation logic
 
   ```css
   /* Colors — Decorative glows & gradients */
-  --gradient-card-sheen: linear-gradient(160deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.02) 100%);
+  --gradient-card-sheen: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
   --color-bg-link: rgba(255, 255, 255, 0.025);
   --color-glow-green-radial: rgba(125, 223, 125, 0.14);
   --color-glow-cyan-radial: rgba(78, 205, 196, 0.12);
@@ -131,6 +135,7 @@ Fix the 6 architecture violations found by the architect audit: simulation logic
 - **Update `styles/atoms/_base.css`** (lines 61, 66, 71): replace the three raw `rgba()` stops in the `--main-page-bg` radial gradients with `var(--color-glow-green-radial)`, `var(--color-glow-cyan-radial)`, `var(--color-glow-green-radial-faint)`.
 
 - **Update `styles/templates/_landing-page.css`**:
+
   - Line 47: `drop-shadow(var(--shadow-logo-glow))`
   - Lines 75-76: replace the `linear-gradient(160deg, rgba(...), rgba(...))` with `var(--gradient-card-sheen)`
   - Line 111: replace `0 12px 30px rgba(0, 0, 0, 0.35)` with `var(--shadow-card-hover)`
@@ -139,6 +144,7 @@ Fix the 6 architecture violations found by the architect audit: simulation logic
   - Line 180: replace `rgba(255, 255, 255, 0.025)` with `var(--color-bg-link)`
 
 - **Update `styles/organisms/_preview-simulator.css`**:
+
   - Lines 56-57: replace the `linear-gradient(160deg, rgba(...), rgba(...))` with `var(--gradient-card-sheen)`
   - Line 132: replace `inset 0 1px 0 rgba(255, 255, 255, 0.14)` with `inset 0 1px 0 var(--color-highlight-inset)`
   - Line 150: same replacement

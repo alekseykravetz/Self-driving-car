@@ -1,6 +1,6 @@
 import { Point } from '../math/primitives/point.js';
 import { Segment } from '../math/primitives/segment.js';
-import type { VisibleWorldRect } from '../viewport/viewport.js';
+import type { VisibleWorldRect } from '../math/primitives/rect.js';
 
 /** World-space padding (px) added around the visible rect when culling roads,
  * lane markings, and markings, so wide roads and labels straddling the screen

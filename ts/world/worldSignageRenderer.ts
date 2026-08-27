@@ -23,7 +23,7 @@ import {
 } from './oneWayArrows.js';
 import type { OneWayArrowPlacement } from './oneWayArrows.js';
 import { pointInView } from './worldViewCulling.js';
-import type { VisibleWorldRect } from '../viewport/viewport.js';
+import type { VisibleWorldRect } from '../math/primitives/rect.js';
 
 /**
  * Renders the road-signage subsystem for a {@link World}: one-way direction
