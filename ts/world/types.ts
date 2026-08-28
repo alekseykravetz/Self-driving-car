@@ -7,8 +7,7 @@ import type { Marking } from './markings/marking.js';
 import type { Corridor } from './corridor.js';
 import type { Building } from './items/building.js';
 import type { Tree, TreeInstance } from './items/tree.js';
-import type { Viewport, VisibleWorldRect } from '../viewport/viewport.js';
-import type { IMiniMapCar } from '../mini-map/miniMap.js';
+import type { VisibleWorldRect } from '../math/primitives/rect.js';
 
 export interface CarDrawOptions {
   showSensor?: boolean;
@@ -52,16 +51,6 @@ export interface WorldDecoration {
 
 export interface TreeDrawOptions {
   viewPoint: Point;
-}
-
-export interface MiniMapDrawOptions {
-  viewPoint: Point;
-  cars: IMiniMapCar[];
-  roadColor?: string;
-  carColor?: string;
-  backgroundColor?: string;
-  viewport?: Viewport;
-  compactScaleIndicator?: boolean;
 }
 
 export interface IWorld {

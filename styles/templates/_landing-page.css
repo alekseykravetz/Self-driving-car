@@ -44,7 +44,7 @@ body.header-hidden .landing-header {
   flex-shrink: 0;
   width: var(--space-14);
   height: var(--space-14);
-  filter: drop-shadow(0 4px 14px rgba(125, 223, 125, 0.45));
+  filter: drop-shadow(var(--shadow-logo-glow));
 }
 
 .landing-header .subtitle {
@@ -70,11 +70,7 @@ body.header-hidden .landing-header {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.055) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
+  background: var(--gradient-card-sheen);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-2xl);
   padding: var(--space-7) var(--space-6);
@@ -108,7 +104,7 @@ body.header-hidden .landing-header {
   border-color: var(--color-accent-green-border);
   transform: translateY(calc(-1 * var(--space-1)));
   box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.35),
+    var(--shadow-card-hover),
     0 0 0 1px var(--color-accent-green-border-strong);
 }
 
@@ -136,7 +132,7 @@ body.header-hidden .landing-header {
   background: var(--color-accent-green-bg);
   border: 1px solid var(--color-accent-green-border);
   border-radius: var(--radius-xl);
-  box-shadow: inset 0 0 18px rgba(125, 223, 125, 0.1);
+  box-shadow: inset 0 0 18px var(--color-glow-green-inset);
   transition:
     transform var(--transition-normal),
     box-shadow var(--transition-normal);
@@ -145,8 +141,8 @@ body.header-hidden .landing-header {
 .landing-card:hover .card-icon {
   transform: scale(1.06);
   box-shadow:
-    inset 0 0 18px rgba(125, 223, 125, 0.18),
-    0 0 20px rgba(125, 223, 125, 0.25);
+    inset 0 0 18px var(--color-glow-green-inset-strong),
+    0 0 20px var(--color-glow-green-outer);
 }
 
 .landing-card h2 {
@@ -177,7 +173,7 @@ body.header-hidden .landing-header {
   align-items: center;
   gap: var(--space-3\.5);
   padding: var(--space-3\.5) var(--space-4);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--color-bg-link);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-xl);
   text-decoration: none;

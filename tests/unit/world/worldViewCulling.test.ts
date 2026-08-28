@@ -7,7 +7,7 @@ import {
   polygonInView,
   WORLD_CULL_MARGIN_PX,
 } from '../../../ts/world/worldViewCulling.js';
-import type { VisibleWorldRect } from '../../../ts/viewport/viewport.js';
+import type { VisibleWorldRect } from '../../../ts/math/primitives/rect.js';
 
 const bounds: VisibleWorldRect = { minX: 0, minY: 0, maxX: 100, maxY: 100 };
 

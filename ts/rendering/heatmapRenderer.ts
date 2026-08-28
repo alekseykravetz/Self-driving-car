@@ -1,12 +1,7 @@
 import { HeatmapGrid } from '../math/heatmapGrid.js';
+import type { VisibleWorldRect } from '../math/primitives/rect.js';
 
-/** Visible world rectangle used for viewport culling. */
-export interface VisibleWorldRect {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-}
+export type { VisibleWorldRect } from '../math/primitives/rect.js';
 
 /**
  * Renders a {@link HeatmapGrid} as a translucent colour overlay on the game

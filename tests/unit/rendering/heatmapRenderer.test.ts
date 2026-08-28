@@ -4,8 +4,8 @@ import { HeatmapGrid } from '../../../ts/math/heatmapGrid.js';
 import {
   HeatmapRenderer,
   occupancyColor,
-  VisibleWorldRect,
 } from '../../../ts/rendering/heatmapRenderer.js';
+import type { VisibleWorldRect } from '../../../ts/math/primitives/rect.js';
 
 describe('drawHeatmap', () => {
   it('renders heatmap grid cells', () => {

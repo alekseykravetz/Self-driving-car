@@ -3,6 +3,9 @@ import { ScaleIndicator } from './scaleIndicator.js';
 import { scale, subtract, add } from '../math/utils.js';
 import { WORLD_PIXELS_PER_METER } from '../math/worldUnits.js';
 import { PointerGestures } from '../input/pointerGestures.js';
+import type { VisibleWorldRect } from '../math/primitives/rect.js';
+
+export type { VisibleWorldRect } from '../math/primitives/rect.js';
 
 export interface DragState {
   start: Point;
@@ -43,14 +46,6 @@ const RENDER_RADIUS_STEP = 500;
 const MIN_RENDER_RADIUS = 500;
 /** Largest render radius — big enough to cover a whole imported city. */
 const MAX_RENDER_RADIUS = 40000;
-
-/** Axis-aligned world-space rectangle currently visible on the canvas. */
-export interface VisibleWorldRect {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-}
 
 export class Viewport {
   public canvas: HTMLCanvasElement;

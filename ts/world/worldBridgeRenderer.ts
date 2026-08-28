@@ -1,7 +1,7 @@
 import { Envelope } from '../math/primitives/envelope.js';
 import { scale, perpendicular, lerp2D } from '../math/utils.js';
 import { LANE_WIDTH_PX } from '../math/worldUnits.js';
-import type { VisibleWorldRect } from '../viewport/viewport.js';
+import type { VisibleWorldRect } from '../math/primitives/rect.js';
 import { polygonInView } from './worldViewCulling.js';
 
 /**
