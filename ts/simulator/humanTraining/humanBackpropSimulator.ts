@@ -304,7 +304,7 @@ export class HumanBackpropSimulator extends SimulatorShell {
       width: isSimpleMode ? 30 : DEFAULT_CAR_CONFIG.width,
       height: isSimpleMode ? 50 : DEFAULT_CAR_CONFIG.height,
       hiddenLayers: DEFAULT_HIDDEN_LAYERS,
-      physicsModel: this.#mode === 'world' ? 'realistic' : 'arcade',
+      physicsModel: isSimpleMode ? 'arcade' : 'realistic',
       sensor: {
         rayCount: DEFAULT_CAR_CONFIG.sensor.rayCount,
         rayLength: DEFAULT_CAR_CONFIG.sensor.rayLength,

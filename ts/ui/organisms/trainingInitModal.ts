@@ -337,7 +337,7 @@ export class TrainingInitModalElement extends HTMLElement {
       width: this.#isWorldMode ? DEFAULT_CAR_CONFIG.width : 30,
       height: this.#isWorldMode ? DEFAULT_CAR_CONFIG.height : 50,
       hiddenLayers: DEFAULT_HIDDEN_LAYERS,
-      physicsModel: 'realistic',
+      physicsModel: this.#isWorldMode ? 'realistic' : 'arcade',
       sensor: {
         rayCount: DEFAULT_CAR_CONFIG.sensor.rayCount,
         rayLength: DEFAULT_CAR_CONFIG.sensor.rayLength,
